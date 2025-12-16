@@ -541,7 +541,319 @@ fi
 
 ---
 
-## 🧱 SECTION 9 — Real-World Skills You’re Building
+## 🧱 SECTION 9 — AWS CLI + S3 (Backup & Automation)
+
+#### 🎯 Objective
+
+##### Learn how companies:
+
+- **Store backups**
+
+- **Upload logs**
+
+- **Automate file sync**
+
+- **Control access**
+
+🔹 Task 9.1 — Create S3 Bucket (CLI)
+
+```
+aws s3 mb s3://my-company-backup-bucket-12345 --region us-east-1
+```
+
+###### 📌 Why: Companies create separate buckets for:
+
+- **Backups**
+
+- **Logs**
+
+- **Media**
+
+- **Reports**
+
+### 🔹 Task 9.2 — Upload file to S3
+
+```
+echo "Daily backup file" > backup.txt
+aws s3 cp backup.txt s3://my-company-backup-bucket-12345/
+```
+
+##### 📌 Real-life:
+
+###### Uploading:
+
+- **DB dumps**
+
+- **Logs**
+
+- **Reports**
+
+### 🔹 Task 9.3 — Download file from S3
+
+```
+aws s3 cp s3://my-company-backup-bucket-12345/backup.txt .
+```
+
+###### 📌 Why: Restore operations.
+
+### 🔹 Task 9.4 — Sync directory (IMPORTANT)
+
+```
+mkdir app-logs
+aws s3 sync app-logs s3://my-company-backup-bucket-12345/app-logs/
+```
+
+##### 📌 Why:
+
+###### Used daily for:
+
+- **Log backup**
+
+- **Website assets**
+
+- **Disaster recovery**
+
+### 🔹 Task 9.5 — Automated backup script
+
+```
+nano s3-backup.sh
+```
+
+```
+#!/bin/bash
+DATE=$(date +%F)
+aws s3 sync /var/log s3://my-company-backup-bucket-12345/logs/$DATE/
+```
+
+```
+chmod +x s3-backup.sh
+./s3-backup.sh
+```
+
+### 📌 Production reality: Most backups are scripts + cron.
+
+---
+
+## 🧱 SECTION 10 — AWS CLI + IAM Roles & Policies
+
+#### 🎯 Objective
+
+**Learn secure access without access keys.**
+
+### 🔹 Task 10.1 — Create IAM Role for EC2
+
+Trust policy:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "ec2.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+#### Create role:
+
+```
+aws iam create-role \
+--role-name EC2-S3-Role \
+--assume-role-policy-document file://trust.json
+```
+
+
+### 🔹 Task 10.2 — Attach S3 policy
+
+```
+aws iam attach-role-policy \
+--role-name EC2-S3-Role \
+--policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+```
+
+##### 📌 Why:
+
+######IAM Role =
+
+**✅ No access keys**
+
+**✅ More secure**
+
+**✅ Industry standard**
+
+### 🔹 Task 10.3 — Verify role access (on EC2)
+
+```
+aws s3 ls
+```
+
+📌 If it works:
+You are using IAM Role correctly.
+
+---
+
+## 🧱 SECTION 11 — Bash + CloudWatch Logs
+
+#### 🎯 Objective
+
+**Send application/system logs to CloudWatch.**
+
+### 🔹 Task 11.1 — Install CloudWatch Agent
+
+```
+sudo yum install amazon-cloudwatch-agent -y
+```
+
+### 🔹 Task 11.2 — Create log file
+
+```
+echo "App started" >> /var/log/myapp.log
+```
+
+### 🔹 Task 11.3 — Simple logging script
+
+```
+nano app-log.sh
+```
+
+```
+#!/bin/bash
+echo "App running at $(date)" >> /var/log/myapp.log
+```
+
+```
+chmod +x app-log.sh
+./app-log.sh
+```
+
+######  📌 Real-life:Apps write logs → CloudWatch.
+
+### 🔹 Task 11.4 — Why logs matter
+
+#### Companies use logs to:
+
+- **Debug issues**
+
+- **Monitor uptime**
+
+- **Detect attacks**
+
+- **Audit users**
+
+---
+
+## 🧱 SECTION 12 — Bash + Cron Jobs (Automation King 👑)
+
+
+#### 🎯 Objective
+
+**Run scripts automatically.**
+
+### 🔹 Task 12.1 — Open crontab
+
+```
+crontab -e
+```
+
+### 🔹 Task 12.2 — Schedule backup daily
+
+```
+0 2 * * * /home/ec2-user/s3-backup.sh
+```
+
+📌 Meaning:
+
+0 → minute
+
+2 → 2 AM
+
+* → every day
+
+### 🔹 Task 12.3 — Verify cron jobs
+
+```
+crontab -l
+```
+
+######  📌 Real-life:
+
+- **Backups**
+
+- **Cleanup**
+
+- **Monitoring**
+
+- **Reporting**
+
+---
+
+## 🧱 SECTION 13 — Mini Real Company Scenario Project (VERY IMPORTANT)
+
+### 🏢 Scenario: Small IT Company
+
+#### Company requirements:
+
+- **EC2 server running app**
+
+- **Logs backed up daily**
+
+- **Secure access**
+
+- **Cost control**
+
+- **Automation**
+
+### 🔹 Project Tasks
+
+
+### ✅ Task 13.1 — Create EC2 with IAM Role
+
+- **Role:** EC2-S3-Role
+
+#### No access keys
+
+### ✅ Task 13.2 — Application log generation
+
+```
+nano company-app.sh
+```
+
+```
+#!/bin/bash
+echo "Company app running at $(date)" >> /var/log/company-app.log
+```
+
+### ✅ Task 13.3 — Backup logs to S3
+
+```
+aws s3 sync /var/log s3://my-company-backup-bucket-12345/company-logs/
+```
+
+### ✅ Task 13.4 — Automate via cron
+
+```
+0 1 * * * /home/ec2-user/company-app.sh
+```
+
+```
+0 3 * * * /home/ec2-user/s3-backup.sh
+```
+
+### ✅ Task 13.5 — Cost control
+
+```
+aws ec2 stop-instances --instance-ids i-xxxxxxxx
+```
+
+###### 📌 Used daily in real companies.
+
+
+---
+
+## 🧱 SECTION 14 — Real-World Skills You’re Building
 
 #### By completing this path, you are learning:
 
@@ -558,6 +870,18 @@ fi
 **✅ Automation mindset**
 
 **✅ Production-style workflows**
+
+**✅ AWS CLI (S3, IAM, EC2)**
+
+**✅ Linux administration**
+
+**✅ Bash scripting (basic → automation)**
+
+**✅ CloudWatch logging concept**
+
+**✅ Cron job scheduling**
+
+**✅ Real company workflow**
 
 
 
