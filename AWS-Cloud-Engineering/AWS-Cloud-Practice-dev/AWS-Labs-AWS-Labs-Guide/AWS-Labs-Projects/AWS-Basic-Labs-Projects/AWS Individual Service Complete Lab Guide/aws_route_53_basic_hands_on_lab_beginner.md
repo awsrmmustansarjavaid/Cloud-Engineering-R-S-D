@@ -6,7 +6,7 @@
 > 
 > **Goal:** Understand how Route 53 works by doing
 
-## 🎯 AWS Route 53 Conceptual Theory
+## 📖 AWS Route 53 Conceptual Theory
 
 [AWS Route 53 ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/AWS-Cloud-Engineering/aws-research-study-drive/AWS-Course/aws_route_53_complete_guide_beginner_to_advanced.md)
 
