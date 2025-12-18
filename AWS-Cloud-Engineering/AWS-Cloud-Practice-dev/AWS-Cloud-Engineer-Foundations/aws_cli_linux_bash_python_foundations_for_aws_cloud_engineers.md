@@ -1,5 +1,8 @@
 # 👨‍🏫 AWS Cloud Engineer Foundations
-*A Guide for Absolute Beginners*
+
+> **Author:** Charlie
+> 
+> **Level:** Absolute Beginners (Associate → Professional)
 
 This document is written as if I am your **personal AWS cloud trainer**, and you are starting from **zero**. We will build **strong fundamentals** first, then immediately reinforce them with **hands-on labs**.
 
@@ -356,24 +359,19 @@ python3 list_s3.py
 
 # 🧭 WHAT YOU SHOULD DO NEXT (TRAINER ADVICE)
 
-Week 1:
-- Linux + Bash daily practice
+### Week 1:
+- **Linux + Bash daily practice**
 
-Week 2:
-- AWS CLI + S3 + EC2
+### Week 2:
+- **AWS CLI + S3 + EC2**
 
-Week 3:
-- Python + boto3
+### Week 3:
+- **Python + boto3**
 
-Week 4:
-- Mini projects (backup, monitoring)
+### Week 4:
+- **Mini projects (backup, monitoring)**
 
 ---
 
-If you want next:
-- 📄 **Downloadable .MD per chapter**
-- 🧪 **Advanced labs (EC2, IAM, VPC)**
-- 🚀 **Cloud Engineer Roadmap (6 months)**
-
-Just tell me 👍
+### 🏆 The End
 
