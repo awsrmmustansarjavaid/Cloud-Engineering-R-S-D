@@ -34,7 +34,11 @@ So we learn in this order:
 
 ## AWS CLI
 
-[Linux ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/tree/main/AWS-Cloud-Engineering/aws-research-study-drive/AWS%20CheatSheet/AWS_CLI)
+[AWS CLI](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/tree/main/AWS-Cloud-Engineering/aws-research-study-drive/AWS%20CheatSheet/AWS_CLI)
+
+## Bash Scripting 
+
+[Bash Scripting ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/tree/main/CLoud-Engineering/Bash-Scripting-research-study-drive)
 
 
 
