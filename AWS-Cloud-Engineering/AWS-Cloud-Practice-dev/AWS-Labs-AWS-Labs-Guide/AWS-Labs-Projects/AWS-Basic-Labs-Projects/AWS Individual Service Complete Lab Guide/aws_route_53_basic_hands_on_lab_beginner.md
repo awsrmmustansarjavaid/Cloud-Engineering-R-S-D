@@ -1,8 +1,14 @@
 # 🧪 AWS Route 53 — Basic Hands-On Lab (Beginner Level)
 
-> **Trainer:** Expert AWS Cloud Trainer  
-> **Student Level:** First-time AWS Route 53 Practice  
+> **Author:** Charlie
+> 
+> **Level:** Absolute Beginners (Associate → Professional)
+> 
 > **Goal:** Understand how Route 53 works by doing
+
+## 🎯 AWS Route 53 Conceptual Theory
+
+[AWS Route 53 ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/AWS-Cloud-Engineering/aws-research-study-drive/AWS-Course/aws_route_53_complete_guide_beginner_to_advanced.md)
 
 ---
 
