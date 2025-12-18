@@ -22,7 +22,7 @@ So we learn in this order:
 1️⃣ Linux basics → 2️⃣ Bash scripting → 3️⃣ AWS CLI → 4️⃣ Python for AWS
 
 
-## HandNotes 
+## 🧾 HandNotes 
 
 ## Python Language
 
