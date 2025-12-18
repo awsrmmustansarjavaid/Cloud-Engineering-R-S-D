@@ -42,7 +42,7 @@ Before starting, you should have:
 
 User Browser → Route 53 DNS → EC2 Public IP
 
-# 🎓 AWS Architecture Diagram
+## 🎓 AWS Architecture Diagram
 
 ![AWS Route 53 — Basic Hands-On Lab (Beginner Level)](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Visual-Architecture-Diagram/aws_route_53_basic_hands_on_lab_beginner.png?raw=true)
 
