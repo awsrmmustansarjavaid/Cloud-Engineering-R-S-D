@@ -21,6 +21,23 @@ So we learn in this order:
 
 1️⃣ Linux basics → 2️⃣ Bash scripting → 3️⃣ AWS CLI → 4️⃣ Python for AWS
 
+
+## HandNotes 
+
+## Python Language
+
+[Python Language ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/tree/main/CLoud-Engineering/Python)
+
+## Linux
+
+[Linux ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/tree/main/CLoud-Engineering/Linux-research-study-drive/Linux)
+
+## AWS CLI
+
+[Linux ](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/tree/main/AWS-Cloud-Engineering/aws-research-study-drive/AWS%20CheatSheet/AWS_CLI)
+
+
+
 Each chapter has:
 - ✅ **Concept Notes (Why & What)**
 - 🧪 **Hands-on AWS Lab (How)**
