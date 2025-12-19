@@ -1,4 +1,4 @@
-# AWS CLI, REDHAT & Bash Scripting Hands‑On Lab
+# Python Foundation for AI & ML
 
 > **Author:** Charlie
 
