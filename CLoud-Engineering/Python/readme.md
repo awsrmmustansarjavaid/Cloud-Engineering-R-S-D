@@ -520,3 +520,11 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 - **Automate boring tasks first**
 
 - **Push everything to GitHub**
+
+## 💽 Python Tools
+
+1. **Online Python Editor**
+
+online-python.com
+
+
