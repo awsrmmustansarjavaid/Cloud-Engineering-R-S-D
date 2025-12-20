@@ -299,7 +299,7 @@ def health():
 
 ### Official Documentation:
 
-- **[AWS SDK for Python (boto3)][https://boto3.amazonaws.com/v1/documentation/api/latest/index.html]**
+- **[AWS SDK for Python (boto3)](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)**
 
 - **Azure SDK for Python**
 
