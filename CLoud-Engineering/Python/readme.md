@@ -338,7 +338,32 @@ pip install pyyaml         # YAML processing
 - **Week 5-8: Cloud-specific Python (3-4 hours/day)**
 - **Week 9-12: Projects and hands-on practice (4-5 hours/day)**
 
+## 💽 Python Tools
 
+1. **Online Python Editor**
+
+- 📌 https://online-python.com/
+
+2. **Replit**
+
+###### uses the poetry module to automatically install any libraries you need. I don't think I've tested that with pandas either.
+
+- 📌 https://replit.com/
+
+3. **Kaggle**
+
+###### Kaggle is the place to learn data science and build a portfolio.
+
+- 📌 https://Kaggle.com/
+
+4. **Programiz Online Compiler**
+
+- 📌 https://www.programiz.com/python-programming/online-compiler/
+
+
+5. **VSCode Online Web Editor (Recommanded)**
+
+- 📌 https://vscode.dev/
 
 # 📚 Recommended Free Resources 🐍 Python Learning
 
@@ -608,29 +633,4 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 
 - **Push everything to GitHub**
 
-## 💽 Python Tools
 
-1. **Online Python Editor**
-
-- 📌 https://online-python.com/
-
-2. **Replit**
-
-###### uses the poetry module to automatically install any libraries you need. I don't think I've tested that with pandas either.
-
-- 📌 https://replit.com/
-
-3. **Kaggle**
-
-###### Kaggle is the place to learn data science and build a portfolio.
-
-- 📌 https://Kaggle.com/
-
-4. **Programiz Online Compiler**
-
-- 📌 https://www.programiz.com/python-programming/online-compiler/
-
-
-5. **VSCode Online Web Editor (Recommanded)**
-
-- 📌 https://vscode.dev/
