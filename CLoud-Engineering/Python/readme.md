@@ -634,9 +634,9 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 ```
 | Provider | Key Library  | Tutorial/Link                                                                                    | YouTube                                                                        |
 | -------- | ------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| AWS      | Boto3        | https://github.com/boto/boto3 (install: pip install boto3) github​                               | S3 operations: https://www.youtube.com/watch?v=O3LCsq1g0GU youtube​            |
-| Azure    | Azure SDK    | https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-overview learn.microsoft​ | Storage account creation: https://www.youtube.com/watch?v=MDZL_gBVzzk youtube​ |
-| GCP      | google-cloud | pip install google-cloud-storage geeksforgeeks​                                                  | General cloud Python: https://www.youtube.com/watch?v=rHXC6ob9zVI youtube​     |
+| AWS      | Boto3        | https://github.com/boto/boto3 (install: pip install boto3) github​                               | S3 operations: (https://www.youtube.com/watch?v=O3LCsq1g0GU) youtube​            |
+| Azure    | Azure SDK    | https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-overview learn.microsoft​ | Storage account creation: (https://www.youtube.com/watch?v=MDZL_gBVzzk) youtube​ |
+| GCP      | google-cloud | pip install google-cloud-storage geeksforgeeks​                                                  | General cloud Python: (https://www.youtube.com/watch?v=rHXC6ob9zVI) youtube​     |
 ```
 
 ​
