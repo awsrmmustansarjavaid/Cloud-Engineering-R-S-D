@@ -295,6 +295,18 @@ def health():
 
 # 📚 Recommended Free Resources 🐍 Python Learning
 
+## 📖 Reference Documentation
+
+### Official Documentation:
+
+- **[AWS SDK for Python (boto3)][https://boto3.amazonaws.com/v1/documentation/api/latest/index.html]**
+
+- **Azure SDK for Python**
+
+- **Google Cloud Python Client Libraries**
+  
+- **Python Official Documentation**
+
 
 ## 📘 Python for Cloud & DevOps – Reading & Video Resources
 
