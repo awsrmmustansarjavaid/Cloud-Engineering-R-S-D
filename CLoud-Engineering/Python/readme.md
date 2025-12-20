@@ -530,7 +530,7 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 
 1. **Online Python Editor**
 
-- 📌 online-python.com
+- 📌 https://online-python.com/
 
 2. **Replit**
 
@@ -542,6 +542,6 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 
 ###### Kaggle is the place to learn data science and build a portfolio.
 
-- 📌 Kaggle.com
+- 📌 https://Kaggle.com/
 
 
