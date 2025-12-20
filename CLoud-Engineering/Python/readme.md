@@ -530,6 +530,18 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 
 1. **Online Python Editor**
 
-online-python.com
+- 📌 online-python.com
+
+2. **Replit**
+
+###### uses the poetry module to automatically install any libraries you need. I don't think I've tested that with pandas either.
+
+- 📌 https://replit.com/
+
+3. **Kaggle**
+
+###### Kaggle is the place to learn data science and build a portfolio.
+
+- 📌 Kaggle.com
 
 
