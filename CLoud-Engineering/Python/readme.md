@@ -631,13 +631,33 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 
 ###### Apply basics to cloud SDKs: boto3 (AWS), azure-sdk (Azure), google-cloud. Automate resources like S3 buckets or VMs.
 
-```
-| Provider | Key Library  | Tutorial/Link                                                                                    | YouTube                                                                        |
-| -------- | ------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| AWS      | Boto3        | https://github.com/boto/boto3 (install: pip install boto3) github​                               | S3 operations: (https://www.youtube.com/watch?v=O3LCsq1g0GU) youtube​            |
-| Azure    | Azure SDK    | https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-overview learn.microsoft​ | Storage account creation: (https://www.youtube.com/watch?v=MDZL_gBVzzk) youtube​ |
-| GCP      | google-cloud | pip install google-cloud-storage geeksforgeeks​                                                  | General cloud Python: (https://www.youtube.com/watch?v=rHXC6ob9zVI) youtube​     |
-```
+#### 1. Provider :  AWS 
+
+- **Key Library :** Boto3
+
+- **Tutorial/Link :** [install: pip install boto3](https://github.com/boto/boto3)
+  
+- **YouTube :**    [S3 operations:](https://www.youtube.com/watch?v=O3LCsq1g0GU)
+
+---
+
+#### 2. Provider :  Azure 
+
+- **Key Library :** Azure SDK
+
+- **Tutorial/Link :** [Use the Azure libraries (SDK) for Python](https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-overview)
+  
+- **YouTube :** [​Storage account creation:](https://www.youtube.com/watch?v=MDZL_gBVzzk)
+
+---
+
+#### 3. Provider :  GCP
+
+- **Key Library :** google-cloud
+
+- **Tutorial/Link :** [pip install google-cloud-storage](https://pypi.org/project/google-cloud-storage/)
+  
+- **YouTube :** [General cloud Python:](https://www.youtube.com/watch?v=rHXC6ob9zVI)
 
 ​
 ---
