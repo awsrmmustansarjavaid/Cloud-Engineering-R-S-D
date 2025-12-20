@@ -549,3 +549,6 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 - 📌 https://www.programiz.com/python-programming/online-compiler/
 
 
+5. **VSCode Online Web Editor (Recommanded)**
+
+- 📌 https://vscode.dev/
