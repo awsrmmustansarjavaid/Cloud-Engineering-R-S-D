@@ -369,6 +369,11 @@ Browser-based interactive Python lessons with exercises.
 ✔ Practice-heavy learning  
 ✔ Beginners who like hands-on coding  
 
+
+### 6️⃣ W3School - Python
+
+- 📌 https://www.w3schools.com/python/default.asp
+
 ---
 
 ## 📺 Recommended YouTube Channels & Video Courses
