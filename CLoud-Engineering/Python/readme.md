@@ -262,28 +262,28 @@ def health():
 
 #### Beginner Projects:
 
-1. AWS EC2 Instance Manager
+1. **AWS EC2 Instance Manager**
 
 - **Start/stop instances via Python**
 - **Monitor instance status**
 - **Cost calculator**
 
 
-2. Cloud Storage Backup Tool
+2. **Cloud Storage Backup Tool**
 
 - **Upload files to S3/Azure Blob/GCS**
 - **Automated backups**
 - **File organization**
 
 
-3. Resource Monitoring Dashboard
+3. **Resource Monitoring Dashboard**
 
 - **Collect metrics from multiple clouds**
 - **Generate reports**
 - **Send alerts**
 
 
-4. Infrastructure Health Checker
+4. **Infrastructure Health Checker**
 
 - **Check service status**
 - **Automated health reports**
