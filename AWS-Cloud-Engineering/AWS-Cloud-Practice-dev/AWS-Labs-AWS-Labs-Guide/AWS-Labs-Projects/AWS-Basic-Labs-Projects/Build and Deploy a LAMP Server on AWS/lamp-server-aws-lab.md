@@ -54,7 +54,7 @@ MariaDB (Local Database)
 
 ## 🧩 Architecture Diagram
 
-[AWS Architecture Diagram](./LAMP%20architecture%20on%20AWS%20cloud%20diagram.png)
+![AWS Architecture Diagram](./LAMP%20architecture%20on%20AWS%20cloud%20diagram.png)
 ---
 
 ## 🔐 Step 1: Login to AWS Console
@@ -228,4 +228,5 @@ Terminate the EC2 instance to avoid charges.
 ```
 lamp-server-aws-lab.md
 ```
+
 
