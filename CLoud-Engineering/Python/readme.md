@@ -302,8 +302,9 @@ def health():
 
 ## 📖 Core Python for Cloud:
 
+### Must-know concepts:
+
 ```
-# Must-know concepts:
 - Variables and data types
 - Control structures (if/else, loops)
 - Functions and modules
@@ -315,8 +316,9 @@ def health():
 ```
 ## 📖 Cloud-Specific Libraries:
 
+### Install these essential packages:
+
 ```
-# Install these essential packages:
 pip install boto3          # AWS
 pip install azure-sdk       # Azure
 pip install google-cloud     # GCP
