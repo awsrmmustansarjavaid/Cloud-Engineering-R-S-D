@@ -292,17 +292,216 @@ def health():
 
 - **Interview-ready**
 
-## 📚 Recommended Free Resources
 
-### 🐍 Python Learning
+# 📚 Recommended Free Resources 🐍 Python Learning
 
-- **CS50P – Harvard**
 
-- **Microsoft Learn – Python**
+## 📘 Python for Cloud & DevOps – Reading & Video Resources
 
-- **7 Days of Python**
+This document lists **trusted reading materials, courses, and YouTube channels** recommended for **Cloud & DevOps engineers** learning Python.
 
-https://sevendaysofpython.com
+---
+
+## 📘 Where to Read (Online Tutorials & Courses)
+
+### 🐍 Python Learning (Beginner → Advanced)
+
+These resources teach Python from scratch and prepare you for **automation, scripting, and cloud tasks**.
+
+---
+
+### 1️⃣ Official Python Documentation (Beginner Tutorials)
+Start here for a **reliable and authoritative foundation** in Python syntax and core concepts.
+
+- 📌 https://docs.python.org/3/tutorial/
+
+**Best for:**  
+✔ Python fundamentals  
+✔ Syntax clarity  
+✔ Long-term reference  
+
+---
+
+### 2️⃣ CS50P – Introduction to Programming with Python (Free)
+A **beginner-friendly and structured** course by Harvard, focused on Python fundamentals.
+
+- 📌 Search on Google or YouTube: **CS50P Python**
+- Platform: Harvard / edX
+
+**Best for:**  
+✔ Absolute beginners  
+✔ Strong programming foundation  
+✔ Logical thinking  
+
+---
+
+### 3️⃣ Microsoft Learn – Python Modules
+Hands-on, guided learning paths with interactive exercises.
+
+- 📌 https://learn.microsoft.com/en-us/training/browse/?products=python
+
+**Best for:**  
+✔ Cloud engineers  
+✔ Practical scripting  
+✔ Real-world examples  
+
+---
+
+### 4️⃣ 7 Days of Python (Free Roadmap & Labs)
+A simple **7-day Python roadmap** with exercises, suitable for DevOps beginners.
+
+- 📌 Website: https://sevendaysofpython.com
+- 📺 YouTube available
+
+**Best for:**  
+✔ Fast learners  
+✔ Structured short plan  
+✔ Daily practice  
+
+---
+
+### 5️⃣ CS Circles – Interactive Python Course
+Browser-based interactive Python lessons with exercises.
+
+- 📌 https://cscircles.cemc.uwaterloo.ca/
+
+**Best for:**  
+✔ Practice-heavy learning  
+✔ Beginners who like hands-on coding  
+
+---
+
+## 📺 Recommended YouTube Channels & Video Courses
+
+---
+
+## 🐍 Python for Cloud & DevOps (Focused Content)
+
+These playlists are **directly useful for automation, cloud scripting, and DevOps workflows**.
+
+---
+
+### ▶ Python for DevOps – Abhishek Veeramalla
+Full playlist teaching Python **from a DevOps engineer’s perspective**.
+
+- 📺 YouTube: *Abhishek Veeramalla – Python for DevOps*
+
+**Why recommended:**  
+✔ Automation mindset  
+✔ CI/CD relevance  
+✔ Cloud use cases  
+
+---
+
+### ▶ How to Learn Python for Cloud & DevOps
+Roadmap-style guidance for beginners.
+
+- 📺 YouTube: *How to Learn Python for Cloud & DevOps*
+
+**Why recommended:**  
+✔ Clear learning path  
+✔ Tool + skill mapping  
+
+---
+
+### ▶ Python for DevOps & Cloud Automation Tutorial Series
+Covers Python basics with **AWS & automation examples**.
+
+- 📺 YouTube: *Python for DevOps Cloud Automation*
+
+---
+
+### ▶ TrainWithShubham – Python for DevOps Workshop
+Free workshop covering **real automation tasks**.
+
+- 📺 YouTube: *TrainWithShubham Python for DevOps*
+
+**Best for:**  
+✔ Beginners  
+✔ Hands-on mindset  
+
+---
+
+### ▶ Pragmatic AI Labs – Python for DevOps
+Multi-hour professional-grade introduction.
+
+- 📺 YouTube: *Pragmatic AI Labs Python for DevOps*
+
+---
+
+## 🧠 Top General Channels (DevOps & Cloud Fundamentals)
+
+These channels may not focus only on Python, but they are **essential for Cloud & DevOps engineers**.
+
+---
+
+### ⭐ TechWorld with Nana
+- 📺 YouTube: *TechWorld with Nana*
+
+**Topics:**  
+✔ DevOps  
+✔ Docker & Kubernetes  
+✔ CI/CD  
+✔ Cloud basics  
+
+---
+
+### ⭐ Bret Fisher – Docker & DevOps
+- 📺 YouTube: *Bret Fisher*
+
+**Topics:**  
+✔ Containers  
+✔ Automation  
+✔ DevOps best practices  
+
+---
+
+### ⭐ KodeKloud
+- 📺 YouTube: *KodeKloud*
+
+**Topics:**  
+✔ Beginner-friendly DevOps  
+✔ Labs & hands-on learning  
+
+---
+
+### ⭐ Simplilearn
+- 🌐 https://www.simplilearn.com
+
+**Topics:**  
+✔ DevOps fundamentals  
+✔ Cloud & Python basics  
+
+---
+
+### ⭐ Stephane Maarek
+- 📺 Udemy / YouTube
+
+**Topics:**  
+✔ AWS  
+✔ DevOps  
+✔ Certification-level knowledge  
+
+---
+
+### ⭐ Hitesh Choudhary
+- 📺 YouTube: *Hitesh Choudhary*
+
+**Topics:**  
+✔ Beginner programming  
+✔ DevOps mindset  
+
+---
+
+### ⭐ Jeff Geerling (Cloud Advocate)
+- 📺 YouTube: *Jeff Geerling*
+
+**Topics:**  
+✔ Automation  
+✔ Ansible  
+✔ Infrastructure
+
+
 
 ### ☁ Cloud & DevOps
 
