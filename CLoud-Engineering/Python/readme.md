@@ -479,6 +479,27 @@ These playlists are **directly useful for automation, cloud scripting, and DevOp
 
 ---
 
+### ▶ Full beginner tutorial (covers variables, loops, functions):
+
+
+- 📺 YouTube: [ Python for Beginners Tutoria](https://www.youtube.com/watch?v=b093aqAZiPU)
+
+---
+
+### ▶ Comprehensive Python course (9+ hours, includes OOP):
+
+
+- 📺 YouTube: [Python Full Course for Beginners](https://www.youtube.com/watch?v=H2EJuAcrZYU)
+
+---
+
+### ▶ Advanced topics for cloud (file handling, requests, virtual envs):
+
+
+- 📺 YouTube: [Advanced Python Programming Course](https://www.youtube.com/watch?v=rHXC6ob9zVI)
+
+---
+
 ### ▶ Python for DevOps – Abhishek Veeramalla
 Full playlist teaching Python **from a DevOps engineer’s perspective**.
 
@@ -599,7 +620,27 @@ These channels may not focus only on Python, but they are **essential for Cloud 
 ✔ Ansible  
 ✔ Infrastructure
 
+---
+### ⭐ DevOps Python roadmap (files, OS modules):
 
+[python-for-devops](https://github.com/techiescamp/python-for-devops)
+
+---
+
+### ⭐ Cloud Provider Integration (Weeks 9+)
+
+###### Apply basics to cloud SDKs: boto3 (AWS), azure-sdk (Azure), google-cloud. Automate resources like S3 buckets or VMs.
+
+```
+| Provider | Key Library  | Tutorial/Link                                                                                    | YouTube                                                                        |
+| -------- | ------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| AWS      | Boto3        | https://github.com/boto/boto3 (install: pip install boto3) github​                               | S3 operations: https://www.youtube.com/watch?v=O3LCsq1g0GU youtube​            |
+| Azure    | Azure SDK    | https://learn.microsoft.com/en-us/azure/developer/python/sdk/azure-sdk-overview learn.microsoft​ | Storage account creation: https://www.youtube.com/watch?v=MDZL_gBVzzk youtube​ |
+| GCP      | google-cloud | pip install google-cloud-storage geeksforgeeks​                                                  | General cloud Python: https://www.youtube.com/watch?v=rHXC6ob9zVI youtube​     |
+```
+
+​
+---
 
 ### ☁ Cloud & DevOps
 
