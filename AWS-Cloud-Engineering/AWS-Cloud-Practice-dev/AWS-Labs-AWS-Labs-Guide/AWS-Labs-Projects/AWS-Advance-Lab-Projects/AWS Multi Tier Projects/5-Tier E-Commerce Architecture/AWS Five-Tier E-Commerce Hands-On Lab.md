@@ -24,16 +24,6 @@ This lab is **AWS Free Tier–friendly** and designed for **learning by doing**.
 
 ---
 
-### 🧱 FIVE-TIER ARCHITECTURE
-
-1. **Network Tier**
-2. **Web Tier**
-3. **Application Tier**
-4. **Database Tier**
-5. **Automation & Security Tier**
-
----
-
 ### Functional Requirements
 
 * Public static e-commerce website
