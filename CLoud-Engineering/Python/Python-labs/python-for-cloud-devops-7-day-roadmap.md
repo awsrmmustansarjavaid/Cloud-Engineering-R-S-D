@@ -98,8 +98,228 @@ def check_env(env):
         print("⚠️ Production Environment")
 ```
 
+---
+
+## 🗓️ Day 3 – Data Structures & OOP (Very Important)
+
+### 📌 Concepts
+
+- Cloud SDKs (AWS, Azure, GCP) are object-oriented
+
+
+### 🧠 Core Topics
+
+- Lists
+
+- Tuples
+
+- Dictionaries
+
+- Sets
+
+- Classes & Objects
+
+- Inheritance
+
+### 🧪 Hands-On Labs
+
+1. Store EC2 metadata in dictionaries
+
+2. List of IAM users
+
+3. Create a Server class
+
+```
+class Server:
+    def __init__(self, name, ip):
+        self.name = name
+        self.ip = ip
+```
+
 
    
 ###  🎯 Cloud Use Case
+
+**Understanding boto3 (AWS SDK) objects**
+
+---
+
+## 🗓️ Day 4 – Debugging, Testing & Regex
+
+### 📌 Concepts
+
+- DevOps = reliability + debugging skills
+
+
+### 🧠 Core Topics
+
+- Debugging with pdb
+
+- Exception handling (try/except)
+
+- Unit testing with unittest
+
+- Regular Expressions (re)
+
+- datetime module
+
+### 🧪 Hands-On Labs
+
+1. Parse server logs using regex
+
+2. Catch AWS API errors
+
+3. Write a unit test for a function
+
+```
+import re
+re.search("ERROR", log_line)
+```
+
+
+   
+###  🎯 Cloud Use Case
+
+- Log monitoring
+
+- Error detection
+
+- Alert automation
+
+
+---
+
+## 🗓️ Day 5 – Web Apps & Databases (DevOps Perspective)
+
+### 📌 Concepts
+
+- Most DevOps tools expose APIs & dashboards
+
+
+### 🧠 Core Topics
+
+- Flask basics
+
+- REST APIs
+
+- SQLite basics
+
+- JSON responses
+
+### 🧪 Hands-On Labs
+
+1. Create a Flask app
+
+2. API endpoint /health
+
+3. Store deployment info in DB
+
+```
+@app.route("/health")
+def health():
+    return {"status": "ok"}
+```
+
+
+   
+###  🎯 Cloud Use Case
+
+- Health checks
+
+- Internal tooling
+
+- Service dashboards
+
+---
+
+## 🗓️ Day 6 – Automation (The DevOps Core)
+
+### 📌 Concepts
+
+- Python replaces repetitive manual work
+
+
+### 🧠 Core Topics
+
+- File handling
+
+- OS automation
+
+- SSH automation
+
+- Cloud IaC concepts
+
+### 🛠 Tools
+
+- os, subprocess
+
+- paramiko / fabric
+
+- pywinrm
+
+- pulumi (Python IaC)
+
+### 🧪 Hands-On Labs
+
+1. Backup files using Python
+
+2. SSH into remote Linux server
+
+3. Provision cloud resources using Pulumi
+
+   
+###  🎯 Cloud Use Case
+
+- CI/CD scripts
+
+- Infra provisioning
+
+- Remote server management
+
+---
+
+## 🗓️ Day 7 – Real-World DevOps Project
+
+### 🚀 Project: Cloud Automation Dashboard
+
+
+### 📌 Features
+
+- Flask web app
+
+- Markdown content
+
+- Health check API
+
+- Log parser
+
+- Environment-based config
+
+### 🧪 Tasks
+
+1. Build Flask app
+
+2. Read config from file
+
+3. Display service status
+
+4. Parse logs
+
+5. Add error handling
+
+   
+###  🎯 Cloud Use Case
+
+- Real portfolio project
+
+- GitHub-ready
+
+- Interview-ready
+
+---
+
+   
+###  🎯 Cloud Use Case
+
 
 **Conditional deployment logic (prod vs non-prod)**
