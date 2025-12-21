@@ -1,4 +1,7 @@
-# AWS Five-Tier E-Commerce Hands-On Lab (Beginner → Intermediate)
+# 🛒 AWS Five-Tier E-Commerce Hands-On Lab (Beginner → Realistic)
+
+> **Author & Architecture Designer:** Charlie
+
 
 > **Goal:** Build a realistic but safe AWS e-commerce lab using Free Tier–friendly services.
 > **Focus:** Learning by doing (networking, security, APIs, scripting, databases).
@@ -6,6 +9,30 @@
 ---
 
 ## 1. LAB REQUIREMENTS & DESIGN
+
+### 📌 LAB OBJECTIVE
+
+Build a **basic but realistic e-commerce platform** on AWS using a **five-tier architecture** with:
+
+* Static frontend
+* Secure APIs
+* Backend application
+* Hybrid databases
+* Basic automation & security
+
+This lab is **AWS Free Tier–friendly** and designed for **learning by doing**.
+
+---
+
+### 🧱 FIVE-TIER ARCHITECTURE
+
+1. **Network Tier**
+2. **Web Tier**
+3. **Application Tier**
+4. **Database Tier**
+5. **Automation & Security Tier**
+
+---
 
 ### Functional Requirements
 
@@ -61,35 +88,8 @@
 * CloudWatch Logs & Metrics
 * Cognito (Auth-ready)
 
----
 
-# 🛒 AWS Five-Tier E-Commerce Hands-On Lab (Beginner → Realistic)
-
-## 📌 LAB OBJECTIVE
-
-Build a **basic but realistic e-commerce platform** on AWS using a **five-tier architecture** with:
-
-* Static frontend
-* Secure APIs
-* Backend application
-* Hybrid databases
-* Basic automation & security
-
-This lab is **AWS Free Tier–friendly** and designed for **learning by doing**.
-
----
-
-## 🧱 FIVE-TIER ARCHITECTURE
-
-1. **Network Tier**
-2. **Web Tier**
-3. **Application Tier**
-4. **Database Tier**
-5. **Automation & Security Tier**
-
----
-
-## 🔧 AWS SERVICES USED
+### 🔧 AWS SERVICES USED
 
 * VPC, Subnets, Route Tables
 * Internet Gateway, NAT Gateway
