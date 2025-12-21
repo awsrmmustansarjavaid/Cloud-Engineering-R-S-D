@@ -98,6 +98,13 @@ def check_env(env):
         print("⚠️ Production Environment")
 ```
 
+   
+###  🎯 Cloud Use Case
+
+
+**Conditional deployment logic (prod vs non-prod)**
+
+
 ---
 
 ## 🗓️ Day 3 – Data Structures & OOP (Very Important)
@@ -317,9 +324,3 @@ def health():
 - Interview-ready
 
 ---
-
-   
-###  🎯 Cloud Use Case
-
-
-**Conditional deployment logic (prod vs non-prod)**
