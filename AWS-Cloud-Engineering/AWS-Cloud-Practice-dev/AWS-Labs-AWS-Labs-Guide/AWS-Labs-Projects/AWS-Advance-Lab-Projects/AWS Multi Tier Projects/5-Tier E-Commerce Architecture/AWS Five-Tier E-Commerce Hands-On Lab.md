@@ -63,6 +63,352 @@
 
 ---
 
+# 🛒 AWS Five-Tier E-Commerce Hands-On Lab (Beginner → Realistic)
+
+## 📌 LAB OBJECTIVE
+
+Build a **basic but realistic e-commerce platform** on AWS using a **five-tier architecture** with:
+
+* Static frontend
+* Secure APIs
+* Backend application
+* Hybrid databases
+* Basic automation & security
+
+This lab is **AWS Free Tier–friendly** and designed for **learning by doing**.
+
+---
+
+## 🧱 FIVE-TIER ARCHITECTURE
+
+1. **Network Tier**
+2. **Web Tier**
+3. **Application Tier**
+4. **Database Tier**
+5. **Automation & Security Tier**
+
+---
+
+## 🔧 AWS SERVICES USED
+
+* VPC, Subnets, Route Tables
+* Internet Gateway, NAT Gateway
+* EC2, Application Load Balancer (ALB)
+* S3, CloudFront
+* Route 53
+* API Gateway
+* RDS MySQL
+* DynamoDB
+* EFS
+* IAM
+* Secrets Manager
+* Cognito
+* WAF
+* CloudWatch
+* Bash & Python
+
+---
+
+# 🧩 TIER 1: NETWORK TIER
+
+## 1️⃣ Create VPC
+
+**Console → VPC → Create VPC**
+
+* Name: `ecom-vpc`
+* IPv4 CIDR: `10.0.0.0/16`
+
+---
+
+## 2️⃣ Create Subnets
+
+### Public Subnets
+
+* `public-subnet-1` → `10.0.1.0/24`
+* `public-subnet-2` → `10.0.2.0/24`
+
+### Private Subnets
+
+* `private-subnet-app` → `10.0.11.0/24`
+* `private-subnet-db` → `10.0.12.0/24`
+
+---
+
+## 3️⃣ Internet Gateway
+
+* Create Internet Gateway
+* Attach to `ecom-vpc`
+
+---
+
+## 4️⃣ NAT Gateway
+
+* Create NAT Gateway in `public-subnet-1`
+* Allocate Elastic IP
+
+---
+
+## 5️⃣ Route Tables
+
+### Public Route Table
+
+* Route: `0.0.0.0/0 → Internet Gateway`
+* Associate public subnets
+
+### Private Route Table
+
+* Route: `0.0.0.0/0 → NAT Gateway`
+* Associate private subnets
+
+---
+
+# 🌐 TIER 2: WEB TIER (STATIC FRONTEND)
+
+## 6️⃣ Create S3 Bucket
+
+**S3 → Create Bucket**
+
+* Name: `ecom-static-site-<unique>`
+* Block public access: ❌ Disable
+* Enable versioning
+* Default encryption: **SSE-KMS**
+
+---
+
+## 7️⃣ Upload Frontend Files
+
+### `index.html`
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CloudMart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>CloudMart Store</h1>
+<div id="products"></div>
+<script src="app.js"></script>
+</body>
+</html>
+```
+
+### `style.css`
+
+```css
+body { font-family: Arial; }
+.product { border: 1px solid #ccc; margin: 10px; padding: 10px; }
+```
+
+### `app.js`
+
+```javascript
+fetch("https://API_GATEWAY_URL/products")
+.then(res => res.json())
+.then(data => {
+  let div = document.getElementById("products");
+  data.forEach(p => {
+    div.innerHTML += `<div class="product">${p.name} - $${p.price}</div>`;
+  });
+});
+```
+
+---
+
+## 8️⃣ CloudFront Distribution
+
+* Origin: S3 bucket
+* Viewer protocol: Redirect HTTP → HTTPS
+* Default root object: `index.html`
+
+---
+
+## 9️⃣ Route 53
+
+* Create Hosted Zone
+* Add **A Record** → CloudFront distribution
+
+---
+
+# 🧠 TIER 3: APPLICATION TIER
+
+## 🔟 IAM Role for EC2
+
+Attach permissions:
+
+* AmazonS3ReadOnlyAccess
+* AmazonDynamoDBFullAccess
+* SecretsManagerReadWrite
+* CloudWatchAgentServerPolicy
+* AmazonElasticFileSystemClientReadWriteAccess
+
+---
+
+## 1️⃣1️⃣ Security Groups
+
+### ALB Security Group
+
+* Inbound: 80, 443 from `0.0.0.0/0`
+
+### App Security Group
+
+* Inbound: 80 from ALB SG
+* Outbound: All
+
+---
+
+## 1️⃣2️⃣ Launch EC2 (App Server)
+
+* Amazon Linux 2
+* Subnet: `private-subnet-app`
+* IAM Role: Attach
+
+### EC2 User Data (Bash)
+
+```bash
+#!/bin/bash
+yum update -y
+yum install python3 mysql -y
+pip3 install flask boto3 pymysql
+mkdir /app
+```
+
+---
+
+## 1️⃣3️⃣ Application Load Balancer
+
+* Type: Public ALB
+* Target Group: EC2
+* Health Check Path: `/health`
+
+---
+
+## 1️⃣4️⃣ Python App API
+
+### `/app/app.py`
+
+```python
+from flask import Flask, jsonify
+import boto3
+
+app = Flask(__name__)
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('products')
+
+@app.route("/health")
+def health():
+    return "OK"
+
+@app.route("/products")
+def products():
+    res = table.scan()
+    return jsonify(res['Items'])
+
+app.run(host='0.0.0.0', port=80)
+```
+
+---
+
+# 🗄️ TIER 4: DATABASE TIER
+
+## 1️⃣5️⃣ RDS MySQL
+
+* Subnet group: `private-subnet-db`
+* Public access: ❌ Disabled
+* Engine: MySQL
+* Store credentials in **Secrets Manager**
+
+---
+
+## 1️⃣6️⃣ DynamoDB Table
+
+* Table name: `products`
+* Partition key: `product_id`
+
+---
+
+## 1️⃣7️⃣ EFS
+
+* Create EFS
+* Mount target in app subnet
+
+### EFS Mount Script
+
+```bash
+yum install amazon-efs-utils -y
+mkdir /mnt/efs
+mount -t efs fs-xxxx:/ /mnt/efs
+```
+
+---
+
+# 🔐 TIER 5: SECURITY & AUTOMATION
+
+## 1️⃣8️⃣ API Gateway
+
+* REST API
+* Resource: `/products`
+* Method: GET
+* Integration: ALB
+
+---
+
+## 1️⃣9️⃣ Cognito
+
+* Create User Pool
+* Create App Client
+* Configure JWT Authorizer in API Gateway
+
+---
+
+## 2️⃣0️⃣ AWS WAF
+
+* Create Web ACL
+* Attach to CloudFront
+* Add AWS Managed Rules
+
+---
+
+## 2️⃣1️⃣ CloudWatch
+
+Enable logging for:
+
+* EC2
+* ALB
+* API Gateway
+
+---
+
+# 🔁 API SUMMARY
+
+| API       | Method | Backend  |
+| --------- | ------ | -------- |
+| /health   | GET    | App      |
+| /products | GET    | DynamoDB |
+| /orders   | POST   | RDS      |
+| /login    | POST   | Cognito  |
+
+---
+
+## ✅ FINAL RESULT
+
+You now have:
+
+✔ Five-tier AWS architecture
+✔ Static frontend
+✔ Secure APIs
+✔ Hybrid databases
+✔ Cognito authentication
+✔ WAF protection
+✔ Bash & Python automation
+✔ AWS Free Tier–safe lab
+
+---
+
+🎯 **This file is ready to copy-paste as a `.md` file into GitHub.**
+
+
 ## 3. FRONTEND – SINGLE FILE (HTML + CSS + JS)
 
 ### File: `index.html`
