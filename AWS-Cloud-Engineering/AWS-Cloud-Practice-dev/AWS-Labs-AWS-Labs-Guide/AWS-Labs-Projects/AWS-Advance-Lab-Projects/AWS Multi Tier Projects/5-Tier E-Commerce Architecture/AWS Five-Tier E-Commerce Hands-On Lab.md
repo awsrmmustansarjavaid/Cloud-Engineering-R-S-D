@@ -177,41 +177,45 @@ This lab is **AWS Free Tier–friendly** and designed for **learning by doing**.
 
 ## 7️⃣ Upload Frontend Files
 
-### `index.html`
+### FRONTEND – SINGLE FILE (HTML + CSS + JS)
+
+#### File: `index.html`
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CloudMart</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>CloudMart – AWS E-Commerce</title>
+  <style>
+    body { font-family: Arial; background:#f5f5f5; margin:0 }
+    header { background:#232f3e; color:white; padding:15px; text-align:center }
+    .container { padding:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:15px }
+    .product { background:white; padding:15px; border-radius:6px; box-shadow:0 0 5px rgba(0,0,0,0.1) }
+    button { background:#ff9900; border:none; padding:8px; cursor:pointer }
+  </style>
 </head>
 <body>
-<h1>CloudMart Store</h1>
-<div id="products"></div>
-<script src="app.js"></script>
+<header><h1>CloudMart</h1><p>AWS Five-Tier Lab</p></header>
+<div class="container" id="products">Loading...</div>
+<script>
+const API_BASE = "https://YOUR_API_GATEWAY_URL";
+async function loadProducts(){
+ const res = await fetch(`${API_BASE}/products`);
+ const data = await res.json();
+ const div = document.getElementById('products'); div.innerHTML='';
+ data.forEach(p=>{
+  div.innerHTML += `<div class='product'><h3>${p.name}</h3><p>$${p.price}</p><button onclick="order('${p.product_id}')">Buy</button></div>`;
+ });
+}
+async function order(id){
+ await fetch(`${API_BASE}/orders`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_id:id,quantity:1})});
+ alert('Order placed');
+}
+loadProducts();
+</script>
 </body>
 </html>
-```
-
-### `style.css`
-
-```css
-body { font-family: Arial; }
-.product { border: 1px solid #ccc; margin: 10px; padding: 10px; }
-```
-
-### `app.js`
-
-```javascript
-fetch("https://API_GATEWAY_URL/products")
-.then(res => res.json())
-.then(data => {
-  let div = document.getElementById("products");
-  data.forEach(p => {
-    div.innerHTML += `<div class="product">${p.name} - $${p.price}</div>`;
-  });
-});
 ```
 
 ---
