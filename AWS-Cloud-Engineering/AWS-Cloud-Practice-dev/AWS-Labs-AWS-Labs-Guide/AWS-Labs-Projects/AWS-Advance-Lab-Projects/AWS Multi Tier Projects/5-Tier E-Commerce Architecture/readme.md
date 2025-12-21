@@ -1,249 +1,267 @@
-🎯 Goal: Turn Your Lab into a Real-World E-Commerce Cloud Architecture
+# 🎯 Goal: Turn Your Lab into a Real-World E-Commerce Cloud Architecture
 
-Instead of “just using services,” we design this as if:
+**Instead of “just using services,” we design this as if:**
 
-A real company is launching an online store
+- A real company is launching an online store
 
-Traffic comes from global users
+- Traffic comes from global users
 
-Security, scalability, logging, automation, and cost control matter
+- Security, scalability, logging, automation, and cost control matter
 
-You could later show this as a portfolio project or interview case study
+- You could later show this as a portfolio project or interview case study
 
-🧱 1️⃣ Define a Realistic E-Commerce Use Case (Very Important)
+## 🧱 1️⃣ Define a Realistic E-Commerce Use Case (Very Important)
 
 First, give your project a clear business identity.
 
-Example Project Name
+**Example Project Name**
 
-“CloudMart – Serverless & Scalable E-Commerce Platform on AWS”
+> **“CloudMart – Serverless & Scalable E-Commerce Platform on AWS”**
 
-Core Features (Realistic)
+### 1️⃣ Core Features (Realistic)
 
-Public storefront (static site)
+- Public storefront (static site)
 
-Product catalog (images + metadata)
+- Product catalog (images + metadata)
 
-User orders & transactions
+- User orders & transactions
 
-Admin backend (API)
+- Admin backend (API)
 
-Automated background tasks (cleanup, sync, alerts)
+- Automated background tasks (cleanup, sync, alerts)
 
-Secure private backend
+- Secure private backend
 
-Fully monitored & logged
+- Fully monitored & logged
 
-This is not just a demo — this is how real systems are designed.
+##### This is not just a demo — this is how real systems are designed.
 
-🏗️ 2️⃣ Map Your Five Tiers to Real Responsibilities
-1️⃣ Network Tier (Foundation)
+---
 
-Purpose: Isolation, security, traffic control
+## 🏗️ 2️⃣ Map Your Five Tiers to Real Responsibilities
 
-Realistic Design
+### 1️⃣ Network Tier (Foundation)
 
-One VPC
+**Purpose:** Isolation, security, traffic control
 
-Public subnets → Load balancers, NAT Gateway
+#### Realistic Design
 
-Private subnets → App EC2, RDS, EFS
+- One VPC
 
-No direct internet access for DB or App servers
+- Public subnets → Load balancers, NAT Gateway
 
-Route 53 as entry point
+- Private subnets → App EC2, RDS, EFS
 
-Why this matters in real life
+- No direct internet access for DB or App servers
 
-Companies separate public & private layers to reduce attack surface.
+- Route 53 as entry point
 
-2️⃣ Web Tier (Customer Facing)
+**Why this matters in real life**
 
-Purpose: Fast, global, secure content delivery
+##### Companies separate public & private layers to reduce attack surface.
 
-Realistic Stack
+### 2️⃣ Web Tier (Customer Facing)
 
-S3 → Static website (HTML/CSS/JS)
+**Purpose:** Fast, global, secure content delivery
 
-CloudFront → CDN (global edge caching)
+#### Realistic Stack
 
-KMS → Encrypt S3 objects
+- S3 → Static website (HTML/CSS/JS)
 
-CloudTrail → Audit access
+- CloudFront → CDN (global edge caching)
 
-CloudWatch → Metrics & alarms
+- KMS → Encrypt S3 objects
 
-Real E-Commerce Role
+- CloudTrail → Audit access
 
-Homepage
+- CloudWatch → Metrics & alarms
 
-Product listing pages
+#### Real E-Commerce Role
 
-JS calls to API Gateway
+- Homepage
 
-3️⃣ App Tier (Business Logic)
+- Product listing pages
 
-Purpose: Order processing, user actions, data validation
+- JS calls to API Gateway
 
-Realistic Stack
+### 3️⃣ App Tier (Business Logic)
 
-API Gateway → Entry for frontend requests
+**Purpose:** Order processing, user actions, data validation
 
-Application Load Balancer → App health & scaling
+#### Realistic Stack
 
-EC2 (or Lambda later) → Python App API
+- API Gateway → Entry for frontend requests
 
-EFS → Shared files (invoices, exports, temp uploads)
+- Application Load Balancer → App health & scaling
 
-IAM Roles → No hard-coded credentials
+- EC2 (or Lambda later) → Python App API
 
-Real E-Commerce Role
+- EFS → Shared files (invoices, exports, temp uploads)
 
-Create orders
+- IAM Roles → No hard-coded credentials
 
-Fetch product details
+#### Real E-Commerce Role
 
-Save user requests
+- Create orders
 
-Communicate with RDS & DynamoDB
+- Fetch product details
 
-4️⃣ Database Tier (Data Storage)
+- Save user requests
 
-Purpose: Reliable, secure data persistence
+- Communicate with RDS & DynamoDB
 
-Realistic Split (Very Important)
+### 4️⃣ Database Tier (Data Storage)
 
-Data Type	Service	Why
-Orders, users, payments	RDS MySQL	ACID, relational
-Product metadata	DynamoDB	Fast, scalable
-Product images	S3	Cheap, durable
-Secrets	Secrets Manager	Security
+**Purpose:** Reliable, secure data persistence
 
-This hybrid data model is exactly how modern e-commerce works.
+#### Realistic Split (Very Important)
 
-5️⃣ Automation Tier (Operations & Intelligence)
+```
+| Data Type               | Service         | Why              |
+| ----------------------- | --------------- | ---------------- |
+| Orders, users, payments | RDS MySQL       | ACID, relational |
+| Product metadata        | DynamoDB        | Fast, scalable   |
+| Product images          | S3              | Cheap, durable   |
+| Secrets                 | Secrets Manager | Security         |
+```
 
-Purpose: Reduce manual work
+##### This hybrid data model is exactly how modern e-commerce works.
 
-Realistic Stack
+### 5️⃣ Automation Tier (Operations & Intelligence)
 
-Lambda → Background jobs
+**Purpose:** Reduce manual work
 
-EventBridge → Schedulers & triggers
+#### Realistic Stack
 
-CloudWatch → Logs, alarms
+- Lambda → Background jobs
 
-Bash → Server bootstrap & DB setup
+- EventBridge → Schedulers & triggers
 
-Python → Business automation
+- CloudWatch → Logs, alarms
 
-Real E-Commerce Use Cases
+- Bash → Server bootstrap & DB setup
 
-Daily sales reports
+- Python → Business automation
 
-Cleanup old temp files
+#### Real E-Commerce Use Cases
 
-Sync DynamoDB → RDS
+- Daily sales reports
 
-Alert on failed orders
+- Cleanup old temp files
 
-🔄 3️⃣ Make the Data Flow Realistic (This Is Key)
-Example: User Buys a Product
+- Sync DynamoDB → RDS
 
-User opens website
-→ CloudFront → S3
+- Alert on failed orders
 
-JS calls API
-→ API Gateway
+---
 
-API request
-→ ALB → EC2 App (Python)
+## 🔄 3️⃣ Make the Data Flow Realistic (This Is Key)
 
-App:
+#### Example: User Buys a Product
 
-Fetch product info → DynamoDB
+#### 1️⃣ User opens website
+- **→ CloudFront → S3**
 
-Fetch image URL → S3
+#### 2️⃣ JS calls API
+- **→ API Gateway**
 
-Save order → RDS MySQL
+#### 3️⃣ API request
+- **→ ALB → EC2 App (Python)**
 
-Store invoice → EFS
+#### 4️⃣ App:
 
-Credentials
-→ Secrets Manager
+- **Fetch product info → DynamoDB**
 
-Logs & metrics
-→ CloudWatch
+- **Fetch image URL → S3**
 
-Background task
-→ EventBridge triggers Lambda
+- **Save order → RDS MySQL**
 
-This is exactly how production systems behave.
+- **Store invoice → EFS**
 
-🔐 4️⃣ Security: What Makes It “Advanced”
+#### 5️⃣ Credentials
+- **→ Secrets Manager**
 
-To be realistic, you must enforce:
+#### 6️⃣ Logs & metrics
+- **→ CloudWatch**
 
-IAM roles only (no passwords in code)
+#### 7️⃣ Background task
+- **→ EventBridge triggers Lambda**
 
-Private subnets for App & DB
+##### This is exactly how production systems behave.
 
-NAT Gateway for outbound access
+---
 
-KMS encryption:
+## 🔐 4️⃣ Security: What Makes It “Advanced”
 
-S3
+### To be realistic, you must enforce:
 
-RDS
+- IAM roles only (no passwords in code)
 
-Secrets
+- Private subnets for App & DB
 
-Security Groups with tier-to-tier access only
+- NAT Gateway for outbound access
 
-CloudTrail for audit logs
+- KMS encryption:
 
-If an interviewer sees this, they’ll immediately know you understand real AWS security.
+  - S3
 
-📜 5️⃣ Scripting Strategy (Professional Level)
-Bash (Infrastructure Level)
+  - RDS
 
-Used for:
+  - Secrets
 
-EC2 bootstrap
+- Security Groups with tier-to-tier access only
 
-EFS mount
+- CloudTrail for audit logs
 
-MySQL initialization
+> **If an interviewer sees this, they’ll immediately know you understand real AWS security.**
 
-OS hardening
+---
 
-Example tasks:
+## 📜 5️⃣ Scripting Strategy (Professional Level)
 
-Install MySQL client
+### Bash (Infrastructure Level)
 
-Create tables
+#### Used for:
 
-Mount EFS persistently
+- EC2 bootstrap
 
-Python (Application Level)
+- EFS mount
 
-Used for:
+- MySQL initialization
 
-API logic
+- OS hardening
 
-Database queries
+#### Example tasks:
 
-DynamoDB operations
+- Install MySQL client
 
-File handling on EFS
+- Create tables
 
-This separation mirrors DevOps best practices.
+- Mount EFS persistently
 
-📈 6️⃣ How This Becomes Portfolio-Ready
+### Python (Application Level)
 
-When finished, you can say:
+#### Used for:
 
-“I designed and implemented a five-tier AWS e-commerce platform using CloudFront, ALB, API Gateway, EC2, RDS, DynamoDB, EFS, Lambda, EventBridge, and KMS with full security, logging, and automation.”
+- API logic
 
-That’s cloud engineer / solutions architect level.
+- Database queries
+
+- DynamoDB operations
+
+- File handling on EFS
+
+##### This separation mirrors DevOps best practices.
+
+---
+
+##  📈 6️⃣ How This Becomes Portfolio-Ready
+
+##### When finished, you can say:
+
+> “I designed and implemented a five-tier AWS e-commerce platform using CloudFront, ALB, API Gateway, EC2, RDS, DynamoDB, EFS, Lambda, EventBridge, and KMS with full security, logging, and automation.”
+
+**That’s cloud engineer / solutions architect level.**
+
+---
 
