@@ -22,6 +22,14 @@ DNS is the **internet's phonebook**.
 3. DNS returns IP address
 4. Browser connects to server
 
+### 🔹 DNS Hierarchy & Resolution Flow
+
+#### How a DNS query travels:
+
+**1. Recursive Resolver → 2. Root DNS → 3. TLD Server → 4. Authoritative DNS (Route 53)**
+
+###### Many beginners skip the full flow, which is essential to understand latency, caching, and troubleshooting.
+
 ---
 
 ## 2️⃣ DNS Components (Very Important)
@@ -55,6 +63,14 @@ DNS is the **internet's phonebook**.
 
 * Stores actual DNS records
 * Amazon Route 53 is an authoritative DNS
+
+### 🔹 TTL (Time to Live) Implications
+
+- Low TTL → faster updates but more DNS queries → more cost
+
+- High TTL → slower propagation
+
+- Understanding TTL helps in failover planning and blue/green deployments.
 
 ---
 
@@ -113,6 +129,16 @@ DNS records map domain names to resources.
 
 * Start of Authority
 * Zone metadata
+
+--
+
+### 🔹 Alias Records vs CNAME
+
+- Alias is AWS-specific, free of charge, supports root domains, automatically tracks AWS resource IP changes
+
+- CNAME cannot be used at root and may incur extra DNS lookups
+
+- Many skip this subtle but important difference.
 
 ---
 
@@ -206,6 +232,12 @@ Each DNS record inside hosted zone is called **Record Set**.
 ### 🔹 Multi-Value Answer Routing
 
 * Returns multiple healthy IPs
+
+### 🔹 Route 53 Routing Policies
+
+- Beginners often just use Simple routing
+
+**Weighted, Latency, Geolocation, GeoProximity, Multi-Value, Failover are advanced but very important for real-world scenarios.**
 
 ---
 
@@ -357,3 +389,4 @@ You now have **complete theoretical knowledge** of Amazon Route 53 from **beginn
 ---
 
 **End of Guide**
+
