@@ -111,7 +111,8 @@ A DNS zone is a **container of DNS records** for a domain.
 
 ---
 
-## DNS Records (DNS Entries)
+## DNS Records 
+##### (DNS Entries)
 
 DNS records map domain names to resources.
 
@@ -408,6 +409,7 @@ You now have **complete theoretical knowledge** of Amazon Route 53 from **beginn
 ---
 
 **End of Guide**
+
 
 
 
