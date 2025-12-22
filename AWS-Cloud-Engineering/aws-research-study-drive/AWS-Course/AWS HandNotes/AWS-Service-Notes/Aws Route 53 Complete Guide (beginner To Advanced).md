@@ -23,7 +23,7 @@
 
 ---
 
-## 1️⃣ What is DNS (Domain Name System)?
+## 1️⃣ Domain Name System
 
 DNS is the **internet's phonebook**.
 
@@ -407,5 +407,6 @@ You now have **complete theoretical knowledge** of Amazon Route 53 from **beginn
 ---
 
 **End of Guide**
+
 
 
