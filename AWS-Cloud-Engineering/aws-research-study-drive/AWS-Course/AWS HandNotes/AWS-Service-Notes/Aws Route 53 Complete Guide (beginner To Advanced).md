@@ -5,6 +5,24 @@
 
 ---
 
+## Table of Contents
+
+1. [Domain Name System](#Domain-Name-System)
+2. [Why Secrets Manager?](#why-secrets-manager)
+3. [Core Concepts](#core-concepts)
+4. [Secrets Manager Features](#secrets-manager-features)
+5. [Pricing](#pricing)
+6. [Basic Hands-On Lab](#basic-hands-on-lab)
+7. [Advanced Usage](#advanced-usage)
+8. [Integrations](#integrations)
+9. [Security Best Practices](#security-best-practices)
+10. [Common Errors & Troubleshooting](#common-errors--troubleshooting)
+11. [Automation with CLI, SDK, and Terraform](#automation-with-cli-sdk-and-terraform)
+12. [Use Cases in Real World](#use-cases-in-real-world)
+13. [Summary](#summary)
+
+---
+
 ## 1️⃣ What is DNS (Domain Name System)?
 
 DNS is the **internet's phonebook**.
@@ -389,4 +407,5 @@ You now have **complete theoretical knowledge** of Amazon Route 53 from **beginn
 ---
 
 **End of Guide**
+
 
