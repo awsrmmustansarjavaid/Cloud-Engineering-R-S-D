@@ -10,7 +10,7 @@
 1. [Domain Name System](#Domain-Name-System)
 2. [DNS Components](#DNS-Components)
 3. [DNS Zones](#DNS-Zones)
-4. [DNS Records (DNS Entries)](#DNS-Records-(DNS-Entries))
+4. [DNS Records (DNS Entries)](#DNS-Records)
 5. [Pricing](#pricing)
 6. [Basic Hands-On Lab](#basic-hands-on-lab)
 7. [Advanced Usage](#advanced-usage)
@@ -408,6 +408,7 @@ You now have **complete theoretical knowledge** of Amazon Route 53 from **beginn
 ---
 
 **End of Guide**
+
 
 
 
