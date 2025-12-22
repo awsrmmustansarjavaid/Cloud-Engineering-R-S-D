@@ -8,9 +8,9 @@
 ## Table of Contents
 
 1. [Domain Name System](#Domain-Name-System)
-2. [Why Secrets Manager?](#why-secrets-manager)
-3. [Core Concepts](#core-concepts)
-4. [Secrets Manager Features](#secrets-manager-features)
+2. [DNS Components](#DNS-Components)
+3. [DNS Zones](#DNS-Zones)
+4. [DNS Records (DNS Entries)](#DNS-Records-(DNS-Entries))
 5. [Pricing](#pricing)
 6. [Basic Hands-On Lab](#basic-hands-on-lab)
 7. [Advanced Usage](#advanced-usage)
@@ -50,7 +50,8 @@ DNS is the **internet's phonebook**.
 
 ---
 
-## 2️⃣ DNS Components (Very Important)
+## DNS Components 
+##### (Very Important)
 
 ### 🔹 Domain Name
 
@@ -92,7 +93,7 @@ DNS is the **internet's phonebook**.
 
 ---
 
-## 3️⃣ DNS Zones
+## DNS Zones
 
 ### 🔹 What is a DNS Zone?
 
@@ -110,7 +111,7 @@ A DNS zone is a **container of DNS records** for a domain.
 
 ---
 
-## 4️⃣ DNS Records (DNS Entries)
+## DNS Records (DNS Entries)
 
 DNS records map domain names to resources.
 
