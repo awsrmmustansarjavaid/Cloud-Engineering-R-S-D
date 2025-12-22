@@ -11,15 +11,13 @@
 2. [DNS Components](#DNS-Components)
 3. [DNS Zones](#DNS-Zones)
 4. [DNS Records (DNS Entries)](#DNS-Records)
-5. [Pricing](#pricing)
-6. [Basic Hands-On Lab](#basic-hands-on-lab)
-7. [Advanced Usage](#advanced-usage)
-8. [Integrations](#integrations)
-9. [Security Best Practices](#security-best-practices)
-10. [Common Errors & Troubleshooting](#common-errors--troubleshooting)
-11. [Automation with CLI, SDK, and Terraform](#automation-with-cli-sdk-and-terraform)
-12. [Use Cases in Real World](#use-cases-in-real-world)
-13. [Summary](#summary)
+5. [Amazon Route 53](#Amazon-Route-53)
+6. [Route 53 Architecture](#Route-53-Architecture)
+7. [Route 53 Hosted Zones](#Route-53-Hosted-Zones)
+8. [Route 53 Record Sets](#Route-53-Record-Sets)
+9. [Routing Policies](#Routing-Policies)
+10. [Route 53 Health Checks](#Route-53-Health-Checks)
+11. [Route 53 Key Notes](#Route-53-Key-Notes)
 
 ---
 
@@ -112,6 +110,7 @@ A DNS zone is a **container of DNS records** for a domain.
 ---
 
 ## DNS Records 
+
 ##### (DNS Entries)
 
 DNS records map domain names to resources.
@@ -162,7 +161,7 @@ DNS records map domain names to resources.
 
 ---
 
-## 5️⃣ What is Amazon Route 53?
+## Amazon Route 53
 
 Amazon Route 53 is a **highly available, scalable DNS web service**.
 
@@ -179,7 +178,7 @@ Amazon Route 53 is a **highly available, scalable DNS web service**.
 
 ---
 
-## 6️⃣ Route 53 Architecture
+## Route 53 Architecture
 
 ### 🔹 Global Service
 
@@ -193,7 +192,7 @@ Amazon Route 53 is a **highly available, scalable DNS web service**.
 
 ---
 
-## 7️⃣ Route 53 Hosted Zones
+## Route 53 Hosted Zones
 
 ### 🔹 Public Hosted Zone
 
@@ -207,7 +206,7 @@ Amazon Route 53 is a **highly available, scalable DNS web service**.
 
 ---
 
-## 8️⃣ Route 53 Record Sets
+## Route 53 Record Sets
 
 Each DNS record inside hosted zone is called **Record Set**.
 
@@ -221,7 +220,9 @@ Each DNS record inside hosted zone is called **Record Set**.
 
 ---
 
-## 9️⃣ Routing Policies (Very Important ⭐)
+## Routing Policies
+
+##### (Very Important ⭐)
 
 ### 🔹 Simple Routing
 
@@ -261,7 +262,7 @@ Each DNS record inside hosted zone is called **Record Set**.
 
 ---
 
-## 🔟 Route 53 Health Checks
+## Route 53 Health Checks
 
 ### 🔹 What is Health Check?
 
@@ -279,6 +280,8 @@ Monitors endpoint health
 * High availability
 
 ---
+
+## Route 53 Key Notes
 
 ## 1️⃣1️⃣ Domain Registration with Route 53
 
@@ -409,8 +412,6 @@ You now have **complete theoretical knowledge** of Amazon Route 53 from **beginn
 ---
 
 **End of Guide**
-
-
 
 
 
