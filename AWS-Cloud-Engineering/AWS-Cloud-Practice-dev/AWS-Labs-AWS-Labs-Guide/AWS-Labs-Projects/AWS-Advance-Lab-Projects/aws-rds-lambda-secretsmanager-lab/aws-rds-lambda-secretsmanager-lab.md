@@ -161,66 +161,14 @@ def lambda_handler(event, context):
 
 ## 10. Basic Lambda Test (Console Test)
 
-### 🔹 Step 1: Create folders (EXACT structure)
+### 🔹 Step 1: Install Python 3 + Pip
 
-#### On your local machine (Windows / Linux / Mac):
+- **Click on link for this task**
 
-```
-mkdir pymysql-layer
-cd pymysql-layer
-mkdir python
-```
+[AWS EC2 Python 3 + Pip](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Individual%20Service%20Complete%20Lab%20Guide/AWS%20EC2%20Python%203%20%2B%20pip.md)
 
-##### ⚠️ Folder name MUST be python (lowercase)
 
-###### If this is wrong → Lambda will NOT find pymysql.
-
-### 🔹 Step 2: Install PyMySQL into python/
-
-#### Run this inside pymysql-layer directory:
-
-```
-pip install pymysql -t python/
-```
-
-#### After this, you MUST see:
-
-```
-pymysql-layer/
-└── python/
-    ├── pymysql/
-    ├── pymysql-1.x.x.dist-info/
-```
-
-##### ✅ If you do NOT see pymysql/ → STOP, it’s wrong.
-
-### 🔹 Step 3: Zip the layer (VERY IMPORTANT)
-
-#### Run:
-
-```
-zip -r pymysql-layer.zip python
-```
-
-#### ✅ The zip must contain:
-
-```
-python/pymysql/...
-```
-
-#### ❌ NOT:
-
-```
-pymysql/
-```
-
-#### ❌ NOT:
-
-```
-pymysql-layer/python/pymysql
-```
-
-### 🔹 Step 4: Create Lambda Layer in AWS
+### 🔹 Step 2: Create Lambda Layer in AWS
 
 - **AWS Console → Lambda → Layers**
 
@@ -246,7 +194,7 @@ Python 3.10
 
 - **Create layer**
 
-### 🔹 Step 5: ATTACH the Layer to Your Lambda (MOST MISSED STEP)
+### 🔹 Step 3: ATTACH the Layer to Your Lambda (MOST MISSED STEP)
 
 - **Open your Lambda function**
 
