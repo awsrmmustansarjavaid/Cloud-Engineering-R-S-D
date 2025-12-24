@@ -26,6 +26,9 @@ User/Event
 → CloudWatch Logs  
 → CloudWatch Alarms  
 
+### Architecture Diagram
+
+![AWS Architecture Hand-on Lab](./aws-rds-lambda-secretsmanager-lab.jpg)
 ---
 
 ## 3. Prerequisites
