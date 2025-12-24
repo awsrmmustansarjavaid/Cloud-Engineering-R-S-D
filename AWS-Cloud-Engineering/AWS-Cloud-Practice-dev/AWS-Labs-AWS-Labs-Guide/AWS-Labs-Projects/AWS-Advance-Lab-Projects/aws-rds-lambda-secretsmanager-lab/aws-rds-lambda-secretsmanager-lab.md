@@ -401,16 +401,15 @@ secret['dbname']
 ## 6. Phase 3 – IAM Role
 
 ### Step 3: Create IAM Role for Lambda
-- **Name:** RDS-SecretsManager-Lambda
-- Permissions:
-   - AWSLambdaBasicExecutionRole
-   - SecretsManagerReadWrite
+
+Permissions:
+- AWSLambdaBasicExecutionRole
+- SecretsManagerReadWrite
 
 Purpose:
 - Read secrets
 - Write logs
 - Access AWS services securely
-
 
 ---
 
@@ -479,9 +478,36 @@ def lambda_handler(event, context):
 - Secrets are fetched dynamically
 - Logs automatically go to CloudWatch
 
+## 10. Basic Lambda Test (Console Test)
+
+1.  Click Test
+2.  Create test event:
+    - Event name: test-basic
+    - JSON:
+
+```
+{}
+```
+
+3.  Click Test
+
+##### ✅ Expected Result
+
+```
+{
+  "statusCode": 200,
+  "body": "Success"
+}
+```
+
+- ✔ Python code works
+- ✔ IAM role works
+- ✔ Secret fetched successfully
+
+
 ---
 
-## 10. Phase 5 – CloudWatch Logs
+## 11. Phase 5 – CloudWatch Logs
 
 ### View Logs
 
@@ -498,7 +524,7 @@ Logs show:
 
 ---
 
-## 11. Phase 6 – CloudWatch Alarms
+## 12. Phase 6 – CloudWatch Alarms
 
 ### Create Alarm
 
@@ -514,7 +540,7 @@ Purpose:
 
 ---
 
-## 12. Common Errors & Fixes
+## 13. Common Errors & Fixes
 
 | Issue | Cause | Fix |
 |-----|-----|-----|
@@ -524,7 +550,7 @@ Purpose:
 
 ---
 
-## 13. Advanced Practice Tasks
+## 14. Advanced Practice Tasks
 
 - Insert records using Lambda
 - Enable secret rotation
@@ -534,7 +560,7 @@ Purpose:
 
 ---
 
-## 14. Final Notes
+## 15. Final Notes
 
 This lab represents **real DevOps production patterns**.
 
