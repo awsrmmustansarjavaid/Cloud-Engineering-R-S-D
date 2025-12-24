@@ -401,7 +401,7 @@ secret['dbname']
 ## 6. Phase 3 – IAM Role
 
 ### Step 3: Create IAM Role for Lambda
-- Name: RDS-SecretsManager-Lambda
+- **Name:** RDS-SecretsManager-Lambda
 - Permissions:
    - AWSLambdaBasicExecutionRole
    - SecretsManagerReadWrite
