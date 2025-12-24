@@ -32,12 +32,17 @@
 6. KodeKloud – Docker Free Labs
 🔗 https://kodekloud.com/free-labs/docker
 
+🎓 Katacoda — interactive in-browser labs for Docker (and other infra).
+🔗 https://www.katacoda.com/courses/docker
 
 7. LearnDocker.online
 🔗 https://learndocker.online/
 
 8. LabEx – Docker Playground
 🔗 https://labex.io/tutorials/docker-online-docker-playground-372912
+
+
+
 
 ---
 
@@ -46,6 +51,8 @@
 9. Cloud Academy – Docker Playground
 🔗 https://platform.qa.com/lab/docker-playground/
 ---
+
+
 
 💡 If you're starting out, I recommend beginning with the free ones (Play with Docker + Docker 101 + Docker Labs).
 They’re enough to build a strong foundation.
