@@ -60,6 +60,10 @@ User/Event
 9. Security Group:
    - Allow inbound **3306** from Lambda SG only
 
+10. Connect RDS on EC2
+[AWS RDS/ Aurora Lab Complete Guide](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Individual%20Service%20Complete%20Lab%20Guide/AWS%20RDS.md)
+
+
 ---
 
 
