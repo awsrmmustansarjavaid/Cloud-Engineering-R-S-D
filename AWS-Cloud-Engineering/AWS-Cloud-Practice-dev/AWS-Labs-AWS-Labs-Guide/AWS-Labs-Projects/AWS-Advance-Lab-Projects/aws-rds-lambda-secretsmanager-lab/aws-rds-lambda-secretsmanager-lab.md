@@ -28,7 +28,7 @@ User/Event
 
 ### Architecture Diagram
 
-![AWS Architecture Hand-on Lab](./aws-rds-lambda-secretsmanager-lab.jpg)
+![AWS Architecture Hand-on Lab](./aws-rds-lambda-secretsmanager-lab.jpeg)
 ---
 
 ## 3. Prerequisites
