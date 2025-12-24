@@ -73,6 +73,9 @@ User/Event
 
 ### Step 1: Create Secret
 
+- **Click on Link for Create Secret**
+
+[AWS Secret Manager Hands-On Lab (Beginner → Advanced)](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Individual%20Service%20Complete%20Lab%20Guide/AWS%20Secret%20Manager.md)
 
 ---
 
