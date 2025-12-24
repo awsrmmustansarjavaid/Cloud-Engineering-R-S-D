@@ -161,6 +161,119 @@ def lambda_handler(event, context):
 
 ## 10. Basic Lambda Test (Console Test)
 
+### 🔹 Step 1: Create folders (EXACT structure)
+
+#### On your local machine (Windows / Linux / Mac):
+
+```
+mkdir pymysql-layer
+cd pymysql-layer
+mkdir python
+```
+
+##### ⚠️ Folder name MUST be python (lowercase)
+
+###### If this is wrong → Lambda will NOT find pymysql.
+
+### 🔹 Step 2: Install PyMySQL into python/
+
+#### Run this inside pymysql-layer directory:
+
+```
+pip install pymysql -t python/
+```
+
+#### After this, you MUST see:
+
+```
+pymysql-layer/
+└── python/
+    ├── pymysql/
+    ├── pymysql-1.x.x.dist-info/
+```
+
+##### ✅ If you do NOT see pymysql/ → STOP, it’s wrong.
+
+### 🔹 Step 3: Zip the layer (VERY IMPORTANT)
+
+#### Run:
+
+```
+zip -r pymysql-layer.zip python
+```
+
+#### ✅ The zip must contain:
+
+```
+python/pymysql/...
+```
+
+#### ❌ NOT:
+
+```
+pymysql/
+```
+
+#### ❌ NOT:
+
+```
+pymysql-layer/python/pymysql
+```
+
+### 🔹 Step 4: Create Lambda Layer in AWS
+
+- **AWS Console → Lambda → Layers**
+
+- **Click Create layer**
+
+- **Name:**
+
+```
+pymysql-layer
+```
+
+- **Upload:**
+
+```
+pymysql-layer.zip
+```
+
+- **Runtime:**
+
+```
+Python 3.10
+```
+
+- **Create layer**
+
+### 🔹 Step 5: ATTACH the Layer to Your Lambda (MOST MISSED STEP)
+
+- **Open your Lambda function**
+
+- **Scroll to Layers**
+
+- **Click Add a layer**
+
+- **Choose:**
+
+```
+Custom layers
+```
+
+- **Select:**
+
+```
+pymysql-layer
+```
+
+- **Version: Latest**
+
+- **Save**
+
+###### ⚠️ If the layer is not attached → Lambda WILL FAIL
+
+## 11. Basic Lambda Test (Console Test)
+
 1.  Click Test
 2.  Create test event:
     - Event name: test-basic
@@ -188,7 +301,7 @@ def lambda_handler(event, context):
 
 ---
 
-## 11. Phase 5 – CloudWatch Logs
+## 12. Phase 5 – CloudWatch Logs
 
 ### View Logs
 
@@ -205,7 +318,7 @@ Logs show:
 
 ---
 
-## 12. Phase 6 – CloudWatch Alarms
+## 13. Phase 6 – CloudWatch Alarms
 
 ### Create Alarm
 
@@ -221,7 +334,7 @@ Purpose:
 
 ---
 
-## 13. Common Errors & Fixes
+## 14. Common Errors & Fixes
 
 | Issue | Cause | Fix |
 |-----|-----|-----|
@@ -231,7 +344,7 @@ Purpose:
 
 ---
 
-## 14. Advanced Practice Tasks
+## 15. Advanced Practice Tasks
 
 - Insert records using Lambda
 - Enable secret rotation
@@ -241,7 +354,7 @@ Purpose:
 
 ---
 
-## 15. Final Notes
+## 16. Final Notes
 
 This lab represents **real DevOps production patterns**.
 
