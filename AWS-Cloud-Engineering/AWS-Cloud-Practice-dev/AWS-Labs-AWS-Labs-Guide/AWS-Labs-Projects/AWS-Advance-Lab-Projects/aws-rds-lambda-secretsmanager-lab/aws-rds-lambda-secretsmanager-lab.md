@@ -39,7 +39,31 @@ User/Event
 
 ---
 
-## 4. Phase 1 – AWS Secrets Manager
+## 4. Phase 1 – Amazon RDS MySQL
+
+### Step 2: Create Database
+
+1. Go to **RDS → Create database**
+2. Engine: **MySQL**
+3. Template: **Free Tier**
+4. DB Identifier:
+   ```
+   app-mysql-db
+   ```
+5. Credentials Settings
+    - **Master username:** admin
+    - **Credentials management:** Managed in AWS Secrets Manager - most secure
+    - **Select the encryption key:** aws/secretsmanager (default)
+6. Instance: `db.t3.micro`
+7. Storage: 20 GB
+8. Public access: **No**
+9. Security Group:
+   - Allow inbound **3306** from Lambda SG only
+
+---
+
+
+## 5. Phase 2 – AWS Secrets Manager
 
 ### Step 1: Create Secret
 
@@ -67,25 +91,6 @@ User/Event
   "dbname": "appdb"
 }
 ```
-
----
-
-## 5. Phase 2 – Amazon RDS MySQL
-
-### Step 2: Create Database
-
-1. Go to **RDS → Create database**
-2. Engine: **MySQL**
-3. Template: **Free Tier**
-4. DB Identifier:
-   ```
-   app-mysql-db
-   ```
-5. Instance: `db.t3.micro`
-6. Storage: 20 GB
-7. Public access: **No**
-8. Security Group:
-   - Allow inbound **3306** from Lambda SG only
 
 ---
 
