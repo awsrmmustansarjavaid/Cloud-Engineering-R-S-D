@@ -56,7 +56,7 @@
 
 ## AWS Architecture Visual Diagram
 
-![AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
+! [AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
 
 Now let’s build it step by step.
 
@@ -364,6 +364,360 @@ echo "<h1>Web Server Running</h1>" | sudo tee /var/www/html/index.html
 ##### This is real cloud engineer work, not theory.
 
 ---
+# AWS Hands-On Lab – Test, Verification & Troubleshooting Guide
+
+## Architecture Overview
+
+This document validates the following AWS services integration:
+
+- VPC with Public Subnet
+- EC2 (Web Server + Application Server + Lab IDE)
+- DynamoDB (Metadata storage)
+- S3 (Object storage)
+- SQS (Message queue)
+- SNS (Email notifications)
+- IAM Roles
+- Internet Gateway & Route Tables
+
+Purpose: Ensure **100% functional verification** of the lab and provide **real-world troubleshooting**.
+
+---
+
+## 1. End-to-End Test Plan
+
+| Step | Component | Test Objective | Expected Result |
+|---|---|---|---|
+| 1 | EC2 | Instance running | 2/2 status checks passed |
+| 2 | Web Server | HTTP access | Web page loads |
+| 3 | IAM | Permissions | No AccessDenied |
+| 4 | DynamoDB | Metadata storage | Item visible |
+| 5 | S3 | Object upload | File exists |
+| 6 | SQS | Message queue | Messages available |
+| 7 | SNS | Email notification | Email received |
+| 8 | Network | Internet access | Ping success |
+
+---
+
+## 2. EC2 & Web Server Verification
+
+### Test 1: EC2 Health Check
+- EC2 Console → Instance → Status checks
+
+**Expected**
+- Instance status: OK
+- System status: OK
+
+**Fix if failed**
+- Restart instance
+- Check subnet & route table
+
+---
+
+### Test 2: Web Server Access
+
+```
+http://<EC2-PUBLIC-IP>
+```
+
+#### Expected Output
+
+```
+Web Server Running
+```
+
+### Common Issue
+- Page not loading
+
+#### Solution
+- Security Group missing port 80
+- Apache not running:
+
+```bash
+sudo systemctl start httpd
+sudo systemctl enable httpd
+```
+
+## 3. IAM Role Verification
+
+### Test 3: IAM Role Attached to EC2
+
+#### Required policies:
+
+- AmazonS3FullAccess
+
+- AmazonDynamoDBFullAccess
+
+- AmazonSQSFullAccess
+
+- AmazonSNSFullAccess
+
+#### Expected
+
+```
+EC2 can access AWS services without credentials
+```
+
+#### Common Issue
+
+```
+AccessDeniedException
+```
+
+#### Solution
+
+- Attach correct IAM role
+
+- Do NOT use access keys on EC2
+
+## 4. DynamoDB Verification
+
+### Test 4: Manual Table Test
+
+#### Create item:
+
+```
+{
+  "id": "test123",
+  "filename": "sample.txt",
+  "timestamp": "2025-12-25"
+}
+```
+
+#### Expected
+
+```
+Item saved successfully
+```
+
+#### Common Issues
+
+- Partition key mismatch
+
+- Wrong data type
+
+#### Solution
+
+Ensure partition key = id (String)
+
+### Test 5: Application → DynamoDB
+
+#### Expected
+
+```
+
+New items auto-created when app runs
+```
 
 
+#### Common Issue
 
+```
+ResourceNotFoundException
+```
+
+#### Solution
+
+- Correct table name
+
+- Correct AWS region
+
+## 5. S3 Bucket Verification
+
+### Test 6: Manual Upload
+
+- S3 Console → Upload a file
+
+#### Expected
+
+```
+Upload successful
+```
+
+### Test 7: EC2 → S3 Upload
+
+```
+echo "lab test" > test.txt
+aws s3 cp test.txt s3://<your-bucket-name>/
+```
+
+#### Expected
+
+```
+upload: ./test.txt
+```
+
+#### Common Issue
+
+```
+Unable to locate credentials
+```
+
+#### Solution
+
+- IAM role not attached
+
+- Restart EC2 instance
+
+## 6. SQS Queue Verification
+
+### Test 8: Manual Message
+
+- SQS → Send message
+
+```
+Hello from AWS Lab
+```
+
+#### Expected
+
+```
+Messages available: 1
+```
+
+### Test 9: Application → SQS
+
+#### Expected
+
+```
+Queue message count increases
+```
+
+
+#### Common Issue
+
+```
+NonExistentQueue
+```
+
+#### Solution
+
+- Use correct Queue URL
+
+- Check region
+
+## 7. SNS Email Verification
+
+### Test 10: Subscription Confirmation
+
+#### Expected
+
+```
+Subscription status: Confirmed
+```
+
+
+#### Common Issue
+
+- Pending confirmation
+
+#### Solution
+
+- Check email inbox / spam
+
+- Click confirmation link
+
+### Test 11: Publish SNS Message
+
+- SNS → Publish message
+
+#### Expected
+
+```
+Email received
+```
+
+#### Common Issue
+
+- No email received
+
+#### Solution
+
+- Confirm subscription
+
+- Correct topic ARN
+
+## 8. Network & Internet Verification
+
+### Test 12: Internet Access from EC2
+
+```
+ping google.com
+```
+
+#### Expected
+
+```
+Successful replies
+```
+
+#### Common Issues
+
+- No Internet Gateway
+
+- Route table missing 0.0.0.0/0
+
+#### Solution
+
+- Attach IGW
+
+- Update route table
+
+## 9. CloudWatch Log Verification
+
+### Test 13: Logs & Errors
+
+- CloudWatch → Logs
+
+#### Expected
+
+```
+No AccessDenied or Timeout errors
+```
+
+#### Common Issues
+
+- Permission errors
+
+- Network timeout
+
+#### Solution
+
+- Update IAM policies
+
+- Fix security groups
+
+## 10. Common Bugs & Fixes Summary
+
+```
+| Issue                  | Root Cause                 | Solution              |
+| ---------------------- | -------------------------- | --------------------- |
+| Website not loading    | Port 80 blocked            | Update Security Group |
+| S3 upload fails        | Missing IAM role           | Attach S3 policy      |
+| DynamoDB error         | Wrong table name           | Fix config            |
+| SNS email not received | Subscription not confirmed | Confirm email         |
+| SQS empty              | Wrong queue URL            | Use correct URL       |
+| EC2 no internet        | IGW missing                | Attach IGW            |
+| Access denied          | Using access keys          | Use IAM role          |
+```
+
+## 11. Final Lab Validation Checklist
+
+- EC2 reachable via browser
+
+- Apache running
+
+- IAM role attached
+
+- DynamoDB item created
+
+- S3 object uploaded
+
+- SQS message visible
+
+- SNS email received
+
+- No CloudWatch errors
+
+##### ✅ If all checks pass, the lab is fully functional and production-ready.
+
+---
