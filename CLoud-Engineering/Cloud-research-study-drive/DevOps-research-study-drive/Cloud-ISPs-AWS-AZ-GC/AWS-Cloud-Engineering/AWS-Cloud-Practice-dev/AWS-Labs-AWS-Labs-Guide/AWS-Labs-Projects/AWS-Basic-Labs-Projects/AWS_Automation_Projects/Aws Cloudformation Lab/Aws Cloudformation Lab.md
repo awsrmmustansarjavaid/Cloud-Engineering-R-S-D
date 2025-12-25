@@ -1,5 +1,7 @@
 # 📘 AWS CloudFormation Hands-On Lab
 
+> **Author & Architecture Designer: ** Charlie 
+
 ## Automating Infrastructure with Infrastructure as Code (IaC)
 
 ## 📌 Lab Goal (What You Will Build)
