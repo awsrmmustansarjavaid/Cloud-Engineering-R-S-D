@@ -5,6 +5,10 @@ Transform a simple café website into a fully functional dynamic online ordering
 
 ---
 
+## AWS Architecture Diagram 
+
+![AWS Architecture Diagram]()
+
 ## Prerequisites
 
 - AWS account with full EC2, VPC, RDS, IAM, and Secrets Manager access  
