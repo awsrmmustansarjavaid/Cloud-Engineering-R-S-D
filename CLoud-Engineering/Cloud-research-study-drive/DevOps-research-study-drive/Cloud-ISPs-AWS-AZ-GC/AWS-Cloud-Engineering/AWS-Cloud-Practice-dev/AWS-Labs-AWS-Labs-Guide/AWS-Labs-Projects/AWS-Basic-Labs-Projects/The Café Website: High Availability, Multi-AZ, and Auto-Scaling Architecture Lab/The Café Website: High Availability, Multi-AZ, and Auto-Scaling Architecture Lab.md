@@ -9,7 +9,7 @@ Rebuild a single-AZ EC2-based café website into a **highly available, resilient
 
 ## AWS Architecture Diagram 
 
-![AWS Architecture Diagram]()
+![AWS Architecture Diagram](./Café%20Website%20High%20Availability%20%26%20Auto-Scaling.png)
 
 
 
@@ -341,5 +341,6 @@ After completing the lab, perform the following steps to ensure everything is wo
 - Ensure **scaling events** trigger automatically under load  
 
 ✅ **Expected Result:** Website remains available, auto-scales, and serves traffic efficiently across multiple AZs.
+
 
 
