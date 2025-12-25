@@ -21,6 +21,18 @@ Amazon RDS (MySQL/PostgreSQL)
 
 ![AWS Architecture Diagram](./aws_serverless_lab_architecture.jpeg)
 
+### Mermaid Diagram
+```mermaid
+graph TD
+    User[User Browser] --> CF[CloudFront CDN]
+    CF --> S3[Amazon S3 Static Website]
+    S3 -->|fetch API| APIGW[API Gateway]
+    APIGW --> Lambda[AWS Lambda - Python]
+    Lambda --> Secrets[AWS Secrets Manager]
+    Lambda --> RDS[Amazon RDS Database]
+    Lambda --> CW[CloudWatch Logs]
+```
+
 ## 2. Step-by-Step Implementation
 
 ### Step 1: RDS Setup
@@ -103,17 +115,7 @@ fetch("https://abc123.execute-api.us-east-1.amazonaws.com/prod/products")
 9. **CloudFront Validation:** Confirm headers `Via: CloudFront`, caching works.
 10. **Security Tests:** DB not public, no credentials in code, API throttling works.
 
-## 4. Mermaid Diagram
-```mermaid
-graph TD
-    User[User Browser] --> CF[CloudFront CDN]
-    CF --> S3[Amazon S3 Static Website]
-    S3 -->|fetch API| APIGW[API Gateway]
-    APIGW --> Lambda[AWS Lambda - Python]
-    Lambda --> Secrets[AWS Secrets Manager]
-    Lambda --> RDS[Amazon RDS Database]
-    Lambda --> CW[CloudWatch Logs]
-```
+
 
 ## 5. Notes & Best Practices
 - Use HTTPS everywhere.
