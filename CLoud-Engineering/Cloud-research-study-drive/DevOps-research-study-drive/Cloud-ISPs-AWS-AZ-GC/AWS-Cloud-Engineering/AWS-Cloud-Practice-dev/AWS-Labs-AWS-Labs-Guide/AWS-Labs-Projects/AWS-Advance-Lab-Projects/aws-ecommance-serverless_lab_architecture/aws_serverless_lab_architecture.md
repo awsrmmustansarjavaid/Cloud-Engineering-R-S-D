@@ -17,6 +17,9 @@ Secrets Manager (DB Credentials)
     ↓
 Amazon RDS (MySQL/PostgreSQL)
 ```
+### Architecture Visual Diagram
+
+![AWS Architecture Diagram](./aws_serverless_lab_architecture.jpeg)
 
 ## 2. Step-by-Step Implementation
 
