@@ -6,6 +6,10 @@ This lab guides you from manually connecting to an EC2 instance using PuTTY to d
 
 ---
 
+## AWS Architecture Diagram
+
+![AWS Architecture Diagram](./AWS_PuTTY_to_CloudFormation_Lab.png)
+
 ## LAB 1: SSH into EC2 Using PuTTY
 
 ### Step 1: AWS Setup
