@@ -7,7 +7,7 @@ Transform a simple café website into a fully functional dynamic online ordering
 
 ## AWS Architecture Diagram 
 
-![AWS Architecture Diagram]()
+![AWS Architecture Diagram](./AWS%20Challenge%20Lab%20Build%20a%20Dynamic%20Café%20Website%20Dev%20%20Prod.jpg)
 
 ## Prerequisites
 
@@ -212,5 +212,6 @@ sudo systemctl restart httpd
 | Orders not saving         | Check MySQL database & credentials, enable remote access if needed  |
 | 403 Forbidden             | Ensure `chown -R apache:apache /var/www/html`                       |
 ```
+
 
 
