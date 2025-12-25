@@ -56,7 +56,7 @@
 
 ## AWS Architecture Visual Diagram
 
-! [AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
+![AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
 
 Now let’s build it step by step.
 
@@ -721,3 +721,4 @@ No AccessDenied or Timeout errors
 ##### ✅ If all checks pass, the lab is fully functional and production-ready.
 
 ---
+
