@@ -1,9 +1,17 @@
 # AWS Lab Guide: Café Website High Availability & Auto-Scaling
 
+> **Author & Architecture Designer:** Charlie 
+
 **Lab Objective:**  
 Rebuild a single-AZ EC2-based café website into a **highly available, resilient, and auto-scaling architecture** using AWS services.
 
 ---
+
+## AWS Architecture Diagram 
+
+![AWS Architecture Diagram]()
+
+
 
 ## 📝 Prerequisites
 
@@ -211,5 +219,127 @@ Target Architecture:
 | NAT Gateway not working              | Route Table misconfigured     | Ensure private subnet route points to NAT   |
 | High traffic crashes site            | Insufficient ASG max size     | Increase max instances in ASG               |
 ```
+
+---
+
+## 🧪 Lab Test & Verification
+
+After completing the lab, perform the following steps to ensure everything is working as expected.
+
+---
+
+### 1️⃣ Verify VPC and Subnets
+
+**Resources to check:**  
+- VPC: `CafeVPC`  
+- Public Subnets: `10.0.1.0/24`, `10.0.2.0/24`  
+- Private Subnets: `10.0.11.0/24`, `10.0.12.0/24`  
+
+**Steps:**  
+1. Go to **VPC Console → Your VPCs** → confirm `CafeVPC` exists with CIDR `10.0.0.0/16`.  
+2. Go to **Subnets** → confirm all 4 subnets are created in the correct AZs.  
+
+✅ **Expected Result:** VPC and subnets are visible and properly configured.  
+
+---
+
+### 2️⃣ Verify Internet & NAT Gateways
+
+**Resources to check:**  
+- Internet Gateway: `CafeIGW`  
+- NAT Gateways in both AZs  
+
+**Steps:**  
+1. Go to **VPC → Internet Gateways** → confirm `CafeIGW` is attached to `CafeVPC`.  
+2. Go to **VPC → NAT Gateways** → confirm 2 NAT Gateways are active, each in a different AZ.  
+
+✅ **Expected Result:** Both NAT gateways are available and functional.  
+
+---
+
+### 3️⃣ Verify Route Tables
+
+**Steps:**  
+1. Go to **Route Tables** → confirm:  
+   - Public subnets route `0.0.0.0/0` → IGW  
+   - Private subnets route `0.0.0.0/0` → respective NAT Gateway  
+
+✅ **Expected Result:** Private instances can access the Internet via NAT.  
+
+---
+
+### 4️⃣ Verify Security Groups
+
+**Steps:**  
+1. ALB Security Group: inbound HTTP `80` from `0.0.0.0/0`  
+2. EC2 Security Group: inbound HTTP `80` from ALB SG, SSH `22` from your IP  
+
+✅ **Expected Result:** ALB can reach EC2 instances, SSH allowed only from your IP.  
+
+---
+
+### 5️⃣ Verify Launch Template
+
+**Steps:**  
+1. Go to **EC2 → Launch Templates** → confirm `CafeLaunchTemplate` exists.  
+2. Check User Data script: Apache installed, index page created.  
+
+✅ **Expected Result:** New EC2 instances launch with website pre-configured.  
+
+---
+
+### 6️⃣ Verify Auto Scaling Group (ASG)
+
+**Steps:**  
+1. Go to **EC2 → Auto Scaling Groups → CafeASG**  
+2. Confirm:  
+   - Min: 2, Desired: 2, Max: 4  
+   - Instances in private subnets, Multi-AZ  
+3. Perform **scale-out test**: simulate high CPU traffic → instances scale up  
+4. Perform **scale-in test**: reduce traffic → instances scale down  
+
+✅ **Expected Result:** Auto Scaling works automatically based on load.  
+
+---
+
+### 7️⃣ Verify Application Load Balancer (ALB)
+
+**Steps:**  
+1. Go to **EC2 → Load Balancers → CafeALB**  
+2. Check Target Group → all EC2 instances are healthy (`InService`)  
+3. Open **ALB DNS** in browser → index page should display  
+
+✅ **Expected Result:** Website loads via ALB; only healthy instances serve traffic.  
+
+---
+
+### 8️⃣ Multi-AZ Failover Test
+
+**Steps:**  
+1. Stop one EC2 instance in AZ-1.  
+2. Refresh ALB website.  
+
+✅ **Expected Result:** Website continues serving traffic via AZ-2 instances; high availability verified.  
+
+---
+
+### 9️⃣ Common Verification Errors & Fixes
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| ALB shows `503` | No healthy targets | Check EC2 health checks & user data script |
+| ASG not scaling | Launch template misconfigured | Verify AMI, SG, subnet |
+| Website not reachable | Security group misconfigured | Ensure ALB SG allows inbound HTTP |
+| Private instance no internet | NAT misconfigured | Verify private subnet route points to NAT Gateway |
+
+---
+
+### 10️⃣ Final Test
+
+- Open website in browser multiple times  
+- Monitor **EC2 instances and ALB metrics** in CloudWatch  
+- Ensure **scaling events** trigger automatically under load  
+
+✅ **Expected Result:** Website remains available, auto-scales, and serves traffic efficiently across multiple AZs.
 
 
