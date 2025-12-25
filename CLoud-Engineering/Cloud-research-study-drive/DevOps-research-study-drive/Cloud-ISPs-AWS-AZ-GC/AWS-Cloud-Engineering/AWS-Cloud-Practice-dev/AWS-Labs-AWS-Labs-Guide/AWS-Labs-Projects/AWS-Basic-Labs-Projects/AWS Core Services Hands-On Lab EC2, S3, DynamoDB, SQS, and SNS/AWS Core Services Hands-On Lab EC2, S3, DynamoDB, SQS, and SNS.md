@@ -56,7 +56,7 @@
 
 ## AWS Architecture Visual Diagram
 
-! [AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
+![AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
 
 Now let’s build it step by step.
 
@@ -364,5 +364,6 @@ echo "<h1>Web Server Running</h1>" | sudo tee /var/www/html/index.html
 ##### This is real cloud engineer work, not theory.
 
 ---
+
 
 
