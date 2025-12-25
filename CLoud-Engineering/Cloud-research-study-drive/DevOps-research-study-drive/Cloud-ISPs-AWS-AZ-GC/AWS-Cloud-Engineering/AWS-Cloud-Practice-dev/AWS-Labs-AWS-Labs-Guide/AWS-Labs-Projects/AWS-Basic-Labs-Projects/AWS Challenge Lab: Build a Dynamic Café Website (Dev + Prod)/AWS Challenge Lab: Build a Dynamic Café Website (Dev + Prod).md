@@ -214,4 +214,132 @@ sudo systemctl restart httpd
 ```
 
 
+# ☑️ AWS Café Website Lab: Test & Verification
+
+**Objective:** Ensure the dynamic café website deployed on AWS is fully functional in both Development (us-east-1) and Production (us-west-2) environments.
+
+---
+
+## 1️⃣ Development Environment (us-east-1)
+
+### EC2 & LAMP Stack Verification
+
+* Navigate to **EC2 Console → Instances**
+* Ensure `CafeDevWebServer` is running
+* Check Public IPv4 is assigned
+* Verify Apache is running:
+
+```bash
+sudo systemctl status httpd
+```
+
+* Verify PHP is working:
+
+```bash
+php -v
+```
+
+### Database Verification
+
+* Connect to MariaDB:
+
+```bash
+mysql -u cafe_user -p -h <EC2-Private-IP> cafe_db
+```
+
+* Ensure database contains tables required by the café app
+* Test inserting and retrieving a sample record:
+
+```sql
+INSERT INTO orders (customer_name, item, quantity) VALUES ('Test', 'Coffee', 1);
+SELECT * FROM orders;
+```
+
+### Secrets Manager Verification
+
+* Navigate to **Secrets Manager → CafeDevDBSecret**
+* Ensure secret contains:
+
+```
+username: cafe_user
+password: <your_password>
+host: <EC2-Private-IP>
+dbname: cafe_db
+```
+
+* Test app can retrieve secret and connect to DB using PHP script
+
+### Web Application Verification
+
+* Open browser → `http://<Dev-EC2-Public-IP>`
+* Verify website loads correctly
+* Place a test order → Ensure it is recorded in the database
+* Check Apache logs for errors:
+
+```bash
+sudo tail -f /var/log/httpd/error_log
+```
+
+### Security Verification
+
+* Security group allows HTTP/SSH traffic
+* MySQL root access is restricted
+* Secrets are not hardcoded in web app
+
+---
+
+## 2️⃣ Production Environment (us-west-2)
+
+### EC2 Instance Verification
+
+* Navigate to **EC2 Console → Instances**
+* Ensure `ProdWebServer` launched from `CafeDevWebAMI` is running
+* Check Public IPv4 is assigned
+* Verify Apache and PHP:
+
+```bash
+sudo systemctl status httpd
+php -v
+```
+
+### Application Verification
+
+* Open browser → `http://<Prod-EC2-Public-IP>`
+* Test all website pages load correctly
+* Place a test order → Verify order appears in the database
+* Ensure session persistence and app functionality match development environment
+
+### Multi-Region Verification
+
+* Dev site accessible: `http://<Dev-EC2-IP>`
+* Prod site accessible: `http://<Prod-EC2-IP>`
+* Check that custom AMI deployment works (Prod instance mirrors Dev app)
+
+---
+
+## 3️⃣ Common Bugs & Solutions
+
+| Issue                       | Solution                                                                      |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| EC2 not reachable           | Verify security group inbound rules & subnet routing                          |
+| PHP page blank              | Ensure `index.php` exists, Apache running, correct permissions                |
+| Database connection fails   | Verify secret ARN, DB credentials, and MySQL user privileges                  |
+| Orders not saving           | Ensure DB connection string is correct and user has INSERT privileges         |
+| 403 Forbidden               | Check `/var/www/html` ownership: `sudo chown -R apache:apache /var/www/html`  |
+| Secrets Manager not working | Check IAM role attached to EC2 has `secretsmanager:GetSecretValue` permission |
+
+---
+
+## 4️⃣ Final Verification Checklist
+
+* [ ] Development EC2 running & Apache/PHP working
+* [ ] MySQL database operational & connected via Secrets Manager
+* [ ] Website fully functional in Dev
+* [ ] Custom AMI created successfully
+* [ ] Production EC2 launched from AMI
+* [ ] Production site fully functional
+* [ ] Multi-region deployment verified
+
+✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
