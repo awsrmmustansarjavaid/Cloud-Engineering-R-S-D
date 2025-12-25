@@ -1,371 +1,368 @@
-#🔥 AWS HANDS-ON LAB – AWS Core Services Hands-On Lab EC2, S3, DynamoDB, SQS, and SNS
+# 🔥 AWS HANDS-ON LAB – AWS Core Services Hands-On Lab EC2, S3, DynamoDB, SQS, and SNS
 
 > **Author & Architecture Desinger:** Charlie
 
+---
 
-🧠 WHAT YOU WILL BUILD (High-Level)
+## 🧠 WHAT YOU WILL BUILD (High-Level)
 
-You will build:
+#### You will build:
 
-A VPC
+- A VPC
 
-A Public Subnet
+- A Public Subnet
 
-An EC2 instance
+- An EC2 instance
 
-Web Server
+  - Web Server
 
-Application Server
+  - Application Server
 
-Lab IDE (developer access)
+  - Lab IDE (developer access)
 
-DynamoDB (metadata storage)
+- DynamoDB (metadata storage)
 
-S3 bucket (object storage)
+- S3 bucket (object storage)
 
-SQS Queue
+- SQS Queue
 
-SNS Topic
+- SNS Topic
 
-Email Notifications
+- Email Notifications
 
-HTTPS access
+- HTTPS access
 
-End-to-End request flow
+- End-to-End request flow
 
-This lab simulates a real production-like AWS architecture.
+##### This lab simulates a real production-like AWS architecture.
 
-🗺️ ARCHITECTURE FLOW (MATCHING THE NUMBERS IN IMAGE)
+## 🗺️ ARCHITECTURE FLOW (MATCHING THE NUMBERS IN IMAGE)
 
-Let’s first understand the numbered flow in your diagram:
+#### Let’s first understand the numbered flow in your diagram:
 
-Step	Description
-1	Users send HTTPS requests
-2	Requests reach Web Server
-3	Web/App server reads/writes metadata to DynamoDB
-4	Data stored in S3
-5	SNS sends notification
-6	SQS Queue buffers messages
-7	Application Server processes logic
-8	S3 object access
+```
+| Step | Description                                      |
+| ---- | ------------------------------------------------ |
+| 1    | Users send HTTPS requests                        |
+| 2    | Requests reach Web Server                        |
+| 3    | Web/App server reads/writes metadata to DynamoDB |
+| 4    | Data stored in S3                                |
+| 5    | SNS sends notification                           |
+| 6    | SQS Queue buffers messages                       |
+| 7    | Application Server processes logic               |
+| 8    | S3 object access                                 |
+```
+
+
+## AWS Architecture Visual Diagram
+
+! [AWS Architecture Visual Diagram](./AWS%20Core%20Services%20Hands-On%20Lab%20EC2%2C%20S3%2C%20DynamoDB%2C%20SQS%2C%20and%20SNS.jpeg)
 
 Now let’s build it step by step.
 
-🧪 LAB PREREQUISITES
-You need:
+---
 
-AWS Free Tier Account
+## 🧪 LAB PREREQUISITES
 
-Verified Email Address
+#### You need:
 
-Basic Linux commands (I’ll explain)
+- AWS Free Tier Account
 
-🟩 STEP 1: CREATE VPC
-WHY?
+- Verified Email Address
 
-A VPC is your private network in AWS.
+- Basic Linux commands (I’ll explain)
 
-HOW:
 
-Open AWS Console
 
-Go to VPC
+### 🟩 STEP 1: CREATE VPC
+#### WHY?: A VPC is your private network in AWS.
 
-Click Create VPC
+- Open AWS Console
 
-Choose:
+- Go to VPC
 
-VPC only
+- Click Create VPC
 
-Name: Lab-VPC
+- Choose:
 
-IPv4 CIDR: 10.0.0.0/16
+    - VPC only
 
-Click Create VPC
+    - Name: Lab-VPC
 
-✅ Done
+    - IPv4 CIDR: 10.0.0.0/16
 
-🟩 STEP 2: CREATE PUBLIC SUBNET
-WHY?
+- Click Create VPC
 
-EC2 needs internet access → public subnet.
+##### ✅ Done
 
-HOW:
+### 🟩 STEP 2: CREATE PUBLIC SUBNET
 
-Go to Subnets
+#### WHY?: EC2 needs internet access → public subnet.
 
-Click Create subnet
 
-Select VPC: Lab-VPC
+- Go to Subnets
 
-Name: Public-Subnet
+- Click Create subnet
 
-Availability Zone: any (e.g. us-east-1a)
+- Select VPC: Lab-VPC
 
-CIDR: 10.0.1.0/24
+- Name: Public-Subnet
 
-Create subnet
+- Availability Zone: any (e.g. us-east-1a)
 
-🟩 STEP 3: CREATE INTERNET GATEWAY
-WHY?
+- CIDR: 10.0.1.0/24
 
-Without IGW, no internet.
+- Create subnet
 
-HOW:
+### 🟩 STEP 3: CREATE INTERNET GATEWAY
 
-Go to Internet Gateways
+#### WHY?: Without IGW, no internet.
 
-Create IGW → Name: Lab-IGW
+- Go to Internet Gateways
 
-Attach to Lab-VPC
+- Create IGW → Name: Lab-IGW
 
-🟩 STEP 4: ROUTE TABLE CONFIGURATION
-WHY?
+- Attach to Lab-VPC
 
-Traffic must know where to go.
+### 🟩 STEP 4: ROUTE TABLE CONFIGURATION
 
-HOW:
+#### WHY? : Traffic must know where to go.
 
-Go to Route Tables
+- Go to Route Tables
 
-Select main route table
+- Select main route table
 
-Add route:
+- Add route:
 
-Destination: 0.0.0.0/0
+    - Destination: 0.0.0.0/0
 
-Target: Internet Gateway
+    - Target: Internet Gateway
 
-Associate with Public-Subnet
+- Associate with Public-Subnet
 
-🟩 STEP 5: CREATE SECURITY GROUP
-WHY?
+### 🟩 STEP 5: CREATE SECURITY GROUP
 
-Acts like a virtual firewall.
+#### WHY? : Acts like a virtual firewall.
 
-HOW:
+- Create SG:
 
-Create SG:
+- Name: Web-SG
 
-Name: Web-SG
+- Inbound rules:
 
-Inbound rules:
+    - HTTP – 80 – Anywhere
 
-HTTP – 80 – Anywhere
+    - HTTPS – 443 – Anywhere
 
-HTTPS – 443 – Anywhere
+    - SSH – 22 – Your IP only
 
-SSH – 22 – Your IP only
+- Outbound: Allow all
 
-Outbound: Allow all
+### 🟩 STEP 6: LAUNCH EC2 INSTANCE
 
-🟩 STEP 6: LAUNCH EC2 INSTANCE
-WHY?
+#### WHY? : 
 
-This EC2 will host:
+- This EC2 will host:
 
-Web Server
+    - Web Server
 
-Application Server
+    - Application Server
 
-Lab IDE
+    - Lab IDE
 
-HOW:
 
-Go to EC2 → Launch Instance
+- Go to EC2 → Launch Instance
 
-Name: Lab-EC2
+- Name: Lab-EC2
 
-AMI: Amazon Linux 2
+- AMI: Amazon Linux 2
 
-Instance Type: t2.micro (Free tier)
+- Instance Type: t2.micro (Free tier)
 
-Key Pair: create/download
+- Key Pair: create/download
 
-Network:
+- Network:
 
-VPC: Lab-VPC
+    - VPC: Lab-VPC
 
-Subnet: Public-Subnet
+    - Subnet: Public-Subnet
 
-Auto-assign public IP: ENABLE
+    - Auto-assign public IP: ENABLE
 
-Security Group: Web-SG
+- Security Group: Web-SG
 
-Launch instance
+- Launch instance
 
-🟩 STEP 7: CONNECT TO EC2 (LAB IDE)
-HOW:
+### 🟩 STEP 7: CONNECT TO EC2 (LAB IDE)
 
 Use EC2 Instance Connect or SSH.
 
-Once inside EC2:
+#### Once inside EC2:
 
+```
 sudo yum update -y
 sudo yum install -y httpd python3 git
 sudo systemctl start httpd
 sudo systemctl enable httpd
+```
 
-🟩 STEP 8: SETUP WEB SERVER
-HOW:
+
+### 🟩 STEP 8: SETUP WEB SERVER
+
+```
 echo "<h1>Web Server Running</h1>" | sudo tee /var/www/html/index.html
+```
 
+##### Open EC2 public IP in browser → ✅ Web server works
 
-Open EC2 public IP in browser → ✅ Web server works
+### 🟩 STEP 9: CREATE DYNAMODB TABLE
 
-🟩 STEP 9: CREATE DYNAMODB TABLE
-WHY?
+#### WHY? : Stores metadata (as shown in diagram).
 
-Stores metadata (as shown in diagram).
+- Go to DynamoDB
 
-HOW:
+- Create table:
 
-Go to DynamoDB
+    - Table name: MetadataTable
 
-Create table:
+    - Partition key: id (String)
 
-Table name: MetadataTable
+- Create table
 
-Partition key: id (String)
+### 🟩 STEP 10: CREATE S3 BUCKET
 
-Create table
+#### WHY? : Stores files/objects.
 
-🟩 STEP 10: CREATE S3 BUCKET
-WHY?
+- Go to S3
 
-Stores files/objects.
+- Create bucket:
 
-HOW:
+    - Name: lab-storage-unique-name
 
-Go to S3
+    - Block public access: ON
 
-Create bucket:
+- Create bucket
 
-Name: lab-storage-unique-name
+### 🟩 STEP 11: CREATE SQS QUEUE
 
-Block public access: ON
+#### WHY? :Message buffering (decoupling).
 
-Create bucket
+- Go to SQS
 
-🟩 STEP 11: CREATE SQS QUEUE
-WHY?
+- Create queue
 
-Message buffering (decoupling).
+- Type: Standard
 
-HOW:
+- Name: Lab-Queue
 
-Go to SQS
+### 🟩 STEP 12: CREATE SNS TOPIC
 
-Create queue
+#### WHY? : Send notifications (email).
 
-Type: Standard
 
-Name: Lab-Queue
+- Go to SNS
 
-🟩 STEP 12: CREATE SNS TOPIC
-WHY?
+- Create topic:
 
-Send notifications (email).
+    - Name: Lab-Topic
 
-HOW:
+- Create subscription:
 
-Go to SNS
+    - Protocol: Email
 
-Create topic:
+    - Endpoint: your email
 
-Name: Lab-Topic
+- Confirm email
 
-Create subscription:
+### 🟩 STEP 13: IAM ROLE FOR EC2
 
-Protocol: Email
+#### WHY? : 
 
-Endpoint: your email
+- EC2 needs permission to:
 
-Confirm email
+    - Access S3
 
-🟩 STEP 13: IAM ROLE FOR EC2
-WHY?
+    - DynamoDB
 
-EC2 needs permission to:
+    - SQS
 
-Access S3
+    - SNS
 
-DynamoDB
+#### Create IAM Role:
 
-SQS
+- Service: EC2
 
-SNS
+- Policies:
 
-HOW:
+    - AmazonS3FullAccess
 
-Create IAM Role:
+    - AmazonDynamoDBFullAccess
 
-Service: EC2
+    - AmazonSQSFullAccess
 
-Policies:
+    - AmazonSNSFullAccess
+- Attach role to EC2
 
-AmazonS3FullAccess
+### 🟩 STEP 14: APPLICATION LOGIC (SIMPLIFIED)
 
-AmazonDynamoDBFullAccess
+#### Your application will:
 
-AmazonSQSFullAccess
+- Receive request
 
-AmazonSNSFullAccess
-Attach role to EC2
+- Store metadata in DynamoDB
 
-🟩 STEP 14: APPLICATION LOGIC (SIMPLIFIED)
+- Upload file to S3
 
-Your application will:
+- Send message to SQS
 
-Receive request
+- Publish SNS notification
 
-Store metadata in DynamoDB
+### 🟩 STEP 15: TEST COMPLETE FLOW
 
-Upload file to S3
+#### TEST CASE:
 
-Send message to SQS
+- Open browser
 
-Publish SNS notification
+- Send request
 
-🟩 STEP 15: TEST COMPLETE FLOW
-TEST CASE:
+- Upload data
 
-Open browser
+- Check:
 
-Send request
+    - DynamoDB entry
 
-Upload data
+    - S3 object
 
-Check:
+    - SQS message
 
-DynamoDB entry
+    - Email received ✅
 
-S3 object
+---
 
-SQS message
+## 🎯 WHAT YOU LEARNED (VERY IMPORTANT)
 
-Email received ✅
+#### You just practiced:
 
-🎯 WHAT YOU LEARNED (VERY IMPORTANT)
+- VPC networking
 
-You just practiced:
+- EC2 hosting
 
-VPC networking
+- Web & App server architecture
 
-EC2 hosting
+- DynamoDB
 
-Web & App server architecture
+- S3
 
-DynamoDB
+- SNS
 
-S3
+- SQS
 
-SNS
+- IAM roles
 
-SQS
+- Real cloud design
 
-IAM roles
+##### This is real cloud engineer work, not theory.
 
-Real cloud design
+---
 
-This is real cloud engineer work, not theory.
+
