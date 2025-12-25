@@ -260,7 +260,151 @@ DeletionPolicy: Retain
 
 * Prevents accidental deletion of important resources
 
-## 🧪 STEP 14: Common Errors & Fixes
+# ✅ CloudFormation Lab Test & Verification
+
+## 1️⃣ Verify Network Stack (VPC Layer)
+
+**Resources to check:**
+
+* VPC
+* Public Subnet
+* Internet Gateway
+* Route Table
+* Outputs (VPC ID & Subnet ID)
+
+**Steps:**
+
+1. Go to **VPC Console → Your VPCs**
+
+   * Check that `MyVPC` exists.
+   * Confirm **CIDR block** is `10.0.0.0/16`.
+2. Go to **Subnets → Your Subnets**
+
+   * Check that the public subnet exists.
+   * Confirm **CIDR block** is `10.0.1.0/24`.
+   * Ensure **Auto-assign public IPv4** is enabled.
+3. Go to **Internet Gateways → Your Internet Gateways**
+
+   * Confirm the IGW is **attached to MyVPC**.
+4. Go to **Route Tables → Your Route Tables**
+
+   * Confirm the public route table exists.
+   * Check that it has a **0.0.0.0/0 → IGW** route.
+   * Verify **Subnet association** with the public subnet.
+5. Check **CloudFormation Outputs**
+
+   * `Network-VPC-ID` and `Network-PublicSubnet-ID` are available.
+6. **Test connectivity (Optional)**
+
+   * Create a temporary EC2 in the public subnet and try `ping 8.8.8.8`.
+
+---
+
+## 2️⃣ Verify Application Stack (EC2 Layer)
+
+**Resources to check:**
+
+* Security Group
+* EC2 Instance
+
+**Steps:**
+
+1. Go to **EC2 Console → Instances**
+
+   * Instance is **running**.
+   * **Public IP** is assigned.
+2. Go to **Security Groups**
+
+   * Check that **port 22 (SSH)** is allowed from your IP.
+3. Check **CloudFormation Outputs / Imports**
+
+   * Ensure the EC2 subnet uses `Network-PublicSubnet-ID`.
+   * Ensure the Security Group is in `Network-VPC-ID`.
+4. **SSH Test (Optional)**
+
+   ```bash
+   ssh -i your-key.pem ec2-user@<Public-IP>
+   ```
+
+   * Confirm you can log in without errors.
+5. **Test Internet Access (Optional)**
+
+   ```bash
+   ping -c 4 google.com
+   ```
+
+   * Confirms IGW & routing are correct.
+
+---
+
+## 3️⃣ Verify Cross-Stack References
+
+* Network stack **exports values**:
+
+  * `Network-VPC-ID`
+  * `Network-PublicSubnet-ID`
+* Application stack **imports these values correctly**:
+
+  * Security Group VPC ID → Imported VPC ID
+  * EC2 Subnet → Imported Public Subnet ID
+* In **CloudFormation → app-stack → Resources**
+
+  * No **ImportValue errors**.
+* Confirm that deleting **app-stack first** works without errors (then **network-stack** can be deleted safely).
+
+---
+
+## 4️⃣ Verify Change Sets (Safe Updates)
+
+1. Create a **Change Set** in `app-stack`.
+2. Modify instance type (t2.micro → t3.micro).
+3. Preview the changes.
+4. Execute the change set.
+5. Verify the EC2 instance type is updated without affecting other resources.
+
+---
+
+## 5️⃣ Verify Deletion Policies
+
+1. Add `DeletionPolicy: Retain` to EC2 or Security Group.
+2. Delete the stack.
+3. Check that retained resources are **not deleted**.
+
+---
+
+## 6️⃣ Verify Visualization (Infrastructure Composer)
+
+1. Open **CloudFormation → Infrastructure Composer**.
+2. Load both stacks.
+3. Confirm all resources are correctly visualized:
+
+   * VPC, Subnet, IGW, Route Table
+   * Security Group, EC2 Instance
+   * Cross-stack links
+
+---
+
+## 7️⃣ Final Verification Checklist
+
+| Resource                | Status                           | Pass? |
+| ----------------------- | -------------------------------- | ----- |
+| VPC                     | Exists with correct CIDR         | ✅     |
+| Public Subnet           | Exists, mapped public IP         | ✅     |
+| Internet Gateway        | Attached to VPC                  | ✅     |
+| Route Table             | Contains route to IGW            | ✅     |
+| CloudFormation Outputs  | All outputs exist                | ✅     |
+| EC2 Instance            | Running, public IP assigned      | ✅     |
+| Security Group          | Port 22 allowed                  | ✅     |
+| Cross-stack References  | Imported correctly               | ✅     |
+| Change Set              | Updates instance type safely     | ✅     |
+| Deletion Policies       | Resources retained if configured | ✅     |
+| Infrastructure Composer | All resources visualized         | ✅     |
+
+> If all of the above pass, your **CloudFormation lab is 100% successful**.
+
+
+
+## 🧪  Common Errors & Fixes
 
 | Error             | Cause                     | Solution                   |
 | ----------------- | ------------------------- | -------------------------- |
@@ -269,7 +413,7 @@ DeletionPolicy: Retain
 | SSH timeout       | SG issue                  | Allow port 22              |
 | Stack rollback    | Syntax error              | Validate YAML              |
 
-## 🧹 STEP 15: Clean Up (IMPORTANT)
+## 🧹 Clean Up (IMPORTANT)
 
 * Delete **app-stack** first
 * Delete **network-stack** next
@@ -291,5 +435,6 @@ DeletionPolicy: Retain
 * DevOps learning
 * Cloud Engineer roles
 * GitHub portfolio
+
 
 
