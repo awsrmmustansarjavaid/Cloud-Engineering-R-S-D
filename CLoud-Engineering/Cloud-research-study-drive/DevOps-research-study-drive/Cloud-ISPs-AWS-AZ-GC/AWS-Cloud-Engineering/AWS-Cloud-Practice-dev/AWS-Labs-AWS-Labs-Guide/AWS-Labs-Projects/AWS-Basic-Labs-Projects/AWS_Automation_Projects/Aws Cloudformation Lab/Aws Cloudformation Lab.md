@@ -7,12 +7,19 @@
 By the end of this lab, you will successfully and confidently:
 
 ✅ Understand Infrastructure as Code (IaC)
+
 ✅ Create a VPC stack (network layer) using CloudFormation
+
 ✅ Create an Application stack that imports values from the network stack
+
 ✅ Use Parameters, Outputs, Exports, and Imports
+
 ✅ Use Change Sets before updating infrastructure
+
 ✅ Use Deletion Policies to protect resources
+
 ✅ Visualize infrastructure using Infrastructure Composer
+
 ✅ Verify, test, and safely delete stacks
 
 ## 🧠 Prerequisites (Read Carefully)
@@ -278,3 +285,4 @@ DeletionPolicy: Retain
 * DevOps learning
 * Cloud Engineer roles
 * GitHub portfolio
+
