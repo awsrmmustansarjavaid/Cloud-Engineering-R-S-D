@@ -24,6 +24,10 @@ By the end of this lab, you will successfully and confidently:
 
 ✅ Verify, test, and safely delete stacks
 
+## AWS Architecture Diagram
+
+![AWS Architecture Diagram](./aws_cloudformation_lab.png)
+
 ## 🧠 Prerequisites (Read Carefully)
 
 ### 1️⃣ AWS Account
@@ -287,4 +291,5 @@ DeletionPolicy: Retain
 * DevOps learning
 * Cloud Engineer roles
 * GitHub portfolio
+
 
