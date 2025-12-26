@@ -320,7 +320,7 @@ dbname: cafe_db
 
 ---
 
-## Step 8: 🔐 Create IAM Role for EC2 (Secrets Manager Access)
+### Step 8: 🔐 Create IAM Role for EC2 (Secrets Manager Access)
 
 #### 🎯 Goal: Allow your EC2 instance to call
 
