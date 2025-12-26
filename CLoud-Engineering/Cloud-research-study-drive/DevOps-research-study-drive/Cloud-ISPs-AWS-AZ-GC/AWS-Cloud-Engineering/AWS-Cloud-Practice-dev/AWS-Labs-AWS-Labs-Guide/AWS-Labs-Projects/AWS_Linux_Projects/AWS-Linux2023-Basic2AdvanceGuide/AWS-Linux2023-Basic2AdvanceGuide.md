@@ -3,177 +3,478 @@
 > **Author & Architecture Designer:** Charlie 
 
 
+# 🐧 Amazon Linux 2023 – Basic to Advanced CLI Command Guide (AWS Focused)
 
-### Step 4: ✅ LAMP Stack Installation on Amazon Linux 2023
+This guide is designed for **AWS learners, Cloud Engineers, SysAdmins, and DevOps beginners** using **Amazon Linux 2023** on EC2.
 
-#### Update the System
+It covers **daily-use, real-world commands** from **basic Linux operations → services → networking → security → web servers → troubleshooting → AWS-friendly tasks**.
 
+---
+
+## 📌 1. System Basics & Information
+
+### Check OS Version
+
+```bash
+cat /etc/os-release
 ```
+
+### Kernel Version
+
+```bash
+uname -r
+```
+
+### System Uptime
+
+```bash
+uptime
+```
+
+### CPU Information
+
+```bash
+lscpu
+```
+
+### Memory Usage
+
+```bash
+free -h
+```
+
+### Disk Usage
+
+```bash
+df -h
+```
+
+### Mounted Filesystems
+
+```bash
+lsblk
+```
+
+---
+
+## 📌 2. Package Management (DNF – Daily Use)
+
+### Update System (MOST COMMON)
+
+```bash
 sudo dnf update -y
 ```
 
-#### Install Apache (httpd)
+### Search a Package
 
+```bash
+dnf search httpd
 ```
+
+### Install a Package
+
+```bash
 sudo dnf install -y httpd
 ```
 
-#### Start & Enable Apache
+### Remove a Package
 
+```bash
+sudo dnf remove httpd
 ```
+
+### List Installed Packages
+
+```bash
+dnf list installed
+```
+
+### Package Information
+
+```bash
+dnf info php
+```
+
+---
+
+## 📌 3. File & Directory Management (Daily Admin Tasks)
+
+### List Files
+
+```bash
+ls
+ls -l
+ls -la
+```
+
+### Create Directory
+
+```bash
+mkdir project
+```
+
+### Create File
+
+```bash
+touch index.html
+```
+
+### Copy Files
+
+```bash
+cp file1 file2
+```
+
+### Move / Rename
+
+```bash
+mv oldname newname
+```
+
+### Delete Files & Directories
+
+```bash
+rm file.txt
+rm -rf folder
+```
+
+### File Permissions
+
+```bash
+chmod 755 script.sh
+```
+
+### Change Ownership
+
+```bash
+sudo chown ec2-user:ec2-user file.txt
+```
+
+---
+
+## 📌 4. User & Permission Management (AWS EC2 Admin)
+
+### Current User
+
+```bash
+whoami
+```
+
+### Add User
+
+```bash
+sudo useradd devuser
+```
+
+### Set Password
+
+```bash
+sudo passwd devuser
+```
+
+### Switch User
+
+```bash
+su - devuser
+```
+
+### Add User to sudo
+
+```bash
+sudo usermod -aG wheel devuser
+```
+
+---
+
+## 📌 5. Service Management (systemctl – VERY IMPORTANT)
+
+### Start Service
+
+```bash
 sudo systemctl start httpd
 ```
 
-```
-sudo systemctl enable httpd
+### Stop Service
+
+```bash
+sudo systemctl stop httpd
 ```
 
-#### Verify Apache
+### Restart Service
 
-```
-sudo systemctl status httpd
-```
-
-#### Allow Apache Through Firewall (if enabled)
-
-```
-sudo firewall-cmd --permanent --add-service=http
-```
-
-```
-sudo firewall-cmd --reload
-```
-
-##### ⚠️ If firewalld is not installed, you can ignore this step.
-
-
-#### Install PHP 8.x (Amazon Linux 2023 Default)
-
-```
-sudo dnf install -y php php-cli php-common php-mysqlnd php-gd php-xml php-mbstring
-```
-
-#### Verify PHP
-
-```
-php -v
-```
-
-#### Install MariaDB Server (MySQL Compatible)
-
-```
-sudo dnf install -y mariadb105-server
-```
-
-#### Start & Enable MariaDB
-
-```
-sudo systemctl start mariadb
-```
-
-```
-sudo systemctl enable mariadb
-```
-
-#### Verify MariaDB
-
-```
-sudo systemctl status mariadb
-```
-
-#### Secure MariaDB
-
-```
-sudo mysql_secure_installation
-```
-##### Set root password, remove test DB, disable remote root login
-
-#### Recommended Answers
-
-```
-Enter current password for root:  (Press Enter)
-Set root password?               Y
-Remove anonymous users?          Y
-Disallow root login remotely?    Y
-Remove test database?            Y
-Reload privilege tables?         Y
-```
-
-#### Test PHP with Apache
-
-```
-sudo nano /var/www/html/info.php
-```
-
-##### Paste:
-
-```
-<?php
-phpinfo();
-?>
-```
-
-#### Restart Apache:
-
-```
+```bash
 sudo systemctl restart httpd
 ```
 
-##### Open in browser:
+### Enable on Boot
 
-```
-http://<EC2-Public-IP>/info.php
-```
-
-##### ✅ If PHP info page appears → PHP is working correctly
-
-##### Fix Permissions (Very Important)
-
-```
-sudo chown -R apache:apache /var/www
+```bash
+sudo systemctl enable httpd
 ```
 
-```
-sudo chmod -R 755 /var/www
-```
+### Disable on Boot
 
-##### Install MySQL Client (Optional but Recommended)
-
-```
-sudo dnf install -y mariadb105
+```bash
+sudo systemctl disable httpd
 ```
 
+### Service Status
 
-##### Verify Full LAMP Stack
-
+```bash
+sudo systemctl status httpd
 ```
-httpd -v
+
+### List Running Services
+
+```bash
+systemctl list-units --type=service
+```
+
+---
+
+## 📌 6. Networking Commands (AWS Troubleshooting)
+
+### IP Address
+
+```bash
+ip a
+```
+
+### Routing Table
+
+```bash
+ip route
+```
+
+### Test Connectivity
+
+```bash
+ping google.com
+```
+
+### Check Open Ports
+
+```bash
+ss -tuln
+```
+
+### DNS Check
+
+```bash
+nslookup google.com
+```
+
+### Curl (API & Web Test)
+
+```bash
+curl http://localhost
+```
+
+---
+
+## 📌 7. Firewall (firewalld – Optional in AL2023)
+
+### Check Firewall Status
+
+```bash
+sudo systemctl status firewalld
+```
+
+### Start Firewall
+
+```bash
+sudo systemctl start firewalld
+```
+
+### Allow HTTP
+
+```bash
+sudo firewall-cmd --permanent --add-service=http
+```
+
+### Reload Firewall
+
+```bash
+sudo firewall-cmd --reload
+```
+
+⚠️ *In AWS, Security Groups are PRIMARY — firewall is secondary.*
+
+---
+
+## 📌 8. LAMP Stack Installation (COMMON AWS LAB TASK)
+
+### Install Apache
+
+```bash
+sudo dnf install -y httpd
+```
+
+### Install PHP 8.x
+
+```bash
+sudo dnf install -y php php-cli php-common php-mysqlnd php-gd php-xml php-mbstring
+```
+
+### Start Apache
+
+```bash
+sudo systemctl start httpd
+```
+
+### Enable Apache
+
+```bash
+sudo systemctl enable httpd
+```
+
+### Verify Apache
+
+```bash
+curl http://localhost
+```
+
+### PHP Version
+
+```bash
 php -v
-mysql --version
 ```
 
-### Step 6: Create MySQL Database for Café App
+---
 
-```
-CREATE DATABASE cafe_db;
-CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
-GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
-FLUSH PRIVILEGES;
-```
+## 📌 9. Logs & Monitoring (Production Troubleshooting)
 
-### Step 7: Store Database Credentials in AWS Secrets Manager
+### View System Logs
 
-1. Go to Secrets Manager → Store a new secret
-
-2. Type: Other type of secret → Key/Value
-
-```
-username: cafe_user
-password: StrongPassword123
-host: <EC2-Private-IP>
-dbname: cafe_db
+```bash
+journalctl -xe
 ```
 
-3. Name: CafeDevDBSecret
+### Service Logs
 
-4. Retrieve Secret ARN for later use in the app
+```bash
+journalctl -u httpd
+```
+
+### Apache Logs
+
+```bash
+/var/log/httpd/access_log
+/var/log/httpd/error_log
+```
+
+### Disk Usage by Folder
+
+```bash
+du -sh *
+```
+
+---
+
+## 📌 10. Process Management
+
+### Running Processes
+
+```bash
+ps aux
+```
+
+### Top (Live Monitoring)
+
+```bash
+top
+```
+
+### Kill Process
+
+```bash
+kill -9 PID
+```
+
+---
+
+## 📌 11. Compression & Backup (AWS Admin Work)
+
+### Create Archive
+
+```bash
+tar -czvf backup.tar.gz folder/
+```
+
+### Extract Archive
+
+```bash
+tar -xzvf backup.tar.gz
+```
+
+---
+
+## 📌 12. AWS EC2-Specific Daily Commands
+
+### Instance Metadata (VERY IMPORTANT)
+
+```bash
+curl http://169.254.169.254/latest/meta-data/
+```
+
+### Public IP
+
+```bash
+curl http://169.254.169.254/latest/meta-data/public-ipv4
+```
+
+### Instance ID
+
+```bash
+curl http://169.254.169.254/latest/meta-data/instance-id
+```
+
+---
+
+## 📌 13. Security Best Practices
+
+### Disable Root Login (SSH)
+
+```bash
+sudo vi /etc/ssh/sshd_config
+```
+
+Set:
+
+```
+PermitRootLogin no
+```
+
+Restart SSH:
+
+```bash
+sudo systemctl restart sshd
+```
+
+---
+
+## 📌 14. Useful Aliases (Productivity)
+
+```bash
+alias ll='ls -lah'
+alias cls='clear'
+```
+
+---
+
+## ✅ Final Notes
+
+✔ Designed for **AWS EC2 + Amazon Linux 2023**
+✔ Covers **real interview + job tasks**
+✔ Perfect for **Cloud, SysAdmin, DevOps beginners**
+
+---
+
+If you want next:
+
+* 🔹 **DevOps-focused Linux guide**
+* 🔹 **Linux commands mapped to AWS interviews**
+* 🔹 **Downloadable `.md` or `.pdf`**
+
+Just tell me 👍
+
