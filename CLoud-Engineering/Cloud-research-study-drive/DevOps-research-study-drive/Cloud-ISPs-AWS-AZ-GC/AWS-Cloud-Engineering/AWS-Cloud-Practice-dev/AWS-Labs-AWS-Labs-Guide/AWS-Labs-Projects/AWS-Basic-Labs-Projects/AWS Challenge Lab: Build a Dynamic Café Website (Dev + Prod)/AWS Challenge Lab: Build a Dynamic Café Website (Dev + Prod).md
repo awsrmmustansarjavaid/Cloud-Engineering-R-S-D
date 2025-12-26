@@ -386,28 +386,47 @@ http://<EC2-Public-IP>
 
 ##### ✅ You should see the AWS Café homepage
 
-
-
 ---
 
-1. Upload app files to /var/www/html via SFTP or Git
-
-2. Update config.php to read Secrets Manager:
+### 🔁 Step 9: Create config.php (Secrets Manager + MariaDB)
 
 ```
-require 'vendor/autoload.php';
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
 use Aws\SecretsManager\SecretsManagerClient;
+use Aws\Exception\AwsException;
 
-$client = new SecretsManagerClient([
-    'version' => 'latest',
-    'region' => 'us-east-1'
-]);
+$region = "us-east-1";   // change for prod if needed
+$secretName = "CafeDevDBSecret";
 
-$result = $client->getSecretValue([
-    'SecretId' => 'CafeDevDBSecret',
-]);
-$secret = json_decode($result['SecretString'], true);
-$db = new mysqli($secret['host'], $secret['username'], $secret['password'], $secret['dbname']);
+try {
+    $client = new SecretsManagerClient([
+        'version' => 'latest',
+        'region'  => $region
+    ]);
+
+    $result = $client->getSecretValue([
+        'SecretId' => $secretName
+    ]);
+
+    $secret = json_decode($result['SecretString'], true);
+
+    $db = new mysqli(
+        $secret['host'],
+        $secret['username'],
+        $secret['password'],
+        $secret['dbname']
+    );
+
+    if ($db->connect_error) {
+        die("Database connection failed: " . $db->connect_error);
+    }
+
+} catch (AwsException $e) {
+    die("Secrets Manager error: " . $e->getMessage());
+}
+?>
 ```
 
 3. Set permissions and restart Apache:
@@ -417,7 +436,7 @@ sudo chown -R apache:apache /var/www/html
 sudo systemctl restart httpd
 ```
 
-### Step 9: Test the Application
+### Step 10: Test the Application
 
 - Access http://<EC2-Public-IP>
 
@@ -425,7 +444,7 @@ sudo systemctl restart httpd
 
 - Debug PHP/Apache logs: /var/log/httpd/error_log
 
-### Step 🔟 Create Custom AMI
+### Step 11 Create Custom AMI
 
 - Go to EC2 Console → Instances → Actions → Create Image
 
