@@ -318,7 +318,220 @@ dbname: cafe_db
 
 4. Retrieve Secret ARN for later use in the app
 
-### Step 8: Deploy Café Web Application
+---
+
+## Step 8: 🔐 Create IAM Role for EC2 (Secrets Manager Access)
+
+#### 🎯 Goal: Allow your EC2 instance to call
+
+```
+secretsmanager:GetSecretValue
+```
+
+#### for:
+
+```
+CafeDevDBSecret
+```
+
+### 🟢 PART 1: Create IAM Role (AWS Console)
+
+#### Step 1: Open IAM Console
+
+- Go to AWS Console
+
+- Search IAM
+
+- Click Roles
+
+- Click Create role
+
+#### Step 2: Select Trusted Entity
+
+- Trusted entity type → AWS service
+
+- Use case → EC2
+
+- Click Next
+
+##### ✅ This step allows EC2 to assume the role
+
+#### Step 3: Create Custom Permission Policy
+
+- Click Create policy (opens new tab)
+
+- Choose: JSON tab
+
+- Paste this exact policy (replace region if needed):
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSecret*"
+    }
+  ]
+}
+```
+
+- Click Next
+
+#### Step 4: Name the Policy
+
+- Policy name:
+
+```
+CafeSecretsManagerAccess
+```
+
+##### Description (optional):
+
+```
+Allow EC2 to read Cafe DB secrets
+```
+
+- Click Create policy
+
+##### ✅ Policy created successfully
+
+#### Step 5: Attach Policy to Role
+
+- Go back to the Create role tab.
+
+- Click Refresh
+
+- Search policy:
+
+```
+CafeSecretsManagerAccess
+```
+
+- Select it
+
+- Click Next
+
+#### Step 6: Name the IAM Role
+
+- Role name:
+
+```
+EC2-Cafe-Secrets-Role
+```
+
+- Description:
+
+```
+IAM role for Cafe EC2 to access Secrets Manager
+```
+
+- Click Create role
+
+##### ✅ IAM Role is now ready
+
+### 🟢 PART 2: Attach IAM Role to EC2 Instance
+
+#### Step 7: Attach Role to Running EC2
+
+- Open EC2 Console
+
+- Go to Instances
+
+- Select your instance
+
+```
+CafeDevWebServer
+```
+
+- Click Actions
+
+- Security
+
+- Modify IAM role
+
+#### Step 8: Select IAM Role
+
+- Choose:
+
+```
+EC2-Cafe-Secrets-Role
+```
+
+- Click Update IAM role
+
+##### ✅ Role attached instantly (NO reboot required)
+
+### 🟢 PART 3: Verify from EC2 (VERY IMPORTANT)
+
+#### Step 9: Verify IAM Role is Attached
+
+##### Run this on EC2:
+
+```
+curl http://169.254.169.254/latest/meta-data/iam/info
+```
+
+###### ✅ If role is attached, you will see JSON output.
+
+#### Step 10: Test Secrets Manager Access from EC2
+
+##### Install AWS CLI if not present:
+
+```
+sudo dnf install -y awscli
+```
+
+##### Run:
+
+```
+aws secretsmanager get-secret-value \
+  --secret-id CafeDevDBSecret \
+  --region us-east-1
+```
+
+##### ✅ If secret value is returned → IAM role works
+
+##### ❌ If AccessDenied → policy or role is wrong
+
+#### 🧠 Common Mistakes (READ THIS)
+
+```
+| Mistake                  | Result             |
+| ------------------------ | ------------------ |
+| Role not attached        | PHP fails silently |
+| Wrong region             | Secret not found   |
+| Using IAM User keys      | ❌ Bad practice     |
+| Hardcoding credentials   | ❌ Security risk    |
+| Missing `GetSecretValue` | AccessDenied       |
+```
+
+#### ✅ FINAL CHECKLIST
+
+✔ IAM role created
+
+✔ Policy attached
+
+✔ Role attached to EC2
+
+✔ Secret accessible via AWS CLI
+
+✔ PHP app can read Secrets Manager
+
+#### 🏁 Final Architecture
+
+```
+EC2
+ └── IAM Role
+      └── SecretsManager:GetSecretValue
+           └── CafeDevDBSecret
+```
+
+---
+
+
+### Step 9: Deploy Café Web Application
 
 
 #### ✅ index.php (Static Café Website – Lab Ready)
@@ -331,37 +544,121 @@ require 'config.php';
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>AWS Café</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #219150;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #ecf0f1;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
 
-<h1>☕ AWS Café Order</h1>
+<header>
+    <h1>☕ AWS Café</h1>
+    <p>Welcome to our cloud-powered café</p>
+</header>
 
-<form method="POST">
-    Name: <input type="text" name="name" required><br><br>
-    Item:
-    <select name="item">
-        <option>Coffee</option>
-        <option>Tea</option>
-    </select><br><br>
-    Quantity: <input type="number" name="qty" value="1"><br><br>
-    <button type="submit">Place Order</button>
-</form>
+<div class="container">
+    <h2>Place Your Order</h2>
 
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $stmt = $db->prepare("INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)");
-    $stmt->bind_param("ssi", $_POST['name'], $_POST['item'], $_POST['qty']);
-    $stmt->execute();
-    echo "<p>✅ Order placed successfully!</p>";
-}
-?>
+    <form method="POST">
+        <label for="name">Customer Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+        <label for="item">Select Item</label>
+        <select id="item" name="item">
+            <option value="Coffee">Coffee</option>
+            <option value="Tea">Tea</option>
+            <option value="Latte">Latte</option>
+            <option value="Cappuccino">Cappuccino</option>
+        </select>
+
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1">
+
+        <button type="submit">Place Order</button>
+    </form>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Prepare and execute statement safely
+        $stmt = $db->prepare("INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssi", $_POST['name'], $_POST['item'], $_POST['quantity']);
+        $stmt->execute();
+        echo "<p>✅ Order placed successfully!</p>";
+    }
+    ?>
+</div>
+
+<footer>
+    <p>© 2025 AWS Café | Built on Amazon EC2 (LAMP Stack)</p>
+</footer>
 
 </body>
 </html>
-
 ```
 
 #### 📂 Where to Save This File on EC2
@@ -388,7 +685,7 @@ http://<EC2-Public-IP>
 
 ---
 
-### 🔁 Step 9: Create config.php (Secrets Manager + MariaDB)
+### 🔁 Create config.php (Secrets Manager + MariaDB)
 
 ```
 <?php
