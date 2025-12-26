@@ -60,11 +60,29 @@ ssh -i "CafeDevKey.pem" ec2-user@<Public-IP>
 
 ```
 sudo yum update -y
+```
+
+```
 sudo amazon-linux-extras enable lamp-mariadb10.3-php8.2
+```
+
+```
 sudo amazon-linux-extras install -y lamp-mariadb10.3-php8.2
+```
+
+```
 sudo yum install -y httpd mariadb-server
+```
+
+```
 sudo systemctl start httpd
+```
+
+```
 sudo systemctl enable httpd
+```
+
+```
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 ```
@@ -73,8 +91,9 @@ sudo systemctl enable mariadb
 
 ```
 sudo mysql_secure_installation
-# Set root password, remove test DB, disable remote root login
 ```
+##### Set root password, remove test DB, disable remote root login
+
 
 ### Step 6: Create MySQL Database for Café App
 
@@ -341,5 +360,6 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
