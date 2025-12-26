@@ -349,7 +349,7 @@ dbname: cafe_db
 #### 📂 Where to Save This File on EC2
 
 ```
-sudo nano /var/www/html/index.html
+sudo nano /var/www/html/index.php
 ```
 
 - Paste the code → Save → Exit
@@ -609,6 +609,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
