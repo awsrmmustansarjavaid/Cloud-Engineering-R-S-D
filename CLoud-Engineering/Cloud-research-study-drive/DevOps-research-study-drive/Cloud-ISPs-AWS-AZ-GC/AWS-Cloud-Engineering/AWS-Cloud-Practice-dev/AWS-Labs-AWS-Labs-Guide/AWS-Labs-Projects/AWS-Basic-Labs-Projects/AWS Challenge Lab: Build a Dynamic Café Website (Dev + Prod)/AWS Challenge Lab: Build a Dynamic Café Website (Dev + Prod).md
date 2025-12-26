@@ -111,46 +111,6 @@ sudo dnf install -y php php-cli php-common php-mysqlnd php-gd php-xml php-mbstri
 php -v
 ```
 
-#### Install MariaDB Server (MySQL Compatible)
-
-```
-sudo dnf install -y mariadb105-server
-```
-
-#### Start & Enable MariaDB
-
-```
-sudo systemctl start mariadb
-```
-
-```
-sudo systemctl enable mariadb
-```
-
-#### Verify MariaDB
-
-```
-sudo systemctl status mariadb
-```
-
-#### Secure MariaDB
-
-```
-sudo mysql_secure_installation
-```
-##### Set root password, remove test DB, disable remote root login
-
-#### Recommended Answers
-
-```
-Enter current password for root:  (Press Enter)
-Set root password?               Y
-Remove anonymous users?          Y
-Disallow root login remotely?    Y
-Remove test database?            Y
-Reload privilege tables?         Y
-```
-
 #### Test PHP with Apache
 
 ```
@@ -189,13 +149,6 @@ sudo chown -R apache:apache /var/www
 sudo chmod -R 755 /var/www
 ```
 
-##### Install MySQL Client (Optional but Recommended)
-
-```
-sudo dnf install -y mariadb105
-```
-
-
 ##### Verify Full LAMP Stack
 
 ```
@@ -203,14 +156,149 @@ httpd -v
 php -v
 mysql --version
 ```
+### Step 5: ✅ install and configure MariaDB Server on Amazon Linux 2023
+
+##### Update Your System
+
+```
+sudo dnf update -y
+```
+
+#### Install MariaDB Server (MySQL Compatible)
+
+```
+sudo dnf install -y mariadb105-server
+```
+
+#### Start & Enable MariaDB
+
+```
+sudo systemctl start mariadb
+```
+
+```
+sudo systemctl enable mariadb
+```
+
+#### Verify MariaDB
+
+```
+sudo systemctl status mariadb
+```
+
+#### Secure MariaDB
+
+```
+sudo mysql_secure_installation
+```
+##### Set root password, remove test DB, disable remote root login
+
+##### Recommended Answers
+
+
+```
+Enter current password for root:  (Press Enter)
+Set root password?               Y
+Remove anonymous users?          Y
+Disallow root login remotely?    Y
+Remove test database?            Y
+Reload privilege tables?         Y
+```
+
+- Set root password
+
+- Remove anonymous users
+
+- Disallow root login remotely (optional for security)
+
+- Remove test database
+
+- Reload privilege tables → yes
+
+
+
+##### Install MySQL Client (Optional but Recommended)
+
+```
+sudo dnf install -y mariadb105
+```
 
 ### Step 6: Create MySQL Database for Café App
+
+#### Login to MariaDB:
+
+```
+sudo mysql -u root -p
+```
+
+#### Create MySQL Database
+
+##### Run:
 
 ```
 CREATE DATABASE cafe_db;
 CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
 GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
+```
+
+#### Configure MariaDB to Allow Remote Connections (Optional)
+
+##### Edit:
+
+```
+sudo nano /etc/my.cnf.d/mariadb-server.cnf
+```
+
+##### Find bind-address and set:
+
+```
+bind-address = 0.0.0.0
+```
+
+#### Restart MariaDB:
+
+```
+sudo systemctl restart mariadb
+```
+
+#### Configure EC2 Security Group
+
+- **Go to EC2 Console → Security Groups → Inbound rules**
+
+- **Add rule:**
+
+   - **Type: MySQL/Aurora**
+
+   - **Port: 3306**
+
+   - **Source: your IP (or anywhere 0.0.0.0/0 for lab/testing)**
+
+#### Test Connection
+
+##### From EC2 itself:
+
+```
+mysql -u cafe_user -p -h 127.0.0.1 cafedevdatabase
+```
+
+##### From another machine (if remote enabled):
+
+```
+mysql -u cafe_user -p -h <EC2-Public-IP> cafedevdatabase
+```
+
+#### Connect from PHP App
+
+##### Your PHP config.php will use these credentials:
+
+```
+$db = new mysqli(
+    '<EC2-Private-IP-or-127.0.0.1>',
+    'cafe_user',
+    'YourStrongPassword',
+    'cafedevdatabase'
+);
 ```
 
 ### Step 7: Store Database Credentials in AWS Secrets Manager
@@ -233,117 +321,47 @@ dbname: cafe_db
 ### Step 8: Deploy Café Web Application
 
 
-#### ✅ index.html (Static Café Website – Lab Ready)
+#### ✅ index.php (Static Café Website – Lab Ready)
 
 ##### 👉 Copy & paste exactly as it is
 
 ```
+<?php
+require 'config.php';
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>AWS Café</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 25px;
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #219150;
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            margin-top: 30px;
-            background-color: #ecf0f1;
-            color: #555;
-        }
-    </style>
 </head>
 <body>
 
-<header>
-    <h1>☕ AWS Café</h1>
-    <p>Welcome to our cloud-powered café</p>
-</header>
+<h1>☕ AWS Café Order</h1>
 
-<div class="container">
-    <h2>Place Your Order</h2>
+<form method="POST">
+    Name: <input type="text" name="name" required><br><br>
+    Item:
+    <select name="item">
+        <option>Coffee</option>
+        <option>Tea</option>
+    </select><br><br>
+    Quantity: <input type="number" name="qty" value="1"><br><br>
+    <button type="submit">Place Order</button>
+</form>
 
-    <form>
-        <label for="name">Customer Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter your name" required>
-
-        <label for="item">Select Item</label>
-        <select id="item" name="item">
-            <option value="Coffee">Coffee</option>
-            <option value="Tea">Tea</option>
-            <option value="Latte">Latte</option>
-            <option value="Cappuccino">Cappuccino</option>
-        </select>
-
-        <label for="quantity">Quantity</label>
-        <input type="number" id="quantity" name="quantity" min="1" value="1">
-
-        <button type="submit">Place Order</button>
-    </form>
-</div>
-
-<footer>
-    <p>© 2025 AWS Café | Built on Amazon EC2 (LAMP Stack)</p>
-</footer>
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $stmt = $db->prepare("INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssi", $_POST['name'], $_POST['item'], $_POST['qty']);
+    $stmt->execute();
+    echo "<p>✅ Order placed successfully!</p>";
+}
+?>
 
 </body>
 </html>
+
 ```
 
 #### 📂 Where to Save This File on EC2
@@ -609,6 +627,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
