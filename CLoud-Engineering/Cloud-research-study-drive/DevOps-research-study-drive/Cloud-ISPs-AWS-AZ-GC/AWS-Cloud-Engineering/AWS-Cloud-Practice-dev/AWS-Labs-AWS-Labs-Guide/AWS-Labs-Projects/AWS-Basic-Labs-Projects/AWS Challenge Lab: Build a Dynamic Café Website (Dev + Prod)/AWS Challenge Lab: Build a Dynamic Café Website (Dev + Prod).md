@@ -232,6 +232,146 @@ dbname: cafe_db
 
 ### Step 8: Deploy Café Web Application
 
+
+#### ✅ index.html (Static Café Website – Lab Ready)
+
+##### 👉 Copy & paste exactly as it is
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Café</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #219150;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #ecf0f1;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>☕ AWS Café</h1>
+    <p>Welcome to our cloud-powered café</p>
+</header>
+
+<div class="container">
+    <h2>Place Your Order</h2>
+
+    <form>
+        <label for="name">Customer Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+        <label for="item">Select Item</label>
+        <select id="item" name="item">
+            <option value="Coffee">Coffee</option>
+            <option value="Tea">Tea</option>
+            <option value="Latte">Latte</option>
+            <option value="Cappuccino">Cappuccino</option>
+        </select>
+
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1">
+
+        <button type="submit">Place Order</button>
+    </form>
+</div>
+
+<footer>
+    <p>© 2025 AWS Café | Built on Amazon EC2 (LAMP Stack)</p>
+</footer>
+
+</body>
+</html>
+```
+
+#### 📂 Where to Save This File on EC2
+
+```
+sudo nano /var/www/html/index.html
+```
+
+- Paste the code → Save → Exit
+
+#### 🔄 Restart Apache
+
+```
+sudo systemctl restart httpd
+```
+
+#### 🌐 Test in Browser
+
+```
+http://<EC2-Public-IP>
+```
+
+##### ✅ You should see the AWS Café homepage
+
+
+
+---
+
 1. Upload app files to /var/www/html via SFTP or Git
 
 2. Update config.php to read Secrets Manager:
@@ -469,6 +609,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
