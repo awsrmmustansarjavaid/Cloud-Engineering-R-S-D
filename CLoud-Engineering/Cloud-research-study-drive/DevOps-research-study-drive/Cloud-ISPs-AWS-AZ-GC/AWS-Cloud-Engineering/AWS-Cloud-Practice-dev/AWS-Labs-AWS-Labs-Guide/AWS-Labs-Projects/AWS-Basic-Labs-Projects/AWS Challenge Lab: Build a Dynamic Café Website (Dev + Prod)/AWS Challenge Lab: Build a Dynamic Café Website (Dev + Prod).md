@@ -84,6 +84,9 @@ sudo systemctl enable httpd
 
 ```
 sudo systemctl start mariadb
+```
+
+```
 sudo systemctl enable mariadb
 ```
 
@@ -360,6 +363,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
