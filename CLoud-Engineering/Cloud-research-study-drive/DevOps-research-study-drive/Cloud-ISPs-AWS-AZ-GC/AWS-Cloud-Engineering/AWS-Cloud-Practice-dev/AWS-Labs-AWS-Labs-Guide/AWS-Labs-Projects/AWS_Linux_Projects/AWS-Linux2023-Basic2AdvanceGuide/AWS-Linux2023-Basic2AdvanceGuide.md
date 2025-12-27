@@ -11,6 +11,44 @@ It covers **daily-use, real-world commands** from **basic Linux operations → s
 
 ---
 
+---
+
+# Content 
+
+### 1. [System Basics & Information](#System-Basics-&-Information)
+
+### 2. [Package Management (DNF – Daily Use)](#Package-Management)
+
+### 3. [File & Directory Management](#File-&-Directory-Management)
+
+### 4. [User & Permission Management](#User-&-Permission-Management)
+
+### 5. [Service Management](#Service-Management)
+
+### 6. [Networking Commands](#Networking-Commands)
+
+### 7. [System Basics & Information](#System-Basics-&-Information)
+
+### 8. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+### 9. [System Basics & Information](#System-Basics-&-Information)
+
+---
+
 ## 📌 1. System Basics & Information
 
 ### Check OS Version
@@ -57,7 +95,9 @@ lsblk
 
 ---
 
-## 📌 2. Package Management (DNF – Daily Use)
+## 📌 2. Package Management 
+
+##### (DNF – Daily Use)
 
 ### Update System (MOST COMMON)
 
@@ -97,7 +137,9 @@ dnf info php
 
 ---
 
-## 📌 3. File & Directory Management (Daily Admin Tasks)
+## 📌 3. File & Directory Management 
+
+##### (Daily Admin Tasks)
 
 ### List Files
 
@@ -152,7 +194,9 @@ sudo chown ec2-user:ec2-user file.txt
 
 ---
 
-## 📌 4. User & Permission Management (AWS EC2 Admin)
+## 📌 4. User & Permission Management
+
+##### (AWS EC2 Admin)
 
 ### Current User
 
@@ -186,7 +230,9 @@ sudo usermod -aG wheel devuser
 
 ---
 
-## 📌 5. Service Management (systemctl – VERY IMPORTANT)
+## 📌 5. Service Management 
+
+##### (systemctl – VERY IMPORTANT)
 
 ### Start Service
 
@@ -232,7 +278,9 @@ systemctl list-units --type=service
 
 ---
 
-## 📌 6. Networking Commands (AWS Troubleshooting)
+## 📌 6. Networking Commands 
+
+##### (AWS Troubleshooting)
 
 ### IP Address
 
