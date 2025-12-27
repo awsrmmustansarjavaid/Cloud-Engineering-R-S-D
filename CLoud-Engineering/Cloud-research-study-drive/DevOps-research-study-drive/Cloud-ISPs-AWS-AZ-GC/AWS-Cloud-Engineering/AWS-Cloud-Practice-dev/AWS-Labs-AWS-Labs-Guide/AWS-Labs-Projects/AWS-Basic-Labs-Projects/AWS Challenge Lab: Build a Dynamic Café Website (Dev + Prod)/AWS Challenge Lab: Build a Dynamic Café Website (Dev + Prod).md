@@ -245,8 +245,17 @@ sudo mysql -u root -p
 
 ```
 CREATE DATABASE cafe_db;
+```
+
+```
 CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
+```
+
+```
 GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
+```
+
+```
 FLUSH PRIVILEGES;
 ```
 
@@ -951,6 +960,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
