@@ -49,7 +49,7 @@ It covers **daily-use, real-world commands** from **basic Linux operations → s
 
 ---
 
-## 📌 System Basics & Information
+## System Basics & Information
 
 ### Check OS Version
 
@@ -933,6 +933,7 @@ If you want next:
 * 🔹 **Downloadable `.md` or `.pdf`**
 
 Just tell me 👍
+
 
 
 
