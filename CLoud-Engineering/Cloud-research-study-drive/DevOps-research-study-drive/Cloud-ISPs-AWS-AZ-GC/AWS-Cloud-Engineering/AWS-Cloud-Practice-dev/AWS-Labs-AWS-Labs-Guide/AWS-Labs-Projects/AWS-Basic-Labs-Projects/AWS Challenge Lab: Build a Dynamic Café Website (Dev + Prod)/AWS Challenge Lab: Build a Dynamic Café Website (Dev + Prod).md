@@ -587,6 +587,26 @@ SHOW TABLES;
 orders
 ```
 
+#### Test insert manually (CLI)
+
+```
+INSERT INTO orders (customer_name, item, quantity)
+VALUES ('CLI-Test', 'Coffee', 1);
+```
+
+#### Verify:
+
+```
+SELECT * FROM orders;
+```
+
+###### ✅ If you see the row → DB is READY
+
+#### Exit MySQL:
+
+```
+EXIT;
+```
 
 
 #### Configure MariaDB to Allow Remote Connections (Optional)
