@@ -552,7 +552,7 @@ FLUSH PRIVILEGES;
 ##### Verify 
 
 ```
-mysql -u cafe_user -p cafedevdatabase
+mysql -u cafe_user -p cafe_db
 ```
 
 #### Configure MariaDB to Allow Remote Connections (Optional)
@@ -1068,6 +1068,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
