@@ -296,7 +296,7 @@ sudo systemctl restart mariadb
 ##### From EC2 itself:
 
 ```
-mysql -u cafe_user -p -h 127.0.0.1 cafedevdatabase
+mysql -u cafe_user -p -h 127.0.0.1 cafe_db
 ```
 
 ##### From another machine (if remote enabled):
@@ -960,6 +960,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
