@@ -549,11 +549,45 @@ GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-##### Verify 
+#### Verify 
 
 ```
 mysql -u cafe_user -p cafe_db
 ```
+
+#### Use the correct database
+
+```
+USE cafe_db;
+```
+
+#### Create the orders table (REQUIRED)
+
+##### Run this exact SQL:
+
+```
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    item VARCHAR(50) NOT NULL,
+    quantity INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### Verify table exists
+
+```
+SHOW TABLES;
+```
+
+##### You should see:
+
+```
+orders
+```
+
+
 
 #### Configure MariaDB to Allow Remote Connections (Optional)
 
@@ -1068,6 +1102,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
