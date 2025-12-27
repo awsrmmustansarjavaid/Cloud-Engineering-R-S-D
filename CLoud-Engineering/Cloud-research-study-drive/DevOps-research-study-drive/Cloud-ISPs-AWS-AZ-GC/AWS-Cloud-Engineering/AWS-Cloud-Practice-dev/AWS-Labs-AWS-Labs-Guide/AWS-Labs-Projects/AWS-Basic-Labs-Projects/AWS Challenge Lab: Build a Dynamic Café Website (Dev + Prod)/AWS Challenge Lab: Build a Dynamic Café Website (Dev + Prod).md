@@ -159,13 +159,6 @@ httpd -v
 php -v
 ```
 
-```
-systemctl status php-fpm
-```
-
-```
-systemctl status httpd
-```
 
 ### Step 5: ✅ install and configure MariaDB Server on Amazon Linux 2023
 
@@ -773,6 +766,42 @@ sudo nano /etc/httpd/conf.d/php.conf
 
 If missing → PHP files will cause 500 error
 
+### 🔁 Install AWS SDK for PHP properly (BEST PRACTICE)
+
+##### This keeps your Secrets Manager integration secure and correct.
+
+#### Install Composer
+
+```
+sudo dnf install -y composer
+```
+
+#### Go to your web root
+
+```
+cd /var/www/html
+```
+
+#### Initialize composer
+
+```
+sudo composer init
+```
+
+##### (Press ENTER for all prompts)
+
+#### Install AWS SDK for PHP
+
+```
+sudo composer require aws/aws-sdk-php
+```
+
+##### This creates:
+
+```
+/var/www/html/vendor/
+└── autoload.php
+```
 
 #### Set permissions and restart Apache:
 
@@ -787,8 +816,34 @@ sudo systemctl restart httpd
 #### 🔄 Restart Apache
 
 ```
+sudo systemctl restart php-fpm
+```
+
+```
 sudo systemctl restart httpd
 ```
+
+####  Verify 
+
+```
+php -v
+```
+
+```
+systemctl status php-fpm
+```
+
+```
+systemctl status httpd
+```
+
+```
+mysql -u cafe_user -p cafedevdatabase
+```
+
+
+
+
 
 #### 🌐 Test in EC2 CLI
 
@@ -1016,7 +1071,6 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
-
 
 
 
