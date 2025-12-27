@@ -15,7 +15,7 @@ It covers **daily-use, real-world commands** from **basic Linux operations → s
 
 # Content 
 
-### 1. [System Basics & Information](#System-Basics-&-Information)
+### 1. [System Basics & Information](#1-system-basics--information)
 
 ### 2. [Package Management (DNF – Daily Use)](#Package-Management)
 
@@ -933,4 +933,5 @@ If you want next:
 * 🔹 **Downloadable `.md` or `.pdf`**
 
 Just tell me 👍
+
 
