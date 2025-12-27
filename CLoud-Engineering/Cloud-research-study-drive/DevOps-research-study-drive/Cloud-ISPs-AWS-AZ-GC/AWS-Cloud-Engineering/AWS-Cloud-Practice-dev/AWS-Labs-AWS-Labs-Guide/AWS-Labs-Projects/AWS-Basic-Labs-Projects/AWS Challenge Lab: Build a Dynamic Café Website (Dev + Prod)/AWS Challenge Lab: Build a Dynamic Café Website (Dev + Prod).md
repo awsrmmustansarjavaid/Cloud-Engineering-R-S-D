@@ -159,6 +159,13 @@ httpd -v
 php -v
 ```
 
+```
+systemctl status php-fpm
+```
+
+```
+systemctl status httpd
+```
 
 ### Step 5: ✅ install and configure MariaDB Server on Amazon Linux 2023
 
@@ -1009,6 +1016,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
