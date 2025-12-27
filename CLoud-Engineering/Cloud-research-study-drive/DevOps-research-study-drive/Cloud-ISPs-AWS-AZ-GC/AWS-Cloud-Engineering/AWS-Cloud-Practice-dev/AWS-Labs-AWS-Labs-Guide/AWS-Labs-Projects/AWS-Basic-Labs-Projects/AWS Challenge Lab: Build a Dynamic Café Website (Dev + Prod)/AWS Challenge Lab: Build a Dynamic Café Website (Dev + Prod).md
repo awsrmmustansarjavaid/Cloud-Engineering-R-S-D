@@ -703,6 +703,12 @@ require 'config.php';
 
 ### 🔁 Create config.php (Secrets Manager + MariaDB)
 
+#### 📂 Where to Save This File on EC2
+
+```
+sudo nano /var/www/html/config.php
+```
+
 ```
 <?php
 require __DIR__ . '/vendor/autoload.php';
@@ -975,6 +981,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
