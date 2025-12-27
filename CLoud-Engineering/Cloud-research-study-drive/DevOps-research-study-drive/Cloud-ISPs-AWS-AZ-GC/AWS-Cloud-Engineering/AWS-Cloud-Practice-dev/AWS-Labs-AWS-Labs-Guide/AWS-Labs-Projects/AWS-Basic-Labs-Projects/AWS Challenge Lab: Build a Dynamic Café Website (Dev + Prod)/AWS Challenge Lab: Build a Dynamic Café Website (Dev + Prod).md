@@ -159,9 +159,7 @@ httpd -v
 php -v
 ```
 
-```
-mysql --version
-```
+
 ### Step 5: ✅ install and configure MariaDB Server on Amazon Linux 2023
 
 ##### Update Your System
@@ -221,7 +219,11 @@ Reload privilege tables?         Y
 
 - Reload privilege tables → yes
 
+#### Verify mysql
 
+```
+mysql --version
+```
 
 ##### Install MySQL Client (Optional but Recommended)
 
@@ -949,6 +951,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
