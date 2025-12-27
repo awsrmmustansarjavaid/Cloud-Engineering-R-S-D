@@ -462,6 +462,223 @@ alias cls='clear'
 
 ---
 
+## 📌 15. install and configure MariaDB Server on Amazon Linux 2023
+
+
+##### Update Your System
+
+```
+sudo dnf update -y
+```
+
+#### Install MariaDB Server (MySQL Compatible)
+
+```
+sudo dnf install -y mariadb105-server
+```
+
+#### Start & Enable MariaDB
+
+```
+sudo systemctl start mariadb
+```
+
+```
+sudo systemctl enable mariadb
+```
+
+#### Verify MariaDB
+
+```
+sudo systemctl status mariadb
+```
+
+#### Secure MariaDB
+
+```
+sudo mysql_secure_installation
+```
+##### Set root password, remove test DB, disable remote root login
+
+##### Recommended Answers
+
+
+```
+Enter current password for root:  (Press Enter)
+Set root password?               Y
+Remove anonymous users?          Y
+Disallow root login remotely?    Y
+Remove test database?            Y
+Reload privilege tables?         Y
+```
+
+- Set root password
+
+- Remove anonymous users
+
+- Disallow root login remotely (optional for security)
+
+- Remove test database
+
+- Reload privilege tables → yes
+
+
+
+##### Install MySQL Client (Optional but Recommended)
+
+```
+sudo dnf install -y mariadb105
+```
+
+### Step 6: Create MySQL Database for Café App
+
+#### Login to MariaDB:
+
+```
+sudo mysql
+```
+
+##### If root password is required:
+
+```
+sudo mysql -u root -p
+```
+
+#### Verify Database Exists
+
+```
+SHOW DATABASES;
+```
+
+##### ✅ Check if you see:
+
+```
+cafedevdatabase
+```
+
+#### Create MySQL Database
+
+##### Run:
+
+```
+CREATE DATABASE cafe_db;
+CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
+GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
+FLUSH PRIVILEGES;
+```
+
+
+#### Verify User Exists
+
+```
+SELECT user, host FROM mysql.user WHERE user='cafe_user';
+```
+
+##### Expected output:
+
+```
+cafe_user | %
+```
+
+#### Confirm Privileges
+
+```
+SHOW GRANTS FOR 'cafe_user'@'%';
+```
+
+##### You MUST see something like:
+
+```
+GRANT ALL PRIVILEGES ON `cafedevdatabase`.* TO 'cafe_user'@'%'
+```
+
+#### Exit MySQL
+
+```
+EXIT;
+```
+
+#### Test Table Access
+
+```
+SHOW TABLES;
+```
+
+#### Create test table:
+
+```
+CREATE TABLE orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_name VARCHAR(100),
+  item VARCHAR(100),
+  quantity INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### Insert test data:
+
+```
+INSERT INTO orders (customer_name, item, quantity)
+VALUES ('TestUser', 'Coffee', 1);
+```
+
+#### Verify Table & Table's Data:
+
+```
+SELECT * FROM orders;
+```
+
+
+#### Configure MariaDB to Allow Remote Connections (Optional)
+
+##### Edit:
+
+```
+sudo nano /etc/my.cnf.d/mariadb-server.cnf
+```
+
+##### Find bind-address and set:
+
+```
+bind-address = 0.0.0.0
+```
+
+#### Restart MariaDB:
+
+```
+sudo systemctl restart mariadb
+```
+
+#### Configure EC2 Security Group
+
+- **Go to EC2 Console → Security Groups → Inbound rules**
+
+- **Add rule:**
+
+   - **Type: MySQL/Aurora**
+
+   - **Port: 3306**
+
+   - **Source: your IP (or anywhere 0.0.0.0/0 for lab/testing)**
+
+#### Test Connection
+
+##### From EC2 itself:
+
+```
+mysql -u cafe_user -p -h 127.0.0.1 cafedevdatabase
+```
+
+##### From another machine (if remote enabled):
+
+```
+mysql -u cafe_user -p -h <EC2-Public-IP> cafedevdatabase
+```
+
+
+---
+
 ## ✅ Final Notes
 
 ✔ Designed for **AWS EC2 + Amazon Linux 2023**
