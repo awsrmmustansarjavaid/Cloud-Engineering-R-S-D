@@ -568,7 +568,15 @@ EC2
 
 #### ✅ index.php (Static Café Website – Lab Ready)
 
+#### 📂 Where to Save This File on EC2
+
+```
+sudo nano /var/www/html/index.php
+```
+
 ##### 👉 Copy & paste exactly as it is
+
+- Paste the code → Save → Exit
 
 ```
 <?php
@@ -692,14 +700,6 @@ require 'config.php';
 </body>
 </html>
 ```
-
-#### 📂 Where to Save This File on EC2
-
-```
-sudo nano /var/www/html/index.php
-```
-
-- Paste the code → Save → Exit
 
 #### 🔄 Restart Apache
 
@@ -975,6 +975,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
