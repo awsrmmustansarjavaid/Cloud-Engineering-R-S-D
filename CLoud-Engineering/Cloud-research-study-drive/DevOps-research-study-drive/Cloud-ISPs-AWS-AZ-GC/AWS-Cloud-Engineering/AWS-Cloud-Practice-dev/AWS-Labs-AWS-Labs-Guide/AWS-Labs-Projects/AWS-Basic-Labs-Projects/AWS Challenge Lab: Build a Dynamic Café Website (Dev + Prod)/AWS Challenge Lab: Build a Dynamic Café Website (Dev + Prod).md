@@ -748,10 +748,13 @@ try {
 ?>
 ```
 
-3. Set permissions and restart Apache:
+#### Set permissions and restart Apache:
 
 ```
 sudo chown -R apache:apache /var/www/html
+```
+
+```
 sudo systemctl restart httpd
 ```
 
@@ -981,6 +984,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
