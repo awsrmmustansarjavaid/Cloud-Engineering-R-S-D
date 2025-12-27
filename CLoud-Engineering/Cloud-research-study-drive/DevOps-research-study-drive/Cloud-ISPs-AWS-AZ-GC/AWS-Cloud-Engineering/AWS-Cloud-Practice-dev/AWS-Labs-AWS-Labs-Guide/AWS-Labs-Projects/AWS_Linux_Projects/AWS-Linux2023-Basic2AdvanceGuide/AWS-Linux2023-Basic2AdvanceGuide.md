@@ -348,7 +348,25 @@ systemctl status php-fpm
 systemctl status httpd
 ```
 
+### Check PHP-FPM log:
 
+```
+sudo tail -n 50 /var/log/php-fpm/www-error.log
+```
+
+#### If file doesn’t exist:
+
+```
+sudo journalctl -u php-fpm --no-pager -n 50
+```
+
+#### 👉 You WILL see something like:
+
+- mysqli_sql_exception
+
+- Access denied for user
+
+- Call to a member function prepare() on bool
 
 ---
 
