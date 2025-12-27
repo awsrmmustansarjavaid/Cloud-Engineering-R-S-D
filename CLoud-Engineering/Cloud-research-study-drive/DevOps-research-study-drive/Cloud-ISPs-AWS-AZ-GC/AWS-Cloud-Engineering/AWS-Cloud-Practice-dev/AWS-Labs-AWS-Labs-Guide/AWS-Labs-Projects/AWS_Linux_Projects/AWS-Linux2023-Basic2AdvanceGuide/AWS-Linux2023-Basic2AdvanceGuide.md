@@ -340,6 +340,16 @@ curl http://localhost
 php -v
 ```
 
+```
+systemctl status php-fpm
+```
+
+```
+systemctl status httpd
+```
+
+
+
 ---
 
 ## 📌 9. Logs & Monitoring (Production Troubleshooting)
