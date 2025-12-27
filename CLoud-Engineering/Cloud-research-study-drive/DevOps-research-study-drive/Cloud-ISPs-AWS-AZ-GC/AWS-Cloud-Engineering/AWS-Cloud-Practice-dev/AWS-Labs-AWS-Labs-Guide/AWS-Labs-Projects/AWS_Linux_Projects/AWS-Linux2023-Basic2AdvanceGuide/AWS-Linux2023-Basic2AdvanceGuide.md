@@ -11,45 +11,7 @@ It covers **daily-use, real-world commands** from **basic Linux operations → s
 
 ---
 
----
-
-# Content 
-
-### 1. [System Basics & Information](#system-basics--information)
-
-### 2. [Package Management (DNF – Daily Use)](#Package-Management)
-
-### 3. [File & Directory Management](#File-&-Directory-Management)
-
-### 4. [User & Permission Management](#User-&-Permission-Management)
-
-### 5. [Service Management](#Service-Management)
-
-### 6. [Networking Commands](#Networking-Commands)
-
-### 7. [System Basics & Information](#System-Basics-&-Information)
-
-### 8. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
-### 9. [System Basics & Information](#System-Basics-&-Information)
-
----
-
-## System Basics & Information
+## 📌 1. System Basics & Information
 
 ### Check OS Version
 
@@ -933,6 +895,7 @@ If you want next:
 * 🔹 **Downloadable `.md` or `.pdf`**
 
 Just tell me 👍
+
 
 
 
