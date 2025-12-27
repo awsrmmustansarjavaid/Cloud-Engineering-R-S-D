@@ -302,41 +302,187 @@ sudo firewall-cmd --reload
 
 ---
 
-## 📌 8. LAMP Stack Installation (COMMON AWS LAB TASK)
+## 📌 8. ✅ LAMP Stack Installation on Amazon Linux 2023
 
-### Install Apache
+#### Update the System
 
-```bash
+```
+sudo dnf update -y
+```
+
+#### Install Apache (httpd)
+
+```
 sudo dnf install -y httpd
 ```
 
-### Install PHP 8.x
+#### Start & Enable Apache
 
-```bash
-sudo dnf install -y php php-cli php-common php-mysqlnd php-gd php-xml php-mbstring
 ```
-
-### Start Apache
-
-```bash
 sudo systemctl start httpd
 ```
 
-### Enable Apache
-
-```bash
+```
 sudo systemctl enable httpd
 ```
 
-### Verify Apache
+#### Verify Apache
 
-```bash
-curl http://localhost
+```
+sudo systemctl status httpd
 ```
 
-### PHP Version
+#### Allow Apache Through Firewall (if enabled)
 
-```bash
+```
+sudo firewall-cmd --permanent --add-service=http
+```
+
+```
+sudo firewall-cmd --reload
+```
+
+##### ⚠️ If firewalld is not installed, you can ignore this step.
+
+
+#### Install PHP 8.x (Amazon Linux 2023 Default)
+
+```
+sudo dnf install -y php php-cli php-common php-mysqlnd php-gd php-xml php-mbstring
+```
+
+#### Verify PHP
+
+```
+php -v
+```
+
+#### Test PHP with Apache
+
+```
+sudo nano /var/www/html/info.php
+```
+
+##### Paste:
+
+```
+<?php
+phpinfo();
+?>
+```
+
+#### Restart Apache:
+
+```
+sudo systemctl restart httpd
+```
+
+##### Open in browser:
+
+```
+http://<EC2-Public-IP>/info.php
+```
+
+##### ✅ If PHP info page appears → PHP is working correctly
+
+##### Fix Permissions (Very Important)
+
+```
+sudo chown -R apache:apache /var/www
+```
+
+```
+sudo chmod -R 755 /var/www
+```
+
+##### Verify Full LAMP Stack
+
+```
+httpd -v
+```
+
+```
+php -v
+```
+
+`#### `Apache is NOT configured to use PHP-FPM
+
+##### Check this file:
+
+```
+sudo nano /etc/httpd/conf.d/php.conf
+```
+
+##### It must contain this (default usually does):
+
+```
+<FilesMatch \.php$>
+    SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
+</FilesMatch>
+```
+
+If missing → PHP files will cause 500 error
+
+## 📌 9. 🔁 Install AWS SDK for PHP properly (BEST PRACTICE)
+
+##### This keeps your Secrets Manager integration secure and correct.
+
+#### Install Composer
+
+```
+sudo dnf install -y composer
+```
+
+#### Go to your web root
+
+```
+cd /var/www/html
+```
+
+#### Initialize composer
+
+```
+sudo composer init
+```
+
+##### (Press ENTER for all prompts)
+
+#### Install AWS SDK for PHP
+
+```
+sudo composer require aws/aws-sdk-php
+```
+
+##### This creates:
+
+```
+/var/www/html/vendor/
+└── autoload.php
+```
+
+#### Set permissions and restart Apache:
+
+```
+sudo chown -R apache:apache /var/www/html
+```
+
+```
+sudo systemctl restart httpd
+```
+
+#### 🔄 Restart Apache
+
+```
+sudo systemctl restart php-fpm
+```
+
+```
+sudo systemctl restart httpd
+```
+
+####  Verify 
+
+```
 php -v
 ```
 
@@ -348,11 +494,24 @@ systemctl status php-fpm
 systemctl status httpd
 ```
 
+#### 🌐 Test in EC2 CLI
+
+```
+curl -I http://localhost/
+```
+
+#### 🌐 Test in Browser
+
+```
+http://<EC2-Public-IP>
+```
+
+##### ✅ You should see the AWS Café homepage
 
 
 ---
 
-## 📌 9. Logs & Monitoring (Production Troubleshooting)
+## 📌 10. Logs & Monitoring (Production Troubleshooting)
 
 ### View System Logs
 
@@ -403,7 +562,7 @@ du -sh *
 
 ---
 
-## 📌 10. Process Management
+## 📌 11. Process Management
 
 ### Running Processes
 
@@ -425,7 +584,7 @@ kill -9 PID
 
 ---
 
-## 📌 11. Compression & Backup (AWS Admin Work)
+## 📌 12. Compression & Backup (AWS Admin Work)
 
 ### Create Archive
 
@@ -441,7 +600,7 @@ tar -xzvf backup.tar.gz
 
 ---
 
-## 📌 12. AWS EC2-Specific Daily Commands
+## 📌 13. AWS EC2-Specific Daily Commands
 
 ### Instance Metadata (VERY IMPORTANT)
 
@@ -463,7 +622,7 @@ curl http://169.254.169.254/latest/meta-data/instance-id
 
 ---
 
-## 📌 13. Security Best Practices
+## 📌 14. Security Best Practices
 
 ### Disable Root Login (SSH)
 
@@ -485,7 +644,7 @@ sudo systemctl restart sshd
 
 ---
 
-## 📌 14. Useful Aliases (Productivity)
+## 📌 15. Useful Aliases (Productivity)
 
 ```bash
 alias ll='ls -lah'
@@ -494,7 +653,7 @@ alias cls='clear'
 
 ---
 
-## 📌 15. install and configure MariaDB Server on Amazon Linux 2023
+## 📌 16. install and configure MariaDB Server on Amazon Linux 2023
 
 
 ##### Update Your System
