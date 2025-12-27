@@ -748,6 +748,25 @@ try {
 ?>
 ```
 
+`#### `Apache is NOT configured to use PHP-FPM
+
+##### Check this file:
+
+```
+sudo nano /etc/httpd/conf.d/php.conf
+```
+
+##### It must contain this (default usually does):
+
+```
+<FilesMatch \.php$>
+    SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
+</FilesMatch>
+```
+
+If missing → PHP files will cause 500 error
+
+
 #### Set permissions and restart Apache:
 
 ```
