@@ -764,6 +764,12 @@ sudo systemctl restart httpd
 sudo systemctl restart httpd
 ```
 
+#### 🌐 Test in EC2 CLI
+
+```
+curl -I http://localhost/
+```
+
 #### 🌐 Test in Browser
 
 ```
@@ -984,6 +990,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
