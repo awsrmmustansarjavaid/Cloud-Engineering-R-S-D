@@ -510,6 +510,21 @@ aws secretsmanager get-secret-value \
 
 ##### ✅ If secret value is returned → IAM role works
 
+For example !
+
+```
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSecret-OgLDg9",
+    "Name": "CafeDevDBSecret",
+    "VersionId": "bbdf3ecb-5d93-46ae-8049-5e4d4164fc10",
+    "SecretString": "{\"username\":\"cafe_user\",\"password\":\"StrongPassword123\",\"host\":\"10.0.0.130\",\"dbname\":\"cafe_db\"}",
+    "VersionStages": [
+        "AWSCURRENT"
+    ],
+    "CreatedDate": "2025-12-27T10:25:34.199000+00:00"
+}
+```
+
 ##### ❌ If AccessDenied → policy or role is wrong
 
 #### 🧠 Common Mistakes (READ THIS)
@@ -960,6 +975,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
