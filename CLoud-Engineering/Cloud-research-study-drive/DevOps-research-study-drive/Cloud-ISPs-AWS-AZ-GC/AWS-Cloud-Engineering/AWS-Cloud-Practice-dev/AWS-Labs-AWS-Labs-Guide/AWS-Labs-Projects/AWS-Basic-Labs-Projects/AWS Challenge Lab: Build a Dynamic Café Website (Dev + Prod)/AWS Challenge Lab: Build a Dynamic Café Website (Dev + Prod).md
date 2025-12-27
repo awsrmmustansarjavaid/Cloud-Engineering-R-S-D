@@ -701,22 +701,6 @@ require 'config.php';
 </html>
 ```
 
-#### 🔄 Restart Apache
-
-```
-sudo systemctl restart httpd
-```
-
-#### 🌐 Test in Browser
-
-```
-http://<EC2-Public-IP>
-```
-
-##### ✅ You should see the AWS Café homepage
-
----
-
 ### 🔁 Create config.php (Secrets Manager + MariaDB)
 
 ```
@@ -764,6 +748,22 @@ try {
 sudo chown -R apache:apache /var/www/html
 sudo systemctl restart httpd
 ```
+
+#### 🔄 Restart Apache
+
+```
+sudo systemctl restart httpd
+```
+
+#### 🌐 Test in Browser
+
+```
+http://<EC2-Public-IP>
+```
+
+##### ✅ You should see the AWS Café homepage
+
+---
 
 ### Step 10: Test the Application
 
@@ -975,6 +975,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
