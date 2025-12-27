@@ -153,7 +153,13 @@ sudo chmod -R 755 /var/www
 
 ```
 httpd -v
+```
+
+```
 php -v
+```
+
+```
 mysql --version
 ```
 ### Step 5: ✅ install and configure MariaDB Server on Amazon Linux 2023
@@ -943,6 +949,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
