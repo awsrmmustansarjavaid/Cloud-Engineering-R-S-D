@@ -1,4 +1,4 @@
-# 🚀 AWS Challenge Lab: Build a Dynamic Café Website (Dev + Prod)
+# ☕ AWS Café Lab - Build a Dynamic Café Website (Dev + Prod)
 
 **Objective:**  
 Transform a simple café website into a fully functional dynamic online ordering system deployed across two AWS Regions.
@@ -1122,6 +1122,7 @@ php -v
 * [ ] Multi-region deployment verified
 
 ✅ **Result:** Once all checks pass, the café website is fully deployed and verified in both Dev and Prod environments.
+
 
 
 
