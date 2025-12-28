@@ -26,6 +26,9 @@ Secrets Manager (DB creds)
 RDS MySQL (orders table)
 
 ---
+## AWS Architecture Diagram
+
+![AWS Architecture Diagam](./AWS%20Café%20Lab-API%20Gateway%20%2B%20Lambda%20%2B%20RDS%20%2B%20Secrets%20Manage.png)
 
 ## PHASE 0️⃣ – PREREQUISITES (DO NOT SKIP)
 
@@ -272,3 +275,4 @@ echo json_encode(['statusCode'=>200,'body'=>json_encode(['message'=>'Order place
 * ✔ GET /orders works
 
 🎓 **You built a real-world, serverless AWS architecture** 💪
+
