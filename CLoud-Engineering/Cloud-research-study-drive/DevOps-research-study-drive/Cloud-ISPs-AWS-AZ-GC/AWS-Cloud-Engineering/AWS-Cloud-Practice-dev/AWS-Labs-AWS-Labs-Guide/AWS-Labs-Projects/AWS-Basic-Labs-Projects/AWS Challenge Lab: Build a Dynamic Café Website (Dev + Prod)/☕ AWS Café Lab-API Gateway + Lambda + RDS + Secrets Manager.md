@@ -1021,15 +1021,598 @@ But now you understand Lambda internals, not just code.
 
 ---
 
+## PHASE 9️⃣ – Add GET /orders API
+
+### (API Gateway → PHP Lambda → RDS MySQL)
+
+### 🧠 FINAL FLOW
+
+```
+Browser / curl
+   ↓  GET /orders
+API Gateway
+   ↓
+PHP Lambda (same function)
+   ↓
+RDS MySQL
+```
+
+### PHASE 1️⃣ – DATABASE CHECK (VERY IMPORTANT)
+
+#### SSH into EC2 (or connect via MySQL client)
+
+```
+mysql -h <RDS-ENDPOINT> -u <user> -p
+```
+
+```
+USE cafe_db;
+
+SHOW TABLES;
+
+SELECT * FROM orders;
+```
+
+#### You must already have:
+
+```
+orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_name VARCHAR(100),
+  item VARCHAR(50),
+  quantity INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**✅ If this exists → continue**
 
 
+### PHASE 2️⃣ – UPDATE PHP LAMBDA CODE
+
+>**We will detect HTTP method inside Lambda.**
+
+#### 🔧 Modify index.php
+
+##### Replace your existing index.php with this FULL VERSION
+###### (it supports POST /order AND GET /orders)
+
+```
+<?php
+require 'vendor/autoload.php';
+
+use Aws\SecretsManager\SecretsManagerClient;
+
+$event = json_decode(stream_get_contents(STDIN), true);
+$method = $event['requestContext']['http']['method'] ?? 'GET';
+
+try {
+    // Secrets Manager
+    $sm = new SecretsManagerClient([
+        'version' => 'latest',
+        'region' => getenv('AWS_REGION')
+    ]);
+
+    $secret = $sm->getSecretValue([
+        'SecretId' => getenv('DB_SECRET')
+    ]);
+
+    $creds = json_decode($secret['SecretString'], true);
+
+    // DB connection
+    $db = new mysqli(
+        getenv('DB_HOST'),
+        $creds['username'],
+        $creds['password'],
+        $creds['dbname']
+    );
+
+    if ($db->connect_error) {
+        throw new Exception("DB connection failed");
+    }
+
+    /* =======================
+       POST /order
+       ======================= */
+    if ($method === 'POST') {
+
+        $body = json_decode($event['body'], true);
+
+        $stmt = $db->prepare(
+            "INSERT INTO orders (customer_name, item, quantity)
+             VALUES (?, ?, ?)"
+        );
+
+        $stmt->bind_param(
+            "ssi",
+            $body['name'],
+            $body['item'],
+            $body['quantity']
+        );
+
+        $stmt->execute();
+
+        echo json_encode([
+            "statusCode" => 200,
+            "headers" => [
+                "Content-Type" => "application/json",
+                "Access-Control-Allow-Origin" => "*"
+            ],
+            "body" => json_encode([
+                "message" => "Order placed successfully"
+            ])
+        ]);
+        exit;
+    }
+
+    /* =======================
+       GET /orders
+       ======================= */
+    if ($method === 'GET') {
+
+        $result = $db->query(
+            "SELECT id, customer_name, item, quantity, created_at
+             FROM orders
+             ORDER BY created_at DESC"
+        );
+
+        $orders = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $orders[] = $row;
+        }
+
+        echo json_encode([
+            "statusCode" => 200,
+            "headers" => [
+                "Content-Type" => "application/json",
+                "Access-Control-Allow-Origin" => "*"
+            ],
+            "body" => json_encode($orders)
+        ]);
+        exit;
+    }
+
+    // Unsupported method
+    echo json_encode([
+        "statusCode" => 405,
+        "body" => json_encode(["error" => "Method not allowed"])
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        "statusCode" => 500,
+        "body" => json_encode(["error" => $e->getMessage()])
+    ]);
+}
+```
+
+### PHASE 3️⃣ – ZIP & UPLOAD AGAIN
+
+#### From your build directory:
+
+```
+zip -r cafe-php-lambda.zip .
+```
+
+Upload ZIP → Lambda → Deploy
+
+### PHASE 4️⃣ – API GATEWAY CONFIGURATION (NO SKIPS)
+
+#### 1️⃣ Open API Gateway
+
+- API type: HTTP API (recommended)
+
+- Your existing API
+
+#### 2️⃣ Create GET Route
+
+```
+Routes → Create
+```
+
+```
+| Setting | Value   |
+| ------- | ------- |
+| Method  | GET     |
+| Path    | /orders |
+```
+
+#### 3️⃣ Attach Integration
+
+- Integration type: Lambda
+
+- Lambda function: CafePHPOrderFunction
+
+Save.
+
+#### 4️⃣ Enable CORS (CRITICAL)
+
+```
+CORS → Edit
+```
+
+#### Enable:
+
+```
+Allow origins: *
+Allow methods: GET, POST, OPTIONS
+Allow headers: Content-Type
+```
+
+Save.
+
+#### 5️⃣ Deploy
+
+```
+Deploy → Stage: prod
+```
+
+### PHASE 5️⃣ – TEST FROM CLI (EC2 or Local)
+
+#### GET all orders
+
+```
+curl https://API-ID.execute-api.us-east-1.amazonaws.com/prod/orders
+```
+
+#### Expected response
+
+```
+[
+  {
+    "id": 5,
+    "customer_name": "Sara",
+    "item": "Latte",
+    "quantity": 2,
+    "created_at": "2025-12-27 15:22:10"
+  }
+]
+```
+
+### PHASE 6️⃣ – FRONTEND INTEGRATION (OPTIONAL)
+
+Example JS fetch
+
+```
+<script>
+fetch("https://API-ID.execute-api.us-east-1.amazonaws.com/prod/orders")
+  .then(res => res.json())
+  .then(data => console.log(data));
+</script>
+```
+
+### PHASE 7️⃣ – CLOUDWATCH DEBUGGING
+
+#### If something fails:
+
+```
+CloudWatch → Logs → /aws/lambda/CafePHPOrderFunction
+```
+
+##### Look for:
+
+- DB connection errors
+
+- Permission errors
+
+- Timeout errors
+
+### ✅ FINAL VERIFICATION CHECKLIST
+
+✔ GET /orders returns JSON
+
+✔ POST /order inserts row
+
+✔ Secrets Manager used
+
+✔ No EC2 dependency
+
+✔ Fully serverless backend
+
+### 🎓 WHAT YOU JUST LEARNED (IMPORTANT)
+
+#### You now understand:
+
+- Multi-method Lambda routing
+
+- REST design
+
+- PHP custom runtime
+
+- Real-world API Gateway usage
+
+**This is mid → senior cloud skill 💪**
+
+---
+
+## PHASE 🔟 – ☕ AWS Café Lab – CloudWatch Alarms (Complete Guide)
+
+### 🧠 WHAT WE WILL MONITOR
+
+```
+| Component | Alarm                     |
+| --------- | ------------------------- |
+| ALB       | High 5XX errors           |
+| ALB       | High target response time |
+| Lambda    | Errors                    |
+| Lambda    | Duration                  |
+| RDS MySQL | CPU utilization           |
+| RDS MySQL | Database connections      |
+| SNS       | Email notifications       |
+```
+
+### PHASE 1️⃣ – CREATE SNS TOPIC (FOR ALERTS)
+
+Alarms need a notification target.
+
+#### Step 1: Open SNS
+
+```
+AWS Console → SNS → Topics → Create topic
+```
+
+```
+| Setting      | Value       |
+| ------------ | ----------- |
+| Type         | Standard    |
+| Name         | Cafe-Alerts |
+| Display name | CafeAlerts  |
+```
+
+#### Step 2: Subscribe Email
+
+```
+SNS → Cafe-Alerts → Subscriptions → Create
+```
+
+```
+| Setting  | Value                                                   |
+| -------- | ------------------------------------------------------- |
+| Protocol | Email                                                   |
+| Endpoint | [your-email@example.com](mailto:your-email@example.com) |
+```
+
+#### 📩 Check your email and CONFIRM subscription
+
+#### ⚠️ Alarm notifications won’t work until confirmed.
+
+### PHASE 2️⃣ – ALB CLOUDWATCH ALARMS
+
+### 🔔 Alarm 1: ALB 5XX Errors
 
 
+```
+CloudWatch → Alarms → Create alarm
+```
 
+#### Select Metric
+
+```
+ApplicationELB
+→ LoadBalancer
+→ HTTPCode_ELB_5XX_Count
+```
+
+Choose your ALB name
+
+#### Conditions
+
+```
+| Setting    | Value      |
+| ---------- | ---------- |
+| Statistic  | Sum        |
+| Period     | 1 minute   |
+| Threshold  | ≥ 5        |
+| Evaluation | 1 out of 1 |
+```
+
+#### Meaning:
+
+> Alert if ALB returns 5 or more server errors in 1 minute
+
+#### Notification
+
+- Alarm state → In alarm
+
+- SNS topic → Cafe-Alerts
+
+Create alarm.
+
+### 🔔 Alarm 2: ALB High Latency
+
+#### Metric:
+
+```
+ApplicationELB → TargetResponseTime
+```
+
+```
+| Setting   | Value       |
+| --------- | ----------- |
+| Statistic | Average     |
+| Threshold | > 3 seconds |
+| Period    | 1 minute    |
+```
+
+#### Meaning:
+
+> Backend is slow or overloaded
+
+Create alarm.
+
+
+### PHASE 3️⃣ – LAMBDA CLOUDWATCH ALARMS
+
+### 🔔 Alarm 3: Lambda Errors
+
+```
+CloudWatch → Alarms → Create alarm
+```
+
+#### Metric
+
+```
+Lambda → By Function Name → Errors
+```
+
+Choose your Lambda function.
+
+#### Conditions
+
+```
+| Setting   | Value    |
+| --------- | -------- |
+| Statistic | Sum      |
+| Period    | 1 minute |
+| Threshold | ≥ 1      |
+```
+
+#### Meaning:
+
+> Alert on any Lambda failure
+
+#### Notification
+
+- SNS → Cafe-Alerts
+
+Create alarm.
+
+### 🔔 Alarm 4: Lambda Duration
+
+#### Metric:
+
+```
+Lambda → Duration
+```
+
+```
+| Setting   | Value     |
+| --------- | --------- |
+| Statistic | Average   |
+| Threshold | > 2000 ms |
+```
+
+#### Meaning:
+
+> Lambda getting slow (DB, Secrets Manager, network issues)
+
+Create alarm.
+
+### PHASE 4️⃣ – RDS MYSQL CLOUDWATCH ALARMS
+
+### 🔔 Alarm 5: RDS High CPU
+
+#### Metric:
+
+```
+RDS → Per-DBInstance → CPUUtilization
+```
+
+```
+| Setting   | Value     |
+| --------- | --------- |
+| Threshold | ≥ 70%     |
+| Period    | 5 minutes |
+```
+
+#### Meaning:
+
+> DB under heavy load
+
+Create alarm.
+
+### 🔔 Alarm 6: RDS Too Many Connections
+
+#### Metric:
+
+```
+RDS → DatabaseConnections
+```
+
+```
+| Setting   | Value     |
+| --------- | --------- |
+| Threshold | ≥ 80      |
+| Period    | 5 minutes |
+```
+
+#### Meaning:
+
+> App leaking DB connections
+
+Create alarm.
+
+### PHASE 5️⃣ – TEST ALARMS (VERY IMPORTANT)
+
+#### 🔥 Trigger Lambda Error (Test)
+
+##### Temporarily break DB name in Secrets Manager:
+
+```
+dbname: wrong_db
+```
+
+#### Call API:
+
+```
+curl https://API-ID.execute-api.us-east-1.amazonaws.com/prod/orders
+```
+
+✔ Lambda error occurs
+✔ Alarm → In alarm
+✔ Email received
+
+👉 Fix secret afterward.
+
+#### 🔥 Trigger ALB Error
+
+##### Stop backend target temporarily:
+
+```
+Stop EC2 or Lambda integration
+```
+
+#### Send traffic.
+
+✔ 5XX alarm fires
+
+✔ Email received
+
+### PHASE 6️⃣ – FINAL VERIFICATION CHECKLIST
+
+✅ SNS email confirmed
+
+✅ ALB error alarm
+
+✅ ALB latency alarm
+
+✅ Lambda error alarm
+
+✅ Lambda duration alarm
+
+✅ RDS CPU alarm
+
+✅ RDS connections alarm
+
+
+### 🎓 WHAT YOU JUST LEARNED
+
+#### You now know:
+
+✔ Production-grade monitoring
+
+✔ How AWS teams detect outages
+
+✔ How SREs design alerting
+
+✔ End-to-end observability
+
+**This is interview-level AWS knowledge 💼☁️**
 
 
 ---
-## PHASE 8️⃣ – Testing & Verification
+## PHASE 🔟 – Testing & Verification
 
 ### Test via ALB DNS
 
