@@ -53,7 +53,7 @@ RDS MySQL (orders table)
 
 ## 🏗️ AWS Architecture Diagram
 
-![AWS Architecture Diagram]()
+![AWS Architecture Diagram](./AWS%20Café%20Lab-API%20Gateway%20%2B%20Lambda%20%2B%20RDS%20%2B%20Secrets%20Manage.png)
 
 ---
 
@@ -1728,3 +1728,4 @@ SELECT * FROM orders;
 ---
 
 ☕ **You have now built a REAL AWS production system.**
+
