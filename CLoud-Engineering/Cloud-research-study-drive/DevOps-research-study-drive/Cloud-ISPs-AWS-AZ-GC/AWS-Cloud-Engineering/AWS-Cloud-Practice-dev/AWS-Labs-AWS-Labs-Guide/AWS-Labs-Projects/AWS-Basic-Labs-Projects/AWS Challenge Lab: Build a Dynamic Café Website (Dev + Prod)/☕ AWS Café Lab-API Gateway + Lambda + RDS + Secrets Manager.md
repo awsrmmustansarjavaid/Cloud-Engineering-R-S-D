@@ -6,273 +6,558 @@
 
 ---
 
-## Goal
+## 🏗️ Architecture Overview
 
-Frontend (index.html) → API Gateway → Lambda → RDS MySQL
-Credentials fetched securely from Secrets Manager
+**Frontend**
 
----
+* Static `index.html`
+* Hosted on **EC2 behind ALB**
 
-## 🧠 FINAL FLOW (Understand First)
+**Backend**
 
-Browser (index.html)
-↓ HTTP POST / GET
-API Gateway
-↓
-Lambda Function (Node.js / PHP)
-↓
-Secrets Manager (DB creds)
-↓
-RDS MySQL (orders table)
+* **API Gateway (REST API)**
+* **Lambda (PHP via custom runtime OR Node.js)**
+* **Amazon RDS MySQL**
+* **AWS Secrets Manager**
 
----
-## AWS Architecture Diagram
+**Security & Networking**
 
-![AWS Architecture Diagam](./AWS%20Café%20Lab-API%20Gateway%20%2B%20Lambda%20%2B%20RDS%20%2B%20Secrets%20Manage.png)
-
-## PHASE 0️⃣ – PREREQUISITES (DO NOT SKIP)
-
-* ✅ RDS MySQL instance exists
-* ✅ Database `cafe_db` exists
-* ✅ `orders` table exists
-* ✅ Secrets Manager secret exists
-* ✅ Lambda execution role exists
+* VPC with public & private subnets
+* ALB in public subnet
+* RDS in private subnet
+* IAM least-privilege roles
 
 ---
 
-## PHASE 1️⃣ – IAM ROLE FOR LAMBDA
+## 📌 Region Used
 
-### 1️⃣ Create IAM Role
-
-Path: **IAM → Roles → Create role**
-
-* Trusted entity: AWS service
-* Use case: Lambda
-
-### 2️⃣ Attach policies
-
-* `AWSLambdaBasicExecutionRole`
-* `SecretsManagerReadWrite` (or custom with `secretsmanager:GetSecretValue`)
-
-### 3️⃣ Name role
-
-* Role name: **CafeLambdaRole**
+* Primary: **us-east-1**
 
 ---
 
-## PHASE 2️⃣ – CREATE LAMBDA FUNCTION (Node.js)
+## PHASE 1️⃣ – Networking (VPC Foundation)
 
-### 2️⃣ Create Lambda
+### Step 1: Create VPC
 
-Path: **Lambda → Create function**
+* VPC Name: `Cafe-VPC`
+* CIDR: `10.0.0.0/16`
 
-* Author from scratch
-* Name: `CafeOrderFunction`
+### Step 2: Create Subnets
+
+| Name             | Type    | CIDR        | AZ         |
+| ---------------- | ------- | ----------- | ---------- |
+| Public-Subnet-A  | Public  | 10.0.1.0/24 | us-east-1a |
+| Public-Subnet-B  | Public  | 10.0.2.0/24 | us-east-1b |
+| Private-Subnet-A | Private | 10.0.3.0/24 | us-east-1a |
+| Private-Subnet-B | Private | 10.0.4.0/24 | us-east-1b |
+
+### Step 3: Internet Gateway
+
+* Create IGW: `Cafe-IGW`
+* Attach to `Cafe-VPC`
+
+### Step 4: Route Tables
+
+**Public Route Table**
+
+* Route: `0.0.0.0/0 → IGW`
+* Associate public subnets
+
+**Private Route Table**
+
+* No internet route
+* Associate private subnets
+
+---
+
+## PHASE 2️⃣ – Amazon RDS MySQL
+
+### Step 5: Create DB Subnet Group
+
+* Name: `cafe-db-subnet-group`
+* Subnets: Private A & B
+
+### Step 6: Create Secrets Manager Secret
+
+Secret Name: `CafeRDSSecret`
+
+```json
+{
+  "username": "cafe_user",
+  "password": "StrongPassword123!",
+  "dbname": "cafe_db",
+  "engine": "mysql",
+  "port": 3306
+}
+```
+
+### Step 7: Create RDS MySQL
+
+* Engine: MySQL 8.x
+* DB Instance: `cafe-rds`
+* Public Access: ❌ No
+* Subnet Group: `cafe-db-subnet-group`
+* Credentials: **From Secrets Manager**
+
+### Step 8: RDS Security Group
+
+Inbound:
+
+* MySQL (3306)
+* Source: Lambda SG
+
+---
+
+## PHASE 3️⃣ – Database Initialization
+
+### Step 9: Connect from Bastion / EC2
+
+```bash
+mysql -h <RDS-ENDPOINT> -u cafe_user -p cafe_db
+```
+
+### Step 10: Create Table
+
+```sql
+CREATE TABLE orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_name VARCHAR(100),
+  item VARCHAR(50),
+  quantity INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## PHASE 4️⃣ – Backend API (Lambda + API Gateway)
+
+### Step 11: IAM Role for Lambda
+
+Permissions:
+
+* AWSLambdaBasicExecutionRole
+* SecretsManagerGetSecretValue
+
+### Step 12: Create Lambda Function
+
+* Name: `CafeOrderAPI`
 * Runtime: Node.js 18.x
-* Architecture: x86_64
-* Execution role: CafeLambdaRole
-
-### 3️⃣ Configure VPC
-
-Lambda → Configuration → VPC
-
-* VPC: Cafe VPC
-* Subnets: Private Subnet A & B
-* Security group: lambda-sg
-
-⚠️ Lambda must be in same VPC as RDS
-
-### 4️⃣ Environment Variables
-
-| Key        | Value          |
-| ---------- | -------------- |
-| DB_SECRET  | CafeRDSSecret  |
-| DB_HOST    | <RDS-ENDPOINT> |
-| AWS_REGION | us-east-1      |
-
----
-
-## PHASE 3️⃣ – LAMBDA CODE (Node.js)
 
 ```js
 const AWS = require('aws-sdk');
 const mysql = require('mysql2/promise');
 
 exports.handler = async (event) => {
-  try {
-    const body = JSON.parse(event.body);
+  const sm = new AWS.SecretsManager();
+  const secret = await sm.getSecretValue({ SecretId: 'CafeRDSSecret' }).promise();
+  const creds = JSON.parse(secret.SecretString);
 
-    const sm = new AWS.SecretsManager({ region: process.env.AWS_REGION });
-    const secret = await sm.getSecretValue({ SecretId: process.env.DB_SECRET }).promise();
-    const creds = JSON.parse(secret.SecretString);
+  const conn = await mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: creds.username,
+    password: creds.password,
+    database: creds.dbname
+  });
 
-    const conn = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: creds.username,
-      password: creds.password,
-      database: creds.dbname
-    });
+  const body = JSON.parse(event.body);
 
-    await conn.execute(
-      'INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)',
-      [body.name, body.item, body.quantity]
-    );
+  await conn.execute(
+    'INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)',
+    [body.name, body.item, body.quantity]
+  );
 
-    return {
-      statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ message: 'Order placed successfully' })
-    };
-  } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
-  }
+  return {
+    statusCode: 200,
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    body: JSON.stringify({ message: 'Order placed' })
+  };
 };
 ```
 
-### Add MySQL Dependency
+Set environment variable:
 
-```bash
-mkdir lambda-package && cd lambda-package
-npm init -y
-npm install mysql2
-zip -r cafe-lambda.zip .
-```
-
-Upload ZIP → Lambda
+* `DB_HOST = <RDS-ENDPOINT>`
 
 ---
 
-## PHASE 4️⃣ – API GATEWAY (REST API)
+## PHASE 5️⃣ – API Gateway
 
-### Create API
+### Step 13: Create REST API
 
-* API Gateway → Create API
-* REST API → Build
-* Name: CafeAPI
-* Endpoint: Regional
+* Name: `CafeAPI`
 
-### Create Resource & Method
+### Step 14: Create Resource & Method
 
 * Resource: `/order`
-* Method: POST
-* Integration: Lambda → CafeOrderFunction
+* Method: `POST`
+* Integration: Lambda
 
-### Enable CORS
+Enable CORS.
 
-* Enable POST + OPTIONS
+### Step 15: Deploy API
 
-### Deploy
-
-* Stage: prod
-
-Endpoint:
-
-```
-https://API-ID.execute-api.us-east-1.amazonaws.com/prod/order
-```
+* Stage: `prod`
+* Copy Invoke URL
 
 ---
 
-## PHASE 5️⃣ – TEST API
+## PHASE 6️⃣ – Frontend (index.html)
 
-```bash
-curl -X POST \
-https://API-ID.execute-api.us-east-1.amazonaws.com/prod/order \
--H "Content-Type: application/json" \
--d '{"name":"Ali","item":"Coffee","quantity":1}'
-```
-
----
-
-## PHASE 6️⃣ – FRONTEND INTEGRATION
+### Step 16: Create index.html
 
 ```html
+<!DOCTYPE html>
+<html>
+<body>
+<h2>AWS Café</h2>
+<form id="orderForm">
+<input name="name" placeholder="Name" />
+<input name="item" placeholder="Item" />
+<input name="quantity" type="number" />
+<button>Order</button>
+</form>
+
 <script>
-document.getElementById("orderForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const data = { name: name.value, item: item.value, quantity: quantity.value };
-  await fetch("https://API-ID.execute-api.us-east-1.amazonaws.com/prod/order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-  alert("Order placed!");
-});
-</script>
-```
-
----
-
-## ☕ PHP Lambda Conversion (Custom Runtime)
-
-### Runtime: `provided.al2`
-
-Structure:
-
-```
-php-lambda/
-├── bootstrap
-├── index.php
-└── vendor/
-```
-
-### bootstrap
-
-```sh
-#!/bin/sh
-set -e
-while true; do
-  EVENT=$(curl -sS http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/next)
-  RESPONSE=$(echo "$EVENT" | php index.php)
-  REQUEST_ID=$(echo "$EVENT" | jq -r '.requestContext.requestId')
-  curl -X POST http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response -d "$RESPONSE"
-done
-```
-
-### index.php (POST + GET)
-
-```php
-<?php
-require 'vendor/autoload.php';
-use Aws\SecretsManager\SecretsManagerClient;
-$event = json_decode(stream_get_contents(STDIN), true);
-$method = $event['requestContext']['http']['method'] ?? 'GET';
-$sm = new SecretsManagerClient(['version'=>'latest','region'=>getenv('AWS_REGION')]);
-$secret = $sm->getSecretValue(['SecretId'=>getenv('DB_SECRET')]);
-$creds = json_decode($secret['SecretString'], true);
-$db = new mysqli(getenv('DB_HOST'), $creds['username'], $creds['password'], $creds['dbname']);
-if ($method === 'GET') {
-  $res = $db->query("SELECT * FROM orders ORDER BY created_at DESC");
-  echo json_encode(['statusCode'=>200,'body'=>json_encode($res->fetch_all(MYSQLI_ASSOC))]);
-  exit;
+document.getElementById('orderForm').onsubmit = async e => {
+ e.preventDefault();
+ const data = Object.fromEntries(new FormData(e.target));
+ await fetch('API_GATEWAY_URL/order', {
+   method:'POST',
+   body: JSON.stringify(data)
+ });
+ alert('Order placed');
 }
-$body = json_decode($event['body'], true);
-$stmt = $db->prepare("INSERT INTO orders (customer_name,item,quantity) VALUES (?,?,?)");
-$stmt->bind_param("ssi", $body['name'],$body['item'],$body['quantity']);
-$stmt->execute();
-echo json_encode(['statusCode'=>200,'body'=>json_encode(['message'=>'Order placed'])]);
+</script>
+</body>
+</html>
 ```
 
 ---
 
-## ☁️ CloudWatch Debugging
+## PHASE 7️⃣ – EC2 + ALB
 
-* Logs: `/aws/lambda/CafeOrderFunction`
-* Check for:
+### Step 17: Launch EC2
 
-  * DB errors
-  * Secrets permission
-  * Timeout
+* Amazon Linux 2023
+* Install Apache
+
+```bash
+sudo dnf install -y httpd
+sudo systemctl enable --now httpd
+```
+
+Upload `index.html` to `/var/www/html`
 
 ---
 
-## ✅ FINAL CHECKLIST
+### Step 18: Create ALB
 
-* ✔ API Gateway responds
-* ✔ Lambda logs visible
-* ✔ Secrets Manager used
-* ✔ RDS updated
-* ✔ GET /orders works
+#### 1️⃣ Create ALB Security Group
 
-🎓 **You built a real-world, serverless AWS architecture** 💪
+##### Console Path:
 
+```
+EC2 → Security Groups → Create security group
+```
+
+#### Settings:
+
+- Name: alb-sg
+
+- Description: ALB public access
+
+- VPC: Your Cafe VPC
+
+#### Inbound rules:
+
+```
+| Type | Protocol | Port | Source    |
+| ---- | -------- | ---- | --------- |
+| HTTP | TCP      | 80   | 0.0.0.0/0 |
+```
+
+❌ Do NOT add SSH
+
+❌ Do NOT restrict IPs yet
+
+#### Outbound rules:
+
+- Allow all (default)
+
+- Click Create security group
+
+#### 2️⃣Update EC2 Security Group (VERY IMPORTANT)
+
+##### Your EC2 must allow traffic FROM ALB, not from internet.
+
+- **Go to: EC2 → Security Groups → EC2-SG**
+
+
+#### Inbound rules:
+
+```
+| Type | Port | Source |
+| ---- | ---- | ------ |
+| HTTP | 80   | alb-sg |
+```
+
+❌ Remove 0.0.0.0/0 for HTTP
+
+✔ ALB → EC2 only (secure)
+
+- Save rules.
+
+#### 3️⃣ Create Target Group
+
+Console Path:
+
+```
+EC2 → Load Balancing → Target Groups → Create target group
+```
+#### Basic configuration
+
+- Target type: Instances
+
+- Target group name: cafe-tg
+
+- Protocol: HTTP
+
+- Port: 80
+
+- VPC: Your Cafe VPC
+
+- Protocol version: HTTP1
+
+- Click Next
+
+#### Health checks (DO NOT SKIP)
+
+- Set:
+
+  - Health check protocol: HTTP
+
+  - Health check path:
+
+```
+ /
+```
+
+#### Advanced health check:
+
+- Healthy threshold: 2
+
+- Unhealthy threshold: 2
+
+- Timeout: 5
+
+- Interval: 10
+
+- Success codes: 200
+
+- Click Next
+
+#### Register targets
+
+✔ Select your EC2 instance
+
+✔ Port: 80
+
+- Click Include as pending below
+
+- Click Create target group
+
+#### VERIFY TARGET HEALTH (IMPORTANT)
+
+- Open cafe-tg
+
+- Go to Targets tab
+
+You MUST see:
+
+```
+EC2-ID     | Port | Status
+-----------|------|--------
+i-xxxxxxx  | 80   | healthy
+```
+
+#### ❌ If status = unhealthy:
+
+- Apache not running
+
+- Security group issue
+
+- Wrong health check path
+
+
+#### CREATE APPLICATION LOAD BALANCER
+
+- Console Path:
+
+```
+EC2 → Load Balancers → Create load balancer
+```
+- Choose: Application Load Balancer
+
+#### Basic configuration
+
+- Load balancer name: cafe-alb
+
+- Scheme: Internet-facing
+
+- IP address type: IPv4
+
+#### Network mapping
+
+- VPC: Cafe VPC
+
+- Mappings:
+
+  ✔ Public Subnet AZ-a
+
+  ✔ Public Subnet AZ-b
+
+⚠️ MUST be public subnets
+
+#### Security groups
+
+- Remove default SG
+
+- Select: alb-sg
+
+#### Listeners & routing
+
+- Listener:
+
+  - Protocol: HTTP
+
+  - Port: 80
+
+- Default action:
+
+  - Forward to: cafe-tg
+
+Click Create load balancer
+
+**⏳ Wait 1–2 minutes until:**
+
+```
+State: Active
+```
+
+## PHASE 8️⃣ – Testing & Verification
+
+### Test via ALB DNS
+
+#### Go to:
+
+```
+EC2 → Load Balancers → cafe-alb
+```
+
+Copy:
+
+```
+DNS name
+```
+
+Example:
+
+```
+http://cafe-alb-123456.us-east-1.elb.amazonaws.com
+```
+
+Paste into browser.
+
+✅ EXPECTED RESULT
+
+You should see:
+
+```
+☕ AWS Café
+Place Your Order
+```
+
+❌ If it fails:
+
+Check target group health
+
+Check EC2 SG
+
+Check Apache
+
+### CLI VERIFICATION
+
+#### On EC2:
+
+```
+curl http://localhost
+```
+
+#### From your laptop:
+
+```
+curl http://ALB-DNS-NAME
+```
+
+**✅ Both should return HTML.**
+
+### API Test
+
+```bash
+curl -X POST API_URL/order -d '{"name":"Ali","item":"Coffee","quantity":1}'
+```
+
+### DB Verification
+
+```sql
+SELECT * FROM orders;
+```
+
+### Browser Test
+
+* Open ALB DNS
+* Place order
+* Verify DB
+
+---
+
+## ✅ FINAL RESULT
+
+✔ Static frontend
+
+✔ Serverless backend
+
+✔ Secure RDS
+
+✔ Secrets Manager
+
+✔ ALB
+
+✔ Production-ready
+
+## 🧠 COMMON ALB FAILURES
+
+```
+| Problem                     | Cause                   |
+| --------------------------- | ----------------------- |
+| 503 error                   | Target unhealthy        |
+| Infinite loading            | Wrong subnets           |
+| Works on EC2 IP but not ALB | SG misconfigured        |
+| Health check fails          | index missing           |
+| ALB created but no traffic  | Listener not forwarding |
+```
+
+
+---
+
+## 🎯 Interview Talking Points
+
+* Why ALB + API Gateway?
+* Why private RDS?
+* Why Secrets Manager?
+* How scaling works?
+
+---
+
+☕ **You have now built a REAL AWS production system.**
