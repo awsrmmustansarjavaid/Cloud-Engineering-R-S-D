@@ -4,6 +4,12 @@
 
 > **Author & Architecture Desinger:** Charlie
 
+
+**Goal:**
+
+> **Frontend (index.html) → API Gateway → Lambda → RDS MySQL
+Credentials fetched securely from Secrets Manager**
+
 ---
 
 ## 🏗️ Architecture Overview
@@ -26,6 +32,28 @@
 * ALB in public subnet
 * RDS in private subnet
 * IAM least-privilege roles
+
+---
+
+## 🧠 FINAL FLOW
+
+```
+Browser (index.html)
+        ↓  HTTP POST
+API Gateway (/order)
+        ↓
+Lambda Function
+        ↓
+Secrets Manager (DB creds)
+        ↓
+RDS MySQL (orders table)
+```
+
+---
+
+## 🏗️ AWS Architecture Diagram
+
+![AWS Architecture Diagram]()
 
 ---
 
@@ -134,45 +162,174 @@ CREATE TABLE orders (
 
 ### Step 11: IAM Role for Lambda
 
-Permissions:
+Console path:
 
-* AWSLambdaBasicExecutionRole
-* SecretsManagerGetSecretValue
+```
+IAM → Roles → Create role
+```
+
+#### Trusted entity
+
+- Trusted entity: AWS service
+
+- Use case: Lambda
+
+- Click Next
+
+
+####  Attach permissions
+
+```
+AWSLambdaBasicExecutionRole
+
+SecretsManagerGetSecretValue
+```
+
+##### (or better: custom policy with secretsmanager:GetSecretValue)
+
+- Click Next
+
+####  Name the role
+
+- Role name: CafeLambdaRole
+
+- Create role
 
 ### Step 12: Create Lambda Function
 
-* Name: `CafeOrderAPI`
-* Runtime: Node.js 18.x
+#### Console path:
 
-```js
+```
+Lambda → Create function
+```
+#### Basic info
+
+- Author from scratch
+
+- Function name: CafeOrderAPI
+
+- Runtime: Node.js 18.x
+
+- Architecture: x86_64
+
+#### Permissions
+
+- Execution role: Use an existing role
+
+- Select: CafeLambdaRole
+
+- Click Create function
+
+#### Configure Lambda Networking (RDS ACCESS)
+
+- Go to: Lambda → CafeOrderFunction → Configuration → VPC
+
+- Click Edit
+
+  - VPC: Cafe VPC
+
+  - Subnets: Private Subnet A & B
+
+  - Security group: lambda-sg
+
+##### ⚠️ Lambda MUST be in same VPC as RDS
+
+- Save.
+
+#### Lambda Environment Variables
+
+- Go to: Configuration → Environment variables
+
+- Add:
+
+```
+| Key        | Value          |
+| ---------- | -------------- |
+| DB_SECRET  | CafeRDSSecret  |
+| DB_HOST    | <RDS-ENDPOINT> |
+| AWS_REGION | us-east-1      |
+```
+
+- Save.
+
+#### LAMBDA CODE (BACKEND LOGIC)
+
+```
 const AWS = require('aws-sdk');
 const mysql = require('mysql2/promise');
 
 exports.handler = async (event) => {
-  const sm = new AWS.SecretsManager();
-  const secret = await sm.getSecretValue({ SecretId: 'CafeRDSSecret' }).promise();
-  const creds = JSON.parse(secret.SecretString);
+  try {
+    const body = JSON.parse(event.body);
 
-  const conn = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: creds.username,
-    password: creds.password,
-    database: creds.dbname
-  });
+    const sm = new AWS.SecretsManager({
+      region: process.env.AWS_REGION
+    });
 
-  const body = JSON.parse(event.body);
+    const secret = await sm.getSecretValue({
+      SecretId: process.env.DB_SECRET
+    }).promise();
 
-  await conn.execute(
-    'INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)',
-    [body.name, body.item, body.quantity]
-  );
+    const creds = JSON.parse(secret.SecretString);
 
-  return {
-    statusCode: 200,
-    headers: { 'Access-Control-Allow-Origin': '*' },
-    body: JSON.stringify({ message: 'Order placed' })
-  };
+    const conn = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: creds.username,
+      password: creds.password,
+      database: creds.dbname
+    });
+
+    await conn.execute(
+      'INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)',
+      [body.name, body.item, body.quantity]
+    );
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ message: 'Order placed successfully' })
+    };
+
+  } catch (err) {
+    console.error(err);
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: err.message })
+    };
+  }
 };
+```
+
+#### Add MySQL Dependency (CRITICAL)
+
+Lambda does NOT include mysql library by default.
+
+##### On your local machine (or EC2):
+
+```
+mkdir lambda-package
+cd lambda-package
+npm init -y
+npm install mysql2
+```
+
+Copy index.js into this folder.
+
+##### Zip contents:
+
+```
+zip -r cafe-lambda.zip .
+```
+
+##### Upload zip:
+
+```
+Lambda → Code → Upload from → .zip file
 ```
 
 Set environment variable:
@@ -183,22 +340,125 @@ Set environment variable:
 
 ## PHASE 5️⃣ – API Gateway
 
-### Step 13: Create REST API
+#### Console path:
 
-* Name: `CafeAPI`
+```
+API Gateway → Create API
+```
 
-### Step 14: Create Resource & Method
+#### Choose:
 
-* Resource: `/order`
-* Method: `POST`
-* Integration: Lambda
+- REST API (not HTTP API)
 
-Enable CORS.
+- Click Build
 
-### Step 15: Deploy API
+#### API details
 
-* Stage: `prod`
-* Copy Invoke URL
+- API name: CafeAPI
+
+- Endpoint type: Regional
+
+- Create API.
+
+#### Create Resource /order
+
+##### In API Gateway:
+
+```
+Resources → /
+```
+
+- Click Create Resource
+
+  - Resource Name: order
+
+  - Resource Path: /order
+
+- Create resource.
+
+#### Create POST Method
+
+- Click /order
+
+- Click Create Method
+
+  - Method type: POST
+
+  - Integration type: Lambda Function
+
+  - Lambda region: us-east-1
+
+  - Lambda function: CafeOrderFunction
+
+- Click Create method
+
+✔ Allow API Gateway to invoke Lambda → YES
+
+#### Enable CORS (DO NOT SKIP)
+
+- Select /order
+
+- Click Enable CORS
+
+- Check:
+  ✔ POST
+
+  ✔ OPTIONS
+
+- Click Save
+
+### DEPLOY API
+
+#### Deploy API
+
+- Click:
+
+```
+Deploy API
+```
+
+- Stage name: prod
+
+- Deploy
+
+#### Copy Invoke URL
+
+##### You will see:
+
+```
+https://abcd1234.execute-api.us-east-1.amazonaws.com/prod
+```
+
+##### Final endpoint:
+
+```
+https://abcd1234.execute-api.us-east-1.amazonaws.com/prod/order
+```
+
+### TEST API
+
+#### Test via CLI
+
+```
+curl -X POST \
+https://API-ID.execute-api.us-east-1.amazonaws.com/prod/order \
+-H "Content-Type: application/json" \
+-d '{"name":"Ali","item":"Coffee","quantity":1}'
+```
+
+#### Expected response:
+
+```
+{"message":"Order placed successfully"}
+```
+
+#### Verify in RDS
+
+```
+SELECT * FROM orders ORDER BY id DESC;
+```
+
+
 
 ---
 
@@ -219,18 +479,54 @@ Enable CORS.
 </form>
 
 <script>
-document.getElementById('orderForm').onsubmit = async e => {
- e.preventDefault();
- const data = Object.fromEntries(new FormData(e.target));
- await fetch('API_GATEWAY_URL/order', {
-   method:'POST',
-   body: JSON.stringify(data)
- });
- alert('Order placed');
-}
+document.getElementById("orderForm").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const data = {
+    name: name.value,
+    item: item.value,
+    quantity: quantity.value
+  };
+
+  const res = await fetch(
+    "https://API-ID.execute-api.us-east-1.amazonaws.com/prod/order",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }
+  );
+
+  alert("Order placed!");
+});
 </script>
+
 </body>
 </html>
+```
+
+### FINAL VERIFICATION
+
+✔ API Gateway responds
+
+✔ Lambda logs visible in CloudWatch
+
+✔ RDS table updated
+
+✔ Secrets Manager accessed
+
+✔ Frontend works
+
+### 🔍 DEBUGGING CHECKLIST
+
+```
+| Problem          | Check                  |
+| ---------------- | ---------------------- |
+| 500 error        | CloudWatch Lambda logs |
+| CORS error       | OPTIONS enabled        |
+| Timeout          | Lambda VPC / SG        |
+| DB connect fails | RDS SG allows Lambda   |
+| Forbidden        | IAM role               |
 ```
 
 ---
@@ -444,7 +740,295 @@ Click Create load balancer
 ```
 State: Active
 ```
+---
 
+## PHASE 8️⃣ – ☕ Convert Backend to PHP Lambda
+
+### 🧠 FINAL ARCHITECTURE
+
+```
+API Gateway
+    ↓
+PHP Lambda (Custom Runtime)
+    ↓
+Secrets Manager
+    ↓
+RDS MySQL
+```
+
+### PHASE 0️⃣ – WHAT YOU NEED TO KNOW FIRST
+
+Why PHP Lambda is different
+
+- No php runtime in AWS
+
+- You must package:
+
+  - PHP binary
+
+  - PHP code
+
+  - Bootstrap file
+
+### PHASE 1️⃣ – CREATE PHP LAMBDA FUNCTION
+
+1️⃣ Create Lambda (Shell Only)
+Console path:
+
+```
+Lambda → Create function
+```
+
+#### Settings:
+
+- Author from scratch
+
+- Function name: CafePHPOrderFunction
+
+- Runtime: Custom runtime
+
+- Runtime: provided.al2
+
+- Architecture: x86_64
+
+- Execution role: CafeLambdaRole
+
+Create function.
+
+### PHASE 2️⃣ – BUILD PHP RUNTIME (IMPORTANT)
+
+You must build PHP on Amazon Linux, not Windows.
+
+#### Best options:
+
+✔ EC2 Amazon Linux 2
+
+✔ CloudShell (recommended)
+
+#### 2️⃣ Launch CloudShell
+
+Open AWS CloudShell
+
+#### 3️⃣ Install Required Tools
+
+```
+sudo yum install -y php php-cli php-mysqlnd unzip
+```
+
+#### Check:
+
+```
+php -v
+```
+
+### PHASE 3️⃣ – CREATE LAMBDA FILE STRUCTURE
+
+```
+mkdir php-lambda
+cd php-lambda
+```
+
+#### Required files:
+
+```
+php-lambda/
+├── bootstrap
+├── index.php
+└── vendor/ (optional later)
+```
+
+### PHASE 4️⃣ – CREATE bootstrap FILE (MOST IMPORTANT)
+
+```
+nano bootstrap
+```
+
+#### Paste EXACTLY:
+
+```
+#!/bin/sh
+set -e
+
+while true
+do
+  EVENT=$(curl -sS \
+    -H "Lambda-Runtime-Function-Name: $AWS_LAMBDA_FUNCTION_NAME" \
+    http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/next)
+
+  RESPONSE=$(echo "$EVENT" | php index.php)
+
+  REQUEST_ID=$(echo "$EVENT" | jq -r '.requestContext.requestId')
+
+  curl -sS -X POST \
+    "http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" \
+    -d "$RESPONSE"
+done
+```
+
+#### Make executable:
+
+```
+chmod +x bootstrap
+```
+
+### PHASE 5️⃣ – PHP HANDLER (index.php)
+
+```
+<?php
+require 'vendor/autoload.php';
+
+use Aws\SecretsManager\SecretsManagerClient;
+
+$event = json_decode(stream_get_contents(STDIN), true);
+
+try {
+    $sm = new SecretsManagerClient([
+        'version' => 'latest',
+        'region' => getenv('AWS_REGION')
+    ]);
+
+    $secret = $sm->getSecretValue([
+        'SecretId' => getenv('DB_SECRET')
+    ]);
+
+    $creds = json_decode($secret['SecretString'], true);
+
+    $db = new mysqli(
+        getenv('DB_HOST'),
+        $creds['username'],
+        $creds['password'],
+        $creds['dbname']
+    );
+
+    $body = json_decode($event['body'], true);
+
+    $stmt = $db->prepare(
+        "INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)"
+    );
+    $stmt->bind_param("ssi", $body['name'], $body['item'], $body['quantity']);
+    $stmt->execute();
+
+    echo json_encode([
+        "statusCode" => 200,
+        "headers" => ["Access-Control-Allow-Origin" => "*"],
+        "body" => json_encode(["message" => "Order placed"])
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        "statusCode" => 500,
+        "body" => json_encode(["error" => $e->getMessage()])
+    ]);
+}
+```
+
+### PHASE 6️⃣ – INSTALL AWS SDK FOR PHP
+
+```
+curl -sS https://getcomposer.org/installer | php
+php composer.phar require aws/aws-sdk-php
+```
+
+#### This creates:
+
+```
+vendor/
+```
+
+### PHASE 7️⃣ – PACKAGE LAMBDA
+
+```
+zip -r cafe-php-lambda.zip .
+```
+
+### PHASE 8️⃣ – UPLOAD TO LAMBDA
+
+
+- Lambda → Code → Upload from → ZIP
+
+### PHASE 9️⃣ – CONFIGURE LAMBDA SETTINGS
+
+#### Environment variables
+
+```
+DB_SECRET = CafeRDSSecret
+DB_HOST   = <RDS-ENDPOINT>
+AWS_REGION = us-east-1
+```
+
+#### Timeout & Memory
+
+- Timeout: 30 seconds
+
+- Memory: 512 MB
+
+### PHASE 🔟 – CONNECT API GATEWAY (SAME AS BEFORE)
+
+- REST API
+
+- POST /order
+
+- Lambda integration
+
+- Enable CORS
+
+- Deploy
+
+### PHASE 1️⃣1️⃣ – TEST
+
+```
+curl -X POST \
+https://API-ID.execute-api.us-east-1.amazonaws.com/prod/order \
+-H "Content-Type: application/json" \
+-d '{"name":"Sara","item":"Latte","quantity":2}'
+```
+
+### ✅ SUCCESS CHECK
+
+✔ Lambda logs in CloudWatch
+
+✔ Secrets Manager accessed
+
+✔ MySQL updated
+
+✔ API Gateway responds
+
+### ⚠️ COMMON PHP LAMBDA ERRORS
+
+```
+| Error         | Fix                   |
+| ------------- | --------------------- |
+| PHP not found | Build on Amazon Linux |
+| 500 error     | Check CloudWatch logs |
+| Timeout       | Increase memory       |
+| DB fails      | VPC + SG issue        |
+| Secrets fail  | IAM permission        |
+```
+
+### 🎓 REAL TALK (IMPORTANT)
+
+#### PHP Lambda is:
+
+✔ Great for learning
+
+✔ Works in production
+
+❌ Slower than Node/Python
+
+❌ More complex to maintain
+
+But now you understand Lambda internals, not just code.
+
+---
+
+
+
+
+
+
+
+
+---
 ## PHASE 8️⃣ – Testing & Verification
 
 ### Test via ALB DNS
