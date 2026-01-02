@@ -281,7 +281,7 @@ Lambda → Create function
 | ---------- | -------------- |
 | DB_SECRET  | CafeRDSSecret  |
 | DB_HOST    | <RDS-ENDPOINT> |
-| AWS_REGION | us-east-1      |
+
 ```
 
 - Save.
@@ -296,9 +296,8 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
 
-    const sm = new AWS.SecretsManager({
-      region: process.env.AWS_REGION
-    });
+    // AWS_REGION is automatically provided by Lambda
+    const sm = new AWS.SecretsManager();
 
     const secret = await sm.getSecretValue({
       SecretId: process.env.DB_SECRET
@@ -318,16 +317,20 @@ exports.handler = async (event) => {
       [body.name, body.item, body.quantity]
     );
 
+    await conn.end();
+
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST'
       },
       body: JSON.stringify({ message: 'Order placed successfully' })
     };
 
   } catch (err) {
-    console.error(err);
+    console.error('ERROR:', err);
     return {
       statusCode: 500,
       headers: {
@@ -337,6 +340,7 @@ exports.handler = async (event) => {
     };
   }
 };
+
 ```
 
 #### Add MySQL Dependency (CRITICAL)
@@ -1762,6 +1766,7 @@ SELECT * FROM orders;
 ---
 
 ☕ **You have now built a REAL AWS production system.**
+
 
 
 
