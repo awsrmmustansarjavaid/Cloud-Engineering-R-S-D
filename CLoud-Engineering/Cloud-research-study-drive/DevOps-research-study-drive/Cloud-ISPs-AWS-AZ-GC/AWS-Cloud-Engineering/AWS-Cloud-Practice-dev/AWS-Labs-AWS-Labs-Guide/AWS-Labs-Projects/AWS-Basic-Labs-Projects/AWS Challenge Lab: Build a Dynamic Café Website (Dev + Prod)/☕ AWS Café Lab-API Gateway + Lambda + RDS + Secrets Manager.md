@@ -639,6 +639,8 @@ API Gateway → Create API
 
 - Endpoint type: Regional
 
+- Security Policy: SecurityPolicy_TLS13_1_2_2021_06
+
 - Create API.
 
 #### Create Resource /order
