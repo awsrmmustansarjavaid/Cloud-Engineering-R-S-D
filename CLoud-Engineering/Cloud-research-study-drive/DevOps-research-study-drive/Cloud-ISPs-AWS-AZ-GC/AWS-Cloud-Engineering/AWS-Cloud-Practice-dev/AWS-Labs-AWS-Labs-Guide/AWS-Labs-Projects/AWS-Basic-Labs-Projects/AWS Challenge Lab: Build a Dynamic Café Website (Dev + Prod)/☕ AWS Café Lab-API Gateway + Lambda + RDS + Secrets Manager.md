@@ -349,26 +349,148 @@ Lambda does NOT include mysql library by default.
 
 ##### On your local machine (or EC2):
 
+##### Install Node.js & npm
+
 ```
-mkdir lambda-package
-cd lambda-package
+sudo dnf update -y
+```
+
+```
+sudo dnf install -y nodejs
+```
+
+##### Verify:
+
+```
+node -v
+```
+
+```
+npm -v
+```
+
+##### Create Lambda Package Directory
+
+```
+mkdir ~/lambda-package
+```
+
+```
+cd ~/lambda-package
+```
+
+##### Initialize npm
+
+```
 npm init -y
+```
+
+##### Install mysql2 Dependency
+
+```
 npm install mysql2
 ```
 
-Copy index.js into this folder.
-
-##### Zip contents:
+##### Create Lambda Handler File
 
 ```
-zip -r cafe-lambda.zip .
+nano index.js
 ```
 
-##### Upload zip:
+**Paste THIS EXACT CODE 👇**
 
 ```
-Lambda → Code → Upload from → .zip file
+const AWS = require('aws-sdk');
+const mysql = require('mysql2/promise');
+
+exports.handler = async (event) => {
+  try {
+    const body = JSON.parse(event.body || '{}');
+
+    const sm = new AWS.SecretsManager();
+
+    const secret = await sm.getSecretValue({
+      SecretId: process.env.DB_SECRET
+    }).promise();
+
+    const creds = JSON.parse(secret.SecretString);
+
+    const conn = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: creds.username,
+      password: creds.password,
+      database: creds.dbname
+    });
+
+    await conn.execute(
+      'INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)',
+      [body.name, body.item, body.quantity]
+    );
+
+    await conn.end();
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ message: 'Order placed successfully' })
+    };
+
+  } catch (err) {
+    console.error(err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
+};
 ```
+
+##### Zip Lambda Package
+
+```
+zip -r lambda.zip .
+```
+
+##### Verify:
+
+```
+ls
+```
+
+##### AWS Console:
+
+```
+Lambda → Your Function → Code → Upload from → .zip file
+```
+
+##### Upload ZIP to Lambda
+
+```
+aws lambda update-function-code \
+  --function-name CafeOrderAPI \
+  --zip-file fileb://lambda.zip
+```
+
+##### Verify in Console
+
+
+Go to:
+
+```
+Lambda → Your Function → Code
+```
+
+You should see:
+
+index.js
+
+node_modules/mysql2
+
+
+
+
 
 Set environment variable:
 
@@ -1766,6 +1888,7 @@ SELECT * FROM orders;
 ---
 
 ☕ **You have now built a REAL AWS production system.**
+
 
 
 
