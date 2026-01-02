@@ -161,7 +161,7 @@ mysql --version
 ##### Connect from Bastion / EC2
 
 ```bash
-mysql -h <RDS-ENDPOINT> -u cafe_user -p cafe_db
+mysql -h <RDS-ENDPOINT> -u cafe_user -p 
 ```
 
 ### Step 10: Create Table
@@ -1762,5 +1762,6 @@ SELECT * FROM orders;
 ---
 
 ☕ **You have now built a REAL AWS production system.**
+
 
 
