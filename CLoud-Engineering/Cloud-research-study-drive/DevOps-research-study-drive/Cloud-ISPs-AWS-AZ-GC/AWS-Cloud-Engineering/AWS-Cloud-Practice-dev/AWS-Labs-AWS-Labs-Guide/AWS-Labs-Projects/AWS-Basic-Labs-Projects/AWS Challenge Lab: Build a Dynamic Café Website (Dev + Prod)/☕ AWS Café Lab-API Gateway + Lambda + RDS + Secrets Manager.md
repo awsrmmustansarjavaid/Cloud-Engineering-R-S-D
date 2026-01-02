@@ -138,13 +138,47 @@ Inbound:
 
 ## PHASE 3️⃣ – Database Initialization
 
-### Step 9: Connect from Bastion / EC2
+### Step 9: install and configure Database
+
+##### Update Your System
+
+```
+sudo dnf update -y
+```
+
+##### Install MySQL Client (Optional but Recommended)
+
+```
+sudo dnf install -y mariadb105
+```
+
+#### Verify mysql
+
+```
+mysql --version
+```
+
+##### Connect from Bastion / EC2
 
 ```bash
 mysql -h <RDS-ENDPOINT> -u cafe_user -p cafe_db
 ```
 
 ### Step 10: Create Table
+
+#### Create MySQL Database
+
+```
+CREATE DATABASE cafe_db;
+```
+
+#### Use the correct database
+
+```
+USE cafe_db;
+```
+
+#### Create the orders table (REQUIRED)
 
 ```sql
 CREATE TABLE orders (
@@ -1728,4 +1762,5 @@ SELECT * FROM orders;
 ---
 
 ☕ **You have now built a REAL AWS production system.**
+
 
