@@ -490,6 +490,127 @@ node_modules/mysql2
 
 
 
+### Method - 2  Upload Lambda ZIP DIRECTLY FROM EC2 (AWS CLI)
+
+This avoids browser uploads completely and is how professionals do it.
+
+#### Make sure AWS CLI exists on EC2
+
+```
+aws --version
+```
+
+If not installed:
+
+```
+sudo dnf install awscli -y
+```
+
+
+#### Make sure your EC2 IAM role allows Lambda update
+
+##### Your EC2 instance role must have:
+
+```
+lambda:UpdateFunctionCode
+```
+
+Quick check:
+
+```
+aws sts get-caller-identity
+```
+
+If this works → permissions are OK.
+
+
+#### Go to your lambda ZIP directory
+
+Example:
+
+```
+cd ~/lambda-package
+ls
+```
+
+You should see:
+
+```
+index.js
+node_modules/
+package.json
+lambda.zip
+```
+
+#### Upload ZIP to Lambda
+
+```
+aws lambda update-function-code \
+  --function-name CafeOrderAPI \
+  --zip-file fileb://lambda.zip
+```
+
+✅ Expected output:
+
+```
+{
+  "LastUpdateStatus": "Successful"
+}
+```
+
+🎉 DONE — no console needed
+
+#### Verify in Console
+
+Go to:
+
+```
+Lambda → Your Function → Code
+```
+
+You should see:
+
+index.js
+
+node_modules/mysql2
+
+
+### Method - 3  Upload ZIP via S3 (Used if ZIP > 10MB)
+
+#### Upload ZIP to S3 from EC2
+
+```
+aws s3 cp lambda.zip s3://my-lambda-artifacts-bucket/
+```
+
+#### Update Lambda from S3
+
+```
+aws lambda update-function-code \
+  --function-name CafeOrderAPI \
+  --s3-bucket my-lambda-artifacts-bucket \
+  --s3-key lambda.zip
+```
+
+### Method - 4  Download ZIP from EC2 to your laptop
+
+Only if you insist on browser upload.
+
+#### From your local machine:
+
+```
+scp -i mykey.pem ec2-user@EC2_PUBLIC_IP:/home/ec2-user/lambda-package/lambda.zip .
+```
+
+Then:
+
+```
+Lambda Console → Upload from → .zip file
+```
+
+
+
+
 
 
 Set environment variable:
