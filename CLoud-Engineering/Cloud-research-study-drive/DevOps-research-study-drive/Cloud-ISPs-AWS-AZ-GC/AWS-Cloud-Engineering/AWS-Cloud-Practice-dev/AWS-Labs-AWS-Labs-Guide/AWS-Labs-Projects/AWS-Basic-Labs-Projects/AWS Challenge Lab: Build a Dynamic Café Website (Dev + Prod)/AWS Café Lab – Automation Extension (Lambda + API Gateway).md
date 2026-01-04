@@ -419,7 +419,11 @@ ModuleNotFoundError: No module named 'pymysql'
 ```
 CafeOrderAPI
 ```
+* API endpoint type: **Regional **
 
+* Security policy - new: **SecurityPolicy_TLS13_1_2_2021_06**
+
+        
 ---
 
 ## Step 2: Create Resource
