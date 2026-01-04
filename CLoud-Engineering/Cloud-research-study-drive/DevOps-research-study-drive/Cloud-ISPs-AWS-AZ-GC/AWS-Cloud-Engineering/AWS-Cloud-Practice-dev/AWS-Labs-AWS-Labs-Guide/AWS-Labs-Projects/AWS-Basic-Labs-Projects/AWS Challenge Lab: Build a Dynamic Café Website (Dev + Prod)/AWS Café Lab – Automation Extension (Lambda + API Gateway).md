@@ -1,5 +1,8 @@
 # ☕ AWS Café Lab – Automation Extension (Lambda + API Gateway)
 
+> **Author & Architecture Designer:** Charlie
+>
+> 
 > **Purpose**: Modify the existing EC2-based café app so **order placement is automated via API Gateway + Lambda** (serverless), while the website remains on EC2. This introduces modern automation, separation of concerns, and prepares you for full serverless later.
 
 ---
@@ -49,15 +52,9 @@ MariaDB (Dev) / RDS (Optional upgrade)
 * Trusted entity: **AWS Service**
 * Use case: **Lambda**
 
-## Step 2: Attach Permissions
 
-Attach **AWS managed policies**:
 
-```
-AWSLambdaBasicExecutionRole
-```
-
-## Step 3: Add Custom Policy for Secrets Manager
+## Step 2: Add Custom Policy for Secrets Manager
 
 **IAM → Policies → Create policy → JSON**
 
@@ -75,6 +72,18 @@ AWSLambdaBasicExecutionRole
 ```
 
 Policy name:
+
+```
+LambdaCafeSecretsAccess
+```
+
+## Step 3: Attach Permissions
+
+Attach **AWS managed policies**:
+
+```
+AWSLambdaBasicExecutionRole
+```
 
 ```
 LambdaCafeSecretsAccess
