@@ -195,19 +195,217 @@ pip install pymysql -t python/
 zip -r pymysql-layer.zip python
 ```
 
-### Upload Layer
+### Upload Zip
 
-* Lambda → Layers → Create layer
-* Name:
+###### Uploading a Lambda layer from EC2 via S3
+
+#### 1️⃣ Verify ZIP Exists on EC2
+
+##### On EC2, run:
+
+```
+ls -lh
+```
+##### You must see:
+
+```
+pymysql-layer.zip
+```
+
+##### If not, recreate it:
+
+```
+zip -r pymysql-layer.zip python
+```
+
+#### 2️⃣ Install & Configure AWS CLI on EC2
+
+```
+sudo dnf install -y awscli
+```
+
+##### Verify:
+
+```
+aws --version
+```
+
+#### 3️⃣ Verify IAM Role Has S3 Permissions
+
+###### Your EC2 must have an IAM role attached.
+
+##### Required permission:
+
+```
+s3:PutObject
+```
+
+##### Quick Test (run this):
+
+```
+aws sts get-caller-identity
+```
+
+✅ If JSON output appears → role is attached
+
+❌ If error → IAM role missing
+
+#### 4️⃣ Add S3 Permission (If Needed)
+
+- **IAM → Roles → Your EC2 role**
+
+##### Attach this AWS managed policy:
+
+```
+AmazonS3FullAccess
+```
+
+###### (For lab only — in production, use least privilege)
+
+#### 5️⃣ Create Bucket (Same Region as Lambda)
+
+- **From AWS Console → S3:**
+
+###### Bucket name (must be globally unique):
+
+```
+cafe-lambda-layers-<your-name>
+```
+
+##### Region:
+
+```
+us-east-1
+```
+
+- **Block public access → ON**
+
+- **Encryption → Default (ON)**
+
+✅ Click Create bucket
+
+#### 6️⃣ Upload ZIP from EC2 to S3
+
+From EC2 (inside directory with ZIP):
+
+```
+aws s3 cp pymysql-layer.zip s3://cafe-lambda-layers-<your-name>/
+```
+
+##### Verify upload:
+
+```
+aws s3 ls s3://cafe-lambda-layers-<your-name>/
+```
+
+##### You should see:
+
+```
+pymysql-layer.zip
+```
+
+✅ Upload complete
+
+
+### Lambda layer
+
+#### 1️⃣ Create Layer
+
+* AWS Console → Lambda → Layers → Create layer
+
+#### 2️⃣ Layer Configuration
+
+##### Fill exactly:
+
+```
+| Field               | Value                                                   |
+| ------------------- | ------------------------------------------------------- |
+| Name                | `pymysql-layer`                                         |
+| Description         | `PyMySQL library for Cafe Order Lambda`                 |
+| Code source         | **Upload a file from Amazon S3**                        |
+| S3 URI              | `s3://cafe-lambda-layers-<your-name>/pymysql-layer.zip` |
+| Compatible runtimes | ✅ Python 3.12                                           |
+```
+
+* Click Create
+
+#### 3️⃣ Attach Layer to Lambda Function
+
+* Lambda → Functions
+
+* Open:
+
+```
+CafeOrderProcessor
+```
+
+* Scroll to Layers
+
+* Click Add a layer
+
+* Choose:
+
+```
+Custom layers
+```
+
+* Select:
 
 ```
 pymysql-layer
 ```
 
-* Upload `pymysql-layer.zip`
-* Runtime: Python 3.12
+* Version: 1
 
-Attach layer to Lambda.
+* Click Add
+
+#### 4️⃣ Verify Layer Is Working
+
+##### Check Lambda Test Event
+
+* Create Test Event
+
+```
+{
+  "body": "{\"name\":\"LayerTest\",\"item\":\"Coffee\",\"quantity\":1}"
+}
+```
+
+* Click Test
+
+##### Expected Result ✅
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\":\"Order placed successfully\"}"
+}
+```
+
+#### 4️⃣ Check CloudWatch Logs
+
+* **Lambda → Monitor → View logs**
+
+##### You should NOT see:
+
+```
+ModuleNotFoundError: No module named 'pymysql'
+```
+
+**⛔️ If you do → ZIP structure is wrong.**
+
+#### 🚨 Common Mistakes
+
+```
+| Mistake                              | Result                    |
+| ------------------------------------ | ------------------------- |
+| Zipped contents instead of `python/` | Import error              |
+| Used Windows to build layer          | Binary mismatch           |
+| Wrong runtime selected               | Layer ignored             |
+| Uploaded wrong ZIP                   | Lambda can't find pymysql |
+```
+
+
 
 ---
 
