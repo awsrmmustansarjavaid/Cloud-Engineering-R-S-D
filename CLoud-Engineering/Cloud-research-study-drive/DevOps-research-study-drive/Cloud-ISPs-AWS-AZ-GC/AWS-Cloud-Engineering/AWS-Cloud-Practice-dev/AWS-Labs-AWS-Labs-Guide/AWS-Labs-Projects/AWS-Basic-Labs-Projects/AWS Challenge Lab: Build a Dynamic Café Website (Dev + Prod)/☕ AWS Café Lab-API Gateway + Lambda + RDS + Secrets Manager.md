@@ -610,15 +610,6 @@ Then:
 Lambda Console → Upload from → .zip file
 ```
 
-
-
-
-
-
-Set environment variable:
-
-* `DB_HOST = <RDS-ENDPOINT>`
-
 ---
 
 ## PHASE 5️⃣ – API Gateway
