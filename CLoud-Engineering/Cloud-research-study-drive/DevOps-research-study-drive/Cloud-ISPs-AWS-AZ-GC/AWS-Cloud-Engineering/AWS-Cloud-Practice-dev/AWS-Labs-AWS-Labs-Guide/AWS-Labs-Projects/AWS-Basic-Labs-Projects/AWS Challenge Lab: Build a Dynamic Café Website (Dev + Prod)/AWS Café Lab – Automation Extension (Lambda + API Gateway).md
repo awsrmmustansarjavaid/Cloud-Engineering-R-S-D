@@ -1,8 +1,5 @@
 # ☕ AWS Café Lab – Automation Extension (Lambda + API Gateway)
 
-> **Author & Architecture Designer:** Charlie
->
-> 
 > **Purpose**: Modify the existing EC2-based café app so **order placement is automated via API Gateway + Lambda** (serverless), while the website remains on EC2. This introduces modern automation, separation of concerns, and prepares you for full serverless later.
 
 ---
@@ -191,6 +188,9 @@ Lambda does **not include pymysql by default**.
 ```bash
 mkdir lambda-layer
 cd lambda-layer
+sudo dnf install -y python3 python3-pip
+python3 --version
+pip3 --version
 pip install pymysql -t python/
 zip -r pymysql-layer.zip python
 ```
