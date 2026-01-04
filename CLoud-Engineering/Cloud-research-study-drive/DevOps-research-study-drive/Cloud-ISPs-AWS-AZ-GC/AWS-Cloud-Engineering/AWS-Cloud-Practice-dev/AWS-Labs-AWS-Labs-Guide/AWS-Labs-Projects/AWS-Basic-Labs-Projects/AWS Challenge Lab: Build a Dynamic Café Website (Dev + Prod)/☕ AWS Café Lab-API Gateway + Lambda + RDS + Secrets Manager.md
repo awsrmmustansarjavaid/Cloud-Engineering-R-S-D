@@ -465,6 +465,8 @@ ls
 Lambda → Your Function → Code → Upload from → .zip file
 ```
 
+or
+
 ##### Upload ZIP to Lambda
 
 ```
@@ -2011,6 +2013,7 @@ SELECT * FROM orders;
 ---
 
 ☕ **You have now built a REAL AWS production system.**
+
 
 
 
