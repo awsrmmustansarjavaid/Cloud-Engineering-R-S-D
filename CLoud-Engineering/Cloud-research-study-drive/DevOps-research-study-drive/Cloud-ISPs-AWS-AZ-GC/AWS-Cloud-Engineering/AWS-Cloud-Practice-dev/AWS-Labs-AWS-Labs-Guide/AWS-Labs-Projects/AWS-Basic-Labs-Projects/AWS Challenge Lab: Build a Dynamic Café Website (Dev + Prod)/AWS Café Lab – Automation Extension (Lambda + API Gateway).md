@@ -213,19 +213,31 @@ VALUES ('CLI-Test', 'Coffee', 1);
 SELECT * FROM orders;
 ```
 
+###### ✅ If you see the row → DB is READY
+
+#### Exit MySQL:
+
+```
+EXIT;
+```
+
 ---
 
 # PHASE 4 — SECRETS & SECURITY (BEST PRACTICE)
 
 ## 8️⃣ Store DB Credentials in Secrets Manager
 
-Secret name:
+- Go to Secrets Manager → Store a new secret
+
+- Type: Other type of secret → Key/Value
+
+- Secret name:
 
 ```
 CafeDevDBSM
 ```
 
-Keys:
+### Keys:
 
 ```text
 username
@@ -233,6 +245,17 @@ password
 host
 dbname
 ```
+
+### Values:
+
+```text
+cafe_user
+StrongPassword123
+<EC2-Private-IP>
+cafe_db
+```
+
+- Retrieve Secret ARN for later use in the app
 
 ---
 
