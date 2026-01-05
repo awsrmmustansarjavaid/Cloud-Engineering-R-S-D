@@ -1,5 +1,7 @@
 # ☕ AWS Café Lab – Ordered Zero-to-Production Guide (Dev + Prod + Automation)
 
+**Author & Architecture Designer:** Charlie
+
 > **Trainer-led, exam-safe, production-style guide**
 > This document rearranges the entire lab into the **correct real-world order**: infrastructure → OS → runtime → database → security → application → automation → production.
 
@@ -34,6 +36,12 @@ Secrets Manager
   ↓
 MariaDB (Dev) / RDS (Optional)
 ```
+
+---
+
+## AWS Architecture Diagram 
+
+![AWS Architecture Diagram](./AWS%20Challenge%20Lab%20Build%20a%20Dynamic%20Café%20Website%20Dev%20%20Prod.jpg)
 
 ---
 
@@ -100,8 +108,11 @@ sudo dnf update -y
 
 ### Install Apache
 
-```bash
+```
 sudo dnf install -y httpd
+```
+
+```
 sudo systemctl enable --now httpd
 ```
 
@@ -143,7 +154,11 @@ sudo systemctl enable --now mariadb
 ```bash
 sudo mysql_secure_installation
 ```
+### Login to MariaDB:
 
+```
+sudo mysql -u root -p
+```
 ---
 
 ## 7️⃣ Create Café Database
