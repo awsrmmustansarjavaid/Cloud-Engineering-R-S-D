@@ -54,6 +54,17 @@ MariaDB (Dev) / RDS (Optional)
 
 ---
 
+## 📋 AWS Hand-On Lab Content
+
+[Development VPC](#Development-VPC)
+
+[Lamb Sever](#Lamb-ser)
+
+
+
+
+---
+
 # PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
 ## 1️⃣ Create Development VPC (us‑east‑1)
