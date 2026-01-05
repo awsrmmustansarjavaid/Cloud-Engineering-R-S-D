@@ -929,7 +929,7 @@ sudo nano /var/www/html/index.php
             "quantity"      => (int) $_POST["quantity"]
         ];
 
-        $apiUrl = "https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders";
+        $apiUrl = "https://f4c57y07gb.execute-api.us-east-1.amazonaws.com/dev/orders";
 
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
