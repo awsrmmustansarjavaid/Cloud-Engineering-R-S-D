@@ -970,9 +970,9 @@ sudo systemctl restart httpd
 
 ```
 curl -X POST \
-  https://f4c57y07gb.execute-api.us-east-1.amazonaws.com/dev \
+  https://f4c57y07gb.execute-api.us-east-1.amazonaws.com/dev/orders \
   -H "Content-Type: application/json" \
-  -d '{"name":"TestUser","item":"Latte","quantity":1}'
+  -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
 ```
 
 #### Expected result:
