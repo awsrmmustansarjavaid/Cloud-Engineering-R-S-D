@@ -710,12 +710,80 @@ Click **Add**
 
 ## 4️⃣ API Gateway
 
-* REST API
-* Resource: `/orders`
-* Method: POST
-* Integration: Lambda (proxy enabled)
-* Enable CORS
-* Stage: `dev`
+**Objective:**  
+Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café web app can send orders to it.
+
+### 1️⃣ Create a REST API
+
+1. Open **AWS Management Console → API Gateway**.
+2. Click **Create API**.
+3. Choose **REST API → Build**.
+4. **Configuration:**
+   - API name: `CafeOrderAPI`
+   - Description: `API for processing café orders`
+   - Endpoint type: `Regional` (default)
+5. Click **Create API**.
+
+
+
+### 2️⃣ Create Resource
+
+1. In your API, click **Resources → Actions → Create Resource**.
+2. Configure:
+   - Resource Name: `orders`
+   - Resource Path: `/orders`
+3. Click **Create Resource**.
+
+
+
+### 3️⃣ Create POST Method
+
+1. Select `/orders` resource.
+2. Click **Actions → Create Method → POST**.
+3. Integration type: **Lambda Function**
+   - Check **Use Lambda Proxy integration**
+   - Lambda Region: `us-east-1`
+   - Lambda Function: `CafeOrderProcessor`
+4. Click **Save** → **OK** to give permissions to API Gateway to invoke Lambda.
+
+
+
+### 4️⃣ Enable CORS (Cross-Origin Resource Sharing)
+
+1. Select `/orders` resource.
+2. Click **Actions → Enable CORS**.
+3. Configure:
+   - Allowed Methods: `POST`
+   - Allowed Headers: `Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token`
+   - Allow Credentials: unchecked
+4. Click **Enable CORS and replace existing CORS headers**.
+5. Click **Yes, replace existing values** if prompted.
+
+
+
+### 5️⃣ Deploy API
+
+1. Click **Actions → Deploy API**.
+2. Configure:
+   - Deployment stage: `dev`
+   - Stage description: `Development stage`
+   - Deployment description: `Initial deployment`
+3. Click **Deploy**.
+
+
+
+### 6️⃣ Copy API Invoke URL
+
+After deployment, you’ll see an **Invoke URL** at the top of the Stage page, e.g.:
+
+```
+https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
+```
+
+
+> This URL will be used in your EC2 PHP web app `curl` requests.
+
+
 
 ---
 
