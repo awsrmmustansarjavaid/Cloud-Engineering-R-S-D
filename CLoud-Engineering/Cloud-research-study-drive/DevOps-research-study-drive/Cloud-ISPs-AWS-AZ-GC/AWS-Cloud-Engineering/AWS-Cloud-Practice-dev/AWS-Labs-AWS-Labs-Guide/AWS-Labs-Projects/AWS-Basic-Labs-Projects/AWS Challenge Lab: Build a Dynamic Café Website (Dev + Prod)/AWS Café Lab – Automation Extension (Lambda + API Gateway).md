@@ -1,528 +1,315 @@
-# ☕ AWS Café Lab – Automation Extension (Lambda + API Gateway)
+# ☕ AWS Café Lab – Ordered Zero-to-Production Guide (Dev + Prod + Automation)
 
-> **Purpose**: Modify the existing EC2-based café app so **order placement is automated via API Gateway + Lambda** (serverless), while the website remains on EC2. This introduces modern automation, separation of concerns, and prepares you for full serverless later.
-
----
-
-## 🎯 What Changes From Original Lab
-
-| Component        | Before                 | After                                     |
-| ---------------- | ---------------------- | ----------------------------------------- |
-| Order submission | PHP → MariaDB directly | PHP → API Gateway → Lambda → DB           |
-| Business logic   | On EC2                 | In Lambda (serverless)                    |
-| Security         | DB creds on EC2        | DB creds only in Secrets Manager (Lambda) |
-| Automation       | Manual                 | Fully automated order processing          |
+> **Trainer-led, exam-safe, production-style guide**
+> This document rearranges the entire lab into the **correct real-world order**: infrastructure → OS → runtime → database → security → application → automation → production.
 
 ---
 
-## 🧠 Final Architecture (Automation Added)
+## 🎯 Objective
+
+Build a **dynamic café ordering system** using:
+
+* EC2 + LAMP (Dev)
+* MariaDB
+* Secrets Manager
+* IAM Roles (NO hardcoded creds)
+* Custom AMI
+* Production environment (multi‑region)
+* **Automation using Lambda + API Gateway**
+
+---
+
+## 🧱 High-Level Architecture
 
 ```
 Browser
   ↓
 EC2 (Apache + PHP)
-  ↓ HTTP POST
-API Gateway (REST API)
+  ↓ (POST JSON)
+API Gateway
   ↓
-Lambda (OrderProcessor)
+Lambda (Order Processor)
   ↓
-Secrets Manager → DB Credentials
+Secrets Manager
   ↓
-MariaDB (Dev) / RDS (Optional upgrade)
+MariaDB (Dev) / RDS (Optional)
 ```
 
 ---
 
-## 🔐 Prerequisites (Already Done)
+## ✅ Prerequisites
 
-✔ EC2 Café website running
-✔ MariaDB working
-✔ Secrets Manager secret exists (`CafeDevDBSecret`)
-✔ IAM basics understood
+* AWS Account (EC2, VPC, IAM, Secrets Manager, Lambda)
+* Basic Linux commands
+* PHP + MySQL knowledge
+* SSH client or Cloud9
 
 ---
 
-# 1️⃣ Create IAM Role for Lambda
+# PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
-## Step 1: IAM → Roles → Create Role
+## 1️⃣ Create Development VPC (us‑east‑1)
 
-* Trusted entity: **AWS Service**
-* Use case: **Lambda**
+* VPC Name: `CafeDevVPC`
+* CIDR: `10.0.0.0/16`
 
+### Create Public Subnet
 
+* Name: `CafeDevPublicSubnet`
+* CIDR: `10.0.1.0/24`
+* Auto‑assign public IP: **Enabled**
 
-## Step 2: Add Custom Policy for Secrets Manager
+### Internet Access
 
-**IAM → Policies → Create policy → JSON**
+* Create Internet Gateway → Attach to VPC
+* Route table → Add route `0.0.0.0/0 → IGW`
+
+---
+
+## 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
+
+* AMI: Amazon Linux 2023
+* Type: `t2.micro`
+* VPC/Subnet: Dev VPC + Public subnet
+* Security Group:
+
+  * SSH (22) → Your IP
+  * HTTP (80) → 0.0.0.0/0
+* Name tag: `CafeDevWebServer`
+
+---
+
+## 3️⃣ Connect to EC2
+
+```bash
+chmod 400 CafeDevKey.pem
+ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
+```
+
+---
+
+# PHASE 2 — OPERATING SYSTEM & RUNTIME
+
+## 4️⃣ Install LAMP Stack (ORDER MATTERS)
+
+### Update OS
+
+```bash
+sudo dnf update -y
+```
+
+### Install Apache
+
+```bash
+sudo dnf install -y httpd
+sudo systemctl enable --now httpd
+```
+
+### Install PHP
+
+```bash
+sudo dnf install -y php php-mysqlnd php-cli php-common php-mbstring php-xml
+```
+
+### Verify
+
+```bash
+php -v
+httpd -v
+```
+
+---
+
+## 5️⃣ Fix Permissions (MANDATORY)
+
+```bash
+sudo chown -R apache:apache /var/www
+sudo chmod -R 755 /var/www
+```
+
+---
+
+# PHASE 3 — DATABASE (LOCAL DEV)
+
+## 6️⃣ Install MariaDB
+
+```bash
+sudo dnf install -y mariadb105-server
+sudo systemctl enable --now mariadb
+```
+
+### Secure DB
+
+```bash
+sudo mysql_secure_installation
+```
+
+---
+
+## 7️⃣ Create Café Database
+
+```sql
+CREATE DATABASE cafe_db;
+CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
+GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
+FLUSH PRIVILEGES;
+```
+
+### Orders Table
+
+```sql
+CREATE TABLE orders (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ customer_name VARCHAR(100),
+ item VARCHAR(50),
+ quantity INT,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+# PHASE 4 — SECRETS & SECURITY (BEST PRACTICE)
+
+## 8️⃣ Store DB Credentials in Secrets Manager
+
+Secret name:
+
+```
+CafeDevDBSecret
+```
+
+Keys:
+
+```text
+username
+password
+host
+dbname
+```
+
+---
+
+## 9️⃣ IAM Role for EC2 (Secrets Access)
+
+Policy:
 
 ```json
 {
   "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "secretsmanager:GetSecretValue",
-      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSecret*"
-    }
-  ]
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": "secretsmanager:GetSecretValue",
+    "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSecret*"
+  }]
 }
 ```
-
-Policy name:
-
-```
-LambdaCafeSecretsAccess
-```
-
-## Step 3: Attach Permissions
-
-Attach **AWS managed policies**:
-
-```
-AWSLambdaBasicExecutionRole
-```
-
-```
-LambdaCafeSecretsAccess
-```
-
-Attach this policy to the Lambda role.
 
 Role name:
 
 ```
-Lambda-Cafe-Order-Role
+EC2-Cafe-Secrets-Role
 ```
+
+Attach role to EC2 (NO reboot).
 
 ---
 
-# 2️⃣ Create Lambda Function (Order Processor)
+# PHASE 5 — APPLICATION CODE
 
-## Step 1: Lambda → Create Function
+## 🔹 index.php
 
-* Function name:
-
-```
-CafeOrderProcessor
-```
-
-* Runtime:
-
-```
-Python 3.12
-```
-
-* Execution role:
-
-```
-Use existing role → Lambda-Cafe-Order-Role
-```
+* Location: `/var/www/html/index.php`
+* Purpose: UI + API call (no DB logic)
 
 ---
 
-## Step 2: Lambda Function Code
+## 🔹 config.php
 
-> This Lambda **receives order JSON**, reads DB credentials from Secrets Manager, and inserts into MariaDB.
-
-### Paste **EXACT** code:
-
-```python
-import json
-import pymysql
-import boto3
-
-secrets_client = boto3.client('secretsmanager', region_name='us-east-1')
-
-SECRET_NAME = "CafeDevDBSecret"
-
-def get_db_credentials():
-    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
-    return json.loads(response['SecretString'])
-
-
-def lambda_handler(event, context):
-    try:
-        body = json.loads(event['body'])
-        creds = get_db_credentials()
-
-        connection = pymysql.connect(
-            host=creds['host'],
-            user=creds['username'],
-            password=creds['password'],
-            database=creds['dbname'],
-            cursorclass=pymysql.cursors.DictCursor
-        )
-
-        with connection.cursor() as cursor:
-            sql = "INSERT INTO orders (customer_name, item, quantity) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (
-                body['name'],
-                body['item'],
-                body['quantity']
-            ))
-        connection.commit()
-        connection.close()
-
-        return {
-            'statusCode': 200,
-            'headers': {"Access-Control-Allow-Origin": "*"},
-            'body': json.dumps({'message': 'Order placed successfully'})
-        }
-
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'headers': {"Access-Control-Allow-Origin": "*"},
-            'body': json.dumps({'error': str(e)})
-        }
-```
+* Reads Secrets Manager
+* Establishes DB connection
+* Uses AWS SDK for PHP
 
 ---
 
-## Step 3: Add Lambda Layer (pymysql)
-
-Lambda does **not include pymysql by default**.
-
-### From EC2 or CloudShell:
+## 10️⃣ Install AWS SDK for PHP
 
 ```bash
-mkdir lambda-layer
-cd lambda-layer
+cd /var/www/html
+sudo dnf install -y composer
+sudo composer require aws/aws-sdk-php
+```
+
+Restart:
+
+```bash
+sudo systemctl restart httpd
+```
+
+---
+
+# PHASE 6 — AUTOMATION (SERVERLESS)
+
+## 1️⃣ Create Lambda Role
+
+* Name: `Lambda-Cafe-Order-Role`
+* Policies:
+
+  * AWSLambdaBasicExecutionRole
+  * Secrets Manager custom policy
+
+---
+
+## 2️⃣ Create Lambda Function
+
+* Name: `CafeOrderProcessor`
+* Runtime: Python 3.12
+* Role: `Lambda-Cafe-Order-Role`
+
+---
+
+## 3️⃣ Lambda Layer (pymysql)
+
+```bash
 sudo dnf install -y python3 python3-pip
-python3 --version
-pip3 --version
-pip install pymysql -t python/
+mkdir lambda-layer && cd lambda-layer
+pip3 install pymysql -t python/
 zip -r pymysql-layer.zip python
 ```
 
-### Upload Zip
-
-###### Uploading a Lambda layer from EC2 via S3
-
-#### 1️⃣ Verify ZIP Exists on EC2
-
-##### On EC2, run:
-
-```
-ls -lh
-```
-##### You must see:
-
-```
-pymysql-layer.zip
-```
-
-##### If not, recreate it:
-
-```
-zip -r pymysql-layer.zip python
-```
-
-#### 2️⃣ Install & Configure AWS CLI on EC2
-
-```
-sudo dnf install -y awscli
-```
-
-##### Verify:
-
-```
-aws --version
-```
-
-#### 3️⃣ Verify IAM Role Has S3 Permissions
-
-###### Your EC2 must have an IAM role attached.
-
-##### Required permission:
-
-```
-s3:PutObject
-```
-
-##### Quick Test (run this):
-
-```
-aws sts get-caller-identity
-```
-
-✅ If JSON output appears → role is attached
-
-❌ If error → IAM role missing
-
-#### 4️⃣ Add S3 Permission (If Needed)
-
-- **IAM → Roles → Your EC2 role**
-
-##### Attach this AWS managed policy:
-
-```
-AmazonS3FullAccess
-```
-
-###### (For lab only — in production, use least privilege)
-
-#### 5️⃣ Create Bucket (Same Region as Lambda)
-
-- **From AWS Console → S3:**
-
-###### Bucket name (must be globally unique):
-
-```
-cafe-lambda-layers-<your-name>
-```
-
-##### Region:
-
-```
-us-east-1
-```
-
-- **Block public access → ON**
-
-- **Encryption → Default (ON)**
-
-✅ Click Create bucket
-
-#### 6️⃣ Upload ZIP from EC2 to S3
-
-From EC2 (inside directory with ZIP):
-
-```
-aws s3 cp pymysql-layer.zip s3://cafe-lambda-layers-<your-name>/
-```
-
-##### Verify upload:
-
-```
-aws s3 ls s3://cafe-lambda-layers-<your-name>/
-```
-
-##### You should see:
-
-```
-pymysql-layer.zip
-```
-
-✅ Upload complete
-
-
-### Lambda layer
-
-#### 1️⃣ Create Layer
-
-* AWS Console → Lambda → Layers → Create layer
-
-#### 2️⃣ Layer Configuration
-
-##### Fill exactly:
-
-```
-| Field               | Value                                                   |
-| ------------------- | ------------------------------------------------------- |
-| Name                | `pymysql-layer`                                         |
-| Description         | `PyMySQL library for Cafe Order Lambda`                 |
-| Code source         | **Upload a file from Amazon S3**                        |
-| S3 URI              | `s3://cafe-lambda-layers-<your-name>/pymysql-layer.zip` |
-| Compatible runtimes | ✅ Python 3.12                                           |
-```
-
-* Click Create
-
-#### 3️⃣ Attach Layer to Lambda Function
-
-* Lambda → Functions
-
-* Open:
-
-```
-CafeOrderProcessor
-```
-
-* Scroll to Layers
-
-* Click Add a layer
-
-* Choose:
-
-```
-Custom layers
-```
-
-* Select:
-
-```
-pymysql-layer
-```
-
-* Version: 1
-
-* Click Add
-
-#### 4️⃣ Verify Layer Is Working
-
-##### Check Lambda Test Event
-
-* Create Test Event
-
-```
-{
-  "body": "{\"name\":\"LayerTest\",\"item\":\"Coffee\",\"quantity\":1}"
-}
-```
-
-* Click Test
-
-##### Expected Result ✅
-
-```
-{
-  "statusCode": 200,
-  "body": "{\"message\":\"Order placed successfully\"}"
-}
-```
-
-#### 4️⃣ Check CloudWatch Logs
-
-* **Lambda → Monitor → View logs**
-
-##### You should NOT see:
-
-```
-ModuleNotFoundError: No module named 'pymysql'
-```
-
-**⛔️ If you do → ZIP structure is wrong.**
-
-#### 🚨 Common Mistakes
-
-```
-| Mistake                              | Result                    |
-| ------------------------------------ | ------------------------- |
-| Zipped contents instead of `python/` | Import error              |
-| Used Windows to build layer          | Binary mismatch           |
-| Wrong runtime selected               | Layer ignored             |
-| Uploaded wrong ZIP                   | Lambda can't find pymysql |
-```
-
-
+Upload layer → Attach to Lambda.
 
 ---
 
-# 3️⃣ Create API Gateway (REST API)
+## 4️⃣ API Gateway
 
-## Step 1: API Gateway → Create API
-
-* Type: **REST API**
-* Name:
-
-```
-CafeOrderAPI
-```
-* API endpoint type: **Regional **
-
-* Security policy - new: **SecurityPolicy_TLS13_1_2_2021_06**
-
-        
----
-
-## Step 2: Create Resource
-
-```
-/orders
-```
-
----
-
-## Step 3: Create POST Method
-
-* Integration type: **Lambda Function**
-* Lambda:
-
-```
-CafeOrderProcessor
-```
-
-* Enable **Lambda proxy integration**
-
----
-
-## Step 4: Enable CORS
-
+* REST API
 * Resource: `/orders`
-* Actions → Enable CORS
-* Allow:
-
-```
-POST
-```
+* Method: POST
+* Integration: Lambda (proxy enabled)
+* Enable CORS
+* Stage: `dev`
 
 ---
 
-## Step 5: Deploy API
+## 5️⃣ Modify index.php (Automation)
 
-* Actions → Deploy API
-* Stage name:
-
-```
-dev
-```
-
-### Copy Invoke URL
-
-```
-https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/orders
-```
+* Remove direct DB insert
+* Send POST JSON to API Gateway
 
 ---
 
-# 4️⃣ Modify EC2 PHP App (Automation Enabled)
+# PHASE 7 — TESTING & VERIFICATION
 
-## Replace Order Insert Logic in `index.php`
+## Lambda Test
 
-### 🔁 REMOVE this block:
-
-```php
-$stmt = $db->prepare("INSERT INTO orders...");
-```
-
-### ✅ ADD this instead:
-
-```php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $data = json_encode([
-        "name" => $_POST['name'],
-        "item" => $_POST['item'],
-        "quantity" => $_POST['quantity']
-    ]);
-
-    $ch = curl_init("https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/orders");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-    $response = curl_exec($ch);
-    curl_close($ch);
-
-    echo "<p>✅ Order sent to serverless backend!</p>";
+```json
+{
+ "body": "{\"name\":\"Test\",\"item\":\"Coffee\",\"quantity\":1}"
 }
 ```
 
----
-
-# 5️⃣ Automation Testing
-
-## Test via CURL
-
-```bash
-curl -X POST \
-https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/orders \
--H "Content-Type: application/json" \
--d '{"name":"API-Test","item":"Latte","quantity":2}'
-```
-
-## Verify DB
+## DB Verify
 
 ```sql
 SELECT * FROM orders ORDER BY id DESC;
@@ -530,33 +317,39 @@ SELECT * FROM orders ORDER BY id DESC;
 
 ---
 
-# 6️⃣ Production Upgrade (Optional Automation)
+# PHASE 8 — PRODUCTION (us‑west‑2)
 
-✔ Same Lambda code
-✔ New API stage: `prod`
-✔ New secret: `CafeProdDBSecret`
-✔ Point EC2 Prod site to **prod API URL**
+## Create AMI
 
----
+* Name: `CafeDevWebAMI`
 
-# ✅ Final Automation Checklist
+## Launch Prod EC2
 
-✔ Lambda processes orders
-✔ API Gateway exposes endpoint
-✔ PHP no longer touches DB
-✔ Secrets Manager only accessed by Lambda
-✔ Fully automated order pipeline
+* Region: us‑west‑2
+* From AMI
+* New VPC/Subnet
 
 ---
 
-## 🚀 Next Enhancements (Tell me when ready)
+# ✅ FINAL CHECKLIST
 
-1. Replace MariaDB with **Amazon RDS**
-2. Use **DynamoDB (fully serverless)**
-3. Add **SQS queue** for async orders
-4. Add **CloudWatch dashboards**
-5. Add **WAF + rate limiting**
+* [ ] Dev works
+* [ ] Secrets secure
+* [ ] Lambda inserts orders
+* [ ] API Gateway reachable
+* [ ] Prod mirrors Dev
 
 ---
 
-**You now have a REAL production-grade AWS automation architecture.**
+## 🏁 RESULT
+
+You now have a **real AWS production architecture** with:
+
+✔ Secure credentials
+✔ Automation
+✔ Multi‑region deployment
+✔ Exam‑ready design
+
+---
+
+🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
