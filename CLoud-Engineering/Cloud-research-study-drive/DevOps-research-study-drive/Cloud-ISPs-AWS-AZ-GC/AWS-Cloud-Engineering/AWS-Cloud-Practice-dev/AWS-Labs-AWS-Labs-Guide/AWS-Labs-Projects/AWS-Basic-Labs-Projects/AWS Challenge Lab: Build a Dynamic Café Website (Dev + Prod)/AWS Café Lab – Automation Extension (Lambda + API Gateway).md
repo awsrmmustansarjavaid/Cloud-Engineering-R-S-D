@@ -793,9 +793,14 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 
 > This URL will be used in your EC2 PHP web app `curl` requests.
 
+---
 
+## 5️⃣ Modify index.php (Automation)
 
-### 7️⃣ Update EC2 PHP App to Use API Gateway
+* Remove direct DB insert
+* Send POST JSON to API Gateway
+
+### 1️⃣ Update EC2 PHP App to Use API Gateway
 
 #### In your `index.php`:
 
@@ -958,13 +963,13 @@ sudo nano /var/www/html/index.php
 </body>
 </html>
 ```
-#### Restart Apache (MANDATORY)
+### 2️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
 
-### 8️⃣ Test API Gateway
+### 3️⃣ Test API Gateway
 
 #### Test via CURL
 
@@ -989,7 +994,7 @@ curl -X POST \
 
 - Verify new orders appear in your MariaDB database.
 
-### 9️⃣ Common Issues & Troubleshooting
+### 4️⃣ Common Issues & Troubleshooting
 
 
 | Issue                              | Solution                                                                |
@@ -1004,13 +1009,6 @@ curl -X POST \
 
 
 
-
----
-
-## 5️⃣ Modify index.php (Automation)
-
-* Remove direct DB insert
-* Send POST JSON to API Gateway
 
 ---
 
