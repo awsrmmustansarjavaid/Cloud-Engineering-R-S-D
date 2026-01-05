@@ -547,6 +547,15 @@ try {
 ?>
 ```
 
+### Fix Permissions (Very Important)
+
+```
+sudo chown -R apache:apache /var/www
+```
+
+```
+sudo chmod -R 755 /var/www
+```
 
 ---
 
