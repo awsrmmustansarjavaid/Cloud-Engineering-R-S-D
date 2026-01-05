@@ -631,7 +631,7 @@ ls -lh pymysql-layer.zip
 
 | Setting             | Value                            |
 | ------------------- | -------------------------------- |
-| Bucket name         | `cafe-lambda-artifacts-<unique>` |
+| Bucket name         | `mn-cafe-s3-bucket` |
 | Region              | `us-east-1` (same as Lambda)     |
 | Object ownership    | ACLs disabled                    |
 | Block public access | ✅ Enabled (KEEP ON)             |
@@ -664,7 +664,47 @@ upload: ./pymysql-layer.zip to s3://cafe-lambda-artifacts-xxx/layers/pymysql-lay
 * Add file → select `pymysql-layer.zip`
 * Click **Upload**
 
+### Step 3: Create Lambda Layer Using S3
 
+### 1️⃣  Lambda Console
+
+* AWS Console → **Lambda**
+* Click **Layers**
+* Click **Create layer**
+
+### 2️⃣  Layer Settings
+
+| Field              | Value                                                          |
+| ------------------ | -------------------------------------------------------------- |
+| Name               | `pymysql-layer`                                                |
+| Description        | PyMySQL dependency layer                                       |
+| Code entry type    | **Upload a file from Amazon S3**                               |
+| S3 URI             | `s3://cafe-lambda-artifacts-<unique>/layers/pymysql-layer.zip` |
+| Compatible runtime | Python 3.12                                                    |
+
+Click **Create**
+
+✅ Lambda Layer created from S3
+
+### 3️⃣ Attach Layer to Lambda Function
+
+####  1️⃣ Open Lambda Function
+
+* Lambda → Functions → `CafeOrderProcessor`
+
+#### 2️⃣ Add Layer
+
+* Scroll to **Layers** section
+* Click **Add a layer**
+* Choose **Custom layers**
+* Select:
+
+  * Layer: `pymysql-layer`
+  * Version: latest
+
+Click **Add**
+
+---
 
 ---
 
