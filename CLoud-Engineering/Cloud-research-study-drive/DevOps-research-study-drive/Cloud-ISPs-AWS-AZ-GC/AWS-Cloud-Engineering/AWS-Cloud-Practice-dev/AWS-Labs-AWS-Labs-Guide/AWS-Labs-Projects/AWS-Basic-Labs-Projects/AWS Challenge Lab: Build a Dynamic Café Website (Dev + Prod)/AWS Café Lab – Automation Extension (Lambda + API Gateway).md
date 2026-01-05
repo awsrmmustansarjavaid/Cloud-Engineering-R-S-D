@@ -791,8 +791,213 @@ After deployment, you’ll see an **Invoke URL** at the top of the Stage page, e
 https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 ```
 
-
 > This URL will be used in your EC2 PHP web app `curl` requests.
+
+
+
+### 7️⃣ Update EC2 PHP App to Use API Gateway
+
+#### In your `index.php`:
+
+```php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $data = json_encode([
+        "name" => $_POST['name'],
+        "item" => $_POST['item'],
+        "quantity" => $_POST['quantity']
+    ]);
+
+    $ch = curl_init("https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    echo "<p>✅ Order sent to serverless backend!</p>";
+}
+```
+
+#### FULL UPDATED index.php (FINAL VERSION)
+
+You can copy-paste this entire file safely 👇
+
+```
+sudo nano /var/www/html/index.php
+```
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Café</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #219150;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #ecf0f1;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>☕ AWS Café</h1>
+    <p>Welcome to our cloud-powered café</p>
+</header>
+
+<div class="container">
+    <h2>Place Your Order</h2>
+
+    <form method="POST">
+        <label>Customer Name</label>
+        <input type="text" name="name" required>
+
+        <label>Select Item</label>
+        <select name="item">
+            <option value="Coffee">Coffee</option>
+            <option value="Tea">Tea</option>
+            <option value="Latte">Latte</option>
+            <option value="Cappuccino">Cappuccino</option>
+        </select>
+
+        <label>Quantity</label>
+        <input type="number" name="quantity" min="1" value="1">
+
+        <button type="submit">Place Order</button>
+    </form>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+        $payload = [
+            "customer_name" => $_POST["name"],
+            "item"          => $_POST["item"],
+            "quantity"      => (int) $_POST["quantity"]
+        ];
+
+        $apiUrl = "https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200) {
+            echo "<p>✅ Order sent successfully!</p>";
+        } else {
+            echo "<p>❌ Error sending order</p>";
+            echo "<pre>$response</pre>";
+        }
+    }
+    ?>
+</div>
+
+<footer>
+    <p>© 2025 AWS Café | Serverless Backend</p>
+</footer>
+
+</body>
+</html>
+```
+
+
+### 8️⃣ Test API Gateway
+
+#### Test via CURL
+
+```
+curl -X POST \
+  https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{"name":"TestUser","item":"Latte","quantity":1}'
+```
+
+#### Expected result:
+
+```
+{
+  "message": "Order placed successfully"
+}
+```
+
+#### Verify in Lambda
+
+- Check your Lambda CloudWatch logs to ensure the function executed correctly.
+
+- Verify new orders appear in your MariaDB database.
+
+### 9️⃣ Common Issues & Troubleshooting
+
+
+| Issue                              | Solution                                                                |
+| ---------------------------------- | ----------------------------------------------------------------------- |
+| CORS error in browser              | Ensure CORS is enabled for `/orders` with POST method                   |
+| 403 Forbidden / Lambda not invoked | Check Lambda permissions (API Gateway needs `lambda:InvokeFunction`)    |
+| 500 Internal Server Error          | Check Lambda CloudWatch logs for errors, confirm secrets are accessible |
+| Orders not saving                  | Verify DB credentials in Secrets Manager and Lambda function            |
+
+
+
+
 
 
 
