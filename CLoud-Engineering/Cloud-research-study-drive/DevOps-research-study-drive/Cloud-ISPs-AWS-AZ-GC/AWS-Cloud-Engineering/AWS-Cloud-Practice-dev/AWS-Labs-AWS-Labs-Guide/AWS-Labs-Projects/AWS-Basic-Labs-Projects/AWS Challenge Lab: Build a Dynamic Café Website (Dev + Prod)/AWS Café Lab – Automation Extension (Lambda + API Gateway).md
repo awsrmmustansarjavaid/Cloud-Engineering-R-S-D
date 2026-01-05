@@ -261,6 +261,8 @@ cafe_db
 
 ## 9️⃣ IAM Role for EC2 (Secrets Access)
 
+### Step 1: Create IAM Role
+
 Policy:
 
 ```json
@@ -281,6 +283,74 @@ EC2-Cafe-Secrets-Role
 ```
 
 Attach role to EC2 (NO reboot).
+
+### Step 2: Verify IAM Role is Attached
+
+#### Run this on EC2:
+
+###### If an IAM role is attached correctly to an EC2 instance, these MUST work:
+
+```
+curl http://169.254.169.254/latest/meta-data/iam/info
+```
+
+#### Expected output (example):
+
+```
+{
+  "Code" : "Success",
+  "LastUpdated" : "2026-01-04T10:22:18Z",
+  "InstanceProfileArn" : "arn:aws:iam::123456789012:instance-profile/EC2-Cafe-Secrets-Role",
+  "InstanceProfileId" : "AIPAXXXXXXXXX"
+}
+```
+
+```
+curl http://169.254.169.254/latest/meta-data/iam/security-credentials/
+```
+
+#### Expected output (example):
+
+```
+EC2-Cafe-Secrets-Role
+```
+
+###### ✅ If role is attached, you will see JSON output.
+
+### Step 3: Test Secrets Manager Access from EC2
+
+#### Install AWS CLI if not present:
+
+```
+sudo dnf install -y awscli
+```
+
+#### Run:
+
+```
+aws secretsmanager get-secret-value \
+  --secret-id CafeDevDBSM \
+  --region us-east-1
+```
+
+##### ✅ If secret value is returned → IAM role works
+
+For example !
+
+```
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSecret-OgLDg9",
+    "Name": "CafeDevDBSecret",
+    "VersionId": "bbdf3ecb-5d93-46ae-8049-5e4d4164fc10",
+    "SecretString": "{\"username\":\"cafe_user\",\"password\":\"StrongPassword123\",\"host\":\"10.0.0.130\",\"dbname\":\"cafe_db\"}",
+    "VersionStages": [
+        "AWSCURRENT"
+    ],
+    "CreatedDate": "2025-12-27T10:25:34.199000+00:00"
+}
+```
+
+
 
 ---
 
