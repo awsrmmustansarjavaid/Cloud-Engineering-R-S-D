@@ -170,6 +170,12 @@ GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
+#### Use the correct database
+
+```
+USE cafe_db;
+```
+
 ### Orders Table
 
 ```sql
