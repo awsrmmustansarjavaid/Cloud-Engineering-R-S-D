@@ -958,7 +958,11 @@ sudo nano /var/www/html/index.php
 </body>
 </html>
 ```
+#### Restart Apache (MANDATORY)
 
+```
+sudo systemctl restart httpd
+```
 
 ### 8️⃣ Test API Gateway
 
