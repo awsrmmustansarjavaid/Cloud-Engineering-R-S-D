@@ -188,6 +188,31 @@ CREATE TABLE orders (
 );
 ```
 
+#### Verify table exists
+
+```
+SHOW TABLES;
+```
+
+##### You should see:
+
+```
+orders
+```
+
+#### Test insert manually (CLI)
+
+```
+INSERT INTO orders (customer_name, item, quantity)
+VALUES ('CLI-Test', 'Coffee', 1);
+```
+
+#### Verify:
+
+```
+SELECT * FROM orders;
+```
+
 ---
 
 # PHASE 4 — SECRETS & SECURITY (BEST PRACTICE)
@@ -197,7 +222,7 @@ CREATE TABLE orders (
 Secret name:
 
 ```
-CafeDevDBSecret
+CafeDevDBSM
 ```
 
 Keys:
