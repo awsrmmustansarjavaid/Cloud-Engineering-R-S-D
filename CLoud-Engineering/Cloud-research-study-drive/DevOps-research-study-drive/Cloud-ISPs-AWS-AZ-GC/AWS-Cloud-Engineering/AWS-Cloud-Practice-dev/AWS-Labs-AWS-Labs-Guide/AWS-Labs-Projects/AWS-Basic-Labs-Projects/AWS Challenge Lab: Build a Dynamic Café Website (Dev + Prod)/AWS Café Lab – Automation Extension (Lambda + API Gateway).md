@@ -547,7 +547,9 @@ try {
 ?>
 ```
 
-### Fix Permissions (Very Important)
+## Deployment 
+
+### Step 1: Fix Permissions (Very Important)
 
 ```
 sudo chown -R apache:apache /var/www
@@ -559,7 +561,7 @@ sudo chmod -R 755 /var/www
 
 ---
 
-## 10️⃣ Install AWS SDK for PHP
+### Step 2: Install AWS SDK for PHP
 
 ```bash
 cd /var/www/html
@@ -567,7 +569,7 @@ sudo dnf install -y composer
 sudo composer require aws/aws-sdk-php
 ```
 
-Restart:
+### Step 3: Restart
 
 ```bash
 sudo systemctl restart httpd
@@ -597,6 +599,8 @@ sudo systemctl restart httpd
 
 ## 3️⃣ Lambda Layer (pymysql)
 
+### Prepare ZIP File (EC2 or Local)
+
 ```bash
 sudo dnf install -y python3 python3-pip
 mkdir lambda-layer && cd lambda-layer
@@ -604,7 +608,63 @@ pip3 install pymysql -t python/
 zip -r pymysql-layer.zip python
 ```
 
-Upload layer → Attach to Lambda.
+### Confirm ZIP exists:
+
+```bash
+ls -lh pymysql-layer.zip
+```
+
+---
+
+## 4️⃣ S3 Bucket - Upload ZIP to Lambda
+
+#### Upload layer → Attach to Lambda.
+
+### Step 1: Create S3 Bucket 
+
+- AWS Console → Search S3
+
+- Click Create bucket
+
+#### Bucket Configuration :
+
+
+| Setting             | Value                            |
+| ------------------- | -------------------------------- |
+| Bucket name         | `cafe-lambda-artifacts-<unique>` |
+| Region              | `us-east-1` (same as Lambda)     |
+| Object ownership    | ACLs disabled                    |
+| Block public access | ✅ Enabled (KEEP ON)             |
+
+
+Click **Create bucket**
+
+✅ Bucket created
+
+
+### Step 2: Upload ZIP to S3
+
+##### Upload via AWS CLI (Recommended)
+
+```bash
+aws s3 cp pymysql-layer.zip s3://cafe-lambda-artifacts-<unique>/layers/pymysql-layer.zip
+```
+
+#### Expected output:
+
+```
+upload: ./pymysql-layer.zip to s3://cafe-lambda-artifacts-xxx/layers/pymysql-layer.zip
+```
+
+
+##### Option B: Upload via S3 Console
+
+* Open your S3 bucket
+* Click **Upload**
+* Add file → select `pymysql-layer.zip`
+* Click **Upload**
+
+
 
 ---
 
