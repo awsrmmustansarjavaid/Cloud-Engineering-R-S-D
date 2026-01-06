@@ -41,7 +41,7 @@ MariaDB (Dev)
 
 ## AWS Architecture Diagram 
 
-![AWS Architecture Diagram](./AWS%20Challenge%20Lab%20Build%20a%20Dynamic%20Café%20Website%20Dev%20%20Prod.jpg)
+![AWS Architecture Diagram](./AWS%20Café%20Lab%20–%20Automation%20Extension%20(Lambda%20%2B%20API%20Gateway).jpg)
 
 ---
 
@@ -1257,4 +1257,5 @@ You now have a **real AWS production architecture** with:
 ---
 
 🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
+
 
