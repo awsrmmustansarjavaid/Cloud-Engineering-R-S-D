@@ -367,200 +367,17 @@ For example !
 
 # PHASE 5 — APPLICATION CODE
 
-## 🔹 index.php (Static Café Website – Lab Ready)
-
-* 📂 Location: `/var/www/html/index.php`
-
-* ✅ Purpose: UI + API call (no DB logic)
-
-### Run
-
-```
-sudo nano /var/www/html/index.php
-```
-
-#### 👉 Copy & paste exactly as it is
-
-- Paste the code → Save → Exit
-
-```
-<?php
-require 'config.php';
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>AWS Café</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 25px;
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #219150;
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            margin-top: 30px;
-            background-color: #ecf0f1;
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <h1>☕ AWS Café</h1>
-    <p>Welcome to our cloud-powered café</p>
-</header>
-
-<div class="container">
-    <h2>Place Your Order</h2>
-
-    <form method="POST">
-        <label for="name">Customer Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter your name" required>
-
-        <label for="item">Select Item</label>
-        <select id="item" name="item">
-            <option value="Coffee">Coffee</option>
-            <option value="Tea">Tea</option>
-            <option value="Latte">Latte</option>
-            <option value="Cappuccino">Cappuccino</option>
-        </select>
-
-        <label for="quantity">Quantity</label>
-        <input type="number" id="quantity" name="quantity" min="1" value="1">
-
-        <button type="submit">Place Order</button>
-    </form>
-
-    <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Prepare and execute statement safely
-        $stmt = $db->prepare("INSERT INTO orders (customer_name, item, quantity) VALUES (?, ?, ?)");
-        $stmt->bind_param("ssi", $_POST['name'], $_POST['item'], $_POST['quantity']);
-        $stmt->execute();
-        echo "<p>✅ Order placed successfully!</p>";
-    }
-    ?>
-</div>
-
-<footer>
-    <p>© 2025 AWS Café | Built on Amazon EC2 (LAMP Stack)</p>
-</footer>
-
-</body>
-</html>
-```
-
----
-
-## 🔹 config.php (Secrets Manager + MariaDB)
-
-* Reads Secrets Manager
-* Establishes DB connection
-* Uses AWS SDK for PHP
-* 📂 Location: `/var/www/html/config.php`
-
-```
-sudo nano /var/www/html/config.php
-```
-
-```
-<?php
-require __DIR__ . '/vendor/autoload.php';
-
-use Aws\SecretsManager\SecretsManagerClient;
-use Aws\Exception\AwsException;
-
-$region = "us-east-1";   // change for prod if needed
-$secretName = "CafeDevDBSecret";
-
-try {
-    $client = new SecretsManagerClient([
-        'version' => 'latest',
-        'region'  => $region
-    ]);
-
-    $result = $client->getSecretValue([
-        'SecretId' => $secretName
-    ]);
-
-    $secret = json_decode($result['SecretString'], true);
-
-    $db = new mysqli(
-        $secret['host'],
-        $secret['username'],
-        $secret['password'],
-        $secret['dbname']
-    );
-
-    if ($db->connect_error) {
-        die("Database connection failed: " . $db->connect_error);
-    }
-
-} catch (AwsException $e) {
-    die("Secrets Manager error: " . $e->getMessage());
-}
-?>
-```
-
 ## Deployment 
 
-### Step 1: Fix Permissions (Very Important)
+### Step 1: Install AWS SDK for PHP
+
+```bash
+cd /var/www/html
+sudo dnf install -y composer
+sudo composer require aws/aws-sdk-php
+```
+
+### Step 2: Fix Permissions (Very Important)
 
 ```
 sudo chown -R apache:apache /var/www
@@ -571,14 +388,6 @@ sudo chmod -R 755 /var/www
 ```
 
 ---
-
-### Step 2: Install AWS SDK for PHP
-
-```bash
-cd /var/www/html
-sudo dnf install -y composer
-sudo composer require aws/aws-sdk-php
-```
 
 ### Step 3: Restart
 
