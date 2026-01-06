@@ -1051,7 +1051,7 @@ mysql -u cafe_user -p cafe_db
 ```
 
 ```
-SELECT * FROM orders ORDER BY id DESC;
+SELECT * FROM orders;
 ```
 
 #### You should see:
@@ -1214,9 +1214,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 sudo systemctl restart httpd
 ```
 
-### 3️⃣ Lambda Payload (IMPORTANT)
+### 3️⃣ Lambda Payload Code (INSERT INTO MariaDB)
 
 Paste THIS EXACT CODE ⬇️
+
 
 ```
 import json
@@ -1224,26 +1225,27 @@ import pymysql
 import boto3
 import os
 
-secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
-
-SECRET_NAME = "CafeDevDBSM"
-
-def get_db_credentials():
-    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
-    return json.loads(response["SecretString"])
+def get_db_secret():
+    client = boto3.client('secretsmanager')
+    secret = client.get_secret_value(SecretId='CafeDevDBSM')
+    return json.loads(secret['SecretString'])
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event["body"])
+        body = json.loads(event['body'])
 
-        creds = get_db_credentials()
+        customer_name = body['customer_name']
+        item = body['item']
+        quantity = int(body['quantity'])
+
+        secret = get_db_secret()
 
         connection = pymysql.connect(
-            host=creds["host"],
-            user=creds["username"],
-            password=creds["password"],
-            database=creds["dbname"],
-            cursorclass=pymysql.cursors.DictCursor
+            host=secret['DB_HOST'],
+            user=secret['DB_USER'],
+            password=secret['DB_PASSWORD'],
+            database=secret['DB_NAME'],
+            connect_timeout=5
         )
 
         with connection.cursor() as cursor:
@@ -1251,34 +1253,20 @@ def lambda_handler(event, context):
             INSERT INTO orders (customer_name, item, quantity)
             VALUES (%s, %s, %s)
             """
-            cursor.execute(sql, (
-                body["customer_name"],
-                body["item"],
-                body["quantity"]
-            ))
+            cursor.execute(sql, (customer_name, item, quantity))
+            connection.commit()
 
-        connection.commit()
         connection.close()
 
         return {
             "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            },
-            "body": json.dumps({
-                "message": "Order saved successfully"
-            })
+            "body": json.dumps({"message": "Order saved successfully"})
         }
 
     except Exception as e:
         return {
             "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            },
-            "body": json.dumps({
-                "error": str(e)
-            })
+            "body": json.dumps({"error": str(e)})
         }
 ```
 
@@ -1288,7 +1276,33 @@ Click Deploy (top right)
 
 ⚠️ If you don’t click Deploy → old code runs
 
-### 4️⃣ Test API Gateway
+### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - VPC → same as EC2
+
+    - Subnets → PRIVATE subnets (important)
+
+    - Security Group → Lambda SG
+
+    - Save
+
+⏳ Wait until Lambda status = Active
+
+
+
+
+
+### 5️⃣ Test API Gateway
 
 #### Test via CURL
 
@@ -1309,7 +1323,7 @@ curl -X POST \
 
 
 
-### 4️⃣ Test Lambda Directly (Console)
+### 6️⃣ Test Lambda Directly (Console)
 
 - Check your Lambda CloudWatch logs to ensure the function executed correctly.
 
@@ -1334,14 +1348,14 @@ curl -X POST \
 }
 ```
 
-### 5️⃣ Verify Database
+### 7️⃣ Verify Database
 
 ```
 mysql -u cafe_user -p cafe_db
 ```
 
 ```
-SELECT * FROM orders ORDER BY id DESC;
+SELECT * FROM orders;
 ```
 
 #### You should see:
