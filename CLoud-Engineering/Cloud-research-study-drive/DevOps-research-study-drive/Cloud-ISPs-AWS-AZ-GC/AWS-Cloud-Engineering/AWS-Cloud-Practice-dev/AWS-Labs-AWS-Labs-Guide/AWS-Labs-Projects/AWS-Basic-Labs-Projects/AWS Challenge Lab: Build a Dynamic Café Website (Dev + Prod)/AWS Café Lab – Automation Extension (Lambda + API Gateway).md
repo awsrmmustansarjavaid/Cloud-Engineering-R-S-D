@@ -1223,12 +1223,11 @@ Paste THIS EXACT CODE ⬇️
 import json
 import pymysql
 import boto3
-import os
 
 def get_db_secret():
     client = boto3.client('secretsmanager')
-    secret = client.get_secret_value(SecretId='CafeDevDBSM')
-    return json.loads(secret['SecretString'])
+    response = client.get_secret_value(SecretId='CafeDevDBSM')
+    return json.loads(response['SecretString'])
 
 def lambda_handler(event, context):
     try:
@@ -1241,17 +1240,17 @@ def lambda_handler(event, context):
         secret = get_db_secret()
 
         connection = pymysql.connect(
-            host=secret['DB_HOST'],
-            user=secret['DB_USER'],
-            password=secret['DB_PASSWORD'],
-            database=secret['DB_NAME'],
+            host=secret['host'],
+            user=secret['username'],
+            password=secret['password'],
+            database=secret['dbname'],
             connect_timeout=5
         )
 
         with connection.cursor() as cursor:
             sql = """
-            INSERT INTO orders (customer_name, item, quantity)
-            VALUES (%s, %s, %s)
+                INSERT INTO orders (customer_name, item, quantity)
+                VALUES (%s, %s, %s)
             """
             cursor.execute(sql, (customer_name, item, quantity))
             connection.commit()
@@ -1260,12 +1259,19 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
             "body": json.dumps({"message": "Order saved successfully"})
         }
 
     except Exception as e:
+        print("ERROR:", str(e))
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
             "body": json.dumps({"error": str(e)})
         }
 ```
