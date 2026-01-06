@@ -34,7 +34,7 @@ Lambda (Order Processor)
   ↓
 Secrets Manager
   ↓
-MariaDB (Dev) / RDS (Optional)
+MariaDB (Dev)
 ```
 
 ---
@@ -54,16 +54,6 @@ MariaDB (Dev) / RDS (Optional)
 
 ---
 
-## 📋 AWS Hand-On Lab Content
-
-[Development VPC](#Development-VPC)
-
-[Lamb Sever](#Lamb-ser)
-
-
-
-
----
 
 # PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
@@ -109,7 +99,7 @@ ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 
 # PHASE 2 — OPERATING SYSTEM & RUNTIME
 
-## 4️⃣ Install LAMP Stack (ORDER MATTERS)
+## 1️⃣  Install LAMP Stack (ORDER MATTERS)
 
 ### Update OS
 
@@ -142,7 +132,7 @@ httpd -v
 
 ---
 
-## 5️⃣ Fix Permissions (MANDATORY)
+## 2️⃣ Fix Permissions (MANDATORY)
 
 ```bash
 sudo chown -R apache:apache /var/www
@@ -153,7 +143,7 @@ sudo chmod -R 755 /var/www
 
 # PHASE 3 — DATABASE (LOCAL DEV)
 
-## 6️⃣ Install MariaDB
+## 1️⃣ Install MariaDB
 
 ```bash
 sudo dnf install -y mariadb105-server
@@ -165,14 +155,14 @@ sudo systemctl enable --now mariadb
 ```bash
 sudo mysql_secure_installation
 ```
-### Login to MariaDB:
+## 2️⃣ Login to MariaDB:
 
 ```
 sudo mysql -u root -p
 ```
 ---
 
-## 7️⃣ Create Café Database
+## 3️⃣ Create Café Database
 
 ```sql
 CREATE DATABASE cafe_db;
@@ -181,13 +171,13 @@ GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-#### Use the correct database
+## 4️⃣ Use the correct database
 
 ```
 USE cafe_db;
 ```
 
-### Orders Table
+## 5️⃣ Orders Table
 
 ```sql
 CREATE TABLE orders (
@@ -199,7 +189,7 @@ CREATE TABLE orders (
 );
 ```
 
-#### Verify table exists
+## 6️⃣ Verify table exists
 
 ```
 SHOW TABLES;
@@ -211,14 +201,14 @@ SHOW TABLES;
 orders
 ```
 
-#### Test insert manually (CLI)
+## 7️⃣ Test insert manually (CLI)
 
 ```
 INSERT INTO orders (customer_name, item, quantity)
 VALUES ('CLI-Test', 'Coffee', 1);
 ```
 
-#### Verify:
+## 8️⃣ Verify:
 
 ```
 SELECT * FROM orders;
@@ -236,7 +226,7 @@ EXIT;
 
 # PHASE 4 — SECRETS & SECURITY (BEST PRACTICE)
 
-## 8️⃣ Store DB Credentials in Secrets Manager
+## 1️⃣ Store DB Credentials in Secrets Manager
 
 - Go to Secrets Manager → Store a new secret
 
@@ -270,7 +260,7 @@ cafe_db
 
 ---
 
-## 9️⃣ IAM Role for EC2 (Secrets Access)
+## 2️⃣ IAM Role for EC2 (Secrets Access)
 
 ### Step 1: Create IAM Role
 
@@ -328,7 +318,7 @@ EC2-Cafe-Secrets-Role
 
 ###### ✅ If role is attached, you will see JSON output.
 
-### Step 3: Test Secrets Manager Access from EC2
+## 3️⃣ Test Secrets Manager Access from EC2
 
 #### Install AWS CLI if not present:
 
@@ -367,9 +357,7 @@ For example !
 
 # PHASE 5 — APPLICATION CODE
 
-## Deployment 
-
-### Step 1: Install AWS SDK for PHP
+## 1️⃣ Install AWS SDK for PHP
 
 ```bash
 cd /var/www/html
@@ -377,7 +365,7 @@ sudo dnf install -y composer
 sudo composer require aws/aws-sdk-php
 ```
 
-### Step 2: Fix Permissions (Very Important)
+## 2️⃣ Fix Permissions (Very Important)
 
 ```
 sudo chown -R apache:apache /var/www
@@ -389,7 +377,7 @@ sudo chmod -R 755 /var/www
 
 ---
 
-### Step 3: Restart
+## 3️⃣ Restart
 
 ```bash
 sudo systemctl restart httpd
@@ -1269,3 +1257,4 @@ You now have a **real AWS production architecture** with:
 ---
 
 🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
+
