@@ -1019,7 +1019,7 @@ curl -X POST \
 
 
 
-### 4️⃣ Test Lambda Directly (Console)
+### 5️⃣ Test Lambda Directly (Console)
 
 - Check your Lambda CloudWatch logs to ensure the function executed correctly.
 
@@ -1044,14 +1044,14 @@ curl -X POST \
 }
 ```
 
-### 5️⃣ Verify Database
+### 6️⃣ Verify Database
 
 ```
 mysql -u cafe_user -p cafe_db
 ```
 
 ```
-SELECT * FROM orders;
+SELECT * FROM orders ORDER BY id DESC;
 ```
 
 #### You should see:
@@ -1299,7 +1299,27 @@ Click Deploy (top right)
 ⏳ Wait until Lambda status = Active
 
 
+### 5️⃣ Create VPC Endpoint
 
+- AWS Console → VPC → Endpoints → Create endpoint
+
+- Service category : AWS services
+
+- Service name : com.amazonaws.us-east-1.secretsmanager
+
+- Type : Interface
+
+- VPC : Select VPC 
+
+- Subnets :
+
+✔ Select the SAME private subnets used by Lambda
+
+- Security Group :
+
+Allow HTTPS (443) inbound from Lambda SG
+
+Create endpoint ✅
 
 
 ### 5️⃣ Test API Gateway
