@@ -934,7 +934,7 @@ sudo nano /var/www/html/index.php
             "quantity"      => (int) $_POST["quantity"]
         ];
 
-        $apiUrl = "https://f4c57y07gb.execute-api.us-east-1.amazonaws.com/dev/orders";
+        $apiUrl = "https://kg2lm1s1r8.execute-api.us-east-1.amazonaws.com/dev/orders";
 
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -969,13 +969,108 @@ sudo nano /var/www/html/index.php
 sudo systemctl restart httpd
 ```
 
-### 3️⃣ Test API Gateway
+### 3️⃣ Lambda Payload (IMPORTANT)
+
+##### Your Lambda must expect proxy format:
+
+```
+import json
+
+def lambda_handler(event, context):
+    body = json.loads(event["body"])
+
+    customer_name = body["customer_name"]
+    item = body["item"]
+    quantity = body["quantity"]
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps({"message": "Order saved"})
+    }
+```
+
+or Paste THIS EXACT CODE ⬇️
+
+```
+import json
+import pymysql
+import boto3
+import os
+
+secrets_client = boto3.client("secretsmanager", region_name="us-east-1")
+
+SECRET_NAME = "CafeDevDBSM"
+
+def get_db_credentials():
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event["body"])
+
+        creds = get_db_credentials()
+
+        connection = pymysql.connect(
+            host=creds["host"],
+            user=creds["username"],
+            password=creds["password"],
+            database=creds["dbname"],
+            cursorclass=pymysql.cursors.DictCursor
+        )
+
+        with connection.cursor() as cursor:
+            sql = """
+            INSERT INTO orders (customer_name, item, quantity)
+            VALUES (%s, %s, %s)
+            """
+            cursor.execute(sql, (
+                body["customer_name"],
+                body["item"],
+                body["quantity"]
+            ))
+
+        connection.commit()
+        connection.close()
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "message": "Order saved successfully"
+            })
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": str(e)
+            })
+        }
+```
+
+3️⃣ Save Lambda
+
+Click Deploy (top right)
+
+⚠️ If you don’t click Deploy → old code runs
+
+### 4️⃣ Test API Gateway
 
 #### Test via CURL
 
 ```
 curl -X POST \
-  https://f4c57y07gb.execute-api.us-east-1.amazonaws.com/dev/orders \
+  https://kg2lm1s1r8.execute-api.us-east-1.amazonaws.com/dev/orders \
   -H "Content-Type: application/json" \
   -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
 ```
@@ -988,13 +1083,50 @@ curl -X POST \
 }
 ```
 
-#### Verify in Lambda
+
+
+### 4️⃣ Test Lambda Directly (Console)
 
 - Check your Lambda CloudWatch logs to ensure the function executed correctly.
 
 - Verify new orders appear in your MariaDB database.
 
-### 4️⃣ Common Issues & Troubleshooting
+- In Lambda → Test
+
+#### Test Event JSON:
+
+```
+{
+  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\":\"Order saved successfully\"}"
+}
+```
+
+### 5️⃣ Verify Database
+
+```
+mysql -u cafe_user -p cafe_db
+```
+
+```
+SELECT * FROM orders ORDER BY id DESC;
+```
+
+#### You should see:
+
+```
+EC2-Test | Latte | 1
+```
+
+### 6️⃣ Common Issues & Troubleshooting
 
 
 | Issue                              | Solution                                                                |
@@ -1003,9 +1135,6 @@ curl -X POST \
 | 403 Forbidden / Lambda not invoked | Check Lambda permissions (API Gateway needs `lambda:InvokeFunction`)    |
 | 500 Internal Server Error          | Check Lambda CloudWatch logs for errors, confirm secrets are accessible |
 | Orders not saving                  | Verify DB credentials in Secrets Manager and Lambda function            |
-
-
-
 
 
 
