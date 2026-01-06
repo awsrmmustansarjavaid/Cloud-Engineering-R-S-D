@@ -1051,7 +1051,7 @@ mysql -u cafe_user -p cafe_db
 ```
 
 ```
-SELECT * FROM orders ORDER BY id DESC;
+SELECT * FROM orders;
 ```
 
 #### You should see:
