@@ -412,11 +412,15 @@ For example !
 
 ## 1️⃣ Install AWS SDK for PHP
 
+##### (Press ENTER for all prompts)
+
 ```bash
 cd /var/www/html
 sudo dnf install -y composer
 sudo composer require aws/aws-sdk-php
 ```
+
+
 
 ## 2️⃣ Fix Permissions (Very Important)
 
