@@ -826,7 +826,7 @@ sudo nano /var/www/html/index.php
             "quantity"      => (int) $_POST["quantity"]
         ];
 
-        $apiUrl = "https://kg2lm1s1r8.execute-api.us-east-1.amazonaws.com/dev/orders";
+        $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
 
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -896,7 +896,7 @@ Click Deploy (top right)
 
 ```
 curl -X POST \
-  https://kg2lm1s1r8.execute-api.us-east-1.amazonaws.com/dev/orders \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
   -H "Content-Type: application/json" \
   -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
 ```
@@ -1271,6 +1271,13 @@ curl -X POST \
 ```
 mysql -u cafe_user -p cafe_db
 ```
+
+or
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p
+```
+
 
 ```
 SELECT * FROM orders;
