@@ -1552,7 +1552,7 @@ curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
 
 ---
 
-# PHASE 13 — AMAZON COGNITO (AUTHENTICATION)
+# PHASE 14 — AMAZON COGNITO (AUTHENTICATION)
 
 ## 1️⃣ Create Cognito User Pool
 
@@ -1640,7 +1640,7 @@ Actions → Deploy API → Stage: dev
 
 ---
 
-# PHASE 2 — CLOUDFRONT + CACHING
+# PHASE 15 — CLOUDFRONT + CACHING
 
 ## 1️⃣ Create CloudFront Distribution
 
@@ -1687,7 +1687,7 @@ For GET /menu:
 
 ---
 
-# PHASE 3 — COST OPTIMIZATION
+# PHASE 16 — COST OPTIMIZATION
 
 ## 1️⃣ EC2 Cost Optimization
 - Instance type: t3.micro
@@ -1714,7 +1714,7 @@ For GET /menu:
 
 ---
 
-# PHASE 4 — BILLING ALERTS & BUDGETS
+# PHASE 17 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -1754,7 +1754,7 @@ Create alarm
 
 ---
 
-# PHASE 5 — TESTING
+# PHASE 18 — TESTING
 
 ## Cognito Test
 - Sign up user
