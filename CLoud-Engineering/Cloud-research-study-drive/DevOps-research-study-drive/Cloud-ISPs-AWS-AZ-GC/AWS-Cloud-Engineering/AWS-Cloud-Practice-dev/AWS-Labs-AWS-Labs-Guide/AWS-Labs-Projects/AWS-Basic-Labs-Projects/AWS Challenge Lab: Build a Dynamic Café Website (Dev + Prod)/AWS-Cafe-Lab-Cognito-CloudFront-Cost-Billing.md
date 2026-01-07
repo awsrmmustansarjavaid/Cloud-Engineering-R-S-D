@@ -2313,14 +2313,21 @@ RDS + DynamoDB
 
 - Select SQS
 
+```
+your SQS arn url
+```
+
+
 #### Trigger settings:
 
-| Field        | Value           |
-| ------------ | --------------- |
-| SQS queue    | CafeOrdersQueue |
-| Batch size   | 1               |
-| Batch window | 0               |
-| Enabled      | ✔️              |
+| Field                      | Value         |
+| -------------------------- | ------------- |
+| Activate trigger           | ✅ Checked     |
+| Batch size                 | 1             |
+| Batch window               | 0             |
+| Maximum concurrency        | (leave empty) |
+| Report batch item failures | ❌ unchecked   |
+
 
 **✔️ Click Add**
 
@@ -2390,25 +2397,76 @@ CafeOrderWorkerPermissions
 ```
 import json
 import boto3
+import pymysql
+from decimal import Decimal
 
+# ---------- AWS CLIENTS ----------
+secrets_client = boto3.client('secretsmanager')
+dynamodb = boto3.resource('dynamodb')
+
+# ---------- CONSTANTS ----------
+SECRET_NAME = "CafeDevDBSM"
+DYNAMODB_TABLE = "CafeMenu"
+
+# ---------- GET DB CREDS ----------
+def get_db_secret():
+    response = secrets_client.get_secret_value(
+        SecretId=SECRET_NAME
+    )
+    return json.loads(response["SecretString"])
+
+# ---------- LAMBDA HANDLER ----------
 def lambda_handler(event, context):
-    for record in event['Records']:
-        order = json.loads(record['body'])
 
-        # 1. Insert into RDS (pseudo code)
-        print("Insert order into RDS:", order)
+    secret = get_db_secret()
 
-        # 2. Update cache (example)
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('CafeMenu')
+    connection = pymysql.connect(
+        host=secret["host"],
+        user=secret["username"],
+        password=secret["password"],
+        database=secret["dbname"],
+        connect_timeout=5
+    )
 
-        table.update_item(
-            Key={'item': order['item']},
-            UpdateExpression="ADD orders :inc",
-            ExpressionAttributeValues={':inc': 1}
-        )
+    table = dynamodb.Table(DYNAMODB_TABLE)
 
-    return "Processed"
+    try:
+        with connection.cursor() as cursor:
+
+            for record in event["Records"]:
+
+                order = json.loads(record["body"])
+
+                customer_name = order["customer_name"]
+                item = order["item"]
+                quantity = int(order["quantity"])
+
+                # ---------- INSERT INTO RDS ----------
+                sql = """
+                    INSERT INTO orders (customer_name, item, quantity)
+                    VALUES (%s, %s, %s)
+                """
+                cursor.execute(sql, (customer_name, item, quantity))
+                connection.commit()
+
+                # ---------- UPDATE DYNAMODB CACHE ----------
+                table.update_item(
+                    Key={"item": item},
+                    UpdateExpression="ADD orders :inc",
+                    ExpressionAttributeValues={
+                        ":inc": Decimal(quantity)
+                    }
+                )
+
+                print(f"✅ Order processed: {order}")
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"message": "Orders processed successfully"})
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
 ```
 
 ### 5️⃣ TEST END-TO-END (MANDATORY)
