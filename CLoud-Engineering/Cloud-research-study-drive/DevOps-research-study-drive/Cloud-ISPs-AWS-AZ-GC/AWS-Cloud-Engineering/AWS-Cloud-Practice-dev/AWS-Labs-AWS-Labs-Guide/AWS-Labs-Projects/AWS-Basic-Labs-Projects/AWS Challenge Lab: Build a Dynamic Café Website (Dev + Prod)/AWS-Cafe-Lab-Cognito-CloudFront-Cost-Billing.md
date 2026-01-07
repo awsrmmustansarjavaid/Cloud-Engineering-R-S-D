@@ -2469,7 +2469,26 @@ def lambda_handler(event, context):
         print("❌ ERROR:", str(e))
 ```
 
-### 5️⃣ TEST END-TO-END (MANDATORY)
+### 5️⃣ Attach Layer to Worker Lambda
+
+- Lambda → CafeOrderWorker
+
+> **Scroll to Layers**
+
+- Click Add a layer
+
+- Choose:
+
+    - ☑ Custom layers
+
+    - Select PyMySQLLayer
+
+    - Version: latest
+
+- Click Add
+
+
+### 6️⃣ TEST END-TO-END (MANDATORY)
 
 #### 🧪 TESTING OVERVIEW
 
