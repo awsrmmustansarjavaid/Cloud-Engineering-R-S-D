@@ -220,28 +220,52 @@ sudo chmod -R 755 /var/www
 
 ---
 
-# PHASE 3 — DATABASE (LOCAL DEV)
+# PHASE 3 — AMAZON RDS (Replace EC2 MariaDB)
 
-## 1️⃣ Install MariaDB
+## 1️⃣ Create DB Subnet Group
+AWS Console → RDS → Subnet groups → Create
+- Name: CafeRDSSubnetGroup
+- VPC: CafeDevVPC
+- Subnets: **PRIVATE subnets (2 AZs)**
 
-```bash
-sudo dnf install -y mariadb105-server
-sudo systemctl enable --now mariadb
+Create
+
+## 2️⃣ Create Security Group for RDS
+VPC → Security Groups → Create
+- Name: CafeRDS-SG
+- Inbound:
+  - MySQL/Aurora (3306) → Source: Lambda-SG
+  - MySQL/Aurora (3306) → Source: EC2-Web-SG
+- Outbound: All
+
+Create
+
+## 3️⃣ Create RDS Instance
+RDS → Databases → Create database
+- Engine: MySQL (or MariaDB)
+- Template: Free tier
+- DB identifier: cafedb
+- Username: admin
+- Password: strong password
+- VPC: CafeDevVPC
+- Subnet group: CafeRDSSubnetGroup
+- Public access: ❌ No
+- Security group: CafeRDS-SG
+- Backup: Enabled
+
+Create database ⏳
+
+## 4️⃣ Create Schema in RDS
+Connect from EC2:
+
+## 1️⃣ Login to MariaDB:
+
 ```
-
-### Secure DB
-
-```bash
-sudo mysql_secure_installation
-```
-## 2️⃣ Login to MariaDB:
-
-```
-sudo mysql -u root -p
+mysql -h <rds-endpoint> -u admin -p
 ```
 ---
 
-## 3️⃣ Create Café Database
+## 2️⃣ Create Café Database
 
 ```sql
 CREATE DATABASE cafe_db;
@@ -250,13 +274,13 @@ GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-## 4️⃣ Use the correct database
+## 3️⃣ Use the correct database
 
 ```
 USE cafe_db;
 ```
 
-## 5️⃣ Orders Table
+## 4️⃣ Orders Table
 
 ```sql
 CREATE TABLE orders (
@@ -268,7 +292,7 @@ CREATE TABLE orders (
 );
 ```
 
-## 6️⃣ Verify table exists
+## 5️⃣ Verify table exists
 
 ```
 SHOW TABLES;
@@ -280,14 +304,14 @@ SHOW TABLES;
 orders
 ```
 
-## 7️⃣ Test insert manually (CLI)
+## 6️⃣ Test insert manually (CLI)
 
 ```
 INSERT INTO orders (customer_name, item, quantity)
 VALUES ('CLI-Test', 'Coffee', 1);
 ```
 
-## 8️⃣ Verify:
+## 7️⃣ Verify:
 
 ```
 SELECT * FROM orders;
@@ -331,7 +355,7 @@ dbname
 ```text
 cafe_user
 StrongPassword123
-<EC2-Private-IP>
+RDS endpoint
 cafe_db
 ```
 
@@ -1337,71 +1361,7 @@ You now have a **real AWS production architecture** with:
 🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
 
 
-# PHASE 8 — AMAZON RDS (Replace EC2 MariaDB)
-
-## 1️⃣ Create DB Subnet Group
-AWS Console → RDS → Subnet groups → Create
-- Name: CafeRDSSubnetGroup
-- VPC: CafeDevVPC
-- Subnets: **PRIVATE subnets (2 AZs)**
-
-Create
-
-## 2️⃣ Create Security Group for RDS
-VPC → Security Groups → Create
-- Name: CafeRDS-SG
-- Inbound:
-  - MySQL/Aurora (3306) → Source: Lambda-SG
-  - MySQL/Aurora (3306) → Source: EC2-Web-SG
-- Outbound: All
-
-Create
-
-## 3️⃣ Create RDS Instance
-RDS → Databases → Create database
-- Engine: MySQL (or MariaDB)
-- Template: Free tier
-- DB identifier: cafedb
-- Username: admin
-- Password: strong password
-- VPC: CafeDevVPC
-- Subnet group: CafeRDSSubnetGroup
-- Public access: ❌ No
-- Security group: CafeRDS-SG
-- Backup: Enabled
-
-Create database ⏳
-
-## 4️⃣ Update Secrets Manager
-Secrets Manager → CafeDevDBSM
-- host = RDS endpoint
-- username = admin
-- password = ******
-- dbname = cafe_db
-
-Save
-
-## 5️⃣ Create Schema in RDS
-Connect from EC2:
-
-mysql -h <rds-endpoint> -u admin -p
-
-CREATE DATABASE cafe_db;
-USE cafe_db;
-
-CREATE TABLE orders (
- id INT AUTO_INCREMENT PRIMARY KEY,
- customer_name VARCHAR(100),
- item VARCHAR(50),
- quantity INT,
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-EXIT;
-
----
-
-# PHASE 9 — DYNAMODB (Menu + Cache)
+# PHASE 8 — DYNAMODB (Menu + Cache)
 
 ## 1️⃣ Create DynamoDB Table
 DynamoDB → Create table
@@ -1430,7 +1390,7 @@ Use boto3 to fetch menu/prices before processing orders.
 
 ---
 
-# PHASE 10 — SQS (Async Order Processing)
+# PHASE 9 — SQS (Async Order Processing)
 
 ## 1️⃣ Create SQS Queue
 SQS → Create queue
@@ -1461,7 +1421,7 @@ Worker Responsibilities:
 
 ---
 
-# PHASE 11 — AWS WAF (Security)
+# PHASE 10 — AWS WAF (Security)
 
 ## 1️⃣ Create Web ACL
 WAF → Create web ACL
@@ -1480,7 +1440,7 @@ Associate with:
 
 ---
 
-# PHASE 12 — CI/CD (CodePipeline)
+# PHASE 11 — CI/CD (CodePipeline)
 
 ## 1️⃣ Create GitHub Repository
 Repo structure:
@@ -1521,7 +1481,7 @@ Repeat pipeline for:
 
 ---
 
-# PHASE 13 — TESTING
+# PHASE 12 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
@@ -1552,7 +1512,7 @@ curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
 
 ---
 
-# PHASE 14 — AMAZON COGNITO (AUTHENTICATION)
+# PHASE 13 — AMAZON COGNITO (AUTHENTICATION)
 
 ## 1️⃣ Create Cognito User Pool
 
@@ -1640,7 +1600,7 @@ Actions → Deploy API → Stage: dev
 
 ---
 
-# PHASE 15 — CLOUDFRONT + CACHING
+# PHASE 14 — CLOUDFRONT + CACHING
 
 ## 1️⃣ Create CloudFront Distribution
 
@@ -1687,7 +1647,7 @@ For GET /menu:
 
 ---
 
-# PHASE 16 — COST OPTIMIZATION
+# PHASE 15 — COST OPTIMIZATION
 
 ## 1️⃣ EC2 Cost Optimization
 - Instance type: t3.micro
@@ -1714,7 +1674,7 @@ For GET /menu:
 
 ---
 
-# PHASE 17 — BILLING ALERTS & BUDGETS
+# PHASE 16 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -1754,7 +1714,7 @@ Create alarm
 
 ---
 
-# PHASE 18 — TESTING
+# PHASE 17 — TESTING
 
 ## Cognito Test
 - Sign up user
