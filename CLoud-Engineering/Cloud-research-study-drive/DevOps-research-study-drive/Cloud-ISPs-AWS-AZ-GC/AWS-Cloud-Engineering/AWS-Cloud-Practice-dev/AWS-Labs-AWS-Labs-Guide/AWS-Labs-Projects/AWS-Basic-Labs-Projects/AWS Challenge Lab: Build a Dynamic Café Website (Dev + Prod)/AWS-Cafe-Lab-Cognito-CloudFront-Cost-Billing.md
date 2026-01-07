@@ -1972,6 +1972,46 @@ def lambda_handler(event, context):
     }
 ```
 
+or 
+
+```
+import json
+import boto3
+import os
+
+sqs = boto3.client('sqs')
+QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+
+        message = {
+            "customer_name": body["customer_name"],
+            "item": body["item"],
+            "quantity": int(body["quantity"])
+        }
+
+        sqs.send_message(
+            QueueUrl=QUEUE_URL,
+            MessageBody=json.dumps(message)
+        )
+
+        return {
+            "statusCode": 202,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"message": "Order accepted"})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
 **✔️ Click Deploy**
 
 ### 4️⃣ Test with API Gateway or Lambda test
