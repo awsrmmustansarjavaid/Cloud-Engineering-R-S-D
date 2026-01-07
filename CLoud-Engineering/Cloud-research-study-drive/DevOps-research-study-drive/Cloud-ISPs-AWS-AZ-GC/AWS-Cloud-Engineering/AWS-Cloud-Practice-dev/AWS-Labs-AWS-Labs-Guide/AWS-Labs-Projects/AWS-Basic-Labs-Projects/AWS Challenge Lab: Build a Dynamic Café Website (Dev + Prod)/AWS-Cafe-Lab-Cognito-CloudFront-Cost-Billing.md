@@ -2124,16 +2124,179 @@ curl -X POST \
 
 ## 4️⃣ Create Worker Lambda (Consumer)
 
-Lambda → Create function
-- Name: CafeOrderWorker
-- Runtime: Python 3.12
-- Trigger: SQS → CafeOrdersQueue
-- Batch size: 1
+### 📢 Worker Responsibilities:
 
-Worker Responsibilities:
 - Read message
 - Insert into RDS
 - Update DynamoDB cache
+
+### 🟡 ARCHITECTURE FLOW:
+
+```
+Client
+ ↓
+API Gateway
+ ↓
+Order API Lambda
+ ↓
+SQS Queue
+ ↓
+Worker Lambda
+ ↓
+RDS + DynamoDB
+```
+
+### 1️⃣ Create Lambda Function
+
+- **Lambda → Create function**
+
+- **Select Author from scratch**
+
+| Field          | Value                         |
+| -------------- | ----------------------------- |
+| Function name  | `CafeOrderWorker`             |
+| Runtime        | Python 3.12                   |
+| Architecture   | x86_64                        |
+| Execution role | Use existing role             |
+| Role           | Same role with RDS + DynamoDB |
+
+
+**✔️ Click Create function**
+
+### 2️⃣ Add SQS Trigger (VERY IMPORTANT)
+
+- Scroll to Function overview
+
+- Click Add trigger
+
+- Select SQS
+
+#### Trigger settings:
+
+| Field        | Value           |
+| ------------ | --------------- |
+| SQS queue    | CafeOrdersQueue |
+| Batch size   | 1               |
+| Batch window | 0               |
+| Enabled      | ✔️              |
+
+**✔️ Click Add**
+
+#### ⚠️ CRITICAL:
+
+- AWS automatically:
+
+- Creates event source mapping
+
+- Adds ReceiveMessage permissions
+
+
+### 3️⃣ IAM PERMISSIONS FOR WORKER LAMBDA
+
+> **Your worker needs 3 permissions**
+
+- Attach These Permissions
+
+#### Add inline policy with:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes"
+      ],
+      "Resource": "arn:aws:sqs:*:*:CafeOrdersQueue"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "rds-db:connect"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/CafeMenu"
+    }
+  ]
+}
+```
+
+### 4️⃣ WORKER LAMBDA CODE (FULL EXAMPLE)
+
+```
+import json
+import boto3
+
+def lambda_handler(event, context):
+    for record in event['Records']:
+        order = json.loads(record['body'])
+
+        # 1. Insert into RDS (pseudo code)
+        print("Insert order into RDS:", order)
+
+        # 2. Update cache (example)
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table('CafeMenu')
+
+        table.update_item(
+            Key={'item': order['item']},
+            UpdateExpression="ADD orders :inc",
+            ExpressionAttributeValues={':inc': 1}
+        )
+
+    return "Processed"
+```
+
+### 5️⃣ TEST END-TO-END (MANDATORY)
+
+#### 7.1 Send Order
+
+- Call API Gateway
+
+- Or Lambda test event
+
+#### 7.2 Observe SQS
+
+- SQS → CafeOrdersQueue
+
+- Click Send and receive messages
+
+- Queue should empty automatically
+
+#### 7.3 Check Worker Logs
+
+- CloudWatch → Logs
+
+- /aws/lambda/CafeOrderWorker
+
+#### Confirm:
+
+- Message received
+
+- No retry loop
+
+
+### 🔑 COMMON MISTAKES (READ THIS)
+
+❌ Using FIFO queue
+
+❌ Same Lambda for producer + consumer
+
+❌ Visibility timeout too low
+
+❌ No IAM permissions
+
+❌ Batch size > 1 while learning
 
 ---
 
