@@ -197,7 +197,19 @@ Create database ⏳
 ## 4️⃣ Create Schema in RDS
 Connect from EC2:
 
-## 1️⃣ Login to MariaDB:
+## 1️⃣ Install & Login MySQL Client
+
+```
+sudo dnf install -y mariadb105
+```
+
+### Verify mysql
+
+```
+mysql --version
+```
+
+### Login to MariaDB:
 
 ```
 mysql -h <rds-endpoint> -u admin -p
