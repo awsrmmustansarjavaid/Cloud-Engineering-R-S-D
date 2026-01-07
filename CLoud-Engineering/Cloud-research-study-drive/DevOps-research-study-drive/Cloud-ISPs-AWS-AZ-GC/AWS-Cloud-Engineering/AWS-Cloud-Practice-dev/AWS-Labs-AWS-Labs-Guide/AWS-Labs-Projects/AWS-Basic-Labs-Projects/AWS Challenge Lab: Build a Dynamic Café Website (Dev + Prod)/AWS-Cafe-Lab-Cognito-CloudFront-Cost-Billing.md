@@ -1479,8 +1479,12 @@ Replace everything with:
 
 ```
 {
-  "item": "Coffee",
-  "price": 3
+  "item": {
+    "S": "Coffee"
+  },
+  "price": {
+    "N": "3"
+  }
 }
 ```
 
@@ -1492,8 +1496,12 @@ Click Create item again:
 
 ```
 {
-  "item": "Latte",
-  "price": 5
+  "item": {
+    "S": "Latte"
+  },
+  "price": {
+    "N": "5"
+  }
 }
 ```
 
@@ -1505,8 +1513,12 @@ Click Create item again:
 
 ```
 {
-  "item": "Tea",
-  "price": 2
+  "item": {
+    "S": "Tea"
+  },
+  "price": {
+    "N": "2"
+  }
 }
 ```
 
