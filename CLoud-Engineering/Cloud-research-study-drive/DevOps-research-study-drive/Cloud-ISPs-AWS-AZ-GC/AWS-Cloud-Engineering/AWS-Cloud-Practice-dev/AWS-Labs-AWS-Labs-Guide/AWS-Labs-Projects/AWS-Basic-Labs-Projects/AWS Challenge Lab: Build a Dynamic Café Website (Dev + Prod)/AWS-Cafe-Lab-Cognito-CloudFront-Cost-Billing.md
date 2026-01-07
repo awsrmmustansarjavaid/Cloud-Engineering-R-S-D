@@ -212,7 +212,7 @@ mysql --version
 ### Login to MariaDB:
 
 ```
-mysql -h <rds-endpoint> -u admin -p
+mysql -h <rds-endpoint> -u cafe_user -p
 ```
 ---
 
