@@ -550,13 +550,13 @@ aws sts get-caller-identity
 #### Upload via AWS CLI (Recommended)
 
 ```bash
-aws s3 cp pymysql-layer.zip s3://cafe-lambda-artifacts-<unique>/layers/pymysql-layer.zip
+aws s3 cp pymysql-layer.zip s3://mn-cafe-s3-bucket/layers/pymysql-layer.zip
 ```
 
 #### Expected output:
 
 ```
-upload: ./pymysql-layer.zip to s3://cafe-lambda-artifacts-xxx/layers/pymysql-layer.zip
+upload: ./pymysql-layer.zip to s3://mn-cafe-s3-bucket/layers/pymysql-layer.zip
 ```
 
 
