@@ -1628,25 +1628,6 @@ Allow Lambda to read menu items from DynamoDB
 }
 ```
 
-or
-
-```
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:PutItem"
-      ],
-      "Resource": "arn:aws:dynamodb:*:*:table/CafeMenu"
-    }
-  ]
-}
-```
-
 #### 📌 Example:
 
 ```
@@ -1735,7 +1716,6 @@ def lambda_handler(event, context):
         },
         "body": json.dumps(items, default=decimal_to_native)
     }
-
 ```
 
 Click Deploy
