@@ -2339,7 +2339,10 @@ RDS + DynamoDB
 
 - Attach These Permissions
 
+
 #### Add inline policy with:
+
+
 
 ```
 {
@@ -2352,26 +2355,35 @@ RDS + DynamoDB
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes"
       ],
-      "Resource": "arn:aws:sqs:*:*:CafeOrdersQueue"
+      "Resource": "your SQS arn url"
     },
     {
       "Effect": "Allow",
       "Action": [
-        "rds-db:connect"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": "*"
+      "Resource": "your secrets manager arn url*"
     },
     {
       "Effect": "Allow",
       "Action": [
         "dynamodb:PutItem",
-        "dynamodb:UpdateItem"
+        "dynamodb:UpdateItem",
+        "dynamodb:GetItem"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/CafeMenu"
+      "Resource": "your DynamoDB arn url"
     }
   ]
 }
 ```
+- Name: 
+
+```
+CafeOrderWorkerPermissions
+```
+
+✅ IAM permissions are now correct
+
 
 ### 4️⃣ WORKER LAMBDA CODE (FULL EXAMPLE)
 
