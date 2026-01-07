@@ -942,6 +942,12 @@ curl -X POST \
 mysql -u cafe_user -p cafe_db
 ```
 
+or
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p
+```
+
 ```
 SELECT * FROM orders;
 ```
