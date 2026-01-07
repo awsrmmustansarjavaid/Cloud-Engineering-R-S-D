@@ -509,7 +509,45 @@ Click **Create bucket**
 
 ### Step 2: Upload ZIP to S3
 
-##### Upload via AWS CLI (Recommended)
+#### connect Configure AWS CLI
+
+Run this on your local machine / EC2 / CloudShell:
+
+```
+aws configure
+```
+
+#### Enter values exactly like this:
+
+```
+AWS Access Key ID [None]: AKIA************
+AWS Secret Access Key [None]: ********************
+Default region name [None]: us-east-1
+Default output format [None]: json
+```
+
+✔ Press Enter after each input
+
+#### Verify CLI Configuration
+
+```
+aws sts get-caller-identity
+```
+
+#### Expected output:
+
+```
+{
+  "UserId": "AIDA************",
+  "Account": "123456789012",
+  "Arn": "arn:aws:iam::123456789012:user/cafe-lab-cli-user"
+}
+```
+
+✔ This confirms AWS CLI is correctly authenticated.
+
+
+#### Upload via AWS CLI (Recommended)
 
 ```bash
 aws s3 cp pymysql-layer.zip s3://cafe-lambda-artifacts-<unique>/layers/pymysql-layer.zip
