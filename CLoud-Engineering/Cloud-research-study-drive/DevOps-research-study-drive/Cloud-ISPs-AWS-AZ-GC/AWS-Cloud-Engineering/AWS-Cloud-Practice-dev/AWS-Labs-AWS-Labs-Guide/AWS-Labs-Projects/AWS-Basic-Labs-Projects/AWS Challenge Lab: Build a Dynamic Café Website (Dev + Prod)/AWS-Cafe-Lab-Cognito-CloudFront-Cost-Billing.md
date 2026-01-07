@@ -41,7 +41,7 @@ EC2 (Web UI) → API Gateway (no direct DB access)
 
 ## AWS Architecture Diagram 
 
-![AWS Architecture Diagram](./AWS%20Challenge%20Lab:%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20+%20Prod)/AWS-Cafe-Lab-Cognito-CloudFront-Cost-Billing.jpeg)
+![AWS Architecture Diagram](./AWS-Cafe-Lab-Cognito-CloudFront-Cost-Billing.jpeg)
 
 ---
 
