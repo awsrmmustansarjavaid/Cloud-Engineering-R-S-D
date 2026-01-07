@@ -1669,8 +1669,6 @@ CafeMenuDynamoDBReadPolicy
 
 - Open AWS Lambda
 
-- Click Create function
-
 - **Function details:**
 
 | Field          | Value                     |
@@ -1681,7 +1679,7 @@ CafeMenuDynamoDBReadPolicy
 | Execution role | Use existing role         |
 | Role           | `CafeLambdaExecutionRole` |
 
-Click Create function
+**✔️ Click Create function**
 
 ## 5️⃣ Lambda Code: Read Menu from DynamoDB (Python)
 
@@ -1718,7 +1716,7 @@ def lambda_handler(event, context):
     }
 ```
 
-Click Deploy
+**✔️ Click Deploy**
 
 ## 6️⃣ TEST LAMBDA (MANDATORY)
 
@@ -1732,7 +1730,7 @@ Click Deploy
 {}
 ```
 
-Click Test
+**✔️ Click Test**
 
 #### ✅ Expected Output:
 
@@ -1748,22 +1746,384 @@ Click Test
 
 # PHASE 10 — SQS (Async Order Processing)
 
+## 🧠 WHY SQS EXISTS (VERY IMPORTANT)
+
+### ➖ Without SQS:
+
+- API waits for DB insert ❌
+
+- API fails if DB is slow ❌
+
+- Users get errors ❌
+
+### ➕ With SQS:
+
+- API responds instantly ✅
+
+- Orders are processed in background ✅
+
+- System scales safely ✅
+
+## 📢 PRE-CHECK (DO NOT SKIP)
+
+#### Before starting, confirm:
+
+- Region is same for Lambda + SQS + RDS
+
+- You have IAM role for Lambda
+
+- You are using Standard Queue (NOT FIFO)
+
 ## 1️⃣ Create SQS Queue
-SQS → Create queue
-- Type: Standard
-- Name: CafeOrdersQueue
-- Visibility timeout: 60
 
-Create
+- **SQS → Create queue**
 
-## 2️⃣ Update API Lambda (Producer)
-- Remove direct DB insert
-- Send message to SQS
+- **Queue Type:** Standard
 
-Permissions:
-- sqs:SendMessage
+    ⚠️ Do NOT select FIFO
 
-## 3️⃣ Create Worker Lambda (Consumer)
+- **Name:** CafeOrdersQueue
+
+**Configuration:**
+
+- **Visibility timeout:** 60
+
+> **💡 Why: Worker Lambda must finish DB insert within this time**
+
+- **Message retention:** 4 days **(Leave default)**
+
+- **Maximum message size:** 256 KB **(Leave default)**
+
+- **Delivery delay:** 0 seconds **(Leave default)**
+
+- **Receive message wait time:** 0 seconds **(Leave default)**
+
+- **Dead-letter queue:** ❌ Disable for now **(we’ll add later)**
+
+- **Encryption:** Select: Disabled **(Free tier friendly)**
+
+- **Access Policy:** Leave Basic **(Do NOT change)**
+
+**✔️ Click Create queue**
+
+### ✅ Verify
+
+- Queue status should be Available
+
+- Copy Queue ARN
+
+- Copy Queue URL (IMPORTANT — save it)
+
+
+## 2️⃣ IAM PERMISSIONS FOR PRODUCER LAMBDA
+
+**Your API Lambda must be allowed to send messages.**
+
+- **Go to IAM → Policies → Create inline policy**
+
+#### Paste exactly:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sqs:SendMessage",
+      "Resource": "arn:aws:sqs:*:*:CafeOrdersQueue"
+    }
+  ]
+}
+```
+- Save Policy
+
+- **Name:**
+
+```
+SendOrderToSQS
+```
+
+**✔️ Click Create policy**
+
+## 3️⃣ Update API Lambda (Producer)
+
+### 1️⃣ Open Order API Lambda
+
+- AWS Console → Lambda
+
+- Click your Order API Lambda
+
+### 2️⃣ Add Environment Variable:
+
+- Configuration → Environment variables
+
+- Click Edit
+
+- Add:
+
+| Key           | Value                  |
+| ------------- | ---------------------- |
+| SQS_QUEUE_URL | (paste your Queue URL) |
+
+**✔️ Click Save**
+
+### 3️⃣ Update Lambda Code (FULL)
+
+#### Replace your order insert logic with this:
+
+```
+import json
+import boto3
+import os
+
+sqs = boto3.client('sqs')
+QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+def lambda_handler(event, context):
+    body = json.loads(event['body'])
+
+    message = {
+        "order_id": body["order_id"],
+        "item": body["item"],
+        "quantity": body["quantity"]
+    }
+
+    sqs.send_message(
+        QueueUrl=QUEUE_URL,
+        MessageBody=json.dumps(message)
+    )
+
+    return {
+        "statusCode": 202,
+        "body": json.dumps({"message": "Order accepted"})
+    }
+```
+
+**✔️ Click Deploy**
+
+### 4️⃣ Test with API Gateway or Lambda test
+
+### 🔍 METHOD A — TEST USING LAMBDA CONSOLE (EASIEST)
+
+> **This tests only the Lambda logic, not API Gateway.**
+
+#### 🟦 A1 — OPEN THE PRODUCER LAMBDA
+
+- AWS Console → Lambda
+
+- Click your Order API Lambda
+(the one sending messages to SQS)
+
+#### 🟦 A2 — CREATE A TEST EVENT
+
+- Click Test
+
+- Click Create new event
+
+**Event configuration:**
+
+| Field      | Value             |
+| ---------- | ----------------- |
+| Event name | `SqsProducerTest` |
+| Template   | `Hello World`     |
+
+
+#### 🟦 A3 — REPLACE EVENT JSON (IMPORTANT)
+
+#### Delete everything and paste exactly:
+
+```
+{
+  "body": "{\"order_id\":\"ORD-1001\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### ⚠️ Notice:
+
+- body must be a STRING
+
+- This simulates API Gateway behavior
+
+#### 🟦 A4 — RUN TEST
+
+- Click Save
+
+- Click Test
+
+#### ✅ EXPECTED RESULT (LAMBDA)
+
+**Lambda Response:**
+
+```
+{
+  "statusCode": 202,
+  "body": "{\"message\": \"Order accepted\"}"
+}
+```
+
+#### 🟦 A5 — VERIFY MESSAGE IN SQS
+
+- AWS Console → SQS
+
+- Click CafeOrdersQueue
+
+- Click Send and receive messages
+
+- Click Poll for messages
+
+#### ✅ You should see:
+
+```
+{
+  "order_id": "ORD-1001",
+  "item": "Coffee",
+  "quantity": 2
+}
+```
+
+If you see this → Producer Lambda works perfectly ✅
+
+### 🌐 METHOD B — TEST USING API GATEWAY (REAL END-USER TEST)
+
+This tests the full HTTP flow.
+
+#### 🟦 B1 — OPEN API GATEWAY
+
+- AWS Console → search API Gateway
+
+- Click API Gateway
+
+- Click your Order API (REST API)
+
+#### 🟦 B2 — SELECT THE RESOURCE
+
+#### In left panel, expand:
+
+- /orders (or your order path)
+
+- Click POST
+
+#### 🟦 B3 — USE API GATEWAY TEST FEATURE
+
+- Click Test (⚠️ NOT Deploy)
+
+#### In Request Body, paste:
+
+```
+{
+  "order_id": "ORD-2001",
+  "item": "Latte",
+  "quantity": 1
+}
+```
+
+- Click Test
+
+#### ✅ EXPECTED API RESPONSE 
+
+#### Status:
+
+```
+202
+```
+
+#### Body:
+
+```
+{"message":"Order accepted"}
+```
+
+#### 🟦 B4 — VERIFY SQS MESSAGE
+
+#### Same as before:
+
+- SQS → CafeOrdersQueue
+
+- Send and receive messages
+
+- Poll for messages
+
+#### You should see:
+
+```
+{
+  "order_id": "ORD-2001",
+  "item": "Latte",
+  "quantity": 1
+}
+```
+
+### 🌍 METHOD C — TEST USING PUBLIC API URL (OPTIONAL BUT REALISTIC)
+
+#### If API is deployed:
+
+#### 🟦 C1 — GET INVOKE URL
+
+- API Gateway → Stages
+
+- Click your stage (e.g., prod)
+
+- Copy Invoke URL
+
+#### Example:
+
+```
+https://abcd1234.execute-api.ap-south-1.amazonaws.com/prod/orders
+```
+
+#### 🟦 C2 — TEST USING CURL (OPTIONAL)
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"order_id":"ORD-3001","item":"Tea","quantity":3}' \
+  https://abcd1234.execute-api.ap-south-1.amazonaws.com/prod/orders
+```
+
+#### 🟦 C3 — VERIFY SQS
+
+- Same verification steps.
+
+
+### 🚨 COMMON ERRORS & FIXES
+
+#### ❌ Error: KeyError: 'body'
+
+✔ Fix: Your test event body is not stringified
+
+#### ❌ Error: AccessDenied: sqs:SendMessage
+
+✔ Fix:
+
+- IAM policy missing
+
+- Wrong Queue ARN
+
+- Wrong region
+
+#### ❌ No message in SQS
+
+✔ Fix:
+
+- Check QUEUE_URL
+
+- Check Lambda environment variable
+
+- Check CloudWatch logs
+
+### ✅ FINAL CONFIRMATION CHECKLIST
+
+✔ Lambda returns 202
+
+✔ SQS receives message
+
+✔ No DB insert in producer
+
+✔ Worker Lambda will process later
+
+
+## 4️⃣ Create Worker Lambda (Consumer)
+
 Lambda → Create function
 - Name: CafeOrderWorker
 - Runtime: Python 3.12
