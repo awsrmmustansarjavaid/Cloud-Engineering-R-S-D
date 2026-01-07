@@ -1662,7 +1662,7 @@ Example:
 CafeAPILambdaRole
 ```
 
-- Attach Policy to API Lambda role
+- Attach Policy to API Lambda role **CafeLambdaExecutionRole**
 
 ```
 CafeMenuDynamoDBReadPolicy
@@ -1672,11 +1672,75 @@ CafeMenuDynamoDBReadPolicy
 ✅ Lambda now has DynamoDB access
 
 
-## 4️⃣ Lambda Code: Read Menu from DynamoDB (Python)
+## 4️⃣ CREATE NEW LAMBDA (MENU API)
+
+- Open AWS Lambda
+
+- Click Create function
+
+- **Function details:**
+
+| Field          | Value                     |
+| -------------- | ------------------------- |
+| Function name  | `CafeMenuLambda`          |
+| Runtime        | Python 3.12               |
+| Architecture   | x86_64                    |
+| Execution role | Use existing role         |
+| Role           | `CafeLambdaExecutionRole` |
+
+Click Create function
+
+## 5️⃣ Lambda Code: Read Menu from DynamoDB (Python)
 
 Now we implement the logic.
 
 Use boto3 to fetch menu/prices before processing orders.
+
+```
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeMenu')
+
+def lambda_handler(event, context):
+    response = table.scan()
+    items = response.get('Items', [])
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps(items)
+    }
+```
+
+Click Deploy
+
+## 6️⃣ TEST LAMBDA (MANDATORY)
+
+- Click Test
+
+- Test name: MenuTest
+
+- Event JSON:
+
+```
+{}
+```
+
+Click Test
+
+#### ✅ Expected Output:
+
+```
+[
+  {"item": "Coffee", "price": 3},
+  {"item": "Latte", "price": 5},
+  {"item": "Tea", "price": 2}
+]
+```
 
 ---
 
