@@ -80,6 +80,12 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 * CIDR: `10.0.1.0/24`
 * Auto‑assign public IP: **Enabled**
 
+### Create TWO private subnets:
+
+- CafeDevPrivateSubnet1 → 10.0.2.0/24 (AZ-a)
+- CafeDevPrivateSubnet2 → 10.0.3.0/24 (AZ-b)
+
+
 ### Internet Access
 
 * Create Internet Gateway → Attach to VPC
