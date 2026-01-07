@@ -1375,31 +1375,307 @@ You now have a **real AWS production architecture** with:
 🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
 
 
-# PHASE 9 — DYNAMODB (Menu + Cache)
+# PHASE 9 — AMAZON DYNAMODB (Menu + Cache Layer)
+
+## 🎯 Purpose of This Phase (IMPORTANT)
+
+### In your architecture:
+
+- DynamoDB is NOT replacing RDS
+
+- DynamoDB is used for:
+
+    - Menu data (Coffee, Latte, Tea)
+
+    - Fast reads
+
+    - Cache-like behavior
+
+- Lambda reads menu price from DynamoDB
+
+- RDS is still used for orders & transactions
+
+So the flow is:
+
+```
+CloudFront
+   ↓
+API Gateway
+   ↓
+Lambda (Menu API)
+   ↓
+DynamoDB (CafeMenu)
+```
 
 ## 1️⃣ Create DynamoDB Table
-DynamoDB → Create table
-- Table name: CafeMenu
-- Partition key: item (String)
-- Capacity: On‑demand
 
-Create
+- **DynamoDB → Create table**
+
+### 1️⃣ Basic Table Settings
+
+| Field         | Value      |
+| ------------- | ---------- |
+| Table name    | `CafeMenu` |
+| Partition key | `item`     |
+| Type          | `String`   |
+
+
+
+##### ⚠️ Do NOT add Sort key
+
+##### ⚠️ Partition key name must be exactly item
+
+### 2️⃣ Table Settings (Capacity)
+
+Scroll down to Table settings
+
+- Capacity mode:
+
+    ✅ On-demand
+
+#### Why?
+
+- No capacity planning
+
+- Free-tier friendly
+
+- Ideal for learning & small apps
+
+### 3️⃣ Additional Settings (Keep Default)
+
+Leave ALL of these as default:
+
+- Encryption at rest: AWS owned key
+
+- Table class: Standard
+
+- Deletion protection: Disabled
+
+- Tags: Optional (skip)
+
+### 4️⃣ Create Table
+
+- Click Create table
+
+#### Wait until:
+
+```
+Status = ACTIVE
+```
+
+##### ⏳ This may take 20–60 seconds
 
 ## 2️⃣ Insert Menu Items
-DynamoDB → CafeMenu → Explore table → Create item
-- item: Coffee | price: 3
-- item: Latte | price: 5
-- item: Tea | price: 2
 
-## 3️⃣ IAM Policy for Lambda
-Allow:
-- dynamodb:GetItem
-- dynamodb:PutItem
-- dynamodb:Scan
+- **DynamoDB → CafeMenu → Explore table → Create item**
 
-Attach to Lambda roles
+### 1️⃣ Method 1 JSON EDitor
 
-## 4️⃣ Lambda Read from DynamoDB (Menu)
+#### 1️⃣ Create First Item (Coffee)
+
+You will see a JSON editor.
+
+Replace everything with:
+
+```
+{
+  "item": "Coffee",
+  "price": 3
+}
+```
+
+- ✅ Click Create item
+
+#### 2️⃣ Create Second Item (Latte)
+
+Click Create item again:
+
+```
+{
+  "item": "Latte",
+  "price": 5
+}
+```
+
+- ✅ Click Create item
+
+#### 3️⃣ Create Third Item (Tea)
+
+Click Create item again:
+
+```
+{
+  "item": "Tea",
+  "price": 2
+}
+```
+
+- ✅ Click Create item
+
+---
+
+### 2️⃣ Method 2 Item editor screen
+
+
+#### 1️⃣ Create First Item (Coffee)
+
+1. Partition key:
+
+- item → Coffee
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 3
+
+- ✅ Click Create item
+
+#### 2️⃣ Create Second Item (Latte)
+
+1. Partition key:
+
+- item → Latte
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 5
+
+- ✅ Click Create item
+
+#### 3️⃣ Create Third Item (Tea)
+
+1. Partition key:
+
+- item → Latte
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 2
+
+- ✅ Click Create item
+
+---
+### 3️⃣ Verify Items
+
+You should now see 3 items in the table. You should now see:
+
+| item   | price |
+| ------ | ----- |
+| Coffee | 3     |
+| Latte  | 5     |
+| Tea    | 2     |
+
+✅ DynamoDB table is ready
+
+
+## 3️⃣ Create IAM Policy for DynamoDB Access
+
+Now Lambda needs permission to read from DynamoDB.
+
+- **Go to IAM → Policies → Create policy** 
+
+- **Policy name:** 
+
+```        
+CafeMenuDynamoDBReadPolicy
+```
+
+- **Description:**
+
+```
+Allow Lambda to read menu items from DynamoDB
+```
+
+### 1️⃣ Create Policy (JSON Mode)
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:PutItem"
+      ],
+      "Resource": "arn:aws:dynamodb:YOUR-REGION:YOUR-ACCOUNT-ID:table/CafeMenu"
+    }
+  ]
+}
+```
+
+or
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:PutItem"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/CafeMenu"
+    }
+  ]
+}
+```
+
+#### 📌 Example:
+
+```
+arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
+```
+
+- Click Create policy
+
+
+### 2️⃣ Attach Policy to Lambda Role
+
+You likely have two Lambdas:
+
+    API Lambda
+
+    Worker Lambda
+
+👉 Attach this policy to API Lambda role
+
+- **Go to IAM → Roles → Search for your Lambda role**
+
+Example:
+
+```
+CafeAPILambdaRole
+```
+
+- Attach Policy to API Lambda role
+
+```
+CafeMenuDynamoDBReadPolicy
+```
+✅ IAM is now correctly configured
+
+✅ Lambda now has DynamoDB access
+
+
+## 4️⃣ Lambda Code: Read Menu from DynamoDB (Python)
+
+Now we implement the logic.
+
 Use boto3 to fetch menu/prices before processing orders.
 
 ---
