@@ -949,6 +949,10 @@ mysql -h <rds-endpoint> -u cafe_user -p
 ```
 
 ```
+use cafe_db;
+```
+
+```
 SELECT * FROM orders;
 ```
 
@@ -1068,7 +1072,7 @@ sudo nano /var/www/html/index.php
     <?php
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $apiUrl = "https://kg2lm1s1r8.execute-api.us-east-1.amazonaws.com/dev/orders";
+    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
 
     $payload = json_encode([
         "customer_name" => $_POST['name'],
@@ -1282,6 +1286,10 @@ or
 
 ```
 mysql -h <rds-endpoint> -u cafe_user -p
+```
+
+```
+use cafe_db;
 ```
 
 
