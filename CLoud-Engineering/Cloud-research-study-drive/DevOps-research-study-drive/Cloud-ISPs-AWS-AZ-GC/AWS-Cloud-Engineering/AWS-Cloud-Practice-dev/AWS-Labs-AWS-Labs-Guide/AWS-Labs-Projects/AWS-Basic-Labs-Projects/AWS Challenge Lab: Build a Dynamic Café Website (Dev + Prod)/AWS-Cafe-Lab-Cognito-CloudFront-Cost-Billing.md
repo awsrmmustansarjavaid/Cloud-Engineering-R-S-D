@@ -1942,37 +1942,7 @@ Click Create function
 
 ### 3️⃣ Update Lambda Code (FULL)
 
-#### Replace your order insert logic with this:
-
-```
-import json
-import boto3
-import os
-
-sqs = boto3.client('sqs')
-QUEUE_URL = os.environ['SQS_QUEUE_URL']
-
-def lambda_handler(event, context):
-    body = json.loads(event['body'])
-
-    message = {
-        "order_id": body["order_id"],
-        "item": body["item"],
-        "quantity": body["quantity"]
-    }
-
-    sqs.send_message(
-        QueueUrl=QUEUE_URL,
-        MessageBody=json.dumps(message)
-    )
-
-    return {
-        "statusCode": 202,
-        "body": json.dumps({"message": "Order accepted"})
-    }
-```
-
-or 
+#### 1️⃣ Replace your order insert logic with this:
 
 ```
 import json
@@ -2013,6 +1983,65 @@ def lambda_handler(event, context):
 ```
 
 **✔️ Click Deploy**
+
+#### 2️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
+
+- Click Test
+
+- Select Create new test event
+
+- Event name:
+
+```
+ApiOrderTest
+```
+
+Event JSON:
+
+
+```
+{
+  "body": "{\"customer_name\":\"ConsoleTest\",\"item\":\"Latte\",\"quantity\":2}"
+}
+```
+
+Click Save
+
+Click Test
+
+#### Expected Result (SUCCESS)
+
+```
+{
+  "statusCode": 202,
+  "body": "{\"message\":\"Order accepted\"}"
+}
+```
+
+#### 3️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
+
+- AWS Console → SQS
+
+- Click CafeOrdersQueue
+
+- Click Send and receive messages
+
+- Click Poll for messages
+
+#### Expected Output:
+
+You should see message like:
+
+```
+{
+  "customer_name": "ConsoleTest",
+  "item": "Latte",
+  "quantity": 2
+}
+```
+
+✅ If message exists → Producer Lambda WORKS
+
 
 ### 4️⃣ Test with API Gateway or Lambda test
 
