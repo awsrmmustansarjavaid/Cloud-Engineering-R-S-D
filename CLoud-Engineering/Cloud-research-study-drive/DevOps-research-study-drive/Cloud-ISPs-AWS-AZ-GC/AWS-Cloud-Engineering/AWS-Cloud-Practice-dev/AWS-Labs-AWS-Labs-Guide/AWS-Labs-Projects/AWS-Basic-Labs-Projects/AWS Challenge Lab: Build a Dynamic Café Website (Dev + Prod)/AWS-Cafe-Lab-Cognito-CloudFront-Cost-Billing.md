@@ -1294,7 +1294,7 @@ You now have a **real AWS production architecture** with:
 🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
 
 
-# PHASE 8 — DYNAMODB (Menu + Cache)
+# PHASE 9 — DYNAMODB (Menu + Cache)
 
 ## 1️⃣ Create DynamoDB Table
 DynamoDB → Create table
@@ -1323,7 +1323,7 @@ Use boto3 to fetch menu/prices before processing orders.
 
 ---
 
-# PHASE 9 — SQS (Async Order Processing)
+# PHASE 10 — SQS (Async Order Processing)
 
 ## 1️⃣ Create SQS Queue
 SQS → Create queue
@@ -1354,7 +1354,7 @@ Worker Responsibilities:
 
 ---
 
-# PHASE 10 — AWS WAF (Security)
+# PHASE 11 — AWS WAF (Security)
 
 ## 1️⃣ Create Web ACL
 WAF → Create web ACL
@@ -1373,7 +1373,7 @@ Associate with:
 
 ---
 
-# PHASE 11 — CI/CD (CodePipeline)
+# PHASE 12 — CI/CD (CodePipeline)
 
 ## 1️⃣ Create GitHub Repository
 Repo structure:
@@ -1414,7 +1414,7 @@ Repeat pipeline for:
 
 ---
 
-# PHASE 12 — TESTING
+# PHASE 13 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
@@ -1445,7 +1445,7 @@ curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
 
 ---
 
-# PHASE 13 — AMAZON COGNITO (AUTHENTICATION)
+# PHASE 14 — AMAZON COGNITO (AUTHENTICATION)
 
 ## 1️⃣ Create Cognito User Pool
 
@@ -1533,7 +1533,7 @@ Actions → Deploy API → Stage: dev
 
 ---
 
-# PHASE 14 — CLOUDFRONT + CACHING
+# PHASE 15 — CLOUDFRONT + CACHING
 
 ## 1️⃣ Create CloudFront Distribution
 
@@ -1580,7 +1580,7 @@ For GET /menu:
 
 ---
 
-# PHASE 15 — COST OPTIMIZATION
+# PHASE 16 — COST OPTIMIZATION
 
 ## 1️⃣ EC2 Cost Optimization
 - Instance type: t3.micro
@@ -1607,7 +1607,7 @@ For GET /menu:
 
 ---
 
-# PHASE 16 — BILLING ALERTS & BUDGETS
+# PHASE 17 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -1647,7 +1647,7 @@ Create alarm
 
 ---
 
-# PHASE 17 — TESTING
+# PHASE 18 — TESTING
 
 ## Cognito Test
 - Sign up user
