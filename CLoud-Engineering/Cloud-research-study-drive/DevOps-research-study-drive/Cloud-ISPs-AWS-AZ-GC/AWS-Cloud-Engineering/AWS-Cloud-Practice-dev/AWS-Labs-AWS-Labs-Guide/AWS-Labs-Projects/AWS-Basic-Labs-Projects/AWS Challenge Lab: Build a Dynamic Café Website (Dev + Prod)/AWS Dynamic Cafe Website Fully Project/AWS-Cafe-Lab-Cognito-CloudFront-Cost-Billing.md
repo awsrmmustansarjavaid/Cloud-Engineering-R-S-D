@@ -95,7 +95,7 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ## 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
-
+[EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
 
 ---
 
@@ -4230,5 +4230,6 @@ Expected: 200 OK
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
+
 
 
