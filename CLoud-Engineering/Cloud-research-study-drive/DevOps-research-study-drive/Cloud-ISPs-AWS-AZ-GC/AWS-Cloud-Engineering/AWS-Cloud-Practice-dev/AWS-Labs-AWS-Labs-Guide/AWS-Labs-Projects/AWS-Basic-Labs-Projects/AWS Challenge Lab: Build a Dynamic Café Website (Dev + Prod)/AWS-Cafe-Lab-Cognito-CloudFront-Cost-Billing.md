@@ -3026,8 +3026,29 @@ def lambda_handler(event, context):
 
 - Click Add
 
+### 6️⃣ TEST (MANDATORY)
 
-### 6️⃣ TEST END-TO-END (MANDATORY)
+
+### 1️⃣ Test manually from Lambda console
+
+#### You must wrap the test event in Records:
+
+```
+{
+  "Records": [
+    {
+      "body": "{\"customer_name\": \"WorkerTest\", \"item\": \"Coffee\", \"quantity\": 2}"
+    }
+  ]
+}
+```
+
+- This mimics SQS event structure
+
+- Now the Lambda code won’t fail with 'Records'
+
+
+### 2️⃣ TEST END-TO-END (MANDATORY)
 
 #### 🧪 TESTING OVERVIEW
 
