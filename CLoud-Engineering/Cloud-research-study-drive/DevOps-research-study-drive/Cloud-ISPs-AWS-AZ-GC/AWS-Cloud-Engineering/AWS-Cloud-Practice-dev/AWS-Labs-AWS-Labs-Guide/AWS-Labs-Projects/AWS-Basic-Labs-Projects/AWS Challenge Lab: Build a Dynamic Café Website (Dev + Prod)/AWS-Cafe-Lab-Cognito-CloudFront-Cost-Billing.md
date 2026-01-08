@@ -207,8 +207,207 @@ http://<EC2-PUBLIC-IP>/info.php
 mysql --version
 ```
 
+### 4️⃣ VERIFY APACHE (httpd) (CLI)
+
+#### 1️⃣ Check Apache Service Status
+
+```
+sudo systemctl status httpd
+```
+
+#### ✅ Expected:
+
+```
+Active: active (running)
+```
+
+#### 2️⃣ Verify Apache Version
+
+```
+httpd -v
+```
+
+#### ✅ Expected:
+
+```
+Server version: Apache/2.4.xx (Amazon Linux)
+```
+
+#### 3️⃣ Test Apache Locally (CLI)
+
+```
+curl http://localhost
+```
+
+#### ✅ Expected:
+
+```
+It works!
+```
+
+⚠️ If not installed correctly, you’ll get connection refused.
+
+### 5️⃣ VERIFY PHP (CLI)
+
+#### 1️⃣ Check PHP Version
+
+```
+php -v
+```
+
+#### ✅ Expected:
+
+```
+PHP 8.x.x (cli)
+```
+
+#### 2️⃣ Create PHP Test File (CLI)
+
+```
+sudo nano /var/www/html/test.php
+```
+
+##### Paste:
+
+```
+<?php
+echo "PHP is working";
+phpinfo();
+?>
+```
+
+**Save and exit.**
+
+#### 3️⃣ Test PHP via Apache (LOCAL)
+
+```
+curl http://localhost/test.php
+```
+
+#### ✅ Expected:
+
+- Text: PHP is working
+
+- PHP info output (HTML text)
+
+**This confirms:**
+
+✔ Apache → PHP module works
+
+✔ PHP interpreter works
+
+### 6️⃣ VERIFY FILE PERMISSIONS (IMPORTANT)
+
+```
+ls -ld /var/www /var/www/html
+```
+
+#### ✅ Expected:
+
+```
+drwxr-xr-x apache apache ...
+```
+
+#### ✅ If not:
+
+```
+sudo chown -R apache:apache /var/www
+```
+
+```
+sudo chmod -R 755 /var/www
+```
+
+### 7️⃣ VERIFY PHP ↔ MYSQL EXTENSION
+
+```
+php -m | grep mysql
+```
+
+#### ✅ Expected:
+
+```
+mysqlnd
+```
+
+**This confirms PHP can talk to MySQL/RDS.**
+
+### 8️⃣ OPTIONAL: CHECK APACHE LOGS
+
+#### 1️⃣ Access Log
+
+```
+sudo tail -f /var/log/httpd/access_log
+```
+
+#### 2️⃣ Error Log
+
+```
+sudo tail -f /var/log/httpd/error_log
+```
+
+#### Open another terminal and run:
+
+```
+curl http://localhost/test.php
+```
+
+You should see logs updating.
+
+### 9️⃣ COMMON ERRORS & FIXES
+
+#### ❌ Apache not running
+
+```
+sudo systemctl start httpd
+```
+
+```
+sudo systemctl enable httpd
+```
+
+#### ❌ PHP file downloads instead of executing
+
+> **Cause: PHP module missing**
+
+#### Fix:
+
+```
+sudo dnf install -y php php-mysqlnd
+```
+
+```
+sudo systemctl restart httpd
+```
+
+#### ❌ curl returns empty or 403
+
+#### Check permissions:
+
+```
+sudo chmod -R 755 /var/www
+```
+
+### 🧠 REAL ENGINEER CHECKLIST (FINAL)
+
+| Check           | Command                   |
+| --------------- | ------------------------- |
+| Apache running  | `systemctl status httpd`  |
+| Apache responds | `curl localhost`          |
+| PHP CLI works   | `php -v`                  |
+| PHP via Apache  | `curl localhost/test.php` |
+| MySQL extension | `php -m \| grep mysql`    |
 
 
+### 🏁 YOU ARE DONE
+
+Your EC2 is now LAMP-ready and verified from:
+
+- CLI ✅
+
+- Apache ✅
+
+- PHP ✅
 
 ---
 
