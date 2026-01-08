@@ -789,8 +789,17 @@ sudo systemctl restart httpd
 
 ```bash
 sudo dnf install -y python3 python3-pip
+```
+
+```
 mkdir lambda-layer && cd lambda-layer
+```
+
+```
 pip3 install pymysql -t python/
+```
+
+```
 zip -r pymysql-layer.zip python
 ```
 
