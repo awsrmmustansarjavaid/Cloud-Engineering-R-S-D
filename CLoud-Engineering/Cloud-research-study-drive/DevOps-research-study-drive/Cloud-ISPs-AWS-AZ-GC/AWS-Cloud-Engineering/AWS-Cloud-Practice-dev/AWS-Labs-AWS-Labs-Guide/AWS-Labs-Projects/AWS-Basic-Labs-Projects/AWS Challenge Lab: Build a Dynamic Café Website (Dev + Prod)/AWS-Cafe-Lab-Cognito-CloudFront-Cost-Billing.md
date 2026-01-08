@@ -1888,7 +1888,7 @@ Make sure SQS Queue already exists:
 
 ❌ If not → STOP and create it first
 
-### 1️⃣ Create Lambda Function
+### ▶️ Create Lambda Function
 
 - Open Lambda Console
 
@@ -2718,6 +2718,10 @@ raise Exception("FORCE FAIL")
 - Logs show repeated failures
 
 This proves production-grade reliability
+
+---
+
+
 
 
 ### 🔑 COMMON MISTAKES (READ THIS)
