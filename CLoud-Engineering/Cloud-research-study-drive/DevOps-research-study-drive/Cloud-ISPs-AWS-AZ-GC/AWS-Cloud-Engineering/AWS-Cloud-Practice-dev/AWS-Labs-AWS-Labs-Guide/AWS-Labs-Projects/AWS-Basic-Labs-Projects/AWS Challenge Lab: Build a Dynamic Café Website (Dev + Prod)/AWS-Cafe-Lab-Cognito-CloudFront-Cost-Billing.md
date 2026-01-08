@@ -3706,10 +3706,6 @@ Re-enable trigger afterward.
 
 That’s two consumers competing for the same messages.
 
-
-
-
-
 ### 🧠 WHY YOU CANNOT SEE THE MESSAGE IN SQS
 
 **When SQS → Lambda trigger is enabled:**
@@ -3818,22 +3814,142 @@ The issue was INFRASTRUCTURE, not logic.
 
 ---
 
-# PHASE 11 — AWS WAF (Security)
+# 🔒 PHASE 11 — AWS WAF (Security)
 
-## 1️⃣ Create Web ACL
-WAF → Create web ACL
-- Name: CafeWebACL
-- Scope: Regional
-- Region: us‑east‑1
+### Purpose: 
 
-## 2️⃣ Add Rules
-- AWSManagedRulesCommonRuleSet
-- AWSManagedRulesSQLiRuleSet
-- Rate limit: 1000 req / 5 min / IP
+Protect your API Gateway from common attacks (SQL Injection, XSS, rate-limiting) and secure your serverless cafe orders API.
 
-## 3️⃣ Associate WAF
-Associate with:
-- API Gateway (CafeOrderAPI)
+## 1️⃣ — Create a Web ACL
+
+**Open the AWS Console → WAF & Shield → Web ACLs → Create Web ACL**
+
+### Basic Configuration:
+
+- **Name:** CafeWebACL
+
+- **Scope:** Regional (Because API Gateway is regional)
+
+- **Region:** us-east-1
+
+- **Resource Type:** API Gateway (we will associate later)
+
+- **Click Next: Add Rules**
+
+## 2️⃣ — Add Managed Rules
+
+Managed rules help you quickly protect your API without writing custom rules.
+
+- **Click Add Managed rule groups**
+
+- **Select the following:**
+
+  - **AWSManagedRulesCommonRuleSet → protects against common exploits (XSS, known malicious patterns)**
+
+  - **AWSManagedRulesSQLiRuleSet → protects against SQL Injection attempts**
+
+- **Optional:** Set Rule action for these managed rules → Count for testing, later change to Block
+
+- **Click Next: Add your own rules → skip for now**
+
+## 3️⃣ — Add Rate-Based Rule (Optional but Recommended)
+
+- **Click Add my own rules → Create rule → Rate-based rule**
+
+### Configure:
+
+- **Name:** RateLimit1000
+
+- **Rate limit:** 1000 requests per 5 minutes per IP
+
+- **Action:** Block (or Count for testing)
+
+- **Save the rule**
+
+## 4️⃣ — Review and Create Web ACL
+
+- Review your Web ACL configuration
+
+- **Managed rules:** CommonRuleSet + SQLiRuleSet
+
+- **Rate limit:** 1000/5min
+
+- **Click Create Web ACL**
+
+✅ You now have a working WAF, but it’s not yet attached to any resource.
+
+## 5️⃣ — Associate WAF with API Gateway
+
+- **Go to AWS WAF → Web ACLs → CafeWebACL → Associations → Add association**
+
+- **Select API Gateway → Choose your CafeOrderAPI**
+
+- **Click Add association**
+
+## 6️⃣ — Test WAF Protection (Verification)
+
+### 1️⃣ — Basic Functionality Test
+
+#### Use Postman or curl to make a normal request to your API:
+
+```
+curl -X POST https://<API_GATEWAY_URL>/orders \
+-H "Content-Type: application/json" \
+-d '{"customer_name": "TestUser", "item": "Coffee", "quantity": 1}'
+```
+
+#### ✅ Expect: 
+
+```
+HTTP 200 → Order is processed
+```
+
+### 2️⃣ — SQL Injection Test
+
+#### Send a payload with typical SQLi attack:
+
+```
+{
+  "customer_name": "' OR '1'='1",
+  "item": "Latte",
+  "quantity": 1
+}
+```
+
+#### ✅ Expect: 
+
+```
+HTTP 403 (blocked by SQLi rule)
+```
+
+
+### 3️⃣ — Rate Limiting Test
+
+- Send >1000 requests within 5 minutes from the same IP
+
+- Confirm WAF blocks further requests after the limit
+
+### 4️⃣ — CloudWatch Logs Verification
+
+- Go to CloudWatch → Logs → WAF (if logging enabled)
+
+- Verify blocked requests appear with rule name (SQLi, CommonRuleSet, RateLimit1000)
+
+## 7️⃣ — Optional: Enable WAF Logging
+
+- Go to Web ACL → Logging and Metrics → Enable Logging
+
+- Choose CloudWatch Logs → Create a log group /aws/waf/CafeWebACL
+
+- You can now monitor attacks in real-time
+
+#### ✅ Result:
+
+- All normal requests go through API Gateway → Lambda → RDS/DynamoDB
+
+- Malicious or excessive requests are blocked
+
+- WAF provides logs for auditing and monitoring
 
 ---
 
