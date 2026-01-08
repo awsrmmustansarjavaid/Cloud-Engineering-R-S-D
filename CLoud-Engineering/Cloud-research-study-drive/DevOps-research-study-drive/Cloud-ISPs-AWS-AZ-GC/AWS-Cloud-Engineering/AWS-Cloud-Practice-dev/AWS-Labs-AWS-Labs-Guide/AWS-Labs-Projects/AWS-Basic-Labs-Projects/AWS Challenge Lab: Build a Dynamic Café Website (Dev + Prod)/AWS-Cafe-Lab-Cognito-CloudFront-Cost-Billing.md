@@ -3080,14 +3080,79 @@ Set EXACTLY like this:
 
 | Setting | Value          |
 | ------- | -------------- |
-| Timeout | **15 seconds** |
+| Timeout | **30 seconds** |
 | Memory  | **512 MB**     |
 
-👉 Memory also improves network performance.
+
+👉 Why:
+
+- ENI creation
+
+- Cold start
+
+- DB connection
+
+- Memory also improves network performance.
 
 Click Save
 
-#### 4️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
+#### 4️⃣ VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
+
+You already have Secrets Manager endpoint ✅
+
+Now add the remaining REQUIRED endpoints.
+
+#### 1️⃣ Create SQS Interface Endpoint
+
+**VPC → Endpoints → Create endpoint**
+
+| Field          | Value                         |
+| -------------- | ----------------------------- |
+| Service        | `com.amazonaws.us-east-1.sqs` |
+| Type           | Interface                     |
+| VPC            | Same VPC                      |
+| Subnets        | Same private subnets          |
+| Security group | Lambda-SG                     |
+| Private DNS    | ✅ ENABLE                      |
+
+#### 2️⃣ Create CloudWatch Logs Interface Endpoint
+
+- **Service:**
+
+```
+com.amazonaws.us-east-1.logs
+```
+
+Same settings as above
+
+Private DNS ✅
+
+#### 3️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
+
+- **Service:**
+
+```
+com.amazonaws.us-east-1.dynamodb
+```
+
+- **Type:** Gateway
+
+- **Attach to:**
+
+  - ALL private route tables
+
+Click Create
+
+#### 4️⃣ Verify IAM Role (YOU ARE ALREADY OK)
+
+You already have correct policies ✅
+
+Nothing to change here.
+
+
+
+
+#### 5️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
 
 Your secret must contain EXACT keys:
 
@@ -3102,7 +3167,7 @@ Your secret must contain EXACT keys:
 
 ❌ If even ONE key name differs → connection fails silently
 
-#### 5️⃣ Add DEBUG LOGS (TEMPORARY)
+#### 6️⃣ Add DEBUG LOGS (TEMPORARY)
 
 Update your Lambda code temporarily:
 
@@ -3180,7 +3245,6 @@ WorkerTest | Coffee | 2
 - DynamoDB → CafeMenu → Coffee
 
 - Attribute orders increased
-
 
 
 ### 2️⃣ TEST END-TO-END (MANDATORY)
