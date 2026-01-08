@@ -2406,7 +2406,7 @@ You should see message like:
 
 ```
 {
-  "body": "{\"order_id\":\"ORD-1001\",\"item\":\"Coffee\",\"quantity\":2}"
+  "body": "{\"customer_name\":\"ConsoleTest\",\"item\":\"Latte\",\"quantity\":2}"
 }
 ```
 
@@ -2447,9 +2447,9 @@ You should see message like:
 
 ```
 {
-  "order_id": "ORD-1001",
-  "item": "Coffee",
-  "quantity": 2
+  "customer_name": "ApiTestUser",
+  "item": "Latte",
+  "quantity": 1
 }
 ```
 
@@ -2519,7 +2519,7 @@ This tests the full HTTP flow.
 
 ```
 {
-  "order_id": "ORD-2001",
+  "customer_name": "ApiTestUser",
   "item": "Latte",
   "quantity": 1
 }
