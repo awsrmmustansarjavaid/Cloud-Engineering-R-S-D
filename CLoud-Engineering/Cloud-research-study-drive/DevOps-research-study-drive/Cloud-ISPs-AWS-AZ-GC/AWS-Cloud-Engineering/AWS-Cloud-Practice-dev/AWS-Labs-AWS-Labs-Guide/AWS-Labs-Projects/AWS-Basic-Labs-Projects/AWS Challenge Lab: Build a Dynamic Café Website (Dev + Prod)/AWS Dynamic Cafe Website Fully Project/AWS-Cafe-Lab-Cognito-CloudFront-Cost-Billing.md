@@ -54,7 +54,7 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ## AWS Architecture Diagram 
 
-![AWS Architecture Diagram](./AWS-Cafe-Lab-Cognito-CloudFront-Cost-Billing.jpeg)
+![AWS Architecture Diagram](./AWS%20Cafe%20Project%20Architecture%20Diagram/AWS-Cafe-Lab-Cognito-CloudFront-Cost-Billing.jpeg)
 
 ---
 
@@ -4542,5 +4542,6 @@ Expected: 200 OK
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
+
 
 
