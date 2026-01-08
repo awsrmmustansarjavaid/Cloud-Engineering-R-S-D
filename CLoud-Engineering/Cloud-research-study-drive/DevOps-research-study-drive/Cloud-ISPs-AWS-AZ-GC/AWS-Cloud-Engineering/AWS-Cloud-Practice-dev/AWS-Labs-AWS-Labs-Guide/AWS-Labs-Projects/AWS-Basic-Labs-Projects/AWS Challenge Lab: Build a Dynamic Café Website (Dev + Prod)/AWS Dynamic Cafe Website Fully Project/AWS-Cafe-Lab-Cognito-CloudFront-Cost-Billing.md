@@ -116,45 +116,7 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ---
 
-# PHASE 5 — APPLICATION CODE
 
-## 1️⃣ Install AWS SDK for PHP
-
-##### (Press ENTER for all prompts)
-
-```bash
-cd /var/www/html
-```
-
-```
-sudo dnf install -y composer
-```
-
-```
-sudo composer require aws/aws-sdk-php
-```
-
-
-
-## 2️⃣ Fix Permissions (Very Important)
-
-```
-sudo chown -R apache:apache /var/www
-```
-
-```
-sudo chmod -R 755 /var/www
-```
-
----
-
-## 3️⃣ Restart
-
-```bash
-sudo systemctl restart httpd
-```
-
----
 
 # PHASE 6 — AUTOMATION (SERVERLESS)
 
