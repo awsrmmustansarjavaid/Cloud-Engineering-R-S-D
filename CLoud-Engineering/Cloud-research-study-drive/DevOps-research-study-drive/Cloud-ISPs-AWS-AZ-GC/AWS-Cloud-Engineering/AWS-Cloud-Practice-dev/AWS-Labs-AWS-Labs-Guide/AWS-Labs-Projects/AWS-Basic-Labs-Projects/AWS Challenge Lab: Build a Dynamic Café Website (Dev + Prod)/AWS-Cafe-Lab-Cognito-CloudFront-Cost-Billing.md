@@ -445,6 +445,9 @@ sudo dnf install -y php php-mysqlnd php-cli php-common php-mbstring php-xml
 
 ```bash
 php -v
+```
+
+```
 httpd -v
 ```
 
@@ -454,6 +457,9 @@ httpd -v
 
 ```bash
 sudo chown -R apache:apache /var/www
+```
+
+```
 sudo chmod -R 755 /var/www
 ```
 
@@ -520,8 +526,17 @@ mysql -h <rds-endpoint> -u cafe_user -p
 
 ```sql
 CREATE DATABASE cafe_db;
+```
+
+```
 CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
+```
+
+```
 GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
+```
+
+```
 FLUSH PRIVILEGES;
 ```
 
@@ -716,7 +731,13 @@ For example !
 
 ```bash
 cd /var/www/html
+```
+
+```
 sudo dnf install -y composer
+```
+
+```
 sudo composer require aws/aws-sdk-php
 ```
 
