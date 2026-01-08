@@ -1566,7 +1566,7 @@ Create endpoint ✅
 
 ```
 curl -X POST \
-  https://kg2lm1s1r8.execute-api.us-east-1.amazonaws.com/dev/orders \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
   -H "Content-Type: application/json" \
   -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
 ```
@@ -2447,9 +2447,9 @@ You should see message like:
 
 ```
 {
-  "order_id": "ORD-1001",
-  "item": "Coffee",
-  "quantity": 2
+  "customer_name": "ApiTestUser",
+  "item": "Latte",
+  "quantity": 1
 }
 ```
 
