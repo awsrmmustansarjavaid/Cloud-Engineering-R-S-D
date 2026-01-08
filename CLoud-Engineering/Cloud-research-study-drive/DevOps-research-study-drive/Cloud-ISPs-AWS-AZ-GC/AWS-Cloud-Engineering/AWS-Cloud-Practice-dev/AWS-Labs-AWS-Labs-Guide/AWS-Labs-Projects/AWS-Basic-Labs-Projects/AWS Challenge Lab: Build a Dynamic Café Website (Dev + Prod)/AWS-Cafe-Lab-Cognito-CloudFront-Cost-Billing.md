@@ -3026,12 +3026,112 @@ def lambda_handler(event, context):
 
 - Click Add
 
-### 6️⃣ TEST (MANDATORY)
+### 6️⃣ Attach Lambda to VPC (MANDATORY)
+
+#### 1️⃣ Attach Lambda to VPC
+
+- **AWS Console → Lambda → CafeOrderWorker**
+
+1️⃣ Click Configuration
+
+2️⃣ Click VPC
+
+3️⃣ Click Edit
+
+Set EXACTLY like this:
+
+| Field           | Value                                 |
+| --------------- | ------------------------------------- |
+| VPC             | **Same VPC as RDS**                   |
+| Subnets         | **Private subnets (same AZs as RDS)** |
+| Security groups | **Lambda-SG (or create new)**         |
+
+4️⃣ Click Save
+
+⏳ Wait 1–2 minutes
+
+#### 2️⃣ Fix Security Groups (MANDATORY)
+
+**A) RDS Security Group**
+
+#### Inbound rule:
+
+| Type         | Port | Source        |
+| ------------ | ---- | ------------- |
+| MySQL/Aurora | 3306 | **Lambda-SG** |
+
+
+❌ NOT 0.0.0.0/0
+
+✅ MUST be Lambda SG
+
+**B) Lambda Security Group**
+
+#### Outbound rule (default usually OK):
+
+| Type        | Destination |
+| ----------- | ----------- |
+| All traffic | 0.0.0.0/0   |
+
+
+#### 3️⃣ Increase Lambda Timeout
+
+**Lambda → Configuration → General configuration → Edit**
+
+| Setting | Value          |
+| ------- | -------------- |
+| Timeout | **15 seconds** |
+| Memory  | **512 MB**     |
+
+👉 Memory also improves network performance.
+
+Click Save
+
+#### 4️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
+
+Your secret must contain EXACT keys:
+
+```
+{
+  "host": "your-rds-endpoint",
+  "username": "cafe_user",
+  "password": "********",
+  "dbname": "cafe_db"
+}
+```
+
+❌ If even ONE key name differs → connection fails silently
+
+#### 5️⃣ Add DEBUG LOGS (TEMPORARY)
+
+Update your Lambda code temporarily:
+
+```
+print("DEBUG: Lambda invoked")
+print("DEBUG: Event =", event)
+
+secret = get_db_secret()
+print("DEBUG: Secret fetched")
+
+connection = pymysql.connect(
+    host=secret["host"],
+    user=secret["username"],
+    password=secret["password"],
+    database=secret["dbname"],
+    connect_timeout=5
+)
+
+print("DEBUG: RDS connected")
+```
+
+This lets us see exactly where it stops.
+
+### 7️⃣ TEST (MANDATORY)
 
 
 ### 1️⃣ Test manually from Lambda console
 
-#### You must wrap the test event in Records:
+#### 1️⃣ You must wrap the test event in Records:
 
 ```
 {
@@ -3046,6 +3146,41 @@ def lambda_handler(event, context):
 - This mimics SQS event structure
 
 - Now the Lambda code won’t fail with 'Records'
+
+#### ✅ EXPECTED CLOUDWATCH LOGS (SUCCESS)
+
+You should see:
+
+```
+DEBUG: Lambda invoked
+DEBUG: Event = {...}
+DEBUG: Secret fetched
+DEBUG: RDS connected
+✅ Order processed: {...}
+```
+
+#### 2️⃣ Verify RDS
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p cafe_db
+```
+
+```
+SELECT * FROM orders ORDER BY id DESC;
+```
+
+#### Expected row:
+
+```
+WorkerTest | Coffee | 2
+```
+
+#### 3️⃣ Verify DynamoDB
+
+- DynamoDB → CafeMenu → Coffee
+
+- Attribute orders increased
+
 
 
 ### 2️⃣ TEST END-TO-END (MANDATORY)
@@ -3281,6 +3416,38 @@ This proves production-grade reliability
 
 ---
 
+### 🔥 IMPORTANT CLARIFICATIONS
+
+#### ❓ Why SQS message disappeared?
+
+**Because Lambda DID poll it, but timed out before completing**
+
+- SQS deletes message only after successful invocation, but Lambda retried internally until timeout.
+
+#### ❓ Why no logs before?
+
+**Because:**
+
+- Lambda couldn’t reach RDS
+
+- Timeout occurred before prints
+
+#### ❓ Is your code correct?
+
+✅ YES — your code is PRODUCTION-GRADE
+
+The issue was INFRASTRUCTURE, not logic.
+
+### 🧠 FINAL DIAGNOSIS
+
+| Component          | Status    |
+| ------------------ | --------- |
+| SQS                | ✅ Working |
+| Lambda trigger     | ✅ Working |
+| IAM                | ✅ Correct |
+| Code               | ✅ Correct |
+| **VPC attachment** | ❌ Missing |
+| **Timeout**        | ❌ Too low |
 
 
 
