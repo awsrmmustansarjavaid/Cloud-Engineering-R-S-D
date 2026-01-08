@@ -95,63 +95,9 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ## 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
+
 [EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
 
----
-
-# PHASE 2 — OPERATING SYSTEM & RUNTIME
-
-## 1️⃣  Install LAMP Stack (ORDER MATTERS)
-
-### ⚠️ VERY IMPORTANT NOTE (DO NOT IGNORE)
-
-**If you forget to add user data at instance launch, then follow this:**
-
-### Update OS
-
-```bash
-sudo dnf update -y
-```
-
-### Install Apache
-
-```
-sudo dnf install -y httpd
-```
-
-```
-sudo systemctl enable --now httpd
-```
-
-### Install PHP
-
-```bash
-sudo dnf install -y php php-mysqlnd php-cli php-common php-mbstring php-xml
-```
-
-### Verify
-
-```bash
-php -v
-```
-
-```
-httpd -v
-```
-
----
-
-## 2️⃣ Fix Permissions (MANDATORY)
-
-```bash
-sudo chown -R apache:apache /var/www
-```
-
-```
-sudo chmod -R 755 /var/www
-```
-
----
 
 # PHASE 3 — AMAZON RDS (Replace EC2 MariaDB)
 
@@ -4230,6 +4176,5 @@ Expected: 200 OK
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
-
 
 
