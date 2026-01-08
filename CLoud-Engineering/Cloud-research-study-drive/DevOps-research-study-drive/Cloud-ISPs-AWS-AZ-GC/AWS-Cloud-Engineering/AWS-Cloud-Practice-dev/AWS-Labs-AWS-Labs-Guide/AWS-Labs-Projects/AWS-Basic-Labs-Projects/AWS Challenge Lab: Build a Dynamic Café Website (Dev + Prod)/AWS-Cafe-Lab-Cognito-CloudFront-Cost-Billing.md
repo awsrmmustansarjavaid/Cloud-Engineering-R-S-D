@@ -2506,6 +2506,20 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": str(e)})
         }
 ```
+#### 🧠 Learning Summary (Why This Matters)
+
+| Version | What You Learned             |
+| ------- | ---------------------------- |
+| v1      | Strict validation & failures |
+| v2      | Defaults & API safety        |
+| v3      | Real-world production design |
+
+
+> **API Lambda validates and enqueues.**
+> **Worker Lambda processes and writes to RDS.**
+
+**✅ This separation is core serverless architecture.**
+
 
 **✔️ Click Deploy**
 
