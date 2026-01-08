@@ -313,3 +313,60 @@ Your EC2 is now LAMP-ready and verified from:
 - Apache ✅
 
 - PHP ✅
+
+---
+
+# PHASE 2 — OPERATING SYSTEM & RUNTIME
+
+## 1️⃣  Install LAMP Stack (ORDER MATTERS)
+
+### ⚠️ VERY IMPORTANT NOTE (DO NOT IGNORE)
+
+**If you forget to add user data at instance launch, then follow this:**
+
+### Update OS
+
+```bash
+sudo dnf update -y
+```
+
+### Install Apache
+
+```
+sudo dnf install -y httpd
+```
+
+```
+sudo systemctl enable --now httpd
+```
+
+### Install PHP
+
+```bash
+sudo dnf install -y php php-mysqlnd php-cli php-common php-mbstring php-xml
+```
+
+### Verify
+
+```bash
+php -v
+```
+
+```
+httpd -v
+```
+
+---
+
+## 2️⃣ Fix Permissions (MANDATORY)
+
+```bash
+sudo chown -R apache:apache /var/www
+```
+
+```
+sudo chmod -R 755 /var/www
+```
+
+---
+
