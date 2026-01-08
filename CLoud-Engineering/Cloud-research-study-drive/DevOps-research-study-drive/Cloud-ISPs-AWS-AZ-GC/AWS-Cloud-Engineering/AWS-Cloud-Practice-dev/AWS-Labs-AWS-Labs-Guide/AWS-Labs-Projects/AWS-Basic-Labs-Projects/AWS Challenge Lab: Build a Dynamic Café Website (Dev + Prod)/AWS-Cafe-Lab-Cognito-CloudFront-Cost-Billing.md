@@ -2286,28 +2286,27 @@ def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
 
-        message = {
-            "customer_name": body["customer_name"],
+        order = {
+            "customer_name": body.get("customer_name", "Guest"),
             "item": body["item"],
-            "quantity": int(body["quantity"])
+            "quantity": body["quantity"]
         }
 
         sqs.send_message(
             QueueUrl=QUEUE_URL,
-            MessageBody=json.dumps(message)
+            MessageBody=json.dumps(order)
         )
 
         return {
             "statusCode": 202,
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            },
+            "headers": {"Access-Control-Allow-Origin": "*"},
             "body": json.dumps({"message": "Order accepted"})
         }
 
     except Exception as e:
         return {
-            "statusCode": 400,
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
             "body": json.dumps({"error": str(e)})
         }
 ```
