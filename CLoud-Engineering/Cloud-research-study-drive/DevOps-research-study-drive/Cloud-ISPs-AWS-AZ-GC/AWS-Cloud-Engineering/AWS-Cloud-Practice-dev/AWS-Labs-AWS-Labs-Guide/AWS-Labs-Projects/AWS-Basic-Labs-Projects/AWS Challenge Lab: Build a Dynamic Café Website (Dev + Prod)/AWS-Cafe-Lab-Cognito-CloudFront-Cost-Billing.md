@@ -3820,137 +3820,95 @@ The issue was INFRASTRUCTURE, not logic.
 
 Protect your API Gateway from common attacks (SQL Injection, XSS, rate-limiting) and secure your serverless cafe orders API.
 
-## 1️⃣ — Create a Web ACL
+## 1️⃣ — Create WAF Protection Pack (Web ACL) for CafeOrderAPI
 
 **Open the AWS Console → WAF & Shield → Web ACLs → Create Web ACL**
 
-### Basic Configuration:
+### 1️⃣ — “Tell us about your app”
 
-- **Name:** CafeWebACL
+- **App category:** Click the dropdown and select the most relevant category.
 
-- **Scope:** Regional (Because API Gateway is regional)
+  - For your cafe order API, choose “Business Application” or something closest if available.
 
-- **Region:** us-east-1
+- **App focus:** Since your API is primarily for API Gateway requests:
 
-- **Resource Type:** API Gateway (we will associate later)
+  - Select Both API and web (recommended if you may later expose a website)
 
-- **Click Next: Add Rules**
+- Or select API if it’s purely API requests.
 
-## 2️⃣ — Add Managed Rules
+✅ This step tells AWS WAF what kind of attacks to prioritize.
 
-Managed rules help you quickly protect your API without writing custom rules.
+### 2️⃣ — “Select resources to protect”
 
-- **Click Add Managed rule groups**
+- Click Select resources to protect
 
-- **Select the following:**
+- **Choose your API Gateway resource:** CafeOrderAPI
 
-  - **AWSManagedRulesCommonRuleSet → protects against common exploits (XSS, known malicious patterns)**
+- Add the stage you want to protect (like prod or test)
 
-  - **AWSManagedRulesSQLiRuleSet → protects against SQL Injection attempts**
+- Click Add
 
-- **Optional:** Set Rule action for these managed rules → Count for testing, later change to Block
+✅ This associates your WAF with your API so the rules can start protecting it.
 
-- **Click Next: Add your own rules → skip for now**
+### 3️⃣ — “Choose initial protections”
 
-## 3️⃣ — Add Rate-Based Rule (Optional but Recommended)
+- AWS will suggest protection rules based on your app category.
 
-- **Click Add my own rules → Create rule → Rate-based rule**
+**You can either:**
 
-### Configure:
+  - Use the recommended protection package (simpler, automatic rules for SQLi, XSS, etc.)
 
-- **Name:** RateLimit1000
+  - Or select individual rules if you want more granular control:
 
-- **Rate limit:** 1000 requests per 5 minutes per IP
+    - AWSManagedRulesCommonRuleSet → common attacks
 
-- **Action:** Block (or Count for testing)
+    - AWSManagedRulesSQLiRuleSet → SQL Injection attacks
 
-- **Save the rule**
+- Optionally, add a rate-based rule:
 
-## 4️⃣ — Review and Create Web ACL
+  - Example: Limit to 1000 requests per 5 minutes per IP
 
-- Review your Web ACL configuration
+✅ These rules are your main defense for API attacks.
 
-- **Managed rules:** CommonRuleSet + SQLiRuleSet
+### 4️⃣ — “Name and describe”
 
-- **Rate limit:** 1000/5min
+- Enter a name: CafeWebACL
 
-- **Click Create Web ACL**
+- Optional description: "Protects CafeOrderAPI from common attacks, SQLi, XSS, and rate limiting"
 
-✅ You now have a working WAF, but it’s not yet attached to any resource.
+### 5️⃣ — “Customize protection pack (optional)”
 
-## 5️⃣ — Associate WAF with API Gateway
+- This is optional.
 
-- **Go to AWS WAF → Web ACLs → CafeWebACL → Associations → Add association**
+- You can enable logging to CloudWatch here:
 
-- **Select API Gateway → Choose your CafeOrderAPI**
+  - Turn on logging
 
-- **Click Add association**
+  - Select or create a CloudWatch log group (e.g., /aws/waf/CafeWebACL)
 
-## 6️⃣ — Test WAF Protection (Verification)
+- Leave other settings default for now.
 
-### 1️⃣ — Basic Functionality Test
+✅ Logging is very useful to monitor attacks and blocked requests.
 
-#### Use Postman or curl to make a normal request to your API:
+### 6️⃣ — Create protection pack
 
-```
-curl -X POST https://<API_GATEWAY_URL>/orders \
--H "Content-Type: application/json" \
--d '{"customer_name": "TestUser", "item": "Coffee", "quantity": 1}'
-```
+- Click Create protection pack (web ACL)
 
-#### ✅ Expect: 
+- AWS will provision the Web ACL, attach the rules, and associate it with your API Gateway.
 
-```
-HTTP 200 → Order is processed
-```
+✅ Once created, your API is protected, and WAF will start enforcing rules.
 
-### 2️⃣ — SQL Injection Test
+### 7️⃣ — Verification
 
-#### Send a payload with typical SQLi attack:
+- Normal API request: Should pass normally (HTTP 200)
 
-```
-{
-  "customer_name": "' OR '1'='1",
-  "item": "Latte",
-  "quantity": 1
-}
-```
+- SQL injection attempt: Should be blocked (HTTP 403)
 
-#### ✅ Expect: 
+- Rate limit test: Exceed 1000 requests in 5 minutes → requests blocked
 
-```
-HTTP 403 (blocked by SQLi rule)
-```
+- CloudWatch logs: Check /aws/waf/CafeWebACL → confirm logs for blocked requests
 
-
-### 3️⃣ — Rate Limiting Test
-
-- Send >1000 requests within 5 minutes from the same IP
-
-- Confirm WAF blocks further requests after the limit
-
-### 4️⃣ — CloudWatch Logs Verification
-
-- Go to CloudWatch → Logs → WAF (if logging enabled)
-
-- Verify blocked requests appear with rule name (SQLi, CommonRuleSet, RateLimit1000)
-
-## 7️⃣ — Optional: Enable WAF Logging
-
-- Go to Web ACL → Logging and Metrics → Enable Logging
-
-- Choose CloudWatch Logs → Create a log group /aws/waf/CafeWebACL
-
-- You can now monitor attacks in real-time
-
-#### ✅ Result:
-
-- All normal requests go through API Gateway → Lambda → RDS/DynamoDB
-
-- Malicious or excessive requests are blocked
-
-- WAF provides logs for auditing and monitoring
-
+### 💡 Tip: Protection packs are automated and recommended for beginners. If you want more granular control, you can manually create a Web ACL as in the previous step-by-step guide.
 ---
 
 # PHASE 12 — CI/CD (CodePipeline)
