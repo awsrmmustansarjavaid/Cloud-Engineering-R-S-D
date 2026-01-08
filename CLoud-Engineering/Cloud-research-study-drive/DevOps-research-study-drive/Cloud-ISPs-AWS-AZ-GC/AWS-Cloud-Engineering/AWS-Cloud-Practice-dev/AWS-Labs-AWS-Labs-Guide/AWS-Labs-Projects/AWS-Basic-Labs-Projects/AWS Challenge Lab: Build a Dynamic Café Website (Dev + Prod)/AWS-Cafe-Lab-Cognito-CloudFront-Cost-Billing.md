@@ -285,8 +285,8 @@ RDS → Databases → Create database
 - Engine: MySQL (or MariaDB)
 - Template: Free tier
 - DB identifier: cafedb
-- Username: admin
-- Password: strong password
+- Username: cafe_user
+- Password: StrongPassword123
 - VPC: CafeDevVPC
 - Subnet group: CafeRDSSubnetGroup
 - Public access: ❌ No
