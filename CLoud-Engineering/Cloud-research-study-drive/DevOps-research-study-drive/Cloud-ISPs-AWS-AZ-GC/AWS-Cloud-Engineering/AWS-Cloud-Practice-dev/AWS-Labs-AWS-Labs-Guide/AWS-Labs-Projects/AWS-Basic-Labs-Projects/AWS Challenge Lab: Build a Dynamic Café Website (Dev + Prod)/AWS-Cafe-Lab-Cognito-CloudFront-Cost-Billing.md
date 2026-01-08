@@ -104,7 +104,65 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
   * HTTP (80) → 0.0.0.0/0
 * Name tag: `CafeDevWebServer`
 
----
+### ✅ EC2 USER DATA — LAMP + MySQL CLIENT (Amazon Linux 2023) 
+
+> **You can copy-paste directly into EC2 → Advanced details → User data.**
+
+```
+#!/bin/bash
+# --------------------------------------------
+# EC2 User Data Script
+# Amazon Linux 2023
+# Installs LAMP Stack + MySQL Client
+# --------------------------------------------
+
+# 1️⃣ Update OS (MANDATORY FIRST)
+dnf update -y
+
+# 2️⃣ Install Apache (httpd)
+dnf install -y httpd
+systemctl enable httpd
+systemctl start httpd
+
+# 3️⃣ Install PHP + MySQL Support
+dnf install -y \
+php \
+php-mysqlnd \
+php-cli \
+php-common \
+php-mbstring \
+php-xml
+
+# 4️⃣ Fix Web Directory Permissions (MANDATORY)
+chown -R apache:apache /var/www
+chmod -R 755 /var/www
+
+# 5️⃣ Install MySQL Client (MariaDB)
+dnf install -y mariadb105
+
+# 6️⃣ Create a PHP Info Page (Optional Verification)
+echo "<?php phpinfo(); ?>" > /var/www/html/info.php
+
+# 7️⃣ Restart Apache to Apply PHP
+systemctl restart httpd
+
+# --------------------------------------------
+# END OF USER DATA
+# --------------------------------------------
+```
+
+#### ✅ WHAT THIS USER DATA DOES AUTOMATICALLY
+
+| Task                   | Status |
+| ---------------------- | ------ |
+| OS update              | ✅      |
+| Apache install & start | ✅      |
+| PHP install            | ✅      |
+| PHP–MySQL driver       | ✅      |
+| Correct permissions    | ✅      |
+| MySQL client           | ✅      |
+| Apache restart         | ✅      |
+
 
 ## 3️⃣ Connect to EC2
 
@@ -113,11 +171,54 @@ chmod 400 CafeDevKey.pem
 ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ```
 
+## 4️⃣ 🧪 HOW TO VERIFY AFTER EC2 IS RUNNING
+
+### 1️⃣ Apache Test
+
+#### Open browser:
+
+```
+http://<EC2-PUBLIC-IP>/
+```
+
+#### You should see:
+
+```
+It works!
+```
+
+### 2️⃣ PHP Test
+
+#### Open:
+
+```
+http://<EC2-PUBLIC-IP>/info.php
+```
+
+#### You should see:
+
+- PHP version
+
+- mysqlnd enabled
+
+### 3️⃣ MySQL Client Test (SSH)
+
+```
+mysql --version
+```
+
+
+
+
 ---
 
 # PHASE 2 — OPERATING SYSTEM & RUNTIME
 
 ## 1️⃣  Install LAMP Stack (ORDER MATTERS)
+
+### ⚠️ VERY IMPORTANT NOTE (DO NOT IGNORE)
+
+**If you forget to add user data at instance launch, then follow this:**
 
 ### Update OS
 
