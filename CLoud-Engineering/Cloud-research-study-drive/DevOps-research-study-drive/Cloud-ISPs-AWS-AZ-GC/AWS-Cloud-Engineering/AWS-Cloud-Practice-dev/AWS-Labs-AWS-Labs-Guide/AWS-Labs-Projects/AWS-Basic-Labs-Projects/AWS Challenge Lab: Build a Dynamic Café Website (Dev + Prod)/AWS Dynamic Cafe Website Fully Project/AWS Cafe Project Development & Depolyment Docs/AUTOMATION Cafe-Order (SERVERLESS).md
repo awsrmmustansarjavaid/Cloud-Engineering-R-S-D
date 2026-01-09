@@ -433,7 +433,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </html>
 ```
 
-#### (Do not use this in production; it is for research and study purposes only.)
+### ❌ (Do not use this in production; it is for research and study purposes only.)
 
 
 ```
@@ -642,7 +642,7 @@ Save Lambda
 
 Click Deploy (top right)
 
-#### (Do not use this in production; it is for research and study purposes only.)
+### ❌ (Do not use this in production; it is for research and study purposes only.)
 
 ##### Your Lambda must expect proxy format:
 
