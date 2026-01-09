@@ -1,7 +1,5 @@
 # 🌐 Launch EC2 Instance (Amazon Linux 2023)
 
-
-
 ### ✅ EC2 USER DATA — LAMP + MySQL CLIENT (Amazon Linux 2023) 
 
 > **You can copy-paste directly into EC2 → Advanced details → User data.**
