@@ -534,137 +534,182 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ```
 
-#### FULL UPDATED orders.php (FINAL VERSION)
+#### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
 ```
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AWS Café</title>
+    <title>Charlie Cafe ☕ | Place Order</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
         }
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
+
+        /* Navbar */
+        .navbar {
+            background-color: #3b1f0e;
         }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 25px;
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: 600;
         }
-        h2 {
-            text-align: center;
-            color: #333;
+
+        /* Order Card */
+        .order-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
         }
+
+        .order-card h2 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
         label {
-            display: block;
+            font-weight: 500;
             margin-top: 15px;
-            font-weight: bold;
         }
-        input, select, button {
-            width: 100%;
+
+        input, select {
+            border-radius: 10px;
             padding: 10px;
-            margin-top: 5px;
-            font-size: 16px;
         }
-        button {
-            background-color: #27ae60;
-            color: white;
+
+        /* Button */
+        .btn-order {
+            background-color: #ff9800;
+            color: #000;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 12px;
             border: none;
-            margin-top: 20px;
-            cursor: pointer;
+            transition: 0.3s;
         }
-        button:hover {
-            background-color: #219150;
+
+        .btn-order:hover {
+            background-color: #e68900;
         }
+
+        /* Footer */
         footer {
+            color: #fff;
             text-align: center;
             padding: 15px;
-            margin-top: 30px;
-            background-color: #ecf0f1;
-            color: #555;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        .response-box {
+            margin-top: 20px;
+            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>☕ AWS Café</h1>
-    <p>Welcome to our cloud-powered café</p>
-</header>
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
+    </div>
+</nav>
 
-<div class="container">
-    <h2>Place Your Order</h2>
+<!-- Order Section -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="col-md-6">
+        <div class="order-card">
 
-    <form method="POST">
-        <label>Customer Name</label>
-        <input type="text" name="name" required>
+            <h2 class="text-center">Place Your Order</h2>
+            <p class="text-center text-muted">Fresh • Hot • Made with Love</p>
 
-        <label>Select Item</label>
-        <select name="item">
-            <option value="Coffee">Coffee</option>
-            <option value="Tea">Tea</option>
-            <option value="Latte">Latte</option>
-            <option value="Cappuccino">Cappuccino</option>
-        </select>
+            <form method="POST">
 
-        <label>Quantity</label>
-        <input type="number" name="quantity" min="1" value="1">
+                <label>Customer Name</label>
+                <input type="text" name="name" class="form-control" required>
 
-        <button type="submit">Place Order</button>
-    </form>
+                <label>Select Item</label>
+                <select name="item" class="form-select">
+                    <option value="Coffee">Coffee</option>
+                    <option value="Tea">Tea</option>
+                    <option value="Latte">Latte</option>
+                    <option value="Cappuccino">Cappuccino</option>
+                    <option value="Fresh Juice">Fresh Juice</option>
+                </select>
 
-    <?php
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+                <label>Quantity</label>
+                <input type="number" name="quantity" min="1" value="1" class="form-control">
 
-    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+                <button type="submit" class="btn btn-order w-100 mt-4">
+                    ☕ Place Order
+                </button>
+            </form>
 
-    $payload = json_encode([
-        "customer_name" => $_POST['name'],
-        "item" => $_POST['item'],
-        "quantity" => (int)$_POST['quantity']
-    ]);
+            <!-- Backend Response (UNCHANGED) -->
+            <div class="response-box">
+                <?php
+                if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $ch = curl_init($apiUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Content-Type: application/json"
-    ]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+                    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
 
-    $response = curl_exec($ch);
+                    $payload = json_encode([
+                        "customer_name" => $_POST['name'],
+                        "item" => $_POST['item'],
+                        "quantity" => (int)$_POST['quantity']
+                    ]);
 
-    if ($response === false) {
-        echo "<p style='color:red'>❌ CURL Error: " . curl_error($ch) . "</p>";
-    } else {
-        echo "<p style='color:green'>✅ Order sent successfully</p>";
-        echo "<pre>$response</pre>";
-    }
+                    $ch = curl_init($apiUrl);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        "Content-Type: application/json"
+                    ]);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
-    curl_close($ch);
-}
-?>
+                    $response = curl_exec($ch);
 
+                    if ($response === false) {
+                        echo "<p class='text-danger'>❌ CURL Error: " . curl_error($ch) . "</p>";
+                    } else {
+                        echo "<p class='text-success fw-bold'>✅ Order sent successfully</p>";
+                        echo "<pre class='bg-light p-2 rounded'>$response</pre>";
+                    }
+
+                    curl_close($ch);
+                }
+                ?>
+            </div>
+
+        </div>
+    </div>
 </div>
 
+<!-- Footer -->
 <footer>
-    <p>© 2025 AWS Café | Serverless Backend</p>
+    © 2026 Charlie Cafe | Serverless Orders ☁️
 </footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
