@@ -78,9 +78,35 @@ Browser (order-status.html)
 
 ##  PHASE 1️⃣ — RDS DATABASE
 
-### 1️⃣ UPDATE DATABASE (SAFE CHANGE)
+### 1️⃣ ADD DATE & TIME TO RDS (NO SKIP)
 
-#### RDS: orders table
+#### 1️⃣ Connect to RDS
+
+#### From EC2 or local MySQL client:
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p cafe_db
+```
+
+#### You should see:
+
+```
+mysql>
+```
+#### 2️⃣ Check current table
+
+```
+DESCRIBE orders;
+```
+
+#### ❗ Look carefully
+
+- If you do NOT see created_at → continue
+- If you already see it → skip to Step 2
+
+
+
+#### 3️⃣ Add created_at column
 
 ```
 ALTER TABLE orders
@@ -91,22 +117,40 @@ ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 ✔️ Automatically tracks date & time
 
+#### 4️⃣ VERIFY (MANDATORY)
+
+```
+DESCRIBE orders;
+```
+
+#### You MUST see:
+
+```
+created_at | timestamp | DEFAULT CURRENT_TIMESTAMP
+```
+
+✅ Phase 1 complete
+
 ---
-##  PHASE 2️⃣ — DYNAMODB
 
-### 1️⃣ CREATE DYNAMODB METRICS TABLE
+##  PHASE 2️⃣ — DYNAMODB METRICS TABLE (FULL)
 
-#### 1️⃣ Table name:
+### 1️⃣ Open DynamoDB Console
 
-```
-CafeOrderMetrics
-```
+#### AWS Console → DynamoDB → Tables → Create table
 
-#### 2️⃣ Partition key:
+### 2️⃣ CREATE DYNAMODB METRICS TABLE
 
-```
-metric (String)
-```
+#### 1️⃣ Table configuration
+
+| Field         | Value              |
+| ------------- | ------------------ |
+| Table name    | `CafeOrderMetrics` |
+| Partition key | `metric` (String)  |
+| Sort key      | ❌ None             |
+| Table class   | Standard           |
+| Capacity      | On-demand          |
+| Encryption    | Default            |
 
 #### Sample items:
 
@@ -115,16 +159,62 @@ metric (String)
 { "metric": "TODAY_ORDERS", "count": 25 }
 ```
 
----
-##  PHASE 3️⃣ — LAMBDA
+Click Create table
 
-###  1️⃣ UPDATE WORKER LAMBDA (SAFE ADDITION)
+**🕐 WAIT until status = ACTIVE**
+
+### 3️⃣ Insert initial items (VERY IMPORTANT)
+
+**Click table → Explore table → Create item**
+
+#### Item 1
+
+```
+{
+  "metric": "TOTAL_ORDERS",
+  "count": 0
+}
+```
+
+Click Create item
+
+#### Item 2
+
+```
+{
+  "metric": "TODAY_ORDERS",
+  "count": 0
+}
+```
+
+Click Create item
+
+✅ Phase 2 complete
+
+---
+##  PHASE 3️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
+
+#### ⚠️ This step is inside existing Worker Lambda, NOT API Lambda.
+
+###  1️⃣ Open Worker Lambda
+
+### AWS Console → Lambda → CafeOrderWorker
+
+###  2️⃣ UPDATE WORKER LAMBDA (SAFE ADDITION)
+
+### 1️⃣ Add this code at the TOP
+
+```
+metrics_table = dynamodb.Table("CafeOrderMetrics")
+```
+
+### 2️⃣ Add this AFTER successful RDS insert
+
+⚠️ Place it AFTER cursor.execute(...) and commit()
 
 #### Inside your SQS Worker Lambda, after DB insert:
 
 ```
-metrics_table = dynamodb.Table("CafeOrderMetrics")
-
 metrics_table.update_item(
     Key={"metric": "TOTAL_ORDERS"},
     UpdateExpression="ADD #c :inc",
@@ -132,51 +222,93 @@ metrics_table.update_item(
     ExpressionAttributeValues={":inc": Decimal(1)}
 )
 ```
+**Click Deploy**
 
 ✔️ RDS remains main source
 
 ✔️ DynamoDB gives fast counters
 
-### 2️⃣ CREATE ORDER STATUS LAMBDA (NEW)
+### 3️⃣ VERIFY THIS STEP
 
-#### 1️⃣ Lambda Name
+1️⃣ Place one new order
 
-```
-GetOrderStatusLambda
-```
+2️⃣ Go to DynamoDB → CafeOrderMetrics
 
-#### 2️⃣ IAM Permissions
+3️⃣ Open TOTAL_ORDERS
 
-- RDS access
+✔ Count increased by 1
 
-- DynamoDB read-only
+✅ Step 3 complete
+
+### 4️⃣ CREATE ORDER STATUS LAMBDA (NEW)
+
+#### 📢 This Lambda ONLY READS DATA.
+
+#### 1️⃣ Create Lambda
+
+#### AWS Console → Lambda → Create function
+
+| Setting        | Value                                   |
+| -------------- | --------------------------------------- |
+| Name           | `GetOrderStatusLambda`                  |
+| Runtime        | Python 3.12                             |
+| Execution role | Use existing role                       |
+| Role           | Same role as Worker (read-only is fine) |
+
+
+#### Click Create function
+
+#### 2️⃣ Add IAM Permissions (IMPORTANT)
+
+#### IAM → Role → Attach policy
+
+#### Add:
+
+- AmazonDynamoDBReadOnlyAccess
+
+- RDS access (same as Worker)
 
 #### 3️⃣ Lambda Code
 
 ```
-import pymysql
 import json
 import boto3
+import pymysql
 
+secrets_client = boto3.client('secretsmanager')
 dynamodb = boto3.resource('dynamodb')
-metrics_table = dynamodb.Table('CafeOrderMetrics')
+
+metrics_table = dynamodb.Table("CafeOrderMetrics")
+SECRET_NAME = "CafeDevDBSM"
+
+def get_db_secret():
+    return json.loads(
+        secrets_client.get_secret_value(SecretId=SECRET_NAME)["SecretString"]
+    )
 
 def lambda_handler(event, context):
 
-    # ---- Fetch metrics ----
+    secret = get_db_secret()
+
+    connection = pymysql.connect(
+        host=secret["host"],
+        user=secret["username"],
+        password=secret["password"],
+        database=secret["dbname"],
+        connect_timeout=5,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
     metrics = metrics_table.scan()["Items"]
 
-    # ---- DB connection (reuse Secrets Manager) ----
-    # (use same secret logic as before)
-
-    cursor.execute("""
-        SELECT customer_name, item, quantity, created_at
-        FROM orders
-        ORDER BY created_at DESC
-        LIMIT 20
-    """)
-
-    orders = cursor.fetchall()
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT customer_name, item, quantity, created_at
+            FROM orders
+            ORDER BY created_at DESC
+            LIMIT 20
+        """)
+        orders = cursor.fetchall()
 
     return {
         "statusCode": 200,
@@ -187,24 +319,136 @@ def lambda_handler(event, context):
         }, default=str)
     }
 ```
-##  PHASE 4️⃣ — API GATEWAY
 
-### 1️⃣ Create API
+#### 4️⃣ Test Lambda
+
+#### Test event:
+
+```
+{}
+```
+
+✔ Status code: 200
+
+✔ JSON returned
+
+✅ Step 4 complete
+
+---
+##  PHASE 4️⃣ — API GATEWAY ENDPOINT
+
+### 1️⃣ Open API Gateway
+
+#### API Gateway → Your API → Resources
+
+### 2️⃣ Create API
 
 ```
 GET /order-status
 ```
 
-- Integration: GetOrderStatusLambda
+### 3️⃣ Create method
 
-- Enable CORS
+- **Method:** GET
 
-- Deploy
+- **Integration:** Lambda
 
+- **Lambda name:** GetOrderStatusLambda
 
+#### Enable:
+
+✔ Lambda proxy
+
+✔ CORS
+
+### 3️⃣ Deploy API
+
+- **Stage name:** prod
+
+### 4️⃣ VERIFY API
+
+#### Open browser:
+
+```
+https://API_ID.execute-api.region.amazonaws.com/prod/order-status
+```
+
+✔ JSON visible
+
+✅ Phase 4 complete
+
+---
 ##  PHASE 5️⃣ — FRONTEND ORDER STATUS PAGE
 
-Create:
+### 1️⃣ Create File
+
+```
+order-status.html
+```
+
+### 1️⃣ CODE
+
+Paste EXACT CODE
+
+```
+<h2>📊 Cafe Order Status</h2>
+
+<div id="metrics"></div>
+
+<table border="1">
+<tr>
+  <th>Customer</th>
+  <th>Item</th>
+  <th>Qty</th>
+  <th>Date</th>
+</tr>
+<tbody id="orders"></tbody>
+</table>
+
+<script>
+fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
+.then(res => res.json())
+.then(data => {
+  data.metrics.forEach(m => {
+    document.getElementById("metrics").innerHTML +=
+      `<p><b>${m.metric}</b>: ${m.count}</p>`;
+  });
+
+  data.recent_orders.forEach(o => {
+    document.getElementById("orders").innerHTML += `
+      <tr>
+        <td>${o.customer_name}</td>
+        <td>${o.item}</td>
+        <td>${o.quantity}</td>
+        <td>${o.created_at}</td>
+      </tr>`;
+  });
+});
+</script>
+```
+
+### 2️⃣ Open page in browser
+
+✔ Orders visible
+
+✔ Counts visible
+
+✔ Date/time visible
+
+✅ Step 5 complete
+
+---
+
+### 🧪 FINAL VERIFICATION
+
+| Check                     | Result |
+| ------------------------- | ------ |
+| Place new order           | ✅      |
+| RDS updated               | ✅      |
+| DynamoDB count +1         | ✅      |
+| Order-status page updated | ✅      |
+
+---
 
 
 
