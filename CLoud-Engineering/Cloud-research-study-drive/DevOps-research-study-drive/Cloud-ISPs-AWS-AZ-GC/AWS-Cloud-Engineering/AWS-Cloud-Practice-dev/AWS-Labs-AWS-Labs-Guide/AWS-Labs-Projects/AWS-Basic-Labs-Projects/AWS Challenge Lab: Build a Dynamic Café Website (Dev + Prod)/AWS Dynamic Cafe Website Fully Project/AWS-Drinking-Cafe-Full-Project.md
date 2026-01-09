@@ -344,13 +344,12 @@ sudo nano /var/www/html/index.php
     <!-- Favicon -->
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG">
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- Custom CSS -->
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -369,24 +368,46 @@ sudo nano /var/www/html/index.php
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)),
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
                         url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
             background-size: cover;
             background-position: center;
             height: 90vh;
             display: flex;
             align-items: center;
-            color: white;
+            color: #fff;
         }
 
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 600;
+        /* Cards */
+        .menu-card {
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
 
-        .hero p {
-            font-size: 1.1rem;
-            margin-bottom: 25px;
+        .menu-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .menu-card img {
+            height: 230px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        /* Order Section with Background */
+        .order-section {
+            background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+            padding: 80px 20px;
+            border-radius: 25px;
+        }
+
+        .order-box {
+            color: #fff;
         }
 
         /* Buttons */
@@ -394,39 +415,13 @@ sudo nano /var/www/html/index.php
             background-color: #ff9800;
             color: #000;
             font-weight: 600;
-            padding: 12px 25px;
             border-radius: 30px;
+            padding: 12px 28px;
             transition: 0.3s;
         }
 
         .btn-order:hover {
             background-color: #e68900;
-            color: #000;
-        }
-
-        /* Section Titles */
-        .section-title {
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-
-        /* Cards */
-        .menu-card {
-            border: none;
-            border-radius: 15px;
-            transition: transform 0.3s;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-8px);
-        }
-
-        /* Order Box */
-        .order-box {
-            background: #3b1f0e;
-            color: white;
-            padding: 40px;
-            border-radius: 20px;
         }
 
         /* Footer */
@@ -443,29 +438,29 @@ sudo nano /var/www/html/index.php
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">
-            ☕ Charlie Cafe
-        </a>
+        <a class="navbar-brand" href="#">☕ Charlie Cafe</a>
     </div>
 </nav>
 
-<!-- Hero Section -->
+<!-- Hero -->
 <section class="hero">
     <div class="container text-center">
-        <h1>Fresh Drinks & Perfect Coffee</h1>
-        <p>Enjoy premium coffee, tea & fresh fruit juices crafted with love</p>
-        <a href="orders.php" class="btn btn-order">Order Now</a>
+        <h1 class="display-5 fw-bold">Fresh Drinks & Perfect Coffee</h1>
+        <p class="lead">Coffee • Tea • Fresh Fruit Juices</p>
+        <a href="orders.php" class="btn btn-order mt-3">Order Now</a>
     </div>
 </section>
 
 <!-- Menu Section -->
 <section class="container py-5">
-    <h2 class="text-center section-title">Our Special Menu</h2>
+    <h2 class="text-center fw-bold mb-5">Our Special Menu</h2>
+
     <div class="row g-4">
 
+        <!-- Coffee -->
         <div class="col-md-4">
             <div class="card menu-card shadow">
-                <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348" class="card-img-top">
+                <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348" alt="Coffee">
                 <div class="card-body text-center">
                     <h5>Coffee</h5>
                     <p>Espresso, Cappuccino, Latte, Americano</p>
@@ -473,9 +468,10 @@ sudo nano /var/www/html/index.php
             </div>
         </div>
 
+        <!-- Tea -->
         <div class="col-md-4">
             <div class="card menu-card shadow">
-                <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574" class="card-img-top">
+                <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574" alt="Tea">
                 <div class="card-body text-center">
                     <h5>Tea</h5>
                     <p>Green Tea, Black Tea, Masala Chai</p>
@@ -483,9 +479,14 @@ sudo nano /var/www/html/index.php
             </div>
         </div>
 
+        <!-- Fresh Juice -->
         <div class="col-md-4">
             <div class="card menu-card shadow">
-                <img src="https://images.unsplash.com/photo-1571687949920-b3e5a2e8f6ae" class="card-img-top">
+                <img
+                    src="https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="Fresh Juice"
+                    referrerpolicy="no-referrer"
+                    loading="lazy">
                 <div class="card-body text-center">
                     <h5>Fresh Juice</h5>
                     <p>Orange, Mango, Apple, Mixed Fruits</p>
@@ -496,12 +497,14 @@ sudo nano /var/www/html/index.php
     </div>
 </section>
 
-<!-- Order Box -->
+<!-- Order Section with Background -->
 <section class="container my-5">
-    <div class="order-box text-center">
-        <h2>Order Your Favorite Drink Now ☕🥤</h2>
-        <p class="mt-3">Fast • Fresh • Delicious</p>
-        <a href="orders.php" class="btn btn-order mt-3">Go to Order Page</a>
+    <div class="order-section text-center">
+        <div class="order-box">
+            <h2 class="fw-bold">Order Your Favorite Drink ☕🥤</h2>
+            <p class="mt-3">Fast • Fresh • Delicious</p>
+            <a href="orders.php" class="btn btn-order mt-4">Go to Order Page</a>
+        </div>
     </div>
 </section>
 
@@ -512,12 +515,6 @@ sudo nano /var/www/html/index.php
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Custom JS -->
-<script>
-    // Simple welcome message (optional)
-    console.log("Welcome to Charlie Cafe ☕");
-</script>
 
 </body>
 </html>
