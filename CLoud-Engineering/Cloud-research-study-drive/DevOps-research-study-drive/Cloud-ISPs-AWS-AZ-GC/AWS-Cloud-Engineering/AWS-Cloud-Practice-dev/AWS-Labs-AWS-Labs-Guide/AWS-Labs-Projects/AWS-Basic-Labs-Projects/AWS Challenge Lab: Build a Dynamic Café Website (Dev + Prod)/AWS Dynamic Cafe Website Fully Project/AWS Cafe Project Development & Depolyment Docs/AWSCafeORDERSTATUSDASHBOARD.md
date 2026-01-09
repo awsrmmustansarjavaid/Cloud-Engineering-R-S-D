@@ -535,6 +535,52 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
 
 ---
 
+##  PHASE 6️⃣ — VERIFICATION CHECKLIST
+
+### 1️⃣ Send order from frontend / API
+
+✔ Order placed
+
+### 2️⃣ Check SQS
+
+✔ Message disappears (consumed)
+
+### 3️⃣ Check RDS
+
+```
+SELECT * FROM orders ORDER BY created_at DESC;
+```
+
+✔ New row present
+
+### 4️⃣ Check DynamoDB → CafeMenu
+
+✔ orders increased for item
+
+### 5️⃣ Check DynamoDB → CafeOrderMetrics
+
+✔ TOTAL_ORDERS increased by 1
+
+### 6️⃣ Check CloudWatch Logs
+
+✔ "Order processed successfully"
+
+### 🏆 RESULT
+
+You now have:
+
+✅ Event-driven backend
+
+✅ Reliable order processing
+
+✅ Real-time metrics
+
+✅ Production-safe SQS worker
+
+✅ Zero backend breakage
+
+---
+
 ### 🧪 FINAL VERIFICATION
 
 | Check                     | Result |
