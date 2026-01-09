@@ -69,7 +69,7 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 # 📢 SECTION 1 CAFE BASIC CONFIGURATIONS
 
-# PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
+## PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
 ## 1️⃣ Create Development VPC (us‑east‑1)
 
@@ -96,9 +96,6 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 ### 4️⃣ Security Group and NACL
 
 
-
-
-
 ---
 
 ## 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
@@ -107,25 +104,25 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 [EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
 
 
-# PHASE 2 — AMAZON RDS (Replace EC2 MariaDB)
+## PHASE 2 — AMAZON RDS (Replace EC2 MariaDB)
 
 
 [AMAZON RDS (Replace EC2 MariaDB)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20RDS.md)
 
 ---
 
-# PHASE 3 — SECRETS & SECURITY (BEST PRACTICE)
+## PHASE 3 — SECRETS & SECURITY (BEST PRACTICE)
 
 [SECRETS & SECURITY (BEST PRACTICE)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20Secrets%20Manager.md)
 ---
 
-# PHASE 4 — AUTOMATION Cafe-Order (SERVERLESS)
+## PHASE 4 — AUTOMATION Cafe-Order (SERVERLESS)
 
 [AUTOMATION Cafe-Order (SERVERLESS)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AUTOMATION%20Cafe-Order%20(SERVERLESS).md)
 
 ---
 
-# PHASE 5 — PRODUCTION (us‑west‑2)
+## PHASE 5 — PRODUCTION (us‑west‑2)
 
 ## Create AMI
 
@@ -143,7 +140,7 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ---
 
-# PHASE 6 — AMAZON DYNAMODB (Menu + Cache Layer)
+## PHASE 6 — AMAZON DYNAMODB (Menu + Cache Layer)
 
 ## 🎯 Purpose of This Phase (IMPORTANT)
 
@@ -739,181 +736,9 @@ Click Create function
 
 #### 1️⃣ Replace your order insert logic with this:
 
+#### 📣 CafeOrderApiLambda  — Production-Ready (Recommended for This Lab)
 
-#### 📣 CafeOrderApiLambda — Code Evolution & Purpose
-
-In this lab, the CafeOrderApiLambda is responsible for:
-
-✅ Receiving orders from API Gateway
-
-✅ Validating input
-
-✅ Sending orders to Amazon SQS
-
-❌ NOT interacting with RDS directly
-
-> **This section documents all versions of the Lambda code used during learning, including their purpose, limitations, and why improvements were needed.**
-
-#### 🧪 Version 1 — Strict Input Validation (Initial Learning Version)
-
-#### 📌 Purpose
-
-- Learn basic API → Lambda → SQS flow
-
-- Enforce strict input requirements
-
-- Understand how missing fields cause failures
-
-#### 🧠 Key Behavior
-
-- Requires customer_name, item, and quantity
-
-- Fails if any field is missing
-
-- Explicitly converts quantity to integer
-
-- Returns HTTP 400 for client errors
-
-#### ⚠️ Limitation
-
-- No default values
-
-- No CORS header on error
-
-- Not user-friendly for real APIs
-
-#### 💻 Code
-
-```
-import json
-import boto3
-import os
-
-sqs = boto3.client('sqs')
-QUEUE_URL = os.environ['SQS_QUEUE_URL']
-
-def lambda_handler(event, context):
-    try:
-        body = json.loads(event['body'])
-
-        message = {
-            "customer_name": body["customer_name"],
-            "item": body["item"],
-            "quantity": int(body["quantity"])
-        }
-
-        sqs.send_message(
-            QueueUrl=QUEUE_URL,
-            MessageBody=json.dumps(message)
-        )
-
-        return {
-            "statusCode": 202,
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            },
-            "body": json.dumps({"message": "Order accepted"})
-        }
-
-    except Exception as e:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"error": str(e)})
-        }
-```        
-
-#### 🧪 Version 2 — Safer Defaults (Improved Usability Version)
-
-#### 📌 Purpose
-
-- Allow optional customer_name
-
-- Avoid breaking API if field is missing
-
-- Improve user experience
-
-#### 🧠 Key Behavior
-
-- Defaults customer_name to "Guest"
-
-- Keeps API functional even if field missing
-
-- Always returns CORS headers
-
-#### ⚠️ Limitation
-
-- Does NOT convert quantity to integer
-
-- Incorrect use of HTTP 500 for client errors
-
-- Still lacks full validation
-
-#### 💻 Code
-
-```
-import json
-import boto3
-import os
-
-sqs = boto3.client('sqs')
-QUEUE_URL = os.environ['SQS_QUEUE_URL']
-
-def lambda_handler(event, context):
-    try:
-        body = json.loads(event['body'])
-
-        order = {
-            "customer_name": body.get("customer_name", "Guest"),
-            "item": body["item"],
-            "quantity": body["quantity"]
-        }
-
-        sqs.send_message(
-            QueueUrl=QUEUE_URL,
-            MessageBody=json.dumps(order)
-        )
-
-        return {
-            "statusCode": 202,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"message": "Order accepted"})
-        }
-
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"error": str(e)})
-        }
-```
-
-#### ✅ Version 3 — Final Merged & Production-Ready (Recommended)
-
-#### 📌 Purpose
-
-- Combine strict validation + safe defaults
-
-- Follow real-world serverless best practices
-
-- Clean separation between API Lambda and Worker Lambda
-
-- Suitable for interviews, demos, and production labs
-
-#### 🧠 Key Improvements
-
-✔ Input validation
-
-✔ Default values
-
-✔ Type safety
-
-✔ Correct HTTP status codes
-
-✔ Proper CORS handling
-
-✔ Clean SQS message format
-
-#### 💻 Final Code (Recommended for This Lab)
+#### 💻 Code (Recommended for This Lab)
 
 ```
 import json
@@ -971,20 +796,6 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": str(e)})
         }
 ```
-#### 🧠 Learning Summary (Why This Matters)
-
-| Version | What You Learned             |
-| ------- | ---------------------------- |
-| v1      | Strict validation & failures |
-| v2      | Defaults & API safety        |
-| v3      | Real-world production design |
-
-
-> **API Lambda validates and enqueues.**
-> **Worker Lambda processes and writes to RDS.**
-
-**✅ This separation is core serverless architecture.**
-
 
 **✔️ Click Deploy**
 
