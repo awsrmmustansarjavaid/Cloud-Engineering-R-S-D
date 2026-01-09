@@ -338,3 +338,255 @@ def lambda_handler(event, context):
 
 
 ---
+
+### 2️⃣ Lambda Code — AUTOMATION SQS (Async Order Processing)
+
+#### 📣 CafeOrderApiLambda — Code Evolution & Purpose
+
+In this lab, the CafeOrderApiLambda is responsible for:
+
+✅ Receiving orders from API Gateway
+
+✅ Validating input
+
+✅ Sending orders to Amazon SQS
+
+❌ NOT interacting with RDS directly
+
+> **This section documents all versions of the Lambda code used during learning, including their purpose, limitations, and why improvements were needed.**
+
+#### 🧪 Version 1 — Strict Input Validation (Initial Learning Version)
+
+#### 📌 Purpose
+
+- Learn basic API → Lambda → SQS flow
+
+- Enforce strict input requirements
+
+- Understand how missing fields cause failures
+
+#### 🧠 Key Behavior
+
+- Requires customer_name, item, and quantity
+
+- Fails if any field is missing
+
+- Explicitly converts quantity to integer
+
+- Returns HTTP 400 for client errors
+
+#### ⚠️ Limitation
+
+- No default values
+
+- No CORS header on error
+
+- Not user-friendly for real APIs
+
+#### 💻 Code
+
+```
+import json
+import boto3
+import os
+
+sqs = boto3.client('sqs')
+QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+
+        message = {
+            "customer_name": body["customer_name"],
+            "item": body["item"],
+            "quantity": int(body["quantity"])
+        }
+
+        sqs.send_message(
+            QueueUrl=QUEUE_URL,
+            MessageBody=json.dumps(message)
+        )
+
+        return {
+            "statusCode": 202,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"message": "Order accepted"})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": str(e)})
+        }
+```        
+
+#### 🧪 Version 2 — Safer Defaults (Improved Usability Version)
+
+#### 📌 Purpose
+
+- Allow optional customer_name
+
+- Avoid breaking API if field is missing
+
+- Improve user experience
+
+#### 🧠 Key Behavior
+
+- Defaults customer_name to "Guest"
+
+- Keeps API functional even if field missing
+
+- Always returns CORS headers
+
+#### ⚠️ Limitation
+
+- Does NOT convert quantity to integer
+
+- Incorrect use of HTTP 500 for client errors
+
+- Still lacks full validation
+
+#### 💻 Code
+
+```
+import json
+import boto3
+import os
+
+sqs = boto3.client('sqs')
+QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+
+        order = {
+            "customer_name": body.get("customer_name", "Guest"),
+            "item": body["item"],
+            "quantity": body["quantity"]
+        }
+
+        sqs.send_message(
+            QueueUrl=QUEUE_URL,
+            MessageBody=json.dumps(order)
+        )
+
+        return {
+            "statusCode": 202,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"message": "Order accepted"})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
+#### ✅ Version 3 — Final Merged & Production-Ready (Recommended)
+
+#### 📌 Purpose
+
+- Combine strict validation + safe defaults
+
+- Follow real-world serverless best practices
+
+- Clean separation between API Lambda and Worker Lambda
+
+- Suitable for interviews, demos, and production labs
+
+#### 🧠 Key Improvements
+
+✔ Input validation
+
+✔ Default values
+
+✔ Type safety
+
+✔ Correct HTTP status codes
+
+✔ Proper CORS handling
+
+✔ Clean SQS message format
+
+#### 💻 Final Code (Recommended for This Lab)
+
+```
+import json
+import boto3
+import os
+
+sqs = boto3.client('sqs')
+QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+def lambda_handler(event, context):
+    try:
+        # Parse request body
+        body = json.loads(event.get('body', '{}'))
+
+        # Validate required fields
+        if "item" not in body or "quantity" not in body:
+            return {
+                "statusCode": 400,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Missing required fields: item, quantity"})
+            }
+
+        order = {
+            "customer_name": body.get("customer_name", "Guest"),
+            "item": body["item"],
+            "quantity": int(body["quantity"])
+        }
+
+        # Send message to SQS
+        sqs.send_message(
+            QueueUrl=QUEUE_URL,
+            MessageBody=json.dumps(order)
+        )
+
+        return {
+            "statusCode": 202,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({
+                "message": "Order accepted",
+                "order": order
+            })
+        }
+
+    except ValueError:
+        return {
+            "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": "Quantity must be a number"})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
+        }
+```
+#### 🧠 Learning Summary (Why This Matters)
+
+| Version | What You Learned             |
+| ------- | ---------------------------- |
+| v1      | Strict validation & failures |
+| v2      | Defaults & API safety        |
+| v3      | Real-world production design |
+
+
+> **API Lambda validates and enqueues.**
+> **Worker Lambda processes and writes to RDS.**
+
+**✅ This separation is core serverless architecture.**
+
+---
+
+
+
