@@ -107,15 +107,64 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
   * HTTP (80) → 0.0.0.0/0
 * Name tag: `CafeDevWebServer`
 
+#### ✅ EC2 USER DATA
 
+```
+#!/bin/bash
+# --------------------------------------------
+# EC2 User Data Script
+# Amazon Linux 2023
+# Installs LAMP Stack + MySQL Client
+# --------------------------------------------
+
+# 1️⃣ Update OS (MANDATORY FIRST)
+dnf update -y
+
+# 2️⃣ Install Apache (httpd)
+dnf install -y httpd
+systemctl enable httpd
+systemctl start httpd
+
+# 3️⃣ Install PHP + MySQL Support
+dnf install -y \
+php \
+php-mysqlnd \
+php-cli \
+php-common \
+php-mbstring \
+php-xml
+
+# 4️⃣ Fix Web Directory Permissions (MANDATORY)
+chown -R apache:apache /var/www
+chmod -R 755 /var/www
+
+# 5️⃣ Install MySQL Client (MariaDB)
+dnf install -y mariadb105
+
+# 6️⃣ Create a PHP Info Page (Optional Verification)
+echo "<?php phpinfo(); ?>" > /var/www/html/info.php
+
+# 7️⃣ Restart Apache to Apply PHP
+systemctl restart httpd
+
+# --------------------------------------------
+# END OF USER DATA
+# --------------------------------------------
+```
 
 ---
 ## PHASE 2 — Development and Delopment LAMP Server 
 
 ## 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
+```
+chmod 400 CafeDevKey.pem
+ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
+```
 
-[EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
+## 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+
+
 
 ---
 
