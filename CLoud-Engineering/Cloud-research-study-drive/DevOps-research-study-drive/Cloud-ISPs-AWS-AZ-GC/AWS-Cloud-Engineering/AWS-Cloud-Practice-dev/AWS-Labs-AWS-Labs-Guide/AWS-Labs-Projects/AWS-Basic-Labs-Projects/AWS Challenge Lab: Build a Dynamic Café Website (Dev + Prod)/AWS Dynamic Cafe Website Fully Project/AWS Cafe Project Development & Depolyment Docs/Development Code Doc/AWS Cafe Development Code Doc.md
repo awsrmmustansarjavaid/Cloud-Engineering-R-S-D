@@ -4,7 +4,104 @@
 
 ## PHASE 1 - Frontend Development Code
 
-### 1️⃣ Update EC2 PHP App to Use API Gateway
+### 1️⃣  — Create index.php (Landing Page)
+
+```
+sudo nano /var/www/html/index.php
+```
+
+#### 💻 Paste this clean landing page code:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe ☕</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 15px 40px;
+            background: #3b1f0e;
+            color: white;
+        }
+
+        header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .hero {
+            height: 420px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding-left: 60px;
+            color: white;
+        }
+
+        .hero-box {
+            background: rgba(0,0,0,0.55);
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 18px;
+            background: orange;
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .section {
+            padding: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG" alt="Coffee Logo">
+    <h2>Charlie Cafe</h2>
+</header>
+
+<section class="hero" style="background-image:url('S3_IMAGE_URL_HERE')">
+    <div class="hero-box">
+        <h1>Great Coffee For Some Joy</h1>
+        <p>Freshly brewed coffee, crafted with love.</p>
+        <a href="order.php" class="btn">Order Now</a>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Our Speciality</h2>
+    <p>Espresso • Americano • Cappuccino</p>
+</section>
+
+</body>
+</html>
+```
+
+**⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
+
+
+
+
+### 2️⃣ Update EC2 PHP App to Use API Gateway
 
 ```
 sudo nano /var/www/html/orders.php
