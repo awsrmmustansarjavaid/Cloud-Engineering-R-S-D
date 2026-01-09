@@ -96,23 +96,37 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 ### 4️⃣ Security Group and NACL
 
 
----
+### 5️⃣ EC2 Instance (Amazon Linux 2023)
 
-## 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
+* AMI: Amazon Linux 2023
+* Type: `t2.micro`
+* VPC/Subnet: Dev VPC + Public subnet
+* Security Group:
+
+  * SSH (22) → Your IP
+  * HTTP (80) → 0.0.0.0/0
+* Name tag: `CafeDevWebServer`
+
+
+
+---
+## PHASE 2 — Development and Delopment LAMP Server 
+
+## 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
 
 [EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
 
 ---
 
-## PHASE 2 — AWSCafeOrderProcessor
+## PHASE 3 — AWSCafeOrderProcessor
 
 
 [AMAZON RDS (Replace EC2 MariaDB)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeOrderProcessor.md)
 
 ---
 
-## PHASE 3 — AWSCafeOrderProcessor
+## PHASE 4 — AWSCafeOrderProcessor
 
 ---
 ## PHASE 5 — PRODUCTION (us‑west‑2)
