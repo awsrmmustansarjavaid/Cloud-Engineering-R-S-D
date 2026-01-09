@@ -850,6 +850,32 @@ def lambda_handler(event, context):
 
 - Matches real-world serverless architecture patterns
 
+❌ If even ONE key name differs → connection fails silently
+
+#### 6️⃣ Add DEBUG LOGS (TEMPORARY)
+
+Update your Lambda code temporarily:
+
+```
+print("DEBUG: Lambda invoked")
+print("DEBUG: Event =", event)
+
+secret = get_db_secret()
+print("DEBUG: Secret fetched")
+
+connection = pymysql.connect(
+    host=secret["host"],
+    user=secret["username"],
+    password=secret["password"],
+    database=secret["dbname"],
+    connect_timeout=5
+)
+
+print("DEBUG: RDS connected")
+```
+
+This lets us see exactly where it stops.
+
 ---
 
 
