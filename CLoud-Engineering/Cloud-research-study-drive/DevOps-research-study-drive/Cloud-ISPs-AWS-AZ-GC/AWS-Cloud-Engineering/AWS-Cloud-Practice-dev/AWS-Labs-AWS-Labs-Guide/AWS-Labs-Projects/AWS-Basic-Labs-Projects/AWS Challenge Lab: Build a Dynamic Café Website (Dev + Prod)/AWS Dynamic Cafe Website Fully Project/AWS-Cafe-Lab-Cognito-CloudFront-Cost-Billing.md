@@ -67,6 +67,8 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ---
 
+# 📢 SECTION 1 CAFE BASIC CONFIGURATIONS
+
 # PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
 ## 1️⃣ Create Development VPC (us‑east‑1)
@@ -74,22 +76,28 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 * VPC Name: `CafeDevVPC`
 * CIDR: `10.0.0.0/16`
 
-### Create Public Subnet
+### 1️⃣ Create Public Subnet
 
 * Name: `CafeDevPublicSubnet`
 * CIDR: `10.0.1.0/24`
 * Auto‑assign public IP: **Enabled**
 
-### Create TWO private subnets:
+### 2️⃣ Create TWO private subnets:
 
 - CafeDevPrivateSubnet1 → 10.0.2.0/24 (AZ-a)
 - CafeDevPrivateSubnet2 → 10.0.3.0/24 (AZ-b)
 
 
-### Internet Access
+### 3️⃣ Internet Access
 
 * Create Internet Gateway → Attach to VPC
 * Route table → Add route `0.0.0.0/0 → IGW`
+
+### 4️⃣ Security Group and NACL
+
+
+
+
 
 ---
 
@@ -99,29 +107,25 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 [EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
 
 
-# PHASE 3 — AMAZON RDS (Replace EC2 MariaDB)
+# PHASE 2 — AMAZON RDS (Replace EC2 MariaDB)
 
 
 [AMAZON RDS (Replace EC2 MariaDB)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20RDS.md)
 
-
-
 ---
 
-# PHASE 4 — SECRETS & SECURITY (BEST PRACTICE)
+# PHASE 3 — SECRETS & SECURITY (BEST PRACTICE)
 
 [SECRETS & SECURITY (BEST PRACTICE)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20Secrets%20Manager.md)
-
-
 ---
 
-# PHASE 6 — AUTOMATION Cafe-Order (SERVERLESS)
+# PHASE 4 — AUTOMATION Cafe-Order (SERVERLESS)
 
 [AUTOMATION Cafe-Order (SERVERLESS)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AUTOMATION%20Cafe-Order%20(SERVERLESS).md)
 
 ---
 
-# PHASE 8 — PRODUCTION (us‑west‑2)
+# PHASE 5 — PRODUCTION (us‑west‑2)
 
 ## Create AMI
 
@@ -137,18 +141,9 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 🚀 *Next Sections*: RDS, DynamoDB, SQS, WAF, CI/CD
 
-
-
-
-
 ---
 
-
-
-
-
-
-# PHASE 9 — AMAZON DYNAMODB (Menu + Cache Layer)
+# PHASE 6 — AMAZON DYNAMODB (Menu + Cache Layer)
 
 ## 🎯 Purpose of This Phase (IMPORTANT)
 
