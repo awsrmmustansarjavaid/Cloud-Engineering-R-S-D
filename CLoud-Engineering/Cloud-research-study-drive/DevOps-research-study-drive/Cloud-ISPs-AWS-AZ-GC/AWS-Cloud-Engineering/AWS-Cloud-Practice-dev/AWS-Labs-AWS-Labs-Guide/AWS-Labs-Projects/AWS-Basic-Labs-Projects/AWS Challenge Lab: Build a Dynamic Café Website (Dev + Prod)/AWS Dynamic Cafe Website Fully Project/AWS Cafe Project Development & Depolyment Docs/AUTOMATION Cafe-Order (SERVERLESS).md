@@ -428,3 +428,465 @@ sudo systemctl restart httpd
 ```
 
 
+
+### 3️⃣ Lambda Payload (IMPORTANT)
+
+##### Your Lambda must expect proxy format:
+
+```
+import json
+
+def lambda_handler(event, context):
+    body = json.loads(event["body"])
+
+    customer_name = body["customer_name"]
+    item = body["item"]
+    quantity = body["quantity"]
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps({"message": "Order saved"})
+    }
+```
+
+Save Lambda
+
+Click Deploy (top right)
+
+⚠️ If you don’t click Deploy → old code runs
+
+### 4️⃣ Test API Gateway
+
+#### Test via CURL
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
+```
+
+#### Expected result:
+
+```
+{
+  "message": "Order placed successfully"
+}
+```
+
+
+
+### 5️⃣ Test Lambda Directly (Console)
+
+- Check your Lambda CloudWatch logs to ensure the function executed correctly.
+
+- Verify new orders appear in your MariaDB database.
+
+- In Lambda → Test
+
+#### Test Event JSON:
+
+```
+{
+  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\":\"Order saved successfully\"}"
+}
+```
+
+### 6️⃣ Verify Database
+
+```
+mysql -u cafe_user -p cafe_db
+```
+
+or
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p
+```
+
+```
+use cafe_db;
+```
+
+```
+SELECT * FROM orders;
+```
+
+#### You should see:
+
+```
+EC2-Test | Latte | 1
+```
+
+---
+
+
+## 🌐 Configuration for Insert Data in EC2 MariaDB server
+
+### 1️⃣ Update EC2 PHP App to Use API Gateway
+
+#### In your `index.php`:
+
+You can copy-paste this entire file safely 👇
+
+```
+sudo nano /var/www/html/index.php
+```
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Café</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #219150;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 30px;
+            background-color: #ecf0f1;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>☕ AWS Café</h1>
+    <p>Welcome to our cloud-powered café</p>
+</header>
+
+<div class="container">
+    <h2>Place Your Order</h2>
+
+    <form method="POST">
+        <label>Customer Name</label>
+        <input type="text" name="name" required>
+
+        <label>Select Item</label>
+        <select name="item">
+            <option value="Coffee">Coffee</option>
+            <option value="Tea">Tea</option>
+            <option value="Latte">Latte</option>
+            <option value="Cappuccino">Cappuccino</option>
+        </select>
+
+        <label>Quantity</label>
+        <input type="number" name="quantity" min="1" value="1">
+
+        <button type="submit">Place Order</button>
+    </form>
+
+    <?php
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+    $payload = json_encode([
+        "customer_name" => $_POST['name'],
+        "item" => $_POST['item'],
+        "quantity" => (int)$_POST['quantity']
+    ]);
+
+    $ch = curl_init($apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Content-Type: application/json"
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+
+    $response = curl_exec($ch);
+
+    if ($response === false) {
+        echo "<p style='color:red'>❌ CURL Error: " . curl_error($ch) . "</p>";
+    } else {
+        echo "<p style='color:green'>✅ Order sent successfully</p>";
+        echo "<pre>$response</pre>";
+    }
+
+    curl_close($ch);
+}
+?>
+
+</div>
+
+<footer>
+    <p>© 2025 AWS Café | Serverless Backend</p>
+</footer>
+
+</body>
+</html>
+```
+### 2️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+### 3️⃣ Lambda Payload Code (INSERT INTO MariaDB)
+
+Paste THIS EXACT CODE ⬇️
+
+
+```
+import json
+import pymysql
+import boto3
+
+def get_db_secret():
+    client = boto3.client('secretsmanager')
+    response = client.get_secret_value(SecretId='CafeDevDBSM')
+    return json.loads(response['SecretString'])
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+
+        customer_name = body['customer_name']
+        item = body['item']
+        quantity = int(body['quantity'])
+
+        secret = get_db_secret()
+
+        connection = pymysql.connect(
+            host=secret['host'],
+            user=secret['username'],
+            password=secret['password'],
+            database=secret['dbname'],
+            connect_timeout=5
+        )
+
+        with connection.cursor() as cursor:
+            sql = """
+                INSERT INTO orders (customer_name, item, quantity)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(sql, (customer_name, item, quantity))
+            connection.commit()
+
+        connection.close()
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"message": "Order saved successfully"})
+        }
+
+    except Exception as e:
+        print("ERROR:", str(e))
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
+Save Lambda
+
+Click Deploy (top right)
+
+⚠️ If you don’t click Deploy → old code runs
+
+### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - VPC → same as EC2
+
+    - Subnets → PRIVATE subnets (important)
+
+    - Security Group → Lambda SG
+
+    - Save
+
+⏳ Wait until Lambda status = Active
+
+
+### 5️⃣ Create VPC Endpoint
+
+- AWS Console → VPC → Endpoints → Create endpoint
+
+- Service category : AWS services
+
+- Service name : com.amazonaws.us-east-1.secretsmanager
+
+- Type : Interface
+
+- VPC : Select VPC 
+
+- Subnets :
+
+✔ Select the SAME private subnets used by Lambda
+
+- Security Group :
+
+Allow HTTPS (443) inbound from Lambda SG
+
+Create endpoint ✅
+
+
+### 5️⃣ Test API Gateway
+
+#### Test via CURL
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
+```
+
+#### Expected result:
+
+```
+{
+  "message": "Order placed successfully"
+}
+```
+
+
+
+### 6️⃣ Test Lambda Directly (Console)
+
+- Check your Lambda CloudWatch logs to ensure the function executed correctly.
+
+- Verify new orders appear in your MariaDB database.
+
+- In Lambda → Test
+
+#### Test Event JSON:
+
+```
+{
+  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\":\"Order saved successfully\"}"
+}
+```
+
+### 7️⃣ Verify Database
+
+```
+mysql -u cafe_user -p cafe_db
+```
+
+or
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p
+```
+
+```
+use cafe_db;
+```
+
+
+```
+SELECT * FROM orders;
+```
+
+#### You should see:
+
+```
+EC2-Test | Latte | 1
+```
+
+
+---
+
+# PHASE 7 — TESTING & VERIFICATION
+
+## Lambda Test
+
+```json
+{
+ "body": "{\"name\":\"Test\",\"item\":\"Coffee\",\"quantity\":1}"
+}
+```
+
+## DB Verify
+
+```sql
+SELECT * FROM orders ORDER BY id DESC;
+```
+
