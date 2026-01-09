@@ -259,7 +259,7 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 
 # PHASE 5 — Frontend Development Code
 
-##  Modify index.php (Automation)
+##  Modify orders.php (Automation)
 
 * Remove direct DB insert
 * Send POST JSON to API Gateway
@@ -269,10 +269,10 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 ### 1️⃣ Update EC2 PHP App to Use API Gateway
 
 ```
-sudo nano /var/www/html/index.php
+sudo nano /var/www/html/orders.php
 ```
 
-#### In your `index.php`:
+#### In your `orders.php`:
 
 You can copy-paste this entire file safely 👇
 
@@ -297,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ```
 
-#### FULL UPDATED index.php (FINAL VERSION)
+#### FULL UPDATED orders.php (FINAL VERSION)
 
 ```
 <!DOCTYPE html>
