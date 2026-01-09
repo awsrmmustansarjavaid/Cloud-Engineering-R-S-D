@@ -103,25 +103,18 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 [EC2 Instance (Amazon Linux 2023)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/EC2%20Instance%20(Amazon%20Linux%202023).md)
 
+---
 
-## PHASE 2 — AMAZON RDS (Replace EC2 MariaDB)
+## PHASE 2 — AWSCafeOrderProcessor
 
 
-[AMAZON RDS (Replace EC2 MariaDB)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20RDS.md)
+[AMAZON RDS (Replace EC2 MariaDB)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeOrderProcessor.md)
 
 ---
 
-## PHASE 3 — SECRETS & SECURITY (BEST PRACTICE)
-
-[SECRETS & SECURITY (BEST PRACTICE)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20Secrets%20Manager.md)
----
-
-## PHASE 4 — AUTOMATION Cafe-Order (SERVERLESS)
-
-[AUTOMATION Cafe-Order (SERVERLESS)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AUTOMATION%20Cafe-Order%20(SERVERLESS).md)
+## PHASE 3 — AWSCafeOrderProcessor
 
 ---
-
 ## PHASE 5 — PRODUCTION (us‑west‑2)
 
 ## Create AMI
