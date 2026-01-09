@@ -325,93 +325,199 @@ mysqlnd
 
 ### 3️⃣ Frontend Development
 
-### 1️⃣  — Create index.php (Landing Page)
+### 1️⃣  ✅ Full Responsive Bootstrap Landing Page (index.php)
 
 ```
 sudo nano /var/www/html/index.php
 ```
-
 #### 💻 Paste this clean landing page code:
+
+
 
 ```
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Charlie Cafe ☕</title>
+    <title>Charlie Cafe ☕ | Fresh Drinks & Coffee</title>
+
+    <!-- Favicon -->
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
     <style>
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
         }
 
-        header {
-            display: flex;
-            align-items: center;
-            padding: 15px 40px;
-            background: #3b1f0e;
-            color: white;
+        /* Navbar */
+        .navbar {
+            background-color: #3b1f0e;
         }
 
-        header img {
-            height: 40px;
-            margin-right: 10px;
+        .navbar-brand {
+            font-weight: 600;
+            color: #fff !important;
         }
 
+        /* Hero Section */
         .hero {
-            height: 420px;
+            background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)),
+                        url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
             background-size: cover;
             background-position: center;
+            height: 90vh;
             display: flex;
             align-items: center;
-            padding-left: 60px;
             color: white;
         }
 
-        .hero-box {
-            background: rgba(0,0,0,0.55);
-            padding: 25px;
-            border-radius: 10px;
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 600;
         }
 
-        .btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 18px;
-            background: orange;
-            color: black;
-            text-decoration: none;
-            border-radius: 5px;
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
         }
 
-        .section {
+        /* Buttons */
+        .btn-order {
+            background-color: #ff9800;
+            color: #000;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+
+        .btn-order:hover {
+            background-color: #e68900;
+            color: #000;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        /* Cards */
+        .menu-card {
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+        }
+
+        /* Order Box */
+        .order-box {
+            background: #3b1f0e;
+            color: white;
             padding: 40px;
-            text-align: center;
+            border-radius: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #3b1f0e;
+            color: #fff;
+            padding: 15px 0;
         }
     </style>
 </head>
 
 <body>
 
-<header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG" alt="Coffee Logo">
-    <h2>Charlie Cafe</h2>
-</header>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            ☕ Charlie Cafe
+        </a>
+    </div>
+</nav>
 
-<section class="hero" style="background-image:url('S3_IMAGE_URL_HERE')">
-    <div class="hero-box">
-        <h1>Great Coffee For Some Joy</h1>
-        <p>Freshly brewed coffee, crafted with love.</p>
-        <a href="order.php" class="btn">Order Now</a>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container text-center">
+        <h1>Fresh Drinks & Perfect Coffee</h1>
+        <p>Enjoy premium coffee, tea & fresh fruit juices crafted with love</p>
+        <a href="orders.php" class="btn btn-order">Order Now</a>
     </div>
 </section>
 
-<section class="section">
-    <h2>Our Speciality</h2>
-    <p>Espresso • Americano • Cappuccino</p>
+<!-- Menu Section -->
+<section class="container py-5">
+    <h2 class="text-center section-title">Our Special Menu</h2>
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card menu-card shadow">
+                <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Coffee</h5>
+                    <p>Espresso, Cappuccino, Latte, Americano</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card menu-card shadow">
+                <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Tea</h5>
+                    <p>Green Tea, Black Tea, Masala Chai</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card menu-card shadow">
+                <img src="https://images.unsplash.com/photo-1571687949920-b3e5a2e8f6ae" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Fresh Juice</h5>
+                    <p>Orange, Mango, Apple, Mixed Fruits</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </section>
+
+<!-- Order Box -->
+<section class="container my-5">
+    <div class="order-box text-center">
+        <h2>Order Your Favorite Drink Now ☕🥤</h2>
+        <p class="mt-3">Fast • Fresh • Delicious</p>
+        <a href="orders.php" class="btn btn-order mt-3">Go to Order Page</a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="text-center">
+    <p class="mb-0">© 2026 Charlie Cafe | Fresh Drinks Everyday</p>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS -->
+<script>
+    // Simple welcome message (optional)
+    console.log("Welcome to Charlie Cafe ☕");
+</script>
 
 </body>
 </html>
