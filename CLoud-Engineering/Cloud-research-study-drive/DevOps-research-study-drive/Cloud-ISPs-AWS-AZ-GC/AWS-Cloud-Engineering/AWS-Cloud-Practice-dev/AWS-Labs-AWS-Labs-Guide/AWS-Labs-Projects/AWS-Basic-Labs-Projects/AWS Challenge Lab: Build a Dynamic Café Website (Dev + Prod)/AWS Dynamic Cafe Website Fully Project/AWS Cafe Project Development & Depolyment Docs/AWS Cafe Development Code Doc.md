@@ -626,5 +626,231 @@ def lambda_handler(event, context):
 
 ---
 
+### 4️⃣ Lambda Code — AUTOMATION SQS (Async Order Processing) Worker Lambda (Consumer)
+
+#### 📄 CafeOrderWorker Lambda Codes
+
+> **We have two versions of the Worker Lambda. Both process orders from SQS and insert them into RDS + DynamoDB, but there are subtle differences in production safety and error handling.**
+
+#### 1️⃣ Worker Lambda — Full Example (Original)
+
+#### Purpose:
+
+This is the first full example of a Lambda function that consumes messages from SQS, inserts them into RDS, and updates DynamoDB. Good for learning and initial testing, but not fully safe for production.
+
+#### Pros:
+
+- Simple, clear structure
+
+- Easy to understand for beginners
+
+- Works for initial testing
+
+#### Cons / Risks:
+
+- Does not raise errors to SQS on failure → messages may be lost silently
+
+- No extra logging for debugging production issues
+
+- Short DB timeout (5s) may fail in real-life high-latency situations
+
+#### 💻 Code:
+
+```
+import json
+import boto3
+import pymysql
+from decimal import Decimal
+
+# ---------- AWS CLIENTS ----------
+secrets_client = boto3.client('secretsmanager')
+dynamodb = boto3.resource('dynamodb')
+
+# ---------- CONSTANTS ----------
+SECRET_NAME = "CafeDevDBSM"
+DYNAMODB_TABLE = "CafeMenu"
+
+# ---------- GET DB CREDS ----------
+def get_db_secret():
+    response = secrets_client.get_secret_value(
+        SecretId=SECRET_NAME
+    )
+    return json.loads(response["SecretString"])
+
+# ---------- LAMBDA HANDLER ----------
+def lambda_handler(event, context):
+
+    secret = get_db_secret()
+
+    connection = pymysql.connect(
+        host=secret["host"],
+        user=secret["username"],
+        password=secret["password"],
+        database=secret["dbname"],
+        connect_timeout=5
+    )
+
+    table = dynamodb.Table(DYNAMODB_TABLE)
+
+    try:
+        with connection.cursor() as cursor:
+
+            for record in event["Records"]:
+
+                order = json.loads(record["body"])
+
+                customer_name = order["customer_name"]
+                item = order["item"]
+                quantity = int(order["quantity"])
+
+                # ---------- INSERT INTO RDS ----------
+                sql = """
+                    INSERT INTO orders (customer_name, item, quantity)
+                    VALUES (%s, %s, %s)
+                """
+                cursor.execute(sql, (customer_name, item, quantity))
+                connection.commit()
+
+                # ---------- UPDATE DYNAMODB CACHE ----------
+                table.update_item(
+                    Key={"item": item},
+                    UpdateExpression="ADD orders :inc",
+                    ExpressionAttributeValues={
+                        ":inc": Decimal(quantity)
+                    }
+                )
+
+                print(f"✅ Order processed: {order}")
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"message": "Orders processed successfully"})
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+```
+
+#### 2️⃣ Worker Lambda — Fixed / Production Safe (Recommended)
+
+#### Purpose:
+
+This is the improved “production-safe” version. Handles errors properly, has better debug logging, and uses a slightly longer DB timeout. Recommended for real SQS-triggered environments.
+
+#### Pros:
+
+- Production-ready: raises exception to SQS → prevents message loss
+
+- Better logging for troubleshooting
+
+- Slightly longer DB timeout (10s) → more reliable
+
+- Safe for automatic SQS polling
+
+#### Cons:
+
+- Slightly more verbose (prints, exception raising)
+
+- Beginners may find it slightly harder to read
+
+#### 💻 Code:
+
+```
+import json
+import boto3
+import pymysql
+from decimal import Decimal
+
+# ---------- AWS CLIENTS ----------
+secrets_client = boto3.client('secretsmanager')
+dynamodb = boto3.resource('dynamodb')
+
+# ---------- CONSTANTS ----------
+SECRET_NAME = "CafeDevDBSM"
+DYNAMODB_TABLE = "CafeMenu"
+
+# ---------- GET DB CREDS ----------
+def get_db_secret():
+    print("Fetching DB secret...")
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+# ---------- LAMBDA HANDLER ----------
+def lambda_handler(event, context):
+
+    print("Lambda triggered by SQS")
+    print("Event:", event)
+
+    secret = get_db_secret()
+
+    connection = pymysql.connect(
+        host=secret["host"],
+        user=secret["username"],
+        password=secret["password"],
+        database=secret["dbname"],
+        connect_timeout=10
+    )
+
+    table = dynamodb.Table(DYNAMODB_TABLE)
+
+    try:
+        with connection.cursor() as cursor:
+            for record in event["Records"]:
+                order = json.loads(record["body"])
+
+                customer_name = order["customer_name"]
+                item = order["item"]
+                quantity = int(order["quantity"])
+
+                # ---------- INSERT INTO RDS ----------
+                cursor.execute(
+                    "INSERT INTO orders (customer_name, item, quantity) VALUES (%s, %s, %s)",
+                    (customer_name, item, quantity)
+                )
+                connection.commit()
+
+                # ---------- UPDATE DYNAMODB ----------
+                table.update_item(
+                    Key={"item": item},
+                    UpdateExpression="ADD orders :inc",
+                    ExpressionAttributeValues={":inc": Decimal(quantity)}
+                )
+
+                print("✅ Order processed:", order)
+
+        return {"statusCode": 200}
+
+    except Exception as e:
+        print("❌ FATAL ERROR:", str(e))
+        raise e   # 🚨 REQUIRED FOR SQS RETRY
+```
+
+#### 🔑 Key Differences Between Both Versions
+
+| Feature                     | Original Full Example                                 | Fixed / Production Safe                           |
+| --------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
+| Error Handling              | Prints error only, returns 200 → messages may be lost | Raises exception → SQS will retry failed messages |
+| Logging                     | Basic                                                 | Extensive, shows SQS event, debug messages        |
+| DB Timeout                  | 5 seconds                                             | 10 seconds (safer in production)                  |
+| Recommended for Production? | ❌ Only for testing                                    | ✅ Best practice                                   |
+| Safety with SQS             | Not safe                                              | Safe, retries on failure                          |
+| Developer Understanding     | Easy to read                                          | Slightly more complex but safer                   |
+
+#### 💡 Recommendation for this Lab
+
+- Use the Fixed / Production Safe Lambda for CafeOrderWorker.
+
+- Keep the Original version only as a learning reference.
+
+#### Reason:
+
+- Automatic retries from SQS prevent data loss
+
+- Full visibility in CloudWatch logs for debugging
+
+- Matches real-world serverless architecture patterns
+
+---
+
 
 
