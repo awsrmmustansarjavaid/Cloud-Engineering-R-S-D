@@ -149,6 +149,10 @@ echo "<?php phpinfo(); ?>" > /var/www/html/info.php
 # 7️⃣ Restart Apache to Apply PHP
 systemctl restart httpd
 
+# 8️⃣ Install AWS CLI
+sudo dnf install -y awscli
+
+
 # --------------------------------------------
 # END OF USER DATA
 # --------------------------------------------
