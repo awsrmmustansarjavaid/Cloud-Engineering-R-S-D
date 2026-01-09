@@ -335,6 +335,8 @@ sudo chmod +x lamp-verify.sh
 sudo ./lamp-verify.sh
 ```
 
+
+
 ### 1️⃣ Method 2 – Manual Step-by-Step Testing (One by One)
 
 ### 1️⃣ Apache Test
@@ -693,8 +695,14 @@ sudo nano /var/www/html/index.php
 
 **⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
 
+### 4️⃣ Restart Apache (MANDATORY)
 
-### 4️⃣ Upload Images to S3 
+```
+sudo systemctl restart httpd
+```
+
+
+### 5️⃣ Upload Images to S3 
 
 
 ### 1️⃣ Create S3 Bucket
@@ -724,7 +732,7 @@ Click **Create bucket**
 
 ✔️ Acknowledge
 
-### 5️⃣ Upload Images to S3 
+### 6️⃣ Upload Images to S3 
 
 #### 1️⃣ Upload Images
 
@@ -742,7 +750,7 @@ latte.jpg
 
 - Actions → Make public
 
-### 6️⃣ Link S3 Images to index.php
+### 7️⃣ Link S3 Images to index.php
 
 #### Copy S3 Object URL:
 
@@ -760,7 +768,7 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 ✅ No API involved
 
-### 6️⃣ 🧪 VERIFICATION 2 (MANDATORY)
+### 8️⃣ 🧪 VERIFICATION 2 (MANDATORY)
 
 #### 1️⃣ Test Landing Page
 
@@ -777,9 +785,6 @@ http://<EC2_PUBLIC_IP>/
 ✔️ Hero image loads from S3
 
 ✔️ “Order Now” button works
-
-
-
 
 
 
