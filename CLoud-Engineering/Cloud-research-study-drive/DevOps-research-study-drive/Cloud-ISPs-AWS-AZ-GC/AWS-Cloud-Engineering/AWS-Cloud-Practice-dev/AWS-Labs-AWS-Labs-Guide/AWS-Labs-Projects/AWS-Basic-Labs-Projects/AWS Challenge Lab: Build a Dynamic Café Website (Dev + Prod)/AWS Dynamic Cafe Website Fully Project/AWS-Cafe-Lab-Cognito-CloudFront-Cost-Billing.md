@@ -135,41 +135,17 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ---
 
-## Common Issues & Troubleshooting
-
-
-| Issue                              | Solution                                                                |
-| ---------------------------------- | ----------------------------------------------------------------------- |
-| CORS error in browser              | Ensure CORS is enabled for `/orders` with POST method                   |
-| 403 Forbidden / Lambda not invoked | Check Lambda permissions (API Gateway needs `lambda:InvokeFunction`)    |
-| 500 Internal Server Error          | Check Lambda CloudWatch logs for errors, confirm secrets are accessible |
-| Orders not saving                  | Verify DB credentials in Secrets Manager and Lambda function            |
+🚀 *Next Sections*: RDS, DynamoDB, SQS, WAF, CI/CD
 
 
 
 
-## ✅ FINAL CHECKLIST
-
-* [ ] Dev works
-* [ ] Secrets secure
-* [ ] Lambda inserts orders
-* [ ] API Gateway reachable
-* [ ] Prod mirrors Dev
 
 ---
 
-## 🏁 RESULT
 
-You now have a **real AWS production architecture** with:
 
-✔ Secure credentials
-✔ Automation
-✔ Multi‑region deployment
-✔ Exam‑ready design
 
----
-
-🚀 *Next upgrades*: RDS, DynamoDB, SQS, WAF, CI/CD
 
 
 # PHASE 9 — AMAZON DYNAMODB (Menu + Cache Layer)
@@ -2995,11 +2971,30 @@ Expected: 200 OK
 
 ---
 
+## AWS Cafe Common Issues & Troubleshooting
+
+[AWS Cafe Common Issues & Troubleshooting](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20Cafe%20Common%20Issues%20%26%20Troubleshooting.md)
+
+---
+
 # 🏁 FINAL RESULT
 
+You now have a **real AWS production architecture** with:
+
+✔ Secure credentials
+
+✔ Automation
+
+✔ Multi‑region deployment
+
+✔ Exam‑ready design
+
 ✔ Authenticated users only  
-✔ Cached & accelerated API  
+
+✔ Cached & accelerated API 
+
 ✔ Protected costs  
+
 ✔ Billing alerts active  
 
 ---
