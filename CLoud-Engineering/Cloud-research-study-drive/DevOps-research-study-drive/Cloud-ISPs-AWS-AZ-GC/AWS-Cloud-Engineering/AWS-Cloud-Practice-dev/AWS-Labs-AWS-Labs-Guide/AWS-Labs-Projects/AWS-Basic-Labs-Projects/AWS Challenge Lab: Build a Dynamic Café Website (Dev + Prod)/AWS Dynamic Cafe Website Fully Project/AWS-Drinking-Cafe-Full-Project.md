@@ -614,17 +614,16 @@ http://<EC2_PUBLIC_IP>/
 
 ---
 
-## PHASE 3 — AWSCafeOrderProcessor
+# 📢 SECTION 2 — AWSCafeOrderProcessor
 
 
 [AMAZON RDS (Replace EC2 MariaDB)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeOrderProcessor.md)
 
 ---
 
-## PHASE 4 — AWSCafeOrderProcessor
+# 📢 SECTION 3 — AWS Cafe PRODUCTION
 
----
-## PHASE 5 — PRODUCTION (us‑west‑2)
+## PHASE 1 — PRODUCTION (us‑west‑2)
 
 ## Create AMI
 
@@ -642,7 +641,9 @@ http://<EC2_PUBLIC_IP>/
 
 ---
 
-## PHASE 6 — AMAZON DYNAMODB (Menu + Cache Layer)
+# 📢 SECTION 4 — AWS Cafe Menu + Cache Layer
+
+## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
 
 ## 🎯 Purpose of This Phase (IMPORTANT)
 
@@ -1011,14 +1012,16 @@ def lambda_handler(event, context):
 
 ---
 
-# 🔒 SECTION 4 — AWS CAFE SQS (Async Order Processing)
+# 📢 SECTION 5 — AWS CAFE SQS (Async Order Processing)
+
+
 
 [AWS CAFE SQS (Async Order Processing)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20CAFE%20SQS%20(Async%20Order%20Processing).md)
 
 
 
 ---
-# 🔒 SECTION 5 — ORDER STATUS DASHBOARD
+# 📢 SECTION 6 — ORDER STATUS DASHBOARD
 
 [AWS CAFE ORDER STATUS DASHBOARD](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeORDERSTATUSDASHBOARD.md)
 
@@ -1027,7 +1030,7 @@ def lambda_handler(event, context):
 
 
 ---
-# 🔒 SECTION 6 — AWS CAFE SECURITY
+# 📢 SECTION 7 — AWS CAFE SECURITY
 
 
 [AWS CAFE SECURITY](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCAFESECURITY.md)
@@ -1035,7 +1038,7 @@ def lambda_handler(event, context):
 
 ---
 
-# 🔒 SECTION 7 — AWS CAFE CI/CD (CodePipeline)
+# 📢 SECTION 8 — AWS CAFE CI/CD (CodePipeline)
 
 [AWS CAFE CI/CD (CodePipeline)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
 
@@ -1043,7 +1046,7 @@ def lambda_handler(event, context):
 
 ---
 
-# PHASE 13 — TESTING
+# 📢 SECTION 9 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
@@ -1074,7 +1077,7 @@ curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
 
 ---
 
-# PHASE 14 — AMAZON COGNITO (AUTHENTICATION)
+# 📢 SECTION 10 — AMAZON COGNITO (AUTHENTICATION)
 
 ## 1️⃣ Create Cognito User Pool
 
@@ -1162,7 +1165,7 @@ Actions → Deploy API → Stage: dev
 
 ---
 
-# PHASE 15 — CLOUDFRONT + CACHING
+# 📢 SECTION 11 — CLOUDFRONT + CACHING
 
 ## 1️⃣ Create CloudFront Distribution
 
@@ -1209,7 +1212,7 @@ For GET /menu:
 
 ---
 
-# PHASE 16 — COST OPTIMIZATION
+# 📢 SECTION 12 — COST OPTIMIZATION
 
 ## 1️⃣ EC2 Cost Optimization
 - Instance type: t3.micro
@@ -1236,7 +1239,7 @@ For GET /menu:
 
 ---
 
-# PHASE 17 — BILLING ALERTS & BUDGETS
+# 📢 SECTION 13 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -1276,7 +1279,7 @@ Create alarm
 
 ---
 
-# PHASE 18 — TESTING
+# 📢 SECTION 14 — TESTING
 
 ## Cognito Test
 - Sign up user
