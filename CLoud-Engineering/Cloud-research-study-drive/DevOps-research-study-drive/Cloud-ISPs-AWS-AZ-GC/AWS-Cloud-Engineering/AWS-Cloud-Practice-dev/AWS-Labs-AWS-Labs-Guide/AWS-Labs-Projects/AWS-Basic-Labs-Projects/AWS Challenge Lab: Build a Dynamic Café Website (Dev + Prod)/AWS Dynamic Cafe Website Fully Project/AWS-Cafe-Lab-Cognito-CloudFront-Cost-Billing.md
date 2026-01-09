@@ -155,14 +155,14 @@ systemctl restart httpd
 ---
 ## PHASE 2 — Development and Delopment LAMP Server 
 
-## 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
+### 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
 ```
 chmod 400 CafeDevKey.pem
 ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ```
 
-## 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
 
 
