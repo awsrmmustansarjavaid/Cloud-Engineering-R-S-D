@@ -71,9 +71,9 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 
 
-# PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
+## PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
-## 1️⃣ Create Development VPC (us‑east‑1)
+### 1️⃣ Create Development VPC (us‑east‑1)
 
 * VPC Name: `CafeDevVPC`
 * CIDR: `10.0.0.0/16`
@@ -155,16 +155,16 @@ systemctl restart httpd
 ```
 
 ---
-# PHASE 2 — Development and Delopment LAMP Server 
+## PHASE 2 — Development and Delopment LAMP Server 
 
-## 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
+### 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
 ```
 chmod 400 CafeDevKey.pem
 ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ```
 
-## 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
 ### 1️⃣ Apache Test
 
@@ -322,6 +322,192 @@ php -m | grep mysql
 ```
 mysqlnd
 ```
+
+### 3️⃣ Frontend Development
+
+### 1️⃣  — Create index.php (Landing Page)
+
+```
+sudo nano /var/www/html/index.php
+```
+
+#### 💻 Paste this clean landing page code:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe ☕</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 15px 40px;
+            background: #3b1f0e;
+            color: white;
+        }
+
+        header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .hero {
+            height: 420px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding-left: 60px;
+            color: white;
+        }
+
+        .hero-box {
+            background: rgba(0,0,0,0.55);
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 18px;
+            background: orange;
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .section {
+            padding: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG" alt="Coffee Logo">
+    <h2>Charlie Cafe</h2>
+</header>
+
+<section class="hero" style="background-image:url('S3_IMAGE_URL_HERE')">
+    <div class="hero-box">
+        <h1>Great Coffee For Some Joy</h1>
+        <p>Freshly brewed coffee, crafted with love.</p>
+        <a href="order.php" class="btn">Order Now</a>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Our Speciality</h2>
+    <p>Espresso • Americano • Cappuccino</p>
+</section>
+
+</body>
+</html>
+```
+
+**⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
+
+
+### 4️⃣ Upload Images to S3 
+
+
+### 1️⃣ Create S3 Bucket
+
+- AWS Console → Search S3
+
+- Click Create bucket
+
+#### Bucket Configuration :
+
+
+| Setting             | Value                            |
+| ------------------- | -------------------------------- |
+| Bucket name         | `mn-cafe-s3-bucket` |
+| Region              | `us-east-1` (same as Lambda)     |
+| Object ownership    | ACLs disabled                    |
+| Block public access | ✅ Enabled (KEEP ON)             |
+
+
+Click **Create bucket**
+
+#### ✅ Bucket created
+
+#### 📣 Disable “Block Public Access”
+
+✔️ Uncheck all
+
+✔️ Acknowledge
+
+### 5️⃣ Upload Images to S3 
+
+#### 1️⃣ Upload Images
+
+Example:
+
+```
+hero.jpg
+espresso.jpg
+latte.jpg
+```
+
+#### 2️⃣ Make Images Public
+
+- Select image
+
+- Actions → Make public
+
+### 6️⃣ Link S3 Images to index.php
+
+#### Copy S3 Object URL:
+
+```
+https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
+```
+
+#### Replace in index.php:
+
+```
+<section class="hero" style="background-image:url('https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg')">
+```
+
+✅ No backend impact
+
+✅ No API involved
+
+### 6️⃣ 🧪 VERIFICATION 2 (MANDATORY)
+
+#### 1️⃣ Test Landing Page
+
+```
+http://<EC2_PUBLIC_IP>/
+```
+
+#### ☑️ Confirm:
+
+✔️ Logo visible
+
+✔️ “Charlie Cafe” title visible
+
+✔️ Hero image loads from S3
+
+✔️ “Order Now” button works
+
+
+
+
+
 
 ---
 
@@ -2836,6 +3022,7 @@ You now have a **real AWS production architecture** with:
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
+
 
 
 
