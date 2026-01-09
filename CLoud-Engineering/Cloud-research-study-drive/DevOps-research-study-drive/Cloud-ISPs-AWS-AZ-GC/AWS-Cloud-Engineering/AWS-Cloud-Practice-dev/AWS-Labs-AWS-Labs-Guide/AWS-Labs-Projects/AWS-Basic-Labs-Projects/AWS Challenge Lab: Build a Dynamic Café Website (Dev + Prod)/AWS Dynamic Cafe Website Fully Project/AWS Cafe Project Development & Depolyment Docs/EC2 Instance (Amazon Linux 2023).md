@@ -1,13 +1,6 @@
 # 🌐 Launch EC2 Instance (Amazon Linux 2023)
 
-* AMI: Amazon Linux 2023
-* Type: `t2.micro`
-* VPC/Subnet: Dev VPC + Public subnet
-* Security Group:
 
-  * SSH (22) → Your IP
-  * HTTP (80) → 0.0.0.0/0
-* Name tag: `CafeDevWebServer`
 
 ### ✅ EC2 USER DATA — LAMP + MySQL CLIENT (Amazon Linux 2023) 
 
@@ -409,3 +402,4 @@ sudo systemctl restart httpd
 ```
 
 ---
+
