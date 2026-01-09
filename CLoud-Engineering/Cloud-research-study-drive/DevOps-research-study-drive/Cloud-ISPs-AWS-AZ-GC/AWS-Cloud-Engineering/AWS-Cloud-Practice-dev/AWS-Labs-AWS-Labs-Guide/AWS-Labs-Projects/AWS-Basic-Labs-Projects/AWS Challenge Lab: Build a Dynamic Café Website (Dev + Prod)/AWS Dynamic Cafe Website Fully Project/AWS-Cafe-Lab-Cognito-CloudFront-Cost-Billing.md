@@ -69,7 +69,9 @@ EC2 (Web UI) → API Gateway (NO direct DB access)
 
 # 📢 SECTION 1 CAFE BASIC CONFIGURATIONS
 
-## PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
+
+
+# PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
 ## 1️⃣ Create Development VPC (us‑east‑1)
 
@@ -153,18 +155,173 @@ systemctl restart httpd
 ```
 
 ---
-## PHASE 2 — Development and Delopment LAMP Server 
+# PHASE 2 — Development and Delopment LAMP Server 
 
-### 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
+## 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
 ```
 chmod 400 CafeDevKey.pem
 ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ```
 
-### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+## 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
+### 1️⃣ Apache Test
 
+#### Open browser:
+
+```
+http://<EC2-PUBLIC-IP>/
+```
+
+#### You should see:
+
+```
+It works!
+```
+
+### 2️⃣ PHP Test
+
+#### Open:
+
+```
+http://<EC2-PUBLIC-IP>/info.php
+```
+
+#### You should see:
+
+- PHP version
+
+- mysqlnd enabled
+
+### 3️⃣ MySQL Client Test (SSH)
+
+```
+mysql --version
+```
+
+### 4️⃣ VERIFY APACHE (httpd) (CLI)
+
+#### 1️⃣ Check Apache Service Status
+
+```
+sudo systemctl status httpd
+```
+
+#### ✅ Expected:
+
+```
+Active: active (running)
+```
+
+#### 2️⃣ Verify Apache Version
+
+```
+httpd -v
+```
+
+#### ✅ Expected:
+
+```
+Server version: Apache/2.4.xx (Amazon Linux)
+```
+
+#### 3️⃣ Test Apache Locally (CLI)
+
+```
+curl http://localhost
+```
+
+#### ✅ Expected:
+
+```
+It works!
+```
+
+⚠️ If not installed correctly, you’ll get connection refused.
+
+### 5️⃣ VERIFY PHP (CLI)
+
+#### 1️⃣ Check PHP Version
+
+```
+php -v
+```
+
+#### ✅ Expected:
+
+```
+PHP 8.x.x (cli)
+```
+
+#### 2️⃣ Create PHP Test File (CLI)
+
+```
+sudo nano /var/www/html/test.php
+```
+
+##### Paste:
+
+```
+<?php
+echo "PHP is working";
+phpinfo();
+?>
+```
+
+**Save and exit.**
+
+#### 3️⃣ Test PHP via Apache (LOCAL)
+
+```
+curl http://localhost/test.php
+```
+
+#### ✅ Expected:
+
+- Text: PHP is working
+
+- PHP info output (HTML text)
+
+**This confirms:**
+
+✔ Apache → PHP module works
+
+✔ PHP interpreter works
+
+### 6️⃣ VERIFY FILE PERMISSIONS (IMPORTANT)
+
+```
+ls -ld /var/www /var/www/html
+```
+
+#### ✅ Expected:
+
+```
+drwxr-xr-x apache apache ...
+```
+
+#### ✅ If not:
+
+```
+sudo chown -R apache:apache /var/www
+```
+
+```
+sudo chmod -R 755 /var/www
+```
+
+### 7️⃣ VERIFY PHP ↔ MYSQL EXTENSION
+
+```
+php -m | grep mysql
+```
+
+#### ✅ Expected:
+
+```
+mysqlnd
+```
 
 ---
 
