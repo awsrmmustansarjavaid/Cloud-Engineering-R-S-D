@@ -442,6 +442,213 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ```
 
 
+#### ✅ MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+
+✅ Cafe-style background image + dark overlay
+
+✅ Same Poppins font + color theme as index
+
+✅ Clean, modern order card
+
+✅ Mobile-responsive
+
+✅ Backend PHP code 100% untouched
+
+#### ✅ What Changed (Frontend Only)
+
+✔ Cafe-vibe background image
+
+✔ Same color palette as landing page
+
+✔ Modern rounded order card
+
+✔ Mobile + desktop responsive
+
+✔ Backend logic untouched & safe
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe ☕ | Place Order</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #3b1f0e;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .order-card h2 {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        input, select {
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        /* Button */
+        .btn-order {
+            background-color: #ff9800;
+            color: #000;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 12px;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-order:hover {
+            background-color: #e68900;
+        }
+
+        /* Footer */
+        footer {
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        .response-box {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- Order Section -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="col-md-6">
+        <div class="order-card">
+
+            <h2 class="text-center">Place Your Order</h2>
+            <p class="text-center text-muted">Fresh • Hot • Made with Love</p>
+
+            <form method="POST">
+
+                <label>Customer Name</label>
+                <input type="text" name="name" class="form-control" required>
+
+                <label>Select Item</label>
+                <select name="item" class="form-select">
+                    <option value="Coffee">Coffee</option>
+                    <option value="Tea">Tea</option>
+                    <option value="Latte">Latte</option>
+                    <option value="Cappuccino">Cappuccino</option>
+                    <option value="Fresh Juice">Fresh Juice</option>
+                </select>
+
+                <label>Quantity</label>
+                <input type="number" name="quantity" min="1" value="1" class="form-control">
+
+                <button type="submit" class="btn btn-order w-100 mt-4">
+                    ☕ Place Order
+                </button>
+            </form>
+
+            <!-- Backend Response (UNCHANGED) -->
+            <div class="response-box">
+                <?php
+                if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+                    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+                    $payload = json_encode([
+                        "customer_name" => $_POST['name'],
+                        "item" => $_POST['item'],
+                        "quantity" => (int)$_POST['quantity']
+                    ]);
+
+                    $ch = curl_init($apiUrl);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        "Content-Type: application/json"
+                    ]);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+
+                    $response = curl_exec($ch);
+
+                    if ($response === false) {
+                        echo "<p class='text-danger'>❌ CURL Error: " . curl_error($ch) . "</p>";
+                    } else {
+                        echo "<p class='text-success fw-bold'>✅ Order sent successfully</p>";
+                        echo "<pre class='bg-light p-2 rounded'>$response</pre>";
+                    }
+
+                    curl_close($ch);
+                }
+                ?>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    © 2026 Charlie Cafe | Serverless Orders ☁️
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+```
+
+
+
+
+
 #### FULL UPDATED orders.php (FINAL VERSION)
 
 ```
