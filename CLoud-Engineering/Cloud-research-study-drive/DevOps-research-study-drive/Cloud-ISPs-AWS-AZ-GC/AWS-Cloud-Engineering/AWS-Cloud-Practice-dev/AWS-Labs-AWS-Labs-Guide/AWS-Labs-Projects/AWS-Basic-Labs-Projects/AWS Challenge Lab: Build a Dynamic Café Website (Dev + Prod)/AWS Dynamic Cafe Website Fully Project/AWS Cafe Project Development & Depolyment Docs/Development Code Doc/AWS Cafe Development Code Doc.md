@@ -1491,5 +1491,180 @@ This lets us see exactly where it stops.
 
 ---
 
+### 5️⃣ Lambda code - ORDER STATUS DASHBOARD 
 
+#### Below is the FINAL, READY-TO-DEPLOY Worker Lambda code with:
+
+✅ Your existing logic untouched
+
+✅ Order metrics added safely
+
+✅ Correct placement (TOP + AFTER DB insert)
+
+✅ SQS-safe error handling
+
+#### ✅ FINAL WORKER LAMBDA CODE (COPY–PASTE FULL)
+
+```
+import json
+import boto3
+import pymysql
+from decimal import Decimal
+
+# ---------- AWS CLIENTS ----------
+secrets_client = boto3.client('secretsmanager')
+dynamodb = boto3.resource('dynamodb')
+
+# ---------- CONSTANTS ----------
+SECRET_NAME = "CafeDevDBSM"
+DYNAMODB_TABLE = "CafeMenu"
+METRICS_TABLE = "CafeOrderMetrics"
+
+# ---------- DYNAMODB TABLES ----------
+menu_table = dynamodb.Table(DYNAMODB_TABLE)
+metrics_table = dynamodb.Table(METRICS_TABLE)   # 👈 (STEP 3.2 — TOP ADDITION)
+
+# ---------- GET DB CREDS ----------
+def get_db_secret():
+    print("Fetching DB secret...")
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+# ---------- LAMBDA HANDLER ----------
+def lambda_handler(event, context):
+
+    print("Lambda triggered by SQS")
+    print("Event:", event)
+
+    secret = get_db_secret()
+
+    connection = pymysql.connect(
+        host=secret["host"],
+        user=secret["username"],
+        password=secret["password"],
+        database=secret["dbname"],
+        connect_timeout=10
+    )
+
+    try:
+        with connection.cursor() as cursor:
+            for record in event["Records"]:
+
+                # ---------- PARSE SQS MESSAGE ----------
+                order = json.loads(record["body"])
+                customer_name = order["customer_name"]
+                item = order["item"]
+                quantity = int(order["quantity"])
+
+                # ---------- INSERT INTO RDS ----------
+                cursor.execute(
+                    "INSERT INTO orders (customer_name, item, quantity) VALUES (%s, %s, %s)",
+                    (customer_name, item, quantity)
+                )
+                connection.commit()
+
+                # ---------- UPDATE DYNAMODB MENU ----------
+                menu_table.update_item(
+                    Key={"item": item},
+                    UpdateExpression="ADD orders :inc",
+                    ExpressionAttributeValues={":inc": Decimal(quantity)}
+                )
+
+                # ---------- UPDATE ORDER METRICS ----------
+                metrics_table.update_item(
+                    Key={"metric": "TOTAL_ORDERS"},
+                    UpdateExpression="ADD #c :inc",
+                    ExpressionAttributeNames={"#c": "count"},
+                    ExpressionAttributeValues={":inc": Decimal(1)}
+                )
+
+                print("✅ Order processed successfully:", order)
+
+        return {"statusCode": 200}
+
+    except Exception as e:
+        print("❌ FATAL ERROR:", str(e))
+        raise e   # 🚨 REQUIRED so SQS retries on failure
+```
+
+#### 🧠 WHAT WAS ADDED (SO YOU REMEMBER LATER)
+
+#### 1️⃣ At the TOP (Global scope)
+
+```
+metrics_table = dynamodb.Table("CafeOrderMetrics")
+```
+
+Purpose
+
+Creates a reusable DynamoDB connection
+
+Avoids re-creating client inside loop
+
+Best practice for Lambda performance
+
+#### 2️⃣ AFTER successful RDS insert
+
+```
+metrics_table.update_item(
+    Key={"metric": "TOTAL_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+```
+
+Purpose
+
+Increments total orders only after DB success
+
+Keeps RDS as source of truth
+
+DynamoDB used for fast counters
+
+✅ VERIFICATION CHECKLIST (DO THIS NOW)
+1️⃣ Send order from frontend / API
+
+✔ Order placed
+
+2️⃣ Check SQS
+
+✔ Message disappears (consumed)
+
+3️⃣ Check RDS
+
+```
+SELECT * FROM orders ORDER BY created_at DESC;
+```
+✔ New row present
+
+4️⃣ Check DynamoDB → CafeMenu
+
+✔ orders increased for item
+
+5️⃣ Check DynamoDB → CafeOrderMetrics
+
+✔ TOTAL_ORDERS increased by 1
+
+6️⃣ Check CloudWatch Logs
+
+✔ "Order processed successfully"
+
+🏆 RESULT
+
+You now have:
+
+✅ Event-driven backend
+
+✅ Reliable order processing
+
+✅ Real-time metrics
+
+✅ Production-safe SQS worker
+
+✅ Zero backend breakage
+
+---
+
+### 6️⃣ Lambda code - ORDER STATUS DASHBOARD 
 
