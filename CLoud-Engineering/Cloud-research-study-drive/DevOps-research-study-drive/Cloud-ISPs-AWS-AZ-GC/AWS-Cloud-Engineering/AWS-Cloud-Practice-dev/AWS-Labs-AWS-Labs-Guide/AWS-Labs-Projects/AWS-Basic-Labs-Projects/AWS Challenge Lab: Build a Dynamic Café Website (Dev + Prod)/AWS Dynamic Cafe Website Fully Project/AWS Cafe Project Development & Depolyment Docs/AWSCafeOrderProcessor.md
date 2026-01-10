@@ -883,7 +883,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php
                 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-                    $apiUrl = "https://sgrd5vjw5h.execute-api.us-east-1.amazonaws.com/dev/orders";
+                    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
 
                     $payload = json_encode([
                         "table_number"  => (int)$_POST['table_number'],
@@ -950,21 +950,29 @@ import json
 import pymysql
 import boto3
 
+# ---------- GET DB SECRET ----------
 def get_db_secret():
     client = boto3.client('secretsmanager')
     response = client.get_secret_value(SecretId='CafeDevDBSM')
     return json.loads(response['SecretString'])
 
+# ---------- LAMBDA HANDLER ----------
 def lambda_handler(event, context):
     try:
+        # Parse API Gateway body
         body = json.loads(event['body'])
 
-        customer_name = body['customer_name']
+        # NEW: Table Number
+        table_number = int(body['table_number'])
+
+        customer_name = body.get('customer_name', None)
         item = body['item']
         quantity = int(body['quantity'])
 
+        # Fetch DB credentials
         secret = get_db_secret()
 
+        # Connect to RDS
         connection = pymysql.connect(
             host=secret['host'],
             user=secret['username'],
@@ -973,12 +981,16 @@ def lambda_handler(event, context):
             connect_timeout=5
         )
 
+        # Insert order
         with connection.cursor() as cursor:
             sql = """
-                INSERT INTO orders (customer_name, item, quantity)
-                VALUES (%s, %s, %s)
+                INSERT INTO orders (table_number, customer_name, item, quantity)
+                VALUES (%s, %s, %s, %s)
             """
-            cursor.execute(sql, (customer_name, item, quantity))
+            cursor.execute(
+                sql,
+                (table_number, customer_name, item, quantity)
+            )
             connection.commit()
 
         connection.close()
@@ -988,11 +1000,14 @@ def lambda_handler(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*"
             },
-            "body": json.dumps({"message": "Order saved successfully"})
+            "body": json.dumps({
+                "message": "Order saved successfully",
+                "table_number": table_number
+            })
         }
 
     except Exception as e:
-        print("ERROR:", str(e))
+        print("❌ ERROR:", str(e))
         return {
             "statusCode": 500,
             "headers": {
@@ -1104,7 +1119,7 @@ curl -X POST \
 
 #### 🟢 API GATEWAY TEST (MANDATORY)
 
-- **go to post method > Test Event Body**
+- **go to  CafeOrderAPI > post method > Test Event Body**
 
 ```
 {
@@ -1168,7 +1183,7 @@ curl -X POST \
 
 ### 3️⃣ Verify Database
 
-### Method 1 RDS Test
+### Method 1 Simple 1-To-1 RDS Test
 
 ```
 mysql -u cafe_user -p cafe_db
@@ -1200,6 +1215,22 @@ SELECT * FROM orders;
 ```
 EC2-Test | Latte | 1
 ```
+
+#### Updated RDS
+
+```
+SELECT id, table_number, customer_name, item, quantity, created_at
+FROM orders
+ORDER BY id DESC;
+```
+
+✔ table_number populated
+
+✔ created_at auto-generated
+
+✔ No duplicate or missing fields
+
+
 
 ### Method 2 RDS Quick Test Script — One-command style
 
@@ -1579,6 +1610,64 @@ sudo ./rds-secret-test.sh
 | RDS auto-generated rotation format                       | `.host`          | `.username`          | `.password`          |
 
 - Adjust the three jq -r lines if your secret has different key names.
+
+
+### 4️⃣  FRONTEND → BACKEND VERIFICATION
+
+#### 1️⃣ Submit order from orders.php
+
+📊 Table Number: 2
+
+☕ Item: Tea
+
+👨🏾‍🍳 Quantity: 1
+
+### 5️⃣  BACKEND VERIFICATION (MANDATORY)
+
+#### 1️⃣ Check CloudWatch Logs
+
+- **Lambda → Monitor → Logs**
+
+### You should see:
+
+```
+START RequestId:
+END RequestId:
+```
+
+❌ No SQL errors
+
+---
+
+### 🟢 Common Mistakes (Avoid These)
+
+| Mistake                | Result             |
+| ---------------------- | ------------------ |
+| Missing `table_number` | 500 error          |
+| table_number as string | Type error         |
+| quantity ≤ 0           | Validation failure |
+| Wrong API stage        | Order not inserted |
+
+### 🟢 SYSTEM STATUS CHECK
+
+✔ API Gateway updated
+✔ Lambda aligned
+✔ RDS schema aligned
+✔ Frontend orders.php aligned
+
+Your system is now schema-consistent from browser → DB.
+
+### 🏆 Result
+
+#### You now have:
+
+☕ Restaurant-style table orders
+
+📊 Future-ready analytics
+
+🧱 No backend breakage
+
+🚀 Production-safe change
 
 
 ---
