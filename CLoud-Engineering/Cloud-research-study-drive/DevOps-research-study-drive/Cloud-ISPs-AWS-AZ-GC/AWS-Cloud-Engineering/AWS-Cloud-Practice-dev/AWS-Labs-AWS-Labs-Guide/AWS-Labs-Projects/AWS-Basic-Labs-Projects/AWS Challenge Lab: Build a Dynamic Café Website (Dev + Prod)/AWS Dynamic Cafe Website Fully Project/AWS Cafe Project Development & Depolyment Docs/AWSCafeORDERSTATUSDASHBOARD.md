@@ -200,7 +200,69 @@ Click Create item
 ✅ Phase 2 complete
 
 ---
-##  PHASE 3️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
+
+##  PHASE 3️⃣ IAM ROLE CHECK (DO THIS FIRST)
+
+### 1️⃣ Worker Lambda IAM Role
+
+**Make sure Worker Lambda Role has:**
+
+```
+AmazonDynamoDBFullAccess
+AWSSecretsManagerReadOnly
+AmazonSQSFullAccess
+```
+
+(or scoped policies if you prefer)
+
+### 2️⃣  IAM Role Policy
+
+- **AWS Console → IAM → Policies**
+
+- Click Create policy
+
+- Select JSON
+
+- Paste EXACTLY THIS (no changes):
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+#### ✅ This allows:
+
+- Read secret value
+
+- Describe secret
+
+- ❌ No delete
+
+- ❌ No update
+
+Click Next
+
+### Policy name:
+
+```
+
+
+
+
+---
+
+##  PHASE 4️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
 
 #### ⚠️ This step is inside existing Worker Lambda, NOT API Lambda.
 
@@ -332,7 +394,11 @@ def lambda_handler(event, context):
 
 ✔️ DynamoDB gives fast counters
 
-### 3️⃣ VERIFY THIS STEP
+### 3️⃣ IAM ROLE CHECK (DO THIS FIRST)
+
+Make sure Worker Lambda Role has:
+
+### 4️⃣ VERIFY THIS STEP
 
 1️⃣ Place one new order
 
