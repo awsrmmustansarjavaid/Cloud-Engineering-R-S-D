@@ -245,24 +245,40 @@ QUEUE_URL = os.environ['SQS_QUEUE_URL']
 
 def lambda_handler(event, context):
     try:
-        # Parse request body
-        body = json.loads(event.get('body', '{}'))
+        # ---------- Parse request body ----------
+        body = json.loads(event.get("body", "{}"))
 
-        # Validate required fields
-        if "item" not in body or "quantity" not in body:
-            return {
-                "statusCode": 400,
-                "headers": {"Access-Control-Allow-Origin": "*"},
-                "body": json.dumps({"error": "Missing required fields: item, quantity"})
-            }
+        # ---------- Validate required fields ----------
+        required_fields = ["table_number", "item", "quantity"]
+        for field in required_fields:
+            if field not in body:
+                return {
+                    "statusCode": 400,
+                    "headers": {"Access-Control-Allow-Origin": "*"},
+                    "body": json.dumps({
+                        "error": f"Missing required field: {field}"
+                    })
+                }
 
+        # ---------- Validate data ----------
+        table_number = int(body["table_number"])
+        quantity = int(body["quantity"])
+
+        if table_number <= 0:
+            raise ValueError("Invalid table number")
+
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero")
+
+        # ---------- Build order payload ----------
         order = {
+            "table_number": table_number,
             "customer_name": body.get("customer_name", "Guest"),
             "item": body["item"],
-            "quantity": int(body["quantity"])
+            "quantity": quantity
         }
 
-        # Send message to SQS
+        # ---------- Send message to SQS ----------
         sqs.send_message(
             QueueUrl=QUEUE_URL,
             MessageBody=json.dumps(order)
@@ -277,11 +293,11 @@ def lambda_handler(event, context):
             })
         }
 
-    except ValueError:
+    except ValueError as e:
         return {
             "statusCode": 400,
             "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"error": "Quantity must be a number"})
+            "body": json.dumps({"error": str(e)})
         }
 
     except Exception as e:
@@ -311,7 +327,7 @@ Event JSON:
 
 ```
 {
-  "body": "{\"customer_name\":\"ConsoleTest\",\"item\":\"Latte\",\"quantity\":2}"
+  "body": "{\"table_number\":1,\"customer_name\":\"ConsoleTest\",\"item\":\"Latte\",\"quantity\":2}"
 }
 ```
 
@@ -324,9 +340,37 @@ Click Test
 ```
 {
   "statusCode": 202,
-  "body": "{\"message\":\"Order accepted\"}"
+  "body": "{\"message\":\"Order accepted\",\"order\":{\"table_number\":1,\"customer_name\":\"ConsoleTest\",\"item\":\"Latte\",\"quantity\":2}}"
 }
 ```
+
+#### CloudWatch Logs:
+
+```
+Order accepted
+```
+
+#### SQS:
+
+- Message appears briefly
+
+- Then disappears (worker consumes it)
+
+#### RDS:
+
+```
+SELECT * FROM orders ORDER BY id DESC;
+```
+
+#### Result:
+
+```
+id | table_number | customer_name | item  | quantity | created_at
+---------------------------------------------------------------
+12 | 1            | ConsoleTest   | Latte | 2        | 2026-01-xx
+```
+
+
 
 #### 3️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
 
@@ -352,9 +396,53 @@ You should see message like:
 
 ✅ If message exists → Producer Lambda WORKS
 
+#### SQS Message Body (Manual Test)
+
+```
+{
+  "table_number": 2,
+  "customer_name": "WorkerTest",
+  "item": "Latte",
+  "quantity": 2
+}
+```
 ---
 
-### 4️⃣ Test with API Gateway or Lambda test
+### 4️⃣ Frontend (orders.php)
+
+You already fixed it ✔
+Ensure payload includes:
+
+```
+{
+  "table_number": 1,
+  "customer_name": "Charlie",
+  "item": "Tea",
+  "quantity": 2
+}
+```
+
+### 5️⃣ Test with API Gateway or Lambda test
+
+#### Update test body
+
+```
+{
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1
+}
+```
+#### curl Test
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{"table_number":3,"customer_name":"CurlTest","item":"Tea","quantity":2}'
+```
+
 
 ### 🔍 METHOD A — TEST USING LAMBDA CONSOLE (EASIEST)
 
@@ -536,6 +624,36 @@ curl -X POST \
 #### 🟦 C3 — VERIFY SQS
 
 - Same verification steps.
+
+### 6️⃣ Worker Lambda
+
+#### Must read:
+
+```
+table_number = order["table_number"]
+```
+
+#### and insert:
+
+```
+INSERT INTO orders (table_number, customer_name, item, quantity)
+```
+
+### 🧠 RULE TO REMEMBER (VERY IMPORTANT)
+
+Every layer must send the SAME JSON shape
+
+```
+{
+  "table_number": INT,
+  "customer_name": STRING,
+  "item": STRING,
+  "quantity": INT
+}
+```
+
+If one layer misses a field, the pipeline breaks.
+
 
 ---
 
