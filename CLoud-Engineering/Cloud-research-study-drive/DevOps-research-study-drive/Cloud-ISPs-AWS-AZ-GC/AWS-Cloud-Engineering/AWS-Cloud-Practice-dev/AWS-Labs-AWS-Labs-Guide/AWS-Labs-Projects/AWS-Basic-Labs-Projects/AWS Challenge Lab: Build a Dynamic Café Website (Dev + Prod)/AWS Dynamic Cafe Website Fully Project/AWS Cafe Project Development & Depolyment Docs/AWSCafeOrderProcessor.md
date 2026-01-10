@@ -1496,11 +1496,19 @@ fi
 echo "============================================================"
 ```
 
-#### One-liner magic
+#### 3️⃣ Make the script executable
 
 ```
-sudo chmod +x rds-secret-test.sh && sudo ./rds-secret-test.sh
+Sudo chmod +x rds-quick-test.sh
 ```
+This command gives permission to run the file as a program/script.
+
+#### 4️⃣ Run the script (with root privileges)
+
+```
+sudo ./rds-quick-test.sh
+```
+
 
 #### Common Secret JSON structures (choose correct jq paths)
 
