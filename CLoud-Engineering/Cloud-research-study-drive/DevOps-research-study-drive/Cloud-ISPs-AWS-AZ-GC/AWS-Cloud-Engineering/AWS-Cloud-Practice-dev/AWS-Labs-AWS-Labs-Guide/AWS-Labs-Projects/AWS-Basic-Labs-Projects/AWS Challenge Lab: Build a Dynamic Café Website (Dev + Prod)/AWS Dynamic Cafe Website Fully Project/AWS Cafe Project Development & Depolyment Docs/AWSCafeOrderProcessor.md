@@ -1129,6 +1129,16 @@ sudo yum install -y jq
 
 #### RDS Test Script using Secrets Manager
 
+#### Quick Usage
+
+#### Create & edit
+
+```
+sudo nano rds-secret-test.sh
+```
+
+#### Paste script, change only SECRET_NAME and RDS_DB
+
 ##### Save as rds-secret-test.sh
 
 ```
@@ -1272,21 +1282,10 @@ fi
 echo "============================================================"
 ```
 
-#### Quick Usage
-
-#### Create & edit
-
-```
-sudo nano rds-secret-test.sh
-```
-
-
-#### Paste script, change only SECRET_NAME and RDS_DB
-
 #### One-liner magic
 
 ```
-Sudo chmod +x rds-secret-test.sh && sudo ./rds-secret-test.sh
+sudo chmod +x rds-secret-test.sh && sudo ./rds-secret-test.sh
 ```
 
 #### Common Secret JSON structures (choose correct jq paths)
