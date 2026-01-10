@@ -515,21 +515,31 @@ import json
 import boto3
 import pymysql
 
+# ---------- AWS CLIENTS ----------
 secrets_client = boto3.client('secretsmanager')
 dynamodb = boto3.resource('dynamodb')
 
-metrics_table = dynamodb.Table("CafeOrderMetrics")
+# ---------- CONSTANTS ----------
 SECRET_NAME = "CafeDevDBSM"
+METRICS_TABLE = "CafeOrderMetrics"
 
+metrics_table = dynamodb.Table(METRICS_TABLE)
+
+# ---------- GET DB CREDS ----------
 def get_db_secret():
     return json.loads(
-        secrets_client.get_secret_value(SecretId=SECRET_NAME)["SecretString"]
+        secrets_client.get_secret_value(
+            SecretId=SECRET_NAME
+        )["SecretString"]
     )
 
+# ---------- LAMBDA HANDLER ----------
 def lambda_handler(event, context):
 
+    # ---- Fetch DB credentials ----
     secret = get_db_secret()
 
+    # ---- Connect to RDS ----
     connection = pymysql.connect(
         host=secret["host"],
         user=secret["username"],
@@ -539,25 +549,50 @@ def lambda_handler(event, context):
         cursorclass=pymysql.cursors.DictCursor
     )
 
-    metrics = metrics_table.scan()["Items"]
+    try:
+        # ---- Read metrics from DynamoDB ----
+        metrics = metrics_table.scan().get("Items", [])
 
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT customer_name, item, quantity, created_at
-            FROM orders
-            ORDER BY created_at DESC
-            LIMIT 20
-        """)
-        orders = cursor.fetchall()
+        # ---- Read recent orders from RDS ----
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    table_number,
+                    customer_name,
+                    item,
+                    quantity,
+                    created_at
+                FROM orders
+                ORDER BY created_at DESC
+                LIMIT 20
+            """)
+            orders = cursor.fetchall()
 
-    return {
-        "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({
-            "metrics": metrics,
-            "recent_orders": orders
-        }, default=str)
-    }
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps(
+                {
+                    "metrics": metrics,
+                    "recent_orders": orders
+                },
+                default=str
+            )
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
+        }
+
+    finally:
+        connection.close()
 ```
 
 #### 4️⃣ Test Lambda
@@ -694,13 +729,13 @@ Click Deploy
 #### 🌐 FINAL API URL
 
 ```
-GET https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/order-status
+GET https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
 ```
 
 #### 🧪 TEST IT (MUST WORK)
 
 ```
-curl https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/order-status
+curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
 ```
 
 #### You should get:
@@ -715,7 +750,7 @@ curl https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/order-status
 #### Open browser:
 
 ```
-https://API_ID.execute-api.region.amazonaws.com/prod/order-status
+https://API_ID.execute-api.region.amazonaws.com/status/order-status
 ```
 
 ✔ JSON visible
@@ -728,48 +763,219 @@ https://API_ID.execute-api.region.amazonaws.com/prod/order-status
 ### 1️⃣ Create File
 
 ```
-order-status.html
+sudo nano /var/www/html/order-status.html
 ```
+
+
 
 ### 1️⃣ CODE
 
 Paste EXACT CODE
 
 ```
-<h2>📊 Cafe Order Status</h2>
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charlie Cafe ☕ | Order Status</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Font - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+        }
 
-<div id="metrics"></div>
+        /* Navbar */
+        .navbar {
+            background-color: #3b1f0e !important;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            color: #fff !important;
+        }
 
-<table border="1">
-<tr>
-  <th>Customer</th>
-  <th>Item</th>
-  <th>Qty</th>
-  <th>Date</th>
-</tr>
-<tbody id="orders"></tbody>
-</table>
+        /* Main container */
+        .status-container {
+            background: rgba(30, 30, 30, 0.75);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            margin: 40px auto;
+            max-width: 1100px;
+        }
 
+        h2 {
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        }
+
+        /* Metrics Cards */
+        .metric-card {
+            background: linear-gradient(135deg, #4a2c1a, #3b1f0e);
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-8px);
+        }
+        .metric-card .card-body {
+            text-align: center;
+            padding: 25px;
+        }
+        .metric-card h5 {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ff9800;
+        }
+        .metric-card .display-5 {
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Table Styling - Dark & Elegant */
+        .table {
+            background: rgba(40, 40, 40, 0.85);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table thead th {
+            background: #3b1f0e;
+            color: #ff9800;
+            font-weight: 600;
+            border-bottom: 2px solid #ff9800;
+        }
+        .table tbody tr {
+            transition: background 0.2s;
+        }
+        .table tbody tr:hover {
+            background: rgba(255,152,0,0.15);
+        }
+        .table td, .table th {
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0,0,0,0.7);
+            color: #ddd;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .status-container {
+                padding: 25px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="status-container">
+        <h2 class="text-center mb-5">📊 Live Order Status</h2>
+
+        <!-- Metrics (Cards) -->
+        <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+        <!-- Recent Orders Table -->
+        <div class="table-responsive">
+            <table class="table table-hover text-white">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Table</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="orders"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    © 2026 Charlie Cafe | Fresh Drinks • Made with ❤️
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Fetch & Display Data -->
 <script>
-fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
-.then(res => res.json())
-.then(data => {
-  data.metrics.forEach(m => {
-    document.getElementById("metrics").innerHTML +=
-      `<p><b>${m.metric}</b>: ${m.count}</p>`;
-  });
+fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  // ← Replace with your real API endpoint
+    .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+    })
+    .then(data => {
+        // Metrics Cards
+        const metricsContainer = document.getElementById("metrics");
+        data.metrics.forEach(m => {
+            metricsContainer.innerHTML += `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card metric-card shadow">
+                        <div class="card-body">
+                            <h5>${m.metric}</h5>
+                            <p class="display-5 mb-0">${m.count}</p>
+                        </div>
+                    </div>
+                </div>`;
+        });
 
-  data.recent_orders.forEach(o => {
-    document.getElementById("orders").innerHTML += `
-      <tr>
-        <td>${o.customer_name}</td>
-        <td>${o.item}</td>
-        <td>${o.quantity}</td>
-        <td>${o.created_at}</td>
-      </tr>`;
-  });
-});
+        // Orders Table
+        const ordersBody = document.getElementById("orders");
+        data.recent_orders.forEach(o => {
+            ordersBody.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || '<em>Anonymous</em>'}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || '-'}</td>
+                    <td>${o.created_at}</td>
+                </tr>`;
+        });
+    })
+    .catch(err => {
+        document.getElementById("orders").innerHTML = `
+            <tr><td colspan="5" class="text-center text-danger py-4">
+                ⚠️ Failed to load orders: ${err.message}
+            </td></tr>`;
+    });
 </script>
+
+</body>
+</html>
 ```
 
 ### 2️⃣ Open page in browser
