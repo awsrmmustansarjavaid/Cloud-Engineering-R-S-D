@@ -805,15 +805,14 @@ DYNAMODB_TABLE = "CafeMenu"
 
 # ---------- GET DB CREDS ----------
 def get_db_secret():
-    print("Fetching DB secret...")
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
 # ---------- LAMBDA HANDLER ----------
 def lambda_handler(event, context):
 
-    print("Lambda triggered by SQS")
-    print("Event:", event)
+    print("📩 Worker Lambda triggered by SQS")
+    print("Event:", json.dumps(event))
 
     secret = get_db_secret()
 
@@ -822,41 +821,53 @@ def lambda_handler(event, context):
         user=secret["username"],
         password=secret["password"],
         database=secret["dbname"],
-        connect_timeout=10
+        connect_timeout=10,
+        autocommit=False
     )
 
-    table = dynamodb.Table(DYNAMODB_TABLE)
+    menu_table = dynamodb.Table(DYNAMODB_TABLE)
 
     try:
         with connection.cursor() as cursor:
             for record in event["Records"]:
                 order = json.loads(record["body"])
 
+                table_number = int(order["table_number"])
                 customer_name = order["customer_name"]
                 item = order["item"]
                 quantity = int(order["quantity"])
 
                 # ---------- INSERT INTO RDS ----------
                 cursor.execute(
-                    "INSERT INTO orders (customer_name, item, quantity) VALUES (%s, %s, %s)",
-                    (customer_name, item, quantity)
+                    """
+                    INSERT INTO orders
+                    (table_number, customer_name, item, quantity)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (table_number, customer_name, item, quantity)
                 )
-                connection.commit()
 
                 # ---------- UPDATE DYNAMODB ----------
-                table.update_item(
+                menu_table.update_item(
                     Key={"item": item},
                     UpdateExpression="ADD orders :inc",
-                    ExpressionAttributeValues={":inc": Decimal(quantity)}
+                    ExpressionAttributeValues={
+                        ":inc": Decimal(quantity)
+                    }
                 )
 
                 print("✅ Order processed:", order)
 
+        connection.commit()
         return {"statusCode": 200}
 
     except Exception as e:
-        print("❌ FATAL ERROR:", str(e))
-        raise e   # 🚨 REQUIRED FOR SQS RETRY
+        connection.rollback()
+        print("❌ WORKER FAILED:", str(e))
+        raise e  # REQUIRED for SQS retry
+
+    finally:
+        connection.close()
 ```
 
 **Click Deploy**
@@ -1055,15 +1066,24 @@ This lets us see exactly where it stops.
 {
   "Records": [
     {
-      "body": "{\"customer_name\": \"WorkerTest\", \"item\": \"Coffee\", \"quantity\": 2}"
+      "body": "{\"table_number\": 1, \"customer_name\": \"WorkerTest\", \"item\": \"Coffee\", \"quantity\": 2}"
     }
   ]
 }
 ```
 
+✔ Inserts into RDS
+
+✔ Updates DynamoDB
+
+✔ No retries
+
+✔ No errors
+
 - This mimics SQS event structure
 
 - Now the Lambda code won’t fail with 'Records'
+
 
 #### ✅ EXPECTED CLOUDWATCH LOGS (SUCCESS)
 
@@ -1141,6 +1161,7 @@ This avoids API Gateway confusion.
 
 ```
 {
+  "table_number": 5,
   "customer_name": "WorkerTest",
   "item": "Coffee",
   "quantity": 2
@@ -1226,13 +1247,25 @@ mysql -h <rds-endpoint> -u cafe_user -p cafe_db
 SELECT * FROM orders ORDER BY id DESC;
 ```
 
+or 
+
+```
+SELECT * FROM orders ORDER BY created_at DESC;
+```
+
 #### Expected:
 
 ```
 WorkerTest | Coffee | 2
 ```
 
-#### 🟩 STEP 7 — VERIFY DYNAMODB
+table_number ✅
+
+status = RECEIVED ✅
+
+created_at auto-filled ✅
+
+#### 🟩 STEP 7 — VERIFY DYNAMODB (CafeMenu)
 
 - AWS Console → DynamoDB
 
@@ -1244,9 +1277,27 @@ WorkerTest | Coffee | 2
 
 #### Expected:
 
+```
+{
+  "item": "Coffee",
+  "price": 3,
+  "orders": 14
+}
+```
+
 - Attribute orders exists
 
 - Value increased by 2
+
+#### 🟩 STEP 8 — VERIFY CloudWatch Logs
+
+```
+✅ Order processed
+```
+
+No retries, no DLQ hits.
+
+
 
 #### ✅ METHOD 1 COMPLETE
 
@@ -1270,13 +1321,14 @@ Only do this AFTER Method 1 works
 
 ```
 curl -X POST \
-  https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/orders \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customer_name": "ApiTest",
-    "item": "Latte",
-    "quantity": 1
-  }'
+https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/orders \
+-H "Content-Type: application/json" \
+-d '{
+  "table_number": 2,
+  "customer_name": "ApiTest",
+  "item": "Latte",
+  "quantity": 1
+}'
 ```
 
 #### Expected response:
