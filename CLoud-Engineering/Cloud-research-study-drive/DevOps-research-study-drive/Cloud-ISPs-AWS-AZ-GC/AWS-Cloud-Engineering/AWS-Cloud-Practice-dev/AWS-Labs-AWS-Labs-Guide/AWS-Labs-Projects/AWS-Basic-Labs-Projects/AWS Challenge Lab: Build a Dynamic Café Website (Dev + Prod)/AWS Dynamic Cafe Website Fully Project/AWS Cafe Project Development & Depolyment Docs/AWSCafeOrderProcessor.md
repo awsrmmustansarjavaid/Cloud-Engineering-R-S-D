@@ -1651,8 +1651,11 @@ END RequestId:
 ### 🟢 SYSTEM STATUS CHECK
 
 ✔ API Gateway updated
+
 ✔ Lambda aligned
+
 ✔ RDS schema aligned
+
 ✔ Frontend orders.php aligned
 
 Your system is now schema-consistent from browser → DB.
