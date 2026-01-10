@@ -1445,10 +1445,11 @@ sudo chmod +x rds-secret-test.sh && sudo ./rds-secret-test.sh
 
 #### Common Secret JSON structures (choose correct jq paths)
 
-Secret format (what you see in console),jq path for host,jq path for username,jq path for password
-"{""host"":""..."",""username"":""..."",""password"":""...""}",.host,.username,.password
-"{""endpoint"":""..."",""user"":""..."",""pwd"":""...""}",.endpoint,.user,.pwd
-RDS auto-generated rotation format,.host,.username,.password
+| Secret format (what you see in console)                  | jq path for host | jq path for username | jq path for password |
+|----------------------------------------------------------|------------------|----------------------|----------------------|
+| `{"host":"...","username":"...","password":"..."}`       | `.host`          | `.username`          | `.password`          |
+| `{"endpoint":"...","user":"...","pwd":"..."}`            | `.endpoint`      | `.user`              | `.pwd`               |
+| RDS auto-generated rotation format                       | `.host`          | `.username`          | `.password`          |
 
 - Adjust the three jq -r lines if your secret has different key names.
 
