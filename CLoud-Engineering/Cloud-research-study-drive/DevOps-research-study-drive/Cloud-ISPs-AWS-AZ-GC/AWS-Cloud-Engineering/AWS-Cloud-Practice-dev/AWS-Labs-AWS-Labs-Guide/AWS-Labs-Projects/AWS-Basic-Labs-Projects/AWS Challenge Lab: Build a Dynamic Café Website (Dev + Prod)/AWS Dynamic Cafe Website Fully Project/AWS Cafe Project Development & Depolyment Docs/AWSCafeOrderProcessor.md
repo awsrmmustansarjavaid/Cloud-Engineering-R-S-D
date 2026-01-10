@@ -92,6 +92,147 @@ CREATE TABLE orders (
 );
 ```
 
+### 📢 Recommended Final CREATE TABLE (with table_number)
+
+```
+CREATE TABLE orders (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    table_number    INT NOT NULL,                    -- ← Added: table number (1, 2, 3, ...)
+    customer_name   VARCHAR(100),
+    item            VARCHAR(50),
+    quantity        INT NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_table_number (table_number),           -- optional: faster queries by table
+    INDEX idx_created_at (created_at)                -- optional: good for time-based reports
+);
+```
+
+### 📢 Most common real-world version
+
+#### Many cafes/restaurants also like to track status and total amount, so here’s a more complete modern version you might consider:
+
+
+```
+CREATE TABLE orders (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    table_number    INT NOT NULL,
+    customer_name   VARCHAR(100) DEFAULT NULL,       -- optional, sometimes anonymous orders
+    item            VARCHAR(100) NOT NULL,
+    quantity        INT NOT NULL DEFAULT 1,
+    unit_price      DECIMAL(10,2) NOT NULL,          -- important for billing
+    total_amount    DECIMAL(10,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
+    status          ENUM('pending', 'preparing', 'served', 'cancelled') DEFAULT 'pending',
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_table_number (table_number),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at)
+);
+```
+
+### 📢 Remove (Delete) the Table
+
+#### Option A: Normal delete (most common)
+
+```
+DROP TABLE orders;
+```
+
+#### Option B: Delete only if it exists (safer - no error if table doesn't exist)
+
+```
+DROP TABLE IF EXISTS orders;
+```
+
+#### Option C: Very aggressive - delete even if there are foreign keys pointing to it (usually not recommended unless you really know what you're doing)
+
+```
+SET FOREIGN_KEY_CHECKS = 0;
+```
+
+```
+DROP TABLE orders;
+```
+
+```
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+####  Also fine - mixed style
+
+```
+SET FOREIGN_KEY_CHECKS = 0;
+```
+
+```
+DROP TABLE IF EXISTS orders;
+```
+
+```
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+### 📢 Modify Existing Table (ALTER TABLE)
+
+#### A. Add new column
+
+```
+ALTER TABLE orders
+    ADD COLUMN table_number INT NOT NULL AFTER id;
+```
+
+#### B. Add column with default value
+
+```
+ALTER TABLE orders
+    ADD COLUMN status ENUM('pending','preparing','served','cancelled') 
+    DEFAULT 'pending' AFTER quantity;
+```
+
+#### C. Change column type (example: make customer_name longer)
+
+```
+ALTER TABLE orders
+    MODIFY COLUMN customer_name VARCHAR(150) NOT NULL;
+```
+
+#### D. Rename column
+
+```
+ALTER TABLE orders
+    CHANGE COLUMN item product_name VARCHAR(100);
+```
+
+#### E. Drop (remove) column you no longer need
+
+```
+ALTER TABLE orders
+    DROP COLUMN customer_name;
+```
+
+#### F. Add index (very important for performance)
+
+```
+ALTER TABLE orders
+    ADD INDEX idx_table_number (table_number);
+```
+
+#### G. Add auto-increment if you forgot it (very rare case)
+
+```
+ALTER TABLE orders
+    MODIFY id INT AUTO_INCREMENT PRIMARY KEY;
+```
+
+#### H. Change default value for existing column
+
+```
+ALTER TABLE orders
+    ALTER COLUMN quantity SET DEFAULT 1;
+```
+
 ## 5️⃣ Verify table exists
 
 ```
@@ -124,6 +265,20 @@ SELECT * FROM orders;
 ```
 EXIT;
 ```
+
+### 📢 Quick Reference Table - What do you want to do?
+
+| Action                              | Command Example                                   | Risk   |
+|-------------------------------------|---------------------------------------------------|--------|
+| Delete table (force)                | `DROP TABLE orders;`                              | High   |
+| Delete table (safe)                 | `DROP TABLE IF EXISTS orders;`                    | Low    |
+| Add new column                      | `ALTER TABLE orders ADD COLUMN table_number INT;` | Low    |
+| Change column type/size             | `ALTER TABLE orders MODIFY COLUMN name VARCHAR(200);` | Medium |
+| Rename column                       | `ALTER TABLE orders CHANGE COLUMN old_name new_name VARCHAR(100);` | Low    |
+| Delete column                       | `ALTER TABLE orders DROP COLUMN customer_name;`   | Medium |
+| Add index                           | `ALTER TABLE orders ADD INDEX idx_table (table_number);` | Low    |
+| Set/change default value            | `ALTER TABLE orders ALTER COLUMN status SET DEFAULT 'pending';` | Low    |
+
 
 ---
 
