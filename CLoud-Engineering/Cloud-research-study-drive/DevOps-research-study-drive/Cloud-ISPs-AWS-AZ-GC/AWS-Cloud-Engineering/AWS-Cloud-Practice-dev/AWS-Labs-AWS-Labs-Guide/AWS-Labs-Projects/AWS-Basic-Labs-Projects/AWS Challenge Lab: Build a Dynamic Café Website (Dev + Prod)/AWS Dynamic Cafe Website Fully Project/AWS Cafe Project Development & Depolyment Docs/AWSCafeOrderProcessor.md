@@ -1079,6 +1079,50 @@ curl -X POST \
 }
 ```
 
+#### ✅ New UPDATED API GATEWAY CURL TEST AFTER ADDED TABLE NUMBER (REQUIRED)
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "table_number": 3,
+    "customer_name": "TestUser",
+    "item": "Latte",
+    "quantity": 1
+  }'
+```
+
+#### 🟢 Expected Response (SUCCESS)
+
+```
+{
+  "message": "Order saved successfully",
+  "table_number": 3
+}
+```
+
+#### 🟢 API GATEWAY TEST (MANDATORY)
+
+- **go to post method > Test Event Body**
+
+```
+{
+  "table_number": 5,
+  "customer_name": "Charlie",
+  "item": "Coffee",
+  "quantity": 2
+}
+```
+
+#### Expected Result
+
+```
+{
+  "message": "Order saved successfully",
+  "table_number": 5
+}
+```
 
 
 ### 2️⃣ Test Lambda Directly (Console)
@@ -1105,6 +1149,21 @@ curl -X POST \
   "body": "{\"message\":\"Order saved successfully\"}"
 }
 ```
+#### Test Updated Event JSON:
+
+```
+{
+  "body": "{\"table_number\":1,\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+1 | LambdaTest | Coffee | 2 | 2026-01-10 10:32:11
+```
+
+
 
 
 ### 3️⃣ Verify Database
@@ -1500,14 +1559,14 @@ echo "============================================================"
 #### 3️⃣ Make the script executable
 
 ```
-Sudo chmod +x rds-quick-test.sh
+Sudo chmod +x rds-secret-test.sh
 ```
 This command gives permission to run the file as a program/script.
 
 #### 4️⃣ Run the script (with root privileges)
 
 ```
-sudo ./rds-quick-test.sh
+sudo ./rds-secret-test.sh
 ```
 
 
