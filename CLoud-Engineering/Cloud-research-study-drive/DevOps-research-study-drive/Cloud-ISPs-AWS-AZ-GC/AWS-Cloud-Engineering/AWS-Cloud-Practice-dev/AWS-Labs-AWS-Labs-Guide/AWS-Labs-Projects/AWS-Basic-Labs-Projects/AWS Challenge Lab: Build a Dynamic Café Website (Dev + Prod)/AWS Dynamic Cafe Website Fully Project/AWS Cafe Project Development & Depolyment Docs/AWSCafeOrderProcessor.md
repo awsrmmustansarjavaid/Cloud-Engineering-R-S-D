@@ -251,6 +251,65 @@ orders
 INSERT INTO orders (customer_name, item, quantity)
 VALUES ('CLI-Test', 'Coffee', 1);
 ```
+### 📢 Multi Values (with table_number)
+
+
+```
+-- For your first (simpler) table
+INSERT INTO orders (table_number, customer_name, item, quantity) 
+VALUES 
+    (1, 'Ali Khan', 'Espresso', 2),
+    (1, 'Sara Ahmed', 'Cappuccino', 1),
+    (2, 'CLI-Test', 'Coffee', 1),
+    (3, NULL, 'Latte', 3),
+    (5, 'Ahmed Raza', 'Croissant + Tea', 1);
+``` 
+
+#### Most common quick test inserts (good for development):
+
+```
+-- Quick test inserts - very useful for checking
+INSERT INTO orders (table_number, customer_name, item, quantity) VALUES
+    (1, 'Test User', 'Black Coffee', 1),
+    (2, NULL, 'Green Tea', 2),
+    (4, 'CLI-Test', 'Coffee', 1);
+```
+
+### 📢 Complete/Production Version (table NUMBER – with price, status, total_amount)
+
+```
+-- For your second (more complete) table
+INSERT INTO orders (
+    table_number, 
+    customer_name, 
+    item, 
+    quantity, 
+    unit_price, 
+    status
+) VALUES 
+    (1, 'Ali Khan', 'Espresso', 2, 450.00, 'served'),
+    (1, 'Sara Ahmed', 'Cappuccino', 1, 520.00, 'preparing'),
+    (2, 'CLI-Test', 'Coffee', 1, 300.00, 'pending'),
+    (3, NULL, 'Latte + Croissant', 1, 780.00, 'pending'),
+    (5, 'Ahmed Raza', 'Caramel Macchiato', 2, 650.00, 'served'),
+    (4, 'Fatima Noor', 'Iced Americano', 3, 400.00, 'cancelled');
+```
+
+#### Quick development/test version (minimal required fields):
+
+```
+-- Minimal insert for testing (uses defaults for the rest)
+INSERT INTO orders (table_number, item, quantity, unit_price) VALUES
+    (1, 'Black Coffee', 1, 300.00),
+    (2, 'Green Tea', 2, 250.00),
+    (4, 'CLI-Test Coffee', 1, 300.00);
+```
+
+
+
+
+
+
 
 ## 7️⃣ Verify:
 
