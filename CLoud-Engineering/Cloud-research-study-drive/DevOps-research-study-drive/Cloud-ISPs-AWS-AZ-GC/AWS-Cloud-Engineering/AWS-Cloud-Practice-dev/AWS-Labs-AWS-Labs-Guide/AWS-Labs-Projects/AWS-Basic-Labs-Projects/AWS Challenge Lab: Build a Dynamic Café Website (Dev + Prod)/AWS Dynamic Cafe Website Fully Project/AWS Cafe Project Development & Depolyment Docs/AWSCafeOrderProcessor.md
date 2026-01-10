@@ -775,7 +775,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-position: center;
         }
 
-        /* Navbar */
         .navbar {
             background-color: #3b1f0e;
         }
@@ -785,7 +784,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-weight: 600;
         }
 
-        /* Order Card */
         .order-card {
             background: #ffffff;
             border-radius: 20px;
@@ -808,7 +806,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 10px;
         }
 
-        /* Button */
         .btn-order {
             background-color: #ff9800;
             color: #000;
@@ -823,7 +820,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #e68900;
         }
 
-        /* Footer */
         footer {
             color: #fff;
             text-align: center;
@@ -858,8 +854,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <form method="POST">
 
+                <!-- NEW: TABLE NUMBER -->
+                <label>Table Number</label>
+                <input type="number" name="table_number" min="1" class="form-control" required>
+
                 <label>Customer Name</label>
-                <input type="text" name="name" class="form-control" required>
+                <input type="text" name="name" class="form-control">
 
                 <label>Select Item</label>
                 <select name="item" class="form-select">
@@ -878,17 +878,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </button>
             </form>
 
-            <!-- Backend Response (UNCHANGED) -->
+            <!-- Backend Response (UNCHANGED FLOW) -->
             <div class="response-box">
                 <?php
                 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-                    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+                    $apiUrl = "https://sgrd5vjw5h.execute-api.us-east-1.amazonaws.com/dev/orders";
 
                     $payload = json_encode([
+                        "table_number"  => (int)$_POST['table_number'],
                         "customer_name" => $_POST['name'],
-                        "item" => $_POST['item'],
-                        "quantity" => (int)$_POST['quantity']
+                        "item"          => $_POST['item'],
+                        "quantity"      => (int)$_POST['quantity']
                     ]);
 
                     $ch = curl_init($apiUrl);
