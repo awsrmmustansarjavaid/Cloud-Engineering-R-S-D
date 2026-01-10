@@ -256,13 +256,83 @@ Click Next
 ### Policy name:
 
 ```
+CafeSecretsManagerReadOnly
+```
 
+#### Description:
 
+```
+Read-only access to Secrets Manager for Lambda
+```
+
+Click Create policy
+
+###  Attach Policy to Lambda Role
+
+- **IAM → Roles **
+
+#### Select your Lambda role:
+
+```
+Lambda-Cafe-Order-Role
+```
+
+Click Add permissions → Attach policies
+
+#### Search:
+
+```
+CafeSecretsManagerReadOnly
+```
+
+✔️ Attach
+
+### REQUIRED Additional Policies
+
+#### Your Worker Lambda / API Lambda should have:
+
+| Purpose         | Policy                                 |
+| --------------- | -------------------------------------- |
+| Secrets Manager | `CafeSecretsManagerReadOnly` (custom)  |
+| RDS access      | `AWSLambdaVPCAccessExecutionRole`      |
+| CloudWatch logs | `AWSLambdaBasicExecutionRole`          |
+| SQS (worker)    | `AmazonSQSFullAccess` or scoped policy |
+| DynamoDB        | `AmazonDynamoDBFullAccess` (lab)       |
 
 
 ---
 
-##  PHASE 4️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
+##  PHASE 5️⃣ — ✅ VERIFICATION (MANDATORY)
+
+### 🔎 Test in Lambda
+
+- **Go to Lambda → Test**
+
+#### If secret access works:
+
+- ❌ No timeout
+
+- ❌ No access denied
+
+- ✅ DB connects successfully
+
+### 🔎 CloudWatch Log
+
+#### You should see:
+
+```
+Fetching DB secret...
+```
+
+#### No error like:
+
+```
+AccessDeniedException: User is not authorized to perform secretsmanager:GetSecretValue
+```
+
+---
+
+##  PHASE 6️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
 
 #### ⚠️ This step is inside existing Worker Lambda, NOT API Lambda.
 
@@ -507,17 +577,80 @@ def lambda_handler(event, context):
 ---
 ##  PHASE 4️⃣ — API GATEWAY ENDPOINT
 
+👉 Use your EXISTING API
+
+👉 Create a NEW METHOD (GET /order-status) on it
+
+❌ Do NOT create a new API
+
+### 🧠 WHY YOU SHOULD USE THE EXISTING API
+
+#### You already have something like:
+
+```
+CafeOrdersAPI
+https://xxxxx.execute-api.us-east-1.amazonaws.com/dev
+```
+
+#### And inside it you probably have:
+
+```
+POST /orders        → CreateOrderLambda
+```
+
+#### ✔️ This is CORRECT architecture
+
+One API = One backend system
+Multiple resources/methods inside it
+
+**Creating multiple APIs would be:**
+
+❌ Hard to manage
+
+❌ Bad practice
+
+❌ Confusing for frontend
+
+### STRUCTURE (VISUAL)
+
+```
+CafeOrdersAPI
+│
+├── POST /orders
+│     └── CreateOrderLambda
+│
+└── GET /order-status
+      └── GetOrderStatusLambda
+```
+
+✔️ SAME API
+
+✔️ SAME stage (/dev)
+
+✔️ DIFFERENT Lambda functions
+
 ### 1️⃣ Open API Gateway
 
-#### API Gateway → Your API → Resources
+#### API Gateway → Open Your Existing API (example: CafeOrdersAPI) → Resources
 
-### 2️⃣ Create API
+### 2️⃣ Create Resource
+
+```
+Resource name: order-status
+Resource path: /order-status
+```
+
+Click Create resource
+
+### 3️⃣ Create NEW METHOD
+
+Select /order-status
+
+Click Create Method
 
 ```
 GET /order-status
 ```
-
-### 3️⃣ Create method
 
 - **Method:** GET
 
@@ -525,17 +658,59 @@ GET /order-status
 
 - **Lambda name:** GetOrderStatusLambda
 
-#### Enable:
+✔️ Enable Lambda proxy integration
 
-✔ Lambda proxy
+Click Create method
 
-✔ CORS
 
-### 3️⃣ Deploy API
+### 4️⃣ Enable CORS (VERY IMPORTANT)
 
-- **Stage name:** prod
+Select /order-status
 
-### 4️⃣ VERIFY API
+Actions → Enable CORS
+
+✔️ GET
+✔️ OPTIONS
+
+Click Enable CORS and replace existing CORS headers
+
+
+
+### 5️⃣ Deploy API (MOST MISSED STEP 🚨)
+
+API Gateway → Actions → Deploy API
+
+| Field            | Value                 |
+| ---------------- | --------------------- |
+| Deployment stage | New stage             |
+| Stage name       | status                |
+| Description      | Order status endpoint |
+
+
+Click Deploy
+
+### 6️⃣ VERIFY API
+
+#### 🌐 FINAL API URL
+
+```
+GET https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/order-status
+```
+
+#### 🧪 TEST IT (MUST WORK)
+
+```
+curl https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/order-status
+```
+
+#### You should get:
+
+```
+{
+  "metrics": [...],
+  "recent_orders": [...]
+}
+```
 
 #### Open browser:
 
