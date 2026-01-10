@@ -171,8 +171,12 @@ Click Create table
 
 ```
 {
-  "metric": "TOTAL_ORDERS",
-  "count": 0
+  "metric": {
+    "S": "TOTAL_ORDERS"
+  },
+  "count": {
+    "N": "0"
+  }
 }
 ```
 
@@ -182,8 +186,12 @@ Click Create item
 
 ```
 {
-  "metric": "TODAY_ORDERS",
-  "count": 0
+  "metric": {
+    "S": "TOTAL_ORDERS"
+  },
+  "count": {
+    "N": "0"
+  }
 }
 ```
 
