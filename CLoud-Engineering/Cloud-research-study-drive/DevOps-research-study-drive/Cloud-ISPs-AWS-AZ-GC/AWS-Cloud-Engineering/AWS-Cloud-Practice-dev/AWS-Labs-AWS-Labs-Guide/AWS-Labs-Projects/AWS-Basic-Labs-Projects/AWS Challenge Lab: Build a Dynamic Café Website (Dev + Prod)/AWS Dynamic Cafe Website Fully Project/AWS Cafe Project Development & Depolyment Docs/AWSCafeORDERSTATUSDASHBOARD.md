@@ -2146,10 +2146,11 @@ User clicks Login
 
 → NO extra libraries
 
-1️⃣ — AWS COGNITO (CONSOLE ONLY)
-STEP 1: Create User Pool
+###  1️⃣ — AWS COGNITO (CONSOLE ONLY)
 
-AWS Console → Cognito → User Pools
+#### STEP 1: Create User Pool
+
+- **AWS Console → Cognito → User Pools**
 
 • Create user pool
 • Sign-in option: Username
@@ -2158,9 +2159,9 @@ AWS Console → Cognito → User Pools
 
 ✅ Create pool
 
-STEP 2: Create App Client (VERY IMPORTANT)
+#### STEP 2: Create App Client (VERY IMPORTANT)
 
-User pool → App integration → App clients
+- **User pool → App integration → App clients**
 
 • Create app client
 • ❌ Disable client secret (REQUIRED)
@@ -2172,32 +2173,33 @@ User pool → App integration → App clients
 
 Save.
 
-STEP 3: Configure Hosted UI
+#### STEP 3: Configure Hosted UI
 
-User pool → App integration → Hosted UI
+- **User pool → App integration → Hosted UI**
 
-Domain
+#### Domain
 
 • Create Cognito domain
-Example:
+
+#### Example:
 
 ```
 charlie-cafe-admin.auth.ap-south-1.amazoncognito.com
 ```
 
-Callback URL
+#### Callback URL
 
 ```
 https://YOUR-DOMAIN/order-status.html
 ```
 
-Sign-out URL
+#### Sign-out URL
 
 ```
 https://YOUR-DOMAIN/order-status.html
 ```
 
-Scopes
+#### Scopes
 
 ✔ openid
 ✔ email
@@ -2205,21 +2207,21 @@ Scopes
 
 Save changes.
 
-STEP 4: Create Admin User
+#### STEP 4: Create Admin User
 
-User pool → Users → Create user
+- **User pool → Users → Create user**
 
 • Username: admin
 • Password: auto-generate
 • Mark email verified
 
-PART 2️⃣ — FRONTEND (FINAL CODE CHANGE)
+### PART 2️⃣ — FRONTEND (FINAL CODE CHANGE)
 
-🔥 REPLACE ONLY THE <script> SECTION
+**🔥 REPLACE ONLY THE <script> SECTION**
 
-(HTML + CSS stay SAME)
+##### (HTML + CSS stay SAME)
 
-✅ COPY & PASTE THIS SCRIPT (100%)
+#### ✅ COPY & PASTE THIS SCRIPT (100%)
 
 ```
 <script>
@@ -2330,7 +2332,7 @@ if (localStorage.getItem("id_token")) {
 </script>
 ```
 
-✅ FINAL order-status.html
+### ✅ FINAL order-status.html
 
 
 ```
@@ -2538,78 +2540,81 @@ if (localStorage.getItem("id_token")) {
 </body>
 </html>
 ```
-1️⃣ USER_POOL_ID — WHERE TO FIND IT
-Steps
+### 1️⃣ USER_POOL_ID — WHERE TO FIND IT
 
-Open AWS Console
+#### Steps
 
-Go to Cognito
+- Open AWS Console
 
-Click User pools
+- Go to Cognito
 
-Click your user pool
+- Click User pools
 
-On Overview page → copy:
+- Click your user pool
+
+#### On Overview page → copy:
 
 ```
 User pool ID
 ```
 
-Example
+#### Example
 
 ```
 ap-south-1_aBcDe1234
 ```
 
-Paste here
+#### Paste here
 
 ```
 const USER_POOL_ID = "ap-south-1_aBcDe1234";
 ```
 
-2️⃣ CLIENT_ID — WHERE TO FIND IT
-Steps
+### 2️⃣ CLIENT_ID — WHERE TO FIND IT
 
-Inside the same User Pool
+#### Steps
 
-Go to App integration
+- Inside the same User Pool
 
-Scroll to App clients
+- Go to App integration
 
-Click your App client
+- Scroll to App clients
 
-Copy:
+- Click your App client
+
+#### Copy:
 
 ```
 Client ID
 ```
 
-Example
+#### Example
 
 ```
 6h8k9mopq123abcxyz
 ```
 
-Paste here
+#### Paste here
 
 ```
 const CLIENT_ID = "6h8k9mopq123abcxyz";
 ```
 
-3️⃣ DOMAIN — WHERE TO FIND IT
-Steps
+### 3️⃣ DOMAIN — WHERE TO FIND IT
 
-Cognito → User pools
+#### Steps
 
-Select your pool
+- Cognito → User pools
 
-Go to App integration
+- Select your pool
 
-Click Domain
+- Go to App integration
 
-Copy Domain prefix
+- Click Domain
 
-Example
+- Copy Domain prefix
+
+#### Example
 
 If domain shows:
 
@@ -2619,36 +2624,36 @@ charlie-cafe-admin
 
 and region is ap-south-1
 
-Final domain becomes
+#### Final domain becomes
 
 ```
 charlie-cafe-admin.auth.ap-south-1.amazoncognito.com
 ```
 
-Paste here
+#### Paste here
 
 ```
 const DOMAIN = "charlie-cafe-admin.auth.ap-south-1.amazoncognito.com";
 ```
 
-🚨 Do NOT include https://
+**🚨 Do NOT include https://**
 
-4️⃣ API_URL — WHERE TO FIND IT
-Steps
+### 4️⃣ API_URL — WHERE TO FIND IT
+#### Steps
 
-Go to API Gateway
+- Go to API Gateway
 
-Select your API
+- Select your API
 
-Click Stages
+- Click Stages
 
-Choose your stage (status, prod, etc.)
+- Choose your stage (status, prod, etc.)
 
-Copy Invoke URL
+- Copy Invoke URL
 
-Append your resource path
+- Append your resource path
 
-Example
+#### Example
 
 Invoke URL:
 
@@ -2656,25 +2661,25 @@ Invoke URL:
 https://abc123.execute-api.ap-south-1.amazonaws.com/status
 ```
 
-Resource:
+#### Resource:
 
 ```
 GET /order-status
 ```
 
-Final API URL
+#### Final API URL
 
 ```
 https://abc123.execute-api.ap-south-1.amazonaws.com/status/order-status
 ```
 
-Paste here
+#### Paste here
 
 ```
 const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/order-status";
 ```
 
-✅ FINAL EXAMPLE (REALISTIC)
+### ✅ FINAL EXAMPLE (REALISTIC)
 
 ```
 const REGION = "ap-south-1";
@@ -2683,11 +2688,28 @@ const CLIENT_ID = "6h8k9mopq123abcxyz";
 const DOMAIN = "charlie-cafe-admin.auth.ap-south-1.amazoncognito.com";
 const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/order-status";
 ```
+### 🧪 HOW TO VERIFY (IMPORTANT)
+
+- Open order-status.html in browser
+
+- Click Login
+
+- Cognito login page opens
+
+- Login with admin user
+
+- Redirect back
+
+- Dashboard appears
+
+- Orders load every 10 seconds
+
+- If any value is wrong → login loop or blank page.
 
 
+---
 
-
-✅ WHAT YOU NOW HAVE (REAL WORLD)
+### ✅ WHAT YOU NOW HAVE (REAL WORLD)
 
 | Feature                          | Status |
 | -------------------------------- | ------ |
@@ -2699,27 +2721,7 @@ const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/orde
 | Production-grade flow            | ✅      |
 
 
-
-
-🧪 HOW TO VERIFY (IMPORTANT)
-
-Open order-status.html in browser
-
-Click Login
-
-Cognito login page opens
-
-Login with admin user
-
-Redirect back
-
-Dashboard appears
-
-Orders load every 10 seconds
-
-If any value is wrong → login loop or blank page.
-
-
+---
 
 
 
