@@ -705,6 +705,7 @@ Select /order-status
 Actions → Enable CORS
 
 ✔️ GET
+
 ✔️ OPTIONS
 
 Click Enable CORS and replace existing CORS headers
@@ -1959,6 +1960,7 @@ JSON appears
 Now API + spinner + auto refresh are working together
 
 ### 🟣 TASK 4 — TABLE (NO CHART YET)
+
 #### 🎯 GOAL
 
 Show orders in a table
@@ -2153,8 +2155,11 @@ User clicks Login
 - **AWS Console → Cognito → User Pools**
 
 • Create user pool
+
 • Sign-in option: Username
+
 • Password policy: default
+
 • MFA: OFF (for now)
 
 ✅ Create pool
@@ -2164,7 +2169,9 @@ User clicks Login
 - **User pool → App integration → App clients**
 
 • Create app client
+
 • ❌ Disable client secret (REQUIRED)
+
 • Enable:
 
 ✔ Authorization code grant
@@ -2202,7 +2209,9 @@ https://YOUR-DOMAIN/order-status.html
 #### Scopes
 
 ✔ openid
+
 ✔ email
+
 ✔ profile
 
 Save changes.
@@ -2212,7 +2221,9 @@ Save changes.
 - **User pool → Users → Create user**
 
 • Username: admin
+
 • Password: auto-generate
+
 • Mark email verified
 
 ### PART 2️⃣ — FRONTEND (FINAL CODE CHANGE)
