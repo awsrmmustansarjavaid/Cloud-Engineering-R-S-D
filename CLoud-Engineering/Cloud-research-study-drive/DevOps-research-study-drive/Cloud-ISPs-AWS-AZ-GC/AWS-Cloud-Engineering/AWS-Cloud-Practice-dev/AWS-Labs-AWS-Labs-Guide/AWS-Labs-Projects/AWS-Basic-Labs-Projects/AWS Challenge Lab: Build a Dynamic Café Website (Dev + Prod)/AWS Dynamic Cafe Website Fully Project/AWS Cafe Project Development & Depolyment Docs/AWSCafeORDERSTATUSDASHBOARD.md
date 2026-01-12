@@ -302,7 +302,7 @@ CafeSecretsManagerReadOnly
 
 ---
 
-##  PHASE 5️⃣ — ✅ VERIFICATION (MANDATORY)
+##  PHASE 4️⃣ — ✅ VERIFICATION (MANDATORY)
 
 ### 🔎 Test in Lambda
 
@@ -332,7 +332,7 @@ AccessDeniedException: User is not authorized to perform secretsmanager:GetSecre
 
 ---
 
-##  PHASE 6️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
+##  PHASE 5️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
 
 #### ⚠️ This step is inside existing Worker Lambda, NOT API Lambda.
 
@@ -610,7 +610,7 @@ def lambda_handler(event, context):
 ✅ Step 4 complete
 
 ---
-##  PHASE 4️⃣ — API GATEWAY ENDPOINT
+##  PHASE 6️⃣ — API GATEWAY ENDPOINT
 
 👉 Use your EXISTING API
 
@@ -771,7 +771,7 @@ https://API_ID.execute-api.region.amazonaws.com/status/order-status
 ✅ Phase 4 complete
 
 ---
-##  PHASE 5️⃣ — FRONTEND ORDER STATUS PAGE
+##  PHASE 7️⃣ — FRONTEND ORDER STATUS PAGE
 
 ### 1️⃣ Create File
 
@@ -797,7 +797,7 @@ fetch("https://abcd1234.execute-api.us-east-1.amazonaws.com/admin/order-status")
 ```
 
 
-#### Paste EXACT CODE
+#### 1️⃣ Simple order-status.html 
 
 
 
@@ -1007,12 +1007,215 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 </html>
 ```
 
+#### 2️⃣ FINAL order-status.html (Login + Dashboard fully integrated & Recommanded )
+
+> **⚠️ Replace the 3 placeholders later**
+
+- USER_POOL_ID
+
+- APP_CLIENT_ID
+
+- API_URL
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Order Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Amazon Cognito SDK -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.3/dist/amazon-cognito-identity.min.js"></script>
+
+<style>
+body {
+  background:#f5f5f5;
+}
+#dashboard { display:none; }
+</style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+<div class="container">
+  <span class="navbar-brand">☕ Charlie Cafe Admin</span>
+  <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+</div>
+</nav>
+
+<!-- LOGIN -->
+<div class="container mt-5" id="loginBox">
+<div class="col-md-4 mx-auto card p-4">
+<h4 class="text-center mb-3">Admin Login</h4>
+<input id="username" class="form-control mb-2" placeholder="Username">
+<input id="password" type="password" class="form-control mb-3" placeholder="Password">
+<button class="btn btn-warning w-100" onclick="login()">Login</button>
+<p class="text-muted small mt-2 text-center">AWS Cognito Secured</p>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container my-4" id="dashboard">
+
+<!-- FILTER -->
+<div class="row mb-3">
+<div class="col-md-3">
+<input type="date" id="filterDate" class="form-control">
+</div>
+<div class="col-md-2">
+<button class="btn btn-primary w-100" onclick="loadData()">Filter</button>
+</div>
+</div>
+
+<!-- LOADER -->
+<div class="text-center my-3" id="loader" style="display:none">
+<div class="spinner-border text-warning"></div>
+<p>Loading...</p>
+</div>
+
+<!-- METRICS -->
+<div class="row mb-4" id="metrics"></div>
+
+<!-- CHART -->
+<canvas id="orderChart" height="100"></canvas>
+
+<!-- TABLE -->
+<table class="table table-bordered mt-4">
+<thead class="table-dark">
+<tr>
+<th>Customer</th>
+<th>Item</th>
+<th>Qty</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="orders"></tbody>
+</table>
+
+</div>
+
+<script>
+/* ================== CONFIG ================== */
+const USER_POOL_ID = "YOUR_USER_POOL_ID";
+const APP_CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
+
+const poolData = {
+  UserPoolId: USER_POOL_ID,
+  ClientId: APP_CLIENT_ID
+};
+const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+let chart;
+
+/* ================== AUTH ================== */
+function login() {
+  const authData = {
+    Username: username.value,
+    Password: password.value
+  };
+
+  const authDetails = new AmazonCognitoIdentity.AuthenticationDetails(authData);
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+    Username: username.value,
+    Pool: userPool
+  });
+
+  cognitoUser.authenticateUser(authDetails, {
+    onSuccess: function (result) {
+      localStorage.setItem("token", result.getIdToken().getJwtToken());
+      loginBox.style.display="none";
+      dashboard.style.display="block";
+      loadData();
+      setInterval(loadData, 10000);
+    },
+    onFailure: function (err) {
+      alert(err.message);
+    }
+  });
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  location.reload();
+}
+
+/* ================== DATA ================== */
+function loadData() {
+  loader.style.display="block";
+  metrics.innerHTML="";
+  orders.innerHTML="";
+
+  let url = API_URL;
+  const date = filterDate.value;
+  if(date) url += "?date=" + date;
+
+  fetch(url, {
+    headers: {
+      Authorization: localStorage.getItem("token")
+    }
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    loader.style.display="none";
+
+    data.metrics.forEach(m=>{
+      metrics.innerHTML += `
+      <div class="col-md-3">
+        <div class="bg-light p-3 text-center fw-bold rounded">
+          ${m.metric}<br>${m.count}
+        </div>
+      </div>`;
+    });
+
+    const items={};
+    data.recent_orders.forEach(o=>{
+      orders.innerHTML += `
+      <tr>
+        <td>${o.customer_name}</td>
+        <td>${o.item}</td>
+        <td>${o.quantity}</td>
+        <td>${o.created_at}</td>
+      </tr>`;
+      items[o.item]=(items[o.item]||0)+o.quantity;
+    });
+
+    if(chart) chart.destroy();
+    chart = new Chart(orderChart,{
+      type:'bar',
+      data:{
+        labels:Object.keys(items),
+        datasets:[{
+          label:'Orders per Item',
+          data:Object.values(items),
+          backgroundColor:'#ff9800'
+        }]
+      }
+    });
+  });
+}
+</script>
+
+</body>
+</html>
+```
+
 #### Save File
 
 ```
 CTRL + O → ENTER
 CTRL + X
 ```
+
+
 
 ### 2️⃣ SECURITY & PERMISSIONS
 
@@ -1048,7 +1251,7 @@ Ensure EC2 Security Group allows:
 
 ---
 
-## 🔄 PHASE 6 — FEATURE VERIFICATION (IMPORTANT)
+## 🔄 PHASE 8️⃣ — FEATURE VERIFICATION (IMPORTANT)
 
 ### 1️⃣ Send order from frontend / API
 
@@ -1149,39 +1352,132 @@ Pass date as query param:
 ```
 ---
 
-## 🔐 PHASE 7 — COGNITO INTEGRATION (PRODUCTION READY)
+## 🔐 PHASE 9️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
 ### ⚠ IMPORTANT TRUTH
 
 You DID THE RIGHT THING by not hardcoding Cognito.
 
-Professionals:
+#### Professionals:
+
 ✔ Build UI first
+
 ✔ Add auth later
+
 ✔ Avoid blocking progress
 
-✅ What is READY
+### ✅ What is READY
 
 ✔ Login UI
+
 ✔ Protected dashboard
+
 ✔ Auth logic placeholder
 
+```
 function login(){
     if(username.value && password.value){
         loginBox.style.display="none";
         dashboard.style.display="block";
     }
 }
+```
 
-🔜 What You Will Plug Later
 
-When ready, replace login() with:
+### 🔜 What You Will Plug Later
 
-Cognito Item
-User Pool ID
+#### When ready, replace login() with:
+
+| Cognito Item    |
+| --------------- |
+| User Pool ID    |
+| App Client ID   |
+| Hosted UI / SDK |
+
+
+### 📢 AWS COGNITO CONFIGURATION
+
+#### 1️⃣ CREATE USER POOL
+
+- **AWS Console → Cognito**
+
+- Click Create user pool
+
+- **Type:** Email or Username
+
+- **Password policy → Default**
+
+- **MFA → Optional**
+
+**Click Create**
+
+#### 📌 SAVE:
+
+- User Pool ID
+
+#### 2️⃣ CREATE APP CLIENT
+
+User Pool → App integration
+
+App clients → Create app client
+
+❌ Disable client secret
+
+Enable:
+
+USER_PASSWORD_AUTH
+
+Create
+
+📌 SAVE:
+
 App Client ID
-Hosted UI / SDK
 
+#### 3️⃣ CREATE ADMIN USER
+
+Users → Create user
+
+Username: admin
+
+Temporary password
+
+Mark email verified
+
+Create
+
+➡️ Login once → change password
+
+#### 4️⃣ API GATEWAY AUTH (OPTIONAL BUT PRO)
+
+API Gateway → Authorizers
+
+Create Cognito Authorizer
+
+Attach User Pool
+
+Apply to:
+
+```
+GET /order-status
+```
+
+#### 5️⃣ TEST FLOW
+
+#### 1️⃣ Open:
+
+```
+http://YOUR_EC2_IP/order-status.html
+```
+
+2️⃣ Login with Cognito admin
+
+3️⃣ Dashboard loads
+
+4️⃣ Auto refresh works
+
+5️⃣ Chart updates
+
+6️⃣ Metrics visible
 
 
 
@@ -1211,6 +1507,349 @@ You now have:
 | Order-status page updated | ✅      |
 
 ---
+
+# SECTION 2️⃣ Cognito, JWT, API Gateway
+
+## PHASE 1️⃣ load Order Status 
+
+### 🟢 BASELINE (STARTING POINT – DO THIS FIRST)
+
+STEP 0.1 — Open your file
+
+```
+sudo nano /var/www/html/order-status.html
+```
+
+STEP 0.2 — Paste this MINIMAL BASE FILE (NO FEATURES YET)
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Status</title>
+</head>
+<body>
+
+<h2>Order Status</h2>
+
+<button onclick="loadData()">Load Orders</button>
+
+<div id="output"></div>
+
+<script>
+function loadData() {
+  document.getElementById("output").innerHTML = "Loading...";
+}
+</script>
+
+</body>
+</html>
+```
+
+STEP 0.3 — Save & test
+
+```
+CTRL + O → ENTER → CTRL + X
+```
+
+Open browser:
+
+```
+http://EC2_PUBLIC_IP/order-status.html
+```
+
+✅ If you see “Order Status” + button, continue
+
+❌ If not, STOP and fix Apache first
+
+### 🟣 TASK 1 — LOADING SPINNER (NO API YET)
+
+#### 🎯 GOAL
+
+Show spinner when loading starts
+Hide spinner when loading ends
+
+#### STEP 1.1 — ADD SPINNER HTML (WHERE EXACTLY)
+
+Inside <body>, below the button, add:
+
+```
+<div id="loader" style="display:none">
+  Loading...
+</div>
+```
+
+Your body now looks like:
+
+```
+<button onclick="loadData()">Load Orders</button>
+
+<div id="loader" style="display:none">
+  Loading...
+</div>
+
+<div id="output"></div>
+```
+
+STEP 1.2 — SHOW SPINNER (WHAT LINE)
+
+Modify loadData():
+
+```
+<script>
+function loadData() {
+  document.getElementById("loader").style.display = "block";
+}
+</script>
+```
+
+STEP 1.3 — VERIFY
+
+Refresh page → click Load Orders
+
+✅ You see Loading…
+❌ If not, STOP
+
+STEP 1.4 — HIDE SPINNER (SIMULATE END)
+
+Update function:
+
+```
+function loadData() {
+  document.getElementById("loader").style.display = "block";
+
+  setTimeout(() => {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("output").innerHTML = "Loaded!";
+  }, 2000);
+}
+```
+
+STEP 1.5 — VERIFY
+
+Click button:
+
+Spinner shows
+
+After 2 sec → disappears
+
+“Loaded!” appears
+
+✅ TASK 1 COMPLETE
+❌ Do NOT continue if this fails
+
+🟣 TASK 2 — AUTO REFRESH (NO API STILL)
+🎯 GOAL
+
+Run loadData() every 10 seconds automatically
+
+STEP 2.1 — ADD INTERVAL (WHERE)
+
+At bottom of <script>, add:
+
+```
+setInterval(loadData, 10000);
+```
+
+STEP 2.2 — VERIFY
+
+Open page
+
+Every 10 seconds:
+
+Spinner appears
+
+Spinner disappears
+
+✅ TASK 2 COMPLETE
+
+🟣 TASK 3 — FETCH REAL DATA (FIRST API USE)
+🎯 GOAL
+
+Replace fake data with real API response
+
+STEP 3.1 — REPLACE loadData()
+
+```
+function loadData() {
+  document.getElementById("loader").style.display = "block";
+
+  fetch("https://YOUR_API_URL/order-status")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("output").innerHTML =
+        JSON.stringify(data, null, 2);
+    });
+}
+```
+
+STEP 3.2 — VERIFY
+
+Open page
+
+Spinner shows
+
+JSON appears
+
+✅ TASK 3 COMPLETE
+Now API + spinner + auto refresh are working together
+
+🟣 TASK 4 — TABLE (NO CHART YET)
+🎯 GOAL
+
+Show orders in a table
+
+STEP 4.1 — ADD TABLE HTML
+
+Above <div id="output">, add:
+
+```
+<table border="1">
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Item</th>
+      <th>Qty</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody id="orders"></tbody>
+</table>
+```
+
+STEP 4.2 — UPDATE JS
+
+Replace .then(data => { ... }) with:
+
+```
+.then(data => {
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("orders").innerHTML = "";
+
+  data.recent_orders.forEach(o => {
+    document.getElementById("orders").innerHTML += `
+      <tr>
+        <td>${o.customer_name}</td>
+        <td>${o.item}</td>
+        <td>${o.quantity}</td>
+        <td>${o.created_at}</td>
+      </tr>
+    `;
+  });
+});
+```
+
+STEP 4.3 — VERIFY
+
+✅ Orders appear in table
+✅ Auto refresh still works
+
+🟣 TASK 5 — CHART (ONLY NOW)
+🎯 GOAL
+
+Visualize orders per item
+
+STEP 5.1 — ADD CHART.JS
+
+Inside <head>:
+
+```
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+```
+
+STEP 5.2 — ADD CANVAS
+
+Above table:
+
+```
+<canvas id="chart"></canvas>
+```
+
+STEP 5.3 — ADD JS LOGIC
+
+At top of script:
+
+```
+let chart;
+```
+
+Inside fetch success:
+
+```
+const items = {};
+data.recent_orders.forEach(o => {
+  items[o.item] = (items[o.item] || 0) + o.quantity;
+});
+
+if (chart) chart.destroy();
+
+chart = new Chart(document.getElementById("chart"), {
+  type: "bar",
+  data: {
+    labels: Object.keys(items),
+    datasets: [{
+      label: "Orders per item",
+      data: Object.values(items)
+    }]
+  }
+});
+```
+
+STEP 5.4 — VERIFY
+
+✅ Chart renders
+✅ Chart updates every 10s
+
+🟣 TASK 6 — DATE FILTER (FRONTEND ONLY)
+STEP 6.1 — ADD INPUT
+
+```
+<input type="date" id="filterDate">
+```
+
+STEP 6.2 — USE IT
+
+Inside loadData():
+
+```
+const date = document.getElementById("filterDate").value;
+let url = "https://YOUR_API_URL/order-status";
+if (date) url += "?date=" + date;
+```
+
+🟣 TASK 7 — LOGIN (UI ONLY – NO COGNITO YET)
+STEP 7.1 — HIDE DASHBOARD
+
+Wrap dashboard:
+
+```
+<div id="dashboard" style="display:none">
+  <!-- all dashboard html -->
+</div>
+```
+STEP 7.2 — LOGIN FORM
+
+```
+<input id="user">
+<input id="pass" type="password">
+<button onclick="login()">Login</button>
+```
+
+STEP 7.3 — LOGIN FUNCTION
+
+```
+function login() {
+  if(user.value && pass.value) {
+    dashboard.style.display = "block";
+  }
+}
+```
+
+
+
+
+
 
 
 
