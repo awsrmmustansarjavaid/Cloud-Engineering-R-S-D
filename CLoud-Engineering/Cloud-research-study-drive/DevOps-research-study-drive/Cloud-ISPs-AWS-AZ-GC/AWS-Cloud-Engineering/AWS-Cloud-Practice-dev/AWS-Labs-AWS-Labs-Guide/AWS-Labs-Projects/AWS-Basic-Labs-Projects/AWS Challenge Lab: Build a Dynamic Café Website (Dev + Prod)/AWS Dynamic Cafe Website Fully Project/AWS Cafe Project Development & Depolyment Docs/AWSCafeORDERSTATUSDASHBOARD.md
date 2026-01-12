@@ -2214,6 +2214,7 @@ User pool → Users → Create user
 • Mark email verified
 
 PART 2️⃣ — FRONTEND (FINAL CODE CHANGE)
+
 🔥 REPLACE ONLY THE <script> SECTION
 
 (HTML + CSS stay SAME)
@@ -2330,6 +2331,7 @@ if (localStorage.getItem("id_token")) {
 ```
 
 ✅ FINAL order-status.html
+
 
 ```
 <!DOCTYPE html>
@@ -2536,6 +2538,152 @@ if (localStorage.getItem("id_token")) {
 </body>
 </html>
 ```
+1️⃣ USER_POOL_ID — WHERE TO FIND IT
+Steps
+
+Open AWS Console
+
+Go to Cognito
+
+Click User pools
+
+Click your user pool
+
+On Overview page → copy:
+
+```
+User pool ID
+```
+
+Example
+
+```
+ap-south-1_aBcDe1234
+```
+
+Paste here
+
+```
+const USER_POOL_ID = "ap-south-1_aBcDe1234";
+```
+
+2️⃣ CLIENT_ID — WHERE TO FIND IT
+Steps
+
+Inside the same User Pool
+
+Go to App integration
+
+Scroll to App clients
+
+Click your App client
+
+Copy:
+
+```
+Client ID
+```
+
+Example
+
+```
+6h8k9mopq123abcxyz
+```
+
+Paste here
+
+```
+const CLIENT_ID = "6h8k9mopq123abcxyz";
+```
+
+3️⃣ DOMAIN — WHERE TO FIND IT
+Steps
+
+Cognito → User pools
+
+Select your pool
+
+Go to App integration
+
+Click Domain
+
+Copy Domain prefix
+
+Example
+
+If domain shows:
+
+```
+charlie-cafe-admin
+```
+
+and region is ap-south-1
+
+Final domain becomes
+
+```
+charlie-cafe-admin.auth.ap-south-1.amazoncognito.com
+```
+
+Paste here
+
+```
+const DOMAIN = "charlie-cafe-admin.auth.ap-south-1.amazoncognito.com";
+```
+
+🚨 Do NOT include https://
+
+4️⃣ API_URL — WHERE TO FIND IT
+Steps
+
+Go to API Gateway
+
+Select your API
+
+Click Stages
+
+Choose your stage (status, prod, etc.)
+
+Copy Invoke URL
+
+Append your resource path
+
+Example
+
+Invoke URL:
+
+```
+https://abc123.execute-api.ap-south-1.amazonaws.com/status
+```
+
+Resource:
+
+```
+GET /order-status
+```
+
+Final API URL
+
+```
+https://abc123.execute-api.ap-south-1.amazonaws.com/status/order-status
+```
+
+Paste here
+
+```
+const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/order-status";
+```
+
+✅ FINAL EXAMPLE (REALISTIC)
+
+```
+const REGION = "ap-south-1";
+const USER_POOL_ID = "ap-south-1_aBcDe1234";
+const CLIENT_ID = "6h8k9mopq123abcxyz";
+const DOMAIN = "charlie-cafe-admin.auth.ap-south-1.amazoncognito.com";
+const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/order-status";
+```
+
 
 
 
@@ -2552,6 +2700,24 @@ if (localStorage.getItem("id_token")) {
 
 
 
+
+🧪 HOW TO VERIFY (IMPORTANT)
+
+Open order-status.html in browser
+
+Click Login
+
+Cognito login page opens
+
+Login with admin user
+
+Redirect back
+
+Dashboard appears
+
+Orders load every 10 seconds
+
+If any value is wrong → login loop or blank page.
 
 
 
