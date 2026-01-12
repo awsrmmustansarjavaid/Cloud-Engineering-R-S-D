@@ -1510,17 +1510,274 @@ You now have:
 
 # SECTION 2️⃣ Cognito, JWT, API Gateway
 
-## PHASE 1️⃣ load Order Status 
 
-### 🟢 BASELINE (STARTING POINT – DO THIS FIRST)
 
-STEP 0.1 — Open your file
+## Method 1 ( Recommanded)
+
+### ✅ FINAL ORDER STATUS FRONTEND
+
+#### (Login + Spinner + Auto Refresh + Chart + Date Filter)
+
+COGNITO-READY (no backend change required now)
+
+#### 📍 File location (CORRECT)
 
 ```
 sudo nano /var/www/html/order-status.html
 ```
 
-STEP 0.2 — Paste this MINIMAL BASE FILE (NO FEATURES YET)
+#### Paste Code
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charlie Cafe ☕ | Admin Order Status</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),
+    url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+    background-size:cover;
+    background-attachment:fixed;
+    color:#fff;
+}
+
+.navbar{background:#3b1f0e;}
+.status-container{
+    background:rgba(30,30,30,.8);
+    border-radius:20px;
+    padding:40px;
+    margin:40px auto;
+    max-width:1200px;
+}
+
+.metric-card{
+    background:linear-gradient(135deg,#4a2c1a,#3b1f0e);
+    border-radius:15px;
+    text-align:center;
+}
+
+#dashboard{display:none;}
+#loader{display:none;}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark">
+<div class="container">
+<span class="navbar-brand">☕ Charlie Cafe Admin</span>
+<button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+</div>
+</nav>
+
+<!-- LOGIN -->
+<div class="container mt-5" id="loginBox">
+<div class="col-md-4 mx-auto bg-dark p-4 rounded shadow">
+<h4 class="text-center mb-3">Admin Login</h4>
+<input id="username" class="form-control mb-2" placeholder="Username">
+<input id="password" type="password" class="form-control mb-3" placeholder="Password">
+<button class="btn btn-warning w-100 fw-bold" onclick="login()">Login</button>
+<p class="text-center text-muted mt-2 small">Cognito Ready</p>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container">
+<div class="status-container" id="dashboard">
+
+<h2 class="text-center mb-4">📊 Live Order Status</h2>
+
+<!-- FILTER -->
+<div class="row mb-3">
+<div class="col-md-4">
+<input type="date" id="filterDate" class="form-control">
+</div>
+<div class="col-md-3">
+<button class="btn btn-warning w-100 fw-bold" onclick="loadData()">Apply Filter</button>
+</div>
+</div>
+
+<!-- LOADER -->
+<div class="text-center my-3" id="loader">
+<div class="spinner-border text-warning"></div>
+<p>Loading orders...</p>
+</div>
+
+<!-- METRICS -->
+<div class="row g-4 mb-4 justify-content-center" id="metrics"></div>
+
+<!-- CHART -->
+<canvas id="orderChart" height="100"></canvas>
+
+<!-- TABLE -->
+<div class="table-responsive mt-4">
+<table class="table table-hover text-white">
+<thead class="table-dark">
+<tr>
+<th>Customer</th>
+<th>Item</th>
+<th>Qty</th>
+<th>Table</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="orders"></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<footer class="text-center text-muted py-4">
+© 2026 Charlie Cafe | Serverless Analytics ☁️
+</footer>
+
+<script>
+/* ================= CONFIG ================= */
+const API_URL="https://API_ID.execute-api.region.amazonaws.com/status/order-status"; 
+let chart;
+let autoRefresh;
+
+/* ================= LOGIN (TEMP) ================= */
+function login(){
+    if(username.value && password.value){
+        loginBox.style.display="none";
+        dashboard.style.display="block";
+        loadData();
+        autoRefresh=setInterval(loadData,10000);
+    }
+}
+
+function logout(){
+    clearInterval(autoRefresh);
+    location.reload();
+}
+
+/* ================= LOAD DATA ================= */
+function loadData(){
+    loader.style.display="block";
+    metrics.innerHTML="";
+    orders.innerHTML="";
+
+    let url=API_URL;
+    if(filterDate.value){
+        url+="?date="+filterDate.value;
+    }
+
+    fetch(url)
+    .then(res=>res.json())
+    .then(data=>{
+        loader.style.display="none";
+
+        /* METRICS */
+        data.metrics.forEach(m=>{
+            metrics.innerHTML+=`
+            <div class="col-6 col-md-3">
+            <div class="metric-card p-3 shadow">
+                <h5 class="text-warning">${m.metric}</h5>
+                <h2>${m.count}</h2>
+            </div>
+            </div>`;
+        });
+
+        /* TABLE + CHART DATA */
+        const items={};
+        data.recent_orders.forEach(o=>{
+            orders.innerHTML+=`
+            <tr>
+            <td>${o.customer_name||'Guest'}</td>
+            <td>${o.item}</td>
+            <td>${o.quantity}</td>
+            <td>${o.table_number||'-'}</td>
+            <td>${o.created_at}</td>
+            </tr>`;
+            items[o.item]=(items[o.item]||0)+o.quantity;
+        });
+
+        /* CHART */
+        if(chart) chart.destroy();
+        chart=new Chart(orderChart,{
+            type:'bar',
+            data:{
+                labels:Object.keys(items),
+                datasets:[{
+                    label:'Orders per Item',
+                    data:Object.values(items),
+                    backgroundColor:'#ff9800'
+                }]
+            }
+        });
+    })
+    .catch(err=>{
+        loader.style.display="none";
+        orders.innerHTML=`
+        <tr><td colspan="5" class="text-center text-danger">
+        Failed to load data
+        </td></tr>`;
+    });
+}
+</script>
+
+</body>
+</html>
+```
+
+#### ✅ WHAT THIS FILE ALREADY DOES
+
+| Feature                       | Status                               |
+| ----------------------------- | ------------------------------------ |
+| Login screen                  | ✅ Working (temporary, Cognito-ready) |
+| Dashboard hidden before login | ✅                                    |
+| Loading spinner               | ✅                                    |
+| Auto refresh (10s)            | ✅                                    |
+| Metrics cards                 | ✅                                    |
+| Orders table                  | ✅                                    |
+| Chart (orders per item)       | ✅                                    |
+| Date filter (frontend)        | ✅                                    |
+| Backend untouched             | ✅                                    |
+
+### 🔁 ONLY THINGS YOU MUST CHANGE
+
+#### 1️⃣ Replace API URL
+
+```
+const API_URL="https://API_ID.execute-api.region.amazonaws.com/status/order-status";
+```
+
+#### 2️⃣ (Later) Replace login logic with Cognito
+
+NO need now
+
+---
+
+## Method 2
+
+## PHASE 1️⃣ load Order Status 
+
+### 🟢 BASELINE (STARTING POINT – DO THIS FIRST)
+
+#### STEP 0.1 — Open your file
+
+```
+sudo nano /var/www/html/order-status.html
+```
+
+#### STEP 0.2 — Paste this MINIMAL BASE FILE (NO FEATURES YET)
 
 ```
 <!DOCTYPE html>
@@ -1546,13 +1803,13 @@ function loadData() {
 </html>
 ```
 
-STEP 0.3 — Save & test
+#### STEP 0.3 — Save & test
 
 ```
 CTRL + O → ENTER → CTRL + X
 ```
 
-Open browser:
+#### Open browser:
 
 ```
 http://EC2_PUBLIC_IP/order-status.html
@@ -1591,7 +1848,7 @@ Your body now looks like:
 <div id="output"></div>
 ```
 
-STEP 1.2 — SHOW SPINNER (WHAT LINE)
+#### STEP 1.2 — SHOW SPINNER (WHAT LINE)
 
 Modify loadData():
 
@@ -1603,16 +1860,17 @@ function loadData() {
 </script>
 ```
 
-STEP 1.3 — VERIFY
+#### STEP 1.3 — VERIFY
 
 Refresh page → click Load Orders
 
 ✅ You see Loading…
+
 ❌ If not, STOP
 
-STEP 1.4 — HIDE SPINNER (SIMULATE END)
+#### STEP 1.4 — HIDE SPINNER (SIMULATE END)
 
-Update function:
+#### Update function:
 
 ```
 function loadData() {
@@ -1625,9 +1883,9 @@ function loadData() {
 }
 ```
 
-STEP 1.5 — VERIFY
+#### STEP 1.5 — VERIFY
 
-Click button:
+#### Click button:
 
 Spinner shows
 
@@ -1635,15 +1893,18 @@ After 2 sec → disappears
 
 “Loaded!” appears
 
-✅ TASK 1 COMPLETE
-❌ Do NOT continue if this fails
+**✅ TASK 1 COMPLETE**
 
-🟣 TASK 2 — AUTO REFRESH (NO API STILL)
-🎯 GOAL
+**❌ Do NOT continue if this fails**
+
+
+### 🟣 TASK 2 — AUTO REFRESH (NO API STILL)
+
+#### 🎯 GOAL
 
 Run loadData() every 10 seconds automatically
 
-STEP 2.1 — ADD INTERVAL (WHERE)
+#### STEP 2.1 — ADD INTERVAL (WHERE)
 
 At bottom of <script>, add:
 
@@ -1651,24 +1912,25 @@ At bottom of <script>, add:
 setInterval(loadData, 10000);
 ```
 
-STEP 2.2 — VERIFY
+#### STEP 2.2 — VERIFY
 
 Open page
 
-Every 10 seconds:
+**Every 10 seconds:**
 
 Spinner appears
 
 Spinner disappears
 
-✅ TASK 2 COMPLETE
+**✅ TASK 2 COMPLETE**
 
-🟣 TASK 3 — FETCH REAL DATA (FIRST API USE)
-🎯 GOAL
+### 🟣 TASK 3 — FETCH REAL DATA (FIRST API USE)
+
+#### 🎯 GOAL
 
 Replace fake data with real API response
 
-STEP 3.1 — REPLACE loadData()
+#### STEP 3.1 — REPLACE loadData()
 
 ```
 function loadData() {
@@ -1684,7 +1946,7 @@ function loadData() {
 }
 ```
 
-STEP 3.2 — VERIFY
+#### STEP 3.2 — VERIFY
 
 Open page
 
@@ -1692,15 +1954,16 @@ Spinner shows
 
 JSON appears
 
-✅ TASK 3 COMPLETE
+**✅ TASK 3 COMPLETE**
+
 Now API + spinner + auto refresh are working together
 
-🟣 TASK 4 — TABLE (NO CHART YET)
-🎯 GOAL
+### 🟣 TASK 4 — TABLE (NO CHART YET)
+#### 🎯 GOAL
 
 Show orders in a table
 
-STEP 4.1 — ADD TABLE HTML
+#### STEP 4.1 — ADD TABLE HTML
 
 Above <div id="output">, add:
 
@@ -1740,17 +2003,19 @@ Replace .then(data => { ... }) with:
 });
 ```
 
-STEP 4.3 — VERIFY
+#### STEP 4.3 — VERIFY
 
 ✅ Orders appear in table
+
 ✅ Auto refresh still works
 
-🟣 TASK 5 — CHART (ONLY NOW)
-🎯 GOAL
+### 🟣 TASK 5 — CHART (ONLY NOW)
+
+#### 🎯 GOAL
 
 Visualize orders per item
 
-STEP 5.1 — ADD CHART.JS
+#### STEP 5.1 — ADD CHART.JS
 
 Inside <head>:
 
@@ -1758,7 +2023,7 @@ Inside <head>:
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 ```
 
-STEP 5.2 — ADD CANVAS
+#### STEP 5.2 — ADD CANVAS
 
 Above table:
 
@@ -1766,7 +2031,7 @@ Above table:
 <canvas id="chart"></canvas>
 ```
 
-STEP 5.3 — ADD JS LOGIC
+#### STEP 5.3 — ADD JS LOGIC
 
 At top of script:
 
@@ -1796,19 +2061,21 @@ chart = new Chart(document.getElementById("chart"), {
 });
 ```
 
-STEP 5.4 — VERIFY
+#### STEP 5.4 — VERIFY
 
 ✅ Chart renders
+
 ✅ Chart updates every 10s
 
-🟣 TASK 6 — DATE FILTER (FRONTEND ONLY)
-STEP 6.1 — ADD INPUT
+### 🟣 TASK 6 — DATE FILTER (FRONTEND ONLY)
+
+#### STEP 6.1 — ADD INPUT
 
 ```
 <input type="date" id="filterDate">
 ```
 
-STEP 6.2 — USE IT
+#### STEP 6.2 — USE IT
 
 Inside loadData():
 
@@ -1818,8 +2085,9 @@ let url = "https://YOUR_API_URL/order-status";
 if (date) url += "?date=" + date;
 ```
 
-🟣 TASK 7 — LOGIN (UI ONLY – NO COGNITO YET)
-STEP 7.1 — HIDE DASHBOARD
+### 🟣 TASK 7 — LOGIN (UI ONLY – NO COGNITO YET)
+
+#### STEP 7.1 — HIDE DASHBOARD
 
 Wrap dashboard:
 
@@ -1828,7 +2096,7 @@ Wrap dashboard:
   <!-- all dashboard html -->
 </div>
 ```
-STEP 7.2 — LOGIN FORM
+#### STEP 7.2 — LOGIN FORM
 
 ```
 <input id="user">
@@ -1836,7 +2104,7 @@ STEP 7.2 — LOGIN FORM
 <button onclick="login()">Login</button>
 ```
 
-STEP 7.3 — LOGIN FUNCTION
+#### STEP 7.3 — LOGIN FUNCTION
 
 ```
 function login() {
@@ -1845,6 +2113,11 @@ function login() {
   }
 }
 ```
+---
+
+
+
+
 
 
 
