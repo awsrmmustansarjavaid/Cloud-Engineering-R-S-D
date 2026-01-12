@@ -738,14 +738,27 @@ GET https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
 curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
 ```
 
-#### You should get:
+#### ✅ You MUST see JSON like:
 
 ```
 {
-  "metrics": [...],
-  "recent_orders": [...]
+  "metrics": [
+    {"metric":"Total Orders","count":15}
+  ],
+  "recent_orders": [
+    {
+      "customer_name":"Ali",
+      "item":"Coffee",
+      "quantity":2,
+      "created_at":"2026-01-09 12:30:00"
+    }
+  ]
 }
 ```
+
+❌ If this does not work → STOP. Fix backend first.
+
+
 
 #### Open browser:
 
@@ -767,10 +780,26 @@ sudo nano /var/www/html/order-status.html
 ```
 
 
-
 ### 1️⃣ CODE
 
-Paste EXACT CODE
+#### 🚨 IMPORTANT:
+
+#### Replace this line ONLY:
+
+```
+fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
+```
+
+#### With your real API:
+
+```
+fetch("https://abcd1234.execute-api.us-east-1.amazonaws.com/admin/order-status")
+```
+
+
+#### Paste EXACT CODE
+
+
 
 ```
 <!DOCTYPE html>
@@ -978,7 +1007,36 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 </html>
 ```
 
-### 2️⃣ Open page in browser
+#### Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+### 2️⃣ SECURITY & PERMISSIONS
+
+✅ 2.1 Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+✅ 2.2 Open Security Group (MANDATORY)
+
+Ensure EC2 Security Group allows:
+
+
+| Type | Port | Source    |
+| ---- | ---- | --------- |
+| HTTP | 80   | 0.0.0.0/0 |
+
+
+
+### 3️⃣ Open page in browser
 
 ✔ Orders visible
 
@@ -990,7 +1048,7 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 
 ---
 
-##  PHASE 6️⃣ — VERIFICATION CHECKLIST
+## 🔄 PHASE 6 — FEATURE VERIFICATION (IMPORTANT)
 
 ### 1️⃣ Send order from frontend / API
 
@@ -1019,6 +1077,113 @@ SELECT * FROM orders ORDER BY created_at DESC;
 ### 6️⃣ Check CloudWatch Logs
 
 ✔ "Order processed successfully"
+
+
+### 7️⃣ Verify Apache is Running
+
+```
+sudo systemctl status httpd
+```
+
+If not running:
+
+```
+sudo systemctl start httpd
+```
+
+```
+sudo systemctl enable httpd
+```
+
+### 8️⃣ Verify Web Root
+
+```
+ls /var/www/html
+```
+
+This IS THE CORRECT LOCATION ✅
+
+✔ /var/www/html/ is Apache’s default public directory
+
+
+### 🔁 Auto Refresh
+
+#### ✔ Implemented here:
+
+```
+setInterval(loadData,10000);
+```
+
+### ⏳ Loading Spinner
+
+✔ Enabled before fetch
+
+✔ Hidden after response
+
+```
+document.getElementById("loader").style.display="block";
+```
+
+### 📊 Chart (Orders per Item)
+
+✔ Chart.js used
+
+✔ Auto re-draws on refresh
+
+✔ No page reload
+
+### 📅 Date Filter
+
+✔ Frontend ready
+
+```
+<input type="date" id="filterDate">
+```
+
+👉 Backend enhancement later:
+
+Pass date as query param:
+
+```
+/order-status?date=2026-01-09
+```
+---
+
+## 🔐 PHASE 7 — COGNITO INTEGRATION (PRODUCTION READY)
+
+### ⚠ IMPORTANT TRUTH
+
+You DID THE RIGHT THING by not hardcoding Cognito.
+
+Professionals:
+✔ Build UI first
+✔ Add auth later
+✔ Avoid blocking progress
+
+✅ What is READY
+
+✔ Login UI
+✔ Protected dashboard
+✔ Auth logic placeholder
+
+function login(){
+    if(username.value && password.value){
+        loginBox.style.display="none";
+        dashboard.style.display="block";
+    }
+}
+
+🔜 What You Will Plug Later
+
+When ready, replace login() with:
+
+Cognito Item
+User Pool ID
+App Client ID
+Hosted UI / SDK
+
+
+
 
 ### 🏆 RESULT
 
