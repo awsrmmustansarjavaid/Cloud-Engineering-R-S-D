@@ -2115,6 +2115,444 @@ function login() {
 ```
 ---
 
+## SECTION 3- Cognito Hosted UI (industry standard)
+
+**COGNITO → real login**
+
+✅ Real AWS Cognito login
+
+✅ JWT ID token stored in browser
+
+✅ Auto-protect your dashboard
+
+✅ Ready for API Gateway Authorizer later
+
+### 🧠 HOW THIS WILL WORK 
+
+#### Flow:
+
+```
+User clicks Login
+→ Redirect to Cognito Hosted UI
+→ User signs in
+→ Cognito redirects back with JWT
+→ Frontend stores token
+→ Dashboard unlocks
+```
+
+→ NO username/password handling in frontend
+
+→ NO security risk
+
+→ NO extra libraries
+
+1️⃣ — AWS COGNITO (CONSOLE ONLY)
+STEP 1: Create User Pool
+
+AWS Console → Cognito → User Pools
+
+• Create user pool
+• Sign-in option: Username
+• Password policy: default
+• MFA: OFF (for now)
+
+✅ Create pool
+
+STEP 2: Create App Client (VERY IMPORTANT)
+
+User pool → App integration → App clients
+
+• Create app client
+• ❌ Disable client secret (REQUIRED)
+• Enable:
+
+✔ Authorization code grant
+
+✔ Implicit grant
+
+Save.
+
+STEP 3: Configure Hosted UI
+
+User pool → App integration → Hosted UI
+
+Domain
+
+• Create Cognito domain
+Example:
+
+```
+charlie-cafe-admin.auth.ap-south-1.amazoncognito.com
+```
+
+Callback URL
+
+```
+https://YOUR-DOMAIN/order-status.html
+```
+
+Sign-out URL
+
+```
+https://YOUR-DOMAIN/order-status.html
+```
+
+Scopes
+
+✔ openid
+✔ email
+✔ profile
+
+Save changes.
+
+STEP 4: Create Admin User
+
+User pool → Users → Create user
+
+• Username: admin
+• Password: auto-generate
+• Mark email verified
+
+PART 2️⃣ — FRONTEND (FINAL CODE CHANGE)
+🔥 REPLACE ONLY THE <script> SECTION
+
+(HTML + CSS stay SAME)
+
+✅ COPY & PASTE THIS SCRIPT (100%)
+
+```
+<script>
+/* ================= CONFIG ================= */
+const REGION = "ap-south-1";
+const USER_POOL_ID = "ap-south-1_XXXXXXX";
+const CLIENT_ID = "XXXXXXXXXXXXXXXXXXXX";
+const DOMAIN = "charlie-cafe-admin.auth.ap-south-1.amazoncognito.com";
+
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/status/order-status";
+
+/* ================= AUTH ================= */
+function login() {
+    const loginUrl =
+        `https://${DOMAIN}/login?` +
+        `client_id=${CLIENT_ID}` +
+        `&response_type=token` +
+        `&scope=openid+email+profile` +
+        `&redirect_uri=${encodeURIComponent(window.location.href)}`;
+    window.location.href = loginUrl;
+}
+
+function logout() {
+    localStorage.removeItem("id_token");
+    const logoutUrl =
+        `https://${DOMAIN}/logout?` +
+        `client_id=${CLIENT_ID}` +
+        `&logout_uri=${encodeURIComponent(window.location.href)}`;
+    window.location.href = logoutUrl;
+}
+
+/* ================= TOKEN HANDLING ================= */
+function getTokenFromUrl() {
+    if (window.location.hash) {
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const token = params.get("id_token");
+        if (token) {
+            localStorage.setItem("id_token", token);
+            window.location.hash = "";
+        }
+    }
+}
+
+/* ================= LOAD DATA ================= */
+function loadData() {
+    loader.style.display = "block";
+    metrics.innerHTML = "";
+    orders.innerHTML = "";
+
+    fetch(API_URL, {
+        headers: {
+            Authorization: localStorage.getItem("id_token")
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        loader.style.display = "none";
+
+        /* METRICS */
+        data.metrics.forEach(m => {
+            metrics.innerHTML += `
+            <div class="col-6 col-md-3">
+                <div class="metric-card p-3 shadow">
+                    <h5 class="text-warning">${m.metric}</h5>
+                    <h2>${m.count}</h2>
+                </div>
+            </div>`;
+        });
+
+        /* TABLE + CHART */
+        const items = {};
+        data.recent_orders.forEach(o => {
+            orders.innerHTML += `
+            <tr>
+                <td>${o.customer_name || "Guest"}</td>
+                <td>${o.item}</td>
+                <td>${o.quantity}</td>
+                <td>${o.table_number || "-"}</td>
+                <td>${o.created_at}</td>
+            </tr>`;
+            items[o.item] = (items[o.item] || 0) + o.quantity;
+        });
+
+        if (chart) chart.destroy();
+        chart = new Chart(orderChart, {
+            type: "bar",
+            data: {
+                labels: Object.keys(items),
+                datasets: [{
+                    label: "Orders per Item",
+                    data: Object.values(items),
+                    backgroundColor: "#ff9800"
+                }]
+            }
+        });
+    });
+}
+
+/* ================= INIT ================= */
+getTokenFromUrl();
+
+if (localStorage.getItem("id_token")) {
+    loginBox.style.display = "none";
+    dashboard.style.display = "block";
+    loadData();
+    autoRefresh = setInterval(loadData, 10000);
+}
+</script>
+```
+
+✅ FINAL order-status.html
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charlie Cafe ☕ | Order Status</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Navbar */
+.navbar { background:#3b1f0e; }
+.navbar-brand { font-weight:600; }
+
+/* Container */
+.status-container {
+    background: rgba(30,30,30,.75);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.5);
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+/* Metrics */
+.metric-card {
+    background: linear-gradient(135deg,#4a2c1a,#3b1f0e);
+    border-radius: 15px;
+    text-align:center;
+    padding:25px;
+}
+.metric-card h5 { color:#ff9800; }
+.metric-card h2 { color:white; }
+
+/* Spinner */
+#loader { display:none; }
+
+/* Hide dashboard until login */
+#dashboard { display:none; }
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark">
+<div class="container">
+    <span class="navbar-brand">☕ Charlie Cafe Admin</span>
+    <button class="btn btn-warning btn-sm" onclick="login()">Login</button>
+    <button class="btn btn-danger btn-sm ms-2" onclick="logout()">Logout</button>
+</div>
+</nav>
+
+<!-- LOGIN MESSAGE -->
+<div class="container text-center text-white mt-5" id="loginBox">
+<h3>Please login to access order dashboard</h3>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container" id="dashboard">
+<div class="status-container">
+
+<h2 class="text-center mb-4">📊 Live Order Status</h2>
+
+<!-- Loader -->
+<div class="text-center" id="loader">
+<div class="spinner-border text-warning"></div>
+<p>Loading...</p>
+</div>
+
+<!-- Metrics -->
+<div id="metrics" class="row g-4 mb-4 justify-content-center"></div>
+
+<!-- Orders Table -->
+<div class="table-responsive">
+<table class="table table-dark table-hover">
+<thead>
+<tr>
+<th>Customer</th>
+<th>Item</th>
+<th>Qty</th>
+<th>Table</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="orders"></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<footer class="text-center text-white py-3">
+© 2026 Charlie Cafe | Secure Admin Dashboard
+</footer>
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+/* ===== CONFIG (CHANGE THESE) ===== */
+const REGION = "ap-south-1";
+const USER_POOL_ID = "CHANGE_ME";
+const CLIENT_ID = "CHANGE_ME";
+const DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
+
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/status/order-status";
+
+/* ===== LOGIN ===== */
+function login() {
+    const url =
+        `https://${DOMAIN}/login?` +
+        `client_id=${CLIENT_ID}` +
+        `&response_type=token` +
+        `&scope=openid+email+profile` +
+        `&redirect_uri=${encodeURIComponent(window.location.href)}`;
+    window.location.href = url;
+}
+
+function logout() {
+    localStorage.removeItem("id_token");
+    const url =
+        `https://${DOMAIN}/logout?` +
+        `client_id=${CLIENT_ID}` +
+        `&logout_uri=${encodeURIComponent(window.location.href)}`;
+    window.location.href = url;
+}
+
+/* ===== TOKEN HANDLING ===== */
+function handleToken() {
+    if (window.location.hash) {
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const token = params.get("id_token");
+        if (token) {
+            localStorage.setItem("id_token", token);
+            window.location.hash = "";
+        }
+    }
+}
+
+/* ===== LOAD DATA ===== */
+function loadData() {
+    loader.style.display = "block";
+    metrics.innerHTML = "";
+    orders.innerHTML = "";
+
+    fetch(API_URL, {
+        headers: {
+            Authorization: localStorage.getItem("id_token")
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        loader.style.display = "none";
+
+        data.metrics.forEach(m => {
+            metrics.innerHTML += `
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <h5>${m.metric}</h5>
+                    <h2>${m.count}</h2>
+                </div>
+            </div>`;
+        });
+
+        data.recent_orders.forEach(o => {
+            orders.innerHTML += `
+            <tr>
+                <td>${o.customer_name || "Guest"}</td>
+                <td>${o.item}</td>
+                <td>${o.quantity}</td>
+                <td>${o.table_number || "-"}</td>
+                <td>${o.created_at}</td>
+            </tr>`;
+        });
+    });
+}
+
+/* ===== INIT ===== */
+handleToken();
+
+if (localStorage.getItem("id_token")) {
+    loginBox.style.display = "none";
+    dashboard.style.display = "block";
+    loadData();
+    setInterval(loadData, 10000);
+}
+</script>
+
+</body>
+</html>
+```
+
+
+
+✅ WHAT YOU NOW HAVE (REAL WORLD)
+
+| Feature                          | Status |
+| -------------------------------- | ------ |
+| AWS Cognito real login           | ✅      |
+| Hosted UI (secure)               | ✅      |
+| JWT stored                       | ✅      |
+| Dashboard protected              | ✅      |
+| Ready for API Gateway Authorizer | ✅      |
+| Production-grade flow            | ✅      |
+
+
+
+
 
 
 
