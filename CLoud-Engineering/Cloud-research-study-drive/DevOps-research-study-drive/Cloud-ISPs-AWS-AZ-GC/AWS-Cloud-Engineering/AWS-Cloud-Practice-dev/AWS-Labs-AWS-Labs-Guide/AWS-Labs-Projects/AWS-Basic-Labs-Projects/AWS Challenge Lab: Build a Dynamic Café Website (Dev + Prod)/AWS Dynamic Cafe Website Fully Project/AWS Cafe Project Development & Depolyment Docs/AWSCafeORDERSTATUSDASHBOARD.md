@@ -2734,11 +2734,280 @@ const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/orde
 
 ---
 
+## SECTION 🔐 TASK — SECURE API GATEWAY USING COGNITO AUTHORIZER
+
+(MANDATORY – REAL LOGIN SECURITY)
+
+🧠 WHAT YOU ARE DOING (VERY IMPORTANT)
+
+You will:
+
+```
+Frontend (Cognito Login)
+        ↓ JWT Token
+API Gateway (Cognito Authorizer) ✅
+        ↓
+Lambda (Protected)
+```
+
+❌ No JWT → API blocked
+
+❌ Invalid user → API blocked
+
+✅ Only logged-in Cognito users allowed
+
+🟢 PREREQUISITES (CHECK BEFORE START)
+
+Make sure you already have:
+
+✅ Cognito User Pool
+
+✅ Cognito App Client (NO client secret)
+
+✅ API Gateway with GET /order-status
+
+✅ Lambda connected to that method
+
+If YES → continue
+
+If NO → stop and tell me
+
+🟣 STEP 1 — OPEN API GATEWAY
+
+1️⃣ AWS Console
+
+2️⃣ Search API Gateway
+
+3️⃣ Click APIs
+
+4️⃣ Click your API name
+
+(Example: CharlieCafeAPI)
+
+🟣 STEP 2 — CREATE COGNITO AUTHORIZER
+
+2.1 Go to Authorizers
+
+1️⃣ Left menu → click Authorizers
+
+2️⃣ Click Create authorizer
+
+2.2 Fill Authorizer Settings (VERY CAREFUL)
+
+| Field                 | Value                    |
+| --------------------- | ------------------------ |
+| **Authorizer name**   | `CognitoAdminAuthorizer` |
+| **Authorizer type**   | `Cognito`                |
+| **Cognito user pool** | ✅ Select your User Pool  |
+| **Token source**      | `Authorization`          |
+| **Token validation**  | *(leave empty)*          |
+
+⚠️ Token source MUST be exactly:
+
+```
+Authorization
+```
+
+❌ Not Bearer
+
+❌ Not Auth
+
+❌ Not lowercase
+
+2.3 Save Authorizer
+
+Click Create authorizer
+
+✅ Authorizer created
+
+🟣 STEP 3 — ATTACH AUTHORIZER TO API METHOD
+
+This is the MOST IMPORTANT STEP.
+
+3.1 Open Your Resource
+
+1️⃣ Left menu → Resources
+
+2️⃣ Click your resource:
+
+```
+/order-status
+```
+
+3️⃣ Click method:
+
+```
+GET
+```
+
+3.2 Edit Method Request
+
+1️⃣ Click Method Request
+
+2️⃣ Click Edit
+
+3.3 Configure Authorization
+
+Set exactly:
+
+| Setting          | Value                    |
+| ---------------- | ------------------------ |
+| Authorization    | `CognitoAdminAuthorizer` |
+| API Key Required | `false`                  |
+
+Click Save
+
+✅ Now API is protected
+
+🟣 STEP 4 — ENABLE CORS AGAIN (MANDATORY)
+
+Authorizer breaks CORS if not re-enabled.
+
+4.1 Enable CORS
+
+1️⃣ Select GET /order-status
+
+2️⃣ Click Enable CORS
+
+3️⃣ Keep defaults
+
+4️⃣ Click Enable CORS and replace existing CORS headers
+
+✅ CORS fixed
+
+🟣 STEP 5 — DEPLOY API (DO NOT SKIP)
+
+⚠️ Changes do NOT work until deployed
+
+5.1 Deploy
+
+1️⃣ Click Deploy API
+
+2️⃣ Stage:
+
+Select existing stage (example: status)
+OR
+
+Create new stage (example: admin)
+
+👉 I recommend:
+
+```
+admin
+```
+
+3️⃣ Click Deploy
+
+5.2 Copy Invoke URL
+
+After deploy:
+
+```
+https://xxxxx.execute-api.region.amazonaws.com/admin
+```
+
+Your full endpoint:
+
+```
+https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
+```
+
+🟣 STEP 6 — UPDATE FRONTEND API_URL
+
+In order-status.html:
+
+```
+const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-status";
+```
+
+✅ Done
+
+🟣 STEP 7 — HOW AUTHORIZATION WORKS NOW
+Browser Flow
+
+```
+User logs in (Cognito)
+↓
+JWT stored in localStorage
+↓
+Frontend sends:
+Authorization: Bearer eyJhbGciOi...
+↓
+API Gateway validates JWT
+↓
+Lambda executes
+```
+
+🟣 STEP 8 — TEST (VERY IMPORTANT)
+
+8.1 Test WITHOUT Login (Expected ❌)
+
+1️⃣ Open browser
+
+2️⃣ Open:
+
+```
+https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
+```
+
+✅ You should see:
+
+```
+401 Unauthorized
+```
+
+✔️ THIS IS CORRECT
+
+8.2 Test WITH Login (Expected ✅)
+
+1️⃣ Open:
+
+```
+http://YOUR_EC2_IP/order-status.html
+```
+
+2️⃣ Login using Cognito admin
+
+3️⃣ Dashboard loads
+
+4️⃣ Orders visible
+
+✔️ SUCCESS
+
+🟢 COMMON ERRORS (READ THIS)
+
+❌ 401 Unauthorized after login
+
+✔ Token not sent
+
+✔ Wrong API_URL
+
+✔ Wrong authorizer attached
+
+❌ CORS error
+
+✔ You forgot Enable CORS again
+
+✔ Or forgot Deploy API
+
+❌ Blank page
+
+✔ Check browser DevTools → Network → Authorization header
+
+🏆 FINAL SECURITY STATUS
 
 
+| Security Layer         | Status |
+| ---------------------- | ------ |
+| Cognito Login          | ✅      |
+| JWT Issued             | ✅      |
+| API Gateway Validation | ✅      |
+| Unauthorized Blocked   | ✅      |
+| Lambda Protected       | ✅      |
+| Production-grade       | ✅      |
 
 
-
+---
 
 
 
