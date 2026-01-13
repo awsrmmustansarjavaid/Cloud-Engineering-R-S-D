@@ -1,4 +1,4 @@
-# AWS CAFE LAB -- ORDER STATUS DASHBOARD
+# ☕ AWS Café — Order Status Dashboard
 
 # 🔒 SECTION 1 — ORDER STATUS DASHBOARD
 

@@ -1,6 +1,6 @@
-# AWS CAFE LAB -- ORDER STATUS DASHBOARD
+# ☕ AWS CAFE LAB -- ORDER STATUS DASHBOARD
 
-# 🔒 SECTION 1 — ORDER STATUS DASHBOARD
+# ☕ SECTION 1 — ORDER STATUS DASHBOARD
 
 ### 🎯 WHAT YOU WANT (CLARIFIED)
 
@@ -1008,7 +1008,275 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 </html>
 ```
 
-#### 2️⃣ FINAL order-status.html (Login + Dashboard fully integrated & Recommanded )
+#### Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+
+
+### 2️⃣ SECURITY & PERMISSIONS
+
+✅ 2.1 Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+✅ 2.2 Open Security Group (MANDATORY)
+
+Ensure EC2 Security Group allows:
+
+
+| Type | Port | Source    |
+| ---- | ---- | --------- |
+| HTTP | 80   | 0.0.0.0/0 |
+
+
+
+### 3️⃣ Open page in browser
+
+✔ Orders visible
+
+✔ Counts visible
+
+✔ Date/time visible
+
+✅ Step 5 complete
+
+---
+
+## 🔄 PHASE 8️⃣ — FEATURE VERIFICATION (IMPORTANT)
+
+### 1️⃣ Send order from frontend / API
+
+✔ Order placed
+
+### 2️⃣ Check SQS
+
+✔ Message disappears (consumed)
+
+### 3️⃣ Check RDS
+
+```
+SELECT * FROM orders ORDER BY created_at DESC;
+```
+
+✔ New row present
+
+### 4️⃣ Check DynamoDB → CafeMenu
+
+✔ orders increased for item
+
+### 5️⃣ Check DynamoDB → CafeOrderMetrics
+
+✔ TOTAL_ORDERS increased by 1
+
+### 6️⃣ Check CloudWatch Logs
+
+✔ "Order processed successfully"
+
+
+### 7️⃣ Verify Apache is Running
+
+```
+sudo systemctl status httpd
+```
+
+If not running:
+
+```
+sudo systemctl start httpd
+```
+
+```
+sudo systemctl enable httpd
+```
+
+### 8️⃣ Verify Web Root
+
+```
+ls /var/www/html
+```
+
+This IS THE CORRECT LOCATION ✅
+
+✔ /var/www/html/ is Apache’s default public directory
+
+
+### 🔁 Auto Refresh
+
+#### ✔ Implemented here:
+
+```
+setInterval(loadData,10000);
+```
+
+### ⏳ Loading Spinner
+
+✔ Enabled before fetch
+
+✔ Hidden after response
+
+```
+document.getElementById("loader").style.display="block";
+```
+
+### 📊 Chart (Orders per Item)
+
+✔ Chart.js used
+
+✔ Auto re-draws on refresh
+
+✔ No page reload
+
+### 📅 Date Filter
+
+✔ Frontend ready
+
+```
+<input type="date" id="filterDate">
+```
+
+👉 Backend enhancement later:
+
+Pass date as query param:
+
+```
+/order-status?date=2026-01-09
+```
+---
+
+### 🏆 RESULT
+
+You now have:
+
+✅ Event-driven backend
+
+✅ Reliable order processing
+
+✅ Real-time metrics
+
+✅ Production-safe SQS worker
+
+✅ Zero backend breakage
+
+---
+
+### 🧪 FINAL VERIFICATION
+
+| Check                     | Result |
+| ------------------------- | ------ |
+| Place new order           | ✅      |
+| RDS updated               | ✅      |
+| DynamoDB count +1         | ✅      |
+| Order-status page updated | ✅      |
+
+---
+
+# ☕ SECTION 2 — ORDER STATUS Login
+
+## 🔐 PHASE 1️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
+
+### ⚠ IMPORTANT TRUTH
+
+You DID THE RIGHT THING by not hardcoding Cognito.
+
+#### Professionals:
+
+✔ Build UI first
+
+✔ Add auth later
+
+✔ Avoid blocking progress
+
+### ✅ What is READY
+
+✔ Login UI
+
+✔ Protected dashboard
+
+✔ Auth logic placeholder
+
+```
+function login(){
+    if(username.value && password.value){
+        loginBox.style.display="none";
+        dashboard.style.display="block";
+    }
+}
+```
+
+
+### 🔜 What You Will Plug Later
+
+#### When ready, replace login() with:
+
+| Cognito Item    |
+| --------------- |
+| User Pool ID    |
+| App Client ID   |
+| Hosted UI / SDK |
+
+
+### 📢 AWS COGNITO CONFIGURATION
+
+#### 1️⃣ CREATE USER POOL
+
+- **AWS Console → Cognito**
+
+- Click Create user pool
+
+- **Type:** Email or Username
+
+- **Password policy → Default**
+
+- **MFA → Optional**
+
+**Click Create**
+
+#### 📌 SAVE:
+
+- User Pool ID
+
+#### 2️⃣ CREATE APP CLIENT
+
+User Pool → App integration
+
+App clients → Create app client
+
+❌ Disable client secret
+
+Enable:
+
+USER_PASSWORD_AUTH
+
+Create
+
+📌 SAVE:
+
+App Client ID
+
+#### 3️⃣ CREATE ADMIN USER
+
+Users → Create user
+
+Username: admin
+
+Temporary password
+
+Mark email verified
+
+Create
+
+➡️ Login once → change password
+
+## 🔐 PHASE 2️⃣ — order-status.html (Login + Dashboard fully integrated & Recommanded )
 
 > **⚠️ Replace the 3 placeholders later**
 
@@ -1216,239 +1484,7 @@ CTRL + O → ENTER
 CTRL + X
 ```
 
-
-
-### 2️⃣ SECURITY & PERMISSIONS
-
-✅ 2.1 Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/order-status.html
-```
-```
-sudo chmod 644 /var/www/html/order-status.html
-```
-
-✅ 2.2 Open Security Group (MANDATORY)
-
-Ensure EC2 Security Group allows:
-
-
-| Type | Port | Source    |
-| ---- | ---- | --------- |
-| HTTP | 80   | 0.0.0.0/0 |
-
-
-
-### 3️⃣ Open page in browser
-
-✔ Orders visible
-
-✔ Counts visible
-
-✔ Date/time visible
-
-✅ Step 5 complete
-
----
-
-## 🔄 PHASE 8️⃣ — FEATURE VERIFICATION (IMPORTANT)
-
-### 1️⃣ Send order from frontend / API
-
-✔ Order placed
-
-### 2️⃣ Check SQS
-
-✔ Message disappears (consumed)
-
-### 3️⃣ Check RDS
-
-```
-SELECT * FROM orders ORDER BY created_at DESC;
-```
-
-✔ New row present
-
-### 4️⃣ Check DynamoDB → CafeMenu
-
-✔ orders increased for item
-
-### 5️⃣ Check DynamoDB → CafeOrderMetrics
-
-✔ TOTAL_ORDERS increased by 1
-
-### 6️⃣ Check CloudWatch Logs
-
-✔ "Order processed successfully"
-
-
-### 7️⃣ Verify Apache is Running
-
-```
-sudo systemctl status httpd
-```
-
-If not running:
-
-```
-sudo systemctl start httpd
-```
-
-```
-sudo systemctl enable httpd
-```
-
-### 8️⃣ Verify Web Root
-
-```
-ls /var/www/html
-```
-
-This IS THE CORRECT LOCATION ✅
-
-✔ /var/www/html/ is Apache’s default public directory
-
-
-### 🔁 Auto Refresh
-
-#### ✔ Implemented here:
-
-```
-setInterval(loadData,10000);
-```
-
-### ⏳ Loading Spinner
-
-✔ Enabled before fetch
-
-✔ Hidden after response
-
-```
-document.getElementById("loader").style.display="block";
-```
-
-### 📊 Chart (Orders per Item)
-
-✔ Chart.js used
-
-✔ Auto re-draws on refresh
-
-✔ No page reload
-
-### 📅 Date Filter
-
-✔ Frontend ready
-
-```
-<input type="date" id="filterDate">
-```
-
-👉 Backend enhancement later:
-
-Pass date as query param:
-
-```
-/order-status?date=2026-01-09
-```
----
-
-## 🔐 PHASE 9️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
-
-### ⚠ IMPORTANT TRUTH
-
-You DID THE RIGHT THING by not hardcoding Cognito.
-
-#### Professionals:
-
-✔ Build UI first
-
-✔ Add auth later
-
-✔ Avoid blocking progress
-
-### ✅ What is READY
-
-✔ Login UI
-
-✔ Protected dashboard
-
-✔ Auth logic placeholder
-
-```
-function login(){
-    if(username.value && password.value){
-        loginBox.style.display="none";
-        dashboard.style.display="block";
-    }
-}
-```
-
-
-### 🔜 What You Will Plug Later
-
-#### When ready, replace login() with:
-
-| Cognito Item    |
-| --------------- |
-| User Pool ID    |
-| App Client ID   |
-| Hosted UI / SDK |
-
-
-### 📢 AWS COGNITO CONFIGURATION
-
-#### 1️⃣ CREATE USER POOL
-
-- **AWS Console → Cognito**
-
-- Click Create user pool
-
-- **Type:** Email or Username
-
-- **Password policy → Default**
-
-- **MFA → Optional**
-
-**Click Create**
-
-#### 📌 SAVE:
-
-- User Pool ID
-
-#### 2️⃣ CREATE APP CLIENT
-
-User Pool → App integration
-
-App clients → Create app client
-
-❌ Disable client secret
-
-Enable:
-
-USER_PASSWORD_AUTH
-
-Create
-
-📌 SAVE:
-
-App Client ID
-
-#### 3️⃣ CREATE ADMIN USER
-
-Users → Create user
-
-Username: admin
-
-Temporary password
-
-Mark email verified
-
-Create
-
-➡️ Login once → change password
-
-#### 4️⃣ API GATEWAY AUTH (OPTIONAL BUT PRO)
+## 🔐 PHASE 3️⃣ — API GATEWAY AUTH (OPTIONAL BUT PRO)
 
 API Gateway → Authorizers
 
@@ -1462,7 +1498,7 @@ Apply to:
 GET /order-status
 ```
 
-#### 5️⃣ TEST FLOW
+## 🔐 PHASE 4️⃣ — TEST FLOW
 
 #### 1️⃣ Open:
 
@@ -1480,32 +1516,4 @@ http://YOUR_EC2_IP/order-status.html
 
 6️⃣ Metrics visible
 
-
-
-### 🏆 RESULT
-
-You now have:
-
-✅ Event-driven backend
-
-✅ Reliable order processing
-
-✅ Real-time metrics
-
-✅ Production-safe SQS worker
-
-✅ Zero backend breakage
-
 ---
-
-### 🧪 FINAL VERIFICATION
-
-| Check                     | Result |
-| ------------------------- | ------ |
-| Place new order           | ✅      |
-| RDS updated               | ✅      |
-| DynamoDB count +1         | ✅      |
-| Order-status page updated | ✅      |
-
----
-
