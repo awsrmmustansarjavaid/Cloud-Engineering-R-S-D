@@ -1,6 +1,6 @@
-# AWS CAFE LAB
+# AWS CAFE LAB -- ORDER STATUS DASHBOARD
 
-# 🔒 SECTION 5 — ORDER STATUS DASHBOARD
+# 🔒 SECTION 1 — ORDER STATUS DASHBOARD
 
 ### 🎯 WHAT YOU WANT (CLARIFIED)
 
@@ -1509,7 +1509,7 @@ You now have:
 
 ---
 
-# SECTION 2️⃣ Cognito, JWT, API Gateway
+# 🔒 SECTION 2 — Cognito, JWT, API Gateway
 
 
 
@@ -2117,7 +2117,7 @@ function login() {
 ```
 ---
 
-## SECTION 3- Cognito Hosted UI (industry standard)
+# 🔒 SECTION 3 —  Cognito Hosted UI (industry standard)
 
 **COGNITO → real login**
 
@@ -2734,7 +2734,7 @@ const API_URL = "https://abc123.execute-api.ap-south-1.amazonaws.com/status/orde
 
 ---
 
-## SECTION 🔐 TASK — SECURE API GATEWAY USING COGNITO AUTHORIZER
+# 🔒 SECTION 4 —  TASK — SECURE API GATEWAY USING COGNITO AUTHORIZER
 
 (MANDATORY – REAL LOGIN SECURITY)
 
@@ -3009,7 +3009,7 @@ http://YOUR_EC2_IP/order-status.html
 
 ---
 
-## PHASE - JWT → SECURE API (END-TO-END)
+# 🔒 SECTION 5 —   JWT → SECURE API (END-TO-END)
 
 This task answers ONE QUESTION ONLY:
 
@@ -3323,3 +3323,5 @@ Filtering logic → Lambda
 Clean architecture → Real-world
 
 ---
+
+# 🔒 SECTION 6 —   
