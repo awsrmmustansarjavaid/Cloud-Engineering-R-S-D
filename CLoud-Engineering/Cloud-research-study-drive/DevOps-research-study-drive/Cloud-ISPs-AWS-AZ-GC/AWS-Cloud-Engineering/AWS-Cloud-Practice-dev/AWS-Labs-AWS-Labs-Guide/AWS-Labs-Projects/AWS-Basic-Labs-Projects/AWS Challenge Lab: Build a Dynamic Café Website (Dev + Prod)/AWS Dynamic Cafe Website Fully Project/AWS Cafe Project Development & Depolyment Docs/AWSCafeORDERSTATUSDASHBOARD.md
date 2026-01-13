@@ -1008,14 +1008,12 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 </html>
 ```
 
-#### Save File
+#### 2️⃣ Save File
 
 ```
 CTRL + O → ENTER
 CTRL + X
 ```
-
-
 
 ### 2️⃣ SECURITY & PERMISSIONS
 
@@ -1198,7 +1196,7 @@ You now have:
 
 #### ✅ Action
 
-- Copy FINAL PRODUCTION order-status.html (Section 8)
+- Copy FINAL PRODUCTION order-status.html (PHASE 7️⃣)
 
 - Paste it as-is
 
@@ -1206,105 +1204,108 @@ You now have:
 
 #### 🔧 Change ONLY these 4 values
 
-
-
-
-
-
-## 🔐 PHASE 1️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
-
-### ⚠ IMPORTANT TRUTH
-
-You DID THE RIGHT THING by not hardcoding Cognito.
-
-#### Professionals:
-
-✔ Build UI first
-
-✔ Add auth later
-
-✔ Avoid blocking progress
-
-### ✅ What is READY
-
-✔ Login UI
-
-✔ Protected dashboard
-
-✔ Auth logic placeholder
-
 ```
-function login(){
-    if(username.value && password.value){
-        loginBox.style.display="none";
-        dashboard.style.display="block";
-    }
-}
+USER_POOL_ID
+CLIENT_ID
+COGNITO_DOMAIN
+API_URL
 ```
 
+#### ✅ Result:
 
-### 🔜 What You Will Plug Later
+- Login screen
 
-#### When ready, replace login() with:
+- Spinner
 
-| Cognito Item    |
-| --------------- |
-| User Pool ID    |
-| App Client ID   |
-| Hosted UI / SDK |
+- Auto refresh (10s)
 
+- Chart
 
-### 📢 AWS COGNITO CONFIGURATION
+- Date filter
 
-#### 1️⃣ CREATE USER POOL
+- Print buttons
 
-- **AWS Console → Cognito**
+- JWT ready
 
-- Click Create user pool
+## 🔐 PHASE 2️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
-- **Type:** Email or Username
+### 🔐 STEP 1 — CREATE USER POOL (NO CHANGE)
 
-- **Password policy → Default**
+- **Cognito → User Pools → Create**
 
-- **MFA → Optional**
+- Sign-in: Username
 
-**Click Create**
+- Password policy: Default
 
-#### 📌 SAVE:
+- MFA: OFF
+
+- Account recovery: Email
+
+#### ✅ This matches both your old and new guides
+
+### 🔐 STEP 2 — CREATE APP CLIENT (⚠️ ONE IMPORTANT FIX)
+
+- **User Pool → App integration → App clients → Create**
+
+- App type: Public
+
+- ❌ Client secret: DISABLED
+
+#### Auth flows:
+
+✅ USER_PASSWORD_AUTH
+
+✅ REFRESH_TOKEN_AUTH ← ⭐ REQUIRED (missing earlier)
+
+#### 📌 Save:
 
 - User Pool ID
 
-#### 2️⃣ CREATE APP CLIENT
+- App Client ID
 
-User Pool → App integration
+#### ✅ This matches your FINAL frontend code
 
-App clients → Create app client
+### ❌ STEP 3 — HOSTED UI (OPTIONAL / NOT USED)
 
-❌ Disable client secret
+#### Your new guide says:
 
-Enable:
+```
+Configure Hosted UI
+Callback URL
+Logout URL
+```
 
-USER_PASSWORD_AUTH
+#### Truth:
 
-Create
+❌ Not used by your JavaScript
 
-📌 SAVE:
+❌ No redirect logic in your code
 
-App Client ID
+❌ No OAuth flow
 
-#### 3️⃣ CREATE ADMIN USER
+#### Decision:
 
-Users → Create user
+✅ SKIP IT (recommended)
 
-Username: admin
+OR keep it (does not break anything)
 
-Temporary password
+#### 🧠 Professional rule:
 
-Mark email verified
+If you don’t call Hosted UI, don’t configure it.
 
-Create
+### 🔐 STEP 4 — CREATE ADMIN USER (SAME AS BEFORE)
 
-➡️ Login once → change password
+- Users → Create user
+
+- Username: admin
+
+- Temporary password
+
+- Mark email verified
+
+- Login once → set permanent password
+
+#### ✅ Fully compatible
 
 ## 🔐 PHASE 2️⃣ — order-status.html (Login + Dashboard fully integrated & Recommanded )
 
