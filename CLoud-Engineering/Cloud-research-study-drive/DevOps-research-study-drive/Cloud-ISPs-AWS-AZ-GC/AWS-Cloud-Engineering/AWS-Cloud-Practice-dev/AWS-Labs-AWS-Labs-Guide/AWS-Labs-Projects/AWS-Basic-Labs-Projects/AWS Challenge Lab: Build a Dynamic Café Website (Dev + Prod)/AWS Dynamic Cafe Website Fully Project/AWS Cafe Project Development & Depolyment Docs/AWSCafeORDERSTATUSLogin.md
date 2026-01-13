@@ -1,3 +1,5 @@
+# AWS CAFE LAB -- ORDER STATUS DASHBOARD (Login)
+
 # 🔒 SECTION 2 — Cognito, JWT, API Gateway
 
 
