@@ -1211,103 +1211,7 @@ COGNITO_DOMAIN
 API_URL
 ```
 
-#### ✅ Result:
-
-- Login screen
-
-- Spinner
-
-- Auto refresh (10s)
-
-- Chart
-
-- Date filter
-
-- Print buttons
-
-- JWT ready
-
-## 🔐 PHASE 2️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
-
-### 🔐 STEP 1 — CREATE USER POOL (NO CHANGE)
-
-- **Cognito → User Pools → Create**
-
-- Sign-in: Username
-
-- Password policy: Default
-
-- MFA: OFF
-
-- Account recovery: Email
-
-#### ✅ This matches both your old and new guides
-
-### 🔐 STEP 2 — CREATE APP CLIENT (⚠️ ONE IMPORTANT FIX)
-
-- **User Pool → App integration → App clients → Create**
-
-- App type: Public
-
-- ❌ Client secret: DISABLED
-
-#### Auth flows:
-
-✅ USER_PASSWORD_AUTH
-
-✅ REFRESH_TOKEN_AUTH ← ⭐ REQUIRED (missing earlier)
-
-#### 📌 Save:
-
-- User Pool ID
-
-- App Client ID
-
-#### ✅ This matches your FINAL frontend code
-
-### ❌ STEP 3 — HOSTED UI (OPTIONAL / NOT USED)
-
-#### Your new guide says:
-
-```
-Configure Hosted UI
-Callback URL
-Logout URL
-```
-
-#### Truth:
-
-❌ Not used by your JavaScript
-
-❌ No redirect logic in your code
-
-❌ No OAuth flow
-
-#### Decision:
-
-✅ SKIP IT (recommended)
-
-OR keep it (does not break anything)
-
-#### 🧠 Professional rule:
-
-If you don’t call Hosted UI, don’t configure it.
-
-### 🔐 STEP 4 — CREATE ADMIN USER (SAME AS BEFORE)
-
-- Users → Create user
-
-- Username: admin
-
-- Temporary password
-
-- Mark email verified
-
-- Login once → set permanent password
-
-#### ✅ Fully compatible
-
-## 🔐 PHASE 2️⃣ — order-status.html (Login + Dashboard fully integrated & Recommanded )
+#### ✅ Code
 
 > **⚠️ Replace the 3 placeholders later**
 
@@ -1507,6 +1411,121 @@ function loadData() {
 </body>
 </html>
 ```
+
+
+#### ✅ Result:
+
+- Login screen
+
+- Spinner
+
+- Auto refresh (10s)
+
+- Chart
+
+- Date filter
+
+- Print buttons
+
+- JWT ready
+
+## 🔐 PHASE 2️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
+
+### 🔐 STEP 1 — CREATE USER POOL (NO CHANGE)
+
+- **Cognito → User Pools → Create**
+
+- Sign-in: Username
+
+- Password policy: Default
+
+- MFA: OFF
+
+- Account recovery: Email
+
+#### ✅ This matches both your old and new guides
+
+### 🔐 STEP 2 — CREATE APP CLIENT (⚠️ ONE IMPORTANT FIX)
+
+- **User Pool → App integration → App clients → Create**
+
+- App type: Public
+
+- ❌ Client secret: DISABLED
+
+#### Auth flows:
+
+✅ USER_PASSWORD_AUTH
+
+✅ REFRESH_TOKEN_AUTH ← ⭐ REQUIRED (missing earlier)
+
+#### 📌 Save:
+
+- User Pool ID
+
+- App Client ID
+
+#### ✅ This matches your FINAL frontend code
+
+### ❌ STEP 3 — HOSTED UI (OPTIONAL / NOT USED)
+
+#### Your new guide says:
+
+```
+Configure Hosted UI
+Callback URL
+Logout URL
+```
+
+#### Truth:
+
+❌ Not used by your JavaScript
+
+❌ No redirect logic in your code
+
+❌ No OAuth flow
+
+#### Decision:
+
+✅ SKIP IT (recommended)
+
+OR keep it (does not break anything)
+
+#### 🧠 Professional rule:
+
+If you don’t call Hosted UI, don’t configure it.
+
+### 🔐 STEP 4 — CREATE ADMIN USER (SAME AS BEFORE)
+
+- Users → Create user
+
+- Username: admin
+
+- Temporary password
+
+- Mark email verified
+
+- Login once → set permanent password
+
+#### ✅ Fully compatible
+
+## 🔐 PHASE 2️⃣ — order-status.html (Login + Dashboard fully integrated & Recommanded )
+
+### ✅ What I changed (ONLY these)
+
+🌄 Full-screen background image
+
+🎯 Login card perfectly centered (vertical + horizontal)
+
+🧱 Login card has glass/clean overlay so text stays readable
+
+📱 Fully responsive
+
+🔐 Dashboard UI remains unchanged
+
+👉 You can copy–paste directly
+
+👉 Replace ONLY Cognito + API values later
 
 ```
 <!DOCTYPE html>
@@ -1742,12 +1761,42 @@ if (localStorage.getItem("token")) showDashboard();
 </html>
 ```
 
+#### 🔒 WHAT YOU MUST CHANGE (ONLY THESE)
+
+```
+USER_POOL_ID   = "us-east-1_xxxxx"
+APP_CLIENT_ID = "xxxxxxxx"
+API_URL       = "https://xxxx.execute-api.region.amazonaws.com/admin/order-status"
+```
+
 #### Save File
 
 ```
 CTRL + O → ENTER
 CTRL + X
 ```
+
+#### 🔧 OPTIONAL (YOU CAN CHANGE LATER)
+
+Replace background image URL with your own S3 / CloudFront image
+
+#### Adjust opacity:
+
+```
+rgba(0,0,0,.55)
+```
+
+🏆 RESULT
+
+✔ Professional café-style UI
+
+✔ Centered admin login
+
+✔ Secure AWS Cognito auth
+
+✔ Real production dashboard
+
+✔ Resume + interview ready
 
 ## 🔐 PHASE 3️⃣ — API GATEWAY AUTH (OPTIONAL BUT PRO)
 
