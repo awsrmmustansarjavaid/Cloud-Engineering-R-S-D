@@ -83,6 +83,22 @@ const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-
 
 #### ✅ Code (Login + Dashboard fully integrated & Recommanded )
 
+- Cognito Hosted UI redirect login (login() & handleRedirect())
+
+- Access Token stored in localStorage
+
+- Bearer prefix added in Authorization header
+
+- Token expiry check implemented
+
+- Navbar hidden until login
+
+- Spinner, chart, metrics, and table all intact
+
+- Auto-refresh every 10s maintained
+
+#### Here’s the updated HTML/JS code:
+
 ```
 <!DOCTYPE html>
 <html lang="en">
@@ -97,9 +113,6 @@ const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Amazon Cognito SDK -->
-<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.3/dist/amazon-cognito-identity.min.js"></script>
-
 <style>
 /* ===== BACKGROUND ===== */
 body {
@@ -112,20 +125,7 @@ body {
   background-attachment: fixed;
 }
 
-/* ===== LOGIN CENTER ===== */
-#loginWrapper {
-  min-height: calc(100vh - 56px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#loginBox .card {
-  background: rgba(255,255,255,.95);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.4);
-}
-
+/* ===== DASHBOARD ===== */
 #dashboard {
   display: none;
   background:#f5f5f5;
@@ -146,25 +146,12 @@ body {
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-dark bg-dark">
+<nav class="navbar navbar-dark bg-dark" id="navbar" style="display:none">
   <div class="container">
     <span class="navbar-brand">☕ Charlie Cafe Admin</span>
     <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
   </div>
 </nav>
-
-<!-- LOGIN (CENTERED) -->
-<div id="loginWrapper">
-  <div class="container" id="loginBox">
-    <div class="col-md-4 mx-auto card p-4">
-      <h4 class="text-center mb-3">Admin Login</h4>
-      <input id="username" class="form-control mb-2" placeholder="Username">
-      <input id="password" type="password" class="form-control mb-3" placeholder="Password">
-      <button class="btn btn-warning w-100" onclick="login()">Login</button>
-      <p class="text-muted small mt-2 text-center">AWS Cognito Secured</p>
-    </div>
-  </div>
-</div>
 
 <!-- DASHBOARD -->
 <div class="container my-4" id="dashboard">
@@ -208,47 +195,64 @@ body {
 
 <script>
 /* ================== CONFIG ================== */
-const USER_POOL_ID = "YOUR_USER_POOL_ID";
-const APP_CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const REDIRECT_URI = window.location.origin;
 const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
-
-const poolData = { UserPoolId: USER_POOL_ID, ClientId: APP_CLIENT_ID };
-const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
 let chart, refreshTimer;
 
 /* ================== AUTH ================== */
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+// Decode JWT payload
+function parseJwt(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+  const payload = parseJwt(token);
+  return payload.exp * 1000 < Date.now();
+}
+
+// Redirect to Cognito Hosted UI
 function login() {
-  const authDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-    Username: username.value,
-    Password: password.value
-  });
-
-  const cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-    Username: username.value,
-    Pool: userPool
-  });
-
-  cognitoUser.authenticateUser(authDetails, {
-    onSuccess: function (result) {
-      localStorage.setItem("token", result.getIdToken().getJwtToken());
-      showDashboard();
-    },
-    onFailure: function (err) {
-      alert(err.message);
-    }
-  });
+  const loginUrl = `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+  window.location.href = loginUrl;
 }
 
 function logout() {
   localStorage.removeItem("token");
   clearInterval(refreshTimer);
-  location.reload();
+  const logoutUrl = `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
+  window.location.href = logoutUrl;
 }
 
+// Extract Access Token from URL hash
+function handleRedirect() {
+  const hash = window.location.hash.substr(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get("access_token");
+
+  if (token) {
+    localStorage.setItem("token", token);
+    window.location.hash = "";
+  }
+}
+
+/* ================== DASHBOARD ================== */
 function showDashboard() {
-  loginWrapper.style.display = "none";
-  dashboard.style.display = "block";
+  if (!localStorage.getItem("token") || isTokenExpired(localStorage.getItem("token"))) {
+    login();
+    return;
+  }
+
+  document.getElementById("navbar").style.display = "block";
+  document.getElementById("dashboard").style.display = "block";
+
   loadData();
   refreshTimer = setInterval(loadData, 10000);
 }
@@ -256,25 +260,30 @@ function showDashboard() {
 /* ================== DATA ================== */
 function loadData() {
   const token = localStorage.getItem("token");
-  if (!token) return logout();
+  if (!token || isTokenExpired(token)) return logout();
 
-  loader.style.display = "block";
-  metrics.innerHTML = "";
-  orders.innerHTML = "";
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("metrics").innerHTML = "";
+  document.getElementById("orders").innerHTML = "";
 
   let url = API_URL;
-  if (filterDate.value) url += "?date=" + filterDate.value;
+  const filterDate = document.getElementById("filterDate").value;
+  if (filterDate) url += "?date=" + filterDate;
 
-  fetch(url, { headers: { Authorization: token } })
+  fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
   .then(res => {
     if (res.status === 401) logout();
     return res.json();
   })
   .then(data => {
-    loader.style.display = "none";
+    document.getElementById("loader").style.display = "none";
 
     data.metrics.forEach(m => {
-      metrics.innerHTML += `
+      document.getElementById("metrics").innerHTML += `
         <div class="col-md-3 mb-2">
           <div class="card-metric text-center fw-bold">
             ${m.metric}<br>${m.count}
@@ -284,7 +293,7 @@ function loadData() {
 
     const items = {};
     data.recent_orders.forEach(o => {
-      orders.innerHTML += `
+      document.getElementById("orders").innerHTML += `
         <tr>
           <td>${o.customer_name}</td>
           <td>${o.item}</td>
@@ -295,27 +304,30 @@ function loadData() {
     });
 
     if (chart) chart.destroy();
-    chart = new Chart(orderChart, {
+    chart = new Chart(document.getElementById("orderChart"), {
       type: 'bar',
       data: {
         labels: Object.keys(items),
         datasets: [{
           label: 'Orders per Item',
           data: Object.values(items),
-          backgroundColor: '#ff9800'
+          backgroundColor: 'rgba(255, 152, 0, 0.7)'
         }]
       }
     });
   });
 }
 
-/* ================== AUTO LOGIN ================== */
-if (localStorage.getItem("token")) showDashboard();
+/* ================== INIT ================== */
+handleRedirect();
+showDashboard();
 </script>
 
 </body>
 </html>
 ```
+
+
 
 #### Save File
 
