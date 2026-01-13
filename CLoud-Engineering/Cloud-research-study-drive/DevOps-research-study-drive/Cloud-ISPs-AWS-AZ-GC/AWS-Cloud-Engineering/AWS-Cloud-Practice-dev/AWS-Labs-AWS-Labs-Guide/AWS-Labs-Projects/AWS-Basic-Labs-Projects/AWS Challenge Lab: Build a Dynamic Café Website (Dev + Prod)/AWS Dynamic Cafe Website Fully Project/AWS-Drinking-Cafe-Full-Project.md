@@ -1201,12 +1201,14 @@ def lambda_handler(event, context):
 
 [AWS CAFE ORDER STATUS DASHBOARD](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeORDERSTATUSDASHBOARD.md)
 
+---
 
+# 📢 SECTION 7 — AWS  Charlie Cafe — Secure Admin Order Dashboard
 
-
+[AWS  Charlie Cafe — Secure Admin Order Dashboard](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20%20Charlie%20Cafe%20—%20Secure%20Admin%20Order%20Dashboard.md)
 
 ---
-# 📢 SECTION 7 — AWS CAFE SECURITY
+# 📢 SECTION 8 — AWS CAFE SECURITY
 
 
 [AWS CAFE SECURITY](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCAFESECURITY.md)
@@ -1214,7 +1216,7 @@ def lambda_handler(event, context):
 
 ---
 
-# 📢 SECTION 8 — AWS CAFE CI/CD (CodePipeline)
+# 📢 SECTION 9 — AWS CAFE CI/CD (CodePipeline)
 
 [AWS CAFE CI/CD (CodePipeline)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
 
@@ -1222,7 +1224,7 @@ def lambda_handler(event, context):
 
 ---
 
-# 📢 SECTION 9 — TESTING
+# 📢 SECTION 10 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
@@ -1253,95 +1255,8 @@ curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
 
 ---
 
-# 📢 SECTION 10 — AMAZON COGNITO (AUTHENTICATION)
 
-## 1️⃣ Create Cognito User Pool
-
-AWS Console → Search **Cognito** → User Pools → **Create user pool**
-
-### Step 1: Configure sign-in
-- Sign-in options: **Email**
-- User name: Email
-Click **Next**
-
-### Step 2: Security requirements
-- Password policy: Default
-- MFA: Optional (recommended later)
-Click **Next**
-
-### Step 3: Sign-up experience
-- Enable self sign-up: ✅ Enabled
-- Required attributes: Email
-Click **Next**
-
-### Step 4: Email configuration
-- Email provider: Cognito default
-Click **Next**
-
-### Step 5: App integration
-- User pool name: `CafeUserPool`
-- Hosted authentication pages: ❌ Disable
-Click **Next**
-
-### Step 6: Review
-Click **Create user pool**
-
-✅ User Pool created
-
----
-
-## 2️⃣ Create App Client
-
-Inside User Pool → **App integration** → App clients → **Create app client**
-
-- App client name: `CafeWebClient`
-- Generate client secret: ❌ No (required for browser apps)
-- Authentication flows:
-  - ALLOW_USER_PASSWORD_AUTH
-  - ALLOW_REFRESH_TOKEN_AUTH
-
-Click **Create app client**
-
-Save:
-- User Pool ID
-- App Client ID
-
----
-
-## 3️⃣ Create Cognito Domain
-
-User Pool → App integration → Domain
-- Domain type: Cognito domain
-- Domain prefix: `cafe-auth-<unique>`
-
-Save
-
----
-
-## 4️⃣ Integrate Cognito with API Gateway
-
-API Gateway → CafeOrderAPI
-
-### Step 1: Create Authorizer
-- Authorizers → Create
-- Type: Cognito
-- Name: CafeCognitoAuthorizer
-- User pool: CafeUserPool
-- Token source: Authorization
-
-Create
-
-### Step 2: Attach Authorizer
-Resources → /orders → POST
-- Authorization: CafeCognitoAuthorizer
-Save
-
-### Step 3: Redeploy API
-Actions → Deploy API → Stage: dev
-
----
-
-# 📢 SECTION 11 — CLOUDFRONT + CACHING
+# 📢 SECTION 10 — CLOUDFRONT + CACHING
 
 ## 1️⃣ Create CloudFront Distribution
 
@@ -1388,7 +1303,7 @@ For GET /menu:
 
 ---
 
-# 📢 SECTION 12 — COST OPTIMIZATION
+# 📢 SECTION 11 — COST OPTIMIZATION
 
 ## 1️⃣ EC2 Cost Optimization
 - Instance type: t3.micro
@@ -1415,7 +1330,7 @@ For GET /menu:
 
 ---
 
-# 📢 SECTION 13 — BILLING ALERTS & BUDGETS
+# 📢 SECTION 12 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -1455,7 +1370,7 @@ Create alarm
 
 ---
 
-# 📢 SECTION 14 — TESTING
+# 📢 SECTION 13 — TESTING
 
 ## Cognito Test
 - Sign up user
@@ -1504,6 +1419,7 @@ You now have a **real AWS production architecture** with:
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
+
 
 
 
