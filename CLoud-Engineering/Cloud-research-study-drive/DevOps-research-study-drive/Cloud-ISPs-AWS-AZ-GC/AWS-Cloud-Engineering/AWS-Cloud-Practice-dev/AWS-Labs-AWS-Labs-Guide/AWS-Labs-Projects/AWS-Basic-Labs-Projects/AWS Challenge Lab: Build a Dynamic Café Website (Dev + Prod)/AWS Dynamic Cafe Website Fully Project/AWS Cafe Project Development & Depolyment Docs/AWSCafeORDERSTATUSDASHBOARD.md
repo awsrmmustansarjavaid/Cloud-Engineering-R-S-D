@@ -3906,3 +3906,575 @@ function printTodaySummary() {
 ✔ Free-tier safe
 ---
 
+# 🔒 SECTION 8 —  🟢 FINAL order-status.html (PRODUCTION READY)
+
+✔ Real Cognito login (JWT ready)
+
+✔ Secure API call (Authorization header)
+
+✔ Loading spinner
+
+✔ Auto refresh (10s)
+
+✔ Chart (orders per item)
+
+✔ Backend date filter support
+
+✔ Print all orders
+
+✔ Print today summary
+
+✔ NO broken logic / NO skipped wiring
+
+You only change 4 values (clearly marked).
+
+🟢 FINAL order-status.html (PRODUCTION READY)
+
+📍 Correct file location
+
+```
+/var/www/html/order-status.html
+```
+
+✅ ONLY CHANGE THESE 4 VALUES (SEARCH & REPLACE LATER)
+
+```
+USER_POOL_ID
+CLIENT_ID
+COGNITO_DOMAIN
+API_URL
+```
+
+📄 FINAL FULL FILE (COPY 100%)
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Admin Order Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Cognito SDK -->
+<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.3/dist/amazon-cognito-identity.min.js"></script>
+
+<style>
+body {
+  background: linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.75)),
+  url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+  background-size: cover;
+  background-attachment: fixed;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+}
+#dashboard { display:none; }
+.metric-card {
+  background:#3b1f0e;
+  border-radius:15px;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark px-3">
+<span class="navbar-brand">☕ Charlie Cafe Admin</span>
+<button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+</nav>
+
+<!-- LOGIN -->
+<div class="container mt-5" id="loginBox">
+<div class="col-md-4 mx-auto card p-4">
+<h4 class="text-center">Admin Login</h4>
+<input id="username" class="form-control mb-2" placeholder="Username">
+<input id="password" type="password" class="form-control mb-3" placeholder="Password">
+<button class="btn btn-warning w-100" onclick="login()">Login</button>
+<p class="text-center small mt-2 text-muted">AWS Cognito Secure</p>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container my-4" id="dashboard">
+
+<div class="d-flex gap-2 mb-3">
+<input type="date" id="filterDate" class="form-control w-25">
+<button class="btn btn-warning" onclick="loadData()">Filter</button>
+<button class="btn btn-outline-light" onclick="printOrders()">🖨 Print Orders</button>
+<button class="btn btn-outline-warning" onclick="printToday()">📄 Today Summary</button>
+</div>
+
+<!-- Loader -->
+<div id="loader" class="text-center my-3" style="display:none">
+<div class="spinner-border text-warning"></div>
+<p>Loading...</p>
+</div>
+
+<!-- Metrics -->
+<div class="row g-3 mb-4" id="metrics"></div>
+
+<!-- Chart -->
+<canvas id="orderChart" height="90"></canvas>
+
+<!-- Table -->
+<table class="table table-dark table-striped mt-4">
+<thead>
+<tr>
+<th>Customer</th>
+<th>Item</th>
+<th>Qty</th>
+<th>Table</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody id="orders"></tbody>
+</table>
+
+</div>
+
+<script>
+/* ========== CONFIG (CHANGE ONLY THESE 4) ========== */
+const USER_POOL_ID = "YOUR_USER_POOL_ID";
+const CLIENT_ID = "YOUR_CLIENT_ID";
+const COGNITO_DOMAIN = "https://your-domain.auth.us-east-1.amazoncognito.com";
+const API_URL = "https://API_ID.execute-api.us-east-1.amazonaws.com/admin/order-status";
+
+/* ========== COGNITO SETUP ========== */
+const pool = new AmazonCognitoIdentity.CognitoUserPool({
+  UserPoolId: USER_POOL_ID,
+  ClientId: CLIENT_ID
+});
+
+let chart;
+let allOrders = [];
+
+/* ========== LOGIN ========== */
+function login(){
+  const auth = new AmazonCognitoIdentity.AuthenticationDetails({
+    Username: username.value,
+    Password: password.value
+  });
+
+  const user = new AmazonCognitoIdentity.CognitoUser({
+    Username: username.value,
+    Pool: pool
+  });
+
+  user.authenticateUser(auth,{
+    onSuccess:(res)=>{
+      localStorage.setItem("token",res.getIdToken().getJwtToken());
+      loginBox.style.display="none";
+      dashboard.style.display="block";
+      loadData();
+      setInterval(loadData,10000);
+    },
+    onFailure:(err)=>alert(err.message)
+  });
+}
+
+function logout(){
+  localStorage.clear();
+  location.reload();
+}
+
+/* ========== LOAD DATA ========== */
+function loadData(){
+loader.style.display="block";
+metrics.innerHTML="";
+orders.innerHTML="";
+
+let url = API_URL;
+const date = filterDate.value;
+if(date) url += "?date=" + date;
+
+fetch(url,{
+  headers:{ Authorization:"Bearer "+localStorage.getItem("token") }
+})
+.then(r=>r.json())
+.then(data=>{
+loader.style.display="none";
+allOrders = data.recent_orders;
+
+data.metrics.forEach(m=>{
+metrics.innerHTML += `
+<div class="col-md-3">
+<div class="metric-card p-3 text-center">
+<b>${m.metric}</b><br>
+<span class="fs-3">${m.count}</span>
+</div></div>`;
+});
+
+const items={};
+allOrders.forEach(o=>{
+orders.innerHTML+=`
+<tr>
+<td>${o.customer_name}</td>
+<td>${o.item}</td>
+<td>${o.quantity}</td>
+<td>${o.table_number || "-"}</td>
+<td>${o.created_at}</td>
+</tr>`;
+items[o.item]=(items[o.item]||0)+o.quantity;
+});
+
+if(chart) chart.destroy();
+chart=new Chart(orderChart,{
+type:'bar',
+data:{
+labels:Object.keys(items),
+datasets:[{
+label:'Orders per Item',
+data:Object.values(items),
+backgroundColor:'#ff9800'
+}]
+}
+});
+});
+}
+
+/* ========== PRINT FUNCTIONS ========== */
+function printOrders(){
+let html="<h2>Orders</h2><table border='1'>";
+allOrders.forEach(o=>{
+html+=`<tr><td>${o.customer_name}</td><td>${o.item}</td>
+<td>${o.quantity}</td><td>${o.created_at}</td></tr>`;
+});
+html+="</table>";
+openPrint(html);
+}
+
+function printToday(){
+const today=new Date().toISOString().split("T")[0];
+const todayOrders=allOrders.filter(o=>o.created_at.startsWith(today));
+const qty=todayOrders.reduce((s,o)=>s+o.quantity,0);
+openPrint(`<h2>Today's Summary</h2>
+<p>Total Orders: ${todayOrders.length}</p>
+<p>Total Items: ${qty}</p>`);
+}
+
+function openPrint(html){
+const w=window.open("");
+w.document.write(html);
+w.print();
+}
+</script>
+
+</body>
+</html>
+```
+
+✅ WHAT YOU NOW HAVE (CLEAR & FINAL)
+
+| Feature             | Status |
+| ------------------- | ------ |
+| Cognito real login  | ✅      |
+| JWT-secured API     | ✅      |
+| Loading spinner     | ✅      |
+| Auto refresh        | ✅      |
+| Chart analytics     | ✅      |
+| Backend date filter | ✅      |
+| Print orders        | ✅      |
+| Print today summary | ✅      |
+
+
+🎯 NEXT (OPTIONAL – NOT REQUIRED NOW)
+
+API Gateway Authorizer test
+
+Receipt printing
+
+CSV export
+
+Admin vs Staff roles
+
+🚀 COMPLETE ORDER STATUS SYSTEM – FINAL CONFIGURATION GUIDE
+
+This guide covers ALL remaining tasks end-to-end:
+
+1️⃣ JWT → Secure API (Cognito + Authorizer)
+
+2️⃣ API Gateway Authorizer (Mandatory)
+
+3️⃣ Backend Date Filter (Lambda)
+
+4️⃣ Print Each Order + Today Summary (Backend Ready)
+
+🟩 TASK 1 — JWT → Secure API (Cognito Token Flow)
+
+🔹 What this does
+
+Only logged-in Cognito users can access /order-status.
+
+STEP 1️⃣ — User logs in (Frontend)
+
+✔ Already implemented in order-status.html
+
+✔ Cognito returns ID Token (JWT)
+
+```
+localStorage.setItem("token", res.getIdToken().getJwtToken());
+```
+
+STEP 2️⃣ — Frontend sends JWT to API
+
+Every API call sends:
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+✔ Already added in fetch:
+
+```
+headers:{
+  Authorization: "Bearer " + localStorage.getItem("token")
+}
+```
+
+STEP 3️⃣ — API Gateway validates JWT
+
+⛔ Lambda should NOT validate token
+
+✅ API Gateway does it automatically (Authorizer)
+
+➡️ Move to Task 2
+
+🟩 TASK 2 — API Gateway Authorizer (MANDATORY SECURITY)
+
+🔹 What this does
+
+Blocks ALL unauthenticated access at API Gateway level.
+
+STEP 1️⃣ — Open API Gateway
+
+```
+AWS Console → API Gateway → Your API
+```
+
+STEP 2️⃣ — Create Authorizer
+
+```
+Authorizers → Create authorizer
+```
+
+Settings
+
+Authorizer type: Cognito
+
+Name: CafeCognitoAuth
+
+User pool: select your pool
+
+Token source:
+
+```
+Authorization
+```
+
+Click Create
+
+STEP 3️⃣ — Attach Authorizer to GET /order-status
+
+```
+Resources → /order-status → GET → Method Request
+```
+
+Set:
+
+Authorization: CafeCognitoAuth
+
+✔ Save
+
+STEP 4️⃣ — Deploy to NEW Stage
+
+```
+Actions → Deploy API
+```
+
+Stage name: admin
+
+Deploy
+
+✅ Your endpoint becomes:
+
+```
+/admin/order-status
+```
+
+STEP 5️⃣ — Update Frontend API URL
+
+```
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/admin/order-status";
+```
+
+STEP 6️⃣ — Test Security
+
+❌ Open API in browser → 403 Unauthorized
+
+✅ Open after login → SUCCESS
+
+🟩 TASK 3 — FILTER-BACKEND → Date Filter in Lambda
+
+🔹 What this does
+
+Fetch orders by date:
+
+```
+?date=2026-01-13
+```
+
+STEP 1️⃣ — Open Lambda
+
+```
+AWS Console → Lambda → order-status-function
+```
+
+STEP 2️⃣ — Read query parameter
+
+Add this at top:
+
+```
+params = event.get("queryStringParameters") or {}
+filter_date = params.get("date")
+```
+
+STEP 3️⃣ — Apply DynamoDB filter
+
+Example (Python):
+
+```
+from boto3.dynamodb.conditions import Attr
+
+scan_kwargs = {}
+
+if filter_date:
+    scan_kwargs["FilterExpression"] = Attr("created_at").begins_with(filter_date)
+
+response = table.scan(**scan_kwargs)
+items = response["Items"]
+```
+
+STEP 4️⃣ — Return filtered response
+
+Ensure response structure stays SAME:
+
+```
+{
+  "metrics": [...],
+  "recent_orders": [...]
+}
+```
+
+✅ Frontend already supports this
+
+🟩 TASK 4 — PRINT EACH ORDER + TODAY SUMMARY
+🔹 What this does
+
+Print all orders
+
+Print today’s total orders & quantity
+
+STEP 1️⃣ — Backend must send created_at
+
+Your DynamoDB item must include:
+
+```
+"created_at": "2026-01-13T14:22:11"
+```
+
+✔ Already required
+
+STEP 2️⃣ — Frontend stores all orders
+
+Already done:
+
+```
+let allOrders = [];
+```
+
+STEP 3️⃣ — Print ALL Orders
+
+Button:
+
+
+```
+<button onclick="printOrders()">🖨 Print Orders</button>
+```
+
+Logic:
+
+```
+function printOrders(){
+  let html="<h2>Orders</h2><table border='1'>";
+  allOrders.forEach(o=>{
+    html+=`<tr>
+      <td>${o.customer_name}</td>
+      <td>${o.item}</td>
+      <td>${o.quantity}</td>
+      <td>${o.created_at}</td>
+    </tr>`;
+  });
+  html+="</table>";
+  openPrint(html);
+}
+```
+
+STEP 4️⃣ — Print TODAY Summary
+
+Button:
+
+```
+<button onclick="printToday()">📄 Today Summary</button>
+```
+
+Logic:
+
+```
+function printToday(){
+  const today = new Date().toISOString().split("T")[0];
+  const todayOrders = allOrders.filter(o =>
+    o.created_at.startsWith(today)
+  );
+
+  const totalQty = todayOrders.reduce(
+    (sum,o)=>sum+o.quantity,0
+  );
+
+  openPrint(`
+    <h2>Today's Summary</h2>
+    <p>Total Orders: ${todayOrders.length}</p>
+    <p>Total Items: ${totalQty}</p>
+  `);
+}
+```
+
+🟩 FINAL SYSTEM FLOW (REAL-WORLD)
+
+```
+Admin → Login (Cognito)
+      → JWT issued
+      → API Gateway Authorizer validates JWT
+      → Lambda fetches filtered data
+      → Dashboard auto-refresh + print
+```
+
+✅ YOU HAVE BUILT A REAL PRODUCTION SYSTEM
+
+✔ Enterprise authentication
+
+✔ Secure API Gateway
+
+✔ Backend filtering
+
+✔ Admin dashboard
+
+✔ Printing & reporting
+
+✔ Zero shortcuts
+
+---
