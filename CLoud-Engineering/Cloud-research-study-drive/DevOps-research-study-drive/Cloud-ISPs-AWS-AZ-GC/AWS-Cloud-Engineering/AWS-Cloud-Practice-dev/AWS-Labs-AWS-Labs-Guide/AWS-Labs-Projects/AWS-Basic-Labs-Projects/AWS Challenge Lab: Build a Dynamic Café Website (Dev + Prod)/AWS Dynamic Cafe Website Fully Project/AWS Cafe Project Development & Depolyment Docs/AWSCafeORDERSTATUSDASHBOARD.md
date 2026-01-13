@@ -2041,11 +2041,21 @@ Chart → works
 
 ---
 
-## 🔐 PHASE 5️⃣
+## 🔐 PHASE 5️⃣ PRINT FEATURES (NO BACKEND CHANGE)
+
+Already handled in final HTML:
+
+✔ Print all orders
+
+✔ Print today summary
+
+✔ PDF / printer supported
+
+Nothing extra required.
 
 
 ---
-## 🔐 PHASE 4️⃣ — TEST FLOW
+## 🔐 PHASE 6️⃣ — TEST FLOW
 
 #### 1️⃣ Open:
 
