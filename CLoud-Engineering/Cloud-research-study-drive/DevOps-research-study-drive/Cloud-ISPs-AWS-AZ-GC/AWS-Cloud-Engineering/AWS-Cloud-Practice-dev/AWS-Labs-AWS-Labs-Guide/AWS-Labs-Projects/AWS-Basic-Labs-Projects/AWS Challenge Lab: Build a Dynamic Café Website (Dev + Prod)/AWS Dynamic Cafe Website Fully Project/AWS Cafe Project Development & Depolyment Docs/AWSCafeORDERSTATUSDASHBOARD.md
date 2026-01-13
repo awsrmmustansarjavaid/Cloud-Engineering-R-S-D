@@ -3035,7 +3035,7 @@ Lambda executes
 
 ✅ Valid Cognito user → Lambda runs
 
-🟢 STEP 1 — CONFIRM COGNITO USER POOL EXISTS
+### 🟢 STEP 1 — CONFIRM COGNITO USER POOL EXISTS
 
 1️⃣ AWS Console
 
@@ -3043,7 +3043,7 @@ Lambda executes
 
 3️⃣ Click User pools
 
-You MUST see:
+#### You MUST see:
 
 A User Pool name
 
@@ -3055,7 +3055,7 @@ ap-south-1_xxxxx
 
 👉 If not created, STOP and tell me.
 
-🟢 STEP 2 — CONFIRM APP CLIENT EXISTS (VERY IMPORTANT)
+### 🟢 STEP 2 — CONFIRM APP CLIENT EXISTS (VERY IMPORTANT)
 
 1️⃣ Open your User Pool
 
@@ -3063,13 +3063,13 @@ ap-south-1_xxxxx
 
 3️⃣ Click App clients
 
-Confirm:
+#### Confirm:
 
 ❌ Client secret = DISABLED
 
 ✅ USER_PASSWORD_AUTH enabled
 
-Save:
+#### Save:
 
 ```
 USER_POOL_ID
@@ -3077,7 +3077,7 @@ APP_CLIENT_ID
 REGION
 ```
 
-🟢 STEP 3 — FRONTEND MUST SEND JWT (MANDATORY)
+### 🟢 STEP 3 — FRONTEND MUST SEND JWT (MANDATORY)
 
 In your order-status.html, your fetch MUST look like this:
 
@@ -3091,7 +3091,7 @@ fetch(API_URL, {
 
 📌 This is NON-NEGOTIABLE
 
-🟢 STEP 4 — CREATE COGNITO AUTHORIZER (API GATEWAY)
+### 🟢 STEP 4 — CREATE COGNITO AUTHORIZER (API GATEWAY)
 
 1️⃣ AWS Console → API Gateway
 
@@ -3101,7 +3101,7 @@ fetch(API_URL, {
 
 4️⃣ Click Create authorizer
 
-Fill EXACTLY:
+#### Fill EXACTLY:
 
 | Field        | Value               |
 | ------------ | ------------------- |
@@ -3112,7 +3112,7 @@ Fill EXACTLY:
 
 👉 Click Create
 
-🟢 STEP 5 — ATTACH AUTHORIZER TO METHOD
+### 🟢 STEP 5 — ATTACH AUTHORIZER TO METHOD
 
 1️⃣ API Gateway → Resources
 
@@ -3126,7 +3126,7 @@ GET /order-status
 
 4️⃣ Click Edit
 
-Set:
+#### Set:
 
 ```
 Authorization → CognitoAuthorizer
@@ -3134,7 +3134,7 @@ Authorization → CognitoAuthorizer
 
 Click Save
 
-🟢 STEP 6 — ENABLE CORS AGAIN (DO NOT SKIP)
+### 🟢 STEP 6 — ENABLE CORS AGAIN (DO NOT SKIP)
 
 1️⃣ Select GET /order-status
 
@@ -3142,7 +3142,7 @@ Click Save
 
 3️⃣ Click Enable CORS and replace existing
 
-🟢 STEP 7 — DEPLOY API (MANDATORY)
+### 🟢 STEP 7 — DEPLOY API (MANDATORY)
 
 1️⃣ Click Deploy API
 
@@ -3156,13 +3156,13 @@ Click Save
 https://xxxx.execute-api.region.amazonaws.com/admin/order-status
 ```
 
-🟢 STEP 8 — TEST SECURITY
+### 🟢 STEP 8 — TEST SECURITY
 
 ❌ Without Token
 
 Open API URL in browser
 
-Result:
+#### Result:
 
 ```
 401 Unauthorized
@@ -3180,27 +3180,27 @@ Result:
 
 🎉 JWT SECURITY DONE
 
-✅ TASK 2 — BACKEND DATE FILTER (LAMBDA) STEP BY STEP
+### ✅ TASK 2 — BACKEND DATE FILTER (LAMBDA) STEP BY STEP
 
 Now we filter orders by date from backend, not frontend hacks.
 
-🧠 WHAT THIS DOES
+### 🧠 WHAT THIS DOES
 
-Frontend:
+#### Frontend:
 
 ```
 GET /order-status?date=2026-01-12
 ```
 
-Lambda:
+#### Lambda:
 
 ```
 SELECT ... WHERE DATE(created_at) = '2026-01-12'
 ```
 
-🟢 STEP 1 — CONFIRM FRONTEND SENDS DATE
+### 🟢 STEP 1 — CONFIRM FRONTEND SENDS DATE
 
-Your frontend URL must become:
+#### Your frontend URL must become:
 
 ```
 let url = API_URL;
@@ -3210,20 +3210,21 @@ if (date) {
 }
 ```
 
-🟢 STEP 2 — API GATEWAY PASSES QUERY PARAMS (DEFAULT)
+### 🟢 STEP 2 — API GATEWAY PASSES QUERY PARAMS (DEFAULT)
 
 ✅ API Gateway automatically passes query params
 
 ❌ No config required
 
-Lambda receives:
+#### Lambda receives:
 
 ```
 event["queryStringParameters"]
 ```
 
-🟢 STEP 3 — MODIFY LAMBDA CODE (CORE STEP)
-3.1 Read date from request
+### 🟢 STEP 3 — MODIFY LAMBDA CODE (CORE STEP)
+
+#### 3.1 Read date from request
 
 Add inside lambda_handler:
 
@@ -3232,9 +3233,9 @@ params = event.get("queryStringParameters") or {}
 filter_date = params.get("date")
 ```
 
-3.2 Build SQL safely
+#### 3.2 Build SQL safely
 
-Replace your SQL with:
+#### Replace your SQL with:
 
 ```
 sql = """
@@ -3251,14 +3252,14 @@ if filter_date:
 sql += " ORDER BY created_at DESC LIMIT 20"
 ```
 
-3.3 Execute query
+#### 3.3 Execute query
 
 ```
 cursor.execute(sql, values)
 orders = cursor.fetchall()
 ```
 
-🟢 STEP 4 — FULL MINIMAL LAMBDA LOGIC (FILTER PART)
+### 🟢 STEP 4 — FULL MINIMAL LAMBDA LOGIC (FILTER PART)
 
 ```
 params = event.get("queryStringParameters") or {}
@@ -3281,8 +3282,9 @@ cursor.execute(sql, values)
 orders = cursor.fetchall()
 ```
 
-🟢 STEP 5 — DEPLOY & TEST
-Test 1 — No date
+### 🟢 STEP 5 — DEPLOY & TEST
+
+#### Test 1 — No date
 
 ```
 /order-status
@@ -3290,7 +3292,7 @@ Test 1 — No date
 
 ✅ All orders
 
-Test 2 — With date
+#### Test 2 — With date
 
 ```
 /order-status?date=2026-01-12
@@ -3298,7 +3300,7 @@ Test 2 — With date
 
 ✅ Only that day’s orders
 
-🏁 FINAL VERIFICATION CHECKLIST
+### 🏁 FINAL VERIFICATION CHECKLIST
 
 | Item                        | Status |
 | --------------------------- | ------ |
@@ -3310,9 +3312,9 @@ Test 2 — With date
 | Production-grade            | ✅      |
 
 
-🧠 IMPORTANT 
+### 🧠 IMPORTANT 
 
-You now have:
+#### You now have:
 
 Authentication → Cognito
 
@@ -3324,4 +3326,583 @@ Clean architecture → Real-world
 
 ---
 
-# 🔒 SECTION 6 —   
+# 🔒 SECTION 6 —  Print orders 
+
+### 🎯 GOAL 
+
+You want TWO PRINT OPTIONS:
+
+1️⃣ Print all visible orders (table print)
+
+2️⃣ Print today’s total orders count (summary print)
+
+This is exactly how restaurants, POS systems, cafés do it.
+
+### 🧠 FINAL RESULT YOU WILL GET
+
+✔ A Print Orders button
+
+✔ A Print Today Summary button
+
+✔ Print works in browser → printer / PDF
+
+✔ No backend change required (uses existing data)
+
+✔ Free-tier safe
+
+### 🧩 OVERALL FLOW 
+
+```
+API → Orders Loaded
+        ↓
+JS counts today's orders
+        ↓
+User clicks PRINT
+        ↓
+Browser print dialog opens
+```
+
+### 🟢 PART 1 — ADD PRINT BUTTONS (HTML)
+
+👉 NO JS YET
+
+### STEP 1️⃣ — Open your order-status.html
+
+#### Scroll to inside this container (IMPORTANT):
+
+```
+<div class="status-container">
+```
+
+STEP 2️⃣ — Add Print Buttons (COPY EXACTLY)
+
+Paste this below the <h2> heading:
+
+```
+<div class="d-flex justify-content-end gap-2 mb-4">
+    <button class="btn btn-warning fw-bold" onclick="printOrders()">
+        🖨️ Print Orders
+    </button>
+    <button class="btn btn-success fw-bold" onclick="printTodaySummary()">
+        📊 Print Today Summary
+    </button>
+</div>
+```
+
+✅ Buttons added
+
+❌ No logic yet (that comes next)
+
+🟢 PART 2 — STORE ORDERS DATA (MANDATORY)
+
+To print, we must store API response.
+
+STEP 3️⃣ — Declare a global variable
+
+Find your <script> section
+Add this at the TOP of script:
+
+```
+let allOrders = [];
+```
+
+STEP 4️⃣ — Save orders after API fetch
+
+Find this code in your file:
+
+```
+data.recent_orders.forEach(o => {
+```
+
+REPLACE it with this (VERY IMPORTANT):
+
+```
+allOrders = data.recent_orders;
+
+allOrders.forEach(o => {
+```
+
+📌 This stores orders for printing.
+
+🟢 PART 3 — PRINT ALL ORDERS (STEP BY STEP)
+STEP 5️⃣ — Add Print Orders Function
+
+Scroll to bottom of <script>
+
+Paste this FULL FUNCTION:
+
+```
+function printOrders() {
+    if (allOrders.length === 0) {
+        alert("No orders to print");
+        return;
+    }
+
+    let html = `
+        <h2>Charlie Cafe ☕ - Orders</h2>
+        <table border="1" cellspacing="0" cellpadding="8" width="100%">
+            <tr>
+                <th>Customer</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Table</th>
+                <th>Date</th>
+            </tr>
+    `;
+
+    allOrders.forEach(o => {
+        html += `
+            <tr>
+                <td>${o.customer_name || "Anonymous"}</td>
+                <td>${o.item}</td>
+                <td>${o.quantity}</td>
+                <td>${o.table_number || "-"}</td>
+                <td>${o.created_at}</td>
+            </tr>
+        `;
+    });
+
+    html += `</table>`;
+
+    openPrintWindow(html);
+}
+```
+
+🟢 PART 4 — PRINT TODAY TOTAL (STEP BY STEP)
+STEP 6️⃣ — Understand Today Logic (IMPORTANT)
+
+We compare:
+
+```
+order_date === TODAY
+```
+
+Browser date format:
+
+```
+YYYY-MM-DD
+```
+
+STEP 7️⃣ — Add Today Summary Function
+
+Paste this below printOrders():
+
+```
+function printTodaySummary() {
+    const today = new Date().toISOString().split("T")[0];
+
+    let todayOrders = allOrders.filter(o =>
+        o.created_at.startsWith(today)
+    );
+
+    let totalQty = todayOrders.reduce((sum, o) => sum + o.quantity, 0);
+
+    let html = `
+        <h2>Charlie Cafe ☕</h2>
+        <h3>📅 Today's Order Summary</h3>
+        <p><strong>Date:</strong> ${today}</p>
+        <p><strong>Total Orders:</strong> ${todayOrders.length}</p>
+        <p><strong>Total Items Sold:</strong> ${totalQty}</p>
+    `;
+
+    openPrintWindow(html);
+}
+```
+
+🟢 PART 5 — PRINT HELPER FUNCTION (MANDATORY)
+
+This function actually opens the printer.
+
+STEP 8️⃣ — Add Print Helper (DO NOT SKIP)
+
+Paste this ONCE at bottom of script:
+
+```
+function openPrintWindow(content) {
+    const win = window.open("", "", "width=900,height=650");
+    win.document.write(`
+        <html>
+        <head>
+            <title>Print</title>
+            <style>
+                body { font-family: Arial; padding: 20px; }
+                table { border-collapse: collapse; }
+                th { background: #3b1f0e; color: white; }
+                th, td { border: 1px solid #333; }
+            </style>
+        </head>
+        <body>
+            ${content}
+        </body>
+        </html>
+    `);
+    win.document.close();
+    win.print();
+}
+```
+
+🟢 PART 6 — FINAL TESTING (DO NOT SKIP)
+STEP 9️⃣ — Load the page
+
+1️⃣ Open order-status.html
+2️⃣ Wait for orders to load
+
+STEP 🔟 — Test Print Orders
+
+Click:
+
+```
+🖨️ Print Orders
+```
+
+✅ Printer opens
+
+✅ Full table visible
+
+✅ Can save as PDF
+
+STEP 1️⃣1️⃣ — Test Today Summary
+
+Click:
+
+```
+📊 Print Today Summary
+```
+
+✅ Shows:
+
+Today date
+
+Total orders
+
+Total items sold
+
+---
+
+🏁 FINAL CHECKLIST
+
+| Feature             | Status |
+| ------------------- | ------ |
+| Print all orders    | ✅      |
+| Print today summary | ✅      |
+| No backend changes  | ✅      |
+| Works on browser    | ✅      |
+| Restaurant-ready    | ✅      |
+| PDF supported       | ✅      |
+
+
+🏆 WHAT YOU JUST BUILT (REAL WORLD)
+
+This is used in:
+
+✔ Cafés
+✔ POS systems
+✔ Billing counters
+✔ Daily closing reports
+
+---
+
+# 🔒 SECTION 7 —  JWT → SECURE API (API GATEWAY + COGNITO)
+
+🎯 Goal
+
+Only logged-in admins can call your API
+Public users ❌ blocked
+
+🟢 STEP 1 — CREATE COGNITO USER POOL
+
+Open AWS Console
+
+Go to Amazon Cognito
+
+Click Create user pool
+
+Select Cognito User Pool
+
+Click Next
+
+Configure sign-in
+
+Sign-in options → ✅ Username
+
+Password policy → Leave default
+
+MFA → ❌ Disabled
+
+Click Next
+
+Create pool
+
+Pool name: CharlieCafeAdminPool
+
+Click Create user pool
+
+📌 SAVE
+
+User Pool ID
+
+Region (example: us-east-1)
+
+🟢 STEP 2 — CREATE APP CLIENT (VERY IMPORTANT)
+
+Open your User Pool
+
+Go to App integration
+
+Click Create app client
+
+App type → Public client
+
+App client name → admin-dashboard-client
+
+IMPORTANT SETTINGS
+
+❌ Disable Client Secret
+
+Enable:
+
+✅ USER_PASSWORD_AUTH
+
+Click Create app client
+
+📌 SAVE
+
+App Client ID
+
+🟢 STEP 3 — CREATE ADMIN USER
+
+User Pool → Users
+
+Click Create user
+
+Username: admin
+
+Temporary password: set one
+
+Email verified → ✅ Yes
+
+Click Create
+
+➡️ Login once and change password
+
+🟢 STEP 4 — CREATE API GATEWAY AUTHORIZER
+
+Go to API Gateway
+
+Select your API
+
+Click Authorizers
+
+Click Create authorizer
+
+Settings
+
+Type → Cognito
+
+Name → AdminAuthorizer
+
+User Pool → select CharlieCafeAdminPool
+
+Token source → Authorization
+
+Click Create
+
+🟢 STEP 5 — ATTACH AUTHORIZER TO API METHOD
+
+API Gateway → Resources
+
+Select GET /order-status
+
+Click Method Request
+
+Authorization → AdminAuthorizer
+
+Save
+
+🟢 STEP 6 — DEPLOY API
+
+Click Deploy API
+
+Stage name → admin
+
+Deploy
+
+✅ API is now JWT-secured
+
+✅ CONFIGURATION 2 — FILTER-BACKEND (DATE FILTER IN LAMBDA)
+🎯 Goal
+
+Filter orders by date from backend, not frontend
+
+🟢 STEP 1 — READ DATE FROM API REQUEST
+
+In Lambda event:
+
+API Gateway passes query string:
+
+```
+?date=2026-01-13
+```
+
+🟢 STEP 2 — MODIFY LAMBDA CODE
+
+Add this inside lambda_handler:
+
+```
+query = event.get("queryStringParameters") or {}
+filter_date = query.get("date")
+```
+
+🟢 STEP 3 — MODIFY SQL QUERY
+If date is provided:
+
+```
+SELECT *
+FROM orders
+WHERE DATE(created_at) = %s
+ORDER BY created_at DESC
+```
+
+Else:
+
+```
+SELECT *
+FROM orders
+ORDER BY created_at DESC
+LIMIT 20
+```
+
+🟢 STEP 4 — EXECUTE QUERY SAFELY
+
+```
+if filter_date:
+    cursor.execute(sql, (filter_date,))
+else:
+    cursor.execute(sql)
+```
+
+🟢 STEP 5 — TEST
+
+Open browser
+
+Call:
+
+```
+/order-status?date=2026-01-13
+```
+
+✅ Only that day’s orders returned
+
+✅ CONFIGURATION 3 — PRINT EACH ORDER (FRONTEND)
+🎯 Goal
+
+Print all visible orders like POS systems
+
+🟢 STEP 1 — STORE ORDERS IN JS
+
+```
+let allOrders = [];
+```
+
+After API load:
+
+```
+allOrders = data.recent_orders;
+```
+
+🟢 STEP 2 — ADD PRINT BUTTON
+
+```
+<button onclick="printOrders()">🖨 Print Orders</button>
+```
+
+🟢 STEP 3 — PRINT FUNCTION
+
+```
+function printOrders() {
+  let html = "<h2>Orders</h2><table border='1'>";
+  allOrders.forEach(o => {
+    html += `<tr>
+      <td>${o.customer_name}</td>
+      <td>${o.item}</td>
+      <td>${o.quantity}</td>
+      <td>${o.created_at}</td>
+    </tr>`;
+  });
+  html += "</table>";
+  openPrint(html);
+}
+```
+
+🟢 STEP 4 — OPEN PRINT WINDOW
+
+```
+function openPrint(html) {
+  const w = window.open("");
+  w.document.write(html);
+  w.print();
+}
+```
+
+✅ CONFIGURATION 4 — PRINT TODAY TOTAL SUMMARY
+🎯 Goal
+
+Print today’s order count + total quantity
+
+🟢 STEP 1 — GET TODAY DATE
+
+```
+const today = new Date().toISOString().split("T")[0];
+```
+
+🟢 STEP 2 — FILTER TODAY ORDERS
+
+```
+const todayOrders = allOrders.filter(o =>
+  o.created_at.startsWith(today)
+);
+```
+
+🟢 STEP 3 — CALCULATE TOTALS
+
+```
+const totalOrders = todayOrders.length;
+const totalQty = todayOrders.reduce((s,o)=>s+o.quantity,0);
+```
+
+🟢 STEP 4 — PRINT SUMMARY
+
+```
+function printTodaySummary() {
+  let html = `
+    <h2>Today's Summary</h2>
+    <p>Total Orders: ${totalOrders}</p>
+    <p>Total Items: ${totalQty}</p>
+  `;
+  openPrint(html);
+}
+```
+
+🏁 FINAL CHECKLIST (ALL 4)
+
+| Feature             | Status |
+| ------------------- | ------ |
+| JWT Secure API      | ✅      |
+| Backend Date Filter | ✅      |
+| Print Orders        | ✅      |
+| Print Today Summary | ✅      |
+
+
+🏆 WHAT YOU NOW HAVE
+
+✔ Enterprise-grade Admin Dashboard
+
+✔ Secure API
+
+✔ Backend filtering
+
+✔ POS-style printing
+
+✔ Free-tier safe
+---
+
