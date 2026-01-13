@@ -1509,6 +1509,8 @@ If you don’t call Hosted UI, don’t configure it.
 
 #### ✅ Fully compatible
 
+---
+
 ## 🔐 PHASE 2️⃣ — order-status.html (Login + Dashboard fully integrated & Recommanded )
 
 ### ✅ What I changed (ONLY these)
@@ -1798,19 +1800,90 @@ rgba(0,0,0,.55)
 
 ✔ Resume + interview ready
 
-## 🔐 PHASE 3️⃣ — API GATEWAY AUTH (OPTIONAL BUT PRO)
+---
 
-API Gateway → Authorizers
+## 🔐 PHASE 3️⃣ — API GATEWAY AUTH 
 
-Create Cognito Authorizer
+### 🔹 STEP 3 — SECURE API GATEWAY (MOST IMPORTANT)
 
-Attach User Pool
-
-Apply to:
+#### 3.1 Create Cognito Authorizer
 
 ```
-GET /order-status
+API Gateway → Authorizers → Create
+Type: Cognito
+User Pool: SELECT
+Token source: Authorization
 ```
+
+#### 3.2 Attach to API Method
+
+```
+Resources → GET /order-status
+Method Request → Authorization → CognitoAuthorizer
+```
+
+#### 3.3 Enable CORS (AGAIN)
+
+```
+GET /order-status → Enable CORS → Replace headers
+```
+
+#### 3.4 Deploy API
+
+```
+Stage name: admin
+```
+
+#### 📌 Copy new endpoint:
+
+```
+https://xxx.execute-api.region.amazonaws.com/admin/order-status
+```
+
+#### 🔁 Update frontend:
+
+```
+API_URL = ".../admin/order-status"
+```
+
+#### ✅ Result:
+
+- ❌ No login → 401
+
+
+- ✅ Login → data loads
+
+---
+
+## 🔐 PHASE 4️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+### Lambda change (ONLY THIS LOGIC)
+
+```
+params = event.get("queryStringParameters") or {}
+filter_date = params.get("date")
+
+sql = "SELECT * FROM orders"
+values = []
+
+if filter_date:
+    sql += " WHERE DATE(created_at) = %s"
+    values.append(filter_date)
+
+sql += " ORDER BY created_at DESC LIMIT 20"
+cursor.execute(sql, values)
+```
+
+#### ✅ Result:
+
+```
+/order-status?date=YYYY-MM-DD
+```
+
+✅ returns filtered orders
+
+
+
 
 ## 🔐 PHASE 4️⃣ — TEST FLOW
 
