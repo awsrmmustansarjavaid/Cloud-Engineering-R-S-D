@@ -327,8 +327,6 @@ showDashboard();
 </html>
 ```
 
-
-
 #### Save File
 
 ```
@@ -363,6 +361,8 @@ rgba(0,0,0,.55)
 
 - JWT ready
 
+
+
 ## 🔐 PHASE 2️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
 ### 🔐 STEP 1 — CREATE USER POOL (NO CHANGE)
@@ -377,9 +377,14 @@ rgba(0,0,0,.55)
 
 - Account recovery: Email
 
-#### ✅ This matches both your old and new guides
+#### 📌 Save:
 
-### 🔐 STEP 2 — CREATE APP CLIENT (⚠️ ONE IMPORTANT FIX)
+```
+USER_POOL_ID
+REGION
+```
+
+### 🔐 STEP 2 — CREATE APP CLIENT
 
 - **User Pool → App integration → App clients → Create**
 
@@ -395,41 +400,34 @@ rgba(0,0,0,.55)
 
 #### 📌 Save:
 
-- User Pool ID
-
-- App Client ID
-
-#### ✅ This matches your FINAL frontend code
-
-### ❌ STEP 3 — HOSTED UI (OPTIONAL / NOT USED)
-
-#### Your new guide says:
-
 ```
-Configure Hosted UI
-Callback URL
-Logout URL
+CLIENT_ID
 ```
 
-#### Truth:
+### ❌ STEP 3 — HOSTED UI
 
-❌ Not used by your JavaScript
+- Create Cognito domain
 
-❌ No redirect logic in your code
+#### Callback URL:
 
-❌ No OAuth flow
+```
+https://YOUR_DOMAIN/order-status.html
+```
 
-#### Decision:
+#### Scopes:
 
-✅ SKIP IT (recommended)
+```
+openid email profile
+```
 
-OR keep it (does not break anything)
+#### 📌 Save:
 
-#### 🧠 Professional rule:
+```
+COGNITO_DOMAIN
+```
 
-If you don’t call Hosted UI, don’t configure it.
 
-### 🔐 STEP 4 — CREATE ADMIN USER (SAME AS BEFORE)
+### 🔐 STEP 4 — Create Admin User
 
 - Users → Create user
 
@@ -454,18 +452,32 @@ If you don’t call Hosted UI, don’t configure it.
 ```
 API Gateway → Authorizers → Create
 Type: Cognito
-User Pool: SELECT
+User Pool: SELECT Your pool
 Token source: Authorization
 ```
 
+✅ Create authorizer
+
 #### 3.2 Attach to API Method
 
+#### Resource:
+
 ```
-Resources → GET /order-status
-Method Request → Authorization → CognitoAuthorizer
+GET /order-status
 ```
 
+#### Method Request:
+
+```
+Authorization → CognitoAuthorizer
+```
+
+
 #### 3.3 Enable CORS (AGAIN)
+
+- Enable CORS
+
+- Replace existing headers
 
 ```
 GET /order-status → Enable CORS → Replace headers
@@ -473,15 +485,15 @@ GET /order-status → Enable CORS → Replace headers
 
 #### 3.4 Deploy API
 
-```
-Stage name: admin
-```
+- Stage: admin (recommended)
 
-#### 📌 Copy new endpoint:
+#### 📌 Copy new endpoint API URL:
 
 ```
 https://xxx.execute-api.region.amazonaws.com/admin/order-status
 ```
+
+#### 👉 Paste this into frontend once
 
 #### 🔁 Update frontend:
 
@@ -500,13 +512,24 @@ API_URL = ".../admin/order-status"
 
 ## 🔐 PHASE 4️⃣ — BACKEND DATE FILTER (LAMBDA)
 
-### Lambda change (ONLY THIS LOGIC)
+### 🎯 What backend does
+
+- JWT validation → API Gateway
+
+- Date filtering → Lambda
+
+- No frontend hacks
+
+### ✅ FINAL LAMBDA LOGIC
 
 ```
 params = event.get("queryStringParameters") or {}
 filter_date = params.get("date")
 
-sql = "SELECT * FROM orders"
+sql = """
+SELECT customer_name, item, quantity, table_number, created_at
+FROM orders
+"""
 values = []
 
 if filter_date:
@@ -514,8 +537,12 @@ if filter_date:
     values.append(filter_date)
 
 sql += " ORDER BY created_at DESC LIMIT 20"
+
 cursor.execute(sql, values)
+orders = cursor.fetchall()
 ```
+
+> **🚫 No more backend changes needed**
 
 #### ✅ Result:
 
@@ -525,15 +552,6 @@ cursor.execute(sql, values)
 
 ✅ returns filtered orders
 
-### 🔐 Assumptions
-
-- API Gateway already validates JWT (Cognito Authorizer)
-
-- Lambda is NOT doing auth (correct design)
-
-- Database: MySQL / RDS
-
-- Metrics + Analytics supported
 
 ### ✅ FINAL LAMBDA CODE (Python 3.12)
 
