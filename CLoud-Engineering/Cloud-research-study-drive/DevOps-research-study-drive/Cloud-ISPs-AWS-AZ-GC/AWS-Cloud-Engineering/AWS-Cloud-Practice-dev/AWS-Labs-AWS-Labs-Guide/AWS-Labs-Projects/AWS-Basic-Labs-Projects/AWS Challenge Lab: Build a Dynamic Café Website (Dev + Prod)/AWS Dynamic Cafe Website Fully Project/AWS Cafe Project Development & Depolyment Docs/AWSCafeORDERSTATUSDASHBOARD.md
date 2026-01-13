@@ -3009,6 +3009,317 @@ http://YOUR_EC2_IP/order-status.html
 
 ---
 
+## PHASE - JWT → SECURE API (END-TO-END)
+
+This task answers ONE QUESTION ONLY:
+
+> **❓ How does API Gateway + Lambda accept requests ONLY from logged-in Cognito users?**
+
+### 🧠 FINAL FLOW 
+
+```
+Browser Login (Cognito)
+        ↓
+JWT Token (ID token)
+        ↓
+Frontend sends Authorization header
+        ↓
+API Gateway (Cognito Authorizer) ✅
+        ↓
+Lambda executes
+```
+
+❌ No JWT → API Gateway BLOCKS
+
+❌ Fake JWT → API Gateway BLOCKS
+
+✅ Valid Cognito user → Lambda runs
+
+🟢 STEP 1 — CONFIRM COGNITO USER POOL EXISTS
+
+1️⃣ AWS Console
+
+2️⃣ Open Amazon Cognito
+
+3️⃣ Click User pools
+
+You MUST see:
+
+A User Pool name
+
+A User Pool ID like:
+
+```
+ap-south-1_xxxxx
+```
+
+👉 If not created, STOP and tell me.
+
+🟢 STEP 2 — CONFIRM APP CLIENT EXISTS (VERY IMPORTANT)
+
+1️⃣ Open your User Pool
+
+2️⃣ Click App integration
+
+3️⃣ Click App clients
+
+Confirm:
+
+❌ Client secret = DISABLED
+
+✅ USER_PASSWORD_AUTH enabled
+
+Save:
+
+```
+USER_POOL_ID
+APP_CLIENT_ID
+REGION
+```
+
+🟢 STEP 3 — FRONTEND MUST SEND JWT (MANDATORY)
+
+In your order-status.html, your fetch MUST look like this:
+
+```
+fetch(API_URL, {
+  headers: {
+    Authorization: "Bearer " + localStorage.getItem("token")
+  }
+})
+```
+
+📌 This is NON-NEGOTIABLE
+
+🟢 STEP 4 — CREATE COGNITO AUTHORIZER (API GATEWAY)
+
+1️⃣ AWS Console → API Gateway
+
+2️⃣ Open your API
+
+3️⃣ Left menu → Authorizers
+
+4️⃣ Click Create authorizer
+
+Fill EXACTLY:
+
+| Field        | Value               |
+| ------------ | ------------------- |
+| Name         | `CognitoAuthorizer` |
+| Type         | Cognito             |
+| User pool    | SELECT YOUR POOL    |
+| Token source | `Authorization`     |
+
+👉 Click Create
+
+🟢 STEP 5 — ATTACH AUTHORIZER TO METHOD
+
+1️⃣ API Gateway → Resources
+
+2️⃣ Click:
+
+```
+GET /order-status
+```
+
+3️⃣ Click Method Request
+
+4️⃣ Click Edit
+
+Set:
+
+```
+Authorization → CognitoAuthorizer
+```
+
+Click Save
+
+🟢 STEP 6 — ENABLE CORS AGAIN (DO NOT SKIP)
+
+1️⃣ Select GET /order-status
+
+2️⃣ Click Enable CORS
+
+3️⃣ Click Enable CORS and replace existing
+
+🟢 STEP 7 — DEPLOY API (MANDATORY)
+
+1️⃣ Click Deploy API
+
+2️⃣ Stage → admin (recommended)
+
+3️⃣ Click Deploy
+
+📌 Copy final URL:
+
+```
+https://xxxx.execute-api.region.amazonaws.com/admin/order-status
+```
+
+🟢 STEP 8 — TEST SECURITY
+
+❌ Without Token
+
+Open API URL in browser
+
+Result:
+
+```
+401 Unauthorized
+```
+
+✅ CORRECT
+
+✅ With Login
+
+1️⃣ Open order-status.html
+
+2️⃣ Login
+
+3️⃣ Dashboard loads
+
+🎉 JWT SECURITY DONE
+
+✅ TASK 2 — BACKEND DATE FILTER (LAMBDA) STEP BY STEP
+
+Now we filter orders by date from backend, not frontend hacks.
+
+🧠 WHAT THIS DOES
+
+Frontend:
+
+```
+GET /order-status?date=2026-01-12
+```
+
+Lambda:
+
+```
+SELECT ... WHERE DATE(created_at) = '2026-01-12'
+```
+
+🟢 STEP 1 — CONFIRM FRONTEND SENDS DATE
+
+Your frontend URL must become:
+
+```
+let url = API_URL;
+const date = document.getElementById("filterDate").value;
+if (date) {
+  url += "?date=" + date;
+}
+```
+
+🟢 STEP 2 — API GATEWAY PASSES QUERY PARAMS (DEFAULT)
+
+✅ API Gateway automatically passes query params
+
+❌ No config required
+
+Lambda receives:
+
+```
+event["queryStringParameters"]
+```
+
+🟢 STEP 3 — MODIFY LAMBDA CODE (CORE STEP)
+3.1 Read date from request
+
+Add inside lambda_handler:
+
+```
+params = event.get("queryStringParameters") or {}
+filter_date = params.get("date")
+```
+
+3.2 Build SQL safely
+
+Replace your SQL with:
+
+```
+sql = """
+SELECT customer_name, item, quantity, table_number, created_at
+FROM orders
+"""
+
+values = []
+
+if filter_date:
+    sql += " WHERE DATE(created_at) = %s"
+    values.append(filter_date)
+
+sql += " ORDER BY created_at DESC LIMIT 20"
+```
+
+3.3 Execute query
+
+```
+cursor.execute(sql, values)
+orders = cursor.fetchall()
+```
+
+🟢 STEP 4 — FULL MINIMAL LAMBDA LOGIC (FILTER PART)
+
+```
+params = event.get("queryStringParameters") or {}
+filter_date = params.get("date")
+
+sql = """
+SELECT customer_name, item, quantity, table_number, created_at
+FROM orders
+"""
+
+values = []
+
+if filter_date:
+    sql += " WHERE DATE(created_at) = %s"
+    values.append(filter_date)
+
+sql += " ORDER BY created_at DESC LIMIT 20"
+
+cursor.execute(sql, values)
+orders = cursor.fetchall()
+```
+
+🟢 STEP 5 — DEPLOY & TEST
+Test 1 — No date
+
+```
+/order-status
+```
+
+✅ All orders
+
+Test 2 — With date
+
+```
+/order-status?date=2026-01-12
+```
+
+✅ Only that day’s orders
+
+🏁 FINAL VERIFICATION CHECKLIST
+
+| Item                        | Status |
+| --------------------------- | ------ |
+| JWT enforced by API Gateway | ✅      |
+| Unauthorized users blocked  | ✅      |
+| Lambda protected            | ✅      |
+| Backend date filter works   | ✅      |
+| Frontend filter connected   | ✅      |
+| Production-grade            | ✅      |
 
 
+🧠 IMPORTANT 
 
+You now have:
+
+Authentication → Cognito
+
+Authorization → API Gateway
+
+Filtering logic → Lambda
+
+Clean architecture → Real-world
+
+---
