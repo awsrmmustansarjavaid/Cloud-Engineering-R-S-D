@@ -783,3 +783,209 @@ https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
 | Repetition       | ❌ Removed      |
 | Confusion        | ❌ Removed      |
 | Production-ready | ✅ YES          |
+
+---
+
+# SECTION 2- 🏷️ Order Status – Advanced Features Guide
+
+#### Includes:
+
+#### 1️⃣ CSV Export (Backend + Frontend)
+
+
+#### 2️⃣ Admin vs Staff Roles (Cognito + Lambda + Frontend)
+
+## PHASE 1️⃣ - CSV Export (Backend + Frontend)
+
+### 1️⃣ CSV EXPORT (Backend + Frontend)
+
+#### 🎯 Goal: Allow admin to export all order data or filtered by date to a CSV file.
+
+### 🔹 Backend Steps (Lambda)
+
+#### Step 1 — Open your Lambda
+
+- **AWS Console → Lambda → GetOrderStatusAdminLambda**
+
+#### Step 2 — Install CSV library (Python)
+
+#### If using Python:
+
+```
+# Use Lambda Layer for pandas or csv
+```
+
+#### Step 3 — Modify Lambda to add CSV output
+
+#### Add query parameter:
+
+```
+params = event.get("queryStringParameters") or {}
+export_csv = params.get("export") == "true"
+```
+
+#### Fetch orders (with date filter if needed):
+
+```
+filter_date = params.get("date")
+# Apply filter logic as shown in Task 3
+```
+
+#### If export_csv == True, generate CSV:
+
+```
+import csv
+import io
+
+if export_csv:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Customer", "Item", "Quantity", "Table", "Date"])
+    for o in orders:
+        writer.writerow([o["customer_name"], o["item"], o["quantity"], o["table_number"], o["created_at"]])
+    
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "text/csv",
+            "Content-Disposition": "attachment; filename=orders.csv",
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": output.getvalue()
+    }
+```
+
+✔ Now the Lambda supports CSV export.
+
+### 🔹 Frontend Steps
+
+#### Step 1 — Add Export Button
+
+#### Inside dashboard HTML:
+
+```
+<button class="btn btn-success mt-3" onclick="exportCSV()">Export CSV</button>
+```
+
+#### Step 2 — Add JS function
+
+```
+function exportCSV(){
+  let url = API_URL + "?export=true";
+  const date = filterDate.value;
+  if(date) url += "&date=" + date;
+
+  const token = localStorage.getItem("token");
+  fetch(url, {
+    headers:{ Authorization: "Bearer " + token }
+  })
+  .then(res => res.blob())
+  .then(blob => {
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "orders.csv";
+    link.click();
+  });
+}
+```
+
+✔ Users can now download CSV of filtered or all orders.
+
+
+---
+
+## PHASE 2️⃣ - Admin vs Staff Roles (Cognito + Lambda + Frontend)
+
+### 2️⃣ ADMIN VS STAFF ROLES
+
+### 🎯 Goal
+
+- **Admin → Full access (metrics + orders + export)**
+
+- **Staff → Limited access (orders only, no export, no metrics)**
+
+### 🔹 AWS Cognito Steps
+
+#### Step 1 — Create Groups
+
+```
+Cognito → User Pool → Groups → Create Group
+```
+
+- Group 1: Admin
+
+- Group 2: Staff
+
+#### Step 2 — Assign Users to Groups
+
+```
+Users → select user → Add to group → Admin/Staff
+```
+
+#### Step 3 — Update Lambda for Role Check
+
+```
+# After JWT validation
+user_groups = user.get("cognito:groups", [])
+
+if "Admin" in user_groups:
+    role = "Admin"
+elif "Staff" in user_groups:
+    role = "Staff"
+else:
+    return {"statusCode": 403, "body": "Access denied"}
+```
+
+### 🔹 Lambda – Role-Based Permissions
+
+#### Admin
+
+- View metrics
+
+- View orders
+
+- Export CSV
+
+#### Staff
+
+- View orders only
+
+- Cannot export CSV
+
+#### Modify Lambda:
+
+```
+if export_csv and "Admin" not in user_groups:
+    return {"statusCode": 403, "body": "Admins only"}
+```
+
+### 🔹 Frontend – Role-Based UI
+
+#### Step 1 — Hide Buttons for Staff
+
+```
+if(!userGroups.includes("Admin")){
+    document.querySelector("#exportCSVButton").style.display = "none";
+    document.querySelector("#metrics").style.display = "none";
+}
+```
+
+✔ Now Staff only sees orders table.
+
+### ✅ Verification
+
+1️⃣ Admin user logs in → sees metrics + orders + CSV export → can download CSV
+
+2️⃣ Staff user logs in → sees only orders → cannot download CSV → metrics hidden
+
+--
+
+### 🏆 Summary of Features Added
+
+| Feature              | Status |
+| -------------------- | ------ |
+| CSV Export Backend   | ✅ Done |
+| CSV Export Frontend  | ✅ Done |
+| Admin vs Staff Roles | ✅ Done |
+| Role-Based UI        | ✅ Done |
+---
