@@ -1181,6 +1181,36 @@ You now have:
 
 # ☕ SECTION 2 — ORDER STATUS Login
 
+### Goal: Production-ready Admin Dashboard
+
+#### Secure, auto-refreshing, printable, Cognito-protected
+
+
+
+## 🔐 PHASE 1️⃣ — DEPLOY FINAL FRONTEND (ONE FILE ONLY)
+
+
+### 📍 File location
+
+```
+/var/www/html/order-status.html
+```
+
+#### ✅ Action
+
+- Copy FINAL PRODUCTION order-status.html (Section 8)
+
+- Paste it as-is
+
+- Do NOT modify logic
+
+#### 🔧 Change ONLY these 4 values
+
+
+
+
+
+
 ## 🔐 PHASE 1️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
 ### ⚠ IMPORTANT TRUTH
