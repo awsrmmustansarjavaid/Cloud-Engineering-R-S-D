@@ -1,4 +1,4 @@
-# ☕ AWS CAFE — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
+# ☕ AWS CAFE — CloudFront-EC2-API GATEWAY- ALB-DUAL ARchitecture
 
 
 ### 🎯 SECTION GOAL (READ FIRST)
