@@ -25,30 +25,90 @@ Build a **dynamic café ordering system** using:
 ---
 
 
-## 🧱 High-Level Architecture
+## 🧱 AWS Café Visual Architecture (Logical Diagram)
+
+This diagram represents everything you actually built, not theory.
+
+### 🧠 High-Level Architecture Flow
 
 ```
-Browser
-  ↓
-CloudFront
-  ↓
-WAF
-  ↓
-API Gateway (Cognito Auth)
-  ↓
-Lambda (API)
-  ↓
-SQS
-  ↓
-Lambda Worker
-  ↓
-RDS (Orders – Source of Truth)
-  ↓
-DynamoDB (Menu / Cache)
+Customer Browser
+        |
+        v
+   Amazon CloudFront
+        |
+        |-------------------------------|
+        |                               |
+ Static Content                    Dynamic APIs
+ (HTML/CSS/JS)                     (/orders, /status)
+        |                               |
+        v                               v
+ Application Load Balancer        Amazon API Gateway
+        |                               |
+        v                               v
+ EC2 (Apache + PHP)              Lambda (Order API)
+                                        |
+                                        v
+                                  Amazon SQS
+                                        |
+                                        v
+                                 Lambda (Worker)
+                                        |
+                                        v
+                                 Amazon RDS (MySQL)
+                                        |
+                                        v
+                           Order Status & Billing Data
 
-EC2 (Web UI) → API Gateway (NO direct DB access)
 
 ```
+
+### MERMAID DIAGRAM (Copy-Paste Ready)
+
+You can paste this directly into GitHub Markdown, Mermaid Live Editor, or documentation tools.
+
+```
+flowchart TD
+
+    User[Customer Browser]
+
+    CF[Amazon CloudFront]
+
+    ALB[Application Load Balancer]
+    EC2[EC2 - Apache + PHP Frontend]
+
+    APIGW[Amazon API Gateway]
+
+    LambdaAPI[Lambda - Order API]
+    SQS[Amazon SQS Queue]
+    LambdaWorker[Lambda - Order Worker]
+
+    RDS[(Amazon RDS - MySQL)]
+
+    Secrets[AWS Secrets Manager]
+    CW[Amazon CloudWatch]
+
+    User --> CF
+
+    CF -->|Static Content| ALB
+    ALB --> EC2
+
+    CF -->|Dynamic API Requests| APIGW
+    APIGW --> LambdaAPI
+
+    LambdaAPI --> SQS
+    SQS --> LambdaWorker
+
+    LambdaWorker --> RDS
+
+    LambdaAPI --> Secrets
+    LambdaWorker --> Secrets
+
+    LambdaAPI --> CW
+    LambdaWorker --> CW
+```
+
+
 
 ---
 
