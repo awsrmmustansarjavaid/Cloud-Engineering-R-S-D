@@ -1221,119 +1221,18 @@ def lambda_handler(event, context):
 [AWS CAFE Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—%20CUSTOMER%20ORDER%20TRACKING%20%26%20BILLING.md)
 
 ---
+# SECTION 10 — CloudFront with EC2 (Apache + ALB) AND API Gateway (Dual Architecture)
 
-# 📢 SECTION 10 — AWS CAFE CI/CD (CodePipeline)
+[CloudFront with EC2 (Apache + ALB) AND API Gateway (Dual Architecture)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
+
+---
+
+# 📢 SECTION 11 — AWS CAFE CI/CD (CodePipeline)
 
 [AWS CAFE CI/CD (CodePipeline)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
 
----
-
-# 📢 SECTION 11 — TESTING
-
-## API Test
-curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
-
-## Verify
-- SQS: messages consumed
-- Lambda logs clean
-- RDS rows inserted
-- DynamoDB updated
 
 ---
-
-# 🏁 FINAL RESULT
-
-✔ Managed DB (RDS)
-✔ Serverless cache (DynamoDB)
-✔ Async processing (SQS)
-✔ Protected APIs (WAF)
-✔ Automated deployments (CI/CD)
-
----
-
-## 🚀 Next Enhancements
-- CloudFront caching
-- Cognito authentication
-- Terraform IaC
-- Multi‑account setup
-
----
-
-
-# 📢 SECTION 10 — CLOUDFRONT + CACHING
-
-## 1️⃣ Create CloudFront Distribution
-
-AWS Console → CloudFront → Create distribution
-
-### Origin
-- Origin domain: API Gateway invoke URL (without https://)
-- Origin type: Custom
-
-### Default cache behavior
-- Viewer protocol policy: Redirect HTTP to HTTPS
-- Allowed HTTP methods: GET, HEAD, OPTIONS, POST
-- Cache policy: Managed-CachingDisabled (for POST APIs)
-- Origin request policy: Managed-AllViewer
-
-Create distribution ⏳
-
-Copy:
-- CloudFront domain name
-
----
-
-## 2️⃣ Update EC2 Web App
-
-Replace API URL in `index.php`:
-
-```php
-$apiUrl = "https://<cloudfront-domain>/dev/orders";
-```
-
-Restart Apache:
-
-```
-sudo systemctl restart httpd
-```
-
----
-
-## 3️⃣ Optional: Cache Menu (GET)
-
-For GET /menu:
-- Cache policy: Managed-CachingOptimized
-- TTL: Default
-
----
-
-# 📢 SECTION 11 — COST OPTIMIZATION
-
-## 1️⃣ EC2 Cost Optimization
-- Instance type: t3.micro
-- Enable EC2 auto-stop (Lambda scheduler)
-- Delete unused AMIs & snapshots
-
-## 2️⃣ RDS Cost Optimization
-- Use db.t3.micro
-- Disable Multi-AZ (Dev)
-- Set backup retention: 1 day
-
-## 3️⃣ Lambda Optimization
-- Reduce timeout to 5 seconds
-- Right-size memory
-- Enable log retention (7 days)
-
-## 4️⃣ DynamoDB Optimization
-- On-demand capacity
-- Enable TTL for cache tables
-
-## 5️⃣ S3 Optimization
-- Block public access
-- Enable lifecycle rules (delete after 30 days)
-
----
-
 # 📢 SECTION 12 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
@@ -1376,6 +1275,35 @@ Create alarm
 
 # 📢 SECTION 13 — TESTING
 
+## API Test
+curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
+
+## Verify
+- SQS: messages consumed
+- Lambda logs clean
+- RDS rows inserted
+- DynamoDB updated
+
+---
+
+# 🏁 FINAL RESULT
+
+✔ Managed DB (RDS)
+✔ Serverless cache (DynamoDB)
+✔ Async processing (SQS)
+✔ Protected APIs (WAF)
+✔ Automated deployments (CI/CD)
+
+---
+
+## 🚀 Next Enhancements
+- CloudFront caching
+- Cognito authentication
+- Terraform IaC
+- Multi‑account setup
+
+---
+
 ## Cognito Test
 - Sign up user
 - Login → copy JWT token
@@ -1387,6 +1315,8 @@ curl -X POST <cloudfront-url>/dev/orders  -H "Authorization: Bearer <JWT>"  -H "
 ```
 
 Expected: 200 OK
+
+
 
 ---
 
