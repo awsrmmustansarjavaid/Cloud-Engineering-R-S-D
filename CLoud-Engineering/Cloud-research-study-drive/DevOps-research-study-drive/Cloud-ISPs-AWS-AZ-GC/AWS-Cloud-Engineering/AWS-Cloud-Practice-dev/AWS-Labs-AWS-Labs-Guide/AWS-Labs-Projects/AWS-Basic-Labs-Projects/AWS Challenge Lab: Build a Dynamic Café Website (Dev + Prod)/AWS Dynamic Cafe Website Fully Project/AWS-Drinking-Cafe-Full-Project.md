@@ -114,7 +114,7 @@ flowchart TD
 
 ## AWS Architecture Diagram 
 
-![AWS Architecture Diagram](./AWS%20Cafe%20Project%20Architecture%20Diagram/AWS-Cafe-Lab-Cognito-CloudFront-Cost-Billing.jpeg)
+![AWS Architecture Diagram](./AWS%20Cafe%20Project%20Architecture%20Diagram/AWS%20Drinking%20Café%20architecture%20diagram.png)
 
 ---
 
