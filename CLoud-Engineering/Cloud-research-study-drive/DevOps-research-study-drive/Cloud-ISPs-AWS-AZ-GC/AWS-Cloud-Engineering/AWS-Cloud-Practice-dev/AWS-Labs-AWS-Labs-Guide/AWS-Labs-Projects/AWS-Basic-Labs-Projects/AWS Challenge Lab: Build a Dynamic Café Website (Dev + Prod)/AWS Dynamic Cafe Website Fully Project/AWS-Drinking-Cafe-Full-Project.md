@@ -1284,26 +1284,6 @@ curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
 - RDS rows inserted
 - DynamoDB updated
 
----
-
-# 🏁 FINAL RESULT
-
-✔ Managed DB (RDS)
-✔ Serverless cache (DynamoDB)
-✔ Async processing (SQS)
-✔ Protected APIs (WAF)
-✔ Automated deployments (CI/CD)
-
----
-
-## 🚀 Next Enhancements
-- CloudFront caching
-- Cognito authentication
-- Terraform IaC
-- Multi‑account setup
-
----
-
 ## Cognito Test
 - Sign up user
 - Login → copy JWT token
@@ -1315,8 +1295,6 @@ curl -X POST <cloudfront-url>/dev/orders  -H "Authorization: Bearer <JWT>"  -H "
 ```
 
 Expected: 200 OK
-
-
 
 ---
 
