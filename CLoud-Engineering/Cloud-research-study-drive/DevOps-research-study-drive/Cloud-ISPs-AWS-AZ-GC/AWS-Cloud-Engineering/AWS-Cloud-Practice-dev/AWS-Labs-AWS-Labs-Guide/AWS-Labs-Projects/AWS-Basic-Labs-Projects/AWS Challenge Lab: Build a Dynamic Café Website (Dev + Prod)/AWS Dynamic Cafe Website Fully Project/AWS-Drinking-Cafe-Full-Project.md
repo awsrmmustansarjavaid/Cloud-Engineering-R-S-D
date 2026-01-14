@@ -1223,7 +1223,7 @@ def lambda_handler(event, context):
 ---
 # SECTION 10 — CloudFront with EC2 (Apache + ALB) AND API Gateway (Dual Architecture)
 
-[CloudFront with EC2 (Apache + ALB) AND API Gateway (Dual Architecture)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
+[CloudFront with EC2 (Apache + ALB) AND API Gateway (Dual Architecture)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20CAFE-cloudfront-ec2-api-dual-arch.md)
 
 ---
 
