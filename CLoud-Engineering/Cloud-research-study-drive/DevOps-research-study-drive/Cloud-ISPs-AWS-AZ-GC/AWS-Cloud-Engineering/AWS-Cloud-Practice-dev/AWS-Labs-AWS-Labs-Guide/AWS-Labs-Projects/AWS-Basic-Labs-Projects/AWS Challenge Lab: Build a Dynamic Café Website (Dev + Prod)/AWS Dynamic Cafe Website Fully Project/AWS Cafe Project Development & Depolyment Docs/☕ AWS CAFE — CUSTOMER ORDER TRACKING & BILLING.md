@@ -1753,25 +1753,25 @@ setInterval(() => {
 
 ### 🧩 STEP 6 — FINAL TEST (DO NOT SKIP)
 
-1️⃣ Place order
+#### 1️⃣ Place order
 
 ```
 order.php → submit
 ```
 
-2️⃣ Get order ID
+#### 2️⃣ Get order ID
 
 ```
 ORD-XXXX
 ```
 
-3️⃣ Open tracking link
+#### 3️⃣ Open tracking link
 
 ```
 order-status.php?order_id=ORD-XXXX
 ```
 
-4️⃣ Verify
+#### 4️⃣ Verify
 
 ✅ Status visible
 
@@ -1785,14 +1785,18 @@ order-status.php?order_id=ORD-XXXX
 
 ✅ PHASE 13 COMPLETE
 
-You now have:
+#### You now have:
 
-Real customer tracking
+- Real customer tracking
 
-Unique order URLs
+- Unique order URLs
 
-Billing + receipt
+- Billing + receipt
 
-Production-grade frontend
+- Production-grade frontend
 
-Zero risk to existing system
+- Zero risk to existing system
+
+---
+
+
