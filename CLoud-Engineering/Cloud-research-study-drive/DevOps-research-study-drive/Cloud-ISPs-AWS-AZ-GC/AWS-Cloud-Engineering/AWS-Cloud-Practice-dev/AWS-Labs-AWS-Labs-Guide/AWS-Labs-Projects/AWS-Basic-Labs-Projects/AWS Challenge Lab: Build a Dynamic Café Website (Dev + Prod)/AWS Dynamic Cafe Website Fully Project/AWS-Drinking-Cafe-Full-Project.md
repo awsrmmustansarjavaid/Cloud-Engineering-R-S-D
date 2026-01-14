@@ -1216,15 +1216,19 @@ def lambda_handler(event, context):
 
 ---
 
-# 📢 SECTION 9 — AWS CAFE CI/CD (CodePipeline)
+# 📢 SECTION 9 — AWS CAFE Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
 
-[AWS CAFE CI/CD (CodePipeline)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
-
-
+[AWS CAFE Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—%20CUSTOMER%20ORDER%20TRACKING%20%26%20BILLING.md)
 
 ---
 
-# 📢 SECTION 10 — TESTING
+# 📢 SECTION 10 — AWS CAFE CI/CD (CodePipeline)
+
+[AWS CAFE CI/CD (CodePipeline)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
+
+---
+
+# 📢 SECTION 11 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
@@ -1419,6 +1423,7 @@ You now have a **real AWS production architecture** with:
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
+
 
 
 
