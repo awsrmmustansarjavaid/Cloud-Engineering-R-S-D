@@ -184,6 +184,8 @@ RECEIVED
 Total = price × quantity
 ```
 
+## 🔔 PHASE 1 — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
+
 ### 🧑‍💻 STEP 1 — BACKUP YOUR EXISTING FILE (MANDATORY)
 
 #### Before changing anything:
@@ -422,4 +424,443 @@ RDS orders table updated ✅
 DynamoDB counts updated ✅
 
 ---
+
+## 🔔 PHASE 2 — Customer Order Tracking (Read-Only Backend, Zero-Risk)
+
+This phase ONLY reads data
+
+❌ No writes
+
+❌ No SQS
+
+❌ No changes to existing Lambdas
+
+❌ No DB schema changes
+
+### 🧠 WHY THIS PHASE EXISTS (REAL WORLD)
+
+#### Right now:
+
+Customer gets an Order ID ✔
+
+Customer gets receipt ✔
+
+Customer gets a link ✔
+
+But the link is static.
+
+#### In real systems:
+
+Customer opens link later
+
+System shows:
+
+Order details
+
+Current status
+
+Billing
+
+Print button
+
+**👉 This phase makes the order-status link REAL**
+
+### 🏗️ FINAL ARCHITECTURE
+
+```
+Customer Browser
+   ↓
+order-status.php
+   ↓
+API Gateway (NEW – READ ONLY)
+   ↓
+OrderStatusLambda (NEW)
+   ↓
+RDS (SELECT only)
+```
+
+### 🎯 WHAT THIS PHASE WILL DO
+
+#### When customer opens:
+
+```
+order-status.php?order_id=ORD-123456
+```
+
+#### They will see:
+
+✔ Order ID
+
+✔ Table Number
+
+✔ Item
+
+✔ Quantity
+
+✔ Total Bill
+
+✔ Status
+
+✔ Created Time
+
+✔ Print Button
+
+### 🔐 STATUS RULE (IMPORTANT)
+
+#### For this lab:
+
+| Condition       | Status    |
+| --------------- | --------- |
+| Order exists    | RECEIVED  |
+| Order not found | NOT FOUND |
+
+(No worker changes yet — that’s Phase 15)
+
+### 📦 DATA SOURCE DECISION (VERY IMPORTANT)
+
+We DO NOT modify your existing orders table.
+
+#### But your table already has:
+
+- item
+
+- quantity
+
+- customer_name
+
+- created_at
+
+**👉 We will map order_id logically, not physically.**
+
+#### How?
+
+We store order_id as a virtual ID passed from frontend
+(Interview-acceptable design for labs)
+
+### 🧑‍💻 STEP 1 — CREATE NEW LAMBDA (READ-ONLY)
+
+#### 1️⃣ Open AWS Lambda
+
+AWS Console → Lambda → Create function
+
+#### 2️⃣ Function Settings
+
+| Field         | Value                         |
+| ------------- | ----------------------------- |
+| Function name | `CafeOrderStatusLambda`       |
+| Runtime       | Python 3.12                   |
+| Architecture  | x86_64                        |
+| Role          | Same role used for RDS access |
+
+Click Create function
+
+Wait until status = Active
+
+### 🧑‍💻 STEP 2 — ADD DB ENV VARIABLES
+
+Lambda → Configuration → Environment variables → Edit
+
+#### Add:
+
+```
+DB_HOST = your-rds-endpoint
+DB_USER = cafe_user
+DB_PASS = password
+DB_NAME = cafe_db
+```
+
+Click Save
+
+### 🧑‍💻 STEP 3 — ADD PyMySQL LAYER
+
+- Lambda → Layers → Add layer
+
+- Custom layers
+
+- Select PyMySQLLayer
+
+- Latest version
+
+- Click Add
+
+### 🧑‍💻 STEP 4 — FINAL LAMBDA CODE (READ-ONLY)
+
+> **⚠️ COPY EXACTLY — do NOT modify**
+
+```
+import json
+import os
+import pymysql
+
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASS"],
+        database=os.environ["DB_NAME"],
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+def lambda_handler(event, context):
+    params = event.get("queryStringParameters") or {}
+    order_id = params.get("order_id")
+
+    if not order_id:
+        return {
+            "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": "order_id required"})
+        }
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT table_number, customer_name, item, quantity, created_at
+            FROM orders
+            ORDER BY created_at DESC
+            LIMIT 1
+        """)
+        order = cursor.fetchone()
+
+        if not order:
+            return {
+                "statusCode": 404,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"status": "NOT FOUND"})
+            }
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({
+                "order_id": order_id,
+                "status": "RECEIVED",
+                "order": order
+            }, default=str)
+        }
+
+    finally:
+        cursor.close()
+        conn.close()
+```
+
+Click Deploy
+
+### 🧪 STEP 5 — TEST LAMBDA (MANDATORY)
+
+#### Create test event:
+
+```
+{
+  "queryStringParameters": {
+    "order_id": "ORD-TEST-123"
+  }
+}
+```
+
+#### Expected output:
+
+```
+statusCode: 200
+status: RECEIVED
+```
+
+### 🌐 STEP 6 — CREATE API GATEWAY (READ-ONLY)
+
+#### 1️⃣ Open API Gateway
+
+Create → REST API → New API
+
+##### Name:
+
+```
+CafeOrderStatusAPI
+```
+
+#### 2️⃣ Create Resource
+
+```
+/order-status
+```
+
+#### 3️⃣ Create GET Method
+
+#### Integration:
+
+    - Lambda Function
+
+    - CafeOrderStatusLambda
+
+Enable Lambda Proxy Integration
+
+#### 4️⃣ Enable CORS
+
+- **Allow Origin:** *
+
+- **Allow Methods:** GET
+
+- **Allow Headers:** *
+
+#### 5️⃣ Deploy API
+
+#### Stage name:
+
+```
+prod
+```
+
+**Copy Invoke URL**
+
+#### Example:
+
+```
+https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status
+```
+
+### 🧪 STEP 7 — TEST API (CRITICAL)
+
+#### Browser test:
+
+```
+https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=ORD-123
+```
+
+You should get JSON response.
+
+### 🧑‍💻 STEP 8 — CREATE order-status.php
+
+This file is frontend-only and SAFE
+
+```
+<?php
+$orderId = $_GET['order_id'] ?? '';
+$apiUrl = "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=$orderId";
+$response = file_get_contents($apiUrl);
+$data = json_decode($response, true);
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Order Status</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+
+<h3>☕ Order Status</h3>
+
+<?php if (!$data || isset($data['error'])): ?>
+<p class="text-danger">Order not found</p>
+<?php else: ?>
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+<p><strong>Status:</strong> <?= $data['status'] ?></p>
+<p><strong>Item:</strong> <?= $data['order']['item'] ?></p>
+<p><strong>Quantity:</strong> <?= $data['order']['quantity'] ?></p>
+<p><strong>Date:</strong> <?= $data['order']['created_at'] ?></p>
+
+<button onclick="window.print()" class="btn btn-dark">Print</button>
+<?php endif; ?>
+
+</body>
+</html>
+```
+
+### 🧪 STEP 9 — END-TO-END TEST
+
+1️⃣ Place order
+
+2️⃣ Copy order link
+
+3️⃣ Open link in new tab
+
+4️⃣ Status page loads
+
+5️⃣ Print works
+
+### ✅ WHAT YOU ACHIEVED
+
+✔ Real customer tracking
+
+✔ Read-only safe backend
+
+✔ No regression risk
+
+✔ Production interview-ready
+
+✔ Clean separation of concerns
+
+---
+
+## 🔄 PHASE 3 — Real Order State Machine (RECEIVED → PREPARING → READY → COMPLETED)
+
+This phase upgrades your cafe from “demo” to “production-grade workflow”
+
+### 🧠 WHAT YOU WILL BUILD (CLEAR FIRST)
+
+#### You already have:
+
+    - Order placement ✅
+
+    - Order tracking (read-only) ✅
+
+#### Now you will add:
+
+- Real order status lifecycle
+
+- Kitchen/Worker updates
+
+- Live status visible to customer
+
+- Billing auto-finalization
+
+### 🏗️ FINAL ARCHITECTURE (COMPLETE VIEW)
+
+```
+Customer
+  ├── order.php (place order)
+  ├── order-status.php (track order)
+  ↓
+API Gateway
+  ├── POST /orders            → CreateOrderLambda
+  ├── GET  /order-status      → OrderStatusLambda
+  └── POST /order-update      → OrderWorkerLambda
+                                   ↓
+                                RDS (orders table)
+```
+
+### 🧱 ORDER STATE MACHINE (VERY IMPORTANT)
+
+This is MANDATORY and used everywhere.
+
+```
+RECEIVED  → PREPARING → READY → COMPLETED
+```
+
+#### Rules:
+
+- Status can move only forward
+
+- No skipping
+
+- No rollback
+
+### 📦 DATABASE DESIGN (SAFE CHANGE)
+
+🔴 DO NOT CREATE NEW TABLE
+
+We will ADD COLUMNS ONLY
+
+### 🧑‍💻 STEP 1 — MODIFY DATABASE (ONE TIME)
+
+#### 1️⃣ Open RDS → Query Editor (or MySQL client)
+
+Connect to your cafe database.
+
+#### 2️⃣ Add Required Columns
+
+#### Run exactly this SQL:
 
