@@ -1,4 +1,4 @@
-# ☕ AWS CAFE — CUSTOMER ORDER TRACKING & BILLING
+# ☕ AWS CAFE — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
 
 #### (FRONTEND EXTENSION LAB)
 
@@ -33,18 +33,18 @@ This lab adds all of that
 
 ```
 Customer Browser
-     ↓
-Order Page (PHP + HTML)
-     ↓
-Existing API Gateway
-     ↓
-CafeOrderApiLambda
-     ↓
-SQS (CafeOrdersQueue)
-     ↓
-CafeOrderWorker Lambda
-     ↓
-RDS + DynamoDB
+   ↓
+order.php  (THIS LAB)
+   ↓
+API Gateway  (EXISTING)
+   ↓
+CafeOrderApiLambda (EXISTING)
+   ↓
+SQS (EXISTING)
+   ↓
+CafeOrderWorker Lambda (EXISTING)
+   ↓
+RDS + DynamoDB (EXISTING)
 ```
 
 ### 🆕 Frontend Enhancements Only
@@ -58,8 +58,6 @@ RDS + DynamoDB
 - Printable receipt
 
 ## 🧩 LAB PHASE NAME
-
-### 🔔 PHASE 13 — Customer Order Tracking & Billing (Frontend-Only)
 
 ### 🎯 LAB OBJECTIVES
 
@@ -77,6 +75,17 @@ RDS + DynamoDB
 
 ✔ Backend remains 100% untouched
 
+### 🎯 WHAT EXACTLY WE ARE ADDING
+
+| Feature                 | Where    |
+| ----------------------- | -------- |
+| Unique Order ID         | Frontend |
+| Billing Calculation     | Frontend |
+| Order Status (RECEIVED) | Frontend |
+| Order Tracking Link     | Frontend |
+| Print Receipt           | Frontend |
+
+
 ### 📁 FILES USED IN THIS LAB
 
 | File               | Purpose                       |
@@ -84,6 +93,20 @@ RDS + DynamoDB
 | `order.php`        | Order placement + receipt     |
 | `order-status.php` | (Future) Status tracking page |
 | Existing API       | **UNCHANGED**                 |
+
+#### 📁 FILES USED
+
+You will work with ONLY ONE FILE in this phase:
+
+```
+order.php
+```
+
+- No new backend files
+
+- No Lambda changes
+
+- No DB changes
 
 ### 🚫 RULES (DO NOT BREAK)
 
@@ -99,19 +122,23 @@ RDS + DynamoDB
 
 ### 🧪 DATA FLOW (IMPORTANT)
 
-- Customer submits order
+- Customer fills order form
 
-- Frontend sends order to API
+- Frontend sends JSON to API (already working)
 
-- Backend processes asynchronously
+- Backend responds 202 Accepted
 
 #### Frontend immediately:
 
     - Generates Order ID
 
+    - Calculates bill
+
     - Displays receipt
 
     - Shows status link
+
+**👉 Backend continues processing asynchronously via SQS**    
 
 ### 🔑 ORDER STATUS MODEL (FRONTEND)
 
@@ -122,7 +149,22 @@ RDS + DynamoDB
 | READY     | (Future) Ready to serve  |
 | COMPLETED | (Future) Order closed    |
 
-> **In this lab, we use RECEIVED only.**
+#### 🔐 ORDER STATUS LOGIC (FOR NOW)
+
+In this phase, order status is:
+
+```
+RECEIVED
+```
+
+#### Why?
+
+- Order accepted by system
+
+- Async processing is happening
+
+- This matches real systems (Uber Eats, Foodpanda)
+
 
 ### 🧾 BILLING MODEL (FRONTEND)
 
@@ -136,15 +178,47 @@ RDS + DynamoDB
 | Cappuccino  | $4    |
 | Fresh Juice | $5    |
 
-**Total = price × quantity**
+#### Total formula:
 
-### 🧑‍💻 STEP 1 — CREATE UPDATED ORDER FRONTEND
+```
+Total = price × quantity
+```
 
-#### File Name
+### 🧑‍💻 STEP 1 — BACKUP YOUR EXISTING FILE (MANDATORY)
+
+#### Before changing anything:
+
+1️⃣ Go to your server / EC2
+
+2️⃣ Navigate to your web directory
+
+3️⃣ File Name
 
 ```
 order.php
 ```
+
+4️⃣ Rename your file:
+
+```
+order.php  →  order_old.php
+```
+
+**✅ This guarantees rollback safety**
+
+### 🧑‍💻 STEP 2 — CREATE UPDATED ORDER FILE
+
+#### Create a new file:
+
+```
+order.php
+```
+
+Paste the FULL code below
+
+⚠️ Do NOT remove anything
+
+⚠️ Do NOT partially copy
 
 ### ✅ FINAL UPDATED ORDER FRONTEND CODE
 
@@ -297,23 +371,55 @@ $statusUrl = "order-status.php?order_id=$orderId";
 </html>
 ```
 
-🧪 TESTING CHECKLIST
+---
 
-✔ Submit order
-✔ Order accepted (202)
-✔ Receipt displayed
-✔ Unique Order ID shown
+### 🧪 STEP 3 — TESTING (DO NOT SKIP)
+
+#### Test 1 — Form submission
+
+✔ Fill form
+
+✔ Click Place Order
+
+✔ Page reloads
+
+#### Test 2 — Backend unchanged
+
+✔ API returns 202
+
+✔ SQS receives message
+
+✔ Worker inserts into RDS
+
+#### Test 3 — Receipt
+
+✔ Order ID visible
+
 ✔ Status = RECEIVED
-✔ Order link opens
-✔ Print works
 
-🚀 WHAT’S NEXT (NEXT LAB)
-🔮 PHASE 14 — Order Status Backend (Optional)
+✔ Total calculated correctly
 
-Lambda: GetOrderStatus
+#### Test 4 — Print
 
-DynamoDB: OrderStatus table
+✔ Click Print
 
-API Gateway: /order-status
+✔ Browser print dialog opens
 
-Auto-update frontend status page
+---
+
+
+### 🔍 WHAT YOU SHOULD SEE IN AWS (UNCHANGED)
+
+SQS messages consumed ✅
+
+
+Worker Lambda logs appear ✅
+
+
+RDS orders table updated ✅
+
+
+DynamoDB counts updated ✅
+
+---
+
