@@ -232,8 +232,6 @@ flowchart TD
 
 # 📢 SECTION 1 CAFE BASIC CONFIGURATIONS
 
-
-
 ## PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
 
 ### 1️⃣ Create Development VPC (us‑east‑1)
