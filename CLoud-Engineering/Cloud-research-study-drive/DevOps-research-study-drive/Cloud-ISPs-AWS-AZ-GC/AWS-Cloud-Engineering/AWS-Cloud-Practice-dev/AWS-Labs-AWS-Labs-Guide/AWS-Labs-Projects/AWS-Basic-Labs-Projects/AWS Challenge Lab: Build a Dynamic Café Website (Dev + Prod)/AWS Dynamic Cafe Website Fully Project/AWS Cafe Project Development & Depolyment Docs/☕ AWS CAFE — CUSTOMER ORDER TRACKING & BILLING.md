@@ -864,3 +864,440 @@ Connect to your cafe database.
 
 #### Run exactly this SQL:
 
+```
+ALTER TABLE orders
+ADD COLUMN order_id VARCHAR(50),
+ADD COLUMN status VARCHAR(20) DEFAULT 'RECEIVED',
+ADD COLUMN total_amount DECIMAL(10,2),
+ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+```
+
+#### 3️⃣ Verify Columns
+
+```
+DESCRIBE orders;
+```
+
+#### You MUST see:
+
+- order_id
+
+- status
+
+- total_amount
+
+- updated_at
+
+### 🧠 ORDER ID FORMAT (STANDARD)
+
+```
+ORD-YYYYMMDD-XXXX
+```
+
+#### Example:
+
+```
+ORD-20260114-8392
+```
+
+### 🧑‍💻 STEP 2 — UPDATE CREATE ORDER LAMBDA
+
+⚠️ This does not break existing flow
+
+#### 1️⃣ Open Lambda
+
+Function: CreateOrderLambda
+
+#### 2️⃣ Replace Code (100% COPY)
+
+```
+import json
+import pymysql
+import os
+import random
+from datetime import datetime
+
+def generate_order_id():
+    return f"ORD-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000,9999)}"
+
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASS"],
+        database=os.environ["DB_NAME"]
+    )
+
+def lambda_handler(event, context):
+    data = json.loads(event["body"])
+
+    order_id = generate_order_id()
+    table_number = data["table_number"]
+    customer_name = data["customer_name"]
+    item = data["item"]
+    quantity = int(data["quantity"])
+
+    PRICE_LIST = {
+        "Coffee": 3.00,
+        "Tea": 2.50,
+        "Latte": 4.00,
+        "Cappuccino": 4.50,
+        "Fresh Juice": 5.00
+    }
+
+    total_amount = PRICE_LIST[item] * quantity
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO orders
+        (order_id, table_number, customer_name, item, quantity, total_amount, status)
+        VALUES (%s,%s,%s,%s,%s,%s,'RECEIVED')
+    """, (order_id, table_number, customer_name, item, quantity, total_amount))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return {
+        "statusCode": 200,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps({
+            "message": "Order placed",
+            "order_id": order_id,
+            "status": "RECEIVED",
+            "total": total_amount,
+            "track_url": f"/order-status.php?order_id={order_id}"
+        })
+    }
+```
+
+#### 3️⃣ Deploy Lambda
+
+Click Deploy
+
+### 🧪 STEP 3 — TEST ORDER CREATION
+
+Place order from frontend.
+
+#### Expected response:
+
+```
+{
+  "order_id": "ORD-20260114-8392",
+  "status": "RECEIVED",
+  "total": 9.00,
+  "track_url": "/order-status.php?order_id=..."
+}
+```
+
+### 🧑‍💻 STEP 4 — CREATE WORKER (KITCHEN) LAMBDA
+
+#### This simulates:
+
+- Barista
+
+- Kitchen staff
+
+- Admin panel
+
+#### 1️⃣ Create Lambda
+
+| Setting | Value                   |
+| ------- | ----------------------- |
+| Name    | `CafeOrderWorkerLambda` |
+| Runtime | Python 3.12             |
+| Role    | Same RDS role           |
+
+
+### 2️⃣ Lambda Code (STRICT COPY)
+
+```
+import json
+import pymysql
+import os
+
+VALID_FLOW = {
+    "RECEIVED": "PREPARING",
+    "PREPARING": "READY",
+    "READY": "COMPLETED"
+}
+
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASS"],
+        database=os.environ["DB_NAME"]
+    )
+
+def lambda_handler(event, context):
+    data = json.loads(event["body"])
+    order_id = data["order_id"]
+    new_status = data["status"]
+
+    conn = get_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("SELECT status FROM orders WHERE order_id=%s", (order_id,))
+    order = cursor.fetchone()
+
+    if not order:
+        return {"statusCode":404,"body":"Order not found"}
+
+    current_status = order["status"]
+
+    if VALID_FLOW.get(current_status) != new_status:
+        return {"statusCode":400,"body":"Invalid status transition"}
+
+    cursor.execute("""
+        UPDATE orders SET status=%s WHERE order_id=%s
+    """, (new_status, order_id))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return {
+        "statusCode":200,
+        "body":json.dumps({
+            "order_id": order_id,
+            "status": new_status
+        })
+    }
+```
+
+### 🌐 STEP 5 — CREATE API GATEWAY FOR WORKER
+
+#### Endpoint
+
+```
+POST /order-update
+```
+
+- Integration: CafeOrderWorkerLambda
+
+- Enable CORS
+
+- Deploy stage: prod
+
+### 🧪 STEP 6 — TEST STATUS FLOW (MANDATORY)
+
+#### 1️⃣ RECEIVED → PREPARING
+
+```
+{
+  "order_id": "ORD-XXXX",
+  "status": "PREPARING"
+}
+```
+
+#### 2️⃣ PREPARING → READY
+
+#### 3️⃣ READY → COMPLETED
+
+❌ Try skipping → must fail
+
+### 🧑‍💻 STEP 7 — UPDATE ORDER STATUS LAMBDA (READ REAL STATUS)
+
+#### Replace SELECT query:
+
+```
+SELECT order_id, table_number, item, quantity, total_amount, status, created_at
+FROM orders
+WHERE order_id=%s
+```
+
+### 🧑‍💻 STEP 8 — UPDATE order-status.php
+
+#### Add billing & live status:
+
+#### 📌 Requirement: Your backend must expose a GET order status API like:
+
+```
+GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=ORD-XXXX
+```
+
+#### 📁 WHERE THIS FILE BELONGS
+
+```
+/web
+ ├── order.php
+ ├── order-status.php   ✅ (THIS FILE)
+ └── index.html
+```
+
+#### Code Update order-status.php
+
+```
+<p><strong>Total:</strong> $<?= $data['order']['total_amount'] ?></p>
+<p><strong>Status:</strong>
+<span class="badge bg-success"><?= $data['order']['status'] ?></span>
+</p>
+```
+
+**Print button already exists ✅**
+
+#### ☕ order-status.php (FINAL VERSION)
+
+
+#### ✅ FULL Final order-status.php FILE
+
+```
+<?php
+// ================= CONFIG =================
+$apiBaseUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+
+// ================= GET ORDER ID =================
+if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
+    die("❌ Invalid order reference.");
+}
+
+$orderId = $_GET['order_id'];
+
+// ================= CALL API =================
+$apiUrl = $apiBaseUrl . "?order_id=" . urlencode($orderId);
+
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+
+if ($response === false) {
+    die("❌ Failed to fetch order status.");
+}
+
+curl_close($ch);
+$data = json_decode($response, true);
+
+if (!isset($data['order'])) {
+    die("❌ Order not found.");
+}
+
+$order = $data['order'];
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Status | Charlie Cafe ☕</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: #f4f6f9;
+}
+.receipt {
+    max-width: 520px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+.status-badge {
+    font-size: 14px;
+    padding: 6px 12px;
+}
+@media print {
+    button {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="receipt">
+
+    <h4 class="text-center mb-3">☕ Charlie Cafe</h4>
+    <p class="text-center text-muted">Order Receipt</p>
+
+    <hr>
+
+    <p><strong>Order ID:</strong> <?= htmlspecialchars($order['order_id']) ?></p>
+    <p><strong>Customer:</strong> <?= htmlspecialchars($order['customer_name']) ?></p>
+    <p><strong>Table:</strong> <?= htmlspecialchars($order['table_number']) ?></p>
+    <p><strong>Date:</strong> <?= htmlspecialchars($order['created_at']) ?></p>
+
+    <hr>
+
+    <p><strong>Item:</strong> <?= htmlspecialchars($order['item']) ?></p>
+    <p><strong>Quantity:</strong> <?= htmlspecialchars($order['quantity']) ?></p>
+
+    <hr>
+
+    <p>
+        <strong>Status:</strong>
+        <?php
+        $status = $order['status'];
+        $badge = "secondary";
+
+        if ($status === "RECEIVED") $badge = "info";
+        if ($status === "PREPARING") $badge = "warning";
+        if ($status === "READY") $badge = "primary";
+        if ($status === "COMPLETED") $badge = "success";
+        ?>
+        <span class="badge bg-<?= $badge ?> status-badge">
+            <?= $status ?>
+        </span>
+    </p>
+
+    <hr>
+
+    <p><strong>Total Amount:</strong> $<?= number_format($order['total_amount'], 2) ?></p>
+
+    <div class="d-grid mt-4">
+        <button onclick="window.print()" class="btn btn-dark">
+            🖨️ Print Receipt
+        </button>
+    </div>
+
+</div>
+
+</body>
+</html>
+```
+
+#### 🔍 EXPECTED API RESPONSE FORMAT
+
+Your backend MUST return this structure:
+
+```
+{
+  "order": {
+    "order_id": "ORD-20260114-8392",
+    "customer_name": "John",
+    "table_number": 4,
+    "item": "Latte",
+    "quantity": 2,
+    "total_amount": 8.00,
+    "status": "PREPARING",
+    "created_at": "2026-01-14 10:42:00"
+  }
+}
+```
+
+
+
+### 🧪 STEP 9 — END-TO-END FINAL TEST
+
+1️⃣ Place order
+
+2️⃣ Track order → RECEIVED
+
+3️⃣ Update via worker → PREPARING
+
+4️⃣ Refresh customer page
+
+5️⃣ READY → COMPLETED
+
+6️⃣ Print receipt
+
+
+---
