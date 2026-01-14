@@ -42,7 +42,7 @@ Lambda → SQS → Worker → DB
 This teaches REAL AWS decision-making, not tutorials.
 
 
-## 🌍 PHASE 1 — CloudFront + ALB + EC2 (Replacing API Gateway)
+## 🌍 PHASE 1 — PART A — CloudFront + ALB + EC2
 
 #### (Primary Website Architecture)
 
@@ -174,38 +174,116 @@ http://<ALB-DNS-NAME>
 
 ---
 
-## 🌍 PHASE 2 — CLOUDFRONT + CACHING
+## 🌍 PHASE 2 — PART B — CLOUDFRONT + ALB (EC2 WEBSITE)
 
-## 1️⃣ Create CloudFront Distribution
+### 🟦 STEP 4 — CREATE CLOUDFRONT DISTRIBUTION (FOR EC2)
 
-AWS Console → CloudFront → Create distribution
+### 1️⃣ AWS Console → CloudFront → Create distribution
 
-### Origin
-- Origin domain: API Gateway invoke URL (without https://)
-- Origin type: Custom
+### 2️⃣ ORIGIN SETTINGS
 
-### Default cache behavior
-- Viewer protocol policy: Redirect HTTP to HTTPS
-- Allowed HTTP methods: GET, HEAD, OPTIONS, POST
-- Cache policy: Managed-CachingDisabled (for POST APIs)
-- Origin request policy: Managed-AllViewer
+| Field         | Value            |
+| ------------- | ---------------- |
+| Origin domain | **ALB DNS NAME** |
+| Origin type   | Custom           |
+| Protocol      | HTTP only        |
 
-Create distribution ⏳
+### 3️⃣ DEFAULT CACHE BEHAVIOR
 
-Copy:
-- CloudFront domain name
+| Field                 | Value                    |
+| --------------------- | ------------------------ |
+| Viewer protocol       | Redirect HTTP to HTTPS   |
+| Allowed methods       | GET, HEAD                |
+| Cache policy          | Managed-CachingOptimized |
+| Origin request policy | Managed-AllViewer        |
+
+
+### 4️⃣ Create Distribution
+
+⏳ Wait 10–15 minutes
+
+#### Copy:
+
+```
+CloudFront Domain Name
+```
+
+### 🟦 STEP 5 — TEST EC2 VIA CLOUDFRONT
+
+#### Open:
+
+```
+https://<cloudfront-domain>
+```
+
+✔ Page loads
+
+✔ HTTPS enabled
+
+✔ Cached globally
 
 ---
 
-## 2️⃣ Update EC2 Web App
+## 🌍 PHASE 3 — CLOUDFRONT + API GATEWAY (SERVERLESS API)
 
-Replace API URL in `index.php`:
+### 🟨 STEP 6 — CREATE SECOND CLOUDFRONT ORIGIN (API)
 
-```php
-$apiUrl = "https://<cloudfront-domain>/dev/orders";
+#### Edit existing CloudFront distribution
+
+OR create new one (recommended for learning)
+
+#### Origin configuration
+
+| Field         | Value                                      |
+| ------------- | ------------------------------------------ |
+| Origin domain | `xxxx.execute-api.us-east-1.amazonaws.com` |
+| Origin type   | Custom                                     |
+| Protocol      | HTTPS only                                 |
+
+#### Cache behavior (API)
+
+#### Path pattern:
+
+```
+/dev/*
 ```
 
-Restart Apache:
+| Field                 | Value                   |
+| --------------------- | ----------------------- |
+| Allowed methods       | GET, POST, OPTIONS      |
+| Cache policy          | Managed-CachingDisabled |
+| Origin request policy | Managed-AllViewer       |
+| Viewer protocol       | HTTPS only              |
+
+✔ This ensures POST orders are NOT cached
+
+### 🟨 STEP 7 — DEPLOY CLOUDFRONT CHANGES
+
+#### Wait until:
+
+```
+Status: Deployed
+```
+
+---
+
+## 🌍 PHASE 4 — UPDATE EC2 WEBSITE TO USE CLOUDFRONT API
+
+### Edit order.php
+
+#### ❌ OLD:
+
+```
+$apiUrl = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders";
+```
+
+#### ✅ NEW:
+
+```
+$apiUrl = "https://<cloudfront-api-domain>/dev/orders";
+```
+
+#### Restart Apache:
 
 ```
 sudo systemctl restart httpd
@@ -213,37 +291,67 @@ sudo systemctl restart httpd
 
 ---
 
-## 3️⃣ Optional: Cache Menu (GET)
+## 🌍 PHASE 5 — OPTIONAL API CACHING (GET ONLY)
 
-For GET /menu:
-- Cache policy: Managed-CachingOptimized
-- TTL: Default
+### Example: /menu
+
+### Create cache behavior:
+
+```
+/dev/menu
+```
+
+| Setting      | Value                    |
+| ------------ | ------------------------ |
+| Cache policy | Managed-CachingOptimized |
+| TTL          | Default                  |
+
+#### ⚠️ NEVER cache:
+
+- POST
+
+- PUT
+
+- ORDER APIs
+
+### 🧪 FINAL TESTING (MANDATORY)
+
+#### ✅ Test 1 — Website
+
+```
+https://<cloudfront-ec2-domain>
+```
+
+#### ✅ Test 2 — Order Placement
+
+Submit order → success message
+
+#### ✅ Test 3 — Track Order
+
+```
+order-status.php?order_id=ORD-XXXX
+```
+
+#### ✅ Test 4 — Backend
+
+- SQS message consumed
+
+- Worker Lambda logs OK
+
+- DB updated
+
+### 🧠 WHY COMPANIES USE BOTH
+
+| Use Case       | Architecture             |
+| -------------- | ------------------------ |
+| Legacy PHP     | CloudFront + ALB + EC2   |
+| Mobile APIs    | CloudFront + API Gateway |
+| High traffic   | CloudFront               |
+| Cost optimized | API Gateway              |
+| Complex logic  | EC2                      |
+
+You now understand enterprise AWS, not tutorials.
 
 ---
 
-# 📢 SECTION 11 — COST OPTIMIZATION
 
-## 1️⃣ EC2 Cost Optimization
-- Instance type: t3.micro
-- Enable EC2 auto-stop (Lambda scheduler)
-- Delete unused AMIs & snapshots
-
-## 2️⃣ RDS Cost Optimization
-- Use db.t3.micro
-- Disable Multi-AZ (Dev)
-- Set backup retention: 1 day
-
-## 3️⃣ Lambda Optimization
-- Reduce timeout to 5 seconds
-- Right-size memory
-- Enable log retention (7 days)
-
-## 4️⃣ DynamoDB Optimization
-- On-demand capacity
-- Enable TTL for cache tables
-
-## 5️⃣ S3 Optimization
-- Block public access
-- Enable lifecycle rules (delete after 30 days)
-
----
