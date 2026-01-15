@@ -139,6 +139,67 @@ SELECT * FROM orders;
 echo "🎉 SUCCESS: Cafe database is READY!"
 ```
 
+#### ⚠️ IMPORTANT NOTE (Before Running This Script)
+
+> **You MUST replace the placeholder values below with your own AWS RDS credentials before executing this script.**
+
+#### 🔧 Required Changes
+
+> **Update the following variables in the script according to your AWS environment:**
+
+#### RDS Endpoint:
+
+```
+RDS_ENDPOINT="your-rds-endpoint.amazonaws.com"
+```
+
+**👉 Replace with your actual Amazon RDS endpoint**
+
+(Example: cafe-db.cluster-abc123.us-east-1.rds.amazonaws.com)
+
+#### Database Name:
+
+```
+DB_NAME="cafe_db"
+```
+
+**👉 You may change this if you are using a different database name.**
+
+#### Database User:
+
+```
+DB_USER="cafe_user"
+```
+
+**👉 Ensure this matches the MySQL user you want to create or already use.**
+
+#### Database Password:
+
+```
+DB_PASSWORD="StrongPassword123"
+```
+
+**👉 Use a strong password that complies with your RDS security policy.**
+
+#### RDS Master Username:
+
+> **The script initially connects using the RDS master user (for example: admin, root, or the name you set during RDS creation).**
+> **You will be prompted to enter the master password at runtime.**
+
+### 🔐 Security Best Practice (Recommended)
+
+
+❌ Do NOT hardcode real passwords in production
+
+
+✅ Use AWS Secrets Manager or SSM Parameter Store
+
+
+✅ Restrict RDS access using Security Groups
+
+
+✅ Allow connections only from trusted EC2/Bastion hosts
+
 ### 🔐 HOW TO USE THIS SCRIPT
 
 #### 1️⃣ Make it executable
