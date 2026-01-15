@@ -708,7 +708,78 @@ For example !
 
 ## 3️⃣ Lambda Layer (pymysql)
 
-### Prepare ZIP File (EC2 or Local)
+### Method 1️⃣ - PyMySQL Lambda Layer
+
+```
+#!/bin/bash
+
+# Script to build pymysql Lambda Layer (Amazon Linux 2023 EC2)
+
+echo "Starting pymysql Lambda Layer creation..."
+
+# Install python + pip
+sudo dnf install -y python3 python3-pip
+
+# Create directory and go inside
+mkdir -p lambda-layer
+cd lambda-layer || { echo "Error: Cannot enter lambda-layer folder"; exit 1; }
+
+# Install pymysql to the correct folder structure
+pip3 install pymysql -t python/
+
+# Create zip
+zip -r pymysql-layer.zip python
+
+# Show result
+echo ""
+echo "Finished!"
+echo "Layer zip file created: $(pwd)/pymysql-layer.zip"
+echo "File size:"
+ls -lh pymysql-layer.zip
+echo ""
+echo "Next: Upload this zip to your S3 bucket,"
+echo "then create a Lambda Layer from it in AWS console,"
+echo "and attach the layer to your Lambda function."
+echo ""
+```
+
+### 2️⃣ How to create, give permission, and run the script on EC2
+
+#### 1️⃣ Create the file
+
+```
+nano pymysql-layer.sh
+```
+
+→ paste the script above
+
+→ press Ctrl + O → Enter (save)
+
+→ Ctrl + X (exit)
+
+
+#### 2️⃣ Give execute permission
+
+```
+sudo chmod +x pymysql-layer.sh
+```
+
+#### 3️⃣ Run it
+
+```
+sudo ./pymysql-layer.sh
+```
+
+> **After it finishes → you will see pymysql-layer.zip in the current folder (or in ./lambda-layer/ if you cd'ed manually).**
+> **You can now upload it to S3 using AWS console (or aws s3 cp if you have AWS CLI configured on the EC2).**
+
+**✔️ Good luck with your Lambda + pymysql setup!**
+
+---
+
+### Method 2️⃣ - PyMySQL Lambda Layer (1-to-1)
+
+#### 1️⃣ Prepare ZIP File (EC2 or Local)
 
 ```bash
 sudo dnf install -y python3 python3-pip
@@ -726,7 +797,7 @@ pip3 install pymysql -t python/
 zip -r pymysql-layer.zip python
 ```
 
-### Confirm ZIP exists:
+#### 2️⃣ Confirm ZIP exists:
 
 ```bash
 ls -lh pymysql-layer.zip
