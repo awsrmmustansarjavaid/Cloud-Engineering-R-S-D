@@ -493,159 +493,23 @@ Your Charlie Café Admin Dashboard must be:
 
 #### 3️⃣ Required attributes for sign-up
 
-Leave this:
+Click Select attributes
 
 ```
-(empty)
+Email
 ```
 
-#### Because:
+#### ❌ Do NOT select:
 
-**🔘 You’re creating users manually (admin)**
+- Phone number
 
+- Any other attributes
 
+#### 4️⃣ Continue the wizard
 
+→ Finish creating application
 
 
-
-
-
-
-### 🔐 STEP 1 — CREATE USER POOL (NO CHANGE)
-
-> **👉 What is a User Pool?**
-
-> **Think of it as:**
-
-> **A secure table where usernames & passwords are stored**
-
-
-
-#### 1️⃣ Open Cognito
-
-```
-AWS Console → Search → Cognito
-```
-
-#### 2️⃣ Click
-
-```
-User pools → Create user pool
-```
-
-#### 3️⃣ Configure sign-in experience
-
-**Authentication providers**
-
-- **✅ Cognito user pool**
-
-- **Sign-in options**
-
-  - ✔ Username (ONLY)
-
-  - ❌ Email
-
-  - ❌ Phone
-
-👉 Click Next
-
-
-
-
-
-- **Name your application:** charlie-cafe-athouj
-
-#### Configuration:
-
-| Setting          | Value        | Why                  |
-| ---------------- | ------------ | -------------------- |
-| Application type | **Traditional web application** |   |
-| Sign-in          | **Username** | Simple admin login   |
-| Password policy  | Default      | Secure enough        |
-| MFA              | OFF          | Avoid complexity now |
-| Account recovery | Email        | Password reset       |
-| Self-registration | Enable         |                   |
-| Required attributes for sign-up | Email   |             |
-
-> **(uncheck Email and Phone number — your guide says Sign-in: Username)**
-
-➡ Click Create user pool
-
-#### 📌 SAVE THESE (VERY IMPORTANT)
-
-You will use these in frontend + backend later.
-
-```
-USER_POOL_ID
-REGION
-```
-
-#### Example:
-
-```
-USER_POOL_ID = ap-south-1_AbCdEf
-REGION = ap-south-1
-```
-
-### 🔐 STEP 2 — CREATE APP CLIENT
-
-- **User Pool → App integration → App clients → Create**
-
-#### Configuration (CRITICAL)
-
-| Setting       | Value      | WHY                    |
-| ------------- | ---------- | ---------------------- |
-| App type      | **Public** | Browser app            |
-| Client secret | ❌ DISABLED | JS cannot keep secrets |
-
-#### Auth flows:
-
-✅ USER_PASSWORD_AUTH
-
-✅ REFRESH_TOKEN_AUTH ← ⭐ REQUIRED (missing earlier)
-
-#### 📌 Save:
-
-```
-CLIENT_ID
-```
-
-### ❌ STEP 3 — HOSTED UI
-
-- Create Cognito domain
-
-#### Callback URL:
-
-```
-https://YOUR_DOMAIN/order-status.html
-```
-
-#### Scopes:
-
-```
-openid email profile
-```
-
-#### 📌 Save:
-
-```
-COGNITO_DOMAIN
-```
-
-
-### 🔐 STEP 4 — Create Admin User
-
-- Users → Create user
-
-- Username: admin
-
-- Temporary password
-
-- Mark email verified
-
-- Login once → set permanent password
-
-#### ✅ Fully compatible
 
 ---
 
