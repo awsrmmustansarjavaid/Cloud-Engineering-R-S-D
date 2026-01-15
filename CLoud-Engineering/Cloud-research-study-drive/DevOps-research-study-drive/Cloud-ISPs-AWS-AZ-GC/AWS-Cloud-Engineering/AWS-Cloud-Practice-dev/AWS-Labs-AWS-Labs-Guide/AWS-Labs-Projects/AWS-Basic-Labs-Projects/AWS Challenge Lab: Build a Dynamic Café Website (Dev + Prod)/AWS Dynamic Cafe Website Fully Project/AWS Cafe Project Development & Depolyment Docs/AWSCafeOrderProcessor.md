@@ -1381,6 +1381,8 @@ Create endpoint ✅
 
 - In Lambda → Test
 
+- **Event name:** Test_CafeOrderProcessor
+
 #### Test Event JSON:
 
 ```
