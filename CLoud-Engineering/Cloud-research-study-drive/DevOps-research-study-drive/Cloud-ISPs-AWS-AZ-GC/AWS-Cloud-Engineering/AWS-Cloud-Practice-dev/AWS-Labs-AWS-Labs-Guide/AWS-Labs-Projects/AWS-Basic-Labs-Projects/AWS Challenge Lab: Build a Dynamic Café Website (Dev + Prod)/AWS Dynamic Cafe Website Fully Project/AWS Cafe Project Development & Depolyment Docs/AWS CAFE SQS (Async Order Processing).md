@@ -1075,8 +1075,7 @@ print("DEBUG: RDS connected")
 
 This lets us see exactly where it stops.
 
-### 7️⃣ Update Lambda Function Cafe Order Processor
-
+# PHASE 4 — Update Lambda Function Cafe Order Processor
 
 #### 1️⃣ Updated Code 
 
