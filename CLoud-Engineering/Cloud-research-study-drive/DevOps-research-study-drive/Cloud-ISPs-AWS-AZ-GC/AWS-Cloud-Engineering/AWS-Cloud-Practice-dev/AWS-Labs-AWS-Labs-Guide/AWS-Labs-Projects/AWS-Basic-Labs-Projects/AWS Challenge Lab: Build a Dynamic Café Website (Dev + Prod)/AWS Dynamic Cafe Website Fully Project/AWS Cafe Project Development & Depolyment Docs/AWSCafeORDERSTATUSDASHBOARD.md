@@ -480,11 +480,13 @@ Make sure Worker Lambda Role has:
 
 ✅ Step 3 complete
 
-### 4️⃣ CREATE ORDER STATUS LAMBDA (NEW)
+##  PHASE 6️⃣ — CREATE ORDER STATUS LAMBDA (NEW)
+
+
 
 #### 📢 This Lambda ONLY READS DATA.
 
-#### 1️⃣ Create Lambda
+### 1️⃣ Create Lambda
 
 #### AWS Console → Lambda → Create function
 
@@ -498,7 +500,7 @@ Make sure Worker Lambda Role has:
 
 #### Click Create function
 
-#### 2️⃣ Add IAM Permissions (IMPORTANT)
+### 2️⃣ Add IAM Permissions (IMPORTANT)
 
 #### IAM → Role → Attach policy
 
@@ -508,7 +510,7 @@ Make sure Worker Lambda Role has:
 
 - RDS access (same as Worker)
 
-#### 3️⃣ Lambda Status Order Code
+### 3️⃣ Lambda Status Order Code
 
 ```
 import json
@@ -595,7 +597,7 @@ def lambda_handler(event, context):
         connection.close()
 ```
 
-#### 4️⃣ Test Lambda
+### 4️⃣ Test Lambda
 
 #### Test event:
 
@@ -610,7 +612,7 @@ def lambda_handler(event, context):
 ✅ Step 4 complete
 
 ---
-##  PHASE 6️⃣ — API GATEWAY ENDPOINT
+##  PHASE 7️⃣ — API GATEWAY ENDPOINT
 
 👉 Use your EXISTING API
 
@@ -772,7 +774,7 @@ https://API_ID.execute-api.region.amazonaws.com/status/order-status
 ✅ Phase 4 complete
 
 ---
-##  PHASE 7️⃣ — FRONTEND ORDER STATUS PAGE
+##  PHASE 8️⃣ — FRONTEND ORDER STATUS PAGE
 
 ### 1️⃣ Create File
 
@@ -1049,7 +1051,7 @@ Ensure EC2 Security Group allows:
 
 ---
 
-## 🔄 PHASE 8️⃣ — FEATURE VERIFICATION (IMPORTANT)
+## 🔄 PHASE 9️⃣ — FEATURE VERIFICATION (IMPORTANT)
 
 ### 1️⃣ Send order from frontend / API
 
