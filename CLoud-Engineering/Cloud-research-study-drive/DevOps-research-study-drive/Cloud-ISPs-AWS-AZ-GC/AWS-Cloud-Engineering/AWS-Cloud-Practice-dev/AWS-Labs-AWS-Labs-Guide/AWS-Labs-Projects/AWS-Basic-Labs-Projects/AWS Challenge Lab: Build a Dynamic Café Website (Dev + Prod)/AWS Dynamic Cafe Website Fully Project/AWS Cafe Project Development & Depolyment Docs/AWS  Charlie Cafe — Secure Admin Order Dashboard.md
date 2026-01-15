@@ -513,6 +513,14 @@ email   ← OK (this is fine)
 https://YOUR_DOMAIN/order-status.html
 ```
 
+#### For Example:
+
+```
+http://204.236.192.115/order-status.html
+```
+
+
+
 #### Now click the button at bottom-right:
 
 ```
