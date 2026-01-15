@@ -4,7 +4,7 @@
 
 # 🔒 SECTION 7 — AWS CAFE SQS (Async Order Processing)
 
-# PHASE 10 — SQS (Async Order Processing)
+# PHASE 1 — SQS/LAMBDA (Producer)
 
 ## 🧠 WHY SQS EXISTS (VERY IMPORTANT)
 
@@ -310,7 +310,11 @@ def lambda_handler(event, context):
 
 **✔️ Click Deploy**
 
-#### 2️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
+---
+
+# PHASE 2 — Verification SQS/LAMBDA (Producer)
+
+#### 1️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
 
 - Click Test
 
@@ -372,7 +376,7 @@ id | table_number | customer_name | item  | quantity | created_at
 
 
 
-#### 3️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
+#### 2️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
 
 - AWS Console → SQS
 
@@ -408,7 +412,7 @@ You should see message like:
 ```
 ---
 
-### 4️⃣ Frontend (orders.php)
+### 3️⃣ Frontend (orders.php)
 
 You already fixed it ✔
 Ensure payload includes:
@@ -422,7 +426,7 @@ Ensure payload includes:
 }
 ```
 
-### 5️⃣ Test with API Gateway or Lambda test
+### 4️⃣ Test with API Gateway or Lambda test
 
 #### Update test body
 
@@ -657,7 +661,9 @@ If one layer misses a field, the pipeline breaks.
 
 ---
 
-## 5️⃣ Create Worker Lambda (Consumer)
+# PHASE 3 — SQS/Worker LAMBDA (Consumer)
+
+## 1️⃣ Create Worker Lambda (Consumer)
 
 ### 📢 Worker Responsibilities:
 
@@ -1069,8 +1075,153 @@ print("DEBUG: RDS connected")
 
 This lets us see exactly where it stops.
 
-### 7️⃣ TEST (MANDATORY)
+### 7️⃣ Update Lambda Function Cafe Order Processor
 
+
+#### 1️⃣ Updated Code 
+
+```
+import json
+import pymysql
+import boto3
+import os  # Added for environment variables
+
+# ---------- GET DB SECRET ----------
+def get_db_secret():
+    client = boto3.client('secretsmanager')
+    response = client.get_secret_value(SecretId='CafeDevDBSM')
+    return json.loads(response['SecretString'])
+
+# ---------- SQS CLIENT (outside handler for reuse) ----------
+sqs = boto3.client('sqs')
+# Load SQS queue URL from Lambda environment variables (already set to https://sqs.us-east-1.amazonaws.com/910599465397/CafeOrdersQueue)
+SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+# ---------- LAMBDA HANDLER ----------
+def lambda_handler(event, context):
+    try:
+        # Parse API Gateway body
+        body = json.loads(event['body'])
+        
+        # NEW: Table Number
+        table_number = int(body['table_number'])
+        customer_name = body.get('customer_name', None)
+        item = body['item']
+        quantity = int(body['quantity'])
+
+        # Fetch DB credentials
+        secret = get_db_secret()
+
+        # Connect to RDS
+        connection = pymysql.connect(
+            host=secret['host'],
+            user=secret['username'],
+            password=secret['password'],
+            database=secret['dbname'],
+            connect_timeout=5
+        )
+
+        # Insert order into RDS
+        with connection.cursor() as cursor:
+            sql = """
+                INSERT INTO orders (table_number, customer_name, item, quantity)
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(
+                sql,
+                (table_number, customer_name, item, quantity)
+            )
+            connection.commit()
+
+        connection.close()
+
+        # ────────────────────────────────────────────────
+        # NEW: Send message to SQS → triggers Worker Lambda → updates DynamoDB
+        # ────────────────────────────────────────────────
+        order_data = {
+            "source": "web",                    # helps Worker know it's from website
+            "table_number": table_number,
+            "customer_name": customer_name,
+            "item": item,
+            "quantity": quantity,
+            # Optional: add timestamp, order_id (if you fetch it), etc.
+            # "timestamp": str(datetime.now().isoformat())
+        }
+
+        sqs.send_message(
+            QueueUrl=SQS_QUEUE_URL,
+            MessageBody=json.dumps(order_data),
+            # Optional: DelaySeconds=2, MessageGroupId="cafe-orders" (if FIFO queue)
+        )
+
+        # Return success to API Gateway / frontend
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "message": "Order saved successfully",
+                "table_number": table_number
+            })
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
+#### 2️⃣ Add Environment Variable:
+
+- **Configuration → Environment variables**
+
+- Click Edit
+
+#### Add:
+
+| Key           | Value                  |
+| ------------- | ---------------------- |
+| SQS_QUEUE_URL | (paste your Queue URL) |
+
+#### 📍 How to get Queue URL:
+
+- Open SQS
+
+- Click CafeOrdersQueue
+
+- Copy Queue URL
+
+**✔️ Click Save**
+
+
+#### 3️⃣ Test Lambda Code:
+
+#### Event name: 
+
+```
+test-new order processing SQS
+```
+
+#### Paste JSON
+
+```
+{
+      "body": "{\"table_number\": 1, \"customer_name\": \"WorkerTest\", \"item\": \"Tea\", \"quantity\": 2}"
+}
+```
+
+
+
+
+---
+
+# PHASE 5 — SQS/Worker LAMBDA (Consumer)
 
 ### 1️⃣ Test manually from Lambda console
 
