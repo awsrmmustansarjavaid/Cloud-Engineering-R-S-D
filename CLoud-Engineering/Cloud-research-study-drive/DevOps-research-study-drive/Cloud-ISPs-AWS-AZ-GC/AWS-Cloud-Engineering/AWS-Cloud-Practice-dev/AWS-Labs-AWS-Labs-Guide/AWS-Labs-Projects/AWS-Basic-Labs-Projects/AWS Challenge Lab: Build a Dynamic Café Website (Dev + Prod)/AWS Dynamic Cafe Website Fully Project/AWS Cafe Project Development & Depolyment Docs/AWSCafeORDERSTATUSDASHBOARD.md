@@ -597,7 +597,50 @@ def lambda_handler(event, context):
         connection.close()
 ```
 
-### 4️⃣ Test Lambda
+### 4️⃣ Attach Layer to Lambda Function
+
+####  1️⃣ Open Lambda Function
+
+* Lambda → Functions → `CafeOrderProcessor`
+
+#### 2️⃣ Add Layer
+
+* Scroll to **Layers** section
+* Click **Add a layer**
+* Choose **Custom layers**
+* Select:
+
+  * Layer: `pymysql-layer`
+  * Version: latest
+
+Click **Add**
+
+### 5️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
+### 6️⃣ Move Lambda Into VPC
+
+
+### 7️⃣ Test Lambda
 
 #### Test event:
 
