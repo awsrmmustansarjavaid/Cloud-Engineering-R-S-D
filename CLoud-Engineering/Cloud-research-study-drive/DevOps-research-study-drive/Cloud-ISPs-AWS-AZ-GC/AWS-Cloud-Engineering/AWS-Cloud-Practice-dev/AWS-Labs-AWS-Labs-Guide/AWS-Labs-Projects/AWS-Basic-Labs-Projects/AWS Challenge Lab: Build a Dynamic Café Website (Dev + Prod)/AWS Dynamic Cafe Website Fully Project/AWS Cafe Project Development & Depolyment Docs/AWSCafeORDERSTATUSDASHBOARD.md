@@ -637,10 +637,7 @@ Click **Add**
 
 **⏳ Wait until Lambda status = Active**
 
-### 6️⃣ Move Lambda Into VPC
-
-
-### 7️⃣ Test Lambda
+### 6️⃣ Test Lambda
 
 #### Test event:
 
