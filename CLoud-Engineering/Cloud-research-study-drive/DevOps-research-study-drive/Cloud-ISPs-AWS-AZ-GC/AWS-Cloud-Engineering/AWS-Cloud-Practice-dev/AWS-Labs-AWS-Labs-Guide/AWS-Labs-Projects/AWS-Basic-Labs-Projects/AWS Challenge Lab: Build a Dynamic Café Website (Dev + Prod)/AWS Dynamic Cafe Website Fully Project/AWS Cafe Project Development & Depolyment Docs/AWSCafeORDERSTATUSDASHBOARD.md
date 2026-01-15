@@ -746,6 +746,8 @@ GET /order-status
 
 - **Integration:** Lambda
 
+- **Select GetOrderStatusLambda**
+
 - **Lambda name:** GetOrderStatusLambda
 
 ✔️ Enable Lambda proxy integration
