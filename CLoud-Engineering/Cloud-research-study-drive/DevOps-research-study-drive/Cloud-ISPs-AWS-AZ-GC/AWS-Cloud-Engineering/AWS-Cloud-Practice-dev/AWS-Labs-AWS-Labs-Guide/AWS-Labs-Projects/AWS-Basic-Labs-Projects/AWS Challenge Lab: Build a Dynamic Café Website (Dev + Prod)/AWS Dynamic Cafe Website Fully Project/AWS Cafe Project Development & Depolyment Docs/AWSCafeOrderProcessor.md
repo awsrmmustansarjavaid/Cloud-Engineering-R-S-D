@@ -1590,7 +1590,7 @@ echo "============================================================"
 #### 3️⃣ Make the script executable
 
 ```
-Sudo chmod +x rds-secret-test.sh
+sudo chmod +x rds-secret-test.sh
 ```
 This command gives permission to run the file as a program/script.
 
