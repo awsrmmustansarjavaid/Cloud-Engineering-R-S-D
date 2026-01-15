@@ -1076,7 +1076,7 @@ This lets us see exactly where it stops.
 
 #### 1️⃣ You must wrap the test event in Records:
 
-- **Event name:** `Test_CafeOrderWorker`
+- **Event name:** Test_CafeOrderWorker
 
 ```
 {
