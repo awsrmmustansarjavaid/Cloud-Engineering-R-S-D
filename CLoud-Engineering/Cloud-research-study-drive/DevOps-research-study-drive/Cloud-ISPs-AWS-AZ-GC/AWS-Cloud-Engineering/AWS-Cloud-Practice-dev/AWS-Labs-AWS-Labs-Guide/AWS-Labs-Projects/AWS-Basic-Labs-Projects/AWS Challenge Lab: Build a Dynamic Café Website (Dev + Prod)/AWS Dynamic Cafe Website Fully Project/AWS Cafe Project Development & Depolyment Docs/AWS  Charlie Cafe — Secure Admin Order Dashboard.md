@@ -465,8 +465,10 @@ CharlieCafeAdminSPA
 
 ❌ DISABLE self-registration
 
+👉 UNCHECK
+
 ```
-👉 UNCHECK the box
+☐ Enable self-registration (DISABLED)
 ```
 
 #### Why?
@@ -496,7 +498,7 @@ Your Charlie Café Admin Dashboard must be:
 Click Select attributes
 
 ```
-Email
+email   ← OK (this is fine)
 ```
 
 #### ❌ Do NOT select:
@@ -505,12 +507,24 @@ Email
 
 - Any other attributes
 
+#### 4️⃣ Return URL
+
+```
+https://YOUR_DOMAIN/order-status.html
+```
+
+#### Now click the button at bottom-right:
+
+```
+🟠 Create user directory
+```
+
+
+
+
 #### 4️⃣ Continue the wizard
 
 → Finish creating application
-
-
-
 
 
 
