@@ -37,26 +37,162 @@ Create database ⏳
 ## 4️⃣ Create Schema in RDS
 Connect from EC2:
 
-## 1️⃣ Install & Login MySQL Client
+## Method 1 - ☕ AWS Café — RDS MySQL Setup Bash Script
+
+### 📄 File name (recommended)
+
+```
+sudo nano setup_cafe_rds.sh
+```
+
+### ✅ FULL BASH SCRIPT (100% COMPLETE)
+
+```
+#!/bin/bash
+
+# ================================
+# AWS Cafe RDS Setup Script
+# ================================
+
+# -------- CONFIG (EDIT THESE) --------
+RDS_ENDPOINT="your-rds-endpoint.amazonaws.com"
+DB_NAME="cafe_db"
+DB_USER="cafe_user"
+DB_PASSWORD="StrongPassword123"
+
+# -------- STEP 1: INSTALL MYSQL CLIENT --------
+echo "📦 Installing MariaDB (MySQL client)..."
+sudo dnf install -y mariadb105
+
+echo "✅ MySQL client version:"
+mysql --version
+
+# -------- STEP 2: CREATE DATABASE & USER --------
+echo "🛠 Connecting to RDS and configuring database..."
+
+mysql -h "$RDS_ENDPOINT" -u admin -p <<EOF
+-- Create database
+CREATE DATABASE IF NOT EXISTS $DB_NAME;
+
+-- Create user
+CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
+
+-- Grant privileges
+GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
+
+FLUSH PRIVILEGES;
+EOF
+
+echo "✅ Database and user created successfully"
+
+# -------- STEP 3: CREATE TABLE --------
+echo "📊 Creating orders table..."
+
+mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" <<EOF
+USE $DB_NAME;
+
+CREATE TABLE IF NOT EXISTS orders (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    table_number    INT NOT NULL,
+    customer_name   VARCHAR(100),
+    item            VARCHAR(50),
+    quantity        INT NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_table_number (table_number),
+    INDEX idx_created_at (created_at)
+);
+EOF
+
+echo "✅ Orders table created"
+
+# -------- STEP 4: VERIFY TABLE --------
+echo "🔍 Verifying tables..."
+
+mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" -e "
+USE $DB_NAME;
+SHOW TABLES;
+"
+
+# -------- STEP 5: INSERT TEST DATA --------
+echo "🧪 Inserting test records..."
+
+mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" <<EOF
+USE $DB_NAME;
+
+INSERT INTO orders (table_number, customer_name, item, quantity) VALUES
+(1, 'Ali Khan', 'Espresso', 2),
+(1, 'Sara Ahmed', 'Cappuccino', 1),
+(2, 'CLI-Test', 'Coffee', 1),
+(3, NULL, 'Latte', 3),
+(5, 'Ahmed Raza', 'Croissant + Tea', 1);
+EOF
+
+# -------- STEP 6: VERIFY DATA --------
+echo "📄 Verifying inserted records..."
+
+mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" -e "
+USE $DB_NAME;
+SELECT * FROM orders;
+"
+
+echo "🎉 SUCCESS: Cafe database is READY!"
+```
+
+### 🔐 HOW TO USE THIS SCRIPT
+
+#### 1️⃣ Make it executable
+
+```
+sudo chmod +x setup_cafe_rds.sh
+```
+
+#### 2️⃣ Run the script
+
+```
+sudo ./setup_cafe_rds.sh
+```
+
+**You’ll be prompted once for the admin RDS password (master user).**
+
+### ✅ FINAL SUCCESS CHECKLIST
+
+#### If everything is correct, you will see:
+
+✅ MySQL client installed
+
+✅ cafe_db created
+
+✅ cafe_user created
+
+✅ orders table exists
+
+✅ Test rows displayed via SELECT * FROM orders;
+
+---
+
+## Method 2 - ☕ AWS Café — RDS MySQL Setup 1-To-1
+
+### 1️⃣ Install & Login MySQL Client
 
 ```
 sudo dnf install -y mariadb105
 ```
 
-### Verify mysql
+#### Verify mysql
 
 ```
 mysql --version
 ```
 
-### Login to MariaDB:
+#### Login to MariaDB:
 
 ```
 mysql -h <rds-endpoint> -u cafe_user -p
 ```
 ---
 
-## 2️⃣ Create Café Database
+### 2️⃣ Create Café Database
 
 ```sql
 CREATE DATABASE cafe_db;
@@ -74,13 +210,13 @@ GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-## 3️⃣ Use the correct database
+### 3️⃣ Use the correct database
 
 ```
 USE cafe_db;
 ```
 
-## 4️⃣ Orders Table
+### 4️⃣ Orders Table
 
 ```sql
 CREATE TABLE orders (
@@ -92,7 +228,7 @@ CREATE TABLE orders (
 );
 ```
 
-### 📢 Recommended Final CREATE TABLE (with table_number)
+#### 📢 Recommended Final CREATE TABLE (with table_number)
 
 ```
 CREATE TABLE orders (
@@ -108,7 +244,7 @@ CREATE TABLE orders (
 );
 ```
 
-### 📢 Most common real-world version
+#### 📢 Most common real-world version
 
 #### Many cafes/restaurants also like to track status and total amount, so here’s a more complete modern version you might consider:
 
@@ -132,7 +268,7 @@ CREATE TABLE orders (
 );
 ```
 
-### 📢 Remove (Delete) the Table
+#### 📢 Remove (Delete) the Table
 
 #### Option A: Normal delete (most common)
 
@@ -174,7 +310,7 @@ DROP TABLE IF EXISTS orders;
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
-### 📢 Modify Existing Table (ALTER TABLE)
+#### 📢 Modify Existing Table (ALTER TABLE)
 
 #### A. Add new column
 
@@ -233,7 +369,7 @@ ALTER TABLE orders
     ALTER COLUMN quantity SET DEFAULT 1;
 ```
 
-## 5️⃣ Verify table exists
+### 5️⃣ Verify table exists
 
 ```
 SHOW TABLES;
@@ -245,13 +381,13 @@ SHOW TABLES;
 orders
 ```
 
-## 6️⃣ Test insert manually (CLI)
+### 6️⃣ Test insert manually (CLI)
 
 ```
 INSERT INTO orders (customer_name, item, quantity)
 VALUES ('CLI-Test', 'Coffee', 1);
 ```
-### 📢 Multi Values (with table_number)
+#### 📢 Multi Values (with table_number)
 
 
 ```
@@ -275,7 +411,7 @@ INSERT INTO orders (table_number, customer_name, item, quantity) VALUES
     (4, 'CLI-Test', 'Coffee', 1);
 ```
 
-### 📢 Complete/Production Version (table NUMBER – with price, status, total_amount)
+#### 📢 Complete/Production Version (table NUMBER – with price, status, total_amount)
 
 ```
 -- For your second (more complete) table
@@ -305,13 +441,7 @@ INSERT INTO orders (table_number, item, quantity, unit_price) VALUES
     (4, 'CLI-Test Coffee', 1, 300.00);
 ```
 
-
-
-
-
-
-
-## 7️⃣ Verify:
+### 7️⃣ Verify:
 
 ```
 SELECT * FROM orders;
@@ -1385,7 +1515,7 @@ RDS_HOST="your-rds-endpoint.xxxxxxx.us-east-1.rds.amazonaws.com"      # ← CHAN
 #### 3️⃣ Make the script executable
 
 ```
-Sudo chmod +x rds-quick-test.sh
+sudo chmod +x rds-quick-test.sh
 ```
 This command gives permission to run the file as a program/script.
 
