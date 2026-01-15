@@ -365,32 +365,238 @@ rgba(0,0,0,.55)
 
 ## 🔐 PHASE 2️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
+This phase is used to secure the Admin Order Dashboard of your Charlie Cafe project.
+
+### Goal of Phase 2
+
+- Only admin users can access the admin dashboard
+
+- Login handled by Amazon Cognito
+
+- Frontend receives a JWT token
+
+- Backend (API Gateway + Lambda) validates the token
+
+### Charlie Café Admin Login (SPA-based)
+
+#### You are on this page:
+
+> **Amazon Cognito → Set up resources for your application**
+
+#### This wizard creates BOTH:
+
+- User Pool
+
+- App Client
+
+- Hosted UI
+
+- in one flow
+
+
+### 🧭 BIG PICTURE (IMPORTANT)
+
+| Old Guide Term | New Cognito UI Equivalent    |
+| -------------- | ---------------------------- |
+| User Pool      | Created automatically        |
+| App Client     | “Application”                |
+| Public client  | SPA / Web app                |
+| Auth flows     | Selected by Application type |
+| Hosted UI      | “Managed login pages”        |
+| Callback URL   | Return URL                   |
+
+
+### ✅ STEP 1️⃣ — DEFINE YOUR APPLICATION
+
+#### 1️⃣ Application type
+
+> **👉 SELECT THIS (CORRECT FOR YOUR PROJECT)**
+
+```
+✅ Single-page application (SPA)
+```
+
+#### Why?
+
+- Your admin dashboard is HTML + JS
+
+- Runs in browser
+
+- No client secret allowed (correct)
+
+#### ❌ Do NOT choose:
+
+- Traditional web app
+
+- Machine-to-machine
+
+
+#### 2️⃣ Name your application
+
+Example:
+
+```
+CharlieCafeAdminSPA
+```
+
+**❕ (Name doesn’t matter technically)**
+
+### ⚙️ STEP 2️⃣ — CONFIGURE OPTIONS (VERY IMPORTANT)
+
+#### 1️⃣ Options for sign-in identifiers
+
+#### SELECT:
+
+```
+☑ Username
+```
+
+#### DO NOT select:
+
+❌ Email
+
+❌ Phone number
+
+#### 📌 This matches your requirement:
+
+**🔴 Username: admin**
+
+#### 2️⃣ Self-registration (CRITICAL)
+
+❌ DISABLE self-registration
+
+```
+👉 UNCHECK the box
+```
+
+#### Why?
+
+Your Charlie Café Admin Dashboard must be:
+
+🔐 Admin-only
+
+❌ No public sign-up
+
+👤 Users created manually by you
+
+> **So: Unchecking self-registration is 100% correct and production-ready**
+
+#### 🔍 What Happens After Disabling Self-Registration
+
+| Feature                  | Result        |
+| ------------------------ | ------------- |
+| Public sign-up page      | ❌ Disabled    |
+| “Create account” link    | ❌ Hidden      |
+| Admin-created users      | ✅ Allowed     |
+| Temporary password login | ✅ Allowed     |
+| Hosted UI login          | ✅ Still works |
+
+#### 3️⃣ Required attributes for sign-up
+
+Leave this:
+
+```
+(empty)
+```
+
+#### Because:
+
+**🔘 You’re creating users manually (admin)**
+
+
+
+
+
+
+
+
+
 ### 🔐 STEP 1 — CREATE USER POOL (NO CHANGE)
 
-- **Cognito → User Pools → Create**
+> **👉 What is a User Pool?**
 
-- Sign-in: Username
+> **Think of it as:**
 
-- Password policy: Default
+> **A secure table where usernames & passwords are stored**
 
-- MFA: OFF
 
-- Account recovery: Email
 
-#### 📌 Save:
+#### 1️⃣ Open Cognito
+
+```
+AWS Console → Search → Cognito
+```
+
+#### 2️⃣ Click
+
+```
+User pools → Create user pool
+```
+
+#### 3️⃣ Configure sign-in experience
+
+**Authentication providers**
+
+- **✅ Cognito user pool**
+
+- **Sign-in options**
+
+  - ✔ Username (ONLY)
+
+  - ❌ Email
+
+  - ❌ Phone
+
+👉 Click Next
+
+
+
+
+
+- **Name your application:** charlie-cafe-athouj
+
+#### Configuration:
+
+| Setting          | Value        | Why                  |
+| ---------------- | ------------ | -------------------- |
+| Application type | **Traditional web application** |   |
+| Sign-in          | **Username** | Simple admin login   |
+| Password policy  | Default      | Secure enough        |
+| MFA              | OFF          | Avoid complexity now |
+| Account recovery | Email        | Password reset       |
+| Self-registration | Enable         |                   |
+| Required attributes for sign-up | Email   |             |
+
+> **(uncheck Email and Phone number — your guide says Sign-in: Username)**
+
+➡ Click Create user pool
+
+#### 📌 SAVE THESE (VERY IMPORTANT)
+
+You will use these in frontend + backend later.
 
 ```
 USER_POOL_ID
 REGION
 ```
 
+#### Example:
+
+```
+USER_POOL_ID = ap-south-1_AbCdEf
+REGION = ap-south-1
+```
+
 ### 🔐 STEP 2 — CREATE APP CLIENT
 
 - **User Pool → App integration → App clients → Create**
 
-- App type: Public
+#### Configuration (CRITICAL)
 
-- ❌ Client secret: DISABLED
+| Setting       | Value      | WHY                    |
+| ------------- | ---------- | ---------------------- |
+| App type      | **Public** | Browser app            |
+| Client secret | ❌ DISABLED | JS cannot keep secrets |
 
 #### Auth flows:
 
