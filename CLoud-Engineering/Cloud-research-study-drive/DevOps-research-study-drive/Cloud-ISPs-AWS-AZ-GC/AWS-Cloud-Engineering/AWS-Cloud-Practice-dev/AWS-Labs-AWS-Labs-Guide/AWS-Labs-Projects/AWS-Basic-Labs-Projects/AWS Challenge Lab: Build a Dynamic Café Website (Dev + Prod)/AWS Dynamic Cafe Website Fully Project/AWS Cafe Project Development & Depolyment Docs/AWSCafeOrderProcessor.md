@@ -1361,6 +1361,197 @@ Create endpoint ✅
 
 # PHASE 9 — Test & Verification
 
+### 1️⃣  FRONTEND → BACKEND VERIFICATION
+
+#### 1️⃣ Submit order from orders.php
+
+📊 Table Number: 2
+
+☕ Item: Tea
+
+👨🏾‍🍳 Quantity: 1
+
+### 2️⃣  BACKEND VERIFICATION (MANDATORY)
+
+### 1️⃣ Test Lambda Directly (Console)
+
+- Check your Lambda CloudWatch logs to ensure the function executed correctly.
+
+- Verify new orders appear in your MariaDB database.
+
+- In Lambda → Test
+
+#### Test Event JSON:
+
+```
+{
+  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\":\"Order saved successfully\"}"
+}
+```
+#### Test Updated Event JSON:
+
+```
+{
+  "body": "{\"table_number\":1,\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+1 | LambdaTest | Coffee | 2 | 2026-01-10 10:32:11
+```
+
+---
+
+### 2️⃣ Cafe Order API + RDS Tests (API Gateway + rds-secret-test.sh)
+
+### Method 1️⃣ Cafe Order API + RDS Tests
+
+#### 1️⃣ Create & edit file
+
+```
+sudo nano test-api-and-rds.sh
+```
+
+
+#### 2️⃣ Edit the Script and Add Your Details
+
+```
+#!/usr/bin/env bash
+
+# =============================================================================
+#  Cafe Order API + RDS Tests (API Gateway + rds-secret-test.sh)
+# =============================================================================
+
+set -uo pipefail
+
+# ─── Configuration ────────────────────────────────────────────────────────────
+
+API_URL="https://d9c4cvq7w9.execute-api.us-east-1.amazonaws.com/dev/orders"
+
+# Unique test marker so you can identify this run in logs / database
+TEST_CUSTOMER="TestUser_$(date +%Y%m%d_%H%M%S)"
+TEST_ITEM="Latte-Secret-Test"
+
+# Path to your RDS verification script (change if it's in different folder)
+RDS_SECRET_SCRIPT="./rds-secret-test.sh"
+
+# ─── Colors & Helpers ─────────────────────────────────────────────────────────
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+ok()    { echo -e "${GREEN}✓${NC} $*" ; }
+fail()  { echo -e "${RED}✗${NC} $*"; exit 1; }
+warn()  { echo -e "${YELLOW}!${NC} $*"; }
+
+# ─── 1. Test API Gateway ──────────────────────────────────────────────────────
+
+echo ""
+echo "┌──────────────────────────────┐"
+echo "│     1. Testing API Gateway    │"
+echo "└──────────────────────────────┘"
+
+curl_payload=$(cat <<EOF
+{
+  "table_number": 3,
+  "customer_name": "${TEST_CUSTOMER}",
+  "item": "${TEST_ITEM}",
+  "quantity": 1
+}
+EOF
+)
+
+echo "→ POST ${API_URL}"
+echo "  Customer: ${TEST_CUSTOMER}"
+
+response=$(curl -s -w "\n%{http_code}" \
+  -X POST "${API_URL}" \
+  -H "Content-Type: application/json" \
+  -d "${curl_payload}")
+
+http_code=$(echo "$response" | tail -n1)
+body=$(echo "$response" | sed '$d')
+
+if [[ "$http_code" -ge 200 && "$http_code" -le 299 ]]; then
+    ok "API call succeeded (HTTP ${http_code})"
+    echo "  Response:"
+    echo "${body}" | jq . 2>/dev/null || echo "${body}"
+else
+    fail "API call failed → HTTP ${http_code}"
+    echo "${body}"
+    exit 1
+fi
+
+# Give backend some time to process
+sleep 3
+
+# ─── 2. Run rds-secret-test.sh with sudo ──────────────────────────────────────
+
+echo ""
+echo "┌─────────────────────────────────────┐"
+echo "│ 2. Running RDS secret / connection   │"
+echo "│    test script (sudo)                │"
+echo "└─────────────────────────────────────┘"
+
+if [[ ! -f "$RDS_SECRET_SCRIPT" ]]; then
+    fail "Script not found: ${RDS_SECRET_SCRIPT}"
+    echo "Make sure you're running this from the correct directory."
+fi
+
+if [[ ! -x "$RDS_SECRET_SCRIPT" ]]; then
+    warn "Making ${RDS_SECRET_SCRIPT} executable..."
+    chmod +x "$RDS_SECRET_SCRIPT"
+fi
+
+echo "→ Executing: sudo ${RDS_SECRET_SCRIPT}"
+
+# Run it and capture exit status
+sudo bash "$RDS_SECRET_SCRIPT"
+
+exit_code=$?
+
+echo ""
+if [[ $exit_code -eq 0 ]]; then
+    ok "rds-secret-test.sh finished successfully (exit code 0)"
+else
+    warn "rds-secret-test.sh returned non-zero exit code (${exit_code})"
+    echo "→ Check output above for errors"
+    echo "→ Possible issues: credentials, network, mysql client, permissions"
+fi
+
+echo ""
+echo "Test sequence completed."
+echo "Customer name used: ${TEST_CUSTOMER}"
+echo ""
+```
+
+#### 3️⃣ Make the script executable
+
+```
+sudo chmod +x test-api-and-rds.sh
+```
+This command gives permission to run the file as a program/script.
+
+#### 4️⃣ Run the script (with root privileges)
+
+```
+sudo ./test-api-and-rds.sh
+```
+
+### Method 2️⃣ Cafe Order API + RDS Tests
 
 ### 1️⃣ Test API Gateway
 
@@ -1426,49 +1617,7 @@ curl -X POST \
 }
 ```
 
-
-### 2️⃣ Test Lambda Directly (Console)
-
-- Check your Lambda CloudWatch logs to ensure the function executed correctly.
-
-- Verify new orders appear in your MariaDB database.
-
-- In Lambda → Test
-
-#### Test Event JSON:
-
-```
-{
-  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
-}
-```
-
-#### Expected result:
-
-```
-{
-  "statusCode": 200,
-  "body": "{\"message\":\"Order saved successfully\"}"
-}
-```
-#### Test Updated Event JSON:
-
-```
-{
-  "body": "{\"table_number\":1,\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
-}
-```
-
-#### Expected result:
-
-```
-1 | LambdaTest | Coffee | 2 | 2026-01-10 10:32:11
-```
-
-
-
-
-### 3️⃣ Verify Database
+### 2️⃣ Verify Database
 
 ### Method 1 Simple 1-To-1 RDS Test
 
@@ -1898,18 +2047,7 @@ sudo ./rds-secret-test.sh
 
 - Adjust the three jq -r lines if your secret has different key names.
 
-
-### 4️⃣  FRONTEND → BACKEND VERIFICATION
-
-#### 1️⃣ Submit order from orders.php
-
-📊 Table Number: 2
-
-☕ Item: Tea
-
-👨🏾‍🍳 Quantity: 1
-
-### 5️⃣  BACKEND VERIFICATION (MANDATORY)
+---
 
 #### 1️⃣ Check CloudWatch Logs
 
@@ -1947,141 +2085,7 @@ END RequestId:
 
 Your system is now schema-consistent from browser → DB.
 
-### Cafe Order API + RDS Tests (API Gateway + rds-secret-test.sh)
-
-#### 1️⃣ Create & edit file
-
-```
-sudo nano test-api-and-rds.sh
-```
-
-
-#### 2️⃣ Edit the Script and Add Your Details
-
-```
-#!/usr/bin/env bash
-
-# =============================================================================
-#  Cafe Order API + RDS Tests (API Gateway + rds-secret-test.sh)
-# =============================================================================
-
-set -uo pipefail
-
-# ─── Configuration ────────────────────────────────────────────────────────────
-
-API_URL="https://d9c4cvq7w9.execute-api.us-east-1.amazonaws.com/dev/orders"
-
-# Unique test marker so you can identify this run in logs / database
-TEST_CUSTOMER="TestUser_$(date +%Y%m%d_%H%M%S)"
-TEST_ITEM="Latte-Secret-Test"
-
-# Path to your RDS verification script (change if it's in different folder)
-RDS_SECRET_SCRIPT="./rds-secret-test.sh"
-
-# ─── Colors & Helpers ─────────────────────────────────────────────────────────
-
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-
-ok()    { echo -e "${GREEN}✓${NC} $*" ; }
-fail()  { echo -e "${RED}✗${NC} $*"; exit 1; }
-warn()  { echo -e "${YELLOW}!${NC} $*"; }
-
-# ─── 1. Test API Gateway ──────────────────────────────────────────────────────
-
-echo ""
-echo "┌──────────────────────────────┐"
-echo "│     1. Testing API Gateway    │"
-echo "└──────────────────────────────┘"
-
-curl_payload=$(cat <<EOF
-{
-  "table_number": 3,
-  "customer_name": "${TEST_CUSTOMER}",
-  "item": "${TEST_ITEM}",
-  "quantity": 1
-}
-EOF
-)
-
-echo "→ POST ${API_URL}"
-echo "  Customer: ${TEST_CUSTOMER}"
-
-response=$(curl -s -w "\n%{http_code}" \
-  -X POST "${API_URL}" \
-  -H "Content-Type: application/json" \
-  -d "${curl_payload}")
-
-http_code=$(echo "$response" | tail -n1)
-body=$(echo "$response" | sed '$d')
-
-if [[ "$http_code" -ge 200 && "$http_code" -le 299 ]]; then
-    ok "API call succeeded (HTTP ${http_code})"
-    echo "  Response:"
-    echo "${body}" | jq . 2>/dev/null || echo "${body}"
-else
-    fail "API call failed → HTTP ${http_code}"
-    echo "${body}"
-    exit 1
-fi
-
-# Give backend some time to process
-sleep 3
-
-# ─── 2. Run rds-secret-test.sh with sudo ──────────────────────────────────────
-
-echo ""
-echo "┌─────────────────────────────────────┐"
-echo "│ 2. Running RDS secret / connection   │"
-echo "│    test script (sudo)                │"
-echo "└─────────────────────────────────────┘"
-
-if [[ ! -f "$RDS_SECRET_SCRIPT" ]]; then
-    fail "Script not found: ${RDS_SECRET_SCRIPT}"
-    echo "Make sure you're running this from the correct directory."
-fi
-
-if [[ ! -x "$RDS_SECRET_SCRIPT" ]]; then
-    warn "Making ${RDS_SECRET_SCRIPT} executable..."
-    chmod +x "$RDS_SECRET_SCRIPT"
-fi
-
-echo "→ Executing: sudo ${RDS_SECRET_SCRIPT}"
-
-# Run it and capture exit status
-sudo bash "$RDS_SECRET_SCRIPT"
-
-exit_code=$?
-
-echo ""
-if [[ $exit_code -eq 0 ]]; then
-    ok "rds-secret-test.sh finished successfully (exit code 0)"
-else
-    warn "rds-secret-test.sh returned non-zero exit code (${exit_code})"
-    echo "→ Check output above for errors"
-    echo "→ Possible issues: credentials, network, mysql client, permissions"
-fi
-
-echo ""
-echo "Test sequence completed."
-echo "Customer name used: ${TEST_CUSTOMER}"
-echo ""
-```
-
-#### 3️⃣ Make the script executable
-
-```
-sudo chmod +x test-api-and-rds.sh
-```
-This command gives permission to run the file as a program/script.
-
-#### 4️⃣ Run the script (with root privileges)
-
-```
-sudo ./test-api-and-rds.sh
-```
+---
 
 ### 🏆 Result
 
