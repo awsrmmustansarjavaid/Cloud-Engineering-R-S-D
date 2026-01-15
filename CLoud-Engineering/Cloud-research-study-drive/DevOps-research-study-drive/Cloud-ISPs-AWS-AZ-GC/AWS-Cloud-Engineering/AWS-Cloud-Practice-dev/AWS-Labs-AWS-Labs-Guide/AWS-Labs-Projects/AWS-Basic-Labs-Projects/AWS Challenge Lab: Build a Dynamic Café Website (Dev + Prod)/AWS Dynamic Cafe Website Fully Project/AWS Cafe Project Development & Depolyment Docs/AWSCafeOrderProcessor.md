@@ -49,97 +49,123 @@ sudo nano setup_cafe_rds.sh
 
 ```
 #!/bin/bash
+set -euo pipefail
 
-# ================================
-# AWS Cafe RDS Setup Script
-# ================================
+echo "☕ Starting Cafe RDS First-Time Setup..."
 
-# -------- CONFIG (EDIT THESE) --------
-RDS_ENDPOINT="your-rds-endpoint.amazonaws.com"
-DB_NAME="cafe_db"
-DB_USER="cafe_user"
-DB_PASSWORD="StrongPassword123"
+# ================= CONFIG =================
+AWS_REGION="us-east-1"
+SECRET_ARN="arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSM-NSiXdV"   # ← CHANGE TO YOUR REAL SECRET ARN
 
-# -------- STEP 1: INSTALL MYSQL CLIENT --------
-echo "📦 Installing MariaDB (MySQL client)..."
-sudo dnf install -y mariadb105
+DB_NAME="cafe_db"   # Hard-coded for your new cafe setup
 
-echo "✅ MySQL client version:"
+# ================= INSTALL REQUIRED PACKAGES =================
+echo "📦 Installing MariaDB client & jq if missing..."
+sudo dnf install -y mariadb105 jq
+
+# AWS CLI v2 is pre-installed on Amazon Linux 2023 – verify it
+if ! command -v aws >/dev/null 2>&1; then
+    echo "⚠️ AWS CLI not found (unusual on AL2023) – installing official v2..."
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install --update
+    rm -rf aws awscliv2.zip
+fi
+
+aws --version || { echo "❌ AWS CLI failed to run – check installation"; exit 1; }
 mysql --version
+echo ""
 
-# -------- STEP 2: CREATE DATABASE & USER --------
-echo "🛠 Connecting to RDS and configuring database..."
+# ================= FETCH SECRET FROM SECRETS MANAGER =================
+echo "🔐 Fetching RDS credentials from Secrets Manager..."
+SECRET_JSON=$(aws secretsmanager get-secret-value \
+    --secret-id "$SECRET_ARN" \
+    --region "$AWS_REGION" \
+    --query SecretString \
+    --output text)
 
-mysql -h "$RDS_ENDPOINT" -u admin -p <<EOF
--- Create database
-CREATE DATABASE IF NOT EXISTS $DB_NAME;
+DB_HOST=$(echo "$SECRET_JSON" | jq -r '.host // .endpoint // empty')
+DB_USER=$(echo "$SECRET_JSON" | jq -r '.username // empty')
+DB_PASS=$(echo "$SECRET_JSON" | jq -r '.password // empty')
+DB_PORT=$(echo "$SECRET_JSON" | jq -r '.port // "3306"')
 
--- Create user
-CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
+if [[ -z "$DB_HOST" || -z "$DB_USER" || -z "$DB_PASS" ]]; then
+    echo "❌ ERROR: Missing required fields in secret (host/username/password)"
+    exit 1
+fi
 
--- Grant privileges
-GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
+echo "✅ Secret loaded"
+echo "🔗 RDS Endpoint: $DB_HOST"
+echo "   Port:       $DB_PORT"
+echo "👤 DB User:     $DB_USER"
+echo "🗄 Database:     $DB_NAME (creating if not exists)"
+echo ""
 
-FLUSH PRIVILEGES;
+# ================= CREATE TEMP CREDENTIALS FILE =================
+CREDENTIALS_FILE=$(mktemp /tmp/rds-cafe-cred.XXXXXX)
+chmod 600 "$CREDENTIALS_FILE"
+
+cat > "$CREDENTIALS_FILE" << EOF
+[client]
+host=$DB_HOST
+port=$DB_PORT
+user=$DB_USER
+password=$DB_PASS
+connect-timeout=10
 EOF
 
-echo "✅ Database and user created successfully"
+trap 'rm -f "$CREDENTIALS_FILE"' EXIT
 
-# -------- STEP 3: CREATE TABLE --------
-echo "📊 Creating orders table..."
+# ================= TEST CONNECTION =================
+echo "🔌 Testing RDS connection..."
+if ! mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "SELECT 1" >/dev/null 2>&1; then
+    echo "❌ Connection failed. Check:"
+    echo "   • Security Group allows 3306 from this EC2"
+    echo "   • RDS is in same VPC/subnet or properly peered"
+    echo "   • Credentials & endpoint in secret are correct"
+    exit 1
+fi
+echo "✅ Connection OK"
+echo ""
 
-mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" <<EOF
-USE $DB_NAME;
+# ================= CREATE DATABASE =================
+echo "🗄 Creating database '$DB_NAME'..."
+mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+echo ""
 
+# ================= CREATE ORDERS TABLE =================
+echo "📋 Creating orders table..."
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<EOF
 CREATE TABLE IF NOT EXISTS orders (
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    table_number    INT NOT NULL,
-    customer_name   VARCHAR(100),
-    item            VARCHAR(50),
-    quantity        INT NOT NULL,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    table_number  INT NOT NULL,
+    customer_name VARCHAR(100),
+    item          VARCHAR(100),
+    quantity      INT NOT NULL,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     INDEX idx_table_number (table_number),
-    INDEX idx_created_at (created_at)
-);
+    INDEX idx_created_at   (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 EOF
+echo ""
 
-echo "✅ Orders table created"
-
-# -------- STEP 4: VERIFY TABLE --------
-echo "🔍 Verifying tables..."
-
-mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" -e "
-USE $DB_NAME;
-SHOW TABLES;
+# ================= VERIFY =================
+echo "🔍 Verifying setup..."
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" -e "
+    SHOW TABLES;
+    SELECT 'Cafe database ready' AS message;
 "
+echo ""
 
-# -------- STEP 5: INSERT TEST DATA --------
-echo "🧪 Inserting test records..."
-
-mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" <<EOF
-USE $DB_NAME;
-
-INSERT INTO orders (table_number, customer_name, item, quantity) VALUES
-(1, 'Ali Khan', 'Espresso', 2),
-(1, 'Sara Ahmed', 'Cappuccino', 1),
-(2, 'CLI-Test', 'Coffee', 1),
-(3, NULL, 'Latte', 3),
-(5, 'Ahmed Raza', 'Croissant + Tea', 1);
-EOF
-
-# -------- STEP 6: VERIFY DATA --------
-echo "📄 Verifying inserted records..."
-
-mysql -h "$RDS_ENDPOINT" -u "$DB_USER" -p"$DB_PASSWORD" -e "
-USE $DB_NAME;
-SELECT * FROM orders;
-"
-
-echo "🎉 SUCCESS: Cafe database is READY!"
+echo "✅ Cafe RDS setup completed successfully ☕"
+echo "Next steps:"
+echo "  - Use database: $DB_NAME"
+echo "  - Endpoint:    $DB_HOST"
+echo "  - User:        $DB_USER"
 ```
 
-#### ⚠️ IMPORTANT NOTE (Before Running This Script)
+#### ⚠️ Important Configuration Values NOTE (Before Running This Cafe RDS Setup Script)
 
 > **You MUST replace the placeholder values below with your own AWS RDS credentials before executing this script.**
 
@@ -147,15 +173,37 @@ echo "🎉 SUCCESS: Cafe database is READY!"
 
 > **Update the following variables in the script according to your AWS environment:**
 
-#### RDS Endpoint:
+#### AWS Region:
+
+```bash
+AWS_REGION="us-east-1"
+```
+- **Current value:** us-east-1
+
+- **Action:** Replace with your actual AWS region
+
+**👉 Replace with your actual AWS Region**
+
+**Examples: eu-west-1, ap-south-1, us-west-2, sa-east-1**
+
+- **Why:** Secrets Manager and RDS are region-specific
+
+#### Secrets Manager ARN:
 
 ```
-RDS_ENDPOINT="your-rds-endpoint.amazonaws.com"
+SECRET_ARN="arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSM-NSiXdV"
 ```
 
-**👉 Replace with your actual Amazon RDS endpoint**
+- **Current value:** arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSM-NSiXdV
 
-(Example: cafe-db.cluster-abc123.us-east-1.rds.amazonaws.com)
+- **Action:** Replace with the real ARN of your target secret
+- **How to find it:**
+    - AWS Console → Secrets Manager → select your secret → copy the ARN
+
+    - Must match the secret that contains host, username, password
+
+- **Most critical value – wrong ARN = script cannot get credentials**
+
 
 #### Database Name:
 
@@ -163,42 +211,17 @@ RDS_ENDPOINT="your-rds-endpoint.amazonaws.com"
 DB_NAME="cafe_db"
 ```
 
-**👉 You may change this if you are using a different database name.**
+- **Current value:** cafe_db
 
-#### Database User:
+- **Action:** Usually keep as-is for this project
 
-```
-DB_USER="cafe_user"
-```
+- **When to change:**
 
-**👉 Ensure this matches the MySQL user you want to create or already use.**
+    - Different environments: cafe_dev, cafe_staging, cafe_prod
 
-#### Database Password:
+    - Company naming convention: app_cafe_2026, cafe_v1
 
-```
-DB_PASSWORD="StrongPassword123"
-```
-
-**👉 Use a strong password that complies with your RDS security policy.**
-
-#### RDS Master Username:
-
-> **The script initially connects using the RDS master user (for example: admin, root, or the name you set during RDS creation).**
-> **You will be prompted to enter the master password at runtime.**
-
-### 🔐 Security Best Practice (Recommended)
-
-
-❌ Do NOT hardcode real passwords in production
-
-
-✅ Use AWS Secrets Manager or SSM Parameter Store
-
-
-✅ Restrict RDS access using Security Groups
-
-
-✅ Allow connections only from trusted EC2/Bastion hosts
+- **Note:** Script uses CREATE DATABASE IF NOT EXISTS → safe to re-run
 
 ### 🔐 HOW TO USE THIS SCRIPT
 
