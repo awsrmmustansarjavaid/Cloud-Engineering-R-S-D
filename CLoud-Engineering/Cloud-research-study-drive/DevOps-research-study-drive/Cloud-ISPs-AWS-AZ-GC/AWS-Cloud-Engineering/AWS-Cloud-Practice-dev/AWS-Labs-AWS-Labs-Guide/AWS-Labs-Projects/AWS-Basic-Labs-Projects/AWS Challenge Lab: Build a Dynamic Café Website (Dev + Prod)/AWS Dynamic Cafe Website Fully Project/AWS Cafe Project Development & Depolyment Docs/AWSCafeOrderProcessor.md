@@ -1322,38 +1322,38 @@ Click Deploy (top right)
 
 - Select:
 
-    - VPC → same as EC2
+    - **VPC → same as EC2**
 
-    - Subnets → PRIVATE subnets (important)
+    - **Subnets → PRIVATE subnets (important)**
 
-    - Security Group → Lambda SG
+    - **Security Group → Lambda SG**
 
     - Save
 
-⏳ Wait until Lambda status = Active
+**⏳ Wait until Lambda status = Active**
 
 
 ### 3️⃣ Create VPC Endpoint
 
-- AWS Console → VPC → Endpoints → Create endpoint
+- **AWS Console → VPC → Endpoints → Create endpoint**
 
-- Endpoint Name: secretsmanager-INT-EP
+- **Endpoint Name:** secretsmanager-INT-EP
 
-- Service category : AWS services
+- **Service category:** AWS services
 
-- Service name : com.amazonaws.us-east-1.secretsmanager
+- **Service name:** com.amazonaws.us-east-1.secretsmanager
 
-- Type : Interface
+- **Type:** Interface
 
-- VPC : Select VPC 
+- **VPC:** Select VPC 
 
-- Subnets :
+- **Subnets:**
 
-✔ Select the SAME private subnets used by Lambda
+**✔ Select the SAME private subnets used by Lambda**
 
-- Security Group :
+- **Security Group:**
 
-Allow HTTPS (443) inbound from Lambda SG
+**Allow HTTPS (443) inbound from Lambda SG**
 
 Create endpoint ✅
 
