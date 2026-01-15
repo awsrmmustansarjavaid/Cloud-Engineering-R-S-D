@@ -1407,11 +1407,13 @@ def lambda_handler(event, context):
 #### ✅ Expected Output:
 
 ```
-[
-  {"item": "Coffee", "price": 3},
-  {"item": "Latte", "price": 5},
-  {"item": "Tea", "price": 2}
-]
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "[{\"price\": 5, \"item\": \"Latte\"}, {\"price\": 8, \"item\": \"Cappuccino\"}, {\"price\": 6, \"item\": \"Fresh Juice\"}, {\"price\": 2, \"item\": \"Tea\"}, {\"price\": 3, \"item\": \"Coffee\"}]"
+}
 ```
 
 ---
