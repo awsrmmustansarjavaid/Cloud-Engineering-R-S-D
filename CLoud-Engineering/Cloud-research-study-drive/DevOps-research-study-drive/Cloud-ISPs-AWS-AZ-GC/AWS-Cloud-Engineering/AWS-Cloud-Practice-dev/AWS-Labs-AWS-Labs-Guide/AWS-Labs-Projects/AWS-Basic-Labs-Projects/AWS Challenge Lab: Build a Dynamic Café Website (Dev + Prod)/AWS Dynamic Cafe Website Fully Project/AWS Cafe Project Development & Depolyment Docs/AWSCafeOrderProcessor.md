@@ -2051,7 +2051,7 @@ sudo ./rds-secret-test.sh
 
 ---
 
-#### 1️⃣ Check CloudWatch Logs
+#### 3️⃣ Check CloudWatch Logs
 
 - **Lambda → Monitor → Logs**
 
