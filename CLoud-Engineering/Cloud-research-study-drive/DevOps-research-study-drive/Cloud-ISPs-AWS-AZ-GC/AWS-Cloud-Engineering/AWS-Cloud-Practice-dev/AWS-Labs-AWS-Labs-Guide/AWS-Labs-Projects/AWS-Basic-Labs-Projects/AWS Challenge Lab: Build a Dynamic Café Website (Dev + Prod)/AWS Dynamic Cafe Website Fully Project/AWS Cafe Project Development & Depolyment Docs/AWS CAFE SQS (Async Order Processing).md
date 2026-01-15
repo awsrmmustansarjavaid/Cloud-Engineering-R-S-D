@@ -1221,7 +1221,7 @@ test-new order processing SQS
 
 ---
 
-# PHASE 5 — SQS/Worker LAMBDA (Consumer)
+# PHASE 5 — Verification SQS/Worker LAMBDA (Consumer)
 
 ### 1️⃣ Test manually from Lambda console
 
