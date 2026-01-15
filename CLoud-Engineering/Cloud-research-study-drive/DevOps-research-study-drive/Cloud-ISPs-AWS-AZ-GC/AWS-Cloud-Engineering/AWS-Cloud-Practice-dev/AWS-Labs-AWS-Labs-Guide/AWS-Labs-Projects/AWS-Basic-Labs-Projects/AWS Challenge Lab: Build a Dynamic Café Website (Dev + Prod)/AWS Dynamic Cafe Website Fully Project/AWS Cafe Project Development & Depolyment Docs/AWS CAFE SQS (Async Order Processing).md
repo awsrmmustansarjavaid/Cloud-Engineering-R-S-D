@@ -972,6 +972,7 @@ Now add the remaining REQUIRED endpoints.
 
 | Field          | Value                         |
 | -------------- | ----------------------------- |
+| Name           | sqs-INT-EP                    |
 | Service        | `com.amazonaws.us-east-1.sqs` |
 | Type           | Interface                     |
 | VPC            | Same VPC                      |
@@ -980,6 +981,12 @@ Now add the remaining REQUIRED endpoints.
 | Private DNS    | ✅ ENABLE                      |
 
 #### 2️⃣ Create CloudWatch Logs Interface Endpoint
+
+- **Name:**
+
+```
+cloudwatch-INT-EP 
+```
 
 - **Service:**
 
@@ -992,6 +999,13 @@ Same settings as above
 Private DNS ✅
 
 #### 3️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
+
+- **Name:**
+
+```
+dynamodb-GW-EP 
+```
+
 
 - **Service:**
 
