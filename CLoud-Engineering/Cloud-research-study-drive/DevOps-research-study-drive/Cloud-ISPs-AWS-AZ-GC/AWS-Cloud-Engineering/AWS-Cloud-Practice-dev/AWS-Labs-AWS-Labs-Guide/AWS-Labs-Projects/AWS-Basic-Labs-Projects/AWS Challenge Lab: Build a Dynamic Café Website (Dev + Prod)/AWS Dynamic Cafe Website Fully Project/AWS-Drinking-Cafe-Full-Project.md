@@ -1131,6 +1131,40 @@ Click Create item again:
 
 ---
 
+#### 4️⃣ Create Third Item (Cappuccino)
+
+```
+{
+  "item": {
+    "S": "Cappuccino"
+  },
+  "price": {
+    "N": "8"
+  }
+}
+```
+
+- ✅ Click Create item
+
+---
+
+#### 5️⃣ Create Third Item (Fresh Juice)
+
+```
+{
+  "item": {
+    "S": "Fresh Juice"
+  },
+  "price": {
+    "N": "6"
+  }
+}
+```
+
+- ✅ Click Create item
+
+---
+
 ### 2️⃣ Method 2 Item editor screen
 
 
@@ -1182,16 +1216,49 @@ Click Create item again:
 
 - ✅ Click Create item
 
+#### 4️⃣ Create First Item (Cappuccino)
+
+1. Partition key:
+
+- item → Cappuccino
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 8
+
+- ✅ Click Create item
+
+#### 5️⃣ Create First Item (Fresh Juice)
+
+1. Partition key:
+
+- item → Fresh Juice
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 6
+
+- ✅ Click Create item
+
 ---
 ### 3️⃣ Verify Items
 
-You should now see 3 items in the table. You should now see:
+You should now see 5 items in the table. You should now see:
 
 | item   | price |
 | ------ | ----- |
 | Coffee | 3     |
 | Latte  | 5     |
-| Tea    | 2     |
+| Cappuccino    | 8     |
+| Fresh Juice    | 6     |
 
 ✅ DynamoDB table is ready
 
