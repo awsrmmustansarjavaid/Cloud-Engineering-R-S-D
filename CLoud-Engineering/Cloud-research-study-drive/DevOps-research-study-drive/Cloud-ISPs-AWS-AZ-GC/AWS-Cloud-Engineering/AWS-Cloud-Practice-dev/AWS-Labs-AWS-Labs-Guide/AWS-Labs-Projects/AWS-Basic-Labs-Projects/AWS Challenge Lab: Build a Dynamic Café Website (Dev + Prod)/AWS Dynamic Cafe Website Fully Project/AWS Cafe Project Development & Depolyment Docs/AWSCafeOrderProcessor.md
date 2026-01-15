@@ -1337,6 +1337,8 @@ Click Deploy (top right)
 
 - AWS Console → VPC → Endpoints → Create endpoint
 
+- Endpoint Name: secretsmanager-INT-EP
+
 - Service category : AWS services
 
 - Service name : com.amazonaws.us-east-1.secretsmanager
