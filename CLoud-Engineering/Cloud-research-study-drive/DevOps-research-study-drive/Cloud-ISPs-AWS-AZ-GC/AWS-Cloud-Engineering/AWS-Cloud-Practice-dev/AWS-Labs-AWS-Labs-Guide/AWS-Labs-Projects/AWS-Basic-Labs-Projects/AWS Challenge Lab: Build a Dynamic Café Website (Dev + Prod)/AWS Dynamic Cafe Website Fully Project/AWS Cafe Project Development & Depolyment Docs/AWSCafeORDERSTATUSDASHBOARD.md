@@ -645,6 +645,19 @@ Click **Add**
 {}
 ```
 
+#### Expected:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "{\"metrics\": [{\"metric\": \"TOTAL_ORDERS\", \"count\": \"2\"}], \"recent_orders\": ..........."
+}
+```
+
 ✔ Status code: 200
 
 ✔ JSON returned
