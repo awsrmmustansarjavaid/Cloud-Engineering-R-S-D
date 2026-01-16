@@ -725,7 +725,6 @@ AWS Console → CloudFront → Create Distribution
 | Origin domain          | charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com |
 | Origin protocol policy | **HTTP only** ✅                                         |
 | HTTP port              | 80                                                      |
-| HTTPS port             | 443 (unused for now)                                    |
 | Origin SSL protocols   | (doesn’t matter now)                                    |
 
 
@@ -759,7 +758,7 @@ Query strings
 Cookies
 are forwarded correctly.
 
-#### 🔐 STEP 3️⃣ — CloudFront General Configuration & Validation
+#### 🔐 STEP 3️⃣ — CloudFront General Configuration
 
 > **This step finalizes the CloudFront distribution behavior and ensures it works correctly with ALB + Cognito Hosted UI without breaking authentication or routing.**
 
@@ -829,6 +828,213 @@ This ensures:
 CloudFront → ALB → EC2 Apache → order-status.html
 ```
 
+#### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
+
+> **CloudFront caches content at edge locations worldwide.
+When you update a file on EC2 (like order-status.html), CloudFront may still serve the old cached version.**
+
+**👉 Invalidation tells CloudFront to delete cached copies immediately.**
+
+#### 1️⃣ Go to:
+
+```
+CloudFront → Distributions → Your Distribution
+```
+
+#### 2️⃣ Click Invalidations
+
+#### 3️⃣ Click Create invalidation
+
+#### 4️⃣ In Object paths, enter:
+
+invalidation path:
+
+```
+/order-status.html
+```
+
+#### 5️⃣ Click Create invalidation
+
+⏳ Status will show:
+
+```
+In Progress → Completed
+```
+
+Usually completes in 1–3 minutes.
+
+#### When to Use Invalidation
+
+Use invalidation only when you change frontend files, such as:
+
+| Change               | Invalidate? |
+| -------------------- | ----------- |
+| HTML changes         | ✅ Yes       |
+| JS logic             | ✅ Yes       |
+| Cognito redirect URL | ✅ Yes       |
+| API Gateway backend  | ❌ No        |
+| DynamoDB data        | ❌ No        |
+
+#### Best Practice for Your Project
+
+For admin dashboards like Charlie Cafe:
+
+- Invalidate specific files
+
+- Avoid /* unless necessary
+
+✅ Recommended invalidation paths
+
+```
+/order-status.html
+/login.html
+/css/*
+/js/*
+```
+
+#### ❌ Avoid unless emergency
+
+```
+/*
+```
+
+(Uses more invalidation quota)
+
+#### Cost & Limits (Important to Know)
+
+- First 1,000 invalidation paths/month → FREE
+
+- After that → small cost per path
+
+Your usage:
+
+```
+/order-status.html → 1 path ✅
+```
+
+Perfect.
+
+#### How to Confirm Invalidation Worked
+
+After status = Completed:
+
+1️⃣ Open browser
+
+2️⃣ Hard refresh:
+
+- Windows/Linux: Ctrl + F5
+
+- Mac: Cmd + Shift + R
+
+3️⃣ Open:
+
+```
+https://xxxxx.cloudfront.net/order-status.html
+```
+
+You should see latest code.
+
+#### Common Mistakes (Avoid These)
+
+❌ Invalidating:
+
+```
+order-status.html
+```
+
+(missing leading /)
+
+❌ Invalidating wrong file name
+
+❌ Forgetting invalidation after JS changes
+
+#### Important Notes:
+
+✔ /order-status.html is the correct invalidation path
+
+✔ Use invalidation after frontend changes
+
+✔ Do not overuse /*
+
+✔ Required when testing Cognito changes
+
+
+
+#### 🔐 STEP 4 — CloudFront SSL Certificate (Optional)
+Viewer Certificate
+
+Choose:
+
+```
+Default CloudFront certificate (*.cloudfront.net)
+```
+
+✅ This is fine
+
+✅ HTTPS works automatically
+
+❌ No ACM needed here
+
+#### 🧠 STEP 5 — Do NOT Add Cognito to CloudFront
+
+⚠️ VERY IMPORTANT
+
+Do NOT:
+
+Add Cognito as origin
+
+Add Lambda@Edge auth
+
+Add CloudFront auth rules
+
+Why?
+
+Because:
+
+Cognito Hosted UI already handles auth
+
+Your app handles tokens in JavaScript
+
+Adding auth at CloudFront will BREAK redirects
+
+
+👉 SAVE
+
+⏳ Wait 5–10 minutes for deployment.
+
+Wait until:
+
+```
+Status = Deployed
+```
+
+#### You’ll get:
+
+```
+xxxxx.cloudfront.net
+```
+
+🔁 STEP 6 — Update order-status.html (ONE LINE ONLY)
+Replace ONLY this line:
+
+```
+const REDIRECT_URI = "https://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
+```
+
+#### With CloudFront URL:
+
+```
+const REDIRECT_URI = "https://xxxxx.cloudfront.net/order-status.html";
+```
+
+⚠️ Keep /order-status.html
+
+⚠️ Do NOT use ALB URL anymore in browser
+
+🔐 STEP 7 — Update Cognito Callback URLs (FINAL)
+
+Go to:
+
 #### 2️⃣ CloudFront Validation (VERY IMPORTANT)
 
 > **After configuration, always validate CloudFront before integrating Cognito.**
@@ -895,92 +1101,6 @@ http://ALB-DNS-NAME/order-status.html
 - EC2 Apache is running
 
 - Security Groups allow ALB → EC2 (port 80)
-
-
-#### 🔐 STEP 4 — CloudFront SSL Certificate (Optional)
-Viewer Certificate
-
-Choose:
-
-```
-Default CloudFront certificate (*.cloudfront.net)
-```
-
-✅ This is fine
-
-✅ HTTPS works automatically
-
-❌ No ACM needed here
-
-#### 🧠 STEP 5 — Do NOT Add Cognito to CloudFront
-
-⚠️ VERY IMPORTANT
-
-Do NOT:
-
-Add Cognito as origin
-
-Add Lambda@Edge auth
-
-Add CloudFront auth rules
-
-Why?
-
-Because:
-
-Cognito Hosted UI already handles auth
-
-Your app handles tokens in JavaScript
-
-Adding auth at CloudFront will BREAK redirects
-
-#### 🚀 STEP 5 — Create Distribution
-
-Click:
-
-```
-Create distribution
-```
-
-👉 SAVE
-
-⏳ Wait 5–10 minutes for deployment.
-
-Wait until:
-
-```
-Status = Deployed
-```
-
-#### You’ll get:
-
-```
-xxxxx.cloudfront.net
-```
-
-🔁 STEP 6 — Update order-status.html (ONE LINE ONLY)
-Replace ONLY this line:
-
-```
-const REDIRECT_URI = "https://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
-```
-
-#### With CloudFront URL:
-
-```
-const REDIRECT_URI = "https://xxxxx.cloudfront.net/order-status.html";
-```
-
-⚠️ Keep /order-status.html
-
-⚠️ Do NOT use ALB URL anymore in browser
-
-🔐 STEP 7 — Update Cognito Callback URLs (FINAL)
-
-Go to:
-
-
-
 
 
 
