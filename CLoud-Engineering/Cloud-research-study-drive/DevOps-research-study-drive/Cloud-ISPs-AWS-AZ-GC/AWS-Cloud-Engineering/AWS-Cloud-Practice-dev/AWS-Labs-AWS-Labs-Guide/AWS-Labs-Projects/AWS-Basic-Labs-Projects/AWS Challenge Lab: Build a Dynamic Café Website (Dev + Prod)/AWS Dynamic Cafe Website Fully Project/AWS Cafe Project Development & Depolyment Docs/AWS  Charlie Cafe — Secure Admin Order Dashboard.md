@@ -933,7 +933,7 @@ Click Save changes
 
 **✔ Now your account recovery matches the lab**
 
-### ❗  PASSWORD IS “INACTIVE” + SNS ERROR (Option)
+### ❗  PASSWORD IS “INACTIVE” + SNS ERROR (Optional)
 
 > **This is a REAL AWS SERVICE ISSUE, not a mistake.**
 
