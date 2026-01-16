@@ -924,22 +924,6 @@ User pool → Sign-in experience → Account recovery
 Click Save changes
 
 
-
-
-
-
-
-You will see:
-
-🔹 Password policy
-
-✅ Leave default
-(no change needed)
-
-Click Save changes (if enabled)
-
-
-
 ---
 
 ## 🔐 PHASE 5️⃣ — API GATEWAY AUTH 
