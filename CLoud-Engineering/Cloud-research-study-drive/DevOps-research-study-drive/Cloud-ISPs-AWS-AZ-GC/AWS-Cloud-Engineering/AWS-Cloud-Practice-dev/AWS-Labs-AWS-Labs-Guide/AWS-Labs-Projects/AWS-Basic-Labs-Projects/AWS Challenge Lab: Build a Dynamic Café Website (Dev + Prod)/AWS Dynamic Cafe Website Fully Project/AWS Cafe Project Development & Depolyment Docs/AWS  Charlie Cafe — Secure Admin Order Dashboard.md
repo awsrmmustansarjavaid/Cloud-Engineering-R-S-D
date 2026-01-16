@@ -361,11 +361,13 @@ rgba(0,0,0,.55)
 
 - JWT ready
 
+---
+
 ## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
 
-### ✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)
+> **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
-#### ✅ OPTION 1 — USE EC2 PUBLIC IP (BEST FOR LAB)
+### 1️⃣  — USE EC2 PUBLIC IP (BEST FOR LAB)
 
 > **This is 100% acceptable for labs and Cognito testing**
 
@@ -458,7 +460,7 @@ http://54.183.22.10/order-status.html
 
 > **So for Cognito we must do ONE SMALL CHANGE**
 
-#### STEP 6️⃣ — HTTPS REQUIREMENT (CRITICAL)
+### 2️⃣  — HTTPS REQUIREMENT (CRITICAL)
 
 **⚠️ Cognito does NOT allow HTTP except localhost.**
 
@@ -466,10 +468,129 @@ So we must add HTTPS.
 
 You have TWO EASY OPTIONS
 
+### 🟢 OPTION 1️⃣ (EASIEST) — USE ALB (RECOMMENDED)
+
+> **This is the simplest HTTPS solution.**
+
+#### STEP 1️⃣ — CREATE APPLICATION LOAD BALANCER
+
+```
+EC2 → Load Balancers → Create Load Balancer
+```
+
+#### Choose:
+
+```
+Application Load Balancer
+```
+
+STEP A2 — BASIC SETTINGS
+
+Name: charlie-cafe-alb
+
+Scheme: Internet-facing
+
+IP type: IPv4
+
+STEP A3 — NETWORKING
+
+VPC: same as EC2
+
+Subnets: select 2 public subnets
+
+STEP A4 — SECURITY GROUP
+
+Allow:
+
+```
+HTTPS 443  0.0.0.0/0
+```
+
+STEP A5 — TARGET GROUP
+
+Type: Instance
+
+Protocol: HTTP
+
+Port: 80
+
+Register your EC2 instance
+
+STEP A6 — ADD HTTPS LISTENER
+
+Listener: HTTPS 443
+
+Certificate:
+
+Request ACM certificate
+
+Domain can be:
+
+```
+alb-name.region.elb.amazonaws.com
+```
+
+ACM is FREE
+
+STEP A7 — GET ALB DNS NAME
+
+Example:
+
+```
+https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
+```
+
+STEP A8 — TEST PAGE
+
+Open:
+
+```
+https://ALB-DNS/order-status.html
+```
+
+✅ Works → DONE
+
+STEP A9 — USE THIS IN COGNITO
+
+```
+https://ALB-DNS/order-status.html
+```
+
+This is your Return URL
+
+🟡 OPTION B — CLOUD FRONT (ADVANCED, OPTIONAL)
+
+Use this ONLY if:
+
+You want caching
+
+CDN
+
+Production-style setup
+
+For now ❌ SKIP
+
+✅ FINAL RECOMMENDED PATH (FOR YOU)
+
+| Step       | Do this                        |
+| ---------- | ------------------------------ |
+| Host page  | EC2 Apache                     |
+| HTTPS      | ALB                            |
+| Return URL | ALB DNS + `/order-status.html` |
+| CloudFront | Later (optional)               |
+
+🧠 WHY THIS IS THE CORRECT APPROACH
+
+Matches real AWS projects
+
+Works with Cognito HTTPS rule
+
+Simple & debuggable
+
+No unnecessary complexity
 
 
-
-
+---
 
 ## 🔐 PHASE 3️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
