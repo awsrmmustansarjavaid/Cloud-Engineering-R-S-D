@@ -1625,7 +1625,7 @@ https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
 After login, browser redirects to:
 
 ```
-https://ALB-DNS/order-status.html#id_token=xxxxx&access_token=xxxxx
+https://cloudfront/order-status.html#id_token=xxxxx&access_token=xxxxx
 ```
 
 🎉 THIS MEANS SUCCESS
@@ -1653,13 +1653,13 @@ You said:
 So your real URL is something like:
 
 ```
-http://<ALB-DNS-NAME>/order-status.html
+http://<cloudfront>/order-status.html
 ```
 
 Example:
 
 ```
-http://charlie-cafe-alb-123456.us-east-1.elb.amazonaws.com/order-status.html
+https://d2og2zrs47voou.cloudfront.net/order-status.html
 ```
 
 #### 1️⃣ Path (new UI):
@@ -1679,7 +1679,7 @@ Cognito
 #### Add EXACTLY:
 
 ```
-http://<YOUR-ALB-DNS>/order-status.html
+http://<cloudfront>/order-status.html
 ```
 
 ✔ Must match character by character
@@ -1691,7 +1691,7 @@ http://<YOUR-ALB-DNS>/order-status.html
 #### Example:
 
 ```
-http://charlie-cafe-alb-123456.us-east-1.elb.amazonaws.com/order-status.html
+https://d2og2zrs47voou.cloudfront.net/order-status.html
 ```
 
 #### 3️⃣ Sign-out URLs (recommended)
@@ -1699,7 +1699,7 @@ http://charlie-cafe-alb-123456.us-east-1.elb.amazonaws.com/order-status.html
 #### Add the same:
 
 ```
-http://<YOUR-ALB-DNS>/order-status.html
+https://d2og2zrs47voou.cloudfront.net/order-status.html
 ```
 
 **👉 Save changes**
