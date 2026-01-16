@@ -1168,6 +1168,37 @@ https://ALB-DNS/order-status.html#id_token=xxxxx&access_token=xxxxx
 
 🎉 THIS MEANS SUCCESS
 
+### 🟢 STEP 3️⃣ — UPDATE order-status.html (TOKEN HANDLING)
+
+> **Now your admin page must read the token.**
+
+#### 1️⃣ Edit file on EC2:
+
+```
+sudo nano /var/www/html/order-status.html
+```
+
+#### 2️⃣ Add this JavaScript (IMPORTANT):
+
+```
+<script>
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const idToken = params.get("id_token");
+
+  if (!idToken) {
+    alert("Unauthorized access. Redirecting to login...");
+    window.location.href = "/login.html";
+  }
+
+  console.log("JWT Token:", idToken);
+</script>
+```
+
+Save file.
+
+**✅ Page now captures Cognito token**
+
 
 
 ---
