@@ -855,12 +855,12 @@ Amazon Cognito → User pools
 
 **You are now INSIDE the User Pool, not the app wizard.**
 
-#### 🔐 PASSWORD POLICY (REAL LOCATION)
+#### 🔐 PASSWORD POLICY 
 
 #### Path:
 
 ```
-User pool → Authentication → Sign-in
+User pool → Authentication → Authentication methods
 ```
 
 #### You will see:
