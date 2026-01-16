@@ -366,6 +366,16 @@ sudo systemctl restart httpd
 
 ### 4️⃣ Open page in browser
 
+```
+http://EC2 Public IP/order-status.html
+```
+
+#### Example:
+
+```
+http://54.226.96.235/order-status.html
+```
+
 ✔ Orders visible
 
 ✔ Counts visible
