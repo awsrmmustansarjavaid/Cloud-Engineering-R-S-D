@@ -358,7 +358,13 @@ Ensure EC2 Security Group allows:
 
 
 
-### 3️⃣ Open page in browser
+### 3️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+### 4️⃣ Open page in browser
 
 ✔ Orders visible
 
