@@ -1288,19 +1288,22 @@ body {
 <script>
 /* ================== CONFIG ================== */
 
-/* 🔁 REPLACE with your Cognito domain (WITHOUT https://) */
-const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
+/* ✅ Cognito Hosted UI domain (WITHOUT https://) */
+const COGNITO_DOMAIN = "us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com";
 
-/* 🔁 REPLACE with App Client ID */
-const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+/* ✅ App Client ID from Cognito → App integration → App clients */
+const CLIENT_ID = "393ld7o96bt7qlv0shp124osh5";
 
-/* 🔁 REPLACE with your ALB HTTPS URL */
-const REDIRECT_URI = "https://YOUR-ALB-DNS-NAME/order-status.html";
+/* ✅ MUST EXACTLY MATCH Cognito Callback URL */
+const REDIRECT_URI =
+  "http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
 
-/* 🔁 REPLACE with API Gateway endpoint */
-const API_URL = "https://API_ID.execute-api.REGION.amazonaws.com/STAGE/order-status";
+/* ✅ Your real API Gateway endpoint */
+const API_URL =
+  "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
 
 let chart, refreshTimer;
+
 
 /* ================== AUTH ================== */
 
