@@ -682,6 +682,8 @@ This phase is used to secure the Admin Order Dashboard of your Charlie Cafe proj
 | Hosted UI      | “Managed login pages”        |
 | Callback URL   | Return URL                   |
 
+---
+### ▶️ Part 1️⃣ Cognito UserPool
 
 ### ✅ STEP 1️⃣ — DEFINE YOUR APPLICATION
 
@@ -1053,6 +1055,8 @@ Exit SMS sandbox
 
 - API Gateway + Lambda
 
+### ▶️ Part 2️⃣ Cognito UserPool
+
 ### ✅ WHAT YOU HAVE DONE (CONFIRMED)
 
 #### You already have:
@@ -1087,7 +1091,9 @@ Exit SMS sandbox
 
 ✔ Admin can see orders (RDS / DynamoDB)
 
+### 🟢 STEP 1 — CREATE ADMIN USER (MANDATORY)
 
+Where:
 ---
 
 ## 🔐 PHASE 5️⃣ — API GATEWAY AUTH 
