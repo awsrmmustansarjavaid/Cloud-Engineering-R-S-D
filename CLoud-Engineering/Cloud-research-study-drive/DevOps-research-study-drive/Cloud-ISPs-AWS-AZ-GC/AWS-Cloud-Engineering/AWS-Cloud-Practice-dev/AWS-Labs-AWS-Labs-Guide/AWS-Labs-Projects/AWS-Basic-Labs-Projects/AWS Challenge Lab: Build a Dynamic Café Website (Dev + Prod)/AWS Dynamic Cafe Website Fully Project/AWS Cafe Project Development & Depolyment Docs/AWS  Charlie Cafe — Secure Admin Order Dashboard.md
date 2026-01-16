@@ -1111,6 +1111,10 @@ Create user
 
 - **Temporary password:** auto or manual
 
+```
+C@fe@dmin$
+```
+
 - **Email:** your email
 
 ✔ Mark email as verified
