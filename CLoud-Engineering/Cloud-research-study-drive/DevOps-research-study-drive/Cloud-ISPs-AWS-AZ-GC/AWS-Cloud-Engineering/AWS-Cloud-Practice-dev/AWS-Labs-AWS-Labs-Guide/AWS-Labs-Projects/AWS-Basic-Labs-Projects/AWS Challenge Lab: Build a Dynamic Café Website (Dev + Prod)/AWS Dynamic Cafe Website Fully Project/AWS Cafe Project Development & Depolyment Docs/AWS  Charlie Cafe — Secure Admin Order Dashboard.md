@@ -1658,6 +1658,8 @@ You said:
 
 - ALB DNS name
 
+- Cloudfront
+
 So your real URL is something like:
 
 ```
@@ -1722,7 +1724,11 @@ Make sure these are enabled:
 
 #### 1️⃣ OAuth 2.0 grant types Settings 
 
-✔ Authorization code grant OR Implicit grant
+✔ Authorization code grant 
+
+OR 
+
+✔ Implicit grant (Recommanded)
 
 #### 2️⃣ OpenID Connect scopes Settings 
 
