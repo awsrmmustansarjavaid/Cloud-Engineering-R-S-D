@@ -361,13 +361,121 @@ rgba(0,0,0,.55)
 
 - JWT ready
 
+## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
+
+### ✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)
+
+#### ✅ OPTION 1 — USE EC2 PUBLIC IP (BEST FOR LAB)
+
+> **This is 100% acceptable for labs and Cognito testing**
+
+#### STEP 1️⃣ — CONFIRM EC2 IS PUBLIC
+
+#### 1️⃣ Go to:
+
+```
+EC2 → Instances
+```
+
+#### 2️⃣ Select your instance
+
+#### 3️⃣ Copy:
+
+```
+Public IPv4 address
+```
+
+Example:
+
+```
+54.183.22.10
+```
+
+#### ⚠️ If you do NOT see a public IP:
+
+- Instance must be in a public subnet
+
+- Must have Internet Gateway
+
+#### STEP 2️⃣ — CONFIRM APACHE IS RUNNING
+
+#### SSH into EC2:
+
+```
+sudo systemctl status httpd
+```
+
+#### If not running:
+
+```
+sudo systemctl start httpd
+```
+
+```
+sudo systemctl enable httpd
+```
+
+#### STEP 3️⃣ — TEST PAGE DIRECTLY
+
+#### Open browser:
+
+```
+http://54.183.22.10/order-status.html
+```
+
+✅ If page opens → PERFECT
+
+❌ If not → check Security Group
 
 
-## 🔐 PHASE 2️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
+#### STEP 4️⃣ — FIX SECURITY GROUP (VERY IMPORTANT)
+
+#### 1️⃣ Go to:
+
+```
+EC2 → Security Groups → Your SG
+```
+
+#### 2️⃣ Inbound rules:
+
+```
+HTTP   TCP   80   0.0.0.0/0
+```
+
+Save
+
+#### STEP 5️⃣ — USE THIS AS RETURN URL IN COGNITO
+
+Now you FINALLY have a valid Return URL.
+
+#### Use:
+
+```
+http://54.183.22.10/order-status.html
+```
+
+**⚠️ BUT Cognito REQUIRES HTTPS**
+
+> **So for Cognito we must do ONE SMALL CHANGE**
+
+#### STEP 6️⃣ — HTTPS REQUIREMENT (CRITICAL)
+
+**⚠️ Cognito does NOT allow HTTP except localhost.**
+
+So we must add HTTPS.
+
+You have TWO EASY OPTIONS
+
+
+
+
+
+
+## 🔐 PHASE 3️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
 This phase is used to secure the Admin Order Dashboard of your Charlie Cafe project.
 
-### Goal of Phase 2
+### Goal 
 
 - Only admin users can access the admin dashboard
 
@@ -518,6 +626,38 @@ https://YOUR_DOMAIN/order-status.html
 ```
 http://204.236.192.115/order-status.html
 ```
+
+#### 🎯 WHAT “Return URL” REALLY MEANS (IN SIMPLE WORDS)
+
+> **Return URL = the web page where Cognito sends the user AFTER login**
+
+#### So after admin logs in:
+
+```
+Cognito Login → SUCCESS → redirect to order-status.html
+```
+
+**📢 Cognito does NOT host your page**
+
+**👉 YOU must host order-status.html somewhere public**
+
+#### 🧠 YOUR CURRENT SITUATION (BASED ON YOUR MESSAGE)
+
+#### You said:
+
+✅ You already have EC2
+
+✅ Apache HTTP is running
+
+❌ No ALB yet
+
+❌ No CloudFront yet
+
+#### 👉 GOOD NEWS:
+
+**💯 You DO NOT NEED ALB or CloudFront right now**
+
+> **We will do this in the EASIEST possible way first (You can add ALB + CloudFront later)**
 
 
 
