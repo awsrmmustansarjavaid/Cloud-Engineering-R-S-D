@@ -708,17 +708,23 @@ https://ALB-DNS/order-status.html
 AWS Console → CloudFront → Create Distribution
 ```
 
-Distribution name: Charlie-Cafe
+- **Distribution name:** Charlie-Cafe
 
+- **Next:**
 
-#### Origin Settings
+- **Origin type:** Elastic Load Balancer
 
-| Setting            | Value                                                       |
-| ------------------ | ----------------------------------------------------------- |
-| Origin domain      | **charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com** |
-| Origin type        | **Load Balancer**                                           |
-| Protocol           | HTTPS only                                                  |
-| Minimum origin SSL | TLSv1.2                                                     |
+#### CloudFront Origin Settings (CRITICAL)
+
+> **Set EXACTLY like this:**
+
+| Setting                | Value                                                   |
+| ---------------------- | ------------------------------------------------------- |
+| Origin domain          | charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com |
+| Origin protocol policy | **HTTP only** ✅                                         |
+| HTTP port              | 80                                                      |
+| HTTPS port             | 443 (unused for now)                                    |
+| Origin SSL protocols   | (doesn’t matter now)                                    |
 
 
 ✅ This is correct
@@ -810,6 +816,10 @@ Click:
 ```
 Create distribution
 ```
+
+👉 SAVE
+
+⏳ Wait 5–10 minutes for deployment.
 
 Wait until:
 
