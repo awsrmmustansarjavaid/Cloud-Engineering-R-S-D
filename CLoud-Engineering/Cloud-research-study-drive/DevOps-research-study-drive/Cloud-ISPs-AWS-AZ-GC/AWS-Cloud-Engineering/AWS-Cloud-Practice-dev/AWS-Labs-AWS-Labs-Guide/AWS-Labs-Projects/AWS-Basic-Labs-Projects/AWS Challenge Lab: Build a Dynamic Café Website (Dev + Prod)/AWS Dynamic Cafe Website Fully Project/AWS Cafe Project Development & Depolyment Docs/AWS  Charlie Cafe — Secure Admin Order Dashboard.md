@@ -708,6 +708,9 @@ https://ALB-DNS/order-status.html
 AWS Console → CloudFront → Create Distribution
 ```
 
+Distribution name: charliemj-cf
+
+
 #### Origin Settings
 
 | Setting            | Value                                                       |
