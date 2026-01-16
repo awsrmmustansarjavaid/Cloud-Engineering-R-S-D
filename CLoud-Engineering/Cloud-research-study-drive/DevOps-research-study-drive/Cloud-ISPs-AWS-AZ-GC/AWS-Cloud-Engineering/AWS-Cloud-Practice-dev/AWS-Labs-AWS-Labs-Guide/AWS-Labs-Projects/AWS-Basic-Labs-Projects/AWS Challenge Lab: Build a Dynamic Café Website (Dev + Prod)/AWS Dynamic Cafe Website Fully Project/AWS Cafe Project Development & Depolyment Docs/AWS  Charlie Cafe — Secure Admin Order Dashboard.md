@@ -1783,11 +1783,20 @@ response_type=token
 
 **⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
-#### 4️⃣ Check Client Secret
+#### 4️⃣ Check App Client settings
 
 - AWS Console → Cognito → User Pools → App clients → click Show details
 
 - Ensure Client secret is Disabled ✅
+
+In App Client settings:
+
+| Setting       | Value             |
+| ------------- | ----------------- |
+| App type      | **Public client** |
+| Client secret | ❌ Disabled        |
+
+**If client secret is enabled → Invalid request**
 
 > **If the secret is enabled, the browser flow cannot work and will throw “Invalid request”.**
 
