@@ -923,7 +923,20 @@ User pool → Sign-in experience → Account recovery
 
 Click Save changes
 
+#### ✅ SUMMARY
+
+| Requirement      | Status              |
+| ---------------- | ------------------- |
+| Password policy  | ✅ Default (OK)      |
+| MFA              | ✅ No MFA            |
+| Account recovery | ⚠ Fix to Email only |
+
 **✔ Now your account recovery matches the lab**
+
+### ❗  PASSWORD IS “INACTIVE” + SNS ERROR
+
+> **This is a REAL AWS SERVICE ISSUE, not a mistake.**
+
 
 
 ---
