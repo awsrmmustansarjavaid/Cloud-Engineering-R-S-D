@@ -505,9 +505,8 @@ Application Load Balancer
 HTTPS 443  0.0.0.0/0
 ```
 
-#### STEP 4️⃣ — TARGET GROUP
+#### STEP 4️⃣ — Target Group Configuration (for EC2 registration)
 
-### Target Group Configuration (for EC2 registration)
 
 | Setting                  | Value / Selection                          | Notes / Requirement                                      |
 |--------------------------|--------------------------------------------|----------------------------------------------------------|
@@ -517,9 +516,8 @@ HTTPS 443  0.0.0.0/0
 | **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
 | **Health check path**    | / (or /order-status.html)                  | Path ALB uses to check if instance is healthy            |
 
-#### STEP 5️⃣ — ADD HTTPS LISTENER
+#### STEP 5️⃣ — Add HTTPS Listener to ALB
 
-### Step A6 — Add HTTPS Listener to ALB
 
 | Setting                  | Value / Selection                                      | Notes / Requirement                                                                 |
 |--------------------------|--------------------------------------------------------|-------------------------------------------------------------------------------------|
@@ -559,19 +557,19 @@ https://ALB-DNS/order-status.html
 
 This is your Return URL
 
-### 🟡 OPTION B — CLOUD FRONT (ADVANCED, OPTIONAL)
+### 🟢 OPTION 2️⃣ — CLOUD FRONT (ADVANCED, OPTIONAL)
 
-Use this ONLY if:
+#### Use this ONLY if:
 
-You want caching
+- You want caching
 
-CDN
+- CDN
 
-Production-style setup
+- Production-style setup
 
-For now ❌ SKIP
 
-✅ FINAL RECOMMENDED PATH (FOR YOU)
+
+#### ✅ FINAL RECOMMENDED PATH
 
 | Step       | Do this                        |
 | ---------- | ------------------------------ |
@@ -580,15 +578,16 @@ For now ❌ SKIP
 | Return URL | ALB DNS + `/order-status.html` |
 | CloudFront | Later (optional)               |
 
-🧠 WHY THIS IS THE CORRECT APPROACH
 
-Matches real AWS projects
+### 🧠 WHY THIS IS THE CORRECT APPROACH
 
-Works with Cognito HTTPS rule
+- Matches real AWS projects
 
-Simple & debuggable
+- Works with Cognito HTTPS rule
 
-No unnecessary complexity
+- Simple & debuggable
+
+- No unnecessary complexity
 
 
 ---
