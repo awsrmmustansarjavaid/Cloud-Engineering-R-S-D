@@ -1870,15 +1870,16 @@ const COGNITO_DOMAIN = "us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com";
 /* ✅ App Client ID from Cognito → App integration → App clients */
 const CLIENT_ID = "393ld7o96bt7qlv0shp124osh5";
 
-/* ✅ MUST EXACTLY MATCH Cognito Callback URL */
+/* 🔁 CloudFront URL — MUST exactly match Cognito callback */
 const REDIRECT_URI =
-  "http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
+  "https://d2og2zrs47voou.cloudfront.net/order-status.html";
 
-/* ✅ Your real API Gateway endpoint */
+/* 🔁 Replace later when API Gateway is ready */
 const API_URL =
   "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
 
 let chart, refreshTimer;
+
 
 
 /* ================== AUTH ================== */
@@ -2029,11 +2030,11 @@ const COGNITO_DOMAIN = "us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com";
 /* ✅ App Client ID from Cognito → App integration → App clients */
 const CLIENT_ID = "393ld7o96bt7qlv0shp124osh5";
 
-/* ✅ MUST EXACTLY MATCH Cognito Callback URL */
+/* 🔁 CloudFront URL — MUST exactly match Cognito callback */
 const REDIRECT_URI =
-  "http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
+  "https://d2og2zrs47voou.cloudfront.net/order-status.html";
 
-/* ✅ Your real API Gateway endpoint */
+/* 🔁 Replace later when API Gateway is ready */
 const API_URL =
   "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
 
