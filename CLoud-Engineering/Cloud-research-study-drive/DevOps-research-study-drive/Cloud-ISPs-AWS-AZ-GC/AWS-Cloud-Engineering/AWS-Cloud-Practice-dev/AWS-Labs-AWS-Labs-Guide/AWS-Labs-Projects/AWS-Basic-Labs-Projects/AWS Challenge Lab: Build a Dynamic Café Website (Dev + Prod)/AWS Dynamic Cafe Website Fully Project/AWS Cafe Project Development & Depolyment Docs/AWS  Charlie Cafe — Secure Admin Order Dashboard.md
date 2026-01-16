@@ -1641,23 +1641,41 @@ sudo systemctl restart httpd
 
 #### 9️⃣ 🧪 HOW TO TEST
 
-#### 1️⃣ Open:
+- 1️⃣ Open Incognito window
+
+- 2️⃣ Open:
 
 ```
 https://ALB-DNS/order-status.html
 ```
 
-#### 2️⃣ You should be redirected to Cognito login
+#### Example: 
 
-#### 3️⃣ Login as admin
+```
+http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html
+```
 
-#### 4️⃣ After login:
+- 3️⃣ You should be redirected to:
 
-#### 5️⃣ Dashboard loads
+```
+https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
+```
 
-#### 6️⃣ API calls succeed
+- 4️⃣ Login with:
 
-#### 7️⃣ No manual login page needed
+  - Username: 	cafeadmin
+
+  - Password: (your permanent password)
+
+- 5️⃣ After login:
+
+  - ✅ Redirects back
+
+  - ✅ Dashboard appears
+
+  - ✅ No HTTP 400
+
+  
 
 **👍 This is production-style SPA + Cognito + API Gateway security.**
 
