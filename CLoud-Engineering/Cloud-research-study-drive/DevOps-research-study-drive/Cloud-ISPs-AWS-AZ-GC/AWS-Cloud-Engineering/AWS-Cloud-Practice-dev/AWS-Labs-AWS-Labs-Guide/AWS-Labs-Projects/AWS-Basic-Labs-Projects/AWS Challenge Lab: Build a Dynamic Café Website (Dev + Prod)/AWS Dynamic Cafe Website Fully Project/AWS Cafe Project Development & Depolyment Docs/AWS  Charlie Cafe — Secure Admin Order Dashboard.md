@@ -1451,11 +1451,33 @@ Save file.
 
 **✅ Page now captures Cognito token**
 
-### 5️⃣ Restart Apache (MANDATORY)
+#### 5️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
+
+#### 6️⃣ 🧪 HOW TO TEST
+
+#### 1️⃣ Open:
+
+```
+https://ALB-DNS/order-status.html
+```
+
+#### 2️⃣ You should be redirected to Cognito login
+
+#### 3️⃣ Login as admin
+
+#### 4️⃣ After login:
+
+#### 5️⃣ Dashboard loads
+
+#### 6️⃣ API calls succeed
+
+#### 7️⃣ No manual login page needed
+
+**👍 This is production-style SPA + Cognito + API Gateway security.**
 
 
 ---
