@@ -855,7 +855,7 @@ Amazon Cognito → User pools
 
 **You are now INSIDE the User Pool, not the app wizard.**
 
-#### 🔐 PASSWORD POLICY 
+#### 1️⃣  PASSWORD POLICY 
 
 #### Path:
 
@@ -863,7 +863,73 @@ Amazon Cognito → User pools
 User pool → Authentication → Authentication methods
 ```
 
-#### You will see:
+#### Then look for:
+
+```
+Password policy
+```
+
+**⚠️ If you don’t see it yet:**
+
+- Click Authentication methods
+
+- Scroll down
+
+✅ Default password policy is already applied
+
+✅ This satisfies your lab requirement
+
+👉 You do NOT need to change anything
+
+**✔ Password policy = OK**
+
+#### 2️⃣ Multi-factor authentication (MFA)
+
+#### 1️⃣ Path:
+
+```
+User pool → Sign-in experience → Account recovery
+```
+
+#### 2️⃣ Select:
+
+> **YOU ALREADY CONFIGURED IT CORRECTLY**
+
+```
+❌ Off
+```
+
+Click Save changes
+
+#### 2️⃣ ACCOUNT RECOVERY 
+
+#### 1️⃣ Path:
+
+```
+User pool → Sign-in experience → Account recovery
+```
+
+#### 2️⃣ Select:
+
+```
+☑ Email only
+```
+
+#### 3️⃣ Disable:
+
+```
+☐ Phone
+```
+
+Click Save changes
+
+
+
+
+
+
+
+You will see:
 
 🔹 Password policy
 
