@@ -97,6 +97,8 @@ const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-
 
 - Auto-refresh every 10s maintained
 
+#### 1️⃣ Updated Order.html 
+
 #### Here’s the updated HTML/JS code:
 
 ```
@@ -327,12 +329,42 @@ showDashboard();
 </html>
 ```
 
-#### Save File
+#### 2️⃣ Save File
 
 ```
 CTRL + O → ENTER
 CTRL + X
 ```
+
+### 2️⃣ SECURITY & PERMISSIONS
+
+✅ 2.1 Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+✅ 2.2 Open Security Group (MANDATORY)
+
+Ensure EC2 Security Group allows:
+
+
+| Type | Port | Source    |
+| ---- | ---- | --------- |
+| HTTP | 80   | 0.0.0.0/0 |
+
+
+
+### 3️⃣ Open page in browser
+
+✔ Orders visible
+
+✔ Counts visible
+
+✔ Date/time visible
 
 #### 🔧 OPTIONAL (YOU CAN CHANGE LATER)
 
