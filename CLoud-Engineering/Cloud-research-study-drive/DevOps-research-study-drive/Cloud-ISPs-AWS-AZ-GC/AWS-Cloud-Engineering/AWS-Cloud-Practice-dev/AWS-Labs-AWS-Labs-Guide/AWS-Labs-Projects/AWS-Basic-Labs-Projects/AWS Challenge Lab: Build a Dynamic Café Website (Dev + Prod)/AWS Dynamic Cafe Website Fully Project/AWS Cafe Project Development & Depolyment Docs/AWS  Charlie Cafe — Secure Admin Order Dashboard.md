@@ -1119,6 +1119,18 @@ C@fe@dmin$
 
 - **✔ Mark email as verified**
 
+### Step: Create Admin User in Cognito User Pool
+
+| Setting                  | Value / Recommendation                                 | Notes / Action Required                              |
+|--------------------------|--------------------------------------------------------|------------------------------------------------------|
+| **Username**             | cafeadmin                                              | Use this exact username for consistency (case-sensitive in some flows) |
+| **Temporary password**   | Auto-generated (recommended) or Manual                 | If manual: Use a strong one like `C@fe@dmin$` (must meet password policy) |
+| **Suggested manual temp password** | C@fe@dmin$                                             | Meets default policy: 8+ chars, upper/lower/number/special |
+| **Email**                | your-email@example.com                                 | Replace with your real email (used for verification & recovery) |
+| **Mark email as verified** | ✓ Yes (check the box)                                  | Critical: Enables immediate login without email verification step |
+| **Message delivery**     | Email (default)                                        | Temporary password sent to the provided email        |
+| **Additional attributes** | Optional: name = "Cafe Admin" (if required by your app) | Add if your required attributes include name         |
+
 Click Create user
 
 ✅ Admin account created
