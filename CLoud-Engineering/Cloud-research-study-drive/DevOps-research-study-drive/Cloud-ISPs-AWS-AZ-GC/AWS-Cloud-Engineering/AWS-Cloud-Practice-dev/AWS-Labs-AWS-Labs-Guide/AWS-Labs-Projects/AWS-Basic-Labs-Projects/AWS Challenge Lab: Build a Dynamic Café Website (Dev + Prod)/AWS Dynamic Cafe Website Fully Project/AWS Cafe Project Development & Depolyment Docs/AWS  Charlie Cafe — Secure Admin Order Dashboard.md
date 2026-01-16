@@ -579,7 +579,9 @@ HTTPS 443  0.0.0.0/0
 
 **⚠️ ACM is FREE**
 
-#### STEP 6️⃣ Method 2 — Request SSL Certificate (ACM) 
+#### STEP 6️⃣ — Optional - Request SSL Certificate (ACM) 
+
+> **⚠️ Try when do not want to use cloudFront**
 
 #### 1️⃣ Go to:
 
