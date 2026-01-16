@@ -1091,21 +1091,33 @@ Exit SMS sandbox
 
 ✔ Admin can see orders (RDS / DynamoDB)
 
-### 🟢 STEP 1 — CREATE ADMIN USER (MANDATORY)
+### 🟢 STEP 1️⃣ — CREATE ADMIN USER (MANDATORY)
 
-#### Where:
+#### 1️⃣ Where:
 
 ```
 Cognito → User pools → Your user pool → Users
 ```
 
-Click:
+#### 2️⃣ Click:
 
 ```
 Create user
 ```
 
+#### 3️⃣ Fill:
 
+- **Username:** cafeadmin
+
+- **Temporary password:** auto or manual
+
+- **Email:** your email
+
+✔ Mark email as verified
+
+Click Create user
+
+✅ Admin account created
 
 
 
