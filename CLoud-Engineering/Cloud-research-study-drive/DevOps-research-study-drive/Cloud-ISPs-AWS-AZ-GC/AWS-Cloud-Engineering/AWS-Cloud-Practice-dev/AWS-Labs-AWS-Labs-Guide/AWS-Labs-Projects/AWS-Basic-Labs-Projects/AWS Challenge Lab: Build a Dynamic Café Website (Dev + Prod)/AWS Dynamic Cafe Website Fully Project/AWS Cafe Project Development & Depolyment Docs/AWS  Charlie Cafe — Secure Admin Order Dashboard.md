@@ -1702,6 +1702,8 @@ https://d2og2zrs47voou.cloudfront.net/order-status.html
 https://d2og2zrs47voou.cloudfront.net/order-status.html
 ```
 
+> **Cognito is strict: must be HTTPS + exact path, no trailing slash.**
+
 **👉 Save changes**
 
 **⏳ Wait 30–60 seconds (Cognito propagation delay)**
@@ -1774,7 +1776,7 @@ Make sure these are enabled:
 
 You asked this directly, so here is the exact path 👇
 
-#### AWS Console path:
+#### 1️⃣ AWS Console path:
 
 ```
 Cognito
@@ -1784,7 +1786,7 @@ Cognito
 → Domain
 ```
 
-#### You will see something like:
+#### 2️⃣ You will see something like:
 
 ```
 Domain:
@@ -1807,6 +1809,21 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 ```
 
 **📌 Copy ONLY this part (no https, no /login)**
+
+#### 3️⃣ Test the Login URL Directly
+
+Once the above is confirmed:
+
+```
+https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/order-status.html
+```
+
+- Expected: Cognito login page shows
+
+- Login → redirect → CloudFront /order-status.html
+
+**✔️ If this works → frontend code will work too.**
+
 
 #### 6️⃣ ✅ FINAL WORKING order-status.html (READY TO USE)
 
