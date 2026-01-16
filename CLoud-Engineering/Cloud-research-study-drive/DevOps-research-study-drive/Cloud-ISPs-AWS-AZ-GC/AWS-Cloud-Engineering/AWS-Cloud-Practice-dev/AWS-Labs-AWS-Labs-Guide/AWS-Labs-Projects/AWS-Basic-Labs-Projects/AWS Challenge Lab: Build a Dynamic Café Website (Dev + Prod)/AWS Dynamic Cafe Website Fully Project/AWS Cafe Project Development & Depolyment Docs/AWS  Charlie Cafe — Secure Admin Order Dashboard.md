@@ -700,7 +700,7 @@ https://ALB-DNS/order-status.html
 
 ### 3️⃣ — CLOUD FRONT
 
-#### 🧱 STEP 1 — CloudFront Origin (ALB)
+#### 🧱 STEP 1️⃣ — CloudFront Origin (ALB)
 
 #### Go to:
 
@@ -735,7 +735,7 @@ AWS Console → CloudFront → Create Distribution
 
 ❌ Do NOT select S3
 
-#### 🌐 STEP 2 — Default Cache Behavior (VERY IMPORTANT)
+#### 🌐 STEP 2️⃣ — Default Cache Behavior (VERY IMPORTANT)
 
 >**Go to:** Behaviors → Default → Edit
 
@@ -759,7 +759,66 @@ Query strings
 Cookies
 are forwarded correctly.
 
-#### 🔐 STEP 3 — CloudFront SSL Certificate
+#### 🔐 STEP 3️⃣ — CloudFront General Configuration & Validation
+
+> **This step finalizes the CloudFront distribution behavior and ensures it works correctly with ALB + Cognito Hosted UI without breaking authentication or routing.**
+
+#### 1️⃣ ⚙️ General Configuration
+
+- **Configure the following settings in CloudFront → Distribution → General.**
+
+#### 1️⃣ IPv6
+
+- **Turn OFF IPv6**
+
+#### Why
+
+- ALB and EC2 work perfectly on IPv4
+
+- Avoids DNS and routing edge-case issues during labs
+
+- Keeps troubleshooting simple
+
+✅ Recommended for learning & labs
+
+🔁 Can be enabled later in production
+
+#### 2️⃣ Default Root Object (Optional but Recommended)
+
+```
+order-status.html
+```
+
+#### What this does
+
+When users open the root URL:
+
+```
+https://xxxxx.cloudfront.net/
+```
+
+CloudFront automatically serves:
+
+```
+order-status.html
+```
+
+#### Benefits
+
+- Cleaner URL
+
+- Better user experience
+
+- No impact on Cognito authentication
+
+**⚠️ Do NOT add /order-status.html to Origin Path**
+**Origin Path must remain empty.**
+
+
+
+
+
+#### 🔐 STEP 4 — CloudFront SSL Certificate (Optional)
 Viewer Certificate
 
 Choose:
@@ -774,7 +833,7 @@ Default CloudFront certificate (*.cloudfront.net)
 
 ❌ No ACM needed here
 
-#### 🧠 STEP 4 — Do NOT Add Cognito to CloudFront
+#### 🧠 STEP 5 — Do NOT Add Cognito to CloudFront
 
 ⚠️ VERY IMPORTANT
 
