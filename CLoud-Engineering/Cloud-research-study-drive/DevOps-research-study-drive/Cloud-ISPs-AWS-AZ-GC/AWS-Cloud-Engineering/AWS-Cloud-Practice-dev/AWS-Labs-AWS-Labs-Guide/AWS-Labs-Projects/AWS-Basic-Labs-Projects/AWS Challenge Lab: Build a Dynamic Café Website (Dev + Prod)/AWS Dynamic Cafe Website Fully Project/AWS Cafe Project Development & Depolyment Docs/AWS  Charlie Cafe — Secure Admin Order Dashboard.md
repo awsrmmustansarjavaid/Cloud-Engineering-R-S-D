@@ -730,7 +730,7 @@ https://ALB-DNS/order-status.html
 
 - No unnecessary complexity
 
-#### STEP 9️⃣ — USE THIS IN COGNITO
+### 4️⃣ — USE THIS IN COGNITO
 
 ```
 https://ALB-DNS/order-status.html
