@@ -1439,7 +1439,7 @@ showDashboard();
 ```
 #### 6️⃣ WHAT YOU MUST CHANGE (ONLY 3 VALUES)
 
-#### ✅ Replace these with your real values:
+#### 1️⃣ Replace these with your real values:
 
 ```
 const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.REGION.amazoncognito.com";
@@ -1447,9 +1447,69 @@ const CLIENT_ID = "YOUR_CLIENT_ID";
 const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
 ```
 
+#### 2️⃣ 📍 WHERE TO FIND COGNITO DOMAIN URL (VERY IMPORTANT)
+
+#### Follow this exact AWS Console path: 
+
+- AWS Console
+
+- Amazon Cognito
+
+- User pools
+
+- Click your User Pool name
+
+- Left menu → App integration
+
+- Scroll down to Domain
+
+- **You will see something like:**
+
+```
+charlie-cafe-admin.auth.us-east-1.amazoncognito.com
+```
+
+👉 Copy ONLY this part
+
+❌ Do NOT include https://
+
+❌ Do NOT include /login
+
+#### Example:
+
+```
+const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
+```
+
 Save file.
 
 **✅ Page now captures Cognito token**
+
+#### ✅ FINAL CHECKLIST
+
+✔ Cognito App Client
+
+- Implicit grant enabled
+
+- Callback URL = ALB/order-status.html
+
+- Logout URL = ALB/order-status.html
+
+✔ ALB
+
+- HTTPS listener (443)
+
+✔ API Gateway
+
+- Cognito Authorizer
+
+- Uses Access Token
+
+✔ Browser
+
+- No old token in localStorage (clear once)
+
+
 
 #### 7️⃣ Restart Apache (MANDATORY)
 
