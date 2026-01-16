@@ -814,6 +814,21 @@ order-status.html
 **⚠️ Do NOT add /order-status.html to Origin Path**
 **Origin Path must remain empty.**
 
+#### 🧠 Correct CloudFront Path Logic
+
+| Configuration Item   | Value                             |
+| -------------------- | --------------------------------- |
+| Origin Path          | ❌ Empty                           |
+| Default Root Object  | ✅ `order-status.html`             |
+| File location on EC2 | `/var/www/html/order-status.html` |
+
+
+This ensures:
+
+```
+CloudFront → ALB → EC2 Apache → order-status.html
+```
+
 
 
 
