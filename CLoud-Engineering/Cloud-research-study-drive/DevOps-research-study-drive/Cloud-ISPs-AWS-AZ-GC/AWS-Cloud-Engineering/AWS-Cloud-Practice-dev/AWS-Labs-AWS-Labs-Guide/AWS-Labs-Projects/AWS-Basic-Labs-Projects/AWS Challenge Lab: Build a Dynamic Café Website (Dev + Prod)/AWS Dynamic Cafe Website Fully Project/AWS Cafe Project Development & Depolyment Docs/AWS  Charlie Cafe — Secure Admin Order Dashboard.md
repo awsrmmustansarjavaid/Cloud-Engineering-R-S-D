@@ -1125,7 +1125,13 @@ Click Create user
 
 > **This confirms Cognito + ALB + Return URL are working.**
 
-#### 1️⃣ Construct LOGIN URL:
+#### 1️⃣ Where:
+
+```
+Cognito → User pools → Your user pool → App clients → Your App → Login pages  
+```
+
+#### 2️⃣ Construct LOGIN URL:
 
 ```
 https://YOUR_COGNITO_DOMAIN/login
@@ -1140,10 +1146,11 @@ https://YOUR_COGNITO_DOMAIN/login
 ```
 https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
 ```
+#### 3️⃣ Test
 
-Open it in browser.
+- Open it in browser.
 
-#### 2️⃣ Login with:
+#### 4️⃣ Login with:
 
 - Username: admin
 
