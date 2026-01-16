@@ -697,13 +697,6 @@ https://ALB-DNS/order-status.html
 
 ✅ Works → DONE
 
-#### STEP 9️⃣ — USE THIS IN COGNITO
-
-```
-https://ALB-DNS/order-status.html
-```
-
-This is your Return URL
 
 ### 🟢 OPTION 2️⃣ — CLOUD FRONT (ADVANCED, OPTIONAL)
 
@@ -737,6 +730,13 @@ This is your Return URL
 
 - No unnecessary complexity
 
+#### STEP 9️⃣ — USE THIS IN COGNITO
+
+```
+https://ALB-DNS/order-status.html
+```
+
+This is your Return URL
 
 ---
 
