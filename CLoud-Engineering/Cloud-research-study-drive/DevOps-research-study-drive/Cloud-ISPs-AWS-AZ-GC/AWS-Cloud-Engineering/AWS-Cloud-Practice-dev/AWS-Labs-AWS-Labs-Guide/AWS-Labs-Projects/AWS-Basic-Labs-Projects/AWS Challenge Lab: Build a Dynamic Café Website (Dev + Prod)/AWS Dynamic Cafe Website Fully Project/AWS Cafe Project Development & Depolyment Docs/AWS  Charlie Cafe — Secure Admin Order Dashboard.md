@@ -1261,7 +1261,24 @@ http://<YOUR-ALB-DNS>/order-status.html
 
 **⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
-#### 4️⃣ Where to COPY your Cognito Domain (exact path)
+#### 4️⃣ ✅ OAuth settings
+
+Make sure these are enabled:
+
+✔ Authorization code grant OR Implicit grant
+
+✔ OpenID
+
+✔ Email
+
+✔ Profile
+
+👉 Save
+
+👉 Wait 30–60 seconds
+
+
+#### 5️⃣ Where to COPY your Cognito Domain (exact path)
 
 You asked this directly, so here is the exact path 👇
 
@@ -1280,6 +1297,21 @@ Cognito
 ```
 Domain:
 us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com
+```
+
+👉 Copy ONLY this part
+
+❌ Do NOT include https://
+
+❌ Do NOT include /login
+
+**⚠️ Simple words: Do NOT add https:// inside the variable (your code already adds it)**
+
+
+#### Example:
+
+```
+const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 ```
 
 **📌 Copy ONLY this part (no https, no /login)**
@@ -1601,13 +1633,13 @@ Save file.
 
 
 
-#### 7️⃣ Restart Apache (MANDATORY)
+#### 8️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
 
-#### 8️⃣ 🧪 HOW TO TEST
+#### 9️⃣ 🧪 HOW TO TEST
 
 #### 1️⃣ Open:
 
