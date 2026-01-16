@@ -860,7 +860,7 @@ Amazon Cognito → User pools
 #### Path:
 
 ```
-User pool → Sign-in experience → Security requirements
+User pool → Authentication → Sign-in
 ```
 
 #### You will see:
