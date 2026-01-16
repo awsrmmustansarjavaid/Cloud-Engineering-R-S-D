@@ -1195,9 +1195,262 @@ sudo nano /var/www/html/order-status.html
 </script>
 ```
 
+#### 3️⃣ FINAL UPDATED order-status.html (Cognito-Ready)
+
+🔐 Uses Cognito Hosted UI
+
+🔑 Uses ID TOKEN
+
+🛡 Compatible with API Gateway Cognito Authorizer
+
+🚀 Works with ALB HTTPS Return URL
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Order Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+    url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+#dashboard {
+  display: none;
+  background:#f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.card-metric {
+  background:#fff;
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark" id="navbar" style="display:none">
+  <div class="container">
+    <span class="navbar-brand">☕ Charlie Cafe Admin</span>
+    <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="container my-4" id="dashboard">
+
+<div class="row mb-3">
+  <div class="col-md-3">
+    <input type="date" id="filterDate" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100" onclick="loadData()">Filter</button>
+  </div>
+</div>
+
+<div class="text-center my-3" id="loader" style="display:none">
+  <div class="spinner-border text-warning"></div>
+  <p class="mt-2">Loading...</p>
+</div>
+
+<div class="row mb-4" id="metrics"></div>
+
+<canvas id="orderChart" height="100"></canvas>
+
+<table class="table table-bordered mt-4 bg-white">
+  <thead class="table-dark">
+    <tr>
+      <th>Customer</th>
+      <th>Item</th>
+      <th>Qty</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody id="orders"></tbody>
+</table>
+
+</div>
+
+<script>
+/* ================== CONFIG ================== */
+const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const REDIRECT_URI = window.location.origin + window.location.pathname;
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
+
+let chart, refreshTimer;
+
+/* ================== AUTH ================== */
+
+// Decode JWT payload
+function parseJwt(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+  const payload = parseJwt(token);
+  return payload.exp * 1000 < Date.now();
+}
+
+// Redirect to Cognito Hosted UI
+function login() {
+  const loginUrl =
+    `https://${COGNITO_DOMAIN}/login` +
+    `?response_type=token` +
+    `&client_id=${CLIENT_ID}` +
+    `&scope=openid+email+profile` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+
+  window.location.href = loginUrl;
+}
+
+// Logout
+function logout() {
+  localStorage.removeItem("id_token");
+  clearInterval(refreshTimer);
+
+  const logoutUrl =
+    `https://${COGNITO_DOMAIN}/logout` +
+    `?client_id=${CLIENT_ID}` +
+    `&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+
+  window.location.href = logoutUrl;
+}
+
+// Extract ID token from URL hash
+function handleRedirect() {
+  const hash = window.location.hash.substring(1);
+  if (!hash) return;
+
+  const params = new URLSearchParams(hash);
+  const idToken = params.get("id_token");
+
+  if (idToken) {
+    localStorage.setItem("id_token", idToken);
+    window.location.hash = "";
+  }
+}
+
+/* ================== DASHBOARD ================== */
+function showDashboard() {
+  const token = localStorage.getItem("id_token");
+
+  if (!token || isTokenExpired(token)) {
+    login();
+    return;
+  }
+
+  document.getElementById("navbar").style.display = "block";
+  document.getElementById("dashboard").style.display = "block";
+
+  loadData();
+  refreshTimer = setInterval(loadData, 10000);
+}
+
+/* ================== DATA ================== */
+function loadData() {
+  const token = localStorage.getItem("id_token");
+  if (!token || isTokenExpired(token)) return logout();
+
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("metrics").innerHTML = "";
+  document.getElementById("orders").innerHTML = "";
+
+  let url = API_URL;
+  const filterDate = document.getElementById("filterDate").value;
+  if (filterDate) url += "?date=" + filterDate;
+
+  fetch(url, {
+    headers: {
+      Authorization: token
+    }
+  })
+  .then(res => {
+    if (res.status === 401) logout();
+    return res.json();
+  })
+  .then(data => {
+    document.getElementById("loader").style.display = "none";
+
+    data.metrics.forEach(m => {
+      document.getElementById("metrics").innerHTML += `
+        <div class="col-md-3 mb-2">
+          <div class="card-metric text-center fw-bold">
+            ${m.metric}<br>${m.count}
+          </div>
+        </div>`;
+    });
+
+    const items = {};
+    data.recent_orders.forEach(o => {
+      document.getElementById("orders").innerHTML += `
+        <tr>
+          <td>${o.customer_name}</td>
+          <td>${o.item}</td>
+          <td>${o.quantity}</td>
+          <td>${o.created_at}</td>
+        </tr>`;
+      items[o.item] = (items[o.item] || 0) + o.quantity;
+    });
+
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById("orderChart"), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(items),
+        datasets: [{
+          label: 'Orders per Item',
+          data: Object.values(items),
+          backgroundColor: 'rgba(255, 152, 0, 0.7)'
+        }]
+      }
+    });
+  });
+}
+
+/* ================== INIT ================== */
+handleRedirect();
+showDashboard();
+</script>
+
+</body>
+</html>
+```
+
+#### 4️⃣ WHAT YOU MUST CHANGE (ONLY 3 VALUES)
+
+#### ✅ Replace these with your real values:
+
+```
+const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.REGION.amazoncognito.com";
+const CLIENT_ID = "YOUR_CLIENT_ID";
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
+```
+
 Save file.
 
 **✅ Page now captures Cognito token**
+
 
 
 
