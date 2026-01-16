@@ -1451,7 +1451,11 @@ Save file.
 
 **✅ Page now captures Cognito token**
 
+### 5️⃣ Restart Apache (MANDATORY)
 
+```
+sudo systemctl restart httpd
+```
 
 
 ---
