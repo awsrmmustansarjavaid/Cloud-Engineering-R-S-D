@@ -1824,6 +1824,17 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=
 
 **✔️ If this works → frontend code will work too.**
 
+#### ✅ Must Know Before Next Step
+
+- OAuth Scopes: openid, email, profile
+
+- OAuth Grant Type: Implicit grant enabled
+
+- Auth flows: Only 4 boxes checked ✅
+
+- Client secret: Disabled ✅
+
+- Callback + sign-out URLs: Exact CloudFront URL ✅
 
 #### 6️⃣ ✅ FINAL WORKING order-status.html (READY TO USE)
 
