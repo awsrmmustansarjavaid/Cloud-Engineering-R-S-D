@@ -918,10 +918,12 @@ User pool → Sign-in experience → Account recovery
 #### 3️⃣ Disable:
 
 ```
-☐ Phone
+☐ SMS
 ```
 
 Click Save changes
+
+**✔ Now your account recovery matches the lab**
 
 
 ---
