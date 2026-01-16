@@ -1675,10 +1675,7 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
   - ✅ No HTTP 400
 
-  
-
 **👍 This is production-style SPA + Cognito + API Gateway security.**
-
 
 ---
 
