@@ -1747,9 +1747,9 @@ response_type=token
 
 **If missing → Invalid request.**
 
-👉 Save
+**👉 Save changes**
 
-👉 Wait 30–60 seconds
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
 > **✅ This is correct for login with response_type=token.**
 
@@ -1779,9 +1779,9 @@ response_type=token
 
 💡 This is exactly what Cognito needs to allow your front-end response_type=token flow.
 
-👉 Save
+**👉 Save changes**
 
-👉 Wait 30–60 seconds
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
 #### 4️⃣ Check Client Secret
 
@@ -1791,9 +1791,9 @@ response_type=token
 
 > **If the secret is enabled, the browser flow cannot work and will throw “Invalid request”.**
 
-👉 Save
+**👉 Save changes**
 
-👉 Wait 30–60 seconds
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
 #### 5️⃣ Where to COPY your Cognito Domain (exact path)
 
