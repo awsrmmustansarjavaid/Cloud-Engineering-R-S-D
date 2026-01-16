@@ -1055,7 +1055,7 @@ Exit SMS sandbox
 
 - API Gateway + Lambda
 
-### ▶️ Part 2️⃣ Front End Configurations 
+### ▶️ Part 2️⃣ Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
 
 ### ✅ WHAT YOU HAVE DONE (CONFIRMED)
 
@@ -1125,6 +1125,22 @@ Click Create user
 
 > **This confirms Cognito + ALB + Return URL are working.**
 
+#### Flow summary:
+
+- Admin opens the dashboard via ALB URL
+
+- Browser redirects to Cognito Hosted UI login
+
+- After login, Cognito redirects back to order-status.html
+
+- Access Token is stored in browser
+
+- Token is sent to API Gateway (Cognito Authorizer)
+
+- Dashboard loads securely
+
+> **This approach uses OAuth 2.0 Implicit Flow, which is ideal for plain HTML + JavaScript applications hosted on EC2 / Apache.**
+
 #### 1️⃣ Login Page Configuration Tab:
 
 ```
@@ -1132,12 +1148,6 @@ Cognito → User pools → Your user pool → App clients → Your App → Login
 ```
 
 #### 2️⃣ Construct LOGIN URL:
-
-- **Go to Quick setup guide Tab**
-
-- **Select Development Platform:** 
-
-
 
 ```
 https://YOUR_COGNITO_DOMAIN/login
@@ -1152,6 +1162,7 @@ https://YOUR_COGNITO_DOMAIN/login
 ```
 https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
 ```
+
 #### 3️⃣ Test
 
 - Open it in browser.
@@ -1174,9 +1185,7 @@ https://ALB-DNS/order-status.html#id_token=xxxxx&access_token=xxxxx
 
 🎉 THIS MEANS SUCCESS
 
-### 🟢 STEP 3️⃣ — UPDATE order-status.html (TOKEN HANDLING)
-
-> **Now your admin page must read the token.**
+#### 5️⃣ ✅ FINAL WORKING order-status.html (READY TO USE)
 
 #### 1️⃣ Edit file on EC2:
 
@@ -1184,32 +1193,11 @@ https://ALB-DNS/order-status.html#id_token=xxxxx&access_token=xxxxx
 sudo nano /var/www/html/order-status.html
 ```
 
-#### 2️⃣ Add this JavaScript (IMPORTANT):
+#### 1️⃣ Code
 
-```
-<script>
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const idToken = params.get("id_token");
+👉 Copy-paste this FULL file
 
-  if (!idToken) {
-    alert("Unauthorized access. Redirecting to login...");
-    window.location.href = "/login.html";
-  }
-
-  console.log("JWT Token:", idToken);
-</script>
-```
-
-#### 3️⃣ FINAL UPDATED order-status.html (Cognito-Ready)
-
-🔐 Uses Cognito Hosted UI
-
-🔑 Uses ID TOKEN
-
-🛡 Compatible with API Gateway Cognito Authorizer
-
-🚀 Works with ALB HTTPS Return URL
+👉 Replace ONLY the values marked with 🔁 REPLACE
 
 ```
 <!DOCTYPE html>
@@ -1299,26 +1287,33 @@ body {
 
 <script>
 /* ================== CONFIG ================== */
+
+/* 🔁 REPLACE with your Cognito domain (WITHOUT https://) */
 const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
+
+/* 🔁 REPLACE with App Client ID */
 const CLIENT_ID = "YOUR_APP_CLIENT_ID";
-const REDIRECT_URI = window.location.origin + window.location.pathname;
-const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
+
+/* 🔁 REPLACE with your ALB HTTPS URL */
+const REDIRECT_URI = "https://YOUR-ALB-DNS-NAME/order-status.html";
+
+/* 🔁 REPLACE with API Gateway endpoint */
+const API_URL = "https://API_ID.execute-api.REGION.amazonaws.com/STAGE/order-status";
 
 let chart, refreshTimer;
 
 /* ================== AUTH ================== */
 
-// Decode JWT payload
+// Decode JWT
 function parseJwt(token) {
   return JSON.parse(atob(token.split('.')[1]));
 }
 
 function isTokenExpired(token) {
-  const payload = parseJwt(token);
-  return payload.exp * 1000 < Date.now();
+  return parseJwt(token).exp * 1000 < Date.now();
 }
 
-// Redirect to Cognito Hosted UI
+// Redirect to Cognito login
 function login() {
   const loginUrl =
     `https://${COGNITO_DOMAIN}/login` +
@@ -1332,7 +1327,7 @@ function login() {
 
 // Logout
 function logout() {
-  localStorage.removeItem("id_token");
+  localStorage.removeItem("access_token");
   clearInterval(refreshTimer);
 
   const logoutUrl =
@@ -1343,23 +1338,23 @@ function logout() {
   window.location.href = logoutUrl;
 }
 
-// Extract ID token from URL hash
+// Handle redirect from Cognito
 function handleRedirect() {
   const hash = window.location.hash.substring(1);
   if (!hash) return;
 
   const params = new URLSearchParams(hash);
-  const idToken = params.get("id_token");
+  const accessToken = params.get("access_token");
 
-  if (idToken) {
-    localStorage.setItem("id_token", idToken);
+  if (accessToken) {
+    localStorage.setItem("access_token", accessToken);
     window.location.hash = "";
   }
 }
 
 /* ================== DASHBOARD ================== */
 function showDashboard() {
-  const token = localStorage.getItem("id_token");
+  const token = localStorage.getItem("access_token");
 
   if (!token || isTokenExpired(token)) {
     login();
@@ -1375,7 +1370,7 @@ function showDashboard() {
 
 /* ================== DATA ================== */
 function loadData() {
-  const token = localStorage.getItem("id_token");
+  const token = localStorage.getItem("access_token");
   if (!token || isTokenExpired(token)) return logout();
 
   document.getElementById("loader").style.display = "block";
@@ -1388,7 +1383,7 @@ function loadData() {
 
   fetch(url, {
     headers: {
-      Authorization: token
+      Authorization: "Bearer " + token
     }
   })
   .then(res => {
@@ -1442,8 +1437,7 @@ showDashboard();
 </body>
 </html>
 ```
-
-#### 4️⃣ WHAT YOU MUST CHANGE (ONLY 3 VALUES)
+#### 6️⃣ WHAT YOU MUST CHANGE (ONLY 3 VALUES)
 
 #### ✅ Replace these with your real values:
 
@@ -1457,13 +1451,13 @@ Save file.
 
 **✅ Page now captures Cognito token**
 
-#### 5️⃣ Restart Apache (MANDATORY)
+#### 7️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
 
-#### 6️⃣ 🧪 HOW TO TEST
+#### 8️⃣ 🧪 HOW TO TEST
 
 #### 1️⃣ Open:
 
