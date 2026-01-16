@@ -700,13 +700,149 @@ https://ALB-DNS/order-status.html
 
 ### 3️⃣ — CLOUD FRONT
 
-#### Use this ONLY if:
+#### 🧱 STEP 1 — CloudFront Origin (ALB)
 
-- You want caching
+#### Go to:
 
-- CDN
+```
+AWS Console → CloudFront → Create Distribution
+```
 
-- Production-style setup
+#### Origin Settings
+
+| Setting            | Value                                                       |
+| ------------------ | ----------------------------------------------------------- |
+| Origin domain      | **charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com** |
+| Origin type        | **Load Balancer**                                           |
+| Protocol           | HTTPS only                                                  |
+| Minimum origin SSL | TLSv1.2                                                     |
+
+
+✅ This is correct
+
+❌ Do NOT select EC2 IP
+
+❌ Do NOT select S3
+
+#### 🌐 STEP 2 — Default Cache Behavior (VERY IMPORTANT)
+
+#### Viewer Protocol Policy
+
+```
+Redirect HTTP to HTTPS
+```
+
+#### Allowed HTTP Methods
+
+```
+GET, HEAD, OPTIONS
+```
+
+(POST not required for admin page)
+
+#### Cache Policy
+
+```
+CachingDisabled
+```
+
+⚠️ Cognito tokens must NOT be cached
+
+#### Origin Request Policy
+
+```
+AllViewer
+```
+
+#### This ensures:
+
+Authorization headers
+
+Query strings
+
+Cookies
+are forwarded correctly.
+
+#### 🔐 STEP 3 — CloudFront SSL Certificate
+Viewer Certificate
+
+Choose:
+
+```
+Default CloudFront certificate (*.cloudfront.net)
+```
+
+✅ This is fine
+
+✅ HTTPS works automatically
+
+❌ No ACM needed here
+
+#### 🧠 STEP 4 — Do NOT Add Cognito to CloudFront
+
+⚠️ VERY IMPORTANT
+
+Do NOT:
+
+Add Cognito as origin
+
+Add Lambda@Edge auth
+
+Add CloudFront auth rules
+
+Why?
+
+Because:
+
+Cognito Hosted UI already handles auth
+
+Your app handles tokens in JavaScript
+
+Adding auth at CloudFront will BREAK redirects
+
+#### 🚀 STEP 5 — Create Distribution
+
+Click:
+
+```
+Create distribution
+```
+
+Wait until:
+
+```
+Status = Deployed
+```
+
+#### You’ll get:
+
+```
+xxxxx.cloudfront.net
+```
+
+🔁 STEP 6 — Update order-status.html (ONE LINE ONLY)
+Replace ONLY this line:
+
+```
+const REDIRECT_URI = "https://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
+```
+
+#### With CloudFront URL:
+
+```
+const REDIRECT_URI = "https://xxxxx.cloudfront.net/order-status.html";
+```
+
+⚠️ Keep /order-status.html
+
+⚠️ Do NOT use ALB URL anymore in browser
+
+🔐 STEP 7 — Update Cognito Callback URLs (FINAL)
+
+Go to:
+
+
+
 
 
 
