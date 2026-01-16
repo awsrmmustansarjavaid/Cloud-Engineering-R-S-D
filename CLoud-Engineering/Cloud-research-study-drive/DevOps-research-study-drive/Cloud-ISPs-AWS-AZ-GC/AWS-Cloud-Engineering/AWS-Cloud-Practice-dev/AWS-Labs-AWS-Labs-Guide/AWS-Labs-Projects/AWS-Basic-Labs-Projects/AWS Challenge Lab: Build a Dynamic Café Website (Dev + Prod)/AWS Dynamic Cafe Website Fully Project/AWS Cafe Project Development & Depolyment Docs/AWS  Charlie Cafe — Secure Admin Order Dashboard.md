@@ -829,8 +829,72 @@ This ensures:
 CloudFront → ALB → EC2 Apache → order-status.html
 ```
 
+#### 2️⃣ CloudFront Validation (VERY IMPORTANT)
 
+> **After configuration, always validate CloudFront before integrating Cognito.**
 
+#### 🔍 Validation Checklist
+
+#### 1️⃣ Distribution Status
+
+Status must be:
+
+```
+Deployed
+```
+
+**⚠️ If status is In Progress, wait 5–10 minutes.**
+
+#### 2️⃣ Basic Connectivity Test
+
+Open in browser:
+
+```
+https://xxxxx.cloudfront.net/
+```
+
+#### Expected result:
+
+```
+order-status.html loads
+OR
+
+Cafe homepage loads (if root object not set)
+```
+
+#### 3️⃣ Direct File Test
+
+Open:
+
+```
+https://xxxxx.cloudfront.net/order-status.html
+```
+
+#### Expected:
+
+```
+Page loads successfully
+
+No 403 / 504 / timeout errors
+```
+
+#### 4️⃣ Backend Health Verification
+
+If CloudFront fails:
+
+Test ALB directly:
+
+```
+http://ALB-DNS-NAME/order-status.html
+```
+
+#### Ensure:
+
+- ALB target group = Healthy
+
+- EC2 Apache is running
+
+- Security Groups allow ALB → EC2 (port 80)
 
 
 #### 🔐 STEP 4 — CloudFront SSL Certificate (Optional)
