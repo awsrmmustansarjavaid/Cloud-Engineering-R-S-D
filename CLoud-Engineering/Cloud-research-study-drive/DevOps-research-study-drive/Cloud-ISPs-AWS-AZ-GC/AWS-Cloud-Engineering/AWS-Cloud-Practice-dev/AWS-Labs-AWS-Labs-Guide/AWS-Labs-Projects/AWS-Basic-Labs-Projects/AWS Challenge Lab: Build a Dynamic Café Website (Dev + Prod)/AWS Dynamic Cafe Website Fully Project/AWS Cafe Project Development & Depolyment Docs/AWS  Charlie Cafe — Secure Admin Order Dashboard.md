@@ -1475,6 +1475,9 @@ charlie-cafe-admin.auth.us-east-1.amazoncognito.com
 
 ❌ Do NOT include /login
 
+**⚠️ Simple words: Do NOT add https:// inside the variable (your code already adds it)**
+
+
 #### Example:
 
 ```
