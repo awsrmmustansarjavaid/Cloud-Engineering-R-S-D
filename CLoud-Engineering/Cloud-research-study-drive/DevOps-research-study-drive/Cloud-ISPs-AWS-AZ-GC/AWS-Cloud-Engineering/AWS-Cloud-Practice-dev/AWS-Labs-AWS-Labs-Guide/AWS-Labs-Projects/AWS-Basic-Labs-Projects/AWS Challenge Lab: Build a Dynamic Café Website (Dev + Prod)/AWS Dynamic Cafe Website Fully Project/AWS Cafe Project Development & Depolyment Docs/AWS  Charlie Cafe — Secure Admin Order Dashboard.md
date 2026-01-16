@@ -19,7 +19,7 @@ AWS Lambda (Order API)
 Database
 ```
 
-## 🔐 PHASE  0 — PREREQUISITES (CHECK ONLY)
+## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
 
 #### Make sure you already have:
 
@@ -40,7 +40,7 @@ Database
 
 👉 If no, stop here
 
-## 🔐 PHASE 1️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
+## 🔐 PHASE 2️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
 
 #### (ONE FILE ONLY)
 
@@ -363,7 +363,7 @@ rgba(0,0,0,.55)
 
 ---
 
-## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
+## 🔐 PHASE 3️⃣ — Set Up Automatic HTTP → HTTPS Redirection
 
 > **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
@@ -592,7 +592,7 @@ This is your Return URL
 
 ---
 
-## 🔐 PHASE 3️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
+## 🔐 PHASE 4️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
 This phase is used to secure the Admin Order Dashboard of your Charlie Cafe project.
 
@@ -801,7 +801,7 @@ Cognito Login → SUCCESS → redirect to order-status.html
 
 ---
 
-## 🔐 PHASE 3️⃣ — API GATEWAY AUTH 
+## 🔐 PHASE 5️⃣ — API GATEWAY AUTH 
 
 ### 🔹 STEP 3 — SECURE API GATEWAY (MOST IMPORTANT)
 
@@ -868,7 +868,7 @@ API_URL = ".../admin/order-status"
 
 ---
 
-## 🔐 PHASE 4️⃣ — BACKEND DATE FILTER (LAMBDA)
+## 🔐 PHASE 6️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 ### 🎯 What backend does
 
@@ -1060,7 +1060,7 @@ Chart → works
 
 ---
 
-## 🔐 PHASE 5️⃣ PRINTING (FRONTEND ONLY)
+## 🔐 PHASE 7️⃣ PRINTING (FRONTEND ONLY)
 
 ### Already included in frontend:
 
@@ -1074,7 +1074,7 @@ Chart → works
 
 ---
 
-## 🔐 PHASE 6️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
+## 🔐 PHASE 8️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
 
 ```
 User → Login (Cognito)
@@ -1092,7 +1092,7 @@ User → Login (Cognito)
 
 ---
 
-## 🔐 PHASE 7️⃣ — VERIFICATION (DO NOT SKIP)
+## 🔐 PHASE 9️⃣ — VERIFICATION (DO NOT SKIP)
 
 
 ### Test 1 — API Direct (NO LOGIN)
@@ -1144,7 +1144,7 @@ https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
 
 ---
 
-# SECTION 2- 🏷️ Order Status – Advanced Features Guide
+# SECTION 2️⃣- 🏷️ Order Status – Advanced Features Guide
 
 #### Includes:
 
