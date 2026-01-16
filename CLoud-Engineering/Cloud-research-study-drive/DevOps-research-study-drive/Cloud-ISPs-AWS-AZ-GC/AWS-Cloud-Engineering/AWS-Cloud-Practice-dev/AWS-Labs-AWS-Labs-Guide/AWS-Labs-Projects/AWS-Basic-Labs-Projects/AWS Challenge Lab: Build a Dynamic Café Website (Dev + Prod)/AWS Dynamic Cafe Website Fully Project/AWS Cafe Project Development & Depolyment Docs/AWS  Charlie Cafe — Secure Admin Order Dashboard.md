@@ -1107,20 +1107,6 @@ Create user
 
 #### 3️⃣ Fill:
 
-- **Username:** cafeadmin
-
-- **Temporary password:** auto or manual
-
-```
-C@fe@dmin$
-```
-
-- **Email:** your email
-
-- **✔ Mark email as verified**
-
-### Step: Create Admin User in Cognito User Pool
-
 | Setting                  | Value / Recommendation                                 | Notes / Action Required                              |
 |--------------------------|--------------------------------------------------------|------------------------------------------------------|
 | **Username**             | cafeadmin                                              | Use this exact username for consistency (case-sensitive in some flows) |
