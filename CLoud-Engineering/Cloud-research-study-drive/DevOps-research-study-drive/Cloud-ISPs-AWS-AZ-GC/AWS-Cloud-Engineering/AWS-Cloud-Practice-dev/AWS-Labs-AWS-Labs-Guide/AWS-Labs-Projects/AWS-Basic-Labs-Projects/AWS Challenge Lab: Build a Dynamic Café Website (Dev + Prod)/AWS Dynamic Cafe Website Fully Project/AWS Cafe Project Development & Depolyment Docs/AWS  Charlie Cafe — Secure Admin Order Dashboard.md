@@ -484,55 +484,56 @@ EC2 → Load Balancers → Create Load Balancer
 Application Load Balancer
 ```
 
-STEP A2 — BASIC SETTINGS
+#### STEP 2️⃣ — BASIC ALB Configuration
 
-Name: charlie-cafe-alb
 
-Scheme: Internet-facing
+| Setting                  | Value / Selection                                      | Notes / Requirement                          |
+|--------------------------|--------------------------------------------------------|----------------------------------------------|
+| **Name**                 | charlie-cafe-alb                                       | Unique name for your ALB                     |
+| **Scheme**               | Internet-facing                                        | Allows public internet access                |
+| **IP address type**      | IPv4                                                   | Standard for most setups                     |
+| **VPC**                  | Same VPC as your EC2 instance                          | Must match EC2 placement                     |
+| **Subnets**              | Select at least 2 **public** subnets                   | Required for internet-facing ALB; choose different Availability Zones if possible |
+| **Availability Zones**   | At least 2 AZs (where public subnets exist)            | Improves high availability                   |
 
-IP type: IPv4
 
-STEP A3 — NETWORKING
+#### STEP 3️⃣ — SECURITY GROUP
 
-VPC: same as EC2
-
-Subnets: select 2 public subnets
-
-STEP A4 — SECURITY GROUP
-
-Allow:
+#### Allow:
 
 ```
 HTTPS 443  0.0.0.0/0
 ```
 
-STEP A5 — TARGET GROUP
+#### STEP 4️⃣ — TARGET GROUP
 
-Type: Instance
+### Target Group Configuration (for EC2 registration)
 
-Protocol: HTTP
+| Setting                  | Value / Selection                          | Notes / Requirement                                      |
+|--------------------------|--------------------------------------------|----------------------------------------------------------|
+| **Type**                 | Instance                                   | Standard for registering EC2 instances by ID             |
+| **Protocol**             | HTTP                                       | Matches your web server on EC2 (use HTTPS only if EC2 already has SSL) |
+| **Port**                 | 80                                         | Default HTTP port your web server listens on             |
+| **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
+| **Health check path**    | / (or /order-status.html)                  | Path ALB uses to check if instance is healthy            |
 
-Port: 80
+#### STEP 5️⃣ — ADD HTTPS LISTENER
 
-Register your EC2 instance
+### Step A6 — Add HTTPS Listener to ALB
 
-STEP A6 — ADD HTTPS LISTENER
+| Setting                  | Value / Selection                                      | Notes / Requirement                                                                 |
+|--------------------------|--------------------------------------------------------|-------------------------------------------------------------------------------------|
+| **Listener**             | HTTPS : 443                                            | Standard secure port for HTTPS traffic                                              |
+| **Certificate**          | Request or select from ACM (AWS Certificate Manager)   | Must use a valid SSL/TLS certificate; free public certs available via ACM           |
+| **Certificate source**   | ACM                                                    | Recommended – free, auto-renewing certificates                                      |
+| **Domain name (for ACM request)** | Your domain (e.g., charliecafe.com, *.charliecafe.com) | Required to request certificate; can be:<br>• Real domain you own<br>• Wildcard (*.example.com)<br>• Multiple SANs (Subject Alternative Names) |
+| **Validation method**    | DNS validation (preferred) or Email                    | DNS is faster & automatic if using Route 53                                         |
+| **Default action**       | Forward to target group (e.g., cafe-target-group)      | Routes HTTPS traffic to your EC2 instance(s)                                        |
+| **HTTP → HTTPS redirect** | Add separate HTTP:80 listener with redirect rule       | Recommended: Redirect all HTTP traffic to HTTPS                                     |
 
-Listener: HTTPS 443
+**⚠️ ACM is FREE**
 
-Certificate:
-
-Request ACM certificate
-
-Domain can be:
-
-```
-alb-name.region.elb.amazonaws.com
-```
-
-ACM is FREE
-
-STEP A7 — GET ALB DNS NAME
+#### STEP 6️⃣ — GET ALB DNS NAME
 
 Example:
 
@@ -540,7 +541,7 @@ Example:
 https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
 ```
 
-STEP A8 — TEST PAGE
+#### STEP 7️⃣  — TEST PAGE
 
 Open:
 
@@ -550,7 +551,7 @@ https://ALB-DNS/order-status.html
 
 ✅ Works → DONE
 
-STEP A9 — USE THIS IN COGNITO
+#### STEP 8️⃣ — USE THIS IN COGNITO
 
 ```
 https://ALB-DNS/order-status.html
@@ -558,7 +559,7 @@ https://ALB-DNS/order-status.html
 
 This is your Return URL
 
-🟡 OPTION B — CLOUD FRONT (ADVANCED, OPTIONAL)
+### 🟡 OPTION B — CLOUD FRONT (ADVANCED, OPTIONAL)
 
 Use this ONLY if:
 
