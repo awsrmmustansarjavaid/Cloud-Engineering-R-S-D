@@ -1758,6 +1758,17 @@ Make sure these are enabled:
 
 👉 Wait 30–60 seconds
 
+#### 4️⃣ Check Client Secret
+
+- AWS Console → Cognito → User Pools → App clients → click Show details
+
+- Ensure Client secret is Disabled ✅
+
+> **If the secret is enabled, the browser flow cannot work and will throw “Invalid request”.**
+
+👉 Save
+
+👉 Wait 30–60 seconds
 
 #### 5️⃣ Where to COPY your Cognito Domain (exact path)
 
