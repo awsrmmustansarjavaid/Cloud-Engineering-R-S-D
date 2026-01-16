@@ -564,7 +564,15 @@ HTTPS 443  0.0.0.0/0
 | **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
 | **Health check path**    | / (or /order-status.html)                  | Path ALB uses to check if instance is healthy            |
 
-#### STEP 5️⃣ — Add HTTPS Listener to ALB
+#### STEP 5️⃣ — Add Listener to ALB 
+
+#### - Add HTTP listener 
+
+- **Listener:** HTTP 80
+
+- **Target Group:** Select Your Target Group
+
+#### - Add HTTPS listener (Optional)
 
 
 | Setting                  | Value / Selection                                      | Notes / Requirement                                                                 |
