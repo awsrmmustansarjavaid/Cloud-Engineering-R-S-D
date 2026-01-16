@@ -516,7 +516,7 @@ So we must add HTTPS.
 
 You have TWO EASY OPTIONS
 
-### 🟢 OPTION 1️⃣ (EASIEST) — USE ALB (RECOMMENDED)
+### 2️⃣  — USE ALB
 
 > **This is the simplest HTTPS solution.**
 
@@ -698,7 +698,7 @@ https://ALB-DNS/order-status.html
 ✅ Works → DONE
 
 
-### 🟢 OPTION 2️⃣ — CLOUD FRONT (ADVANCED, OPTIONAL)
+### 3️⃣ — CLOUD FRONT
 
 #### Use this ONLY if:
 
