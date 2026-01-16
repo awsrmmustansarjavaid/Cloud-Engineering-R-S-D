@@ -1073,6 +1073,20 @@ Exit SMS sandbox
 
 **👉 Authentication infrastructure is READY**
 
+### 🎯 NOW WHAT IS THE GOAL?
+
+#### For your Café Lab, the remaining goals are:
+
+✔ Admin can log in
+
+✔ Cognito returns a JWT token
+
+✔ Admin dashboard (order-status.html) receives token
+
+✔ API Gateway accepts requests only with valid token
+
+✔ Admin can see orders (RDS / DynamoDB)
+
 
 ---
 
