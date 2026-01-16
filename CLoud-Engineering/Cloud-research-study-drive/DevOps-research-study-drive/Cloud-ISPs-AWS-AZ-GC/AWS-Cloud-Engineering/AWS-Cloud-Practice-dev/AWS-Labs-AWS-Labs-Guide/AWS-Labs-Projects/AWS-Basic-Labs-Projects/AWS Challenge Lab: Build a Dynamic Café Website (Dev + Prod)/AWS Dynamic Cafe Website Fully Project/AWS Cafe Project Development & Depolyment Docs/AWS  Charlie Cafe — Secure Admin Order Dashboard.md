@@ -780,22 +780,49 @@ Cognito Login → SUCCESS → redirect to order-status.html
 
 > **We will do this in the EASIEST possible way first (You can add ALB + CloudFront later)**
 
-
-
 #### Now click the button at bottom-right:
 
 ```
 🟠 Create user directory
 ```
 
+### ✅ STEP 2️⃣ — OPEN THE ACTUAL USER POOL (THIS IS THE MISSING STEP)
 
+> **📢 After creation completes:**
 
+#### Go to:
 
-#### 4️⃣ Continue the wizard
+```
+Amazon Cognito → User pools
+```
 
-→ Finish creating application
+> **You will now see a new User Pool created automatically**
+> **(example name similar to your application)**
 
+#### 👉 CLICK the User Pool name
 
+**⚠️ This is the step everyone misses**
+
+### 🔐 NOW — THIS IS WHERE “STEP 3 — SECURITY” REALLY LIVES
+
+**You are now INSIDE the User Pool, not the app wizard.**
+
+#### 🔐 PASSWORD POLICY (REAL LOCATION)
+
+#### Path:
+
+```
+User pool → Sign-in experience → Security requirements
+```
+
+#### You will see:
+
+🔹 Password policy
+
+✅ Leave default
+(no change needed)
+
+Click Save changes (if enabled)
 
 
 
