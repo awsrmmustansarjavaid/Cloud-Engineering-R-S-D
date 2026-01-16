@@ -1117,7 +1117,7 @@ C@fe@dmin$
 
 - **Email:** your email
 
-✔ Mark email as verified
+- **✔ Mark email as verified**
 
 Click Create user
 
