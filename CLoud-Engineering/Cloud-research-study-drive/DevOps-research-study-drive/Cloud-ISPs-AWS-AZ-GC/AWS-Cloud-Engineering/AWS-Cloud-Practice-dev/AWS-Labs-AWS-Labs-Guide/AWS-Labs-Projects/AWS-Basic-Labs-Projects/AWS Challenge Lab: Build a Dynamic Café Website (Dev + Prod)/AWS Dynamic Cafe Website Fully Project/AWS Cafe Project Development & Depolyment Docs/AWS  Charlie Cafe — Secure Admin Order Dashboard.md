@@ -1234,13 +1234,13 @@ email   ← OK (this is fine)
 #### 4️⃣ Return URL
 
 ```
-https://ALB DNS Name URL/order-status.html
+d2og2zrs47voou.cloudfront.net
 ```
 
 #### For Example:
 
 ```
-https://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html
+https://d2og2zrs47voou.cloudfront.net/order-status.html
 ```
 
 #### 🎯 WHAT “Return URL” REALLY MEANS (IN SIMPLE WORDS)
