@@ -1730,6 +1730,12 @@ OR
 
 ✔ Authorization code grant (optional)
 
+Because you are using:
+
+```
+response_type=token
+```
+
 
 #### 2️⃣ OpenID Connect scopes Settings 
 
@@ -1738,6 +1744,8 @@ OR
 ✔ Email
 
 ✔ Profile
+
+**If missing → Invalid request.**
 
 👉 Save
 
