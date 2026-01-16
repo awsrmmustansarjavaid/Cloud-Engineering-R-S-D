@@ -1125,13 +1125,19 @@ Click Create user
 
 > **This confirms Cognito + ALB + Return URL are working.**
 
-#### 1️⃣ Where:
+#### 1️⃣ Login Page Configuration Tab:
 
 ```
 Cognito → User pools → Your user pool → App clients → Your App → Login pages  
 ```
 
 #### 2️⃣ Construct LOGIN URL:
+
+- **Go to Quick setup guide Tab**
+
+- **Select Development Platform:** 
+
+
 
 ```
 https://YOUR_COGNITO_DOMAIN/login
