@@ -716,6 +716,8 @@ AWS Console → CloudFront → Create Distribution
 
 #### CloudFront Origin Settings (CRITICAL)
 
+>**Go to:** CloudFront → Distributions → Your Distribution → Origins → Edit
+
 > **Set EXACTLY like this:**
 
 | Setting                | Value                                                   |
@@ -735,33 +737,18 @@ AWS Console → CloudFront → Create Distribution
 
 #### 🌐 STEP 2 — Default Cache Behavior (VERY IMPORTANT)
 
-#### Viewer Protocol Policy
+>**Go to:** Behaviors → Default → Edit
 
-```
-Redirect HTTP to HTTPS
-```
 
-#### Allowed HTTP Methods
+| Setting                | Value                  |
+| ---------------------- | ---------------------- |
+| Viewer protocol policy | Redirect HTTP to HTTPS |
+| Allowed HTTP methods   | GET, HEAD, OPTIONS     |
+| Cache policy           | CachingDisabled        |
+| Origin request policy  | AllViewer              |
 
-```
-GET, HEAD, OPTIONS
-```
-
-(POST not required for admin page)
-
-#### Cache Policy
-
-```
-CachingDisabled
-```
 
 ⚠️ Cognito tokens must NOT be cached
-
-#### Origin Request Policy
-
-```
-AllViewer
-```
 
 #### This ensures:
 
