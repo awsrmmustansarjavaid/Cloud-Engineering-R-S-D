@@ -1706,17 +1706,53 @@ https://d2og2zrs47voou.cloudfront.net/order-status.html
 
 **⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
-#### 4️⃣ ✅ OAuth settings
+#### 4️⃣ ✅ OAuth Settings 
 
 Make sure these are enabled:
 
+#### 1️⃣ OAuth 2.0 grant types Settings 
+
 ✔ Authorization code grant OR Implicit grant
+
+#### 2️⃣ OpenID Connect scopes Settings 
 
 ✔ OpenID
 
 ✔ Email
 
 ✔ Profile
+
+👉 Save
+
+👉 Wait 30–60 seconds
+
+> **✅ This is correct for login with response_type=token.**
+
+**Tip:** Only select these 3 scopes for now: openid, email, profile — leave phone optional if not needed.
+
+#### 3️⃣ Check App Client Auth Flows (REFRESH_TOKEN_AUTH)
+
+#### Path in AWS Console :
+
+- AWS Console → Cognito → User Pools → select your pool
+
+- App clients (left menu) → click Show details for your App Client
+
+- Scroll to Authentication flows section
+
+#### You should see exactly these 4 checked boxes:
+
+✔ Choice-based sign-in → ALLOW_USER_AUTH
+
+✔ Sign in with username and password → ALLOW_USER_PASSWORD_AUTH
+
+✔ Sign in with secure remote password (SRP) → ALLOW_USER_SRP_AUTH
+
+✔ Get new user tokens from existing authenticated sessions → ALLOW_REFRESH_TOKEN_AUTH
+
+✅ These 4 are correct. No other boxes should be checked.
+
+💡 This is exactly what Cognito needs to allow your front-end response_type=token flow.
 
 👉 Save
 
