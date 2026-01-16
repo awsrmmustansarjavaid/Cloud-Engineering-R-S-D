@@ -758,6 +758,20 @@ Query strings
 Cookies
 are forwarded correctly.
 
+👉 SAVE
+
+⏳ Wait 5–10 minutes for deployment.
+
+```
+Status = Deployed
+```
+
+#### You’ll get:
+
+```
+xxxxx.cloudfront.net
+```
+
 #### 🔐 STEP 3️⃣ — CloudFront General Configuration
 
 > **This step finalizes the CloudFront distribution behavior and ensures it works correctly with ALB + Cognito Hosted UI without breaking authentication or routing.**
@@ -958,9 +972,7 @@ order-status.html
 
 ✔ Required when testing Cognito changes
 
-
-
-#### 🔐 STEP 4 — CloudFront SSL Certificate (Optional)
+#### 🔐 STEP 4️⃣ — CloudFront SSL Certificate (Optional)
 Viewer Certificate
 
 Choose:
@@ -975,67 +987,8 @@ Default CloudFront certificate (*.cloudfront.net)
 
 ❌ No ACM needed here
 
-#### 🧠 STEP 5 — Do NOT Add Cognito to CloudFront
 
-⚠️ VERY IMPORTANT
-
-Do NOT:
-
-Add Cognito as origin
-
-Add Lambda@Edge auth
-
-Add CloudFront auth rules
-
-Why?
-
-Because:
-
-Cognito Hosted UI already handles auth
-
-Your app handles tokens in JavaScript
-
-Adding auth at CloudFront will BREAK redirects
-
-
-👉 SAVE
-
-⏳ Wait 5–10 minutes for deployment.
-
-Wait until:
-
-```
-Status = Deployed
-```
-
-#### You’ll get:
-
-```
-xxxxx.cloudfront.net
-```
-
-🔁 STEP 6 — Update order-status.html (ONE LINE ONLY)
-Replace ONLY this line:
-
-```
-const REDIRECT_URI = "https://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
-```
-
-#### With CloudFront URL:
-
-```
-const REDIRECT_URI = "https://xxxxx.cloudfront.net/order-status.html";
-```
-
-⚠️ Keep /order-status.html
-
-⚠️ Do NOT use ALB URL anymore in browser
-
-🔐 STEP 7 — Update Cognito Callback URLs (FINAL)
-
-Go to:
-
-#### 2️⃣ CloudFront Validation (VERY IMPORTANT)
+#### 5️⃣ CloudFront Validation (VERY IMPORTANT)
 
 > **After configuration, always validate CloudFront before integrating Cognito.**
 
@@ -1102,7 +1055,13 @@ http://ALB-DNS-NAME/order-status.html
 
 - Security Groups allow ALB → EC2 (port 80)
 
+### 6️⃣ — USE THIS IN COGNITO
 
+```
+d2og2zrs47voou.cloudfront.net
+```
+
+This is your Return URL
 
 #### ✅ FINAL RECOMMENDED PATH
 
@@ -1123,14 +1082,6 @@ http://ALB-DNS-NAME/order-status.html
 - Simple & debuggable
 
 - No unnecessary complexity
-
-### 4️⃣ — USE THIS IN COGNITO
-
-```
-https://ALB-DNS/order-status.html
-```
-
-This is your Return URL
 
 ---
 
