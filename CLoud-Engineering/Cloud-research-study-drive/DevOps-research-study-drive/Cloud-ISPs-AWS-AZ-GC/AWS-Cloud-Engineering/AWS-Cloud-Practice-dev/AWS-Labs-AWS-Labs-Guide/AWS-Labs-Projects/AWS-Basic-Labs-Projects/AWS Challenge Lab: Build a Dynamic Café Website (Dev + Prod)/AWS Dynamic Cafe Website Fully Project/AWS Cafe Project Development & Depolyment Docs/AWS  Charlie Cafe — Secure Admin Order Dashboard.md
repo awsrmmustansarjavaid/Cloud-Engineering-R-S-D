@@ -1724,11 +1724,12 @@ Make sure these are enabled:
 
 #### 1️⃣ OAuth 2.0 grant types Settings 
 
-✔ Authorization code grant 
+✔ Implicit grant (Recommanded)
 
 OR 
 
-✔ Implicit grant (Recommanded)
+✔ Authorization code grant (optional)
+
 
 #### 2️⃣ OpenID Connect scopes Settings 
 
