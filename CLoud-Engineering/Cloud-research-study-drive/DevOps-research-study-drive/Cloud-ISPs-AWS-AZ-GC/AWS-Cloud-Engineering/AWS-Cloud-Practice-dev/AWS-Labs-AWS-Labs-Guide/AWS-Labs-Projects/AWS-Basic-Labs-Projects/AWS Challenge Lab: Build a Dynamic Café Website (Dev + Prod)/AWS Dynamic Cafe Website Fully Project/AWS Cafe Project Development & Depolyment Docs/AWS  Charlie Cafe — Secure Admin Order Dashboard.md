@@ -1055,7 +1055,7 @@ Exit SMS sandbox
 
 - API Gateway + Lambda
 
-### ▶️ Part 2️⃣ CAFÉ LAB SECURITY 
+### ▶️ Part 2️⃣ Front End Configurations 
 
 ### ✅ WHAT YOU HAVE DONE (CONFIRMED)
 
