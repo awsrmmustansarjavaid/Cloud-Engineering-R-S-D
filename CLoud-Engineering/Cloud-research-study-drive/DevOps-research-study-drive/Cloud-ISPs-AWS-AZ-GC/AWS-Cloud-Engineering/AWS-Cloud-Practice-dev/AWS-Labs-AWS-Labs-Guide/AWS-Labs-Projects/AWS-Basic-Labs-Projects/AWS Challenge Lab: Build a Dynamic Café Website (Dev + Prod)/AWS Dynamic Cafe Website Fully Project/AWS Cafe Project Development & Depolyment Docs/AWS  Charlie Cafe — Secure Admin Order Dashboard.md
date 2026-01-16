@@ -1185,7 +1185,106 @@ https://ALB-DNS/order-status.html#id_token=xxxxx&access_token=xxxxx
 
 🎉 THIS MEANS SUCCESS
 
-#### 5️⃣ ✅ FINAL WORKING order-status.html (READY TO USE)
+#### 5️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+
+> **Audio the ❌ HTTP ERROR 400
+
+#### This error happens only for ONE reason in Cognito:
+
+> **The redirect (callback) URL used in the browser does NOT exactly match the Callback URL configured in the App Client***
+
+**🟠 Cognito is extremely strict.**
+
+#### 🔎 What URL is your order-status.html really loaded from?
+
+You said:
+
+- EC2
+
+- Apache
+
+- ALB DNS name
+
+So your real URL is something like:
+
+```
+http://<ALB-DNS-NAME>/order-status.html
+```
+
+Example:
+
+```
+http://charlie-cafe-alb-123456.us-east-1.elb.amazonaws.com/order-status.html
+```
+
+#### 1️⃣ Path (new UI):
+
+```
+Cognito
+→ User pools
+→ Your user pool
+→ App integration
+→ App clients
+→ Click your App Client
+→ Edit
+```
+
+#### 2️⃣ Callback URLs (VERY IMPORTANT)
+
+#### Add EXACTLY:
+
+```
+http://<YOUR-ALB-DNS>/order-status.html
+```
+
+✔ Must match character by character
+
+✔ http vs https must match
+
+✔ trailing slash matters
+
+#### Example:
+
+```
+http://charlie-cafe-alb-123456.us-east-1.elb.amazonaws.com/order-status.html
+```
+
+#### 3️⃣ Sign-out URLs (recommended)
+
+#### Add the same:
+
+```
+http://<YOUR-ALB-DNS>/order-status.html
+```
+
+**👉 Save changes**
+
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
+
+#### 4️⃣ Where to COPY your Cognito Domain (exact path)
+
+You asked this directly, so here is the exact path 👇
+
+#### AWS Console path:
+
+```
+Cognito
+→ User pools
+→ Your user pool
+→ App integration
+→ Domain
+```
+
+#### You will see something like:
+
+```
+Domain:
+us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com
+```
+
+**📌 Copy ONLY this part (no https, no /login)**
+
+#### 6️⃣ ✅ FINAL WORKING order-status.html (READY TO USE)
 
 #### 1️⃣ Edit file on EC2:
 
@@ -1440,52 +1539,37 @@ showDashboard();
 </body>
 </html>
 ```
-#### 6️⃣ WHAT YOU MUST CHANGE (ONLY 3 VALUES)
+#### 7️⃣ Final REQUIRED changes in your order-status.html
 
 #### 1️⃣ Replace these with your real values:
 
 ```
-const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.REGION.amazoncognito.com";
-const CLIENT_ID = "YOUR_CLIENT_ID";
-const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/order-status";
+/* ================== CONFIG ================== */
+
+/* ✅ Cognito Hosted UI domain (WITHOUT https://) */
+const COGNITO_DOMAIN = "us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com";
+
+/* ✅ App Client ID from Cognito → App integration → App clients */
+const CLIENT_ID = "393ld7o96bt7qlv0shp124osh5";
+
+/* ✅ MUST EXACTLY MATCH Cognito Callback URL */
+const REDIRECT_URI =
+  "http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html";
+
+/* ✅ Your real API Gateway endpoint */
+const API_URL =
+  "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+
+let chart, refreshTimer;
 ```
 
-#### 2️⃣ 📍 WHERE TO FIND COGNITO DOMAIN URL (VERY IMPORTANT)
+⚠️ DO NOT change anything else in the file
 
-#### Follow this exact AWS Console path: 
+⚠️ DO NOT add trailing slash
 
-- AWS Console
+⚠️ http vs https must match Cognito exactly
 
-- Amazon Cognito
-
-- User pools
-
-- Click your User Pool name
-
-- Left menu → App integration
-
-- Scroll down to Domain
-
-- **You will see something like:**
-
-```
-charlie-cafe-admin.auth.us-east-1.amazoncognito.com
-```
-
-👉 Copy ONLY this part
-
-❌ Do NOT include https://
-
-❌ Do NOT include /login
-
-**⚠️ Simple words: Do NOT add https:// inside the variable (your code already adds it)**
-
-
-#### Example:
-
-```
-const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
-```
+Your HTML + JS logic is already correct and production-grade ✅
 
 Save file.
 
