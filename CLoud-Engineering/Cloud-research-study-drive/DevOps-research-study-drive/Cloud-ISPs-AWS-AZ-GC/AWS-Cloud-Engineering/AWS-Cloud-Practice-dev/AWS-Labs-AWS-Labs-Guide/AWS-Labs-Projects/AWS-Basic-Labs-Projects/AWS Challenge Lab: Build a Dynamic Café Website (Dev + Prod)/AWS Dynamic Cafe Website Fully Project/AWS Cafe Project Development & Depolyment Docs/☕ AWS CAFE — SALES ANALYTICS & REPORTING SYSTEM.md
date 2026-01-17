@@ -1496,11 +1496,189 @@ Your S3 Bucket
 | Rule description | Generate Order Status PDF daily |
 | Rule type        | **Schedule expression**         |
 
+STEP 5: ADD CRON SCHEDULE
+
+Paste exactly this:
+
+```
+cron(0 0 * * ? *)
+```
+
+Explanation (DO NOT CHANGE):
+
+Runs every day
+
+Time: 00:00 UTC
+
+AWS requires ? in day-of-month or day-of-week
+
+STEP 6: CONFIGURE INPUT (VERY IMPORTANT)
+
+Scroll to Configure input
+
+Select: Constant (JSON text)
+
+Paste EXACT JSON:
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+
+❗ This JSON is mandatory
+❗ Without this, Lambda won’t know which PDF to generate
+
+STEP 7: ADD TRIGGER
+
+Click Add
+
+Trigger appears in Lambda diagram
+
+✅ Daily automation is now ACTIVE
 
 
+#### 2️⃣ TASK 2️⃣: ADD MONTHLY ANALYTICS PDF (USING LAMBDA TRIGGER)
 
-#### 2️⃣ TASK 2️⃣: ADD DAILY ORDER STATUS PDF (USING LAMBDA TRIGGER)
+STEP 1: ADD SECOND TRIGGER
 
+In same Lambda
+
+Click ➕ Add trigger again
+
+STEP 2: SELECT EVENTBRIDGE
+
+Source: EventBridge (CloudWatch Events)
+
+Rule: Create a new rule
+
+STEP 3: CONFIGURE MONTHLY RULE
+
+| Field       | Value                          |
+| ----------- | ------------------------------ |
+| Rule name   | `MonthlyAnalyticsPDF`          |
+| Description | Generate Analytics PDF monthly |
+| Rule type   | Schedule expression            |
+
+
+STEP 4: MONTHLY CRON EXPRESSION
+
+Paste:
+
+```
+cron(0 0 1 * ? *)
+```
+
+Meaning:
+
+Runs on 1st day of every month
+
+At 00:00 UTC
+
+STEP 5: INPUT JSON (VERY IMPORTANT)
+
+Select Constant (JSON text) and paste:
+
+```
+{
+  "queryStringParameters": {
+    "page": "analytics"
+  }
+}
+```
+
+STEP 6: ADD TRIGGER
+
+Click Add
+
+Now Lambda has TWO triggers
+
+🔹 TASK 3: VERIFY TRIGGERS ARE ATTACHED
+
+In Lambda Function overview, you should see:
+
+```
+EventBridge (DailyOrderPDF)
+EventBridge (MonthlyAnalyticsPDF)
+```
+
+If both appear → ✅ SUCCESS
+
+🔹 TASK 4: TEST TRIGGER WITHOUT WAITING
+TEMPORARY FAST TEST (OPTIONAL BUT RECOMMENDED)
+
+Click one trigger name (e.g. DailyOrderPDF)
+
+Click Edit
+
+Change schedule to:
+
+```
+rate(1 minute)
+```
+
+Save
+
+Wait 1 minute
+
+Check S3 bucket
+
+📄 New PDF appears → Automation works
+
+After testing, change back to cron.
+
+🔹 TASK 5: VERIFY OUTPUT
+Check S3
+
+Bucket: cafe-reports
+
+Files should look like:
+
+```
+order-status_report_2026-01-17.pdf
+analytics_report_2026-01-01.pdf
+```
+
+🔹 TASK 6: CLOUDWATCH LOG VERIFICATION
+
+Lambda → Monitor
+
+Click View logs in CloudWatch
+
+Open latest log stream
+
+You should see:
+
+```
+PDF generated successfully
+Uploaded to S3: cafe-reports
+```
+
+#### ✅ FINAL CONFIRMATION CHECKLIST
+
+| Item                           | Status |
+| ------------------------------ | ------ |
+| Lambda manual test             | ✅      |
+| Daily EventBridge trigger      | ✅      |
+| Monthly EventBridge trigger    | ✅      |
+| Correct JSON input             | ✅      |
+| PDF stored in S3               | ✅      |
+| No UI EventBridge setup needed | ✅      |
+
+
+#### 🎯 WHY THIS METHOD IS BETTER
+
+✔ Faster
+
+✔ Less mistakes
+
+✔ IAM auto-permission
+
+✔ Cleaner setup
+
+✔ Same result as EventBridge console
 
 
 ### 3️⃣ METHOD 2- EVENTBRIDGE
