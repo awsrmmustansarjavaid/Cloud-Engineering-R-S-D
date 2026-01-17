@@ -390,45 +390,52 @@ CloudWatchLogsFullAccess
 
 ✅ With this → Lambda can read DynamoDB + write logs
 
-#### 3️⃣ DEPLOY CODE
+### 2️⃣ DEPLOY CODE
 
-**FULL PYTHON CODE (COPY-PASTE)**
+**FULL CafeAnalyticsLambda PYTHON CODE (COPY-PASTE)**
 
 ```
+import os
 import json
 import boto3
 from datetime import datetime, timedelta
-from decimal import Decimal
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('CafeOrders')
+# =======================
+# ENVIRONMENT VARIABLE
+# =======================
+# REPLACE VALUE IN LAMBDA ENV VARIABLES (NOT HERE)
+ORDERS_TABLE_NAME = os.environ.get("ORDERS_TABLE_NAME")
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(ORDERS_TABLE_NAME)
 
 def lambda_handler(event, context):
-    period = event['queryStringParameters']['period']
+
+    period = event.get("queryStringParameters", {}).get("period")
     today = datetime.utcnow().date()
 
-    if period == 'today':
+    if period == "today":
         start = end = today
-    elif period == 'week':
+    elif period == "week":
         start = today - timedelta(days=7)
         end = today
-    elif period == 'month':
+    elif period == "month":
         start = today.replace(day=1)
         end = today
     else:
-        return response(400, "Invalid period")
+        return response(400, {"message": "Invalid period"})
 
     orders = table.query(
-        IndexName='order_date-index',
-        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        IndexName="order_date-index",
+        KeyConditionExpression="order_date BETWEEN :s AND :e",
         ExpressionAttributeValues={
-            ':s': str(start),
-            ':e': str(end)
+            ":s": str(start),
+            ":e": str(end)
         }
-    )['Items']
+    ).get("Items", [])
 
-    total_sales = sum(float(o['total_amount']) for o in orders)
-    total_cost = sum(float(o['total_cost']) for o in orders)
+    total_sales = sum(float(o.get("total_amount", 0)) for o in orders)
+    total_cost = sum(float(o.get("total_cost", 0)) for o in orders)
     profit = total_sales - total_cost
 
     return response(200, {
@@ -442,13 +449,21 @@ def response(code, body):
     return {
         "statusCode": code,
         "headers": {
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json"
         },
         "body": json.dumps(body)
     }
 ```
 
-#### 3️⃣ CREATE TEST EVENT
+### 3️⃣ 🔐 Environment Variable Required
+
+| Variable            | Example      |
+| ------------------- | ------------ |
+| `ORDERS_TABLE_NAME` | `CafeOrders` |
+
+
+### 4️⃣ CREATE TEST EVENT
 
 ❌ “Empty event” is ONLY for health check
 

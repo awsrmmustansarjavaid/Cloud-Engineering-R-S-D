@@ -3589,6 +3589,61 @@ def lambda_handler(event, context):
     }
 ```
 
+**FULL CafeAnalyticsLambda PYTHON CODE (COPY-PASTE)**
+
+```
+import json
+import boto3
+from datetime import datetime, timedelta
+from decimal import Decimal
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    period = event['queryStringParameters']['period']
+    today = datetime.utcnow().date()
+
+    if period == 'today':
+        start = end = today
+    elif period == 'week':
+        start = today - timedelta(days=7)
+        end = today
+    elif period == 'month':
+        start = today.replace(day=1)
+        end = today
+    else:
+        return response(400, "Invalid period")
+
+    orders = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': str(start),
+            ':e': str(end)
+        }
+    )['Items']
+
+    total_sales = sum(float(o['total_amount']) for o in orders)
+    total_cost = sum(float(o['total_cost']) for o in orders)
+    profit = total_sales - total_cost
+
+    return response(200, {
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "profit": profit,
+        "orders_count": len(orders)
+    })
+
+def response(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps(body)
+    }
+```
 
 
 ----
