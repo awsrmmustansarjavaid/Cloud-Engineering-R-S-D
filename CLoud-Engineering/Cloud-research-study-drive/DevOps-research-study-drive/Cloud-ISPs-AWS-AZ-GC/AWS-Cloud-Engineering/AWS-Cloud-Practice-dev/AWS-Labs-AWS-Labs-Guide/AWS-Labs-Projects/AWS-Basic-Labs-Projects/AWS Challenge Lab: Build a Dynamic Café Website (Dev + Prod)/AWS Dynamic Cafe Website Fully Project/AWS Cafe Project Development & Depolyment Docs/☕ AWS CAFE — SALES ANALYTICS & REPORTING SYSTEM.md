@@ -1139,7 +1139,7 @@ Runtime: Python 3.10
 
 ###  3️⃣ DEPLOY EXISTING PDF CODE
 
-> **UPDATED FULL PYTHON CODE (PDF for BOTH PAGES)**
+#### 1️⃣ UPDATED FULL PYTHON CODE (PDF for BOTH PAGES)
 
 ```
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image, Spacer
@@ -1274,6 +1274,45 @@ def lambda_handler(event, context):
         "isBase64Encoded": False
     }
 ```
+
+#### 2️⃣ TESTING THE PDF LAMBDA
+
+- **Go to AWS Console → Lambda → CafePDFReportLambda.**
+
+- Click “Test” button on top-right.
+
+- If you haven’t created a test event yet, it will ask you to configure a new test event.
+
+#### 1️⃣ Create Test Event
+
+- **Event Name:** TestAnalyticsPDF
+
+- **Event JSON:**
+
+#### 1️⃣ To test Analytics PDF:
+
+```
+{
+  "queryStringParameters": {
+    "page": "analytics"
+  }
+}
+```
+
+#### 2️⃣ To test Order Status PDF:
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+
+> **Explanation: queryStringParameters.page is how our Lambda knows which page to generate.**
+
+- **Click “Create”.**
+
 
 
 
