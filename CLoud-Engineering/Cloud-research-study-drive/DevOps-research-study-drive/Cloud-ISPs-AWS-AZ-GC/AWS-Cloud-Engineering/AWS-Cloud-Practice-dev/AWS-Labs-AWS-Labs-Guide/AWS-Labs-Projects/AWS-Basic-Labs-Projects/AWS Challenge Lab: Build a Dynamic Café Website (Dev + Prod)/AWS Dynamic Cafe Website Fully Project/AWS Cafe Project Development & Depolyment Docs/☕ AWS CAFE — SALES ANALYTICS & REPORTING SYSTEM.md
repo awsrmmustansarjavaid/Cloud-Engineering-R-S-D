@@ -2972,22 +2972,21 @@ It MUST contain ALL attributes below:
   "order_status": "COMPLETED"
 }
 ```
+❌ If ANY field is missing → fix order-creation Lambda first
+
+✔ Do NOT continue until this is correct
+
+### 2️⃣ – VERIFY GSI WORKS (NO CODE YET)
+
+#### 1️⃣ Test GSI in Console
+
+- DynamoDB → Explore table items
+
+- Switch Query
+
+- Select index:
 
 
-#### Every order item MUST contain:
-
-```
-{
-  "order_id": "ORD123",
-  "order_date": "2026-01-17",
-  "order_timestamp": 1705488000,
-  "item_name": "Latte",
-  "quantity": 2,
-  "item_cost": 1.5,
-  "item_price": 3.0,
-  "order_status": "COMPLETED"
-}
-```
 
 ### 2️⃣  Analytics Lambda – FINAL RESPONSE FORMAT (STRICT)
 
