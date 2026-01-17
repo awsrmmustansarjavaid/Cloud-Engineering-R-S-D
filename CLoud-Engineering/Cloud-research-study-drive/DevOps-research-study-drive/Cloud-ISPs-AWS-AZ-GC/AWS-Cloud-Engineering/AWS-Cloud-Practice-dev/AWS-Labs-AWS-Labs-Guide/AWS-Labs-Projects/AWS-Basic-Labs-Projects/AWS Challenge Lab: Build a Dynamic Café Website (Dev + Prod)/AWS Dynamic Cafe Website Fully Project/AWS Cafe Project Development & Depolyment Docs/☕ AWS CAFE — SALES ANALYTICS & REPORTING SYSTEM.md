@@ -132,11 +132,11 @@ CafeOrders
 
 **❌ If any attribute is missing, STOP and fix order-saving logic first.**
 
-
-
 ---
 
 ### 3️⃣ – ADD ADD GLOBAL SECONDARY INDEX (GSI - VERY IMPORTANT)
+
+> **This step enables date-range queries (today / week / month).**
 
 #### 1️⃣ Go to Indexes Tab
 
@@ -146,7 +146,7 @@ AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 
 #### 2️⃣ Create Global Secondary Index
 
-#### 1️⃣ Configure Index EXACTLY
+#### Configure Index EXACTLY:
 
 | Setting       | Value                    |
 | ------------- | ------------------------ |
@@ -155,9 +155,11 @@ AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 | Sort key      | order_timestamp (Number) |
 | Projection    | ALL                      |
 
-#### 2️⃣ Create Index
+- **Create Index**
 
-⏳ Wait until status = ACTIVE
+⏳ Wait until Index status = ACTIVE
+
+⚠️ Do not continue until ACTIVE.
 
 ❌ Do not deploy Lambda before this
 
