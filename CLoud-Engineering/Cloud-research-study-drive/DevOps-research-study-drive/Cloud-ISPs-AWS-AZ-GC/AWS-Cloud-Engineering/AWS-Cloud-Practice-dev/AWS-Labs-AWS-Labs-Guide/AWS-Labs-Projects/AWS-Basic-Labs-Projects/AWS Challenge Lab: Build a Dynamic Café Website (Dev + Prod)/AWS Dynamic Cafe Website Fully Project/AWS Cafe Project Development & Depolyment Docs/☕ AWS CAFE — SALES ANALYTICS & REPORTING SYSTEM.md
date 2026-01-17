@@ -889,7 +889,13 @@ period=today|week|month
 
 ## PHASE 4️⃣  BOOTSTRAP ANALYTICS UI
 
-### 1️⃣ analytics.html (FULL CODE)
+### 1️⃣ Create analytics.html
+
+```
+sudo nano /var/www/html/analytics.html
+```
+
+### 2️⃣ analytics.html (FULL CODE)
 
 
 
@@ -1074,6 +1080,24 @@ function downloadPDF(){
 </body>
 </html>
 ```
+
+### 3️⃣ File PERMISSIONS (MANDATORY)
+
+```
+sudo chown -R apache:apache /var/www
+```
+
+```
+sudo chmod -R 755 /var/www
+```
+
+
+### 4️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
 
 **✅ PHASE 4 STATUS**
 
