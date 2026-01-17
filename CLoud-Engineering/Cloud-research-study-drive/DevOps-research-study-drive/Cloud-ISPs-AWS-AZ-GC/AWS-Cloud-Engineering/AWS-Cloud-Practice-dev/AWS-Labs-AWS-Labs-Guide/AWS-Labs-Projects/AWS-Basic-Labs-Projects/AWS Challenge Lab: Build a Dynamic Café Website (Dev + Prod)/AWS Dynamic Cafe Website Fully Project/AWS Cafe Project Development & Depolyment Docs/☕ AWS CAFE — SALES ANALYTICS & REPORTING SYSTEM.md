@@ -1812,6 +1812,11 @@ showDashboard();
 </html>
 ```
 
+### 2️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
 
 ---
 
