@@ -1119,7 +1119,7 @@ Runtime: Python 3.10
 
 - **Lambda → Layers → Create layer**
 
-- **Upload reportlab.zip**
+- **Upload reportlab.zip** (contains reportlab library)
 
 - **Attach layer to:** CafePDFReportLambda
 
@@ -1128,6 +1128,14 @@ Runtime: Python 3.10
     - **Attach IAM policy:**
 
         - **AmazonS3FullAccess**
+
+        - **CloudWatchLogsFullAccess**
+
+        - **AmazonDynamoDBReadOnlyAccess**
+
+** ⚠️ if you want to pull real data from DynamoDB**
+
+
 
 ###  3️⃣ DEPLOY EXISTING PDF CODE
 
