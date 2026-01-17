@@ -1506,8 +1506,6 @@ Click Next
 | ?     | day of week |
 | *     | every year  |
 
-
-
 **⚠️ You can adjust hour/minute for your timezone**
 
 ### 3️⃣ Add Target
@@ -1530,21 +1528,49 @@ Click Next
 
 - **Click Create → EventBridge rule now triggers Lambda daily.**
 
-### 4️⃣ Add Target
+### 4️⃣ Create Monthly Analytics Trigger
 
+- Same as above, but:
 
+- **Name:** MonthlyAnalyticsPDF
 
-### 1️⃣ Rule
+- **Cron for 1st of month at midnight:**
 
 ```
 cron(0 0 1 * ? *)
 ```
 
-### 2️⃣ Target
+#### Input JSON:
 
 ```
-CafePDFReportLambda
+{
+  "queryStringParameters": {
+    "page": "analytics"
+  }
+}
 ```
+
+### 5️⃣ Test EventBridge Trigger
+
+- In EventBridge → click your rule → Select Targets → Test
+
+- Lambda should generate PDF immediately
+
+- Check S3 bucket → new PDF uploaded
+
+### 6️⃣ Confirm Lambda & EventBridge
+
+- Test in Lambda console → works ✅
+
+- EventBridge trigger → works ✅
+
+- PDFs in S3 → accessible ✅
+
+- Both page types supported (analytics & order-status) ✅
+
+### 💡 Tip:For testing purposes, you can temporarily set EventBridge cron to rate(1 minute) to quickly see PDFs being generated before switching to daily/monthly schedules.
+
+
 
 **✅ PHASE 7 STATUS**
 
