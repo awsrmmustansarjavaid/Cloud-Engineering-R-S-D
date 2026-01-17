@@ -3648,13 +3648,197 @@ total_cost = 3.0
 
 ## PHASE 1️⃣1️⃣  PROFIT PER ITEM (ALREADY INCLUDED)
 
-✔ Calculated in Analytics Lambda
+### 🎯 PHASE 11 GOAL (CLEAR)
 
-✔ Returned as profit_per_item[]
+You want to:
 
-✔ Can be rendered in UI or PDF
+✔ Calculate profit per item
 
-No additional configuration needed.
+✔ Use existing CafeOrders table
+
+✔ Do calculation in Analytics Lambda only
+
+✔ Return structured JSON
+
+✔ Use same data for UI + PDF
+
+✔ Test this phase before moving on
+
+### 1️⃣ PREREQUISITE CHECK (DO NOT SKIP)
+
+#### 1️⃣ – Verify DynamoDB Order Item Structure
+
+- Open DynamoDB → Tables → CafeOrders → Explore table
+
+- Confirm EACH ORDER ITEM contains ALL of these attributes:
+
+```
+order_id        (String)
+order_date      (String)   e.g. "2026-01-17"
+order_timestamp (Number)
+item_name       (String)
+quantity        (Number)
+item_price      (Number)   ← selling price
+item_cost       (Number)   ← base cost
+order_status    (String)   ← COMPLETED
+```
+
+❌ If item_cost does NOT exist → STOP
+
+✔ Fix order-processing Lambda FIRST
+
+#### 2️⃣ – Verify Only COMPLETED Orders Are Counted
+
+- **Profit must NOT include:**
+
+```
+PENDING
+CANCELLED
+FAILED
+```
+
+#### Confirm in DynamoDB that:
+
+```
+order_status = "COMPLETED"
+```
+
+### 2️⃣ – PROFIT CALCULATION LOGIC (CLEAR MATH)
+
+#### For each order item:
+
+```
+item_sales = item_price × quantity
+item_cost  = item_cost × quantity
+item_profit = item_sales - item_cost
+```
+
+**📢 For same item_name, values must be aggregated.**
+
+### 3️⃣ – MODIFY ANALYTICS LAMBDA (EXACT LOCATION)
+
+- **Open CafeAnalyticsLambda**
+
+#### 🔍 Find this line:
+
+```
+result = table.query(...)
+```
+
+**📢 This returns raw orders**
+
+#### 1️⃣ – Add Aggregation Containers (DO NOT SKIP)
+
+#### Add ABOVE the loop:
+
+```
+from collections import defaultdict
+
+item_stats = defaultdict(lambda: {
+    "quantity": 0,
+    "sales": 0,
+    "cost": 0
+})
+```
+
+#### 2️⃣ Loop Through Orders (EXACT CODE)
+
+Replace / update your loop:
+
+```
+for o in result:
+    if o['order_status'] != 'COMPLETED':
+        continue
+
+    qty = int(o['quantity'])
+    sale = float(o['item_price']) * qty
+    cost = float(o['item_cost']) * qty
+
+    item = o['item_name']
+
+    item_stats[item]["quantity"] += qty
+    item_stats[item]["sales"] += sale
+    item_stats[item]["cost"] += cost
+```
+
+#### 3️⃣ Build profit_per_item Array
+
+Add AFTER the loop:
+
+```
+profit_per_item = []
+
+for item, data in item_stats.items():
+    profit_per_item.append({
+        "item": item,
+        "quantity": data["quantity"],
+        "sales": data["sales"],
+        "cost": data["cost"],
+        "profit": data["sales"] - data["cost"]
+    })
+```
+
+#### 4️⃣ Add to Lambda Response (MANDATORY)
+
+Update response body:
+
+```
+return response(200, {
+    "period": period,
+    "total_sales": total_sales,
+    "total_cost": total_cost,
+    "profit": total_sales - total_cost,
+    "orders_count": len(result),
+    "profit_per_item": profit_per_item
+})
+```
+
+### 4️⃣ TEST PHASE 11 (DO NOT CONTINUE WITHOUT THIS)
+
+#### 1️⃣ – Lambda Test Event
+
+In Lambda → Test, use:
+
+```
+{
+  "queryStringParameters": {
+    "period": "month"
+  }
+}
+```
+
+#### 2️⃣ – VERIFY RESPONSE (STRICT)
+
+Response MUST include:
+
+```
+"profit_per_item": [
+  {
+    "item": "Latte",
+    "quantity": 12,
+    "sales": 36,
+    "cost": 18,
+    "profit": 18
+  }
+]
+```
+
+❌ Missing field = STOP
+
+❌ Wrong math = STOP
+
+### ✅ PHASE 11 COMPLETION CHECKLIST
+
+✔ DynamoDB has item_cost
+
+✔ Lambda aggregates correctly
+
+✔ profit_per_item returned
+
+✔ Math verified manually
+
+✔ No UI used yet (backend verified first)
+
 
 **✅ PHASE 11 STATUS**
 
