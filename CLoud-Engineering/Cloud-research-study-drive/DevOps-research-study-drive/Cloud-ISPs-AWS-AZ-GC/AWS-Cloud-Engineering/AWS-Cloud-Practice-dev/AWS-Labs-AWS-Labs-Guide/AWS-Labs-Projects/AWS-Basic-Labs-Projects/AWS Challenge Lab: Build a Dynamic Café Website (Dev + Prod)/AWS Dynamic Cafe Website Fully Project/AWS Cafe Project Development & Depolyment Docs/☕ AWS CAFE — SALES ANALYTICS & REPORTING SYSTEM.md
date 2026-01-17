@@ -161,6 +161,22 @@ AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 
 ❌ Do not deploy Lambda before this
 
+### WHY THIS INDEX WORKS (MENTAL MODEL)
+
+- **order_date → filters day ranges**
+
+- **order_timestamp → sorts results chronologically**
+
+- BETWEEN start_date AND end_date → enables:
+
+    - Today
+
+    - Last 7 days
+
+    - Month to date
+
+This avoids full table scans (very important).
+
 #### 3️⃣ TEST INDEX (VERY IMPORTANT)
 
 #### Use DynamoDB PartiQL Editor
