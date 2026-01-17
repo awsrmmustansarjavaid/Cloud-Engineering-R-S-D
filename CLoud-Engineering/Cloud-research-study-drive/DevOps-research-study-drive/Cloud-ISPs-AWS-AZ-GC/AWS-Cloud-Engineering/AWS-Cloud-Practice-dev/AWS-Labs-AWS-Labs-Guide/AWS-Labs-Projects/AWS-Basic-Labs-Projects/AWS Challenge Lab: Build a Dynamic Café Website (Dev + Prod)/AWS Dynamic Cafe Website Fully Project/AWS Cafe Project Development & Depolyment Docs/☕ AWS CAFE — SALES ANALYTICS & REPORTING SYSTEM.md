@@ -92,24 +92,32 @@ CafeOrders
 
 ---
 
-### 2️⃣ – ADD GSI (VERY IMPORTANT)
+### 3️⃣ – ADD ADD GLOBAL SECONDARY INDEX (GSI - VERY IMPORTANT)
 
-#### Create Global Secondary Index
-
-#### 1️⃣ Index Name: 
+#### 1️⃣ Go to Indexes Tab
 
 ```
-order_date-index
+AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 ```
-#### 2️⃣ Index Configurations: 
 
-| Field         | Value                    |
+#### 2️⃣ Create Global Secondary Index
+
+#### 1️⃣ Configure Index EXACTLY
+
+| Setting       | Value                    |
 | ------------- | ------------------------ |
-| Partition Key | order_date (String)      |
-| Sort Key      | order_timestamp (Number) |
+| Index name    | order_date-index         |
+| Partition key | order_date (String)      |
+| Sort key      | order_timestamp (Number) |
 | Projection    | ALL                      |
 
-**👉 AWS Console → DynamoDB → Indexes → Create index**
+#### 2️⃣ Create Index
+
+⏳ Wait until status = ACTIVE
+
+❌ Do not deploy Lambda before this
+
+
 
 ---
 
