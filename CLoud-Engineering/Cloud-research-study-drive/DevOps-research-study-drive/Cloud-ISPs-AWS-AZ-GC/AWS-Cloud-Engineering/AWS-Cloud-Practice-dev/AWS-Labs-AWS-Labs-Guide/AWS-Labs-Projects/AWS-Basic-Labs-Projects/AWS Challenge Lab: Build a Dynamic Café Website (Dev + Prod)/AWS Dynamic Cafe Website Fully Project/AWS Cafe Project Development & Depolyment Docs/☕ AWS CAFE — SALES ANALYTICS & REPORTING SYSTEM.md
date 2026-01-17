@@ -229,3 +229,175 @@ period=today|week|month
 ## PHASE 3️⃣  BOOTSTRAP ANALYTICS UI
 
 ### 1️⃣ analytics.html (FULL CODE)
+
+
+
+```
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cafe Analytics</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+  <h3 class="mb-4">📊 Sales Analytics</h3>
+
+  <select id="period" class="form-select mb-3">
+    <option value="today">Today</option>
+    <option value="week">Last 7 Days</option>
+    <option value="month">This Month</option>
+  </select>
+
+  <button class="btn btn-primary mb-3" onclick="loadData()">Load Data</button>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card p-3">Sales: <span id="sales"></span></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">Cost: <span id="cost"></span></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">Profit: <span id="profit"></span></div>
+    </div>
+  </div>
+
+  <canvas id="chart" class="mt-4"></canvas>
+
+  <button class="btn btn-success mt-4" onclick="downloadPDF()">📄 Download PDF</button>
+</div>
+
+<script>
+function loadData(){
+  const period = document.getElementById('period').value;
+  fetch(`https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=${period}`)
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('sales').innerText = data.total_sales;
+    document.getElementById('cost').innerText = data.total_cost;
+    document.getElementById('profit').innerText = data.profit;
+  });
+}
+
+function downloadPDF(){
+  window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf");
+}
+</script>
+
+</body>
+</html>
+```
+
+---
+
+## PHASE 4️⃣  PDF GENERATION LAMBDA (REPORTLAB)
+
+### Create Cafe PDF Report Lambda
+
+####  1️⃣ Lambda Name
+
+```
+CafePDFReportLambda
+```
+
+####  1️⃣ Add Layer
+
+```
+reportlab
+```
+
+####  1️⃣ FULL PYTHON CODE
+
+```
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+import boto3
+import io
+import datetime
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(50, 800, "Cafe Monthly Sales Report")
+
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(50, 770, f"Generated: {datetime.date.today()}")
+
+    pdf.drawString(50, 740, "Total Sales: 12000")
+    pdf.drawString(50, 720, "Total Cost: 8000")
+    pdf.drawString(50, 700, "Profit: 4000")
+
+    pdf.showPage()
+    pdf.save()
+
+    buffer.seek(0)
+
+    s3.put_object(
+        Bucket='cafe-reports',
+        Key='monthly_report.pdf',
+        Body=buffer.getvalue()
+    )
+
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/pdf"},
+        "body": buffer.getvalue().decode('latin1'),
+        "isBase64Encoded": False
+    }
+```
+
+---
+
+
+## PHASE 5️⃣  CONNECT PDF BUTTON WITH API
+
+🔹 API Gateway
+
+```
+/report/pdf
+POST → CafePDFReportLambda
+```
+
+No frontend change needed except button URL.
+
+---
+
+## PHASE 5️⃣  MONTHLY AUTO REPORT (EVENTBRIDGE)
+
+🔹 Rule
+
+```
+cron(0 0 1 * ? *)
+```
+
+🔹 Target
+
+```
+CafePDFReportLambda
+```
+
+---
+
+## PHASE 5️⃣  ORDER STATUS PAGE CHANGES
+
+✅ MINIMAL CHANGE ONLY
+
+| Area     | Change               |
+| -------- | -------------------- |
+| Frontend | Add Analytics button |
+| Backend  | NONE                 |
+| DB       | NONE                 |
+
+✅ You DO NOT duplicate system
+
+✅ You USE existing Order Status system
+
+
+
