@@ -1538,69 +1538,69 @@ You are now on POST – Setup page
 | Lambda function          | CafePDFReportLambda |
 | Use default timeout      | ✅                   |
 
-⚠️ Region must match Lambda region
+**⚠️ Region must match Lambda region**
 
-#### 1️⃣ Click Save
+#### 2️⃣ Click Save
 
 If AWS asks permission:
 
-“Allow API Gateway to invoke Lambda?”
+> **“Allow API Gateway to invoke Lambda?”**
 
-✔️ Click OK
+- ✔️ Click OK
 
 #### 6️⃣ – ENABLE CORS (DO NOT MISS)
 
-Select /report/pdf
+- Select /report/pdf
 
-Click Enable CORS
+- Click Enable CORS
 
-In popup:
+- **In popup:**
 
-Leave default values
+    - Leave default values
 
-Click Enable CORS and replace existing CORS headers
+- Click Enable CORS and replace existing CORS headers
 
-Click Yes, replace existing values
+- Click Yes, replace existing values
 
-✅ CORS headers added
+**✅ CORS headers added**
 
 #### 7️⃣ – DEPLOY API (MANDATORY)
 
 If you skip this → NOTHING WILL WORK
 
-Click Deploy API
+- Click Deploy API
 
-Deployment stage:
+- **Deployment stage:**
 
-Choose existing stage (example: prod)
+    - **Choose existing stage (example: prod)**
 
-Click Deploy
+- Click Deploy
 
 #### 8️⃣ – COPY FINAL PDF API URL
 
-After deploy, copy this:
+#### After deploy, copy this:
 
 ```
 https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf
 ```
 
-✏️ Replace:
+#### ✏️ Replace:
 
-API_ID
+- API_ID
 
-REGION
+- REGION
 
 SAVE THIS URL – you will use it in frontend
 
 #### 9️⃣ – UNDERSTAND page QUERY PARAMETER (VERY IMPORTANT)
 
-Your Lambda reads:
+#### Your Lambda reads:
 
 ```
 event.queryStringParameters.page
 ```
 
-So API expects:
+#### So API expects:
 
 | Page         | URL                  |
 | ------------ | -------------------- |
@@ -1609,9 +1609,10 @@ So API expects:
 
 
 #### 🔟 – TEST API WITHOUT FRONTEND (DO THIS FIRST)
-10.1 Test from Browser (FASTEST)
 
-Paste in browser:
+#### 1️⃣ Test from Browser (FASTEST)
+
+- **Paste in browser:**
 
 ```
 https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=analytics
@@ -1619,19 +1620,19 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=analytics
 
 #### EXPECTED RESULT:
 
-Browser downloads OR opens PDF
+- Browser downloads OR opens PDF
 
-Lambda logs show SUCCESS
+- Lambda logs show SUCCESS
 
-S3 bucket contains:
+- S3 bucket contains:
 
-```
-analytics_report_YYYY-MM-DD.pdf
-```
+    ```
+    analytics_report_YYYY-MM-DD.pdf
+    ```
 
-10.2 Test Order Status PDF
+#### 1️⃣ Test Order Status PDF
 
-Paste:
+- **Paste:**
 
 ```
 https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-status
