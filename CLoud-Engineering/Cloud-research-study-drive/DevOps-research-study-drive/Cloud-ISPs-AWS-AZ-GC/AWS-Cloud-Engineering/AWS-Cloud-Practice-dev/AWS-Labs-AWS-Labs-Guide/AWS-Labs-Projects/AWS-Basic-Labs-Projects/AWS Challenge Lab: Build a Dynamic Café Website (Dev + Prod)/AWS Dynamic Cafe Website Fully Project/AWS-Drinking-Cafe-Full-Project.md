@@ -1438,10 +1438,12 @@ def lambda_handler(event, context):
 [AWS  Charlie Cafe — Secure Admin Order Dashboard](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20%20Charlie%20Cafe%20—%20Secure%20Admin%20Order%20Dashboard.md)
 
 ---
-# 📢 SECTION 8 — AWS CAFE SECURITY
 
 
-[AWS CAFE SECURITY](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCAFESECURITY.md)
+# 📢 SECTION 8 — CAFE LAB – SALES ANALYTICS & REPORTING SYSTEM
+
+
+[CAFE LAB – SALES ANALYTICS & REPORTING SYSTEM](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—%20SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
 
 
 ---
@@ -1457,13 +1459,20 @@ def lambda_handler(event, context):
 
 ---
 
-# 📢 SECTION 11 — AWS CAFE CI/CD (CodePipeline)
+# 📢 SECTION 11 — AWS CAFE SECURITY
+
+
+[AWS CAFE SECURITY](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCAFESECURITY.md)
+
+---
+
+# 📢 SECTION 12 — AWS CAFE CI/CD (CodePipeline)
 
 [AWS CAFE CI/CD (CodePipeline)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeCICD(CodePipeline).md)
 
 
 ---
-# 📢 SECTION 12 — BILLING ALERTS & BUDGETS
+# 📢 SECTION 13 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -1503,7 +1512,7 @@ Create alarm
 
 ---
 
-# 📢 SECTION 13 — TESTING
+# 📢 SECTION 14 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
@@ -1561,6 +1570,7 @@ You now have a **real AWS production architecture** with:
 - CloudFront + WAF
 - Savings Plans
 - Multi-account billing
+
 
 
 
