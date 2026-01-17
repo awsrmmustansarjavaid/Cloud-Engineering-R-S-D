@@ -3342,6 +3342,22 @@ CafeMenu
 
 **⚠️ DO NOT add sort key**
 
+#### 3️⃣ TABLE SETTINGS (VERY IMPORTANT)
+
+- Click Customize settings
+
+- Leave Table class → Standard
+
+- Leave Capacity mode → On-demand
+
+- Encryption → Default
+
+- Tags → Optional (skip)
+
+- Click Create table
+
+**✅ Wait until Status = Active**
+
 
 
 
