@@ -720,21 +720,139 @@ period   false
 
 **⚠️ If you don’t see this → it was NOT saved.
 
+#### 4️⃣ DO NOTHING ELSE HERE
 
+✅ Do NOT add mapping templates
+
+✅ Do NOT add models
+
+✅ Do NOT add validators
+
+✅ Do NOT touch headers
+
+**⚠️  Because: ✔ Lambda Proxy Integration already passes query parameters automatically**
+
+####  5️⃣ DEPLOY API
+
+> **If you skip this → nothing works**
+
+- Click Actions
+
+- Click Deploy API
+
+- **Choose:**
+
+```
+Stage: prod
+```
+
+(or your existing stage)
+
+- **Click Deploy**
+
+#### 6️⃣ FINAL API URL FORMAT (CONFIRM)
+
+Your final URL MUST look like this:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=today
+```
+
+#### Examples:
+
+```
+?period=today
+?period=week
+?period=month
+```
+
+#### 6️⃣ TEST FROM API GATEWAY (NO UI YET)
+
+#### Go to:
+
+```
+/analytics → GET
+```
+
+- Click Test
+
+- Under Query Strings, enter:
+
+```
+period=today
+```
+
+- **Click Test**
+
+#### ✅ EXPECTED RESULT (VERY IMPORTANT)
+
+Status:
+
+```
+200
+```
+
+Response body (example):
+
+```
+{
+  "total_sales": 1200,
+  "total_cost": 800,
+  "profit": 400,
+  "orders_count": 25
+}
+```
+
+**If this works → API Gateway is configured correctly**
+
+
+#### 🧠 HOW THIS CONNECTS TO YOUR LAMBDA
+
+API Gateway sends this to Lambda automatically:
+
+```
+{
+  "queryStringParameters": {
+    "period": "today"
+  }
+}
+```
+
+Which your Lambda reads as:
+
+```
+event['queryStringParameters']['period']
+```
+
+#### COMMON MISTAKES (READ CAREFULLY)
+
+| Mistake                            | Result                |
+| ---------------------------------- | --------------------- |
+| Forgot to deploy API               | Old config still used |
+| Added param in Integration Request | Won’t work            |
+| Used HTTP API instead of REST      | Different behavior    |
+| Marked `period` as required        | Test fails            |
+| Typo in parameter name             | Lambda gets null      |
+
+#### ✅ FINAL CONFIRMATION CHECKLIST
+
+✔ /analytics exists
+
+✔ GET method exists
+
+✔ Method Request → Query String → period added
+
+✔ Lambda Proxy Integration enabled
+
+✔ API deployed
+
+✔ Test works
 
 ```
 period=today|week|month
 ```
 
-####  5️⃣ DEPLOY API
 
-- **Go to Actions → Deploy API → prod**
-
-#### Copy:
-
-```
-https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics
-```
 
 **✅ PHASE 3 STATUS**
 
