@@ -358,7 +358,7 @@ def lambda_handler(event, context):
 
 ## PHASE 5️⃣  CONNECT PDF BUTTON WITH API
 
-🔹 API Gateway
+### 🔹 API Gateway
 
 ```
 /report/pdf
@@ -369,15 +369,15 @@ No frontend change needed except button URL.
 
 ---
 
-## PHASE 5️⃣  MONTHLY AUTO REPORT (EVENTBRIDGE)
+## PHASE 6️⃣  MONTHLY AUTO REPORT (EVENTBRIDGE)
 
-🔹 Rule
+### 1️⃣ Rule
 
 ```
 cron(0 0 1 * ? *)
 ```
 
-🔹 Target
+### 2️⃣ Target
 
 ```
 CafePDFReportLambda
@@ -385,9 +385,9 @@ CafePDFReportLambda
 
 ---
 
-## PHASE 5️⃣  ORDER STATUS PAGE CHANGES
+## PHASE 7️⃣  ORDER STATUS PAGE CHANGES
 
-✅ MINIMAL CHANGE ONLY
+### ✅ MINIMAL CHANGE ONLY
 
 | Area     | Change               |
 | -------- | -------------------- |
