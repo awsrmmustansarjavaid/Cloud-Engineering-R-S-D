@@ -368,10 +368,15 @@ Before moving to Phase 2, confirm:
 
 ### 1️⃣ Create Cafe Analytics Lambda
 
-#### 1️⃣ Lambda Name
+- **AWS Console → Lambda → Create function**
+
+
+#### 1️⃣ Lambda configurations
 
 ```
-CafeAnalyticsLambda
+Function name: CafeAnalyticsLambda
+Runtime: Python 3.10
+Execution role: Create new role
 ```
 
 #### 2️⃣ IAM Permissions
@@ -381,7 +386,13 @@ AmazonDynamoDBReadOnlyAccess
 CloudWatchLogsFullAccess
 ```
 
-#### 3️⃣ FULL PYTHON CODE (COPY-PASTE)
+✅ Without this → Lambda fails silently
+
+✅ With this → Lambda can read DynamoDB + write logs
+
+#### 3️⃣ DEPLOY CODE
+
+**FULL PYTHON CODE (COPY-PASTE)**
 
 ```
 import json
@@ -436,6 +447,51 @@ def response(code, body):
         "body": json.dumps(body)
     }
 ```
+
+#### 3️⃣ CREATE TEST EVENT
+
+❌ “Empty event” is ONLY for health check
+
+✅ Real test needs API Gateway–like event
+
+- **Deploy → Test → Create new test event**
+
+- **Test event name:** AnalyticsTodayTest
+
+- **Event JSON (COPY EXACTLY)**
+
+```
+{
+  "queryStringParameters": {
+    "period": "today"
+  }
+}
+```
+
+- **Click Save**
+
+#### ✅ EXPECTED SUCCESS OUTPUT (200)
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"total_sales\":100,\"total_cost\":70,\"profit\":30,\"orders_count\":1}"
+}
+```
+
+**This confirms Lambda is alive;**
+
+✔ Lambda is working
+
+✔ DynamoDB query works
+
+✔ GSI works
+
+✔ Calculations work
+
 
 **✅ PHASE 2 STATUS**
 
