@@ -1175,14 +1175,6 @@ def lambda_handler(event, context):
     }
 ```
 
-### 4️⃣ CONNECT API
-
-```
-/report/pdf
-POST → CafePDFReportLambda
-```
-
-- **Enable CORS → Deploy API**
 
 **✅ PHASE 5 STATUS**
 
@@ -1198,6 +1190,8 @@ POST → CafePDFReportLambda
 /report/pdf
 POST → CafePDFReportLambda
 ```
+
+- **Enable CORS → Deploy API**
 
 No frontend change needed except button URL.
 
