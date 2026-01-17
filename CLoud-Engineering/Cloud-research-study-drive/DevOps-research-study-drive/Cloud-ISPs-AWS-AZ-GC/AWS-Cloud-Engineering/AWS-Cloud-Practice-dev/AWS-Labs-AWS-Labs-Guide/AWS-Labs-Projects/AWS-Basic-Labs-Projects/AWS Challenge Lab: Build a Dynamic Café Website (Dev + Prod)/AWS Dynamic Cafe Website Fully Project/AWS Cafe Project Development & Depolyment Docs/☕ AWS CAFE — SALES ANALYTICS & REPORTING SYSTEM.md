@@ -1139,6 +1139,142 @@ Runtime: Python 3.10
 
 ###  3️⃣ DEPLOY EXISTING PDF CODE
 
+> **UPDATED FULL PYTHON CODE (PDF for BOTH PAGES)**
+
+```
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+import boto3
+import io
+import datetime
+import json
+
+# DynamoDB (optional if you want to pull real-time analytics/orders)
+dynamodb = boto3.resource('dynamodb')
+orders_table = dynamodb.Table('CafeOrders')
+
+# S3 client
+s3 = boto3.client('s3')
+
+# Replace with your S3 bucket
+S3_BUCKET = 'cafe-reports'
+
+def lambda_handler(event, context):
+
+    # Determine which PDF to generate
+    page_type = event.get('queryStringParameters', {}).get('page', 'analytics')
+    today = datetime.date.today()
+
+    # Create PDF buffer
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+    title_style = styles['Title']
+    normal_style = styles['Normal']
+
+    # LOGO
+    try:
+        logo = Image("Cafelogo.png", width=120, height=60)
+        elements.append(logo)
+    except:
+        pass  # If logo not in Lambda, ignore
+
+    elements.append(Spacer(1, 20))
+
+    if page_type == 'analytics':
+        # ================= ANALYTICS PDF =================
+        elements.append(Paragraph("📊 Cafe Sales Analytics Report", title_style))
+        elements.append(Paragraph(f"Generated: {today}", normal_style))
+        elements.append(Spacer(1, 12))
+
+        # Fetch analytics data from DynamoDB (optional)
+        # For simplicity, we use placeholders
+        total_sales = 12000
+        total_cost = 8000
+        profit = total_sales - total_cost
+
+        data = [
+            ["Metric", "Amount"],
+            ["Total Sales", total_sales],
+            ["Total Cost", total_cost],
+            ["Profit", profit]
+        ]
+
+        table = Table(data, colWidths=[150, 150])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.brown),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('GRID', (0,0), (-1,-1), 1, colors.black),
+            ('BACKGROUND', (0,1), (-1,-1), colors.beige)
+        ]))
+        elements.append(table)
+
+        # Add daily sales table if available
+        elements.append(Spacer(1, 20))
+        daily_sales_data = [
+            ["Date", "Sales"],
+            ["2026-01-01", 400],
+            ["2026-01-02", 520]
+        ]
+        daily_table = Table(daily_sales_data, colWidths=[150,150])
+        daily_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.darkgreen),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('GRID', (0,0), (-1,-1), 1, colors.black),
+            ('BACKGROUND', (0,1), (-1,-1), colors.lightgreen)
+        ]))
+        elements.append(Paragraph("📅 Daily Sales:", normal_style))
+        elements.append(daily_table)
+
+    elif page_type == 'order-status':
+        # ================= ORDER STATUS PDF =================
+        elements.append(Paragraph("📝 Cafe Order Status Report", title_style))
+        elements.append(Paragraph(f"Generated: {today}", normal_style))
+        elements.append(Spacer(1, 12))
+
+        # Fetch latest orders
+        orders = orders_table.scan().get('Items', [])
+        order_data = [["Order ID", "Item", "Qty", "Cost", "Price", "Profit"]]
+        for o in orders:
+            qty = int(o.get('quantity', 1))
+            cost = float(o.get('item_cost', 0)) * qty
+            price = float(o.get('item_price', 0)) * qty
+            profit = price - cost
+            order_data.append([o['order_id'], o['item_name'], qty, cost, price, profit])
+
+        table = Table(order_data, colWidths=[80,100,50,60,60,60])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.darkblue),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+            ('BACKGROUND', (0,1), (-1,-1), colors.lightgrey)
+        ]))
+        elements.append(table)
+
+    # Build PDF
+    doc.build(elements)
+
+    # Save to S3
+    s3_key = f"{page_type}_report_{today}.pdf"
+    buffer.seek(0)
+    s3.put_object(Bucket=S3_BUCKET, Key=s3_key, Body=buffer.getvalue())
+
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/pdf"},
+        "body": buffer.getvalue().decode('latin1'),
+        "isBase64Encoded": False
+    }
+```
+
 
 
 
