@@ -1540,7 +1540,7 @@ You are now on POST – Setup page
 
 ⚠️ Region must match Lambda region
 
-5.2 Click Save
+#### 1️⃣ Click Save
 
 If AWS asks permission:
 
@@ -1548,7 +1548,7 @@ If AWS asks permission:
 
 ✔️ Click OK
 
-STEP 6️⃣ – ENABLE CORS (DO NOT MISS)
+#### 6️⃣ – ENABLE CORS (DO NOT MISS)
 
 Select /report/pdf
 
@@ -1564,7 +1564,7 @@ Click Yes, replace existing values
 
 ✅ CORS headers added
 
-STEP 7️⃣ – DEPLOY API (MANDATORY)
+#### 7️⃣ – DEPLOY API (MANDATORY)
 
 If you skip this → NOTHING WILL WORK
 
@@ -1576,10 +1576,192 @@ Choose existing stage (example: prod)
 
 Click Deploy
 
-STEP 8️⃣ – COPY FINAL PDF API URL
+#### 8️⃣ – COPY FINAL PDF API URL
 
 After deploy, copy this:
 
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf
+```
+
+✏️ Replace:
+
+API_ID
+
+REGION
+
+SAVE THIS URL – you will use it in frontend
+
+#### 9️⃣ – UNDERSTAND page QUERY PARAMETER (VERY IMPORTANT)
+
+Your Lambda reads:
+
+```
+event.queryStringParameters.page
+```
+
+So API expects:
+
+| Page         | URL                  |
+| ------------ | -------------------- |
+| Analytics    | `?page=analytics`    |
+| Order Status | `?page=order-status` |
+
+
+#### 🔟 – TEST API WITHOUT FRONTEND (DO THIS FIRST)
+10.1 Test from Browser (FASTEST)
+
+Paste in browser:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=analytics
+```
+
+#### EXPECTED RESULT:
+
+Browser downloads OR opens PDF
+
+Lambda logs show SUCCESS
+
+S3 bucket contains:
+
+```
+analytics_report_YYYY-MM-DD.pdf
+```
+
+10.2 Test Order Status PDF
+
+Paste:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-status
+```
+
+#### EXPECTED RESULT:
+
+PDF opens/downloads
+
+Order table visible
+
+S3 object created:
+
+```
+order-status_report_YYYY-MM-DD.pdf
+```
+
+❌ If this fails → STOP
+❌ Do NOT touch frontend yet
+
+STEP 1️⃣1️⃣ – TEST FROM LAMBDA CONSOLE (MANDATORY)
+
+Open Lambda → CafePDFReportLambda
+
+Click Test
+
+Create test event
+
+Name:
+
+```
+AnalyticsPDFTest
+```
+
+Test Event JSON (COPY EXACTLY)
+
+```
+{
+  "queryStringParameters": {
+    "page": "analytics"
+  }
+}
+```
+
+Click Test
+
+EXPECT:
+
+StatusCode: 200
+
+No errors
+
+PDF saved to S3
+
+11.2 Order Status Lambda Test
+
+Create new test:
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+
+STEP 1️⃣2️⃣ – CONNECT ANALYTICS PAGE BUTTON
+12.1 Open analytics.html
+12.2 Replace downloadPDF() with:
+
+```
+function downloadPDF(){
+  window.open(
+    "https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=analytics",
+    "_blank"
+  );
+}
+```
+
+⚠️ Replace:
+
+API_ID
+
+REGION
+
+STEP 1️⃣3️⃣ – CONNECT ORDER STATUS PAGE BUTTON
+13.1 Open order-status.html
+13.2 Add / Update function:
+
+```
+function downloadOrderPDF(){
+  window.open(
+    "https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-status",
+    "_blank"
+  );
+}
+```
+
+13.3 Attach button:
+
+```
+<button class="btn btn-success btn-sm" onclick="downloadOrderPDF()">
+  📄 Download Orders PDF
+</button>
+```
+
+STEP 1️⃣4️⃣ – FINAL FULL TEST (DO NOT SKIP)
+✔ Test Matrix
+
+| Test                         | Result |
+| ---------------------------- | ------ |
+| Browser direct analytics PDF | ✅      |
+| Browser direct order PDF     | ✅      |
+| Lambda test analytics        | ✅      |
+| Lambda test order-status     | ✅      |
+| Analytics page button        | ✅      |
+| Order status page button     | ✅      |
+
+
+✅ PHASE 6 STATUS: COMPLETE & VERIFIED
+
+✔ API Gateway connected
+✔ Lambda receives page parameter
+✔ Two pages → one PDF Lambda
+✔ Browser downloads PDF
+✔ Safe to move to next phase
+
+🔒 IMPORTANT RULE
+
+❗ DO NOT MOVE TO NEXT PHASE UNTIL ALL TESTS ABOVE PASS
 
 
 - **Go to API Gateway → Resources → /report/pdf**
