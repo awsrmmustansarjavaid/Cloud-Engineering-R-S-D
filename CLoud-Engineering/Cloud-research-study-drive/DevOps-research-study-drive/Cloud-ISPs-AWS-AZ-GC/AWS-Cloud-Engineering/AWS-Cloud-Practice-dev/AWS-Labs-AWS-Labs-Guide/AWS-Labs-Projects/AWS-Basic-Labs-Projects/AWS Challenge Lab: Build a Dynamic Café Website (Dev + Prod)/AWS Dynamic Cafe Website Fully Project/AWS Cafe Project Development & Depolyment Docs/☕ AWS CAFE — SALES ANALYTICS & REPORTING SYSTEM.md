@@ -1139,49 +1139,7 @@ Runtime: Python 3.10
 
 ###  3️⃣ DEPLOY EXISTING PDF CODE
 
-#### FULL PYTHON CODE
 
-```
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-import boto3
-import io
-import datetime
-
-s3 = boto3.client('s3')
-
-def lambda_handler(event, context):
-    buffer = io.BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=A4)
-
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(50, 800, "Cafe Monthly Sales Report")
-
-    pdf.setFont("Helvetica", 10)
-    pdf.drawString(50, 770, f"Generated: {datetime.date.today()}")
-
-    pdf.drawString(50, 740, "Total Sales: 12000")
-    pdf.drawString(50, 720, "Total Cost: 8000")
-    pdf.drawString(50, 700, "Profit: 4000")
-
-    pdf.showPage()
-    pdf.save()
-
-    buffer.seek(0)
-
-    s3.put_object(
-        Bucket='cafe-reports',
-        Key='monthly_report.pdf',
-        Body=buffer.getvalue()
-    )
-
-    return {
-        "statusCode": 200,
-        "headers": {"Content-Type": "application/pdf"},
-        "body": buffer.getvalue().decode('latin1'),
-        "isBase64Encoded": False
-    }
-```
 
 
 **✅ PHASE 5 STATUS**
