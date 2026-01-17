@@ -1444,6 +1444,55 @@ order-status_report_2026-01-17.pdf
 
 ### 1️⃣ CONFIGURE API GATEWAY (FOR MULTI-PAGE PDF)
 
+#### 1️⃣ – OPEN API GATEWAY
+
+- Login to AWS Console
+
+- Go to API Gateway
+
+- Click APIs
+
+- Click your existing API
+> **(example name: CafeLabAPI)**
+
+**⚠️ You should now see Resources tree on left side**
+
+#### 2️⃣ – CREATE /report RESOURCE (IF NOT EXISTS)
+
+#### 1️⃣  Check if /report already exists
+
+#### Look in resource tree:
+
+- If you see /report → go to STEP 3
+
+- If NOT → create it
+
+#### 2️⃣ Create /report
+
+- Click root /
+
+- Click Create Resource
+
+- **Resource Name:**
+
+```
+report
+```
+
+- **Resource Path auto-fills:**
+
+```
+/report
+```
+
+- Click Create Resource
+
+**✅ /report now exists**
+
+
+
+
+
 - **Go to API Gateway → Resources → /report/pdf**
 
 - **Method:** POST
