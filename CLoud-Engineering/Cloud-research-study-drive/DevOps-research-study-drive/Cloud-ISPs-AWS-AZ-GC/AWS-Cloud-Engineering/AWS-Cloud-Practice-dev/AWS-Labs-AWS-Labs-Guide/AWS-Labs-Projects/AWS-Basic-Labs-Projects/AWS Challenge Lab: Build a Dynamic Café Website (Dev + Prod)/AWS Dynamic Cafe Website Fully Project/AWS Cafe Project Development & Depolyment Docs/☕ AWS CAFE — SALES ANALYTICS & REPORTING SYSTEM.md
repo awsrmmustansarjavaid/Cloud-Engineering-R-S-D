@@ -3041,56 +3041,29 @@ CloudWatchLogsFullAccess
 
 #### 2️⃣ Paste THIS CODE (COPY EXACTLY)
 
-
-
-
-
-
-
-
-
-
-### 2️⃣  Analytics Lambda – FINAL RESPONSE FORMAT (STRICT)
-
-#### Your Analytics Lambda MUST return exactly this:
-
-```
-{
-  "period": "month",
-  "total_sales": 12000,
-  "total_cost": 8000,
-  "profit": 4000,
-  "orders_count": 340,
-  "profit_per_item": [
-    {
-      "item": "Latte",
-      "quantity": 120,
-      "sales": 360,
-      "cost": 180,
-      "profit": 180
-    }
-  ],
-  "daily_sales": [
-    { "date": "2026-01-01", "sales": 400 },
-    { "date": "2026-01-02", "sales": 520 }
-  ]
-}
-```
-
-### 3️⃣  FULL ANALYTICS LAMBDA CODE (FINAL)
-
 ```
 import json
 import boto3
 from collections import defaultdict
-from decimal import Decimal
 from datetime import datetime, timedelta
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('CafeOrders')
 
 def lambda_handler(event, context):
-    period = event['queryStringParameters']['period']
+
+    # ===============================
+    # 1. READ QUERY PARAMETER
+    # ===============================
+    params = event.get('queryStringParameters') or {}
+    period = params.get('period')
+
+    if not period:
+        return response(400, "Missing period parameter")
+
+    # ===============================
+    # 2. CALCULATE DATE RANGE
+    # ===============================
     today = datetime.utcnow().date()
 
     if period == 'today':
@@ -3102,22 +3075,40 @@ def lambda_handler(event, context):
         start = today.replace(day=1)
         end = today
     else:
-        return response(400, "Invalid period")
+        return response(400, "Invalid period value")
 
-    result = table.query(
+    # ===============================
+    # 3. QUERY DYNAMODB USING GSI
+    # ===============================
+    db_response = table.query(
         IndexName='order_date-index',
         KeyConditionExpression='order_date BETWEEN :s AND :e',
         ExpressionAttributeValues={
             ':s': str(start),
             ':e': str(end)
         }
-    )['Items']
+    )
 
-    total_sales = total_cost = 0
-    item_stats = defaultdict(lambda: {"quantity":0,"sales":0,"cost":0})
-    daily_sales = defaultdict(int)
+    items = db_response.get('Items', [])
 
-    for o in result:
+    # ===============================
+    # 4. INITIALIZE CALCULATIONS
+    # ===============================
+    total_sales = 0
+    total_cost = 0
+
+    item_stats = defaultdict(lambda: {
+        "quantity": 0,
+        "sales": 0,
+        "cost": 0
+    })
+
+    daily_sales = defaultdict(float)
+
+    # ===============================
+    # 5. PROCESS EACH ORDER
+    # ===============================
+    for o in items:
         qty = int(o['quantity'])
         sale = float(o['item_price']) * qty
         cost = float(o['item_cost']) * qty
@@ -3126,37 +3117,67 @@ def lambda_handler(event, context):
         total_cost += cost
 
         item = o['item_name']
-        item_stats[item]["quantity"] += qty
-        item_stats[item]["sales"] += sale
-        item_stats[item]["cost"] += cost
+        item_stats[item]['quantity'] += qty
+        item_stats[item]['sales'] += sale
+        item_stats[item]['cost'] += cost
 
         daily_sales[o['order_date']] += sale
 
-    profit_items = [{
-        "item": k,
-        "quantity": v["quantity"],
-        "sales": v["sales"],
-        "cost": v["cost"],
-        "profit": v["sales"] - v["cost"]
-    } for k,v in item_stats.items()]
+    # ===============================
+    # 6. FORMAT PROFIT PER ITEM
+    # ===============================
+    profit_items = []
+    for item, v in item_stats.items():
+        profit_items.append({
+            "item": item,
+            "quantity": v["quantity"],
+            "sales": v["sales"],
+            "cost": v["cost"],
+            "profit": v["sales"] - v["cost"]
+        })
 
-    return response(200, {
+    # ===============================
+    # 7. FINAL RESPONSE FORMAT
+    # ===============================
+    response_body = {
         "period": period,
         "total_sales": total_sales,
         "total_cost": total_cost,
         "profit": total_sales - total_cost,
-        "orders_count": len(result),
+        "orders_count": len(items),
         "profit_per_item": profit_items,
-        "daily_sales": [{"date": d, "sales": s} for d,s in daily_sales.items()]
-    })
+        "daily_sales": [
+            {"date": d, "sales": s}
+            for d, s in sorted(daily_sales.items())
+        ]
+    }
 
+    return response(200, response_body)
+
+# ===============================
+# COMMON RESPONSE HANDLER
+# ===============================
 def response(code, body):
     return {
         "statusCode": code,
-        "headers": {"Access-Control-Allow-Origin": "*"},
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json"
+        },
         "body": json.dumps(body)
     }
 ```
+
+- Click Deploy
+
+
+
+
+
+
+
+
+
 **✅ PHASE 9 STATUS**
 
 > **🟢 PHASE 9 COMPLETE & VERIFIED**
