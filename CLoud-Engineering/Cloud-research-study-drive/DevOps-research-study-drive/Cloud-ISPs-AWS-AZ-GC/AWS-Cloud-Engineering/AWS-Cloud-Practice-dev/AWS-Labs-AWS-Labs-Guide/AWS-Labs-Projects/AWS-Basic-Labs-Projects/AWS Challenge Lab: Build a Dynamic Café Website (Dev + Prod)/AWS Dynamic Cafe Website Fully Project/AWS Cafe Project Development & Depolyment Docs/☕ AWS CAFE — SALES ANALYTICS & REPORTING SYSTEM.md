@@ -1496,29 +1496,29 @@ Your S3 Bucket
 | Rule description | Generate Order Status PDF daily |
 | Rule type        | **Schedule expression**         |
 
-STEP 5: ADD CRON SCHEDULE
+#### 5️⃣ ADD CRON SCHEDULE
 
-Paste exactly this:
+**Paste exactly this:**
 
 ```
 cron(0 0 * * ? *)
 ```
 
-Explanation (DO NOT CHANGE):
+#### 🔘 Explanation (DO NOT CHANGE):
 
-Runs every day
+- Runs every day
 
-Time: 00:00 UTC
+- Time: 00:00 UTC
 
-AWS requires ? in day-of-month or day-of-week
+- **AWS requires ? in day-of-month or day-of-week**
 
-STEP 6: CONFIGURE INPUT (VERY IMPORTANT)
+#### 6️⃣ CONFIGURE INPUT (VERY IMPORTANT)
 
 Scroll to Configure input
 
-Select: Constant (JSON text)
+- Select: Constant (JSON text)
 
-Paste EXACT JSON:
+- **Paste EXACT JSON:**
 
 ```
 {
@@ -1528,33 +1528,34 @@ Paste EXACT JSON:
 }
 ```
 
-❗ This JSON is mandatory
-❗ Without this, Lambda won’t know which PDF to generate
+**❗ This JSON is mandatory**
 
-STEP 7: ADD TRIGGER
+**❗ Without this, Lambda won’t know which PDF to generate**
 
-Click Add
+#### 7️⃣ ADD TRIGGER
 
-Trigger appears in Lambda diagram
+- Click Add
 
-✅ Daily automation is now ACTIVE
+- Trigger appears in Lambda diagram
+
+**✅ Daily automation is now ACTIVE**
 
 
 #### 2️⃣ TASK 2️⃣: ADD MONTHLY ANALYTICS PDF (USING LAMBDA TRIGGER)
 
-STEP 1: ADD SECOND TRIGGER
+#### 1️⃣ ADD SECOND TRIGGER
 
-In same Lambda
+- In same Lambda
 
-Click ➕ Add trigger again
+- Click ➕ Add trigger again
 
-STEP 2: SELECT EVENTBRIDGE
+#### 2️⃣ SELECT EVENTBRIDGE
 
-Source: EventBridge (CloudWatch Events)
+- **Source:** EventBridge (CloudWatch Events)
 
-Rule: Create a new rule
+- **Rule:** Create a new rule
 
-STEP 3: CONFIGURE MONTHLY RULE
+#### 3️⃣ CONFIGURE MONTHLY RULE
 
 | Field       | Value                          |
 | ----------- | ------------------------------ |
@@ -1563,23 +1564,23 @@ STEP 3: CONFIGURE MONTHLY RULE
 | Rule type   | Schedule expression            |
 
 
-STEP 4: MONTHLY CRON EXPRESSION
+#### 4️⃣ MONTHLY CRON EXPRESSION
 
-Paste:
+- **Paste:**
 
 ```
 cron(0 0 1 * ? *)
 ```
 
-Meaning:
+#### 🔘 Meaning:
 
-Runs on 1st day of every month
+- Runs on 1st day of every month
 
-At 00:00 UTC
+- At 00:00 UTC
 
-STEP 5: INPUT JSON (VERY IMPORTANT)
+#### 5️⃣ INPUT JSON (VERY IMPORTANT)
 
-Select Constant (JSON text) and paste:
+- **Select Constant (JSON text) and paste:**
 
 ```
 {
@@ -1589,59 +1590,61 @@ Select Constant (JSON text) and paste:
 }
 ```
 
-STEP 6: ADD TRIGGER
+#### 6️⃣ ADD TRIGGER
 
-Click Add
+- Click Add
 
-Now Lambda has TWO triggers
+- Now Lambda has TWO triggers
 
-🔹 TASK 3: VERIFY TRIGGERS ARE ATTACHED
+#### TASK 3️⃣ VERIFY TRIGGERS ARE ATTACHED
 
-In Lambda Function overview, you should see:
+#### In Lambda Function overview, you should see:
 
 ```
 EventBridge (DailyOrderPDF)
 EventBridge (MonthlyAnalyticsPDF)
 ```
 
-If both appear → ✅ SUCCESS
+**If both appear → ✅ SUCCESS**
 
-🔹 TASK 4: TEST TRIGGER WITHOUT WAITING
-TEMPORARY FAST TEST (OPTIONAL BUT RECOMMENDED)
+#### TASK 4️⃣ TEST TRIGGER WITHOUT WAITING
 
-Click one trigger name (e.g. DailyOrderPDF)
+#### TEMPORARY FAST TEST (OPTIONAL BUT RECOMMENDED)
 
-Click Edit
+- Click one trigger name (e.g. DailyOrderPDF)
 
-Change schedule to:
+- Click Edit
+
+- Change schedule to:
 
 ```
 rate(1 minute)
 ```
 
-Save
+- Save
 
-Wait 1 minute
+- Wait 1 minute
 
-Check S3 bucket
+- Check S3 bucket
 
-📄 New PDF appears → Automation works
+**📄 New PDF appears → Automation works**
 
-After testing, change back to cron.
+> **After testing, change back to cron.**
 
-🔹 TASK 5: VERIFY OUTPUT
-Check S3
+#### TASK 5️⃣ VERIFY OUTPUT
 
-Bucket: cafe-reports
+#### Check S3
 
-Files should look like:
+- **Bucket:** charlie-cafe-s3-bucket
+
+**Files should look like:**
 
 ```
 order-status_report_2026-01-17.pdf
 analytics_report_2026-01-01.pdf
 ```
 
-🔹 TASK 6: CLOUDWATCH LOG VERIFICATION
+#### TASK 6️⃣ CLOUDWATCH LOG VERIFICATION
 
 Lambda → Monitor
 
