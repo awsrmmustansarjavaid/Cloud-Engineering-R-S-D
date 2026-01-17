@@ -1432,9 +1432,9 @@ No frontend change needed except button URL.
 
 ### 1️⃣ PREREQUISITE CHECK (DO THIS FIRST)
 
-#### Before EventBridge:
+**📢 Before starting, make sure:**
 
-- **Lambda exists:** CafePDFReportLambda
+- **Lambda exists:** CafePDFReportLambda & CafeAnalyticsLambda
 
 - Lambda already works in Test Event (manual test passed)
 
@@ -1449,8 +1449,13 @@ No frontend change needed except button URL.
 ```
 Your S3 Bucket
 ```
+    - CloudWatchLogsFullAccess
+
+- Lambda code is already working when tested manually
 
 **✅ If all above are true → continue.**
+
+**❗ If Lambda test does not work, STOP and fix Lambda first.**
 
 **This will automatically generate PDFs:**
 
@@ -1460,7 +1465,41 @@ Your S3 Bucket
 
 ### 2️⃣ METHOD 1- EventBridge Schedule Using Lambda Trigger  (Recommanded)
 
+#### 1️⃣ TASK 1️⃣: ADD DAILY ORDER STATUS PDF (USING LAMBDA TRIGGER)
 
+#### 1️⃣ OPEN LAMBDA
+
+- AWS Console → Lambda
+
+- Click CafePDFReportLambda
+
+#### 2️⃣ OPEN TRIGGERS TAB
+
+- Scroll to Function overview
+
+- Click ➕ Add trigger
+
+#### 3️⃣ SELECT EVENT SOURCE
+
+- Select source: EventBridge (CloudWatch Events)
+
+**⚠️ This opens EventBridge configuration inside Lambda**
+
+#### 4️⃣ CONFIGURE EVENTBRIDGE RULE
+
+- **Rule settings:**
+
+| Field            | Value                           |
+| ---------------- | ------------------------------- |
+| Rule             | **Create a new rule**           |
+| Rule name        | `DailyOrderPDF`                 |
+| Rule description | Generate Order Status PDF daily |
+| Rule type        | **Schedule expression**         |
+
+
+
+
+#### 2️⃣ TASK 2️⃣: ADD DAILY ORDER STATUS PDF (USING LAMBDA TRIGGER)
 
 
 
