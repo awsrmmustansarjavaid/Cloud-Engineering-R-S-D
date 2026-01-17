@@ -1544,21 +1544,31 @@ Click Next
 
 #### 1️⃣ Create Rule
 
-EventBridge → Rules → Create rule
+- **EventBridge → Rules → Create rule**
 
-#### 4️⃣ Create Monthly Analytics Trigger
+#### 2️⃣ Rule Details
 
-- Same as above, but:
+| Field       | Value                          |
+| ----------- | ------------------------------ |
+| Name        | `MonthlyAnalyticsPDF`          |
+| Description | Generate Analytics PDF monthly |
+| Rule type   | Schedule                       |
 
-- **Name:** MonthlyAnalyticsPDF
-
-- **Cron for 1st of month at midnight:**
+#### 3️⃣ Cron Expression (1st of Month)
 
 ```
 cron(0 0 1 * ? *)
 ```
 
-#### Input JSON:
+**➡️ Runs once per month on the 1st day at 00:00 UTC**
+
+#### 4️⃣ Target Configuration
+
+- **Target:** Lambda function
+
+- **Function:** CafePDFReportLambda
+
+#### 5️⃣ Lambda Input JSON (VERY IMPORTANT)
 
 ```
 {
@@ -1568,13 +1578,70 @@ cron(0 0 1 * ? *)
 }
 ```
 
-### 5️⃣ Test EventBridge Trigger
+#### 📌 This tells Lambda:
 
-- In EventBridge → click your rule → Select Targets → Test
+- **Generate Analytics PDF**
 
-- Lambda should generate PDF immediately
+#### 6️⃣ Create Rule
 
-- Check S3 bucket → new PDF uploaded
+- Click Create rule
+
+**✅ Monthly automation is complete.**
+
+### 4️⃣ TEST EVENTBRIDGE TRIGGER (MANDATORY)
+
+#### 1️⃣ OPTION A: Test via EventBridge
+
+- EventBridge → Rules
+
+- Click DailyOrderPDF
+
+- Click Run now (or Test rule)
+
+**🕘 Wait 5–10 seconds**
+
+#### 2️⃣ OPTION B: Temporary Fast Test (Recommended)
+
+- Edit rule
+
+- Change schedule to:
+
+```
+rate(1 minute)
+```
+
+- Save
+
+- Wait 1 minute
+
+- Confirm PDF created
+
+- Change cron back to original
+
+### 5️⃣ VERIFY PDF GENERATION
+
+#### 1️⃣  Go to:
+
+```
+AWS Console → S3 → your bucket
+```
+
+#### You should see files like:
+
+```
+order-status_2026-01-17.pdf
+analytics_2026-01-01.pdf
+```
+
+#### 2️⃣  Open → PDF contains:
+
+- Tables
+
+- Totals
+
+- Logo
+
+- Correct data
 
 ### 6️⃣ Confirm Lambda & EventBridge
 
