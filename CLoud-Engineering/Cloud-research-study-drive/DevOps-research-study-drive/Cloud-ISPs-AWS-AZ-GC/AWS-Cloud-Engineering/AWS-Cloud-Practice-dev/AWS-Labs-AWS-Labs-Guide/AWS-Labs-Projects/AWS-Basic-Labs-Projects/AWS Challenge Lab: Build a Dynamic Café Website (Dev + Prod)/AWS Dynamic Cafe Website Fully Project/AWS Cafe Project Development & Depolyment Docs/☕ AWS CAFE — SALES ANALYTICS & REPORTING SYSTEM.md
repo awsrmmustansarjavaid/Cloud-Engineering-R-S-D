@@ -2986,7 +2986,21 @@ It MUST contain ALL attributes below:
 
 - Select index:
 
+```
+order_date-index
+```
 
+- Query condition:
+
+```
+order_date BETWEEN 2026-01-01 AND 2026-01-31
+```
+
+- Click Run
+
+✔ If items return → GSI works
+
+❌ If empty → fix dates or index
 
 ### 2️⃣  Analytics Lambda – FINAL RESPONSE FORMAT (STRICT)
 
