@@ -3892,9 +3892,120 @@ Admin
 
 - Click Create group
 
-### 2️⃣ Attach Users to Groups
+#### 2️⃣ Create Staff Group
 
-Cognito → Users → Add to group
+- Repeat:
+
+```
+Group name: Staff
+Precedence: 2
+```
+
+### 👤 3️⃣ – ASSIGN USERS TO GROUPS
+
+- **Cognito → Users → Select User**
+
+#### 1️⃣ Add to Group
+
+- Click Add to group
+
+- **Select:**
+
+```
+Admin   OR   Staff
+```
+
+**❗ A user MUST belong to one group**
+
+
+### 🔗 3️⃣ – VERIFY GROUP CLAIM IN TOKEN
+
+#### 1️⃣ – Login as Admin
+
+- Login via Hosted UI
+
+- Open browser DevTools
+
+- Copy access_token
+
+#### 2️⃣ – Decode JWT (jwt.io)
+
+Confirm this exists:
+
+```
+"cognito:groups": ["Admin"]
+```
+
+**❌ If missing → group assignment failed**
+
+### 🧠 4️⃣ – ENFORCE ROLE IN ANALYTICS LAMBDA
+
+#### 1️⃣ – Extract Claims (EXACT CODE)
+
+Add TOP of lambda_handler:
+
+```
+claims = event['requestContext']['authorizer']['claims']
+groups = claims.get('cognito:groups', '')
+```
+
+#### 2️⃣ – Enforce Admin-Only Access
+
+Add IMMEDIATELY AFTER:
+
+```
+if 'Admin' not in groups:
+    return response(403, "Access denied")
+```
+
+✔ This blocks Staff
+
+✔ This secures Analytics & PDF
+
+### 🧪 5️⃣ – TEST ROLE ACCESS (MANDATORY)
+
+#### 1️⃣ – STAFF USER
+
+- Login as Staff
+
+- Open Analytics
+
+- Expected result:
+
+```
+403 Access denied
+```
+
+**✔ PASS**
+
+#### 2️⃣ – ADMIN USER
+
+- Login as Admin
+
+- Open Analytics
+
+- Expected result:
+
+✔ Data loads
+
+✔ PDF downloads
+
+### ✅ PHASE 12 COMPLETION CHECKLIST
+
+✔ Cognito groups created
+
+✔ Users assigned correctly
+
+✔ Token contains cognito:groups
+
+✔ Lambda enforces role
+
+✔ Staff blocked
+
+✔ Admin allowed
+
+
+
 
 ### 3️⃣ API Gateway Authorizer Context
 
