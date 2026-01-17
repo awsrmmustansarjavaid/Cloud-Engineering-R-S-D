@@ -3421,25 +3421,224 @@ base_cost = 1.2
 
 #### Confirm:
 
-- item_name exists
+    - item_name exists
 
-- base_cost exists
+    - base_cost exists
 
-- base_cost is Number, not String
+    - base_cost is Number, not String
 
-❌ If base_cost is String → DELETE ITEM → RECREATE
+**❌ If base_cost is String → DELETE ITEM → RECREATE**
 
 ### 4️⃣ — OPEN ORDER PROCESSING LAMBDA
 
 #### 1️⃣ OPEN LAMBDA
 
-Go to AWS Lambda
+- Go to AWS Lambda
 
-Click Functions
+- Click Functions
 
-Click your Order Processing Lambda
+- Click your Order Processing Lambda
 
-Example name:
+- Example name:
+
+```
+CafeOrderProcessingLambda
+```
+
+#### 2️⃣ VERIFY IAM PERMISSIONS (NO SKIP)
+
+- Click Configuration
+
+- Click Permissions
+
+- Click Execution role
+
+- Ensure this policy exists:
+
+```
+AmazonDynamoDBReadOnlyAccess
+```
+
+#### ❌ If missing:
+
+- Click Add permissions
+
+- Attach policy
+
+- Save
+
+### 5️⃣ — CONNECT CafeMenu TABLE IN LAMBDA
+
+#### 1️⃣ LOCATE DYNAMODB SETUP CODE
+
+Find existing code like:
+
+```
+dynamodb = boto3.resource('dynamodb')
+orders_table = dynamodb.Table('CafeOrders')
+```
+
+#### 2️⃣ ADD THIS LINE DIRECTLY BELOW
+
+```
+menu_table = dynamodb.Table('CafeMenu')
+```
+
+**⚠️ Do not rename CafeMenu**
+
+### 6️⃣ — ADD COST FETCH FUNCTION (EXACT)
+
+#### 1️⃣ ADD THIS FUNCTION (COPY-PASTE)
+
+```
+def get_item_cost(item_name):
+    response = menu_table.get_item(
+        Key={'item_name': item_name}
+    )
+
+    if 'Item' not in response:
+        raise Exception(f"Cost not found for item: {item_name}")
+
+    return float(response['Item']['base_cost'])
+```
+
+✔ Handles missing item
+
+✔ Prevents silent errors
+
+### 7️⃣ — MODIFY ORDER SAVE LOGIC (CRITICAL STEP)
+
+#### 1️⃣ FIND WHERE ORDER IS SAVED
+
+You will see code similar to:
+
+```
+item_name = body['item_name']
+quantity = int(body['quantity'])
+selling_price = float(body['price'])
+```
+
+#### 2️⃣ ADD COST CALCULATION IMMEDIATELY AFTER
+
+```
+item_cost = get_item_cost(item_name)
+```
+
+#### 3️⃣ CALCULATE TOTAL COST (IMPORTANT)
+
+```
+total_cost = item_cost * quantity
+```
+
+#### 4️⃣ SAVE ORDER WITH COST INCLUDED
+
+Modify DynamoDB put_item:
+
+```
+orders_table.put_item(
+    Item={
+        "order_id": order_id,
+        "item_name": item_name,
+        "quantity": quantity,
+        "item_price": selling_price,
+        "item_cost": item_cost,
+        "total_cost": total_cost,
+        "order_date": order_date,
+        "order_timestamp": order_timestamp,
+        "order_status": "COMPLETED"
+    }
+)
+```
+
+**⚠️ Do NOT remove existing fields**
+
+### 8️⃣ — DEPLOY LAMBDA (DO NOT SKIP)
+
+- Click Deploy
+
+- Wait for success message
+
+### 9️⃣ — TEST THIS PHASE (MANDATORY)
+
+#### ❌ DO NOT CONTINUE WITHOUT TESTING
+
+#### 1️⃣ CREATE TEST EVENT
+
+- Click Test → Configure test event
+
+- Test JSON
+
+```
+{
+  "body": "{\"item_name\":\"Latte\",\"quantity\":2,\"price\":3.0}"
+}
+```
+
+#### 2️⃣ RUN TEST
+
+- Click Test
+
+#### Confirm:
+
+    - StatusCode = 200
+
+    - No exception
+
+#### 3️⃣ VERIFY DYNAMODB OUTPUT
+
+- Open CafeOrders
+
+- Open latest item
+
+- Confirm these fields exist:
+
+```
+item_cost
+total_cost
+```
+
+#### Example:
+
+```
+item_cost = 1.5
+total_cost = 3.0
+```
+
+**❌ If missing → STOP and fix Lambda**
+
+### 🔟 — FINAL CONFIRMATION FOR THIS PHASE
+
+#### ✅ THIS PHASE IS COMPLETE ONLY IF:
+
+✔ CafeMenu table exists
+
+✔ Items exist with base_cost
+
+✔ Order Processing Lambda fetches cost
+
+✔ Orders store item_cost & total_cost
+
+✔ Test event succeeded
+
+#### 🔒 GUARANTEED RESULTS
+
+✔ Cost auto-calculation
+
+✔ No frontend change
+
+✔ Accurate analytics profit
+
+✔ PDF reports become correct
+
+✔ Production-safe logic
+
+#### ⛔ DO NOT MOVE TO NEXT PHASE UNTIL:
+
+❌ You see item_cost in CafeOrders
+
+❌ You tested Lambda manually
+
+❌ You verified DynamoDB records
 
 
 ### 1️⃣  Create Item Cost Table
