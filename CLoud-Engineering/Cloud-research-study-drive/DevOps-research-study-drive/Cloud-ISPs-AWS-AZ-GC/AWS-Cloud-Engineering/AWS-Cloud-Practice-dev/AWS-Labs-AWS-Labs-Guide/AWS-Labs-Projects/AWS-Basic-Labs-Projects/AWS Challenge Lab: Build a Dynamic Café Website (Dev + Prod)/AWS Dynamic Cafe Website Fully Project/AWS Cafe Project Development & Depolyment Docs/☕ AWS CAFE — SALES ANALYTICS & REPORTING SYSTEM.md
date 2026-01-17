@@ -2978,7 +2978,7 @@ It MUST contain ALL attributes below:
 
 ### 2️⃣ – VERIFY GSI WORKS (NO CODE YET)
 
-#### 1️⃣ Test GSI in Console
+#### Test GSI in Console
 
 - DynamoDB → Explore table items
 
@@ -3001,6 +3001,54 @@ order_date BETWEEN 2026-01-01 AND 2026-01-31
 ✔ If items return → GSI works
 
 ❌ If empty → fix dates or index
+
+### 3️⃣ – CREATE ANALYTICS LAMBDA
+
+#### 1️⃣ Create Lambda
+
+- **AWS Console → Lambda → Create function**
+
+| Field          | Value                 |
+| -------------- | --------------------- |
+| Function name  | `CafeAnalyticsLambda` |
+| Runtime        | Python 3.10           |
+| Execution role | Create new role       |
+
+- Click Create function
+
+#### 2️⃣ Attach IAM Permissions
+
+= **Lambda → Configuration → Permissions**
+
+- **Click Role → Attach policies**
+
+- **Attach:**
+
+```
+AmazonDynamoDBReadOnlyAccess
+CloudWatchLogsFullAccess
+```
+
+- ✔ Save
+
+### 4️⃣ – PASTE FINAL ANALYTICS CODE (NO CHANGES)
+
+#### 1️⃣ Open Code Editor
+
+- Lambda → Code tab
+
+    - Delete ALL existing code
+
+#### 2️⃣ Paste THIS CODE (COPY EXACTLY)
+
+
+
+
+
+
+
+
+
 
 ### 2️⃣  Analytics Lambda – FINAL RESPONSE FORMAT (STRICT)
 
