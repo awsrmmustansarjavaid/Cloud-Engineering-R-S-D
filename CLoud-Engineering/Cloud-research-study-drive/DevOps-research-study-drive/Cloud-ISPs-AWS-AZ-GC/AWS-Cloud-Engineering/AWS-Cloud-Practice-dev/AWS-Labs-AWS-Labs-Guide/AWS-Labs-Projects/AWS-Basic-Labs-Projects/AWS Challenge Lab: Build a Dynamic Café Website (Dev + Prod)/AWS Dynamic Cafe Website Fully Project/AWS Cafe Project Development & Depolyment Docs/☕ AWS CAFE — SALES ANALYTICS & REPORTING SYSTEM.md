@@ -3267,7 +3267,13 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=month
 | API test passed              | ✅      |
 | Response format EXACT        | ✅      |
 
+### ⛔ DO NOT MOVE FORWARD UNTIL
 
+✔ You see correct JSON
+
+✔ Numbers match DynamoDB
+
+✔ No CloudWatch errors
 
 **✅ PHASE 9 STATUS**
 
