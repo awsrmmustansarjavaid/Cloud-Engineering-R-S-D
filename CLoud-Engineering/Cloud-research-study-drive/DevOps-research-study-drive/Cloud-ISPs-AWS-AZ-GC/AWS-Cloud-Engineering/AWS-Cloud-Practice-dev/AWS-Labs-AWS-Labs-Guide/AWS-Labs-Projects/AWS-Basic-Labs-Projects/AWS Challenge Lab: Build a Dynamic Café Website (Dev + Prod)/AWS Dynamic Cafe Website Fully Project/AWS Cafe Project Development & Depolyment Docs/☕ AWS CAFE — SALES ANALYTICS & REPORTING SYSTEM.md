@@ -4005,28 +4005,6 @@ if 'Admin' not in groups:
 ✔ Admin allowed
 
 
-
-
-### 3️⃣ API Gateway Authorizer Context
-
-#### In Lambda, extract role:
-
-```
-claims = event['requestContext']['authorizer']['claims']
-role = claims.get('cognito:groups', '')
-```
-
-### 4️⃣ Enforce Analytics Access
-
-```
-if 'Admin' not in role:
-    return response(403, "Access denied")
-```
-
-✔ Staff sees orders
-
-✔ Admin sees analytics + PDF
-
 **✅ PHASE 12 STATUS**
 
 > **🟢 PHASE 12 COMPLETE & VERIFIED**
