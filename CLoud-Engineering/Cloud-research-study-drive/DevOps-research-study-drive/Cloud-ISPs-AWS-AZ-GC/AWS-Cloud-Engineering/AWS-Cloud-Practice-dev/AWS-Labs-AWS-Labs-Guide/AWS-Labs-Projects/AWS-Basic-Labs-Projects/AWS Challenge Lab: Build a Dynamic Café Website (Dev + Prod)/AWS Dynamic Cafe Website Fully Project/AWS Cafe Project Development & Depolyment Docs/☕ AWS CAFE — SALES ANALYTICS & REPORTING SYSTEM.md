@@ -1462,11 +1462,11 @@ Your S3 Bucket
 
 ### 2️⃣ CREATE DAILY ORDER STATUS PDF EVENTBRIDGE RULE
 
-### 1️⃣ Go to EventBridge
+#### 1️⃣ Go to EventBridge
 
 - **Go to EventBridge → Rules → Create rule**
 
-### 2️⃣ Configure Rule
+#### 2️⃣ Configure Rule
 
 - **Name:** DailyOrderPDF
 
@@ -1508,7 +1508,7 @@ Click Next
 
 **⚠️ You can adjust hour/minute for your timezone**
 
-### 3️⃣ Add Target
+#### 3️⃣ Add Target
 
 - **Target:** Lambda function → CafePDFReportLambda
 
@@ -1526,9 +1526,27 @@ Click Next
 }
 ```
 
-- **Click Create → EventBridge rule now triggers Lambda daily.**
+#### 📌 This tells Lambda:
 
-### 4️⃣ Create Monthly Analytics Trigger
+- Generate Order Status PDF
+
+#### 4️⃣ Review & Create Rule
+
+- Review everything
+
+- Click Create rule
+
+**✅ DailyOrderPDF rule is LIVE**
+
+### 3️⃣ CREATE MONTHLY ANALYTICS PDF RULE
+
+> **Repeat steps, but with these changes 👇**
+
+#### 1️⃣ Create Rule
+
+EventBridge → Rules → Create rule
+
+#### 4️⃣ Create Monthly Analytics Trigger
 
 - Same as above, but:
 
