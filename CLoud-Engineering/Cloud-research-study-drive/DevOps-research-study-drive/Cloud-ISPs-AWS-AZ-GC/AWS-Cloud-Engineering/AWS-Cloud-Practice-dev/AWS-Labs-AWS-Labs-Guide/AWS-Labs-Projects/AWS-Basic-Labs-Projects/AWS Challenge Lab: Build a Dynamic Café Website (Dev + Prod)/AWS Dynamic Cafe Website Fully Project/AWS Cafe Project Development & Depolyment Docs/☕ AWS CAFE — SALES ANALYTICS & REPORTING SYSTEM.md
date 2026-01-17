@@ -1764,36 +1764,6 @@ STEP 1️⃣4️⃣ – FINAL FULL TEST (DO NOT SKIP)
 ❗ DO NOT MOVE TO NEXT PHASE UNTIL ALL TESTS ABOVE PASS
 
 
-- **Go to API Gateway → Resources → /report/pdf**
-
-- **Method:** POST
-
-- **Integration:** Lambda Proxy → CafePDFReportLambda
-
-- **Query Parameter:** page
-
-- **analytics → Analytics page PDF**
-
-- **order-status → Order status PDF**
-
-- **Frontend buttons:**
-
-```
-// Analytics Page
-function downloadPDF(){
-  window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=analytics", "_blank");
-}
-
-// Order Status Page
-function downloadOrderPDF(){
-  window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-status", "_blank");
-}
-```
-
-- **Enable CORS → Deploy API**
-
-No frontend change needed except button URL.
-
 **✅ PHASE 6 STATUS**
 
 > **🟢 PHASE 6 COMPLETE & VERIFIED**
