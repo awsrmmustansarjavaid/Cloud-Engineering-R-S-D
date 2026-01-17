@@ -3358,11 +3358,88 @@ CafeMenu
 
 **✅ Wait until Status = Active**
 
+### 2️⃣ — INSERT ITEM COST DATA (MANUAL TEST DATA)
 
+> **This step is MANDATORY for testing.**
 
+#### 1️⃣ OPEN TABLE ITEMS
 
+- Open CafeMenu
 
+- Click Explore table items
 
+- Click Create item
+
+#### 2️⃣ ADD FIRST ITEM (Latte)
+
+| Attribute name | Type   | Value |
+| -------------- | ------ | ----- |
+| item_name      | String | Latte |
+| base_cost      | Number | 1.5   |
+
+- Click Save
+
+#### 3️⃣ ADD MORE ITEMS (RECOMMENDED)
+
+**♻️ Repeat Create item for:**
+
+2. **Cappuccino:**
+
+```
+item_name = Cappuccino
+base_cost = 1.8
+```
+
+3. **Tea:**
+
+```
+item_name = Tea
+base_cost = 0.6
+```
+
+4. **Coffee:**
+
+```
+item_name = Juice
+base_cost = 1.2
+```
+
+5. **Juice**
+
+```
+item_name = Juice
+base_cost = 1.2
+```
+
+**✅ At least 2–3 items must exist for testing**
+
+### 3️⃣ — VERIFY CafeMenu TABLE (VERY IMPORTANT)
+
+#### Before touching Lambda:
+
+- Click Explore table items
+
+#### Confirm:
+
+- item_name exists
+
+- base_cost exists
+
+- base_cost is Number, not String
+
+❌ If base_cost is String → DELETE ITEM → RECREATE
+
+### 4️⃣ — OPEN ORDER PROCESSING LAMBDA
+
+#### 1️⃣ OPEN LAMBDA
+
+Go to AWS Lambda
+
+Click Functions
+
+Click your Order Processing Lambda
+
+Example name:
 
 
 ### 1️⃣  Create Item Cost Table
