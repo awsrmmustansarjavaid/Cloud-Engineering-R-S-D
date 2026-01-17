@@ -1200,7 +1200,11 @@ No frontend change needed except button URL.
 > **🟢 PHASE 6 COMPLETE & VERIFIED**
 ---
 
-## PHASE 7️⃣  MONTHLY AUTO REPORT (EVENTBRIDGE)
+## PHASE 7️⃣  EVENTBRIDGE - MONTHLY AUTO REPORT
+
+### Daily PDF
+
+- **Go to EventBridge → Rules → Create rule**
 
 ### 1️⃣ Rule
 
