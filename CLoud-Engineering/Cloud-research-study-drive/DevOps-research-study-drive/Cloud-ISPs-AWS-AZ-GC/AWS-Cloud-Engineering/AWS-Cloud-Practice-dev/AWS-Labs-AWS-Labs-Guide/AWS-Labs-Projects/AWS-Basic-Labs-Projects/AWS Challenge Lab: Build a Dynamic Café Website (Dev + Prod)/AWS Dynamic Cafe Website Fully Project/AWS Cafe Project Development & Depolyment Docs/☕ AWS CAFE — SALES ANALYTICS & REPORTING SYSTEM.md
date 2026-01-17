@@ -1123,7 +1123,7 @@ Runtime: Python 3.10
 
 - **Attach layer to:** CafePDFReportLambda
 
-- **ADD S3 PERMISSION:**
+- **Required S3 PERMISSION:**
 
     - **Attach IAM policy:**
 
