@@ -1016,8 +1016,329 @@ showDashboard();
 
 
 ---
+## PHASE 8️⃣  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
 
-## PHASE 8️⃣  Test
+### 1️⃣  Required DynamoDB Attributes (Orders Table)
+
+#### Every order item MUST contain:
+
+```
+{
+  "order_id": "ORD123",
+  "order_date": "2026-01-17",
+  "order_timestamp": 1705488000,
+  "item_name": "Latte",
+  "quantity": 2,
+  "item_cost": 1.5,
+  "item_price": 3.0,
+  "order_status": "COMPLETED"
+}
+```
+
+### 2️⃣  Analytics Lambda – FINAL RESPONSE FORMAT (STRICT)
+
+#### Your Analytics Lambda MUST return exactly this:
+
+```
+{
+  "period": "month",
+  "total_sales": 12000,
+  "total_cost": 8000,
+  "profit": 4000,
+  "orders_count": 340,
+  "profit_per_item": [
+    {
+      "item": "Latte",
+      "quantity": 120,
+      "sales": 360,
+      "cost": 180,
+      "profit": 180
+    }
+  ],
+  "daily_sales": [
+    { "date": "2026-01-01", "sales": 400 },
+    { "date": "2026-01-02", "sales": 520 }
+  ]
+}
+```
+
+### 3️⃣  FULL ANALYTICS LAMBDA CODE (FINAL)
+
+```
+import json
+import boto3
+from collections import defaultdict
+from decimal import Decimal
+from datetime import datetime, timedelta
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    period = event['queryStringParameters']['period']
+    today = datetime.utcnow().date()
+
+    if period == 'today':
+        start = end = today
+    elif period == 'week':
+        start = today - timedelta(days=7)
+        end = today
+    elif period == 'month':
+        start = today.replace(day=1)
+        end = today
+    else:
+        return response(400, "Invalid period")
+
+    result = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': str(start),
+            ':e': str(end)
+        }
+    )['Items']
+
+    total_sales = total_cost = 0
+    item_stats = defaultdict(lambda: {"quantity":0,"sales":0,"cost":0})
+    daily_sales = defaultdict(int)
+
+    for o in result:
+        qty = int(o['quantity'])
+        sale = float(o['item_price']) * qty
+        cost = float(o['item_cost']) * qty
+
+        total_sales += sale
+        total_cost += cost
+
+        item = o['item_name']
+        item_stats[item]["quantity"] += qty
+        item_stats[item]["sales"] += sale
+        item_stats[item]["cost"] += cost
+
+        daily_sales[o['order_date']] += sale
+
+    profit_items = [{
+        "item": k,
+        "quantity": v["quantity"],
+        "sales": v["sales"],
+        "cost": v["cost"],
+        "profit": v["sales"] - v["cost"]
+    } for k,v in item_stats.items()]
+
+    return response(200, {
+        "period": period,
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "profit": total_sales - total_cost,
+        "orders_count": len(result),
+        "profit_per_item": profit_items,
+        "daily_sales": [{"date": d, "sales": s} for d,s in daily_sales.items()]
+    })
+
+def response(code, body):
+    return {
+        "statusCode": code,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(body)
+    }
+```
+
+---
+
+## PHASE 9️⃣  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
+
+### 1️⃣  Create Item Cost Table
+
+#### 1️⃣  Table Name:
+
+```
+CafeMenu
+```            
+#### 2️⃣  Basic Configurations:
+
+| PK                 | Attribute          |
+| ------------------ | ------------------ |
+| item_name (String) | base_cost (Number) |
+
+#### Example:
+
+```
+{ "item_name": "Latte", "base_cost": 1.5 }
+```
+
+### 2️⃣  Modify Order Processing Lambda (EXACT)
+
+```
+menu = dynamodb.Table('CafeMenu')
+
+def get_cost(item):
+    r = menu.get_item(Key={'item_name': item})
+    return float(r['Item']['base_cost'])
+```
+
+#### When saving order:
+
+```
+item_cost = get_cost(item_name)
+item_price = selling_price
+```
+
+✔ Cost is now automatic
+
+✔ No frontend change
+
+---
+
+## PHASE 🔟  PROFIT PER ITEM (ALREADY INCLUDED)
+
+✔ Calculated in Analytics Lambda
+
+✔ Returned as profit_per_item[]
+
+✔ Can be rendered in UI or PDF
+
+No additional configuration needed.
+
+---
+
+## PHASE 1️⃣1️⃣  ROLE-BASED ACCESS (ADMIN VS STAFF)
+
+### 1️⃣ Cognito Groups
+
+#### Create groups:
+
+```
+Admin
+Staff
+```
+
+### 2️⃣ Attach Users to Groups
+
+Cognito → Users → Add to group
+
+### 3️⃣ API Gateway Authorizer Context
+
+#### In Lambda, extract role:
+
+```
+claims = event['requestContext']['authorizer']['claims']
+role = claims.get('cognito:groups', '')
+```
+
+### 4️⃣ Enforce Analytics Access
+
+```
+if 'Admin' not in role:
+    return response(403, "Access denied")
+```
+
+✔ Staff sees orders
+
+✔ Admin sees analytics + PDF
+
+---
+
+## PHASE 1️⃣2️⃣  CSV EXPORT (PROFESSIONAL)
+
+### 1️⃣ New API Resource
+
+```
+GET /analytics/csv
+```
+
+### 2️⃣ CSV Lambda Code
+
+```
+import csv, io
+
+def lambda_handler(event, context):
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Item","Qty","Sales","Cost","Profit"])
+
+    for i in profit_items:
+        writer.writerow([
+            i['item'],
+            i['quantity'],
+            i['sales'],
+            i['cost'],
+            i['profit']
+        ])
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "text/csv",
+            "Content-Disposition": "attachment; filename=report.csv"
+        },
+        "body": output.getvalue()
+    }
+```
+
+---
+
+## PHASE 1️⃣3️⃣  DAILY AUTO PDF WITH TABLES & LOGO
+
+### 1️⃣ S3 Bucket
+
+```
+mn-cafe-s3-bucket
+```
+
+### 2️⃣ Upload Logo
+
+```
+Cafelogo.png
+```
+
+### 3️⃣ PDF Lambda (REPORTLAB – FINAL)
+
+```
+from reportlab.platypus import SimpleDocTemplate, Table, Image
+from reportlab.lib.pagesizes import A4
+import datetime
+
+def lambda_handler(event, context):
+    file = f"/tmp/report_{datetime.date.today()}.pdf"
+    doc = SimpleDocTemplate(file, pagesize=A4)
+
+    elements = []
+    elements.append(Image("logo.png", width=120, height=60))
+
+    table_data = [["Item","Qty","Sales","Cost","Profit"]]
+    for i in profit_items:
+        table_data.append([
+            i['item'], i['quantity'],
+            i['sales'], i['cost'], i['profit']
+        ])
+
+    elements.append(Table(table_data))
+    doc.build(elements)
+
+    s3.upload_file(file, "cafe-daily-reports", f"daily_{datetime.date.today()}.pdf")
+```
+
+### 4️⃣ EventBridge Rule
+
+```
+cron(0 0 * * ? *)
+```
+
+✔ Daily midnight PDF
+
+✔ Stored in S3
+
+---
+
+## PHASE 1️⃣4️⃣  DAILY AUTO PDF WITH TABLES & LOGO
+
+
+
+
+
+---
+
+## PHASE 1️⃣4️⃣  Test
 
 ### 1️⃣  - 📄 PDF – HOW IT WORKS FROM ORDER STATUS PAGE
 
@@ -1063,3 +1384,4 @@ cron(0 0 1 * ? *)
 ✔ You kept everything secure & clean
 
 ---
+
