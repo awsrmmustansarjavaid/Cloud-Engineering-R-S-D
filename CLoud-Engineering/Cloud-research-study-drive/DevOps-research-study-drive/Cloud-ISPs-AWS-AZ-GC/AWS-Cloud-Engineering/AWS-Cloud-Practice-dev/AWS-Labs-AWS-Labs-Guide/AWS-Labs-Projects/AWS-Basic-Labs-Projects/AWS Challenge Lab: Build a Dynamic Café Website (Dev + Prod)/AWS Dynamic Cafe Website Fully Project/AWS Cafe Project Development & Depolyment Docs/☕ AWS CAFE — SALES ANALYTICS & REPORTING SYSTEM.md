@@ -1640,34 +1640,35 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-statu
 
 #### EXPECTED RESULT:
 
-PDF opens/downloads
+- PDF opens/downloads
 
-Order table visible
+- Order table visible
 
-S3 object created:
+- S3 object created:
 
-```
-order-status_report_YYYY-MM-DD.pdf
-```
+    ```
+    order-status_report_YYYY-MM-DD.pdf
+    ```
 
 ❌ If this fails → STOP
+
 ❌ Do NOT touch frontend yet
 
-STEP 1️⃣1️⃣ – TEST FROM LAMBDA CONSOLE (MANDATORY)
+#### 1️⃣1️⃣ – TEST FROM LAMBDA CONSOLE (MANDATORY)
 
-Open Lambda → CafePDFReportLambda
+- Open Lambda → CafePDFReportLambda
 
-Click Test
+- Click Test
 
-Create test event
+- Create test event
 
-Name:
+- **Name:**
 
 ```
 AnalyticsPDFTest
 ```
 
-Test Event JSON (COPY EXACTLY)
+#### 1️⃣ Test Event JSON (COPY EXACTLY)
 
 ```
 {
@@ -1677,17 +1678,17 @@ Test Event JSON (COPY EXACTLY)
 }
 ```
 
-Click Test
+- Click Test
 
-EXPECT:
+#### EXPECT:
 
-StatusCode: 200
+- StatusCode: 200
 
-No errors
+- No errors
 
-PDF saved to S3
+- PDF saved to S3
 
-11.2 Order Status Lambda Test
+#### 2️⃣ Order Status Lambda Test
 
 Create new test:
 
@@ -1699,9 +1700,11 @@ Create new test:
 }
 ```
 
-STEP 1️⃣2️⃣ – CONNECT ANALYTICS PAGE BUTTON
-12.1 Open analytics.html
-12.2 Replace downloadPDF() with:
+#### 1️⃣2️⃣ – CONNECT ANALYTICS PAGE BUTTON
+
+#### 1️⃣ Open analytics.html
+
+#### 2️⃣ Replace downloadPDF() with:
 
 ```
 function downloadPDF(){
@@ -1712,15 +1715,17 @@ function downloadPDF(){
 }
 ```
 
-⚠️ Replace:
+#### ⚠️ Replace:
 
-API_ID
+- API_ID
 
-REGION
+- REGION
 
-STEP 1️⃣3️⃣ – CONNECT ORDER STATUS PAGE BUTTON
-13.1 Open order-status.html
-13.2 Add / Update function:
+#### 1️⃣3️⃣ – CONNECT ORDER STATUS PAGE BUTTON
+
+#### 1️⃣ Open order-status.html
+
+#### 2️⃣ Add / Update function:
 
 ```
 function downloadOrderPDF(){
@@ -1731,7 +1736,7 @@ function downloadOrderPDF(){
 }
 ```
 
-13.3 Attach button:
+#### 3️⃣ Attach button:
 
 ```
 <button class="btn btn-success btn-sm" onclick="downloadOrderPDF()">
@@ -1739,8 +1744,9 @@ function downloadOrderPDF(){
 </button>
 ```
 
-STEP 1️⃣4️⃣ – FINAL FULL TEST (DO NOT SKIP)
-✔ Test Matrix
+#### 1️⃣4️⃣ – FINAL FULL TEST (DO NOT SKIP)
+
+**✔ Test Matrix**
 
 | Test                         | Result |
 | ---------------------------- | ------ |
@@ -1752,7 +1758,7 @@ STEP 1️⃣4️⃣ – FINAL FULL TEST (DO NOT SKIP)
 | Order status page button     | ✅      |
 
 
-✅ PHASE 6 STATUS: COMPLETE & VERIFIED
+#### 1️⃣5️⃣ STATUS: COMPLETE & VERIFIED
 
 ✔ API Gateway connected
 ✔ Lambda receives page parameter
@@ -1760,9 +1766,9 @@ STEP 1️⃣4️⃣ – FINAL FULL TEST (DO NOT SKIP)
 ✔ Browser downloads PDF
 ✔ Safe to move to next phase
 
-🔒 IMPORTANT RULE
+#### 🔒 IMPORTANT RULE
 
-❗ DO NOT MOVE TO NEXT PHASE UNTIL ALL TESTS ABOVE PASS
+**❗ DO NOT MOVE TO NEXT PHASE UNTIL ALL TESTS ABOVE PASS**
 
 
 **✅ PHASE 6 STATUS**
