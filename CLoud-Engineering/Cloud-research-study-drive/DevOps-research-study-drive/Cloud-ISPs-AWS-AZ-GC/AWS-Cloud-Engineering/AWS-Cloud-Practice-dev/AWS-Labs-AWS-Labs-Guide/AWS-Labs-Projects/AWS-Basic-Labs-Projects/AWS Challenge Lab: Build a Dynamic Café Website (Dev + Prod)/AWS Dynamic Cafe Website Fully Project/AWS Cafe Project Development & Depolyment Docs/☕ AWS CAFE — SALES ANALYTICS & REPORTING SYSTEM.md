@@ -1108,17 +1108,26 @@ sudo systemctl restart httpd
 
 ### Create Cafe PDF Report Lambda
 
-####  1️⃣ Lambda Name
+####  1️⃣ CREATE LAMBDA
 
 ```
-CafePDFReportLambda
+Name: CafePDFReportLambda
+Runtime: Python 3.10
 ```
 
-####  1️⃣ Add Layer
+####  1️⃣ ADD REPORTLAB LAYER
 
-```
-reportlab
-```
+- **Lambda → Layers → Create layer**
+
+- **Upload reportlab.zip**
+
+- **Attach layer to:** CafePDFReportLambda
+
+- **ADD S3 PERMISSION:**
+
+    - **Attach IAM policy:**
+
+        - **AmazonS3FullAccess**
 
 ####  1️⃣ FULL PYTHON CODE
 
