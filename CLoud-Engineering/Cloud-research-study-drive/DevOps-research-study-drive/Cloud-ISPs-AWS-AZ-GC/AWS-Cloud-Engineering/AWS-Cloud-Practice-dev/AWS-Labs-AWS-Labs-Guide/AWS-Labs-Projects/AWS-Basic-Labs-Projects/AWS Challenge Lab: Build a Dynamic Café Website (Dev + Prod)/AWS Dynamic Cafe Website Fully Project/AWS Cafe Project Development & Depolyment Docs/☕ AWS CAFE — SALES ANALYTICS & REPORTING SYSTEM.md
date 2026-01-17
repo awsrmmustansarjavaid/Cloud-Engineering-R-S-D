@@ -1139,7 +1139,7 @@ Runtime: Python 3.10
 
 ###  3️⃣ DEPLOY EXISTING PDF CODE
 
-#### 1️⃣ UPDATED FULL PYTHON CODE (PDF for BOTH PAGES)
+#### 1️⃣ UPDATED CafePDFReportLambda FULL PYTHON CODE (PDF for BOTH PAGES)
 
 ```
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image, Spacer
@@ -1275,7 +1275,20 @@ def lambda_handler(event, context):
     }
 ```
 
-#### 2️⃣ TESTING THE PDF LAMBDA
+
+#### 2️⃣ 🔐 Environment Variables Required
+
+You will configure these in Lambda (steps below):
+
+| Variable Name         | Value (example) |
+| --------------------- | --------------- |
+| `ORDERS_TABLE_NAME`   | `CafeOrders`    |
+| `REPORTS_BUCKET_NAME` | `cafe-reports`  |
+| `LOGO_FILE_NAME`      | `Cafelogo.png`  |
+
+
+
+#### 3️⃣ TESTING THE PDF LAMBDA
 
 - **Go to AWS Console → Lambda → CafePDFReportLambda.**
 
