@@ -1428,15 +1428,7 @@ No frontend change needed except button URL.
 > **🟢 PHASE 6 COMPLETE & VERIFIED**
 ---
 
-## PHASE 7️⃣  EVENTBRIDGE - MONTHLY AUTO REPORT
-
-**✅ ADD EVENTBRIDGE TRIGGER TO CafePDFReportLambda**
-
-**This will automatically generate PDFs:**
-
-- Daily → Order Status PDF
-
-- Monthly → Analytics PDF
+## PHASE 7️⃣  Automation Monthly Auto Report
 
 ### 1️⃣ PREREQUISITE CHECK (DO THIS FIRST)
 
@@ -1460,7 +1452,23 @@ Your S3 Bucket
 
 **✅ If all above are true → continue.**
 
-### 2️⃣ CREATE DAILY ORDER STATUS PDF EVENTBRIDGE RULE
+**This will automatically generate PDFs:**
+
+- Daily → Order Status PDF
+
+- Monthly → Analytics PDF
+
+### 2️⃣ METHOD 1- EventBridge Schedule Using Lambda Trigger  (Recommanded)
+
+
+
+
+
+### 3️⃣ METHOD 2- EVENTBRIDGE
+
+**✅ ADD EVENTBRIDGE TRIGGER TO CafePDFReportLambda**
+
+### 1️⃣ CREATE DAILY ORDER STATUS PDF EVENTBRIDGE RULE
 
 #### 1️⃣ Go to EventBridge
 
@@ -1538,7 +1546,7 @@ Click Next
 
 **✅ DailyOrderPDF rule is LIVE**
 
-### 3️⃣ CREATE MONTHLY ANALYTICS PDF RULE
+### 2️⃣ CREATE MONTHLY ANALYTICS PDF RULE
 
 > **Repeat steps, but with these changes 👇**
 
@@ -1588,7 +1596,7 @@ cron(0 0 1 * ? *)
 
 **✅ Monthly automation is complete.**
 
-### 4️⃣ TEST EVENTBRIDGE TRIGGER (MANDATORY)
+### 3️⃣ TEST EVENTBRIDGE TRIGGER (MANDATORY)
 
 #### 1️⃣ OPTION A: Test via EventBridge
 
@@ -1618,7 +1626,7 @@ rate(1 minute)
 
 - Change cron back to original
 
-### 5️⃣ VERIFY PDF GENERATION
+### 4️⃣ VERIFY PDF GENERATION
 
 #### 1️⃣  Go to:
 
@@ -1643,7 +1651,7 @@ analytics_2026-01-01.pdf
 
 - Correct data
 
-### 6️⃣ Confirm Lambda & EventBridge
+### 5️⃣ Confirm Lambda & EventBridge
 
 - Test in Lambda console → works ✅
 
