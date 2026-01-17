@@ -1108,14 +1108,14 @@ sudo systemctl restart httpd
 
 ### Create Cafe PDF Report Lambda
 
-####  1️⃣ CREATE LAMBDA
+#### CREATE LAMBDA
 
 ```
 Name: CafePDFReportLambda
 Runtime: Python 3.10
 ```
 
-####  1️⃣ ADD REPORTLAB LAYER
+###  2️⃣ ADD REPORTLAB LAYER
 
 - **Lambda → Layers → Create layer**
 
@@ -1129,7 +1129,9 @@ Runtime: Python 3.10
 
         - **AmazonS3FullAccess**
 
-####  1️⃣ FULL PYTHON CODE
+###  3️⃣ DEPLOY EXISTING PDF CODE
+
+#### FULL PYTHON CODE
 
 ```
 from reportlab.lib.pagesizes import A4
@@ -1172,6 +1174,15 @@ def lambda_handler(event, context):
         "isBase64Encoded": False
     }
 ```
+
+### 4️⃣ CONNECT API
+
+```
+/report/pdf
+POST → CafePDFReportLambda
+```
+
+- **Enable CORS → Deploy API**
 
 **✅ PHASE 5 STATUS**
 
