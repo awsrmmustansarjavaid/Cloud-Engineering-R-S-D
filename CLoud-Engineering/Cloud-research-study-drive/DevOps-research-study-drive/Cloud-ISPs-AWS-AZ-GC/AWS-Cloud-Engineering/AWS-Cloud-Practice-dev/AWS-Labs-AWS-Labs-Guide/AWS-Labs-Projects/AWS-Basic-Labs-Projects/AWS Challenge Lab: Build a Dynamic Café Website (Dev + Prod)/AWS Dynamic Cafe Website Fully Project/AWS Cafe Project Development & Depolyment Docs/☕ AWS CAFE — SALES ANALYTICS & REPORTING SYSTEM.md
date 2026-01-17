@@ -702,11 +702,39 @@ URL Query String Parameters
 Name: period
 Required: ❌ NO (leave unchecked)
 ```
+#### Set Allowed Values for period Parameter
 
-⚠️ Do NOT mark it required
-⚠️ Required = unchecked
+- After adding the query string period (Required = ❌ No), click on it.
+
+- Look for “Request Validator / Model” or “Validation” (depends on API Gateway type).
+
+- Under Allowed Values / Enum (if using REST API Request Validator with Model):
+
+```
+today
+week
+month
+```
 
 - **Click Save**
+
+#### ⚠️ Important Notes
+
+- ⚠️ If you skip this, API Gateway will accept any value and Lambda must handle invalid ones.
+
+- ⚠️ Do NOT mark it required
+
+- ⚠️ Required = unchecked,  You don’t need to mark as required — Lambda already checks for invalid or missing values.
+
+#### In short:
+
+| Parameter | Required | Allowed Values     |
+| --------- | -------- | ------------------ |
+| period    | No       | today, week, month |
+
+
+**That’s it — this is all you need for allowed values configuration.**
+
 
 #### 3️⃣ VERIFY
 
