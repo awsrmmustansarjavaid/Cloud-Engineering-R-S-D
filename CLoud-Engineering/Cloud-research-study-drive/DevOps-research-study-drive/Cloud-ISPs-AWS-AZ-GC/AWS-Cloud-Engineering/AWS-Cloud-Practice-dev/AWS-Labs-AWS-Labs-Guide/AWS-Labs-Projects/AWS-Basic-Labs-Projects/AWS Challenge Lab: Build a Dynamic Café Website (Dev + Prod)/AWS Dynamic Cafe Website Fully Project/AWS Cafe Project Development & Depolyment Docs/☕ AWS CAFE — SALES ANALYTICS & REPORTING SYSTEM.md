@@ -1761,9 +1761,13 @@ function downloadOrderPDF(){
 #### 1️⃣5️⃣ STATUS: COMPLETE & VERIFIED
 
 ✔ API Gateway connected
+
 ✔ Lambda receives page parameter
+
 ✔ Two pages → one PDF Lambda
+
 ✔ Browser downloads PDF
+
 ✔ Safe to move to next phase
 
 #### 🔒 IMPORTANT RULE
