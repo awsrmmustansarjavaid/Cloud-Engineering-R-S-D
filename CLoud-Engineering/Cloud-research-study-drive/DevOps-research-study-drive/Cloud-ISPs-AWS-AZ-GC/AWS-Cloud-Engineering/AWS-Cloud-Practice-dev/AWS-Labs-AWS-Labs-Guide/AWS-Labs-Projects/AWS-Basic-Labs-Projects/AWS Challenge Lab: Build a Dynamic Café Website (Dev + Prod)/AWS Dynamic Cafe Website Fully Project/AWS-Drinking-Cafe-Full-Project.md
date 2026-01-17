@@ -877,7 +877,7 @@ sudo systemctl restart httpd
 
 | Setting             | Value                            |
 | ------------------- | -------------------------------- |
-| Bucket name         | `mn-cafe-s3-bucket` |
+| Bucket name         | `charlie-cafe-s3-bucket` |
 | Region              | `us-east-1` (same as Lambda)     |
 | Object ownership    | ACLs disabled                    |
 | Block public access | ✅ Enabled (KEEP ON)             |
