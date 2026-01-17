@@ -117,7 +117,18 @@ AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 
 ❌ Do not deploy Lambda before this
 
+#### 3️⃣ TEST INDEX (VERY IMPORTANT)
 
+#### Use DynamoDB PartiQL Editor
+
+```
+SELECT * FROM "CafeOrders"."order_date-index"
+WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31'
+```
+
+✔ If results return → continue
+
+❌ If empty → your data format is wrong
 
 ---
 
