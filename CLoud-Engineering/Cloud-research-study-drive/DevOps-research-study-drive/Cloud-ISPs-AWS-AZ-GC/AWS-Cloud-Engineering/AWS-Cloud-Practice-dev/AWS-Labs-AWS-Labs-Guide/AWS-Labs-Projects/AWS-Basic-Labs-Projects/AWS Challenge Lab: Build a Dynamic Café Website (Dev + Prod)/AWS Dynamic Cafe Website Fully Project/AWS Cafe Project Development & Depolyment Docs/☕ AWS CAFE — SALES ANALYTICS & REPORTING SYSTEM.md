@@ -3171,10 +3171,101 @@ def response(code, body):
 - Click Deploy
 
 
+### 🧪 5️⃣ – TEST LAMBDA IN CONSOLE (MANDATORY)
+
+#### 1️⃣ Create Test Event
+
+- **Lambda → Test → Configure test event**
+
+- **Name:**
+
+```
+AnalyticsMonthTest
+```
+
+- **JSON:**
+
+```
+{
+  "queryStringParameters": {
+    "period": "month"
+  }
+}
+```
+
+- Click Save
+
+#### 2️⃣ Run Test
+
+- Click Test
+
+✔ **Status code: 200**
+
+✔ **Response body MUST look like:**
+
+```
+{
+  "period": "month",
+  "total_sales": 12000,
+  "total_cost": 8000,
+  "profit": 4000,
+  "orders_count": 340,
+  "profit_per_item": [
+    {
+      "item": "Latte",
+      "quantity": 120,
+      "sales": 360,
+      "cost": 180,
+      "profit": 180
+    }
+  ],
+  "daily_sales": [
+    { "date": "2026-01-01", "sales": 400 }
+  ]
+}
+```
+
+❌ If error → check CloudWatch logs
+
+❌ If empty → verify DynamoDB dates
+
+### 🧪 6️⃣ – TEST THROUGH API GATEWAY
+
+#### 1️⃣  API Gateway Setup (IF NOT DONE)
+
+```
+GET /analytics
+→ Lambda Proxy → CafeAnalyticsLambda
+```
+
+- Deploy API
+
+#### 2️⃣  Browser Test
+
+#### Open browser:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=month
+```
+
+✔ JSON shown
+
+✔ No CORS error
+
+✔ Correct totals
 
 
+### ✅ PHASE 9 COMPLETION CHECKLIST
 
-
+| Item                         | Status |
+| ---------------------------- | ------ |
+| DynamoDB attributes verified | ✅      |
+| GSI tested                   | ✅      |
+| Lambda created               | ✅      |
+| IAM correct                  | ✅      |
+| Console test passed          | ✅      |
+| API test passed              | ✅      |
+| Response format EXACT        | ✅      |
 
 
 
@@ -3187,7 +3278,7 @@ def response(code, body):
 
 ### 1️⃣  Create Item Cost Table
 
-#### 1️⃣  Table Name:
+#### 1️⃣ Table Name:
 
 ```
 CafeMenu
