@@ -1410,7 +1410,7 @@ order-status_report_2026-01-17.pdf
 ---
 
 
-## PHASE 6️⃣  CONNECT PDF BUTTON WITH API
+## PHASE 6️⃣  CONNECT PDF BUTTON WITH API ( API GATEWAY)
 
 ### Goal :
 
