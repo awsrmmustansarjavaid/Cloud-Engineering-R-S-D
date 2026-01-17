@@ -49,15 +49,19 @@ EventBridge
 
 ## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
 
-#### ✅ Existing Orders Table (REQUIRED STRUCTURE)
+> **⚠️ This phase is mandatory before Lambda works.**
 
-### 1️⃣ Table Name: 
+### 1️⃣ VERIFY EXISTING ORDERS TABLE (REQUIRED STRUCTURE)
+
+
+
+#### 1️⃣ Table Name: 
 
 ```        
 CafeOrders
 ```
 
-### 2️⃣ Partition Key (PK):
+#### 2️⃣ Partition Key (PK):
 
 ```
 order_id (String)
