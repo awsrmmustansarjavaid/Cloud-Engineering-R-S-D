@@ -668,7 +668,65 @@ Actions → Enable CORS
 GET, OPTIONS
 ```
 
-####  4️⃣ DEPLOY API
+####  4️⃣ QUERY STRING PARAMETERS
+
+#### 1️⃣ Find URL Query String Parameters
+
+> **You will see sections like:**
+
+- Authorization
+
+- Request Validator
+
+- URL Query String Parameters
+
+- HTTP Request Headers
+
+#### 👉 Find this section:
+
+```
+URL Query String Parameters
+```
+
+#### 2️⃣ ADD period PARAMETER (EXACT)
+
+- Click Edit (top right)
+
+- Under URL Query String Parameters
+
+- Click Add query string
+
+- **Enter:**
+
+```
+Name: period
+Required: ❌ NO (leave unchecked)
+```
+
+⚠️ Do NOT mark it required
+⚠️ Required = unchecked
+
+- **Click Save**
+
+#### 3️⃣ VERIFY
+
+> **You must now see:**
+
+```
+URL Query String Parameters
+--------------------------------
+period   false
+```
+
+**⚠️ If you don’t see this → it was NOT saved.
+
+
+
+```
+period=today|week|month
+```
+
+####  5️⃣ DEPLOY API
 
 - **Go to Actions → Deploy API → prod**
 
@@ -676,13 +734,6 @@ GET, OPTIONS
 
 ```
 https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics
-```
-
-
-####  4️⃣ Query Parameters
-
-```
-period=today|week|month
 ```
 
 **✅ PHASE 3 STATUS**
