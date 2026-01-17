@@ -1404,7 +1404,6 @@ order-status_report_2026-01-17.pdf
 **✅ You now have both PDFs.**
 
 
-
 **✅ PHASE 5 STATUS**
 
 > **🟢 PHASE 5 COMPLETE & VERIFIED**
@@ -1431,9 +1430,109 @@ No frontend change needed except button URL.
 
 ## PHASE 7️⃣  EVENTBRIDGE - MONTHLY AUTO REPORT
 
-### Daily PDF
+**✅ ADD EVENTBRIDGE TRIGGER TO CafePDFReportLambda**
+
+**This will automatically generate PDFs:**
+
+- Daily → Order Status PDF
+
+- Monthly → Analytics PDF
+
+### 1️⃣ PREREQUISITE CHECK (DO THIS FIRST)
+
+#### Before EventBridge:
+
+- **Lambda exists:** CafePDFReportLambda
+
+- Lambda already works in Test Event (manual test passed)
+
+- **Lambda IAM Role includes:**
+
+    - AmazonS3FullAccess OR
+
+    - Custom policy with s3:PutObject
+
+- S3 bucket exists (example):
+
+```
+Your S3 Bucket
+```
+
+**✅ If all above are true → continue.**
+
+### 2️⃣ CREATE DAILY ORDER STATUS PDF EVENTBRIDGE RULE
+
+### 1️⃣ Go to EventBridge
 
 - **Go to EventBridge → Rules → Create rule**
+
+### 2️⃣ Configure Rule
+
+- **Name:** DailyOrderPDF
+
+- **Description:** “Generate Order Status PDF daily”
+
+- **Event bus:** default
+
+- **Rule type:** Schedule
+
+- **Cron expression for daily midnight:**
+
+```
+cron(0 0 * * ? *)
+```
+
+**➡️ Runs daily at 00:00 UTC**
+
+**⚠️ If you want local time (Pakistan = UTC+5):**
+
+```
+cron(0 19 * * ? *)
+```
+
+Click Next
+
+
+> **Explanation:**
+
+> **0 0 * * ? * → triggers at 00:00 UTC every day**
+
+| Field | Meaning     |
+| ----- | ----------- |
+| 0     | minute      |
+| 0     | hour        |
+| *     | every day   |
+| *     | every month |
+| ?     | day of week |
+| *     | every year  |
+
+
+
+**⚠️ You can adjust hour/minute for your timezone**
+
+### 3️⃣ Add Target
+
+- **Target:** Lambda function → CafePDFReportLambda
+
+- **Configure input:**
+
+    - **Select Constant (JSON text)**
+
+    - **Paste JSON for Order Status PDF:**
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+
+- **Click Create → EventBridge rule now triggers Lambda daily.**
+
+### 4️⃣ Add Target
+
+
 
 ### 1️⃣ Rule
 
