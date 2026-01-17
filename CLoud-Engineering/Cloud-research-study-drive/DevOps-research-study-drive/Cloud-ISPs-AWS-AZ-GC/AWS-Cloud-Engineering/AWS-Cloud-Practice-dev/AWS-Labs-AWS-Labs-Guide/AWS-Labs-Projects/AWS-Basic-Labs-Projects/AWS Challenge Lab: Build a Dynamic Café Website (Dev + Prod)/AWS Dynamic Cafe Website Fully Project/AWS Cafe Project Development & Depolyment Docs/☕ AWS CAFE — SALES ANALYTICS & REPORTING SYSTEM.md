@@ -24,19 +24,27 @@ You will build ONE analytics system that:
 ### 🧱 ARCHITECTURE (FINAL)
 
 ```
-Frontend (Bootstrap Analytics Page)
+Order Status Page (Existing)
         |
-        |--- GET /analytics
-        |--- POST /report/pdf
+        |--- GET /order-status        (existing)
+        |--- GET /analytics           (new)
+        |--- GET /analytics/csv       (new)
+        |--- POST /report/pdf         (new)
         |
-API Gateway
+API Gateway (Existing)
         |
-        |--- Analytics Lambda
-        |--- PDF Lambda
+        |--- OrderStatusLambda        (existing)
+        |--- CafeAnalyticsLambda     (new)
+        |--- CafePDFReportLambda     (new)
         |
-DynamoDB (Existing Orders Table)
+DynamoDB
         |
-EventBridge (Monthly Trigger)
+        |--- CafeOrders              (existing)
+        |--- CafeMenu                (new – cost only)
+        |
+EventBridge
+        |
+        |--- Daily / Monthly PDF
 ```
 
 ## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
