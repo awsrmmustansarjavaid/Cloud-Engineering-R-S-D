@@ -1303,7 +1303,7 @@ def lambda_handler(event, context):
     doc = SimpleDocTemplate(file, pagesize=A4)
 
     elements = []
-    elements.append(Image("logo.png", width=120, height=60))
+    elements.append(Image("Cafelogo.png", width=120, height=60))
 
     table_data = [["Item","Qty","Sales","Cost","Profit"]]
     for i in profit_items:
@@ -1315,7 +1315,7 @@ def lambda_handler(event, context):
     elements.append(Table(table_data))
     doc.build(elements)
 
-    s3.upload_file(file, "cafe-daily-reports", f"daily_{datetime.date.today()}.pdf")
+    s3.upload_file(file, "mn-cafe-s3-bucket", f"daily_{datetime.date.today()}.pdf")
 ```
 
 ### 4️⃣ EventBridge Rule
