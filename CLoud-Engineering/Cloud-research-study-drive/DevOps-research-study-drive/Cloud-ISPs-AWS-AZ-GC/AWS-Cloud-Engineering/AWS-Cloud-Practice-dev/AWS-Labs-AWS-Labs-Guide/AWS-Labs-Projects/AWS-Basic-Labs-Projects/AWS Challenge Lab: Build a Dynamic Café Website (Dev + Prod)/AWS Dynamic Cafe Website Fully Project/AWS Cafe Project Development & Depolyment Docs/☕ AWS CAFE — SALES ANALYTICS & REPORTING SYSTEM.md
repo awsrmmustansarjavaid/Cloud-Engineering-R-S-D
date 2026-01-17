@@ -1646,13 +1646,13 @@ analytics_report_2026-01-01.pdf
 
 #### TASK 6️⃣ CLOUDWATCH LOG VERIFICATION
 
-Lambda → Monitor
+- Lambda → Monitor
 
-Click View logs in CloudWatch
+- Click View logs in CloudWatch
 
-Open latest log stream
+- Open latest log stream
 
-You should see:
+**You should see:**
 
 ```
 PDF generated successfully
