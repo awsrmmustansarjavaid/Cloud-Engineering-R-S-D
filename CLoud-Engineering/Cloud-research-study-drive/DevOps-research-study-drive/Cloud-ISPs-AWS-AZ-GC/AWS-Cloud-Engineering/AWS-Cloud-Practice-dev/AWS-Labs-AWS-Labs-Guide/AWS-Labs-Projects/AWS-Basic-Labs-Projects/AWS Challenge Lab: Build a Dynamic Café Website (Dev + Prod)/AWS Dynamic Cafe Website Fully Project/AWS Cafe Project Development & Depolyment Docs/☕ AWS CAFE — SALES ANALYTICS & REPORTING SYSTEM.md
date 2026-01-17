@@ -53,29 +53,37 @@ EventBridge
 
 ### 1️⃣ VERIFY EXISTING ORDERS TABLE (REQUIRED STRUCTURE)
 
+#### 1️⃣ Open DynamoDB Console: 
 
+```
+AWS Console → DynamoDB → Tables
+```
 
-#### 1️⃣ Table Name: 
+#### 2️⃣ Confirm Table Name: 
 
 ```        
 CafeOrders
 ```
 
-#### 2️⃣ Partition Key (PK):
+**❌ If the name is different, STOP and rename your code, not the table.**
 
-```
-order_id (String)
-```
+### 2️⃣ VERIFY REQUIRED ATTRIBUTES EXIST
 
-#### Attributes (MUST exist):
+#### 1️⃣ Open CafeOrders → Explore Table
 
-```
-order_date      (String)  -> "2026-01-17"
-order_timestamp (Number)  -> 1705488000
-total_amount    (Number)
-total_cost      (Number)
-order_status    (String)  -> COMPLETED
-```
+#### Confirm every item contains:
+
+| Attribute       | Type   | Why Needed       |
+| --------------- | ------ | ---------------- |
+| order_id        | String | Primary Key      |
+| order_date      | String | GSI partition    |
+| order_timestamp | Number | GSI sort         |
+| total_amount    | Number | Sales            |
+| total_cost      | Number | Cost             |
+| order_status    | String | Filter COMPLETED |
+
+**⚠️ If any attribute is missing, analytics will break.**
+
 
 #### 📌 IMPORTANT
 
