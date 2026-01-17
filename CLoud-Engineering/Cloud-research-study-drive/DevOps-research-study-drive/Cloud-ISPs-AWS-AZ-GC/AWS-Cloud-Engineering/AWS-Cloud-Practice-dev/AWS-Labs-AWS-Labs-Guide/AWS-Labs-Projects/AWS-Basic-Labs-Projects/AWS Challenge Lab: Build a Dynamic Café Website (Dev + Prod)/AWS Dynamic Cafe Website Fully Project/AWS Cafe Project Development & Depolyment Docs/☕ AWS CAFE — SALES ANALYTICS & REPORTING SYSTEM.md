@@ -492,6 +492,74 @@ def response(code, body):
 
 ✔ Calculations work
 
+#### 4️⃣ HEALTH CHECK TEST (EMPTY EVENT)
+
+> **This confirms Lambda boots correctly.**
+
+#### 1️⃣ Create another test event:
+
+```
+Test name: HealthCheck
+```
+
+#### 2️⃣ Event JSON:
+
+```
+{}
+```
+
+- **Click Test**
+
+#### ✅ EXPECTED RESULT
+
+```
+StatusCode: 400
+Body: "Invalid period"
+```
+
+✔ Lambda is alive
+
+✔ Error handling works
+
+✔ Code path correct
+
+#### 4️⃣ TEST ALL PERIODS (NO GUESSING)
+
+> **Create 3 separate test events:**
+
+#### 1️⃣ TODAY
+
+```
+{
+  "queryStringParameters": {
+    "period": "today"
+  }
+}
+```
+
+#### 2️⃣ WEEK
+
+```
+{
+  "queryStringParameters": {
+    "period": "week"
+  }
+}
+```
+
+#### 3️⃣ MONTH
+
+```
+{
+  "queryStringParameters": {
+    "period": "month"
+  }
+}
+```
+
+**✅ Each must return statusCode: 200**
+
+
 
 **✅ PHASE 2 STATUS**
 
