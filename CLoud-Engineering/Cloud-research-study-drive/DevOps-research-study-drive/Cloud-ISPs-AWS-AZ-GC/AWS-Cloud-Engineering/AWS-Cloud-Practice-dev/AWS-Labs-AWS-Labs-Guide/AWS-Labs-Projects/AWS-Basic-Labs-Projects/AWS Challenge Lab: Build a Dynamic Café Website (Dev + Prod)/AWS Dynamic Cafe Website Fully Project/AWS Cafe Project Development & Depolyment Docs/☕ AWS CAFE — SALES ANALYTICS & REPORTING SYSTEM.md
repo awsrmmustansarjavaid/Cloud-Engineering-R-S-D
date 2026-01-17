@@ -177,24 +177,13 @@ AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 
 This avoids full table scans (very important).
 
-#### 3️⃣ TEST INDEX (VERY IMPORTANT)
+### 3️⃣ – EXACT DYNAMODB QUERY CODE (REQUIRED)
 
-#### Use DynamoDB PartiQL Editor
+> **This is the canonical query function used by Analytics Lambda.**
 
-```
-SELECT * FROM "CafeOrders"."order_date-index"
-WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31'
-```
+#### ✅ Python Query Function (COPY AS-IS)
 
-✔ If results return → continue
-
-❌ If empty → your data format is wrong
-
----
-
-### 3️⃣ – EXACT DYNAMODB QUERY CODE
-
-####  Daily / Weekly / Monthly Query (Python)
+> **Daily / Weekly / Monthly Query (Python)**
 
 ```
 import boto3
@@ -215,6 +204,164 @@ def query_orders(start_date, end_date):
     return response['Items']
 ```
 
+#### 📌 Notes:
+
+- start_date and end_date must be strings
+
+- Format: "YYYY-MM-DD"
+
+- This code assumes GSI already exists
+
+#### 4️⃣ MANUAL TESTING (NO LAMBDA YET)
+
+#### 1️⃣ Insert Test Orders (If Needed)
+
+**⚠️ If you don’t already have test data:**
+
+- DynamoDB → Explore table items
+
+- Click Create item
+
+- Add at least 3 items:
+
+#### Example:
+
+```
+order_id: ORD-TEST-001
+order_date: 2026-01-17
+order_timestamp: 1705488000
+total_amount: 30
+total_cost: 18
+order_status: COMPLETED
+```
+
+#### 💠 Create:
+
+- One order for today
+
+- One order for 7 days ago
+
+- One order for earlier this month
+
+#### 2️⃣ TEST QUERY USING AWS LAMBDA (TEMP TEST)
+
+> **This confirms the index + query code works.**
+
+#### 1️⃣ Create TEMP Test Lambda
+
+- **AWS → Lambda → Create function**
+
+- **Name:**
+
+```
+CafeDynamoTestLambda
+```
+
+- **Runtime:** Python 3.10
+
+- **Permissions:**
+
+```
+AmazonDynamoDBReadOnlyAccess
+
+CloudWatchLogsFullAccess
+```
+
+#### 2️⃣ Paste Test Code
+
+```
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    result = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': '2026-01-01',
+            ':e': '2026-01-31'
+        }
+    )
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "count": len(result['Items']),
+            "items": result['Items']
+        })
+    }
+```
+
+#### 3️⃣ Run Test
+
+- Click Test
+
+- Create test event → {} (empty JSON)
+
+- Run
+
+#### ✅ EXPECTED RESULT (PASS CRITERIA)
+
+✔ StatusCode = 200
+
+✔ count > 0
+
+✔ Items returned are only:
+
+    - From January
+
+    - Have correct order_date
+
+    - Sorted by timestamp
+
+#### ❌ If error:
+
+- Check GSI name
+
+- Check attribute types
+
+- Check index status = ACTIVE
+
+
+#### 3️⃣ TEST INDEX (VERY IMPORTANT)
+
+#### Use DynamoDB PartiQL Editor
+
+```
+SELECT * FROM "CafeOrders"."order_date-index"
+WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31'
+```
+
+✔ If results return → continue
+
+❌ If empty → your data format is wrong
+
+#### FINAL VALIDATION CHECKLIST
+
+Before moving to Phase 2, confirm:
+
+✔ CafeOrders table exists
+
+✔ order_id is PK
+
+✔ order_date is String
+
+✔ order_timestamp is Number
+
+✔ GSI order_date-index is ACTIVE
+
+✔ Query returns correct data
+
+✔ No table scan used
+
+✔ No missing attributes
+
+**✅ PHASE 1 STATUS**
+
+> **🟢 PHASE 1 COMPLETE & VERIFIED**
 ---
 
 ## PHASE 2️⃣  – ANALYTICS LAMBDA (FULL CODE)
@@ -290,7 +437,9 @@ def response(code, body):
     }
 ```
 
+**✅ PHASE 2 STATUS**
 
+> **🟢 PHASE 2 COMPLETE & VERIFIED**
 ---
 
 ## PHASE 3️⃣  – API GATEWAY
@@ -322,9 +471,12 @@ Lambda Proxy Integration
 period=today|week|month
 ```
 
+**✅ PHASE 3 STATUS**
+
+> **🟢 PHASE 3 COMPLETE & VERIFIED**
 ---
 
-## PHASE 3️⃣  BOOTSTRAP ANALYTICS UI
+## PHASE 4️⃣  BOOTSTRAP ANALYTICS UI
 
 ### 1️⃣ analytics.html (FULL CODE)
 
@@ -389,9 +541,12 @@ function downloadPDF(){
 </html>
 ```
 
+**✅ PHASE 4 STATUS**
+
+> **🟢 PHASE 4 COMPLETE & VERIFIED**
 ---
 
-## PHASE 4️⃣  PDF GENERATION LAMBDA (REPORTLAB)
+## PHASE 5️⃣  PDF GENERATION LAMBDA (REPORTLAB)
 
 ### Create Cafe PDF Report Lambda
 
@@ -451,10 +606,13 @@ def lambda_handler(event, context):
     }
 ```
 
+**✅ PHASE 5 STATUS**
+
+> **🟢 PHASE 5 COMPLETE & VERIFIED**
 ---
 
 
-## PHASE 5️⃣  CONNECT PDF BUTTON WITH API
+## PHASE 6️⃣  CONNECT PDF BUTTON WITH API
 
 ### 🔹 API Gateway
 
@@ -465,9 +623,12 @@ POST → CafePDFReportLambda
 
 No frontend change needed except button URL.
 
+**✅ PHASE 6 STATUS**
+
+> **🟢 PHASE 6 COMPLETE & VERIFIED**
 ---
 
-## PHASE 6️⃣  MONTHLY AUTO REPORT (EVENTBRIDGE)
+## PHASE 7️⃣  MONTHLY AUTO REPORT (EVENTBRIDGE)
 
 ### 1️⃣ Rule
 
@@ -481,9 +642,12 @@ cron(0 0 1 * ? *)
 CafePDFReportLambda
 ```
 
+**✅ PHASE 7 STATUS**
+
+> **🟢 PHASE 7 COMPLETE & VERIFIED**
 ---
 
-## PHASE 7️⃣  MODIFY ORDER STATUS PAGE
+## PHASE 8️⃣  MODIFY ORDER STATUS PAGE
 
 ### 🎯 GOAL
 
@@ -1112,9 +1276,11 @@ showDashboard();
 
 ✔ Production-ready
 
+**✅ PHASE 8 STATUS**
 
+> **🟢 PHASE 8 COMPLETE & VERIFIED**
 ---
-## PHASE 8️⃣  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
+## PHASE 9️⃣  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
 
 ### 1️⃣  Required DynamoDB Attributes (Orders Table)
 
@@ -1240,10 +1406,12 @@ def response(code, body):
         "body": json.dumps(body)
     }
 ```
+**✅ PHASE 9 STATUS**
 
+> **🟢 PHASE 9 COMPLETE & VERIFIED**
 ---
 
-## PHASE 9️⃣  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
+## PHASE 🔟  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
 
 ### 1️⃣  Create Item Cost Table
 
@@ -1285,9 +1453,12 @@ item_price = selling_price
 
 ✔ No frontend change
 
+**✅ PHASE 10 STATUS**
+
+> **🟢 PHASE 10 COMPLETE & VERIFIED**
 ---
 
-## PHASE 🔟  PROFIT PER ITEM (ALREADY INCLUDED)
+## PHASE 1️⃣1️⃣  PROFIT PER ITEM (ALREADY INCLUDED)
 
 ✔ Calculated in Analytics Lambda
 
@@ -1297,9 +1468,13 @@ item_price = selling_price
 
 No additional configuration needed.
 
+**✅ PHASE 11 STATUS**
+
+> **🟢 PHASE 11 COMPLETE & VERIFIED**
+
 ---
 
-## PHASE 1️⃣1️⃣  ROLE-BASED ACCESS (ADMIN VS STAFF)
+## PHASE 1️⃣2️⃣  ROLE-BASED ACCESS (ADMIN VS STAFF)
 
 ### 1️⃣ Cognito Groups
 
@@ -1334,9 +1509,13 @@ if 'Admin' not in role:
 
 ✔ Admin sees analytics + PDF
 
+**✅ PHASE 12 STATUS**
+
+> **🟢 PHASE 12 COMPLETE & VERIFIED**
+
 ---
 
-## PHASE 1️⃣2️⃣  CSV EXPORT (PROFESSIONAL)
+## PHASE 1️⃣3️⃣  CSV EXPORT (PROFESSIONAL)
 
 ### 1️⃣ New API Resource
 
@@ -1373,9 +1552,13 @@ def lambda_handler(event, context):
     }
 ```
 
+
+**✅ PHASE 13 STATUS**
+
+> **🟢 PHASE 13 COMPLETE & VERIFIED**
 ---
 
-## PHASE 1️⃣3️⃣  DAILY AUTO PDF WITH TABLES & LOGO
+## PHASE 1️⃣4️⃣  DAILY AUTO PDF WITH TABLES & LOGO
 
 ### 1️⃣ S3 Bucket
 
@@ -1426,9 +1609,14 @@ cron(0 0 * * ? *)
 
 ✔ Stored in S3
 
+
+**✅ PHASE 14 STATUS**
+
+> **🟢 PHASE 14 COMPLETE & VERIFIED**
+
 ---
 
-## PHASE 1️⃣4️⃣  Test
+## PHASE 1️⃣5️⃣  Test
 
 ### 1️⃣  - 📄 PDF – HOW IT WORKS FROM ORDER STATUS PAGE
 
@@ -1459,6 +1647,8 @@ cron(0 0 1 * ? *)
 
 **No Order Status page change needed.**
 
+
+
 ### ✅ FINAL SYSTEM CHECKLIST CONFIRMATION
 
 ✔ You used existing Order Status system
@@ -1488,6 +1678,10 @@ cron(0 0 1 * ? *)
 ✔ No duplicate systems
 
 ✔ Production ready
+
+**✅ PHASE 15 STATUS**
+
+> **🟢 PHASE 15 COMPLETE & VERIFIED**
 
 ---
 
