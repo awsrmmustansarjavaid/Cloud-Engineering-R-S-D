@@ -895,40 +895,132 @@ period=today|week|month
 
 ```
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Cafe Analytics</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<title>Cafe Analytics ☕</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ===================== BODY & BACKGROUND ===================== */
+body {
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:
+    linear-gradient(rgba(58,44,31,0.75), rgba(58,44,31,0.75)),
+    url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&q=80');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+
+/* ===================== CONTAINER ===================== */
+.container {
+  backdrop-filter: blur(6px);
+  background-color: rgba(0,0,0,0.45);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* ===================== HEADINGS ===================== */
+h3 {
+  text-align: center;
+  font-weight: bold;
+  color: #ffddaa;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* ===================== SELECT & BUTTONS ===================== */
+.form-select, .btn {
+  border-radius: 50px;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, #a0522d, #d2b48c);
+  border: none;
+}
+
+.btn-success {
+  background: linear-gradient(45deg, #8b4513, #f4a460);
+  border: none;
+  font-weight: bold;
+  position: absolute;
+  top: 20px;
+  right: 20px; /* PDF button top-right */
+  z-index: 10;
+}
+
+/* ===================== CARDS ===================== */
+.card {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ===================== CHART ===================== */
+canvas {
+  background: rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+/* ===================== PDF BUTTON HOVER ===================== */
+.btn-success:hover {
+  background: linear-gradient(45deg, #d2691e, #ffcc99);
+}
+</style>
 </head>
-<body class="bg-light">
 
-<div class="container mt-4">
-  <h3 class="mb-4">📊 Sales Analytics</h3>
+<body>
 
-  <select id="period" class="form-select mb-3">
-    <option value="today">Today</option>
-    <option value="week">Last 7 Days</option>
-    <option value="month">This Month</option>
-  </select>
+<div class="container mt-4 position-relative">
 
-  <button class="btn btn-primary mb-3" onclick="loadData()">Load Data</button>
+  <h3>📊 Cafe Sales Analytics</h3>
 
-  <div class="row">
+  <!-- Period & Load Button -->
+  <div class="d-flex justify-content-center align-items-center mt-4 gap-3 flex-wrap">
+    <select id="period" class="form-select w-auto">
+      <option value="today">Today</option>
+      <option value="week">Last 7 Days</option>
+      <option value="month">This Month</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadData()">Load Data</button>
+  </div>
+
+  <!-- Metrics Cards -->
+  <div class="row mt-4 g-4">
     <div class="col-md-4">
-      <div class="card p-3">Sales: <span id="sales"></span></div>
+      <div class="card p-3">Sales: <span id="sales">0</span></div>
     </div>
     <div class="col-md-4">
-      <div class="card p-3">Cost: <span id="cost"></span></div>
+      <div class="card p-3">Cost: <span id="cost">0</span></div>
     </div>
     <div class="col-md-4">
-      <div class="card p-3">Profit: <span id="profit"></span></div>
+      <div class="card p-3">Profit: <span id="profit">0</span></div>
     </div>
   </div>
 
-  <canvas id="chart" class="mt-4"></canvas>
+  <!-- Chart -->
+  <canvas id="chart" class="mt-4" height="120"></canvas>
 
-  <button class="btn btn-success mt-4" onclick="downloadPDF()">📄 Download PDF</button>
+  <!-- PDF Download Button -->
+  <button class="btn btn-success" onclick="downloadPDF()">📄 Download PDF</button>
+
 </div>
 
 <script>
@@ -940,6 +1032,34 @@ function loadData(){
     document.getElementById('sales').innerText = data.total_sales;
     document.getElementById('cost').innerText = data.total_cost;
     document.getElementById('profit').innerText = data.profit;
+
+    // Render Chart
+    const ctx = document.getElementById('chart').getContext('2d');
+
+    if(window.salesChart) window.salesChart.destroy();
+
+    window.salesChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Sales','Cost','Profit'],
+        datasets: [{
+          label: 'Amount',
+          data: [data.total_sales, data.total_cost, data.profit],
+          borderColor: '#ffddaa',
+          backgroundColor: 'rgba(255, 221, 170, 0.3)',
+          borderWidth: 3,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.2)' } },
+          x: { grid: { color: 'rgba(255,255,255,0.2)' } }
+        }
+      }
+    });
   });
 }
 
@@ -947,6 +1067,9 @@ function downloadPDF(){
   window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf");
 }
 </script>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
