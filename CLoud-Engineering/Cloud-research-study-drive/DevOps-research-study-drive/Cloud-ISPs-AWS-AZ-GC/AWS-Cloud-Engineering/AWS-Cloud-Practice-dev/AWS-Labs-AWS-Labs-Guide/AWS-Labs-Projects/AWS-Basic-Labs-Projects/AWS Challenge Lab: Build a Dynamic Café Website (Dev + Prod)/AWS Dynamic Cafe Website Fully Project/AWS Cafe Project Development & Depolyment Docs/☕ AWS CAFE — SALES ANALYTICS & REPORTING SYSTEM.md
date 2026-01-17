@@ -4059,7 +4059,7 @@ def lambda_handler(event, context):
 ### 1️⃣ S3 Bucket
 
 ```
-mn-cafe-s3-bucket
+charlie-cafe-s3-bucket
 ```
 
 ### 2️⃣ Upload Logo
@@ -4092,7 +4092,7 @@ def lambda_handler(event, context):
     elements.append(Table(table_data))
     doc.build(elements)
 
-    s3.upload_file(file, "mn-cafe-s3-bucket", f"daily_{datetime.date.today()}.pdf")
+    s3.upload_file(file, "charlie-cafe-s3-bucket", f"daily_{datetime.date.today()}.pdf")
 ```
 
 ### 4️⃣ EventBridge Rule
