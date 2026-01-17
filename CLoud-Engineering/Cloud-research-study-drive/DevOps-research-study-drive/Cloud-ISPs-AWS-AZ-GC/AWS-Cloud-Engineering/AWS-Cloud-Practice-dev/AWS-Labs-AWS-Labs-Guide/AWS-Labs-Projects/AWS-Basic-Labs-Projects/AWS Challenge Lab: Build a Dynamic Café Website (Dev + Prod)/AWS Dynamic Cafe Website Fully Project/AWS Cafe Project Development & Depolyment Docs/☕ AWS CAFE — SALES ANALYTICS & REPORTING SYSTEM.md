@@ -84,7 +84,6 @@ CafeOrders
 
 **⚠️ If any attribute is missing, analytics will break.**
 
-
 #### 📌 IMPORTANT
 
 - order_timestamp is required for fast filtering
