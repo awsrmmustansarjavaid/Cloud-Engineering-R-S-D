@@ -2898,6 +2898,11 @@ sudo systemctl restart httpd
 ---
 ## PHASE 9️⃣  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
 
+### Goal: 
+
+Build + test ONE analytics Lambda that returns a strict JSON format from DynamoDB.
+
+
 ### 1️⃣  Required DynamoDB Attributes (Orders Table)
 
 #### Every order item MUST contain:
