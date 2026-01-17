@@ -71,7 +71,7 @@ CafeOrders
 
 **❌ If the name is different, STOP and rename your code, not the table.**
 
-#### 2️⃣ Verify Table Keys (CRITICAL)
+#### 3️⃣ Verify Table Keys (CRITICAL)
 
 - **Go to Table details → General information**
 
@@ -131,8 +131,6 @@ CafeOrders
     - total_amount and total_cost are Numbers
 
 **❌ If any attribute is missing, STOP and fix order-saving logic first.**
-
----
 
 ### 3️⃣ – ADD ADD GLOBAL SECONDARY INDEX (GSI - VERY IMPORTANT)
 
