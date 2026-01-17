@@ -51,6 +51,10 @@ EventBridge
 
 > **⚠️ This phase is mandatory before Lambda works.**
 
+**Goal of this phase:**
+
+Ensure your existing DynamoDB table structure, index, and query logic are 100% correct and testable before analytics logic is added.
+
 ### 1️⃣ VERIFY EXISTING ORDERS TABLE (REQUIRED STRUCTURE)
 
 #### 1️⃣ Open DynamoDB Console: 
@@ -67,11 +71,31 @@ CafeOrders
 
 **❌ If the name is different, STOP and rename your code, not the table.**
 
-### 2️⃣ VERIFY REQUIRED ATTRIBUTES EXIST
+#### 2️⃣ Verify Table Keys (CRITICAL)
+
+- **Go to Table details → General information**
+
+#### Confirm:
+
+| Setting       | Value             |
+| ------------- | ----------------- |
+| Table name    | CafeOrders        |
+| Partition key | order_id (String) |
+| Sort key      | ❌ NONE (expected) |
+
+
+**⚠️ Do NOT add a sort key to the main table**
+> **Analytics filtering will be done via GSI.**
+
+### 2️⃣ VERIFY REQUIRED ATTRIBUTES EXIST (DATA CONTRACT)
+
+> **Your analytics depends on these attributes already existing in items.**
 
 #### 1️⃣ Open CafeOrders → Explore Table
 
-#### Confirm every item contains:
+> **✅ Required Attributes per Order Item***
+
+#### Every COMPLETED order MUST contain:
 
 | Attribute       | Type   | Why Needed       |
 | --------------- | ------ | ---------------- |
@@ -89,6 +113,26 @@ CafeOrders
 - order_timestamp is required for fast filtering
 
 - Use Unix timestamp
+
+#### 2️⃣ Verify Attributes Exist in Real Data
+
+- **DynamoDB → CafeOrders**
+
+- Click Explore table items
+
+- Open at least 3 COMPLETED orders
+
+- **Manually confirm:**
+
+    - order_date format = 2026-01-17
+
+    - order_timestamp is Number, not String
+
+    - total_amount and total_cost are Numbers
+
+**❌ If any attribute is missing, STOP and fix order-saving logic first.**
+
+
 
 ---
 
