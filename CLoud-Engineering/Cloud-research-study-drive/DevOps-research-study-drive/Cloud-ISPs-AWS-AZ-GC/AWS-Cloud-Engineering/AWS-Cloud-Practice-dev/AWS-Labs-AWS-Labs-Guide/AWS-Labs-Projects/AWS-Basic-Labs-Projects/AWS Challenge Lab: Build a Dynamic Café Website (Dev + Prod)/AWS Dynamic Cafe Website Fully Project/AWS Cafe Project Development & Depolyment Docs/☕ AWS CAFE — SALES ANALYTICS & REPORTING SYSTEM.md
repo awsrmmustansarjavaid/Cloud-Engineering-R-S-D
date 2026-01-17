@@ -996,7 +996,7 @@ canvas {
 
 <div class="container mt-4 position-relative">
 
-  <h3>📊 Cafe Sales Analytics</h3>
+  <h3>☕ Cafe Sales Analytics</h3>
 
   <!-- Period & Load Button -->
   <div class="d-flex justify-content-center align-items-center mt-4 gap-3 flex-wrap">
