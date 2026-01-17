@@ -1489,7 +1489,96 @@ report
 
 **✅ /report now exists**
 
+#### 3️⃣ – CREATE /pdf RESOURCE (VERY IMPORTANT)
 
+- Click /report
+
+- Click Create Resource
+
+- **Resource Name:**
+
+```
+pdf
+```
+
+- **Resource Path auto-fills:**
+
+```
+/report/pdf
+```
+
+- Click Create Resource
+
+**✅ Final path must be exactly:**
+
+#### 4️⃣ – CREATE POST METHOD (DO NOT SKIP)
+
+- Select /report/pdf
+
+- Click Create Method
+
+- **Choose:**
+
+```
+POST
+```
+
+- Click ✔️
+
+#### 5️⃣ – CONNECT METHOD TO LAMBDA (CRITICAL)
+
+You are now on POST – Setup page
+
+#### 1️⃣ Integration settings (EXACT VALUES)
+
+| Field                    | Value               |
+| ------------------------ | ------------------- |
+| Integration type         | Lambda Function     |
+| Lambda proxy integration | ✅ CHECKED           |
+| Lambda function          | CafePDFReportLambda |
+| Use default timeout      | ✅                   |
+
+⚠️ Region must match Lambda region
+
+5.2 Click Save
+
+If AWS asks permission:
+
+“Allow API Gateway to invoke Lambda?”
+
+✔️ Click OK
+
+STEP 6️⃣ – ENABLE CORS (DO NOT MISS)
+
+Select /report/pdf
+
+Click Enable CORS
+
+In popup:
+
+Leave default values
+
+Click Enable CORS and replace existing CORS headers
+
+Click Yes, replace existing values
+
+✅ CORS headers added
+
+STEP 7️⃣ – DEPLOY API (MANDATORY)
+
+If you skip this → NOTHING WILL WORK
+
+Click Deploy API
+
+Deployment stage:
+
+Choose existing stage (example: prod)
+
+Click Deploy
+
+STEP 8️⃣ – COPY FINAL PDF API URL
+
+After deploy, copy this:
 
 
 
