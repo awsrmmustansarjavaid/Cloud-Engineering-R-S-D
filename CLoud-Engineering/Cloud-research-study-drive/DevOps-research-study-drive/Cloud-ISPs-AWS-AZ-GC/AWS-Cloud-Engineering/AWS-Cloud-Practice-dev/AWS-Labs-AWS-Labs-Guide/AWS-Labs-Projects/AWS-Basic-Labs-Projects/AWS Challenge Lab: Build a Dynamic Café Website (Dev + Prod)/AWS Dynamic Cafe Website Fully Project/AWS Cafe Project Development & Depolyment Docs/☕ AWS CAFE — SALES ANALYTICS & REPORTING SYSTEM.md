@@ -1388,6 +1388,21 @@ You will configure these in Lambda (steps below):
 
 > **☢️ Note: body contains the PDF binary in latin1 encoding. You won’t see the PDF in the console, but the Lambda writes the file to your S3 bucket (cafe-reports) if S3 put_object succeeds.**
 
+#### 3️⃣ Verify S3
+
+- **Go to S3 → your bucket.**
+
+You should see:
+
+```
+analytics_report_2026-01-17.pdf
+order-status_report_2026-01-17.pdf
+```
+
+- Click → Download → Open in PDF viewer.
+
+**✅ You now have both PDFs.**
+
 
 
 **✅ PHASE 5 STATUS**
