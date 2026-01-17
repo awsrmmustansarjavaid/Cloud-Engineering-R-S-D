@@ -640,22 +640,44 @@ GET /analytics?period=today
 
 ####  1️⃣ Create Resource
 
-```
-/analytics
-```
+- **Go to API Gateway → Your Existing API → Resources → Create Resource**
 
-####  2️⃣ Method
 
 ```
-GET
+Resource Name: analytics
+Resource Path: /analytics
 ```
 
-####  3️⃣ Integration
+####  2️⃣ CREATE METHOD
 
 ```
-Lambda Proxy Integration
-→ CafeAnalyticsLambda
+Create Method → GET
+Integration: Lambda Proxy
+Lambda: CafeAnalyticsLambda
 ```
+
+####  3️⃣ ENABLE CORS
+
+```
+Actions → Enable CORS
+```
+
+#### Confirm:
+
+```
+GET, OPTIONS
+```
+
+####  4️⃣ DEPLOY API
+
+- **Go to Actions → Deploy API → prod**
+
+#### Copy:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics
+```
+
 
 ####  4️⃣ Query Parameters
 
