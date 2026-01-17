@@ -3284,6 +3284,40 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=month
 
 > **(MANDATORY BEFORE PROFIT / ANALYTICS / PDF)**
 
+### 🎯 PURPOSE OF THIS PHASE (VERY CLEAR)
+
+After this phase:
+
+✔ Item cost will be fetched automatically
+
+✔ Order Processing Lambda will NOT hardcode cost
+
+✔ Analytics profit will be accurate
+
+✔ Frontend remains UNCHANGED
+
+✔ You can TEST and VERIFY before moving to next phase
+
+### 📌 PRE-REQUISITES (VERIFY BEFORE START)
+
+Before starting this phase, confirm:
+
+✅ DynamoDB service is already used in your project
+
+✅ Order Processing Lambda already exists
+
+✅ Orders are already saved to CafeOrders table
+
+✅ Each order contains item_name
+
+**⚠️ If any one is missing, STOP and fix first.**
+
+
+
+
+
+
+
 ### 1️⃣  Create Item Cost Table
 
 #### 1️⃣ Table Name:
