@@ -559,6 +559,74 @@ Body: "Invalid period"
 
 **✅ Each must return statusCode: 200**
 
+#### 4️⃣ CHECK CLOUDWATCH LOGS (DEBUGGING STEP)
+
+
+#### 1️⃣ Go to:
+
+```
+Lambda → Monitor → View logs in CloudWatch
+```
+
+#### 1️⃣ Open latest log stream
+
+You MUST see:
+
+```
+START RequestId
+END RequestId
+REPORT RequestId
+```
+
+❌ If logs missing → IAM issue
+
+❌ If timeout → DynamoDB index missing
+
+❌ If AccessDenied → wrong policy
+
+#### 5️⃣ – COMMON FAILURES & FIX (IMPORTANT)
+
+#### ❌ Error: ValidationException: Index not found
+
+#### ➡️ Fix:
+
+DynamoDB → Indexes → confirm name is exactly
+
+```
+order_date-index
+```
+
+#### ❌ Error: NoneType is not subscriptable
+
+#### ➡️ Fix:
+
+Test event missing:
+
+```
+queryStringParameters
+```
+
+#### ❌ Returns zeros but no error
+
+#### ➡️ Fix:
+
+Table has no matching dates
+
+Ensure order_date is YYYY-MM-DD
+
+#### 6️⃣ – API GATEWAY READY CHECK (FINAL)
+
+Once Lambda test passes:
+
+#### You are READY to connect API Gateway:
+
+```
+GET /analytics?period=today
+```
+
+❌ No Lambda change needed
+
+❌ No extra config needed
 
 
 **✅ PHASE 2 STATUS**
