@@ -1313,7 +1313,24 @@ def lambda_handler(event, context):
 
 - **Click “Create”.**
 
+#### 2️⃣ Run Test
 
+- Click “Test” (top-right).
+
+- Lambda will execute.
+
+- **Scroll down to Execution Result → should see:**
+
+```
+{
+  "statusCode": 200,
+  "headers": { "Content-Type": "application/pdf" },
+  "body": "...", 
+  "isBase64Encoded": false
+}
+```
+
+> **☢️ Note: body contains the PDF binary in latin1 encoding. You won’t see the PDF in the console, but the Lambda writes the file to your S3 bucket (cafe-reports) if S3 put_object succeeds.**
 
 
 
