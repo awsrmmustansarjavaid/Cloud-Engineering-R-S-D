@@ -458,10 +458,17 @@ def response(code, body):
 
 ### 3️⃣ 🔐 Environment Variable Required
 
+- Open Lambda → Your Function
+
+- Go to Configuration → Environment variables
+
+- Click Edit → Add environment variable
+
 | Variable            | Example      |
 | ------------------- | ------------ |
 | `ORDERS_TABLE_NAME` | `CafeOrders` |
 
+👉 Click Save
 
 ### 4️⃣ CREATE TEST EVENT
 
@@ -1308,6 +1315,12 @@ def lambda_handler(event, context):
 
 #### 2️⃣ 🔐 Environment Variables Required
 
+- Open Lambda → Your Function
+
+- Go to Configuration → Environment variables
+
+- Click Edit → Add environment variable
+
 You will configure these in Lambda (steps below):
 
 | Variable Name         | Value (example) |
@@ -1316,7 +1329,7 @@ You will configure these in Lambda (steps below):
 | `REPORTS_BUCKET_NAME` | `cafe-reports`  |
 | `LOGO_FILE_NAME`      | `Cafelogo.png`  |
 
-
+👉 Click Save
 
 #### 3️⃣ TESTING THE PDF LAMBDA
 
