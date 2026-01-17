@@ -1412,11 +1412,32 @@ order-status_report_2026-01-17.pdf
 
 ## PHASE 6️⃣  CONNECT PDF BUTTON WITH API
 
-### 🔹 API Gateway
+### 1️⃣ CONFIGURE API GATEWAY (FOR MULTI-PAGE PDF)
+
+- **Go to API Gateway → Resources → /report/pdf**
+
+- **Method:** POST
+
+- **Integration:** Lambda Proxy → CafePDFReportLambda
+
+- **Query Parameter:** page
+
+- **analytics → Analytics page PDF**
+
+- **order-status → Order status PDF**
+
+- **Frontend buttons:**
 
 ```
-/report/pdf
-POST → CafePDFReportLambda
+// Analytics Page
+function downloadPDF(){
+  window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=analytics", "_blank");
+}
+
+// Order Status Page
+function downloadOrderPDF(){
+  window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-status", "_blank");
+}
 ```
 
 - **Enable CORS → Deploy API**
