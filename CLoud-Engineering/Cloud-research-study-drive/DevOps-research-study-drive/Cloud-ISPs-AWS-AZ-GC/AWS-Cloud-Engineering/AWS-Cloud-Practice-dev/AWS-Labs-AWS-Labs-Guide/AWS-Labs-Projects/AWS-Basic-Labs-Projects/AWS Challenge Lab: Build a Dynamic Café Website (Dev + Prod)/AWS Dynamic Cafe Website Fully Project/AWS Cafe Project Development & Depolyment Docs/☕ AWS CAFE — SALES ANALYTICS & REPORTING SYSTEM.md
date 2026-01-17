@@ -3641,44 +3641,6 @@ total_cost = 3.0
 ❌ You verified DynamoDB records
 
 
-### 1️⃣  Create Item Cost Table
-
-#### 1️⃣ Table Name:
-
-           
-#### 2️⃣  Basic Configurations:
-
-| PK                 | Attribute          |
-| ------------------ | ------------------ |
-| item_name (String) | base_cost (Number) |
-
-#### Example:
-
-```
-{ "item_name": "Latte", "base_cost": 1.5 }
-```
-
-### 2️⃣  Modify Order Processing Lambda (EXACT)
-
-```
-menu = dynamodb.Table('CafeMenu')
-
-def get_cost(item):
-    r = menu.get_item(Key={'item_name': item})
-    return float(r['Item']['base_cost'])
-```
-
-#### When saving order:
-
-```
-item_cost = get_cost(item_name)
-item_price = selling_price
-```
-
-✔ Cost is now automatic
-
-✔ No frontend change
-
 **✅ PHASE 10 STATUS**
 
 > **🟢 PHASE 10 COMPLETE & VERIFIED**
