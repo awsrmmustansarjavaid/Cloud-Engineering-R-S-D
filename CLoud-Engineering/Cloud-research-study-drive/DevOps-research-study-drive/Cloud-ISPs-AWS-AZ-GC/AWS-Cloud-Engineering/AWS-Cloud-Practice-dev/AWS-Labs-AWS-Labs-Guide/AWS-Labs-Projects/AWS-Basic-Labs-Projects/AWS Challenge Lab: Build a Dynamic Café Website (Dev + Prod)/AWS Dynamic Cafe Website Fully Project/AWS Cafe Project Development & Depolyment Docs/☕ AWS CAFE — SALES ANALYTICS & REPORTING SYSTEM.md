@@ -3848,14 +3848,49 @@ Response MUST include:
 
 ## PHASE 1️⃣2️⃣  ROLE-BASED ACCESS (ADMIN VS STAFF)
 
-### 1️⃣ Cognito Groups
+### 🎯 PHASE 12 GOAL
 
-#### Create groups:
+✔ Staff → Order Status ONLY
+
+✔ Admin → Order Status + Analytics + PDF
+
+✔ Enforced at Lambda level
+
+✔ Uses Cognito Groups
+
+✔ Tested with real users
+
+### 1️⃣ – PREREQUISITE CHECK
+
+Before proceeding, confirm:
+
+✔ Cognito User Pool already exists
+
+✔ API Gateway already uses Cognito Authorizer
+
+✔ Order Status API already works with login
+
+❌ If NOT → STOP and fix auth first
+
+### 👥 2️⃣ – CREATE COGNITO GROUPS (DETAILED)
+
+- **Go to: AWS Console → Cognito → User Pools → YOUR_POOL**
+
+#### 1️⃣ Create Admin Group
+
+- Click Groups
+
+- Click Create group
+
+- **Group name:**
 
 ```
 Admin
-Staff
 ```
+
+- Precedence: 1
+
+- Click Create group
 
 ### 2️⃣ Attach Users to Groups
 
