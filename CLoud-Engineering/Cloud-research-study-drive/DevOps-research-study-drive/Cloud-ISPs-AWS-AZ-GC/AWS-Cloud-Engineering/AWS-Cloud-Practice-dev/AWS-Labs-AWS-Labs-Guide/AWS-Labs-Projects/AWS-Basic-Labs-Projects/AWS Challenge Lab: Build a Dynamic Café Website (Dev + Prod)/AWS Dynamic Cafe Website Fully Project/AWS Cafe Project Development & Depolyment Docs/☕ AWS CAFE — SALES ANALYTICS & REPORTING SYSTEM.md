@@ -2926,7 +2926,53 @@ By the end of PHASE 9️⃣, you will have:
 
 
 
-### 1️⃣  Required DynamoDB Attributes (Orders Table)
+### 1️⃣ Required DynamoDB Attributes (Orders Table)
+
+#### 1️⃣ Open DynamoDB Table
+
+- AWS Console → DynamoDB
+
+- Click Tables
+
+- Open table:
+
+```
+CafeOrders
+```
+
+#### 2️⃣ Verify Table Keys
+
+#### Confirm:
+
+| Setting       | Value               |
+| ------------- | ------------------- |
+| Partition Key | `order_id` (String) |
+| GSI           | `order_date-index`  |
+
+
+**📢 If GSI does not exist, STOP and create it before continuing.**
+
+#### 3️⃣ Verify Required Attributes (CRITICAL)
+
+Click Explore table items
+
+Open at least ONE COMPLETED order
+
+It MUST contain ALL attributes below:
+
+```
+{
+  "order_id": "ORD123",
+  "order_date": "2026-01-17",
+  "order_timestamp": 1705488000,
+  "item_name": "Latte",
+  "quantity": 2,
+  "item_cost": 1.5,
+  "item_price": 3.0,
+  "order_status": "COMPLETED"
+}
+```
+
 
 #### Every order item MUST contain:
 
