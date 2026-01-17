@@ -3312,6 +3312,37 @@ Before starting this phase, confirm:
 
 **⚠️ If any one is missing, STOP and fix first.**
 
+### 1️⃣ — CREATE ITEM COST TABLE (CafeMenu)
+
+#### 1️⃣ OPEN DYNAMODB CONSOLE
+
+- Login to AWS Console
+
+- Search DynamoDB
+
+- Click DynamoDB
+
+- Click Tables
+
+- Click Create table
+
+#### 2️⃣ TABLE BASIC CONFIGURATION
+
+- ➡️ **Table name:**
+
+```
+CafeMenu
+``` 
+
+- ➡️ **Partition key (Primary Key)**
+
+| Field name | Type   |
+| ---------- | ------ |
+| item_name  | String |
+
+**⚠️ DO NOT add sort key**
+
+
 
 
 
@@ -3322,9 +3353,7 @@ Before starting this phase, confirm:
 
 #### 1️⃣ Table Name:
 
-```
-CafeMenu
-```            
+           
 #### 2️⃣  Basic Configurations:
 
 | PK                 | Attribute          |
