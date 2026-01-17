@@ -1326,7 +1326,7 @@ You will configure these in Lambda (steps below):
 | Variable Name         | Value (example) |
 | --------------------- | --------------- |
 | `ORDERS_TABLE_NAME`   | `CafeOrders`    |
-| `REPORTS_BUCKET_NAME` | `cafe-reports`  |
+| `REPORTS_BUCKET_NAME` | `charlie-cafe-s3-bucket`  |
 | `LOGO_FILE_NAME`      | `Cafelogo.png`  |
 
 👉 Click Save
