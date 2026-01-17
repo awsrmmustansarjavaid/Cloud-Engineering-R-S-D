@@ -3280,7 +3280,9 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=month
 > **🟢 PHASE 9 COMPLETE & VERIFIED**
 ---
 
-## PHASE 🔟  EXACT LAMBDA RESPONSE FORMAT FOR ANALYTICS
+## PHASE 🔟  COST AUTO-CALCULATION USING CafeMenu TABLE
+
+> **(MANDATORY BEFORE PROFIT / ANALYTICS / PDF)**
 
 ### 1️⃣  Create Item Cost Table
 
