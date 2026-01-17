@@ -1412,6 +1412,24 @@ order-status_report_2026-01-17.pdf
 
 ## PHASE 6️⃣  CONNECT PDF BUTTON WITH API
 
+#### Goal :
+
+> **When you click PDF button from**
+
+    - analytics.html 
+    
+            OR
+
+    - order-status.html
+
+➡️ API Gateway must call CafePDFReportLambda
+
+➡️ Lambda must know which page requested the PDF
+
+➡️ Browser must download/open the PDF
+
+
+
 ### 1️⃣ CONFIGURE API GATEWAY (FOR MULTI-PAGE PDF)
 
 - **Go to API Gateway → Resources → /report/pdf**
