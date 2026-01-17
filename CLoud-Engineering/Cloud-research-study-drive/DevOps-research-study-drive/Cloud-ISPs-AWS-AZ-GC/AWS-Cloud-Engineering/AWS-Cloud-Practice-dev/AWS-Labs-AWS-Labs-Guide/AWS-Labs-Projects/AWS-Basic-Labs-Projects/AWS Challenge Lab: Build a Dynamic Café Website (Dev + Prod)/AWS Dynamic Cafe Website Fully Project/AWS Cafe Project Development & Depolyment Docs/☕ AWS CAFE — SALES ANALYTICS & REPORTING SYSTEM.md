@@ -1412,7 +1412,7 @@ order-status_report_2026-01-17.pdf
 
 ## PHASE 6️⃣  CONNECT PDF BUTTON WITH API
 
-#### Goal :
+### Goal :
 
 > **When you click PDF button from**
 
@@ -1428,7 +1428,19 @@ order-status_report_2026-01-17.pdf
 
 ➡️ Browser must download/open the PDF
 
+### 🧠 BEFORE YOU START – VERIFY THESE EXIST
 
+#### STOP and verify ALL of these are already done:
+
+| Item            | Must Exist                 |
+| --------------- | -------------------------- |
+| Lambda          | `CafePDFReportLambda`      |
+| Runtime         | Python 3.10                |
+| ReportLab layer | Attached                   |
+| API Gateway     | Same API used by analytics |
+| Region          | Known (ex: `us-east-1`)    |
+
+**❗ If any item is missing → DO NOT continue**
 
 ### 1️⃣ CONFIGURE API GATEWAY (FOR MULTI-PAGE PDF)
 
