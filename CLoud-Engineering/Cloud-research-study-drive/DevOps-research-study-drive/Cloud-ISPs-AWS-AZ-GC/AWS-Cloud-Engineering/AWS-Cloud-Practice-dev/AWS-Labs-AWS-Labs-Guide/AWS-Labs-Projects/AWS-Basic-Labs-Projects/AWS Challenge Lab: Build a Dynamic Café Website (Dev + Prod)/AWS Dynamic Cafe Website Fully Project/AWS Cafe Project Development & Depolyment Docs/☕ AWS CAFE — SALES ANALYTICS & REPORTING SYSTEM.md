@@ -1190,26 +1190,33 @@ sudo nano /var/www/html/analytics.html
 <meta charset="UTF-8">
 <title>Cafe Analytics ☕</title>
 
-<!-- Bootstrap CSS -->
+<!-- ===================== BOOTSTRAP CSS ===================== -->
+<!-- CDN used to avoid local file management -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Chart.js -->
+<!-- ===================== CHART.JS ===================== -->
+<!-- Used for sales / cost / profit visualization -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 /* ===================== BODY & BACKGROUND ===================== */
+/* Cafe-style dark coffee theme background */
 body {
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Coffee-style overlay + image */
   background:
     linear-gradient(rgba(58,44,31,0.75), rgba(58,44,31,0.75)),
     url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&q=80');
+
   background-size: cover;
   background-position: center;
   color: #fff;
 }
 
-/* ===================== CONTAINER ===================== */
+/* ===================== MAIN CONTAINER ===================== */
+/* Glassmorphism effect */
 .container {
   backdrop-filter: blur(6px);
   background-color: rgba(0,0,0,0.45);
@@ -1226,28 +1233,30 @@ h3 {
   text-shadow: 1px 1px 2px #000;
 }
 
-/* ===================== SELECT & BUTTONS ===================== */
+/* ===================== INPUTS & BUTTONS ===================== */
 .form-select, .btn {
   border-radius: 50px;
   font-weight: bold;
 }
 
+/* Load Data button */
 .btn-primary {
   background: linear-gradient(45deg, #a0522d, #d2b48c);
   border: none;
 }
 
+/* PDF button – top right corner */
 .btn-success {
   background: linear-gradient(45deg, #8b4513, #f4a460);
   border: none;
   font-weight: bold;
   position: absolute;
   top: 20px;
-  right: 20px; /* PDF button top-right */
+  right: 20px; /* PDF button location */
   z-index: 10;
 }
 
-/* ===================== CARDS ===================== */
+/* ===================== METRIC CARDS ===================== */
 .card {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.1);
@@ -1258,11 +1267,12 @@ h3 {
   transition: transform 0.2s;
 }
 
+/* Hover animation */
 .card:hover {
   transform: translateY(-5px);
 }
 
-/* ===================== CHART ===================== */
+/* ===================== CHART CANVAS ===================== */
 canvas {
   background: rgba(0,0,0,0.1);
   border-radius: 12px;
@@ -1278,21 +1288,27 @@ canvas {
 
 <body>
 
+<!-- ===================== PAGE CONTAINER ===================== -->
 <div class="container mt-4 position-relative">
 
+  <!-- Page Title -->
   <h3>☕ Cafe Sales Analytics</h3>
 
-  <!-- Period & Load Button -->
+  <!-- ===================== PERIOD SELECT ===================== -->
   <div class="d-flex justify-content-center align-items-center mt-4 gap-3 flex-wrap">
+
+    <!-- Time filter (used by Analytics Lambda) -->
     <select id="period" class="form-select w-auto">
       <option value="today">Today</option>
       <option value="week">Last 7 Days</option>
       <option value="month">This Month</option>
     </select>
+
+    <!-- Trigger analytics API -->
     <button class="btn btn-primary" onclick="loadData()">Load Data</button>
   </div>
 
-  <!-- Metrics Cards -->
+  <!-- ===================== METRICS ===================== -->
   <div class="row mt-4 g-4">
     <div class="col-md-4">
       <div class="card p-3">Sales: <span id="sales">0</span></div>
@@ -1305,60 +1321,101 @@ canvas {
     </div>
   </div>
 
-  <!-- Chart -->
+  <!-- ===================== CHART ===================== -->
+  <!-- Visual summary of Sales vs Cost vs Profit -->
   <canvas id="chart" class="mt-4" height="120"></canvas>
 
-  <!-- PDF Download Button -->
+  <!-- ===================== PDF DOWNLOAD ===================== -->
+  <!-- Calls PDF Lambda via API Gateway -->
   <button class="btn btn-success" onclick="downloadPDF()">📄 Download PDF</button>
 
 </div>
 
 <script>
-function loadData(){
+/* ============================================================
+   ENVIRONMENT STYLE CONFIGURATION (REPLACE ONLY THESE VALUES)
+   ============================================================ */
+
+// 🔁 REPLACE with your real API Gateway base URL
+const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod";
+
+// Analytics endpoint
+const ANALYTICS_API = `${API_BASE_URL}/analytics`;
+
+// PDF report endpoint
+const PDF_API = `${API_BASE_URL}/report/pdf`;
+
+/* ============================================================
+   LOAD ANALYTICS DATA
+   ============================================================ */
+function loadData() {
+
+  // Selected period (today / week / month)
   const period = document.getElementById('period').value;
-  fetch(`https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics?period=${period}`)
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('sales').innerText = data.total_sales;
-    document.getElementById('cost').innerText = data.total_cost;
-    document.getElementById('profit').innerText = data.profit;
 
-    // Render Chart
-    const ctx = document.getElementById('chart').getContext('2d');
+  // Call Analytics Lambda
+  fetch(`${ANALYTICS_API}?period=${period}`)
+    .then(res => res.json())
+    .then(data => {
 
-    if(window.salesChart) window.salesChart.destroy();
+      // Populate metrics
+      document.getElementById('sales').innerText = data.total_sales;
+      document.getElementById('cost').innerText = data.total_cost;
+      document.getElementById('profit').innerText = data.profit;
 
-    window.salesChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Sales','Cost','Profit'],
-        datasets: [{
-          label: 'Amount',
-          data: [data.total_sales, data.total_cost, data.profit],
-          borderColor: '#ffddaa',
-          backgroundColor: 'rgba(255, 221, 170, 0.3)',
-          borderWidth: 3,
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.2)' } },
-          x: { grid: { color: 'rgba(255,255,255,0.2)' } }
+      // ===================== RENDER CHART =====================
+      const ctx = document.getElementById('chart').getContext('2d');
+
+      // Destroy old chart before re-render
+      if (window.salesChart) window.salesChart.destroy();
+
+      // Create new chart
+      window.salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Sales', 'Cost', 'Profit'],
+          datasets: [{
+            label: 'Amount',
+            data: [
+              data.total_sales,
+              data.total_cost,
+              data.profit
+            ],
+            borderColor: '#ffddaa',
+            backgroundColor: 'rgba(255, 221, 170, 0.3)',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.2)' }
+            },
+            x: {
+              grid: { color: 'rgba(255,255,255,0.2)' }
+            }
+          }
         }
-      }
+      });
     });
-  });
 }
 
-function downloadPDF(){
-  window.open("https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf");
+/* ============================================================
+   DOWNLOAD PDF REPORT
+   ============================================================ */
+function downloadPDF() {
+  // Opens PDF Lambda in new tab
+  window.open(PDF_API);
 }
 </script>
 
-<!-- Bootstrap JS Bundle -->
+<!-- ===================== BOOTSTRAP JS ===================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
