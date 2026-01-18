@@ -2489,16 +2489,70 @@ DB_NAME = cafe
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
-### 🧪 FINAL TEST (MATCHES YOUR GUIDE)
+### 2️⃣ CONFIGURE API GATEWAY
 
-#### ❌ Without token
+- **AWS Console → API Gateway → REST API → /order-status**
+
+#### 1️⃣ Add Method
+
+- **Method:** GET
+
+- **Integration type:** Lambda Proxy
+
+- **Lambda function:** OrderStatusLambda
+
+#### 2️⃣ Enable Cognito Authorizer
+
+- **Authorizer type:** Cognito User Pool
+
+- Assign your Cafe Cognito Pool
+
+- Require Authorization header
+
+**✅ This ensures JWT validation automatically**
+
+#### 3️⃣ Deploy API
+
+- **Stage:** prod
+
+- **Save Invoke URL**
+
+e.g., https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+
+
+### 3️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
+
+#### 1️⃣ ❌ Without token
 
 ```
-curl https://api/admin/order-status
-→ 401 Unauthorized ✅
+curl https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
 ```
 
-#### ✅ With frontend
+#### ✅ Expected:
+
+```
+401 Unauthorized
+```
+
+#### 2️⃣ ✅ With Frontend Token
+
+- Login via Cognito Hosted UI
+
+- Get access_token
+
+- Make GET request with header:
+
+```
+curl -H "Authorization: Bearer <access_token>" \
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+```
+
+#### ✅ Expected:
+
+```
+JSON response with metrics + recent orders
+```
+
 
 ```
 Login → token issued
