@@ -328,6 +328,38 @@ CREATE TABLE orders (
 );
 ```
 
+#### ✅ FINAL orders TABLE (WITH CLEAR COMMENTS)
+
+```
+CREATE TABLE orders (
+
+    -- Primary unique identifier for each order
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    -- Cafe table number where customer is seated (1, 2, 3, ...)
+    table_number INT NOT NULL,
+
+    -- Optional customer name (can be NULL for walk-in customers)
+    customer_name VARCHAR(100),
+
+    -- Ordered item name (must match CafeMenu.item_name)
+    item VARCHAR(50),
+
+    -- Quantity of the ordered item
+    quantity INT NOT NULL,
+
+    -- Date & time when order was created (auto-filled by MySQL)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Index to speed up queries by table number (useful for waiter dashboards)
+    INDEX idx_table_number (table_number),
+
+    -- Index to speed up date-based queries (daily, weekly, monthly reports)
+    INDEX idx_created_at (created_at)
+
+);
+```
+
 #### 📢 Most common real-world version
 
 #### Many cafes/restaurants also like to track status and total amount, so here’s a more complete modern version you might consider:
