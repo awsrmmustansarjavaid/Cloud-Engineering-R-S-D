@@ -4343,7 +4343,7 @@ def lambda_handler(event, context):
     })
 ```
 
-### 4️⃣ CONFIGURE LAMBDA ENVIRONMENT VARIABLES (MANDATORY)
+#### 4️⃣ CONFIGURE LAMBDA ENVIRONMENT VARIABLES (MANDATORY)
 
 - **Go to:**
 
@@ -4444,7 +4444,7 @@ Change test event to:
 
 ✔ Security works
 
-### 🧪 5️⃣ – TEST ROLE ACCESS (MANDATORY)
+#### 3️⃣ – TEST ROLE ACCESS (MANDATORY)
 
 #### 1️⃣ – STAFF USER
 
