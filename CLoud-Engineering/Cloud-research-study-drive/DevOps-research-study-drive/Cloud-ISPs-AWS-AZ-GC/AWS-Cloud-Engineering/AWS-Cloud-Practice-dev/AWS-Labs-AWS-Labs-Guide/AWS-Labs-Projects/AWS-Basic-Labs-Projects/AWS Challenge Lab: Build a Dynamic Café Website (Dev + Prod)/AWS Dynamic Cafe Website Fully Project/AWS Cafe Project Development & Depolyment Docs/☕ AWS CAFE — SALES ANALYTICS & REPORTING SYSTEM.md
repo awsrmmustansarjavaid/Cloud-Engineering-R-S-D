@@ -5355,6 +5355,34 @@ Change test event to:
 
 ## PHASE 1️⃣3️⃣  CSV EXPORT (PROFESSIONAL)
 
+### Goal: 
+
+It allows Admin users to download a CSV sales & profit report from the same analytics data.
+
+### 🟥 IMPORTANT RULE (READ CAREFULLY)
+
+✔ We will REUSE the existing Analytics Lambda logic
+
+✔ We will create ONE NEW Lambda for CSV
+
+✔ We will NOT break existing analytics or PDF
+
+✔ You will TEST CSV BEFORE NEXT PHASE
+
+### 🧱 ARCHITECTURE (SIMPLE & SAFE)
+
+```
+Browser
+   ↓
+API Gateway
+   ↓
+CafeAnalyticsCSVLambda
+   ↓
+DynamoDB (CafeOrders)
+```
+
+
+
 ### 1️⃣ New API Resource
 
 ```
