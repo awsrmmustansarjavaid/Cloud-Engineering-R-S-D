@@ -3629,24 +3629,99 @@ base_cost = 1.2
 
 **❌ If base_cost is String → DELETE ITEM → RECREATE**
 
-### 4️⃣ — UPDATE RDS orders TABLE (MANDATORY)
+### 4️⃣ — UPDATE CafeOrderProcessor RDS orders TABLE (MANDATORY)
+
+#### 1️⃣ YOUR CURRENT TABLE (CONFIRMED)
+
+> **You currently have this table:**
+
+```
+CREATE TABLE orders (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    table_number    INT NOT NULL,
+    customer_name   VARCHAR(100),
+    item            VARCHAR(50),
+    quantity        INT NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_table_number (table_number),
+    INDEX idx_created_at (created_at)
+);
+```
+
+✅ This is valid
+
+❌ It is missing cost columns
 
 > **🔴 You MUST add cost columns in MySQL**
 
-#### Connect to your RDS database and run:
+#### 2️⃣ CONNECT TO RDS
+
+> **You must connect to your MySQL database using ONE of these:**
+
+```
+mysql -h <RDS-ENDPOINT> -u <USERNAME> -p
+```
+
+#### After login:
+
+```
+USE <your_database_name>;
+```
+
+#### 3️⃣ RUN THE ALTER COMMAND (COPY–PASTE)
+
+#### ⚠️ Run this EXACTLY once
 
 ```
 ALTER TABLE orders
-ADD COLUMN item_cost DECIMAL(6,2),
-ADD COLUMN total_cost DECIMAL(6,2);
+ADD COLUMN item_cost DECIMAL(6,2) AFTER quantity,
+ADD COLUMN total_cost DECIMAL(6,2) AFTER item_cost;
+```
+#### Why this is safe
+
+✔ Does NOT delete data
+
+✔ Does NOT change existing rows
+
+✔ Just adds two new columns
+
+#### 4️⃣ VERIFY COLUMNS EXIST (MANDATORY)
+
+Immediately run:
+
+```
+DESCRIBE orders;
+```
+#### You MUST see:
+
+```
+item_cost   decimal(6,2)
+total_cost  decimal(6,2)
 ```
 
-✔ Do NOT skip
+**⚠️ If you do NOT see them → STOP and tell me.**
 
-✔ Without this → Lambda will fail
+#### 5️⃣ TEST MANUAL INSERT (OPTIONAL BUT SAFE)
 
+Run this test insert:
 
+```
+INSERT INTO orders
+(table_number, customer_name, item, quantity, item_cost, total_cost)
+VALUES
+(1, 'Test User', 'Latte', 2, 1.50, 3.00);
+```
 
+#### Then verify:
+
+```
+SELECT * FROM orders ORDER BY id DESC LIMIT 1;
+```
+
+✔ If row inserted → DB is READY
+
+✔ If error → do NOT continue
 
 ### 5️⃣ — OPEN ORDER PROCESSING LAMBDA
 
