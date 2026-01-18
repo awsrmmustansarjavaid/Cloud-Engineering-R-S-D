@@ -3198,14 +3198,14 @@ def response(code, body):
 
 ### 🧪 5️⃣ – TEST LAMBDA IN CONSOLE (MANDATORY)
 
-#### 1️⃣ Create Test Event
-
 - **Lambda → Test → Configure test event**
+
+#### 1️⃣ Create Monthly Analytics Test Event
 
 - **Name:**
 
 ```
-AnalyticsMonthTest
+Analytics_Month
 ```
 
 - **JSON:**
@@ -3224,35 +3224,170 @@ AnalyticsMonthTest
 
 - Click Test
 
+#### ✅ Expected Result (Structure MUST match)
+
+```
+{
+  "statusCode": 200,
+  "body": {
+    "period": "month",
+    "total_sales": <number>,
+    "total_cost": <number>,
+    "profit": <number>,
+    "orders_count": <number>,
+    "profit_per_item": [
+      {
+        "item": "<string>",
+        "quantity": <number>,
+        "sales": <number>,
+        "cost": <number>,
+        "profit": <number>
+      }
+    ],
+    "daily_sales": [
+      {
+        "date": "YYYY-MM-DD",
+        "sales": <number>
+      }
+    ]
+  }
+}
+```
+
 ✔ **Status code: 200**
 
 ✔ **Response body MUST look like:**
 
+#### 2️⃣ Create Weekly Analytics Test Event
+
+- **Name:**
+
+```
+Analytics_Week
+```
+
+- **JSON:**
+
 ```
 {
-  "period": "month",
-  "total_sales": 12000,
-  "total_cost": 8000,
-  "profit": 4000,
-  "orders_count": 340,
-  "profit_per_item": [
-    {
-      "item": "Latte",
-      "quantity": 120,
-      "sales": 360,
-      "cost": 180,
-      "profit": 180
-    }
-  ],
-  "daily_sales": [
-    { "date": "2026-01-01", "sales": 400 }
-  ]
+  "queryStringParameters": {
+    "period": "week"
+  }
 }
 ```
 
-❌ If error → check CloudWatch logs
+- Click Save
 
-❌ If empty → verify DynamoDB dates
+#### 2️⃣ Run Test
+
+- Click Test
+
+#### ✅ Expected Result (Structure MUST match)
+
+```
+{
+  "statusCode": 200,
+  "body": {
+    "period": "week",
+    "total_sales": <number>,
+    "total_cost": <number>,
+    "profit": <number>,
+    "orders_count": <number>,
+    "profit_per_item": [],
+    "daily_sales": []
+  }
+}
+```
+
+📌 If last 7 days have data → arrays populated
+
+📌 If not → empty arrays (this is correct behavior)
+
+#### 3️⃣ Create Missing Parameter (ERROR CASE) Test Event
+
+- **Name:**
+
+```
+Analytics_MissingPeriod
+```
+
+- **JSON:**
+
+```
+{
+  "queryStringParameters": {}
+}
+```
+
+- Click Save
+
+#### 2️⃣ Run Test
+
+- Click Test
+
+#### ❌ Expected Result (Structure MUST match)
+
+```
+{
+  "statusCode": 400,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "\"Missing period parameter\""
+}
+```
+
+#### 📌 Note:
+
+- Body is a JSON string
+
+- Quotes are expected because of json.dumps()
+
+#### 3️⃣ Create Invalid Period Value (ERROR CASE) Test Event
+
+- **Name:**
+
+```
+Analytics_InvalidPeriod
+```
+
+- **JSON:**
+
+```
+{
+  "queryStringParameters": {
+    "period": "year"
+  }
+}
+```
+
+- Click Save
+
+#### 2️⃣ Run Test
+
+- Click Test
+
+#### ❌ Expected Result (Structure MUST match)
+
+```
+{
+  "statusCode": 400,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "\"Invalid period value\""
+}
+```
+
+#### 📌 This confirms:
+
+- Input validation works
+
+- Lambda fails safely
+
+- No DynamoDB call happens
 
 ### 🧪 6️⃣ – TEST THROUGH API GATEWAY
 
