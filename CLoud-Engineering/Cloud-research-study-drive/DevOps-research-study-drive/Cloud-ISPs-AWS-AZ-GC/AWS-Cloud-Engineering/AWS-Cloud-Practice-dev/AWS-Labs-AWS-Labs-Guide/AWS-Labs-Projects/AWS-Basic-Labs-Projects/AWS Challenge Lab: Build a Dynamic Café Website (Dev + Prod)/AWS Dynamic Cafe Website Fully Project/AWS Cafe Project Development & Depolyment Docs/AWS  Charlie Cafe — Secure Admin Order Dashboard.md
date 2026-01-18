@@ -2580,6 +2580,76 @@ Only orders for 2026-01-17 returned
 
 - Spinner shows loading
 
+### 📣 Simple & Easy way test 
+
+#### 1️⃣ Login & Token Issued
+
+- Open your Cafe Dashboard frontend (order-status.html).
+
+- Click Login.
+
+- You should be redirected to Cognito Hosted UI.
+
+- Enter Admin credentials.
+
+- After login, you are redirected back to the dashboard.
+
+- Open browser DevTools → Application → Local Storage.
+
+  - **✅ access_token should exist.**
+
+**If no token → STOP, check Cognito setup.**
+
+#### 2️⃣ Dashboard Loads
+
+- After login, the dashboard content should appear (metrics + table).
+
+- Metrics should show Total Orders, Total Items Sold, Customers.
+
+- Orders table should populate with recent orders.
+
+- Spinner should appear while loading, then hide.
+
+- **✅ If dashboard is blank → STOP, check Lambda/API response.**
+
+#### 3️⃣ Auto Refresh Works
+
+- Wait ~10 seconds (or the interval set in frontend).
+
+- Dashboard metrics and table should update automatically.
+
+- Open DevTools → Network tab
+
+  - You should see GET requests to /order-status fired every 10 seconds.
+
+- **✅ If auto refresh doesn’t work → check setInterval(loadData, 10000) in frontend JS.**
+
+#### 4️⃣ Date Filter Works
+
+- On dashboard, select a date in the date picker.
+
+- Click Filter.
+
+- Dashboard metrics + table should update only for that date.
+
+- Network tab → Confirm request URL:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-DD
+```
+
+- **✅ If metrics or table show wrong data → check Lambda filter code.**
+
+#### 5️⃣ Chart Works
+
+- Chart below metrics should update matching the filtered data.
+
+- Check bars/lines correspond to orders/items counts.
+
+- Change date → chart updates accordingly.
+
+- **✅ If chart does not update → check frontend chart destroy/create logic.**
+
 **✔ Everything works → Phase Complete**
 
 ### ✅ PHASE 6 COMPLETION CHECKLIST
