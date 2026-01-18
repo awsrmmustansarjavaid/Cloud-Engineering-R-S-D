@@ -5983,36 +5983,20 @@ manual-test
 PDF generated and uploaded
 ```
 
+#### 4️⃣ VERIFY PDF OUTPUT
 
+- **S3 → charlie-cafe-s3-bucket → daily_reports/**
 
+- **File exists:** daily_YYYY-MM-DD.pdf
 
+- **Download & open PDF**
 
-### 3️⃣ PDF Lambda (REPORTLAB – FINAL)
+✔ Logo visible
 
-```
-from reportlab.platypus import SimpleDocTemplate, Table, Image
-from reportlab.lib.pagesizes import A4
-import datetime
+✔ Table visible
 
-def lambda_handler(event, context):
-    file = f"/tmp/report_{datetime.date.today()}.pdf"
-    doc = SimpleDocTemplate(file, pagesize=A4)
+✔ Correct profit values
 
-    elements = []
-    elements.append(Image("Cafelogo.png", width=120, height=60))
-
-    table_data = [["Item","Qty","Sales","Cost","Profit"]]
-    for i in profit_items:
-        table_data.append([
-            i['item'], i['quantity'],
-            i['sales'], i['cost'], i['profit']
-        ])
-
-    elements.append(Table(table_data))
-    doc.build(elements)
-
-    s3.upload_file(file, "charlie-cafe-s3-bucket", f"daily_{datetime.date.today()}.pdf")
-```
 
 ### 4️⃣ EventBridge Rule
 
