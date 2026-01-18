@@ -5540,6 +5540,35 @@ def lambda_handler(event, context):
 GET /analytics/csv
 ```
 
+#### Fill:
+
+| Field         | Value |
+| ------------- | ----- |
+| Resource Name | csv   |
+| Resource Path | csv   |
+
+**✔ Click Create Resource**
+
+#### 2️⃣ CREATE GET METHOD
+
+- **Select /analytics/csv**
+- **Click Create Method → GET**
+
+#### Method Setup:
+
+| Setting          | Value                  |
+| ---------------- | ---------------------- |
+| Integration type | Lambda                 |
+| Lambda function  | CafeAnalyticsCSVLambda |
+| Use Lambda proxy | ✔ Enabled              |
+
+- **Click Save**
+
+
+
+
+
+
 ### 2️⃣ CSV Lambda Code
 
 ```
