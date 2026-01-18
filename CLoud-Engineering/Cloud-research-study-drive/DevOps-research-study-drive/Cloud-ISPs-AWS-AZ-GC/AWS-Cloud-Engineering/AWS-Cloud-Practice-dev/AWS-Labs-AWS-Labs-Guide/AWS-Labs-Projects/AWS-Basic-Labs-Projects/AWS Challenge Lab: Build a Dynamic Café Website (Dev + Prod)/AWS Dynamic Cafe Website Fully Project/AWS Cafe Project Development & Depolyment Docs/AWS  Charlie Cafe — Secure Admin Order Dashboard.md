@@ -3313,6 +3313,210 @@ http://EC2 Public IP/order-status.html
 
 ## 🔐 PHASE 8️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
 
+### 🖊 Goal
+
+Secure your APIs using Cognito JWT, so:
+
+❌ No token → blocked
+
+❌ Invalid token → blocked
+
+✅ Admin → allowed
+
+✅ Staff → allowed/blocked based on Lambda logic
+
+### 🧠 WHAT YOU ARE BUILDING (MENTAL MODEL)
+
+```
+Browser
+  ↓
+User logs in (Cognito Hosted UI or Custom UI)
+  ↓
+Cognito returns JWT (ID token)
+  ↓
+Frontend sends JWT in Authorization header
+  ↓
+API Gateway Cognito Authorizer validates JWT
+  ↓
+Lambda receives verified claims
+```
+
+### 🧱 PREREQUISITES (DO NOT SKIP)
+
+Before starting PHASE 8, you MUST already have:
+
+✔ Cognito User Pool
+
+✔ At least one user created
+
+✔ API Gateway already created
+
+✔ Lambda already connected to API
+
+If ANY of these are missing, STOP and tell me.
+
+### 🔐 1️⃣  — VERIFY COGNITO USER POOL (NO CONFIG YET)
+
+#### 1️⃣ Open AWS Console
+
+- Go to:
+
+```
+AWS Console → Cognito → User Pools
+```
+
+#### 2️⃣ Click your User Pool
+
+- Example name:
+
+```
+CafeUserPool
+```
+
+#### 3️⃣ Verify these EXIST (do not change yet)
+
+- Users tab → at least 1 user
+
+- App integration tab → App client exists
+
+- Domain → configured (for Hosted UI)
+
+✔ If all exist → continue
+
+❌ If missing → STOP
+
+### 🔐 2️⃣ — CREATE COGNITO GROUPS (VERY IMPORTANT)
+
+- **Inside User Pool → Click Groups**
+
+- **Click Create group**
+
+#### Create FIRST group:
+
+```
+Group name: Admin
+Description: Cafe administrators
+```
+
+- **Click Create group**
+
+✔ Groups created
+❌ Do not skip
+
+### 👤 3️⃣ — ADD USERS TO GROUPS (MANDATORY)
+
+- **Cognito → Users**
+
+- Click a user (your email/username)
+
+- Click Add to group
+
+- Select:
+
+```
+Admin
+```
+
+- Click Add
+
+> **You must have at least one Admin user**
+
+### 🌐 4️⃣ — CONFIGURE APP CLIENT (JWT ISSUED HERE)
+
+- Cognito → App integration
+
+- Click App clients
+
+- Click your app client
+
+- VERIFY THESE SETTINGS (DO NOT GUESS)
+
+✔ Enable sign-in API for server-based authentication
+
+✔ OAuth 2.0 enabled
+
+Under OAuth flows:
+
+```
+✔ Authorization code grant
+```
+
+#### Under OAuth scopes:
+
+```
+✔ openid
+✔ email
+✔ profile
+```
+
+- Click Save changes
+
+### 🌐 5️⃣ — CONFIGURE HOSTED UI (FOR LOGIN TEST)
+
+- Cognito → App integration → Domain
+
+- Verify domain exists like:
+
+```
+https://cafe-auth.auth.ap-south-1.amazoncognito.com
+```
+
+**✔️ Copy this domain — you will use it.**
+
+### 🔑 6️⃣ — GET JWT TOKEN (MANDATORY TEST)
+
+#### 1️⃣ Open browser (new tab)
+
+#### Paste this (replace values):
+
+```
+https://YOUR_DOMAIN/login?
+response_type=token&
+client_id=YOUR_CLIENT_ID&
+redirect_uri=https://jwt.io
+```
+
+#### Example:
+
+```
+https://cafe-auth.auth.ap-south-1.amazoncognito.com/login?response_type=token&client_id=abc123&redirect_uri=https://jwt.io
+```
+
+#### 2️⃣ Login with Admin user
+
+You will be redirected to jwt.io
+
+#### 3️⃣ COPY ID TOKEN (IMPORTANT)
+
+It looks like: 
+
+```
+eyJraWQiOiJLT...
+```
+
+**⚠️ Copy ONLY the id_token, not access_token.**
+
+> **STOP here if token is not received.**
+
+### 🧪 7️⃣ — VERIFY TOKEN CONTENT (NO SKIP)
+
+- On jwt.io
+
+- Paste ID token
+
+Verify payload contains:
+
+```
+{
+  "email": "...",
+  "cognito:groups": ["Admin"],
+  "iss": "https://cognito-idp..."
+}
+```
+
+
+
+
 ```
 User → Login (Cognito)
      → JWT stored
