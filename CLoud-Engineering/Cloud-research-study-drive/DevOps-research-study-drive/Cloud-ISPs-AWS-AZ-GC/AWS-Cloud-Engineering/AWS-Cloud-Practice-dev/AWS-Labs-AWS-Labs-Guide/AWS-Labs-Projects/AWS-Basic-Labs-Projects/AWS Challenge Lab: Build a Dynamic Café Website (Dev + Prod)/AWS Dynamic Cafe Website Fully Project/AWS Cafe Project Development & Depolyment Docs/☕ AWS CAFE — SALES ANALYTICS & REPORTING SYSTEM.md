@@ -5726,6 +5726,56 @@ Cafelogo.png
 | Runtime              | Python 3.10            |
 | Architecture         | x86_64                 |
 
+- **✔️ Create function**
+
+### 6️⃣ ADD REPORTLAB LAYER (REQUIRED)
+
+#### 1️⃣ Prepare reportlab.zip
+
+Your zip must contain:
+
+```
+python/
+ └── reportlab/
+```
+
+#### 2️⃣ Go to:
+
+```
+Lambda → Layers → Create layer
+```
+
+#### 3️⃣ Layer name:
+
+```
+reportlab-layer
+```
+
+#### 4️⃣ Upload ZIP:
+
+```
+reportlab.zip
+```
+
+#### 5️⃣ Compatible runtime:
+
+```
+Python 3.10
+```
+
+- **✔️ Create layer**
+
+#### 6️⃣ Attach Layer to Lambda
+
+```
+Lambda → CafeDailyPDFLambda → Layers → Add layer
+```
+
+✔ Select existing layer
+
+✔ Choose reportlab-layer
+
+✔ Click Add
 
 
 
