@@ -2553,14 +2553,73 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
 JSON response with metrics + recent orders
 ```
 
+#### 3️⃣ Date Filter Test
 
 ```
-Login → token issued
-Dashboard → loads
-Auto refresh → works
-Date filter → works
-Chart → works
+curl -H "Authorization: Bearer <access_token>" \
+"https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=2026-01-17"
 ```
+
+#### ✅ Expected: 
+
+```
+Only orders for 2026-01-17 returned
+```
+
+**✅ Metrics counts match filtered orders**
+
+#### 4️⃣ Verify Auto Refresh / Chart in Frontend
+
+- Open order-status.html
+
+- Enter date in filter box
+
+- Click Filter
+
+- Metrics + table + chart should update correctly
+
+- Spinner shows loading
+
+**✔ Everything works → Phase Complete**
+
+### ✅ PHASE 6 COMPLETION CHECKLIST
+
+✔️ Lambda created/updated
+
+✔️ Environment variables set correctly
+
+✔️ JWT validation works (401 if missing)
+
+✔️ Date filter works (?date=YYYY-MM-DD)
+
+✔️ Metrics calculated correctly
+
+✔️ Recent orders table updates
+
+✔️ Frontend chart + auto-refresh works
+
+✔️ Tested manually via API & frontend
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
+
 
 ---
 
