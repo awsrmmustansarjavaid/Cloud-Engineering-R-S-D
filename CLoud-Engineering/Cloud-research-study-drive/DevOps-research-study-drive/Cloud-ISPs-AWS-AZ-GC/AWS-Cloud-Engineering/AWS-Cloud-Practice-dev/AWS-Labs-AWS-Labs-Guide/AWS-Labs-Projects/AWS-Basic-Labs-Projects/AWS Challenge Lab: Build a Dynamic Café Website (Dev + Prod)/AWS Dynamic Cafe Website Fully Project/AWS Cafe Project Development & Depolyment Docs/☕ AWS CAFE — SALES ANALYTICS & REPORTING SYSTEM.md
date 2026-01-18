@@ -5589,9 +5589,9 @@ prod
 
 - **Click Deploy**
 
-### TEST CSV EXPORT (MANDATORY)
+### 5️⃣ TEST CSV EXPORT (MANDATORY)
 
-#### ✅ TEST AS ADMIN (SUCCESS)
+#### 1️⃣ TEST AS ADMIN (SUCCESS)
 
 #### Use browser or curl:
 
@@ -5603,13 +5603,13 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics/csv
 
 #### ✅ EXPECTED RESULT:
 
-⬇️ File downloads automatically:
+#### ⬇️ File downloads automatically:
 
 ```
 cafe-analytics.csv
 ```
 
-#### Open file → Should show:
+#### 2️⃣ Open file → Should show:
 
 ```
 Item,Quantity,Sales,Cost,Profit
@@ -5617,10 +5617,29 @@ Latte,10,50,30,20
 Espresso,5,25,15,10
 ```
 
+#### 2️⃣ ❌ TEST AS STAFF (BLOCKED)
 
+- Login as Staff
 
+- Open same URL
 
+#### ✅ EXPECTED RESULT:
 
+```
+403 Access denied
+```
+
+✔ Security verified
+
+### ✅ PHASE 13 FINAL STATUS
+
+🟢 PHASE 13 COMPLETE
+
+🟢 TESTED
+
+🟢 ADMIN-ONLY CSV DOWNLOAD
+
+🟢 NO EXISTING SYSTEM BROKEN
 
 
 **✅ PHASE 13 STATUS**
