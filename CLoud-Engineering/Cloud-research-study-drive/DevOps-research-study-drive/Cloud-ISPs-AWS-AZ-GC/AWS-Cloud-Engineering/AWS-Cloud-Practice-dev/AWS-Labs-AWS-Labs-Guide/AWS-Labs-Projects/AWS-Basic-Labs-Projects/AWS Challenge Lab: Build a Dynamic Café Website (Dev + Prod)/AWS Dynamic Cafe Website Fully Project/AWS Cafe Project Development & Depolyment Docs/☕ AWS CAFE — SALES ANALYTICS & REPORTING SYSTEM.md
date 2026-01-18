@@ -3043,12 +3043,20 @@ CloudWatchLogsFullAccess
 
 ```
 import json
+import os
 import boto3
 from collections import defaultdict
 from datetime import datetime, timedelta
 
+# ===============================
+# ENVIRONMENT VARIABLES
+# ===============================
+TABLE_NAME = os.environ['ORDERS_TABLE_NAME']
+GSI_NAME = os.environ['ORDERS_GSI_NAME']
+ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '*')
+
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('CafeOrders')
+table = dynamodb.Table(TABLE_NAME)
 
 def lambda_handler(event, context):
 
@@ -3081,7 +3089,7 @@ def lambda_handler(event, context):
     # 3. QUERY DYNAMODB USING GSI
     # ===============================
     db_response = table.query(
-        IndexName='order_date-index',
+        IndexName=GSI_NAME,
         KeyConditionExpression='order_date BETWEEN :s AND :e',
         ExpressionAttributeValues={
             ':s': str(start),
@@ -3161,7 +3169,7 @@ def response(code, body):
     return {
         "statusCode": code,
         "headers": {
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
             "Content-Type": "application/json"
         },
         "body": json.dumps(body)
@@ -3169,6 +3177,23 @@ def response(code, body):
 ```
 
 - Click Deploy
+
+### 🧪 5️⃣ – Analytics Lambda Using Environment Variables (Production-Ready)
+
+- **Go to: Lambda → Configuration → Environment variables → Edit**
+
+#### Add EXACTLY these:
+
+| Key                 | Value              |
+| ------------------- | ------------------ |
+| `ORDERS_TABLE_NAME` | `CafeOrders`       |
+| `ORDERS_GSI_NAME`   | `order_date-index` |
+| `ALLOWED_ORIGIN`    | `*`                |
+
+✅ Save changes
+
+✅ No code hard-coding remains
+
 
 
 ### 🧪 5️⃣ – TEST LAMBDA IN CONSOLE (MANDATORY)
