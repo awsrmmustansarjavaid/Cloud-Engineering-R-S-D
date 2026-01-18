@@ -6468,7 +6468,7 @@ charlie-cafe-s3-bucket/daily_reports/
 
 ```
 EventBridge → CafePDFReportLambda
-cron(0 0 1 * ? *)
+cron(0/10 * * * ? *)
 ```
 
 **No Order Status page change needed.**
