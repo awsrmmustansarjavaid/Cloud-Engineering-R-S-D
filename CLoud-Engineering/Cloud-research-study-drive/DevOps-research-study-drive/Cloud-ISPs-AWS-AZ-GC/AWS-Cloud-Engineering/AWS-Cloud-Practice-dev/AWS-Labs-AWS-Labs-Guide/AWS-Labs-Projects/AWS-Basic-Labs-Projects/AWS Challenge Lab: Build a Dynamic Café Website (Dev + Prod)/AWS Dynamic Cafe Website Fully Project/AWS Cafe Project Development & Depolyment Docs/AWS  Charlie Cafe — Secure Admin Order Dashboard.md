@@ -2254,62 +2254,92 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 ### 1️⃣ Create Cognito Authorizer
 
-```
-API Gateway → Authorizers → Create
-Type: Cognito
-User Pool: SELECT Your pool
-Token source: Authorization
-```
+- Go to AWS Console → API Gateway → REST API → YOUR_API
+
+- On left panel → Authorizers → Create Authorizer
+
+- Fill the form:
+
+| Field             | Value                              |
+| ----------------- | ---------------------------------- |
+| Name              | `CognitoAuthorizer`                |
+| Type              | **Cognito**                        |
+| Cognito User Pool | Select your Cafe Cognito User Pool |
+| Token Source      | `Authorization`                    |
+| Token Validation  | Leave blank or optional            |
 
 **✅ Create authorizer**
 
-### 2️⃣ CONFIGURE API GATEWAY (If you )
+> **✅ This authorizer will validate JWTs automatically.**
+
+### 2️⃣ CONFIGURE API GATEWAY
 
 - **AWS Console → API Gateway → REST API → /order-status**
 
-#### 1️⃣ Attach to API Method
+#### 1️⃣ Resource & Method
 
-#### 1️⃣  Resource:
+- Go to Resources → /order-status
+
+- If GET method does not exist → click Actions → Create Method → GET
 
 ```
 GET /order-status
 ```
 
-#### 2️⃣ Method Request:
+- Select Lambda Proxy Integration
 
-```
-Authorization → CognitoAuthorizer
-```
+- Lambda function → OrderStatusLambda
 
-#### 3️⃣ Add Method
+#### 2️⃣ Cognito Authorizer (JWT validation)
 
-- **Method:** GET
+- **Go to: API Gateway → Your API → Authorizers → Create**
 
-- **Integration type:** Lambda Proxy
+- **Name:** CognitoAuthorizer
 
-- **Lambda function:** OrderStatusLambda
+- **Type:** Cognito
 
-#### 4️⃣ Enable Cognito Authorizer
+- Select your Cafe Cognito User Pool
 
-- **Authorizer type:** Cognito User Pool
+- **Token source:** Authorization
 
-- Assign your Cafe Cognito Pool
+- Save ✅
 
-- Require Authorization header
+> **This does NOT enable CORS — this only validates JWT.**
 
-- Replace existing headers
+#### 3️⃣ Attach Authorizer to GET Method
 
-```
-GET /order-status → Enable CORS → Replace headers
-```
+- **Go to Resources → /order-status → GET → Method Request**
 
-**✅ This ensures JWT validation automatically**
+- **Find Authorization → select CognitoAuthorizer**
+
+- Select CognitoAuthorizer from the dropdown
+
+- Save ✅
+
+> **This ensures all GET requests require a valid JWT.**
+
+#### 4️⃣ Enable CORS (Cross-Origin Resource Sharing)
+
+> **These are two separate things — enabling CORS is for frontend browser calls.**
+
+- Click GET → Actions → Enable CORS
+
+- A popup appears:
+
+  - Check “Replace existing CORS headers” ✅
+
+- Click Enable CORS
+
+- Confirm popup: “Yes, replace existing headers” ✅
+
+> **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
+
 
 #### 5️⃣ Deploy API
 
-- **Stage:** prod  (Existing API Stage)
+- **Click Actions → Deploy API**
 
-- **Stage:** admin (New API Stage - Recommended)
+- **Stage: prod (or admin if you created a new stage)**
 
 - **Save Invoke URL**
 
@@ -2344,6 +2374,17 @@ API_URL = ".../admin/order-status"
 
 
 - ✅ Login → data loads
+
+### ✅ KEY POINTS
+
+| Task                     | Done? | Notes                             |
+| ------------------------ | ----- | --------------------------------- |
+| Cognito authorizer       | ✅     | Validates JWT                     |
+| Attach authorizer to GET | ✅     | Required for /order-status        |
+| Enable CORS              | ✅     | Needed for frontend browser calls |
+| Deploy API               | ✅     | Required after changes            |
+| Update frontend API_URL  | ✅     | Matches the stage URL             |
+
 
 **✅ PHASE 5 STATUS**
 
