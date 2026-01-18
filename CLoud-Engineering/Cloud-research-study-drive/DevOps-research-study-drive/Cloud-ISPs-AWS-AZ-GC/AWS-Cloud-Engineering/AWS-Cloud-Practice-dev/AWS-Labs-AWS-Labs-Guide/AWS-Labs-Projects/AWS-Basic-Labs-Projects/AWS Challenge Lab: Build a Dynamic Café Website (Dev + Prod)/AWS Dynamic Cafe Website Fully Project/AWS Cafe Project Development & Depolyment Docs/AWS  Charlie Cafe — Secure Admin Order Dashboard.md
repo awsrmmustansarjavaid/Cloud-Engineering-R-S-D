@@ -2738,14 +2738,246 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ## 🔐 PHASE 7️⃣ PRINTING (FRONTEND ONLY)
 
-### Already included in frontend:
+### 🧭 WHAT THIS PHASE DOES (CLEAR SCOPE)
 
-| Feature             | Status |
-| ------------------- | ------ |
-| Print all orders    | ✅      |
-| Print today summary | ✅      |
-| PDF / Printer       | ✅      |
-| No backend call     | ✅      |
+This phase allows:
+
+✅ Print all orders
+
+✅ Print today summary
+
+✅ Print using browser PDF / printer
+
+✅ Uses existing order-status data
+
+✅ NO backend changes
+
+### 1️⃣ — CONFIRM FILE YOU WILL MODIFY (NO JUMP)
+
+#### You must edit this file:
+
+```
+/var/www/html/order-status.html
+```
+
+✔ Same file where orders are shown
+
+✔ Same file used by staff/admin
+
+### 2️⃣ — BACKUP YOUR FILE (MANDATORY)
+
+#### Run:
+
+```
+sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+```
+
+### 3️⃣ — ADD PRINT BUTTONS (EXACT LOCATION)
+
+#### 🔍 FIND THIS IN YOUR FILE:
+
+```
+<h3>Order Status</h3>
+```
+
+#### ⬇️ IMMEDIATELY BELOW IT, PASTE THIS:
+
+```
+<div class="d-flex gap-2 mb-3">
+  <button class="btn btn-outline-dark" onclick="printAllOrders()">
+    🖨️ Print All Orders
+  </button>
+
+  <button class="btn btn-outline-success" onclick="printTodaySummary()">
+    📄 Print Today Summary
+  </button>
+</div>
+```
+
+❌ Do NOT remove anything
+
+❌ Do NOT rename functions
+
+### 4️⃣ — ADD PRINT-ONLY CSS (VERY IMPORTANT)
+
+#### 🔍 FIND:
+
+```
+</head>
+```
+
+#### ⬆️ JUST ABOVE IT, PASTE:
+
+```
+<style>
+@media print {
+
+  body {
+    background: #fff !important;
+  }
+
+  button,
+  select,
+  .no-print {
+    display: none !important;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  h3 {
+    text-align: center;
+  }
+}
+</style>
+```
+
+✔ Ensures clean PDF
+
+✔ Hides buttons automatically
+
+### 5️⃣ — ADD JAVASCRIPT PRINT LOGIC
+
+#### 🔍 FIND THE END OF YOUR <script> TAG
+
+> **🔴 (OR CREATE ONE IF NOT EXISTS)**
+
+#### ⬇️ PASTE THIS FULL CODE:
+
+```
+<script>
+function printAllOrders() {
+  window.print();
+}
+
+function printTodaySummary() {
+
+  const rows = document.querySelectorAll("#ordersTable tbody tr");
+  let today = new Date().toISOString().split("T")[0];
+
+  let totalOrders = 0;
+  let totalAmount = 0;
+
+  rows.forEach(row => {
+    const orderDate = row.dataset.date;
+    const amount = parseFloat(row.dataset.total);
+
+    if (orderDate === today) {
+      totalOrders++;
+      totalAmount += amount;
+    }
+  });
+
+  const summaryHTML = `
+    <h3>☕ Cafe Daily Summary</h3>
+    <p><strong>Date:</strong> ${today}</p>
+    <p><strong>Total Orders:</strong> ${totalOrders}</p>
+    <p><strong>Total Sales:</strong> ${totalAmount}</p>
+  `;
+
+  const original = document.body.innerHTML;
+  document.body.innerHTML = summaryHTML;
+  window.print();
+  document.body.innerHTML = original;
+}
+</script>
+```
+
+❌ Do NOT change function names
+
+❌ Do NOT move code
+
+### 6️⃣ — ENSURE TABLE HAS REQUIRED ATTRIBUTES
+
+#### 🔍 FIND YOUR ORDERS TABLE ROW LOOP
+
+Example:
+
+```
+<tr>
+```
+
+#### 🔁 REPLACE WITH THIS:
+
+```
+<tr data-date="2026-01-17" data-total="15">
+```
+
+#### ⚠️ IMPORTANT
+
+- These values must already exist in JS when rendering rows.
+
+Example in JS:
+
+```
+row.dataset.date = order.order_date;
+row.dataset.total = order.total_amount;
+```
+
+✔ Required for today summary print
+
+### 7️⃣ — TEST PRINT ALL ORDERS (MANDATORY)
+
+1️⃣ Open browser
+
+2️⃣ Go to Order Status Page
+
+3️⃣ Click 🖨️ Print All Orders
+
+#### EXPECTED RESULT:
+
+✔ Browser print dialog opens
+
+✔ Orders table visible
+
+✔ Buttons hidden
+
+✔ Can save as PDF
+
+### 8️⃣ — TEST TODAY SUMMARY PRINT (MANDATORY)
+
+- **1️⃣ Click 📄 Print Today Summary**
+
+#### EXPECTED RESULT:
+
+✔ Only summary visible
+
+✔ Correct date
+
+✔ Correct totals
+
+✔ Clean PDF layout
+
+**❌ If totals = 0 → your data-date missing**
+
+### 🧪  FINAL CONFIRMATION CHECKLIST
+
+| Item                    | Status |
+| ----------------------- | ------ |
+| No backend used         | ✅      |
+| Print dialog opens      | ✅      |
+| PDF save works          | ✅      |
+| Buttons hidden in print | ✅      |
+| Today summary accurate  | ✅      |
+
+
+### 🟢 PHASE 7 FINAL STATUS
+
+✅ PHASE 7 COMPLETE
+
+✅ FULLY TESTED
+
+✅ NO SKIPPED STEPS
+
+✅ SAFE TO MOVE FORWARD
 
 
 **✅ PHASE 7 STATUS**
