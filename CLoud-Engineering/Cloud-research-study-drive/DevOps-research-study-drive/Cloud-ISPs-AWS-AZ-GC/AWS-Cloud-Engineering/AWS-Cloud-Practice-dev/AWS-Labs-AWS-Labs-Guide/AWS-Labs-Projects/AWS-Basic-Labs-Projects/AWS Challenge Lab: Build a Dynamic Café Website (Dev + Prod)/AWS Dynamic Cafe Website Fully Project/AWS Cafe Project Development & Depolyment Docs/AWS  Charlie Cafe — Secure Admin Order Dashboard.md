@@ -2924,6 +2924,286 @@ row.dataset.total = order.total_amount;
 
 ✔ Required for today summary print
 
+### 🧾 ✅ FINAL UPDATED order-status.html (WITH PRINTING + COMMENTS)
+
+#### 🔴 Replace your entire file with this
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Order Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ================== BOOTSTRAP ================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================== CHART.JS ================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ================== MAIN BACKGROUND ================== */
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+    url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* ================== DASHBOARD ================== */
+#dashboard {
+  display: none;
+  background:#f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.card-metric {
+  background:#fff;
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+
+/* ================== PRINT CSS (PHASE 7) ================== */
+@media print {
+
+  body {
+    background: #fff !important;
+  }
+
+  nav,
+  button,
+  input,
+  canvas {
+    display: none !important;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  h3 {
+    text-align: center;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================== NAVBAR ================== -->
+<nav class="navbar navbar-dark bg-dark" id="navbar" style="display:none">
+  <div class="container">
+    <span class="navbar-brand">☕ Charlie Cafe Admin</span>
+    <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- ================== DASHBOARD ================== -->
+<div class="container my-4" id="dashboard">
+
+<!-- ================== FILTER ROW ================== -->
+<div class="row mb-3">
+  <div class="col-md-3">
+    <input type="date" id="filterDate" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary w-100" onclick="loadData()">Filter</button>
+  </div>
+</div>
+
+<!-- ================== PRINT BUTTONS (PHASE 7) ================== -->
+<div class="row mb-3">
+  <div class="col text-end">
+    <button class="btn btn-outline-dark me-2" onclick="printAllOrders()">
+      🖨️ Print All Orders
+    </button>
+    <button class="btn btn-outline-success" onclick="printTodaySummary()">
+      📄 Print Today Summary
+    </button>
+  </div>
+</div>
+
+<!-- ================== LOADER ================== -->
+<div class="text-center my-3" id="loader" style="display:none">
+  <div class="spinner-border text-warning"></div>
+  <p class="mt-2">Loading...</p>
+</div>
+
+<!-- ================== METRICS ================== -->
+<div class="row mb-4" id="metrics"></div>
+
+<!-- ================== CHART ================== -->
+<canvas id="orderChart" height="100"></canvas>
+
+<!-- ================== ORDERS TABLE ================== -->
+<table class="table table-bordered mt-4 bg-white">
+  <thead class="table-dark">
+    <tr>
+      <th>Customer</th>
+      <th>Item</th>
+      <th>Qty</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody id="orders"></tbody>
+</table>
+
+</div>
+
+<script>
+/* ================== CONFIG ================== */
+
+/* 🔁 REPLACE WITH YOUR OWN VALUES IF CHANGED */
+const COGNITO_DOMAIN = "us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = "393ld7o96bt7qlv0shp124osh5";
+const REDIRECT_URI = "https://d2og2zrs47voou.cloudfront.net/order-status.html";
+
+/* 🔴 REPLACE API ID WHEN READY */
+const API_URL = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+
+let chart, refreshTimer;
+
+/* ================== AUTH ================== */
+function parseJwt(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+  return parseJwt(token).exp * 1000 < Date.now();
+}
+
+function login() {
+  window.location.href =
+    `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&scope=openid+email+profile&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+}
+
+function logout() {
+  localStorage.removeItem("access_token");
+  clearInterval(refreshTimer);
+  window.location.href =
+    `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+}
+
+function handleRedirect() {
+  const hash = window.location.hash.substring(1);
+  if (!hash) return;
+  const token = new URLSearchParams(hash).get("access_token");
+  if (token) {
+    localStorage.setItem("access_token", token);
+    window.location.hash = "";
+  }
+}
+
+/* ================== DASHBOARD ================== */
+function showDashboard() {
+  const token = localStorage.getItem("access_token");
+  if (!token || isTokenExpired(token)) return login();
+
+  document.getElementById("navbar").style.display = "block";
+  document.getElementById("dashboard").style.display = "block";
+
+  loadData();
+  refreshTimer = setInterval(loadData, 10000);
+}
+
+/* ================== DATA ================== */
+function loadData() {
+  const token = localStorage.getItem("access_token");
+  if (!token || isTokenExpired(token)) return logout();
+
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("metrics").innerHTML = "";
+  document.getElementById("orders").innerHTML = "";
+
+  let url = API_URL;
+  const date = document.getElementById("filterDate").value;
+  if (date) url += "?date=" + date;
+
+  fetch(url, { headers: { Authorization: "Bearer " + token }})
+  .then(r => r.json())
+  .then(data => {
+
+    document.getElementById("loader").style.display = "none";
+
+    data.metrics.forEach(m => {
+      metrics.innerHTML += `
+        <div class="col-md-3 mb-2">
+          <div class="card-metric text-center fw-bold">${m.metric}<br>${m.count}</div>
+        </div>`;
+    });
+
+    const items = {};
+    data.recent_orders.forEach(o => {
+      orders.innerHTML += `
+        <tr>
+          <td>${o.customer_name}</td>
+          <td>${o.item}</td>
+          <td>${o.quantity}</td>
+          <td>${o.created_at}</td>
+        </tr>`;
+      items[o.item] = (items[o.item] || 0) + o.quantity;
+    });
+
+    if (chart) chart.destroy();
+    chart = new Chart(orderChart, {
+      type: 'bar',
+      data: { labels: Object.keys(items), datasets: [{ label: 'Orders per Item', data: Object.values(items) }] }
+    });
+  });
+}
+
+/* ================== PRINTING (PHASE 7) ================== */
+function printAllOrders() {
+  window.print();
+}
+
+function printTodaySummary() {
+  let today = new Date().toISOString().split("T")[0];
+  let totalQty = 0;
+
+  document.querySelectorAll("#orders tr").forEach(row => {
+    if (row.children[3].innerText.startsWith(today)) {
+      totalQty += parseInt(row.children[2].innerText);
+    }
+  });
+
+  const html = `
+    <h3>☕ Charlie Cafe – Daily Summary</h3>
+    <p><strong>Date:</strong> ${today}</p>
+    <p><strong>Total Items Sold:</strong> ${totalQty}</p>
+  `;
+
+  const original = document.body.innerHTML;
+  document.body.innerHTML = html;
+  window.print();
+  document.body.innerHTML = original;
+  location.reload();
+}
+
+/* ================== INIT ================== */
+handleRedirect();
+showDashboard();
+</script>
+
+</body>
+</html>
+```
+
+
+
 ### 7️⃣ — TEST PRINT ALL ORDERS (MANDATORY)
 
 1️⃣ Open browser
