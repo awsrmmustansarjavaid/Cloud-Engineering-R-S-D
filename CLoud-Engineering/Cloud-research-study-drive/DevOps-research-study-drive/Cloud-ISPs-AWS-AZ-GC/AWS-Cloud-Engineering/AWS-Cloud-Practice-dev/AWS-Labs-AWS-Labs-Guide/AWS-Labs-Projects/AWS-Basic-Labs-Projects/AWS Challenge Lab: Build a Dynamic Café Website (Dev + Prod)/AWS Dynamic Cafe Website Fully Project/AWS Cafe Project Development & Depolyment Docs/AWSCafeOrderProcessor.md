@@ -384,6 +384,57 @@ CREATE TABLE orders (
 );
 ```
 
+#### ☕ orders TABLE — FULLY COMMENTED (PRODUCTION-READY)
+
+```
+CREATE TABLE orders (
+
+    -- Unique ID for each order (auto increases)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    -- Cafe table number (e.g., table 1, table 5)
+    table_number INT NOT NULL,
+
+    -- Customer name (optional: walk-in or anonymous allowed)
+    customer_name VARCHAR(100) DEFAULT NULL,
+
+    -- Item name ordered (must match CafeMenu.item_name)
+    item VARCHAR(100) NOT NULL,
+
+    -- Quantity of the item ordered
+    quantity INT NOT NULL DEFAULT 1,
+
+    -- Selling price per single item (charged to customer)
+    unit_price DECIMAL(10,2) NOT NULL,
+
+    -- Auto-calculated total amount = quantity × unit_price
+    -- STORED means value is physically saved (faster reports)
+    total_amount DECIMAL(10,2)
+        GENERATED ALWAYS AS (quantity * unit_price) STORED,
+
+    -- Order status used by kitchen + order-status dashboard
+    status ENUM('pending', 'preparing', 'served', 'cancelled')
+        DEFAULT 'pending',
+
+    -- Time when order was created
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Time when order was last updated (status change, etc.)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Index for quickly finding orders by table number
+    INDEX idx_table_number (table_number),
+
+    -- Index for fast filtering by order status
+    INDEX idx_status (status),
+
+    -- Index for analytics & reports by date/time
+    INDEX idx_created_at (created_at)
+
+);
+```
+
 #### 📢 Remove (Delete) the Table
 
 #### Option A: Normal delete (most common)
