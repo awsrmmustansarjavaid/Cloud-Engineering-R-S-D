@@ -2243,6 +2243,26 @@ Scroll to Configure input
 cron(0 0 1 * ? *)
 ```
 
+#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+
+#### 🕐 Calculate Next 10-Minute Trigger Time (UTC)
+
+- Suppose your current UTC time is 15:20
+
+- Add 10 minutes → 15:30
+
+- You need cron expression for UTC 15:30 today
+
+```
+cron(30 15 * * ? *)
+```
+
+#### 💡 Format reminder:
+
+```
+cron(Minute Hour Day-of-Month Month Day-of-Week Year)
+```
+
 #### 🔘 Meaning:
 
 - Runs on 1st day of every month
@@ -2389,7 +2409,27 @@ cron(0 0 * * ? *)
 cron(0 19 * * ? *)
 ```
 
-Click Next
+#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+
+#### 🕐 Calculate Next 10-Minute Trigger Time (UTC)
+
+- Suppose your current UTC time is 15:20
+
+- Add 10 minutes → 15:30
+
+- You need cron expression for UTC 15:30 today
+
+```
+cron(30 15 * * ? *)
+```
+
+#### 💡 Format reminder:
+
+```
+cron(Minute Hour Day-of-Month Month Day-of-Week Year)
+```
+
+- **Click Next**
 
 
 > **Explanation:**
@@ -2457,6 +2497,26 @@ Click Next
 
 ```
 cron(0 0 1 * ? *)
+```
+
+#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+
+#### 🕐 Calculate Next 10-Minute Trigger Time (UTC)
+
+- Suppose your current UTC time is 15:20
+
+- Add 10 minutes → 15:30
+
+- You need cron expression for UTC 15:30 today
+
+```
+cron(30 15 * * ? *)
+```
+
+#### 💡 Format reminder:
+
+```
+cron(Minute Hour Day-of-Month Month Day-of-Week Year)
 ```
 
 **➡️ Runs once per month on the 1st day at 00:00 UTC**
