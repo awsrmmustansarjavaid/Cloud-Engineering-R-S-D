@@ -5933,7 +5933,26 @@ def lambda_handler(event, context):
     }
 ```
 
+- **Click Deploy**
 
+### 9️⃣ USE ENVIRONMENT VARIABLES
+
+- Open your CafeDailyPDFLambda → Configuration → Environment variables
+
+- Add the following keys & values exactly:
+
+| Key            | Value                  |
+| -------------- | ---------------------- |
+| BUCKET_NAME    | charlie-cafe-s3-bucket |
+| LOGO_KEY       | Cafelogo.png           |
+| DYNAMODB_TABLE | CafeOrders             |
+| AWS_REGION     | ap-south-1             |
+
+- Save changes.
+
+- In the code, the Lambda reads these using os.environ.get(...).
+
+**⚡ Benefit: You no longer need to edit code when bucket/table changes.**
 
 
 
