@@ -312,7 +312,7 @@ CREATE TABLE orders (
 );
 ```
 
-#### 📢 Recommended Final CREATE TABLE (with table_number)
+#### 📢 Recommended Final CREATE TABLE with table_number
 
 ```
 CREATE TABLE orders (
@@ -328,7 +328,7 @@ CREATE TABLE orders (
 );
 ```
 
-#### ✅ FINAL orders TABLE (WITH CLEAR COMMENTS)
+#### ✅ FINAL orders TABLE with table_number (WITH CLEAR COMMENTS)
 
 ```
 CREATE TABLE orders (
