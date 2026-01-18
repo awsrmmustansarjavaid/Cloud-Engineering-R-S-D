@@ -6281,9 +6281,10 @@ Triggers CafeDailyPDFLambda every day at midnight UTC
 cron(0 0 * * ? *)
 ```
 
-#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+#### 🕐 TEST – EventBridge – Multiple Schedules for Lambda
 
-#### 🕐 Calculate Next 10-Minute Trigger Time (UTC)
+#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+> **Calculate Next 10-Minute Trigger Time (UTC)**
 
 - Suppose your current UTC time is 15:20
 
@@ -6300,6 +6301,47 @@ cron(30 15 * * ? *)
 ```
 cron(Minute Hour Day-of-Month Month Day-of-Week Year)
 ```
+
+#### 🕐 TEST – Every 10 minutes SCHEDULE
+> **Every 10 minutes → quick refresh/testing or frequent updates**
+
+#### Cron expression:
+
+```
+cron(0/10 * * * ? *)
+```
+
+#### Explanation:
+
+- 0/10 → start at minute 0, repeat every 10 minutes
+
+- * → every hour, every day, every month
+
+- ? → placeholder for day-of-week (required by AWS cron)
+
+- * → every year
+
+
+#### 🕐 TEST – Every hour SCHEDULE
+> **Every hour → summary report**
+
+#### Cron expression:
+
+```
+cron(0 0/1 * * ? *)
+```
+
+#### Explanation:
+
+- 0 → run at 0th minute
+
+- 0/1 → every 1 hour
+
+- * → every day, every month
+
+- ? → placeholder for day-of-week
+
+- * → every year
 
 ✔ Daily midnight PDF
 
