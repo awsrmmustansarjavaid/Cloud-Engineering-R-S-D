@@ -5564,39 +5564,63 @@ GET /analytics/csv
 
 - **Click Save**
 
+#### 3️⃣ ENABLE COGNITO AUTHORIZER
 
-
-
-
-
-### 2️⃣ CSV Lambda Code
+- **Open GET /analytics/csv**
+- **Click Method Request**
+- **Set:**
 
 ```
-import csv, io
-
-def lambda_handler(event, context):
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["Item","Qty","Sales","Cost","Profit"])
-
-    for i in profit_items:
-        writer.writerow([
-            i['item'],
-            i['quantity'],
-            i['sales'],
-            i['cost'],
-            i['profit']
-        ])
-
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "text/csv",
-            "Content-Disposition": "attachment; filename=report.csv"
-        },
-        "body": output.getvalue()
-    }
+Authorization → Cognito Authorizer
 ```
+
+- **Choose same authorizer used for analytics**
+
+- **✔ Save**
+
+#### 4️⃣ — DEPLOY API
+
+- **Click Deploy API**
+- **Choose stage:**
+
+```
+prod
+```
+
+- **Click Deploy**
+
+### TEST CSV EXPORT (MANDATORY)
+
+#### ✅ TEST AS ADMIN (SUCCESS)
+
+#### Use browser or curl:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics/csv
+```
+
+✔ Logged in as Admin
+
+#### ✅ EXPECTED RESULT:
+
+⬇️ File downloads automatically:
+
+```
+cafe-analytics.csv
+```
+
+#### Open file → Should show:
+
+```
+Item,Quantity,Sales,Cost,Profit
+Latte,10,50,30,20
+Espresso,5,25,15,10
+```
+
+
+
+
+
 
 
 **✅ PHASE 13 STATUS**
