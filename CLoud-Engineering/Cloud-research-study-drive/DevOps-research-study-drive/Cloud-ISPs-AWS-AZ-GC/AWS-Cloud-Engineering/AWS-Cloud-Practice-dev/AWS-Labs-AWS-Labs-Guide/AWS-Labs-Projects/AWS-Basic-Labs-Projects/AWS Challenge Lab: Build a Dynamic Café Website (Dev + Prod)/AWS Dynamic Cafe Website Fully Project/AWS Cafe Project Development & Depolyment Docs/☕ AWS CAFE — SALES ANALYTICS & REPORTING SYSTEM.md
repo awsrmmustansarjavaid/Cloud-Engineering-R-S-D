@@ -5777,6 +5777,36 @@ Lambda → CafeDailyPDFLambda → Layers → Add layer
 
 ✔ Click Add
 
+### 7️⃣ IAM PERMISSIONS (NO MISS)
+
+#### 1️⃣ Open Lambda:
+
+```
+Configuration → Permissions
+```
+
+#### 2️⃣ Click Role name:
+
+```
+CafeDailyPDFLambda-role-xxxx
+```
+
+#### 3️⃣ Attach policies:
+
+```
+AmazonS3FullAccess
+AmazonDynamoDBReadOnlyAccess
+```
+
+✔ Save
+
+### 8️⃣ REPLACE LAMBDA CODE (FULL FINAL CODE)
+
+> **⚠️ DELETE ALL EXISTING CODE FIRST**
+
+Then PASTE EVERYTHING BELOW
+
+✅ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
 
 
 ### 3️⃣ PDF Lambda (REPORTLAB – FINAL)
