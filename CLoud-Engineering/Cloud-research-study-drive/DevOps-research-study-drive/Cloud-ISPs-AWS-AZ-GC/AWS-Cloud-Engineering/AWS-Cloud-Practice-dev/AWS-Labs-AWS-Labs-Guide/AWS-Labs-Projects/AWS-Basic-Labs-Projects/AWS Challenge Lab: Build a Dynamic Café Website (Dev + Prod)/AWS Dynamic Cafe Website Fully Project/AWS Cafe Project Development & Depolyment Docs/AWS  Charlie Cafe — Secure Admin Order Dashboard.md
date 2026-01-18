@@ -3504,7 +3504,7 @@ eyJraWQiOiJLT...
 
 - Paste ID token
 
-Verify payload contains:
+#### Verify payload contains:
 
 ```
 {
@@ -3514,22 +3514,173 @@ Verify payload contains:
 }
 ```
 
+✔ If cognito:groups exists → continue
 
+❌ If missing → user NOT in group → FIX STEP 3
 
+#### 🚪 8️⃣ — CREATE API GATEWAY COGNITO AUTHORIZER
+> **If you did not create then follow this step... otherwisse leave it**
+
+- API Gateway → Your API
+
+- Click Authorizers
+
+- Click Create authorizer
+
+#### Fill EXACTLY:
 
 ```
-User → Login (Cognito)
-     → JWT stored
-     → Authorization header sent
-     → API Gateway validates
-     → Lambda executes
+Name: CafeCognitoAuthorizer
+Type: Cognito
+Cognito User Pool: CafeUserPool
+Token source: Authorization
 ```
 
-❌ No JWT → 401
+- Click Create
 
-❌ Invalid JWT → 401
+### 🔗 9️⃣ — ATTACH AUTHORIZER TO API METHOD
 
-✅ Admin → Success
+- **API Gateway → Resources**
+
+- **Select endpoint:**
+
+```
+GET /analytics
+```
+
+- **Click Method Request**
+
+- **Authorization:**
+
+```
+Cognito User Pool Authorizer
+```
+
+- **Select:**
+
+```
+CafeCognitoAuthorizer
+```
+
+- Click Save
+
+### 🚀 🔟 — DEPLOY API (DO NOT SKIP)
+
+- **API Gateway → Deploy API**
+
+- **Stage:**
+
+```
+prod
+```
+
+- Click Deploy
+
+### 🧪 1️⃣1️⃣ — TEST ❌ NO JWT (EXPECTED FAIL)
+
+#### CURL / Postman / Browser test
+
+#### Request:
+
+```
+GET https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics
+```
+
+#### EXPECTED RESULT:
+
+```
+401 Unauthorized
+```
+
+✔ Correct → continue
+
+❌ If allowed → authorizer NOT attached
+
+### 🧪 1️⃣2️⃣ — TEST ❌ INVALID JWT
+
+#### Add header:
+
+```
+Authorization: invalidtoken123
+```
+
+#### EXPECTED:
+
+```
+401 Unauthorized
+```
+
+✔ Correct → continue
+
+### 🧪 1️⃣3️⃣ — TEST ✅ ADMIN JWT (EXPECTED SUCCESS)
+
+#### Add header:
+
+```
+Authorization: Bearer YOUR_ID_TOKEN
+```
+
+#### EXPECTED:
+
+```
+200 OK
+```
+
+✔ Lambda executes
+✔ Data returned
+
+### 🧪 1️⃣4️⃣ — TEST STAFF USER (SECURITY VALIDATION)
+
+Login as Staff user, get ID token again.
+
+#### Call API with:
+
+```
+Authorization: Bearer STAFF_TOKEN
+```
+
+#### RESULT DEPENDS ON LAMBDA:
+
+- Analytics Lambda → ❌ 403
+
+- Orders Lambda → ✅ 200
+
+**✔ This proves end-to-end security**
+
+### 🧠 FINAL SECURITY FLOW (CONFIRMED)
+
+```
+No token        → API Gateway blocks (401)
+Invalid token   → API Gateway blocks (401)
+Valid token     → Claims injected
+Admin group     → Lambda allows
+Staff group     → Lambda restricted
+```
+
+### 🧪 PHASE 8 TEST CHECKLIST (ALL MUST PASS)
+
+✔ Token issued
+
+✔ Groups inside JWT
+
+✔ Authorizer attached
+
+✔ No token blocked
+
+✔ Invalid token blocked
+
+✔ Admin allowed
+
+✔ Staff restricted
+
+### ✅ PHASE 8 STATUS
+
+🟢 PHASE 8 COMPLETE
+
+🟢 PHASE 8 FULLY TESTED
+
+🟢 SAFE TO MOVE NEXT
+
 
 **✅ PHASE 8 STATUS**
 
