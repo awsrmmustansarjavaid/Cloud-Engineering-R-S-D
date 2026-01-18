@@ -5806,7 +5806,106 @@ AmazonDynamoDBReadOnlyAccess
 
 Then PASTE EVERYTHING BELOW
 
-✅ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
+#### ✅ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
+
+```
+import boto3
+import datetime
+import os
+from reportlab.platypus import SimpleDocTemplate, Table, Image, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+
+# =========================
+# 🔁 REPLACE VALUES BELOW
+# =========================
+
+BUCKET_NAME = "charlie-cafe-s3-bucket"
+LOGO_KEY = "Cafelogo.png"
+DYNAMODB_TABLE = "CafeOrders"
+AWS_REGION = "ap-south-1"
+
+# =========================
+# DO NOT CHANGE BELOW
+# =========================
+
+s3 = boto3.client("s3")
+dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
+table = dynamodb.Table(DYNAMODB_TABLE)
+
+def lambda_handler(event, context):
+
+    today = datetime.date.today().isoformat()
+    pdf_path = f"/tmp/daily_report_{today}.pdf"
+
+    # -------------------------
+    # Fetch Orders
+    # -------------------------
+    response = table.scan()
+    items = response.get("Items", [])
+
+    profit_items = []
+
+    for i in items:
+        if i.get("order_status") != "COMPLETED":
+            continue
+
+        qty = int(i["quantity"])
+        sales = float(i["item_price"]) * qty
+        cost = float(i["item_cost"]) * qty
+
+        profit_items.append({
+            "item": i["item_name"],
+            "quantity": qty,
+            "sales": round(sales, 2),
+            "cost": round(cost, 2),
+            "profit": round(sales - cost, 2)
+        })
+
+    # -------------------------
+    # Create PDF
+    # -------------------------
+    doc = SimpleDocTemplate(pdf_path, pagesize=A4)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    # Download logo from S3
+    logo_path = "/tmp/logo.png"
+    s3.download_file(BUCKET_NAME, LOGO_KEY, logo_path)
+
+    elements.append(Image(logo_path, width=120, height=60))
+    elements.append(Spacer(1, 20))
+
+    table_data = [["Item", "Qty", "Sales", "Cost", "Profit"]]
+
+    for p in profit_items:
+        table_data.append([
+            p["item"],
+            p["quantity"],
+            p["sales"],
+            p["cost"],
+            p["profit"]
+        ])
+
+    elements.append(Table(table_data))
+    doc.build(elements)
+
+    # -------------------------
+    # Upload to S3
+    # -------------------------
+    s3.upload_file(
+        pdf_path,
+        BUCKET_NAME,
+        f"daily_reports/daily_{today}.pdf"
+    )
+
+    return {
+        "statusCode": 200,
+        "body": f"PDF generated and uploaded: daily_{today}.pdf"
+    }
+```
+
+
 
 
 ### 3️⃣ PDF Lambda (REPORTLAB – FINAL)
