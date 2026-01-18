@@ -2301,13 +2301,30 @@ API_URL = ".../admin/order-status"
 
 ## 🔐 PHASE 6️⃣ — BACKEND DATE FILTER (LAMBDA)
 
-### 🎯 What backend does
+### 🎯 Goal
 
-- JWT validation → API Gateway
+- Validate JWT token via API Gateway.
 
-- Date filtering → Lambda
+- Filter orders by date in Lambda.
 
-- No frontend hacks
+- Return metrics and recent orders.
+
+- Ensure no frontend hacks are needed.
+
+- Fully test before moving to next phase.
+
+### 1️⃣ CREATE OR UPDATE LAMBDA
+
+- **AWS Console → Lambda → Create Function → Author from scratch**
+
+- **Function name:** OrderStatusLambda
+
+- **Runtime:** Python 3.12
+
+- **Permissions:** Create new role with basic Lambda permissions
+
+
+
 
 ### ✅ FINAL LAMBDA LOGIC
 
