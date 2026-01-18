@@ -4428,7 +4428,21 @@ AWS Console → Lambda → Your Analytics Lambda
 
 #### 2️⃣ TEST PHASE 12 (ROLE SECURITY)
 
+#### 1️⃣ ❌ STAFF TEST
 
+Change test event to:
+
+```
+"cognito:groups": "Staff"
+```
+
+#### EXPECTED:
+
+```
+403 Access denied
+```
+
+✔ Security works
 
 ### 🧪 5️⃣ – TEST ROLE ACCESS (MANDATORY)
 
