@@ -3472,16 +3472,6 @@ Order Status Lambda
 DynamoDB (analytics / reporting)
 ```
 
-### ARCHITECTURE AFTER PHASE 10
-
-```
-CafeMenu (DynamoDB)  ← item cost
-        ↓
-CafeOrderProcessor Lambda
-        ↓
-orders (RDS MySQL) ← cost saved here
-```
-
 So:
 
 ✔ CafeOrderProcessor Lambda is CORRECT
@@ -3495,6 +3485,15 @@ So:
 You were absolutely correct to question it.
 Now let’s fix PHASE 10 properly for YOUR ARCHITECTURE.
 
+### ARCHITECTURE AFTER PHASE 10
+
+```
+CafeMenu (DynamoDB)  ← item cost
+        ↓
+CafeOrderProcessor Lambda
+        ↓
+orders (RDS MySQL) ← cost saved here
+```
 
 ### 📌 PRE-REQUISITES (VERIFY BEFORE START)
 
@@ -3534,9 +3533,12 @@ CafeMenu
 
 - ➡️ **Partition key (Primary Key)**
 
-| Field name | Type   |
-| ---------- | ------ |
-| item_name  | String |
+| Field     | Type        |
+| --------- | ----------- |
+| item_name | String (PK) |
+| base_cost | Number      |
+
+✔ Keep as-is
 
 **⚠️ DO NOT add sort key**
 
@@ -3627,7 +3629,26 @@ base_cost = 1.2
 
 **❌ If base_cost is String → DELETE ITEM → RECREATE**
 
-### 4️⃣ — OPEN ORDER PROCESSING LAMBDA
+### 4️⃣ — UPDATE RDS orders TABLE (MANDATORY)
+
+> **🔴 You MUST add cost columns in MySQL**
+
+#### Connect to your RDS database and run:
+
+```
+ALTER TABLE orders
+ADD COLUMN item_cost DECIMAL(6,2),
+ADD COLUMN total_cost DECIMAL(6,2);
+```
+
+✔ Do NOT skip
+
+✔ Without this → Lambda will fail
+
+
+
+
+### 5️⃣ — OPEN ORDER PROCESSING LAMBDA
 
 #### 1️⃣ OPEN LAMBDA
 
