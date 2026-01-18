@@ -3929,7 +3929,7 @@ AWS Console → Lambda → Your Analytics Lambda
 → Configuration → Environment variables → Edit
 ```
 
-#### ➕ Add EXACTLY these variables
+#### 1️⃣ Add EXACTLY these variables
 
 | Key                   | Value        | Notes                      |
 | --------------------- | ------------ | -------------------------- |
@@ -3942,6 +3942,11 @@ AWS Console → Lambda → Your Analytics Lambda
 
 ❗ Key names must match exactly
 
+#### 2️⃣ DEPLOY LAMBDA
+
+- **Click Deploy**
+
+- **🕐 Wait for: Successfully deployed**
 
 ### 5️⃣ TEST PHASE 11 (DO NOT CONTINUE WITHOUT THIS)
 
