@@ -2247,6 +2247,36 @@ Token source: Authorization
 
 ✅ Create authorizer
 
+### 2️⃣ CONFIGURE API GATEWAY (If you )
+
+- **AWS Console → API Gateway → REST API → /order-status**
+
+#### 1️⃣ Add Method
+
+- **Method:** GET
+
+- **Integration type:** Lambda Proxy
+
+- **Lambda function:** OrderStatusLambda
+
+#### 2️⃣ Enable Cognito Authorizer
+
+- **Authorizer type:** Cognito User Pool
+
+- Assign your Cafe Cognito Pool
+
+- Require Authorization header
+
+**✅ This ensures JWT validation automatically**
+
+#### 3️⃣ Deploy API
+
+- **Stage:** prod
+
+- **Save Invoke URL**
+
+e.g., https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+
 #### 3.2 Attach to API Method
 
 #### Resource:
@@ -2323,10 +2353,7 @@ API_URL = ".../admin/order-status"
 
 - **Permissions:** Create new role with basic Lambda permissions
 
-
-
-
-### ✅ FINAL LAMBDA LOGIC
+### 2️⃣ FINAL LAMBDA LOGIC
 
 ```
 params = event.get("queryStringParameters") or {}
@@ -2478,7 +2505,7 @@ def lambda_handler(event, context):
             conn.close()
 ```
 
-### 🔐 Add Environment Variables
+### 3️⃣ 🔐 Add Environment Variables
 
 ```
 DB_HOST = <your-rds-endpoint>
@@ -2489,38 +2516,7 @@ DB_NAME = cafe
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
-### 2️⃣ CONFIGURE API GATEWAY
-
-- **AWS Console → API Gateway → REST API → /order-status**
-
-#### 1️⃣ Add Method
-
-- **Method:** GET
-
-- **Integration type:** Lambda Proxy
-
-- **Lambda function:** OrderStatusLambda
-
-#### 2️⃣ Enable Cognito Authorizer
-
-- **Authorizer type:** Cognito User Pool
-
-- Assign your Cafe Cognito Pool
-
-- Require Authorization header
-
-**✅ This ensures JWT validation automatically**
-
-#### 3️⃣ Deploy API
-
-- **Stage:** prod
-
-- **Save Invoke URL**
-
-e.g., https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
-
-
-### 3️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
+### 4️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
 
 #### 1️⃣ ❌ Without token
 
