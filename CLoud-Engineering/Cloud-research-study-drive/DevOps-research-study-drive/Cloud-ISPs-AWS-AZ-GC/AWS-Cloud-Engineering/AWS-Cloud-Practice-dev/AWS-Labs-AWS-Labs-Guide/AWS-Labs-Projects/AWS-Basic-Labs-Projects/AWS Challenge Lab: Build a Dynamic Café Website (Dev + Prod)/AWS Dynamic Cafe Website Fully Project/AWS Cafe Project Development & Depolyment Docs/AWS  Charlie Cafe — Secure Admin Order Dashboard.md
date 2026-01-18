@@ -2232,11 +2232,9 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 ---
 
-## 🔐 PHASE 5️⃣ — API GATEWAY AUTH 
+## 🔐 PHASE 5️⃣ — SECURE API GATEWAY AUTH (MOST IMPORTANT) 
 
-### 🔹 STEP 3 — SECURE API GATEWAY (MOST IMPORTANT)
-
-#### 3.1 Create Cognito Authorizer
+### 1️⃣ Create Cognito Authorizer
 
 ```
 API Gateway → Authorizers → Create
@@ -2245,13 +2243,27 @@ User Pool: SELECT Your pool
 Token source: Authorization
 ```
 
-✅ Create authorizer
+**✅ Create authorizer**
 
 ### 2️⃣ CONFIGURE API GATEWAY (If you )
 
 - **AWS Console → API Gateway → REST API → /order-status**
 
-#### 1️⃣ Add Method
+#### 1️⃣ Attach to API Method
+
+#### 1️⃣  Resource:
+
+```
+GET /order-status
+```
+
+#### 2️⃣ Method Request:
+
+```
+Authorization → CognitoAuthorizer
+```
+
+#### 3️⃣ Add Method
 
 - **Method:** GET
 
@@ -2259,7 +2271,7 @@ Token source: Authorization
 
 - **Lambda function:** OrderStatusLambda
 
-#### 2️⃣ Enable Cognito Authorizer
+#### 4️⃣ Enable Cognito Authorizer
 
 - **Authorizer type:** Cognito User Pool
 
@@ -2267,46 +2279,28 @@ Token source: Authorization
 
 - Require Authorization header
 
-**✅ This ensures JWT validation automatically**
-
-#### 3️⃣ Deploy API
-
-- **Stage:** prod
-
-- **Save Invoke URL**
-
-e.g., https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
-
-#### 3.2 Attach to API Method
-
-#### Resource:
-
-```
-GET /order-status
-```
-
-#### Method Request:
-
-```
-Authorization → CognitoAuthorizer
-```
-
-
-#### 3.3 Enable CORS (AGAIN)
-
-- Enable CORS
-
 - Replace existing headers
 
 ```
 GET /order-status → Enable CORS → Replace headers
 ```
 
-#### 3.4 Deploy API
+**✅ This ensures JWT validation automatically**
 
-- Stage: admin (recommended)
+#### 5️⃣ Deploy API
+
+- **Stage:** prod  (Existing API Stage)
+
+- **Stage:** admin (New API Stage - Recommended)
+
+- **Save Invoke URL**
 
 #### 📌 Copy new endpoint API URL:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+```
+> **OR**
 
 ```
 https://xxx.execute-api.region.amazonaws.com/admin/order-status
@@ -2315,6 +2309,12 @@ https://xxx.execute-api.region.amazonaws.com/admin/order-status
 #### 👉 Paste this into frontend once
 
 #### 🔁 Update frontend:
+
+```
+API_URL = ".../prod/order-status"
+```
+
+> **OR**
 
 ```
 API_URL = ".../admin/order-status"
