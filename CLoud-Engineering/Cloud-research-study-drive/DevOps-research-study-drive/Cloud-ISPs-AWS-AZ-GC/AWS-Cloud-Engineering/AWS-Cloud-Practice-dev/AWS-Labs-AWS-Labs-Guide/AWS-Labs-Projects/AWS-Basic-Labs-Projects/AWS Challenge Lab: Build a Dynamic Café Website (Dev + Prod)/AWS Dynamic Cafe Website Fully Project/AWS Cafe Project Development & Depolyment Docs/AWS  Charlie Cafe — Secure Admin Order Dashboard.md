@@ -2600,28 +2600,8 @@ Only orders for 2026-01-17 returned
 
 ✔️ Tested manually via API & frontend
 
- 
 
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
-
-
-
-
-
----
+ ---
 
 ## 🔐 PHASE 7️⃣ PRINTING (FRONTEND ONLY)
 
