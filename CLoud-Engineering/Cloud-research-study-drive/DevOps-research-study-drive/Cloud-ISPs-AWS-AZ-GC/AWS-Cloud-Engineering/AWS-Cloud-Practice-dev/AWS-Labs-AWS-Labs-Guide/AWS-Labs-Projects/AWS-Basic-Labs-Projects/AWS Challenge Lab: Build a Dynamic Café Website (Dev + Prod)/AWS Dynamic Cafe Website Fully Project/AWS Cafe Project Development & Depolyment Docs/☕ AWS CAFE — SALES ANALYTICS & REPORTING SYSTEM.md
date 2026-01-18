@@ -3723,6 +3723,52 @@ SELECT * FROM orders ORDER BY id DESC LIMIT 1;
 
 ✔ If error → do NOT continue
 
+#### 🧾 FINAL UPDATED TABLE STRUCTURE (REFERENCE ONLY)
+
+> **❗ You do NOT re-create the table**
+> **This is only to show how it now looks**
+
+```
+CREATE TABLE orders (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    table_number    INT NOT NULL,
+    customer_name   VARCHAR(100),
+    item            VARCHAR(50),
+    quantity        INT NOT NULL,
+
+    -- ✅ NEW COLUMNS
+    item_cost       DECIMAL(6,2),
+    total_cost      DECIMAL(6,2),
+
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_table_number (table_number),
+    INDEX idx_created_at (created_at)
+);
+```
+
+#### 🟢 FINAL CONFIRMATION CHECKLIST (VERY IMPORTANT)
+
+> **❌ Do NOT move forward until ALL are true:**
+
+✔ DESCRIBE orders; shows item_cost
+
+✔ DESCRIBE orders; shows total_cost
+
+✔ Manual INSERT works
+
+✔ No SQL errors
+
+#### ✅ STEP 4️⃣ STATUS
+
+🟢 RDS TABLE UPDATED
+
+🟢 SAFE
+
+🟢 VERIFIED
+
+🟢 READY FOR LAMBDA TEST
+
 ### 5️⃣ — OPEN ORDER PROCESSING LAMBDA
 
 #### 1️⃣ OPEN LAMBDA
