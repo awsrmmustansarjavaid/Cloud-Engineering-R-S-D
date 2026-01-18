@@ -3458,6 +3458,44 @@ After this phase:
 
 ✔ You can TEST and VERIFY before moving to next phase
 
+### ARCHITECTURE Project Flow
+
+```
+Frontend
+  ↓
+CafeOrderProcessor Lambda
+  ↓
+RDS (MySQL)  ✅ ORDERS STORED HERE
+  ↓
+Order Status Lambda
+  ↓
+DynamoDB (analytics / reporting)
+```
+
+### ARCHITECTURE AFTER PHASE 10
+
+```
+CafeMenu (DynamoDB)  ← item cost
+        ↓
+CafeOrderProcessor Lambda
+        ↓
+orders (RDS MySQL) ← cost saved here
+```
+
+So:
+
+✔ CafeOrderProcessor Lambda is CORRECT
+
+✔ RDS is the source of truth
+
+✔ Cost auto-calculation MUST happen HERE
+
+✔ Later Lambda(s) can read cost from RDS or DynamoDB
+
+You were absolutely correct to question it.
+Now let’s fix PHASE 10 properly for YOUR ARCHITECTURE.
+
+
 ### 📌 PRE-REQUISITES (VERIFY BEFORE START)
 
 Before starting this phase, confirm:
@@ -3617,6 +3655,7 @@ CafeOrderProcessingLambda
 
 ```
 AmazonDynamoDBReadOnlyAccess
+AWSSecretsManagerReadWrite
 ```
 
 #### ❌ If missing:
@@ -3646,9 +3685,9 @@ menu_table = dynamodb.Table('CafeMenu')
 
 **⚠️ Do not rename CafeMenu**
 
-### 6️⃣ — ADD COST FETCH FUNCTION (EXACT)
+#### 3️⃣ — ADD COST FETCH FUNCTION (EXACT)
 
-#### 1️⃣ ADD THIS FUNCTION (COPY-PASTE)
+#### ADD THIS FUNCTION (COPY-PASTE)
 
 ```
 def get_item_cost(item_name):
@@ -3666,7 +3705,7 @@ def get_item_cost(item_name):
 
 ✔ Prevents silent errors
 
-### 7️⃣ — MODIFY ORDER SAVE LOGIC (CRITICAL STEP)
+#### 4️⃣ — MODIFY ORDER SAVE LOGIC (CRITICAL STEP)
 
 #### 1️⃣ FIND WHERE ORDER IS SAVED
 
@@ -3712,11 +3751,156 @@ orders_table.put_item(
 
 **⚠️ Do NOT remove existing fields**
 
-### 8️⃣ — DEPLOY LAMBDA (DO NOT SKIP)
+### 🌐 FINAL UPDATED FULL CafeOrderProcessor CODE   (Recommanded)
+
+> **🔒 This is the ONLY CODE you should use**
+
+#### 1️⃣ — Code
+
+```
+import json
+import pymysql
+import boto3
+import os
+from decimal import Decimal
+
+# ==============================
+# ENVIRONMENT VARIABLES
+# ==============================
+
+MENU_TABLE = os.environ['MENU_TABLE_NAME']
+AWS_REGION = os.environ['AWS_REGION']
+
+# ==============================
+# AWS CLIENTS
+# ==============================
+
+dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
+menu_table = dynamodb.Table(MENU_TABLE)
+secrets_client = boto3.client('secretsmanager')
+
+# ==============================
+# GET DB SECRET
+# ==============================
+
+def get_db_secret():
+    response = secrets_client.get_secret_value(
+        SecretId='CafeDevDBSM'
+    )
+    return json.loads(response['SecretString'])
+
+# ==============================
+# FETCH ITEM COST
+# ==============================
+
+def get_item_cost(item_name):
+    response = menu_table.get_item(
+        Key={'item_name': item_name}
+    )
+
+    if 'Item' not in response:
+        raise Exception(f"Cost not found for item: {item_name}")
+
+    return Decimal(str(response['Item']['base_cost']))
+
+# ==============================
+# LAMBDA HANDLER
+# ==============================
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+
+        table_number = int(body['table_number'])
+        customer_name = body.get('customer_name')
+        item_name = body['item']
+        quantity = int(body['quantity'])
+
+        # 🔹 FETCH ITEM COST
+        item_cost = get_item_cost(item_name)
+        total_cost = item_cost * quantity
+
+        # 🔹 FETCH DB CREDENTIALS
+        secret = get_db_secret()
+
+        connection = pymysql.connect(
+            host=secret['host'],
+            user=secret['username'],
+            password=secret['password'],
+            database=secret['dbname'],
+            connect_timeout=5
+        )
+
+        with connection.cursor() as cursor:
+            sql = """
+                INSERT INTO orders
+                (table_number, customer_name, item, quantity, item_cost, total_cost)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(
+                sql,
+                (
+                    table_number,
+                    customer_name,
+                    item_name,
+                    quantity,
+                    float(item_cost),
+                    float(total_cost)
+                )
+            )
+            connection.commit()
+
+        connection.close()
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "message": "Order saved successfully",
+                "item": item_name,
+                "item_cost": float(item_cost),
+                "total_cost": float(total_cost)
+            })
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
+
+
+#### 2️⃣ — DEPLOY LAMBDA (DO NOT SKIP)
 
 - Click Deploy
 
 - Wait for success message
+
+#### 3️⃣ — ADD ENVIRONMENT VARIABLES (MANDATORY)
+
+- **Go to: Configuration → Environment variables → Edit**
+
+#### Add:
+
+| Key             | Value      |
+| --------------- | ---------- |
+| MENU_TABLE_NAME | CafeMenu   |
+| AWS_REGION      | ap-south-1 |
+
+
+- Save
+
+
+
+
 
 ### 9️⃣ — TEST THIS PHASE (MANDATORY)
 
