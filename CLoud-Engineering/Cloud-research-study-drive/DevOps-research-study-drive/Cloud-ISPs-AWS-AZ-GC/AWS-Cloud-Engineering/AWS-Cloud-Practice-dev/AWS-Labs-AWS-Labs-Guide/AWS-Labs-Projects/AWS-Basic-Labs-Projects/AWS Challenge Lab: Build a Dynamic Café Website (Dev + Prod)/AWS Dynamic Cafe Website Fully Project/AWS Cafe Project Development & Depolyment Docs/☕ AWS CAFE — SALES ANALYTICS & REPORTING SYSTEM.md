@@ -5806,7 +5806,7 @@ AmazonDynamoDBReadOnlyAccess
 
 Then PASTE EVERYTHING BELOW
 
-#### ✅ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
+#### 1️⃣ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
 
 ```
 import boto3
@@ -5933,9 +5933,11 @@ def lambda_handler(event, context):
     }
 ```
 
-- **Click Deploy**
+✔ Click Deploy
 
-### 9️⃣ USE ENVIRONMENT VARIABLES
+✔ Wait for success
+
+#### 2️⃣ USE ENVIRONMENT VARIABLES
 
 - Open your CafeDailyPDFLambda → Configuration → Environment variables
 
@@ -5953,6 +5955,35 @@ def lambda_handler(event, context):
 - In the code, the Lambda reads these using os.environ.get(...).
 
 **⚡ Benefit: You no longer need to edit code when bucket/table changes.**
+
+#### 3️⃣ MANUAL TEST (MANDATORY BEFORE NEXT PHASE)
+
+- **Lambda → Test → Create test event**
+- **Event name:**
+
+```
+manual-test
+```
+
+- **Event JSON:**
+
+```
+{}
+```
+
+- **Test**
+
+#### ✅ EXPECTED RESULT
+
+✔ StatusCode: 200
+
+✔ Message:
+
+```
+PDF generated and uploaded
+```
+
+
 
 
 
