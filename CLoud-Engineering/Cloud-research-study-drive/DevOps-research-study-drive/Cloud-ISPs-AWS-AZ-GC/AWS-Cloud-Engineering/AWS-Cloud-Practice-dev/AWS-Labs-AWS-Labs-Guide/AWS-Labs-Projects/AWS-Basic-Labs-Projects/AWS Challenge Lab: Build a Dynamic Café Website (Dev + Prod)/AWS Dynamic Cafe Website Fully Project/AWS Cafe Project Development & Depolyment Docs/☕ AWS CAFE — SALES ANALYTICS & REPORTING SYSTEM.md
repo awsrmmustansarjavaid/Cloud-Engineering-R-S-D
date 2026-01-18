@@ -3954,6 +3954,46 @@ AWS Console → Lambda → Your Analytics Lambda
 
 In Lambda → Test, use:
 
+- **Lambda Test Event - 1: (Recommanded)**
+
+```
+{
+  "queryStringParameters": {
+    "period": "month"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  }
+}
+```
+
+
+### ✅ EXPECTED OUTPUT:
+
+```
+{
+  "total_sales": 120,
+  "total_cost": 70,
+  "profit": 50,
+  "profit_per_item": [
+    {
+      "item": "Latte",
+      "quantity": 10,
+      "sales": 50,
+      "cost": 30,
+      "profit": 20
+    }
+  ]
+}
+```
+
+
+- **Lambda Test Event - 2:**
+
 ```
 {
   "queryStringParameters": {
@@ -3977,6 +4017,10 @@ Response MUST include:
   }
 ]
 ```
+
+✔ Profit math correct
+
+✔ Aggregated per item
 
 ❌ Missing field = STOP
 
