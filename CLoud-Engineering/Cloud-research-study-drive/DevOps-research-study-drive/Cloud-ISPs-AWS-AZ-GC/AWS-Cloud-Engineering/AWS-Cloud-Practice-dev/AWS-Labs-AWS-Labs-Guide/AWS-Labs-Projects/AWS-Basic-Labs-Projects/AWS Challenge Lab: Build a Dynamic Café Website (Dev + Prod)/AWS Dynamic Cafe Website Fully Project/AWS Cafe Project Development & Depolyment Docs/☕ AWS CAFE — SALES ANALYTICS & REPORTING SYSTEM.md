@@ -5649,17 +5649,85 @@ Espresso,5,25,15,10
 
 ## PHASE 1️⃣4️⃣  DAILY AUTO PDF WITH TABLES & LOGO
 
-### 1️⃣ S3 Bucket
+### 🔴 WHAT YOU WILL ACHIEVE (CLEAR GOAL)
+
+At the end of this phase:
+
+✔ A PDF report is generated DAILY
+
+✔ PDF contains
+  • Cafe logo
+
+  • Sales table (Item, Qty, Sales, Cost, Profit)
+
+✔ PDF stored automatically in S3 bucket
+
+✔ PDF generated without UI click
+
+✔ Fully tested manually before automation
+
+✔ Then scheduled with EventBridge
+
+### 🧭 PHASE 14 FLOW (UNDERSTAND FIRST)
+
+```
+EventBridge (daily) 
+        ↓
+CafeDailyPDFLambda
+        ↓
+Fetch analytics data
+        ↓
+Generate PDF (logo + table)
+        ↓
+Upload PDF to S3
+```
+
+
+
+### 1️⃣ CREATE Or Open existing S3 BUCKET
 
 ```
 charlie-cafe-s3-bucket
 ```
 
-### 2️⃣ Upload Logo
+### 2️⃣ Region:
+
+✔ Same region as Lambda
+
+### 3️⃣ Settings:
+
+✔ Block all public access → ON
+
+✔ Bucket versioning → Optional (OFF is fine)
+
+- **Create bucket**
+
+#### ✅ Bucket created
+
+### 4️⃣ UPLOAD LOGO FILE (VERY IMPORTANT)
 
 ```
 Cafelogo.png
 ```
+
+#### ⚠️ Exact name is REQUIRED
+> **(Case-sensitive)**
+
+#### ✅ Logo stored in S3
+
+### 5️⃣ CREATE PDF LAMBDA
+
+#### Basic Configuration
+
+| Parameter            | Value                  |
+|----------------------|------------------------|
+| Creation method      | Author from scratch    |
+| Function name        | CafeDailyPDFLambda     |
+| Runtime              | Python 3.10            |
+| Architecture         | x86_64                 |
+
+
+
 
 ### 3️⃣ PDF Lambda (REPORTLAB – FINAL)
 
