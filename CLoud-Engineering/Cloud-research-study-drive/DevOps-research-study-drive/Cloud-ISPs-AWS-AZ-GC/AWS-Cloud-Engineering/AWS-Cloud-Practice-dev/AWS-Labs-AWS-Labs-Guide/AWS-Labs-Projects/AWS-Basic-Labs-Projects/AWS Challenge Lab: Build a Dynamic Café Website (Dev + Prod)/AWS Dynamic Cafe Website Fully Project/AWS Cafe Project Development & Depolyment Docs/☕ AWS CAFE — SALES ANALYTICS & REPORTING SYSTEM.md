@@ -5998,7 +5998,35 @@ PDF generated and uploaded
 ✔ Correct profit values
 
 
-### 4️⃣ EventBridge Rule
+### 9️⃣ EventBridge Rule (AUTOMATION)
+
+- **Amazon EventBridge → Rules → Create rule**
+
+#### 1️⃣ Rule Details
+
+- **Rule name: (optional, but recommended)**
+
+```
+DailyCafePDFRule
+```
+
+- **Description: (optional, but recommended)**
+
+```
+Triggers CafeDailyPDFLambda every day at midnight UTC
+```
+
+- **Define pattern:**
+
+- **➡️ Choose Schedule**
+
+#### 2️⃣ Schedule Pattern (CRON)
+
+- Select Cron expression
+
+- Enter exact UTC cron expression:
+
+> **(midnight UTC)**
 
 ```
 cron(0 0 * * ? *)
@@ -6007,6 +6035,94 @@ cron(0 0 * * ? *)
 ✔ Daily midnight PDF
 
 ✔ Stored in S3
+
+#### 💡 Explanation:
+
+| Field        | Value | Meaning                  |
+| ------------ | ----- | ------------------------ |
+| Minute       | 0     | At 0 minutes             |
+| Hour         | 0     | At 0 hour (midnight UTC) |
+| Day-of-month | *     | Every day                |
+| Month        | *     | Every month              |
+| Day-of-week  | ?     | No specific day of week  |
+| Year         | *     | Every year               |
+
+> **This will run every day at midnight UTC**
+
+#### 3️⃣ Add Target
+
+- Scroll down to Select targets → Lambda function
+
+- In the dropdown, select:
+
+```
+CafeDailyPDFLambda
+```
+
+- Click Create a new role for this specific resource (if not using existing)
+
+`- Or choose existing IAM role that allows EventBridge → Lambda invoke
+
+**✔ This IAM role must have permission to invoke your Lambda**
+
+#### 4️⃣ Configure Dead Letter Queue (Optional but recommended)
+
+- Keep default None (for now)
+
+- Or add SQS if you want retries
+
+#### 5️⃣ Tags (Optional)
+
+Add tags like:
+
+```
+Environment: Production
+Project: CharlieCafeLab
+```
+
+#### 6️⃣ Review + Create
+
+- Review all settings carefully
+
+- Click Create rule**
+
+✅ Rule created
+
+✅ You now have EventBridge → Lambda
+
+#### 7️⃣ Verify Lambda Trigger
+
+- **Go to Lambda → CafeDailyPDFLambda → Configuration → Triggers**
+
+- You should see:
+
+```
+EventBridge (DailyCafePDFRule)
+```
+
+#### 8️⃣ Manual Test (Before waiting for midnight)
+
+- **Go to Lambda → CafeDailyPDFLambda → Test**
+
+- **Event JSON:**
+
+```
+{}
+```
+
+- **Click Test**
+
+- Verify S3 bucket:
+
+```
+charlie-cafe-s3-bucket/daily_reports/
+```
+
+- File exists: daily_YYYY-MM-DD.pdf
+
+- Logo + table visible
+
+> **This ensures EventBridge will run correctly at schedule**
 
 
 **✅ PHASE 14 STATUS**
