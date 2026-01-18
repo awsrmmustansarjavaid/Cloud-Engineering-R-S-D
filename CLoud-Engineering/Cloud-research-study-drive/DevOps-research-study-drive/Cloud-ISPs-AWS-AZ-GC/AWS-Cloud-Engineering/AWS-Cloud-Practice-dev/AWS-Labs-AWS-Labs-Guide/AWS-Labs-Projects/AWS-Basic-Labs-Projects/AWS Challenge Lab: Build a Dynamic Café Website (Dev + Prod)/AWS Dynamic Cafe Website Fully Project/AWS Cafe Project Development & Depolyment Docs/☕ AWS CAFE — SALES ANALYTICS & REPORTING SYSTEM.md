@@ -3806,19 +3806,16 @@ import boto3
 from collections import defaultdict
 from decimal import Decimal
 
-# ================================
-# 🔁 REPLACE VALUES BELOW
-# ================================
+# ==================================================
+# ✅ ENVIRONMENT VARIABLES (DO NOT HARD-CODE)
+# ==================================================
 
-DYNAMODB_TABLE_NAME = "CafeOrders"  
-# 👆 REPLACE if your table name is different
+DYNAMODB_TABLE_NAME = os.environ["DYNAMODB_TABLE_NAME"]
+AWS_REGION = os.environ["AWS_REGION"]
 
-AWS_REGION = "ap-south-1"  
-# 👆 REPLACE with your region if needed
-
-# ================================
+# ==================================================
 # DO NOT CHANGE BELOW
-# ================================
+# ==================================================
 
 dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
 table = dynamodb.Table(DYNAMODB_TABLE_NAME)
@@ -3923,18 +3920,27 @@ def lambda_handler(event, context):
     })
 ```
 
-### 4️⃣ WHAT YOU MUST REPLACE (ONLY THIS)
+### 4️⃣ CONFIGURE LAMBDA ENVIRONMENT VARIABLES (MANDATORY)
 
-#### 🔁 Replace if needed:
+- **Go to:**
 
 ```
-DYNAMODB_TABLE_NAME = "CafeOrders"
-AWS_REGION = "ap-south-1"
+AWS Console → Lambda → Your Analytics Lambda
+→ Configuration → Environment variables → Edit
 ```
 
-❌ Do NOT change anything else
+#### ➕ Add EXACTLY these variables
 
-❌ Do NOT rename variables
+| Key                   | Value        | Notes                      |
+| --------------------- | ------------ | -------------------------- |
+| `DYNAMODB_TABLE_NAME` | `CafeOrders` | ✅ Your DynamoDB table name |
+| `AWS_REGION`          | `ap-south-1` | ✅ Same region as DynamoDB  |
+
+👉 Click Save
+
+❗ DO NOT add quotes
+
+❗ Key names must match exactly
 
 
 ### 5️⃣ TEST PHASE 11 (DO NOT CONTINUE WITHOUT THIS)
