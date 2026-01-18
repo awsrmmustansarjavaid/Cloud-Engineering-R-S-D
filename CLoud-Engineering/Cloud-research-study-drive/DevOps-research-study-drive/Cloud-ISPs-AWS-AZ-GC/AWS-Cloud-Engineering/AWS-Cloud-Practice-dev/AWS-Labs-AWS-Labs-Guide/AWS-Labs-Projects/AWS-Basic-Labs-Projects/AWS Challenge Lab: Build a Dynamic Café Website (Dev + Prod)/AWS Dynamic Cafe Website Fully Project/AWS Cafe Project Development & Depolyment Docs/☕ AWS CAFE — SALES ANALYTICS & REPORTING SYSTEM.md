@@ -189,18 +189,43 @@ This avoids full table scans (very important).
 import boto3
 from decimal import Decimal
 
+# Initialize DynamoDB resource using default AWS credentials and region
 dynamodb = boto3.resource('dynamodb')
+
+# Reference the DynamoDB table that stores cafe orders
+# ⚠️ Replace 'CafeOrders' only if your actual table name is different
 table = dynamodb.Table('CafeOrders')
 
+
 def query_orders(start_date, end_date):
+    """
+    Query orders from DynamoDB between two dates.
+
+    Parameters:
+    - start_date (str): Start date in YYYY-MM-DD format
+    - end_date (str): End date in YYYY-MM-DD format
+
+    Returns:
+    - List of order items from DynamoDB
+    """
+
+    # Perform query operation on DynamoDB
+    # Uses Global Secondary Index (GSI): order_date-index
+    # This index MUST exist on the CafeOrders table
     response = table.query(
         IndexName='order_date-index',
+
+        # Fetch only items where order_date is between start_date and end_date
         KeyConditionExpression='order_date BETWEEN :s AND :e',
+
+        # Expression values used in KeyConditionExpression
         ExpressionAttributeValues={
-            ':s': start_date,
-            ':e': end_date
+            ':s': start_date,   # Start date boundary
+            ':e': end_date      # End date boundary
         }
     )
+
+    # Return the list of matching order records
     return response['Items']
 ```
 
