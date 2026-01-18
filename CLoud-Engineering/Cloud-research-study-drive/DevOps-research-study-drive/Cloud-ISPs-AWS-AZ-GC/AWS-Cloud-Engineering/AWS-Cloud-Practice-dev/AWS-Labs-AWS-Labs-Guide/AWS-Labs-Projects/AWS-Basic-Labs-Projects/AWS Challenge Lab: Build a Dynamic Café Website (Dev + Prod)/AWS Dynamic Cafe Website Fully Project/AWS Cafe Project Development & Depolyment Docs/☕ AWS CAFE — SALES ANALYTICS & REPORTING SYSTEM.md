@@ -3897,7 +3897,7 @@ orders_table.put_item(
 
 > **🔒 This is the ONLY CODE you should use**
 
-#### 1️⃣ — Code
+#### 1️⃣ — (Cost Auto-Calculation using DynamoDB + RDS) Code
 
 ```
 # ==============================
