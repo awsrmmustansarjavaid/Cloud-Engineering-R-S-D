@@ -5381,6 +5381,41 @@ CafeAnalyticsCSVLambda
 DynamoDB (CafeOrders)
 ```
 
+### 1️⃣ — Cafe Analytics CSV Lambda
+
+- **Go to: AWS Console → Lambda → Create function**
+
+#### 1️⃣ Create new Lambda function
+
+| Field         | Value                  |
+| ------------- | ---------------------- |
+| Function name | CafeAnalyticsCSVLambda |
+| Runtime       | Python 3.10            |
+| Architecture  | x86_64                 |
+
+- **Create function**
+
+**✅ Lambda is created**
+
+### 2️⃣ SET LAMBDA PERMISSIONS (VERY IMPORTANT)
+
+- **Go to Configuration → Permissions**
+- **Click IAM Role name (blue link)**
+- **IAM → Add permissions → Attach policies**
+
+#### Attach ALL:
+
+✔ AmazonDynamoDBReadOnlyAccess
+
+✔ AWSLambdaBasicExecutionRole
+
+- **Click Add permissions**
+
+**✅ Lambda can now read DynamoDB**
+
+
+
+ 
 
 
 ### 1️⃣ New API Resource
