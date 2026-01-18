@@ -3948,7 +3948,62 @@ AWS Console → Lambda → Your Analytics Lambda
 
 - **🕐 Wait for: Successfully deployed**
 
-### 5️⃣ TEST PHASE 11 (DO NOT CONTINUE WITHOUT THIS)
+### 5️⃣ Lambda Test Event
+
+> ** (DO NOT CONTINUE WITHOUT THIS)**
+
+#### 1️⃣ TEST PHASE 11 + 12 (REQUIRED - Recommanded)
+
+#### 1️⃣ ✅ Test as ADMIN (SUCCESS)
+
+#### Lambda Test Event
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  },
+  "queryStringParameters": {
+    "period": "month"
+  }
+}
+```
+
+✔ StatusCode: 200
+
+✔ Returns:
+
+- total_sales
+
+- total_cost
+
+- profit
+
+- profit_per_item[]
+
+#### 2️⃣ ❌ Test as STAFF (BLOCKED)
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Staff"
+      }
+    }
+  }
+}
+```
+
+✔ StatusCode: 403
+
+✔ Message: "Access denied"
+
+#### 2️⃣ TEST PHASE 11 (PROFIT PER ITEM)
 
 #### 1️⃣ – Lambda Test Event
 
