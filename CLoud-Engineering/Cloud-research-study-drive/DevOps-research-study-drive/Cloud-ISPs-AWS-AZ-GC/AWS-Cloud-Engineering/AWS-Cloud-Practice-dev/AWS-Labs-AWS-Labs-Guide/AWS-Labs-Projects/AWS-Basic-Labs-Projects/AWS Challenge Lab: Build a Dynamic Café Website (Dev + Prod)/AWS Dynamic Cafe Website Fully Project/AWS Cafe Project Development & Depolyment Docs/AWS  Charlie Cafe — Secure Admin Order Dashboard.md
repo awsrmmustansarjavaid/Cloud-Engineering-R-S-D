@@ -2478,14 +2478,16 @@ def lambda_handler(event, context):
             conn.close()
 ```
 
-### 🔐 REQUIRED LAMBDA ENV VARIABLES
+### 🔐 Add Environment Variables
 
 ```
-DB_HOST = your-rds-endpoint
+DB_HOST = <your-rds-endpoint>
 DB_USER = admin
-DB_PASS = password
+DB_PASS = <your-db-password>
 DB_NAME = cafe
 ```
+
+> **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
 ### 🧪 FINAL TEST (MATCHES YOUR GUIDE)
 
