@@ -6032,6 +6032,26 @@ Triggers CafeDailyPDFLambda every day at midnight UTC
 cron(0 0 * * ? *)
 ```
 
+#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+
+#### 🕐 Calculate Next 10-Minute Trigger Time (UTC)
+
+- Suppose your current UTC time is 15:20
+
+- Add 10 minutes → 15:30
+
+- You need cron expression for UTC 15:30 today
+
+```
+cron(30 15 * * ? *)
+```
+
+#### 💡 Format reminder:
+
+```
+cron(Minute Hour Day-of-Month Month Day-of-Week Year)
+```
+
 ✔ Daily midnight PDF
 
 ✔ Stored in S3
