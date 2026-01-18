@@ -4680,7 +4680,33 @@ def response(code, body):
 
 ---
 
+#### 2️⃣ Paste Test CafeDynamoTestLambda Code
 
+```
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    result = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': '2026-01-01',
+            ':e': '2026-01-31'
+        }
+    )
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "count": len(result['Items']),
+            "items": result['Items']
+        })
+    }
+```
 
 
 ---

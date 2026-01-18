@@ -189,6 +189,29 @@ This avoids full table scans (very important).
 import boto3
 from decimal import Decimal
 
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def query_orders(start_date, end_date):
+    response = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': start_date,
+            ':e': end_date
+        }
+    )
+    return response['Items']
+```
+
+#### ✅ FINAL UPDATED CODE
+
+> **(Same Logic + Comments)**
+
+```
+import boto3
+from decimal import Decimal
+
 # Initialize DynamoDB resource using default AWS credentials and region
 dynamodb = boto3.resource('dynamodb')
 
@@ -293,6 +316,38 @@ CloudWatchLogsFullAccess
 ```
 
 #### 2️⃣ Paste Test Code
+
+```
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    result = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': '2026-01-01',
+            ':e': '2026-01-31'
+        }
+    )
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "count": len(result['Items']),
+            "items": result['Items']
+        })
+    }
+```
+
+#### ✅ FINAL UPDATED CODE 
+
+> **(Same Logic + Comments + Env Variables)**
+
+👉 You can copy–paste this directly 
 
 ```
 import json
