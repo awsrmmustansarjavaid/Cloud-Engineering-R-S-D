@@ -2926,7 +2926,25 @@ row.dataset.total = order.total_amount;
 
 ### 🧾 ✅ FINAL UPDATED order-status.html (WITH PRINTING + COMMENTS)
 
-#### 🔴 Replace your entire file with this
+#### 📍 Location:
+
+```
+/var/www/html/order-status.html
+```
+
+#### 1️⃣ BACKUP order-status.html
+
+```
+sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+```
+
+#### ♻️ RESTORE IF NEEDED (OPTIONAL)
+
+```
+sudo cp /var/www/html/order-status-backup.html /var/www/html/order-status.html
+```
+
+#### 2️⃣ Replace your entire file with this
 
 ```
 <!DOCTYPE html>
@@ -3202,7 +3220,34 @@ showDashboard();
 </html>
 ```
 
+#### 3️⃣ Save File
 
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 4️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+#### 5️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 6️⃣ Open page in browser
+
+```
+http://EC2 Public IP/order-status.html
+```
 
 ### 7️⃣ — TEST PRINT ALL ORDERS (MANDATORY)
 
