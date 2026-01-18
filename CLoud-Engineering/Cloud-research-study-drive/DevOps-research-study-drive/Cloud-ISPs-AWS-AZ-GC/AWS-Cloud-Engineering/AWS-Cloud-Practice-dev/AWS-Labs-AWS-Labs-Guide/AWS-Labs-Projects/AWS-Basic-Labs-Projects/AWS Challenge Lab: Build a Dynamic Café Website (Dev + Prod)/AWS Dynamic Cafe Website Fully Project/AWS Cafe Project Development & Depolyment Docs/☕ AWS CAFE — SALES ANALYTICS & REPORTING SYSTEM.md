@@ -5806,7 +5806,8 @@ AmazonDynamoDBReadOnlyAccess
 
 Then PASTE EVERYTHING BELOW
 
-#### ✅ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
+#### ✅ CafeDailyPDFLambda 
+#### FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
 
 ```
 import boto3
