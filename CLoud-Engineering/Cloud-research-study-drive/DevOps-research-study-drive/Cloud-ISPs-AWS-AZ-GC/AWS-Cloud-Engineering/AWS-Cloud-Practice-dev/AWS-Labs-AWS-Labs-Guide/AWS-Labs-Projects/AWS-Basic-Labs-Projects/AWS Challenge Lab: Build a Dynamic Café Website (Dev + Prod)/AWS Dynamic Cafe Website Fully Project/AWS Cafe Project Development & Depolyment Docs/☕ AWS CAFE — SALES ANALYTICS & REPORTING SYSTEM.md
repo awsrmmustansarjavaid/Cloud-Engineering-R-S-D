@@ -7267,7 +7267,7 @@ http://EC2 Public IP/order-status.html
 
 > **Admin sees everything**
 
-#### 🔴 IF ANYTHING FAILS (Quick Fix)
+#### 7️⃣ 🔴 IF ANYTHING FAILS (Quick Fix)
 
 #### 1️⃣ ❌ Analytics/PDF not showing for Admin?
 
