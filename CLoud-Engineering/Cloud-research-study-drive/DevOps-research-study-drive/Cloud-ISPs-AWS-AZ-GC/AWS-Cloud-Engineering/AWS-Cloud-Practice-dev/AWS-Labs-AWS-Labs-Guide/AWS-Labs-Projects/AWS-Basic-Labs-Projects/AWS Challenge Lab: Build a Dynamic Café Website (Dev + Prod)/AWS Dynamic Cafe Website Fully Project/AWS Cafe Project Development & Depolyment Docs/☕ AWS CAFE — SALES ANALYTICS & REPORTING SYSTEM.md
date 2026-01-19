@@ -6731,7 +6731,7 @@ class="admin-only"
 
 **JS already handles visibility.**
 
-### ✅ FINAL UPDATED order-status.html
+### ✅ FINAL UPDATED order-status.html (Recommanded)
 
 > **You can directly replace your file with this**
 
