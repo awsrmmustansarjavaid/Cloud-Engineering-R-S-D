@@ -7269,7 +7269,7 @@ http://EC2 Public IP/order-status.html
 
 #### 🔴 IF ANYTHING FAILS (Quick Fix)
 
-#### ❌ Analytics/PDF not showing for Admin?
+#### 1️⃣ ❌ Analytics/PDF not showing for Admin?
 
 #### Check:
 
@@ -7279,7 +7279,7 @@ parseJwt(token)["cognito:groups"]
 
 **👉 Admin must be in Cognito group Admin**
 
-#### ❌ Redirect loop?
+#### 2️⃣ ❌ Redirect loop?
 
 #### Check:
 
