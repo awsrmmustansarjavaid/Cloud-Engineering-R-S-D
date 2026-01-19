@@ -6541,7 +6541,21 @@ charlie-cafe-s3-bucket/daily_reports/
 /var/www/html/order-status.html
 ```
 
-#### 2️⃣ — ADD BUTTON (TOP RIGHT, NEXT TO PRINT)
+#### 2️⃣ — BACKUP YOUR FILE (MANDATORY)
+
+#### Run:
+
+```
+sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+```
+
+#### ♻️ RESTORE IF NEEDED (OPTIONAL)
+
+```
+sudo cp /var/www/html/order-status-backup.html /var/www/html/order-status.html
+```
+
+#### 3️⃣ — ADD BUTTON (TOP RIGHT, NEXT TO PRINT)
 
 #### Find this area (you already have it):
 
@@ -6560,7 +6574,7 @@ charlie-cafe-s3-bucket/daily_reports/
 </button>
 ```
 
-#### 3️⃣ — ADD JS FUNCTION (NO CHANGES TO LAMBDA)
+#### 4️⃣ — ADD JS FUNCTION (NO CHANGES TO LAMBDA)
 
 #### 1️⃣ Add inside <script>:
 
