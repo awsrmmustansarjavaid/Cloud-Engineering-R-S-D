@@ -2276,7 +2276,13 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 **👉 Cognito Hosted UI is not a normal HTML page you can edit.**
 
+### ❓ Cognito login form INSIDE your own page
 
+#### ❌ NO (Directly)
+
+**AWS Cognito does not allow username/password submission from your own HTML for security reasons.**
+
+**👉 This is by design.**
 
 ### 1️⃣ 
 
