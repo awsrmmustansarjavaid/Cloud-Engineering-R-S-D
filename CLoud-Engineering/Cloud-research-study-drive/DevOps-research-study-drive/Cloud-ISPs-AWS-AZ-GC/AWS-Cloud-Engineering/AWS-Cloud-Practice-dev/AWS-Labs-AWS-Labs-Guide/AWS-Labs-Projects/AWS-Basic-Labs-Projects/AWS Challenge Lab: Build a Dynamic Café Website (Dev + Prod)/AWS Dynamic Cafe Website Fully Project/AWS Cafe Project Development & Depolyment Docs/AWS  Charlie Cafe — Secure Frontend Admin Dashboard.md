@@ -456,7 +456,13 @@ function securePage() {
 
 ### 2️⃣ Secure Your Admin Pages
 
+#### What it is: 
 
+The practical application of auth.js to every individual HTML page.
+
+#### Purpose: 
+
+Actually protect each page (dashboard, order-status, analytics) so nobody can view it without logging in.
 
 #### Steps for each page:
 
@@ -480,5 +486,23 @@ fetch(API_URL, {
 
 4️⃣ Now, even if someone knows the URL of order-status.html or analytics.html, they can’t access data without login.
 
+### ✅ In short
+
 **✅ They are related but not the same.**
+
+- **Centralize Authentication:** the reusable code/tool (auth.js)
+
+- **Secure Your Admin Pages:** the practical steps to use that tool on every page
+
+#### Think of it like:
+
+- **Centralize Authentication:**  = “Here’s the key.”
+
+- **Secure Your Admin Pages:**= “Here’s how to lock each door with the key.”
+
+
+
+
+
+
 
