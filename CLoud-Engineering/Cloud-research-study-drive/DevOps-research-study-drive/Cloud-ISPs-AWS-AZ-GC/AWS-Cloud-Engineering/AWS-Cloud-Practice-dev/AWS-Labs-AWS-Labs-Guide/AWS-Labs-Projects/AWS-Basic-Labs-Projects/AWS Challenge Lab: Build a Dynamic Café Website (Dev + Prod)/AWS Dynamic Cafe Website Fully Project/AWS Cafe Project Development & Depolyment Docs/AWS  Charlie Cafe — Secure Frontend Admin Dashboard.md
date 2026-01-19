@@ -374,6 +374,20 @@ http:// Your EC2 Public IP/dashboard.html
 
 ## 🔐 PHASE  2️⃣ — Centralize Authentication
 
+
+
+### 1️⃣ Centralize Authentication
+
+#### What it is: 
+
+The concept and implementation of creating one reusable authentication script (auth.js) that contains all the login/logout/validation logic.
+
+#### Purpose: 
+
+Avoid repeating the same code on every page.
+
+#### What it includes:
+
 ✔️ Create one authentication script (auth.js) for all admin pages.
 
 ✔️ It handles:
@@ -388,11 +402,15 @@ http:// Your EC2 Public IP/dashboard.html
 
 - ✔️ Logout redirect
 
-#### Benefit:
-You don’t have to rewrite login logic for every page. 
-It makes your architecture professional.
+#### Outcome: 
 
-### 1️⃣ auth.js template (reusable)
+One centralized script that any page can include.
+
+#### Benefit:
+You don’t have to rewrite login logic for every page. It makes your architecture professional.
+
+#### auth.js template (reusable)
+
 
 ```
 const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
@@ -437,6 +455,8 @@ function securePage() {
 - Wrap body content with display:none to hide until auth passes.
 
 ### 2️⃣ Secure Your Admin Pages
+
+
 
 #### Steps for each page:
 
