@@ -41,7 +41,9 @@ Database
 👉 If no, stop here
 
 ### 1️⃣ Frontend dashboard 
-> **dashboard.html**
+> **📄 File: dashboard.html**
+
+
 
 ```
 <!DOCTYPE html>
