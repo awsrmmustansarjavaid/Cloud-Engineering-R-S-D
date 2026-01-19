@@ -2284,7 +2284,46 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 **👉 This is by design.**
 
-### 1️⃣ 
+### 1️⃣ The CORRECT & PROFESSIONAL approach (used in real projects)
+
+#### 1️⃣ Option A (RECOMMENDED – what you’re already using)
+
+> **Use Cognito Hosted UI for login, then redirect back to your frontend page.**
+
+#### Flow:
+
+```
+Your Cafe Frontend Page
+   ↓
+Redirect to Cognito Hosted UI
+   ↓
+Login
+   ↓
+Redirect back with JWT
+```
+
+#### This is:
+
+- Secure
+
+- AWS-recommended
+
+- Production-ready
+
+- Simple to maintain
+
+#### 2️⃣ Option B (Advanced – NOT needed now)
+
+- Use Cognito + Custom Auth + Amplify / SDK
+
+- More complex
+
+- More backend work
+
+- Not required for your use case
+
+**👉 My professional advice:**
+**Stick with Hosted UI + redirect (Option A).**
 
 **✅ PHASE 4 STATUS**
 
