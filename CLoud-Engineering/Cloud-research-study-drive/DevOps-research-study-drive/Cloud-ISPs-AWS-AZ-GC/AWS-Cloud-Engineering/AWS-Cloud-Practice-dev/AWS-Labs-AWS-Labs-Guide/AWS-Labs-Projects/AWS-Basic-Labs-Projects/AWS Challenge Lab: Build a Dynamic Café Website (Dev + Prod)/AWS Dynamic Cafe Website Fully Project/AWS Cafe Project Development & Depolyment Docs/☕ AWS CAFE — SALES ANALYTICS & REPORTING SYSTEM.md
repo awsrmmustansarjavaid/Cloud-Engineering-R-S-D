@@ -7267,8 +7267,25 @@ http://EC2 Public IP/order-status.html
 
 > **Admin sees everything**
 
+#### 🔴 IF ANYTHING FAILS (Quick Fix)
 
+#### ❌ Analytics/PDF not showing for Admin?
 
+#### Check:
+
+```
+parseJwt(token)["cognito:groups"]
+```
+
+**👉 Admin must be in Cognito group Admin**
+
+#### ❌ Redirect loop?
+
+#### Check:
+
+- Redirect URI exactly matches Cognito App Client
+
+- No trailing slash mismatch
 
 ### 🧪 FINAL TEST CHECKLIST (DO NOT SKIP)
 
