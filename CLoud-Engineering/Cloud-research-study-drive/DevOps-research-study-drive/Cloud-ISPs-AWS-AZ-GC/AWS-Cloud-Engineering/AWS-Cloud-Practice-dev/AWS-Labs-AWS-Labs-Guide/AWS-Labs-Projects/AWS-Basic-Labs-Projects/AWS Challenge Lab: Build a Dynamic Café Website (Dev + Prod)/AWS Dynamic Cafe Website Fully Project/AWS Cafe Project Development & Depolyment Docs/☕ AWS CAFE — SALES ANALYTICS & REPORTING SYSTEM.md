@@ -6731,6 +6731,432 @@ class="admin-only"
 
 **JS already handles visibility.**
 
+### ✅ FINAL UPDATED order-status.html
+
+> **You can directly replace your file with this**
+
+#### 1️⃣ — CONFIRM FILE YOU WILL MODIFY (NO JUMP)
+
+```
+/var/www/html/order-status.html
+```
+
+✔ Same file where orders are shown
+
+✔ Same file used by staff/admin
+
+#### 2️⃣ — BACKUP YOUR FILE (MANDATORY)
+
+#### Run:
+
+```
+sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+```
+
+#### ♻️ RESTORE IF NEEDED (OPTIONAL)
+
+```
+sudo cp /var/www/html/order-status-backup.html /var/www/html/order-status.html
+```
+
+
+#### 3️⃣ — Replace your entire file with this
+> **🌐 New PRINT Above All Features (EXACT LOCATION)**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Order Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- =====================================================
+     BOOTSTRAP CSS
+===================================================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- =====================================================
+     CHART.JS
+===================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* =====================================================
+   🌈 CAFE BACKGROUND THEMES
+===================================================== */
+body.dark {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
+    url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+body.light {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255,255,255,.7), rgba(255,255,255,.7)),
+    url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* =====================================================
+   DASHBOARD CARD STYLES
+===================================================== */
+#dashboard {
+  display: none;
+  background:#f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.card-metric {
+  background:#fff;
+  padding:15px;
+  border-radius:8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+  font-weight:bold;
+}
+
+/* =====================================================
+   ADMIN ONLY UI (RBAC VISUAL CONTROL)
+===================================================== */
+.admin-only {
+  display: none;
+}
+
+/* =====================================================
+   MOBILE FRIENDLY
+===================================================== */
+@media (max-width: 576px) {
+  h5 { font-size: 16px; }
+  table { font-size: 12px; }
+}
+</style>
+</head>
+
+<body class="dark">
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+<nav class="navbar navbar-dark bg-dark" id="navbar" style="display:none">
+  <div class="container d-flex justify-content-between">
+
+    <span class="navbar-brand">☕ Charlie Cafe</span>
+
+    <div>
+      <!-- 🌗 THEME TOGGLE -->
+      <button class="btn btn-secondary btn-sm me-2" onclick="toggleTheme()">
+        🌙 / ☀️
+      </button>
+
+      <!-- 📊 ANALYTICS (ADMIN ONLY) -->
+      <button class="btn btn-warning btn-sm me-2 admin-only" onclick="openAnalytics()">
+        📊 Analytics
+      </button>
+
+      <!-- 📄 PDF REPORT (ADMIN ONLY) -->
+      <button class="btn btn-outline-light btn-sm me-2 admin-only" onclick="downloadPDF()">
+        📄 PDF
+      </button>
+
+      <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- =====================================================
+     ORDER STATUS DASHBOARD
+===================================================== -->
+<div class="container my-4" id="dashboard">
+
+  <!-- FILTER -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <input type="date" id="filterDate" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100" onclick="loadData()">Filter</button>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="text-center my-3" id="loader" style="display:none">
+    <div class="spinner-border text-warning"></div>
+    <p class="mt-2">Loading...</p>
+  </div>
+
+  <!-- METRICS -->
+  <div class="row mb-4" id="metrics"></div>
+
+  <!-- CHART -->
+  <canvas id="orderChart" height="100"></canvas>
+
+  <!-- ORDERS TABLE -->
+  <table class="table table-bordered mt-4 bg-white">
+    <thead class="table-dark">
+      <tr>
+        <th>Customer</th>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody id="orders"></tbody>
+  </table>
+</div>
+
+<!-- =====================================================
+     ANALYTICS MODAL (ADMIN)
+===================================================== -->
+<div class="modal fade" id="analyticsModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title">📊 Sales Analytics</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <select id="analyticsPeriod" class="form-select">
+              <option value="today">Today</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <button class="btn btn-primary w-100" onclick="loadAnalytics()">Load</button>
+          </div>
+        </div>
+
+        <div class="row text-center mb-4" id="analyticsMetrics"></div>
+        <canvas id="salesChart" height="100"></canvas>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+<script>
+/* =====================================================
+   🔁 CONFIG — REPLACE ONLY THESE VALUES
+===================================================== */
+
+/* 🔴 REPLACE: Cognito Hosted UI Domain */
+const COGNITO_DOMAIN = "REPLACE_WITH_YOUR_COGNITO_DOMAIN";
+
+/* 🔴 REPLACE: Cognito App Client ID */
+const CLIENT_ID = "REPLACE_WITH_YOUR_APP_CLIENT_ID";
+
+/* 🔴 REPLACE: Redirect URL (CloudFront / S3) */
+const REDIRECT_URI = "REPLACE_WITH_YOUR_REDIRECT_URL";
+
+/* 🔴 REPLACE: Order Status API */
+const API_URL = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+
+/* 🔴 REPLACE: Analytics API */
+const ANALYTICS_API = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/analytics";
+
+/* 🔴 REPLACE: PDF API */
+const PDF_API = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/report/pdf";
+
+/* ===================================================== */
+
+let chart, salesChart, refreshTimer;
+
+/* ===================== AUTH ===================== */
+function parseJwt(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+  return parseJwt(token).exp * 1000 < Date.now();
+}
+
+function login() {
+  window.location.href =
+    `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&scope=openid+email+profile&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+}
+
+function logout() {
+  localStorage.removeItem("access_token");
+  clearInterval(refreshTimer);
+  window.location.href =
+    `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+}
+
+function handleRedirect() {
+  const hash = window.location.hash.substring(1);
+  if (!hash) return;
+  const params = new URLSearchParams(hash);
+  const token = params.get("access_token");
+  if (token) {
+    localStorage.setItem("access_token", token);
+    window.location.hash = "";
+  }
+}
+
+/* ===================== RBAC UI ===================== */
+function applyRBAC() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  const groups = parseJwt(token)["cognito:groups"] || [];
+  if (groups.includes("Admin")) {
+    document.querySelectorAll(".admin-only")
+      .forEach(el => el.style.display = "inline-block");
+  }
+}
+
+/* ===================== DASHBOARD ===================== */
+function showDashboard() {
+  const token = localStorage.getItem("access_token");
+  if (!token || isTokenExpired(token)) return login();
+
+  document.getElementById("navbar").style.display = "block";
+  document.getElementById("dashboard").style.display = "block";
+
+  applyRBAC();
+  loadData();
+  refreshTimer = setInterval(loadData, 10000);
+}
+
+/* ===================== ORDER DATA ===================== */
+function loadData() {
+  const token = localStorage.getItem("access_token");
+  if (!token || isTokenExpired(token)) return logout();
+
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("metrics").innerHTML = "";
+  document.getElementById("orders").innerHTML = "";
+
+  let url = API_URL;
+  const filterDate = document.getElementById("filterDate").value;
+  if (filterDate) url += "?date=" + filterDate;
+
+  fetch(url, { headers: { Authorization: "Bearer " + token }})
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("loader").style.display = "none";
+
+      data.metrics.forEach(m => {
+        metrics.innerHTML += `
+          <div class="col-md-3 mb-2">
+            <div class="card-metric text-center">${m.metric}<br>${m.count}</div>
+          </div>`;
+      });
+
+      const items = {};
+      data.recent_orders.forEach(o => {
+        orders.innerHTML += `
+          <tr>
+            <td>${o.customer_name}</td>
+            <td>${o.item}</td>
+            <td>${o.quantity}</td>
+            <td>${o.created_at}</td>
+          </tr>`;
+        items[o.item] = (items[o.item] || 0) + o.quantity;
+      });
+
+      if (chart) chart.destroy();
+      chart = new Chart(orderChart, {
+        type: "bar",
+        data: {
+          labels: Object.keys(items),
+          datasets: [{ label: "Orders", data: Object.values(items) }]
+        }
+      });
+    });
+}
+
+/* ===================== ANALYTICS ===================== */
+function openAnalytics() {
+  new bootstrap.Modal(analyticsModal).show();
+  loadAnalytics();
+}
+
+function loadAnalytics() {
+  const token = localStorage.getItem("access_token");
+  const period = analyticsPeriod.value;
+
+  fetch(`${ANALYTICS_API}?period=${period}`, {
+    headers: { Authorization: "Bearer " + token }
+  })
+  .then(res => res.json())
+  .then(data => {
+    analyticsMetrics.innerHTML = `
+      <div class="col-md-3"><div class="card-metric">Sales<br>${data.total_sales}</div></div>
+      <div class="col-md-3"><div class="card-metric">Cost<br>${data.total_cost}</div></div>
+      <div class="col-md-3"><div class="card-metric">Profit<br>${data.profit}</div></div>
+      <div class="col-md-3"><div class="card-metric">Orders<br>${data.orders_count}</div></div>
+    `;
+  });
+}
+
+/* ===================== PDF ===================== */
+function downloadPDF() {
+  window.open(PDF_API, "_blank");
+}
+
+/* ===================== THEME ===================== */
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  document.body.classList.toggle("light");
+}
+
+/* ===================== INIT ===================== */
+handleRedirect();
+showDashboard();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+#### 4️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 5️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+#### 6️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 7️⃣ Open page in browser
+
+```
+http://EC2 Public IP/order-status.html
+```
+
 
 
 ### 🧪 FINAL TEST CHECKLIST (DO NOT SKIP)
