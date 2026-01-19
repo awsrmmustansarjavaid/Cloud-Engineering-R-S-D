@@ -43,7 +43,27 @@ Database
 ### 1️⃣ Frontend dashboard 
 > **📄 File: dashboard.html**
 
+#### 1️⃣ Create dashboard.html
 
+```
+sudo nano /var/www/html/dashboard.html
+```
+
+#### 2️⃣ Paste Code
+
+#### ✅ Frontend-only dashboard
+
+❌ NO backend calls
+
+❌ NO Cognito yet
+
+🎨 Just layout + cafe branding
+
+☕ Charlie Cafe (Drinks Cafe, not food)
+
+🧪 Easy to test UI first
+
+🔜 Later → we will plug Cognito + APIs + PDF
 
 ```
 <!DOCTYPE html>
@@ -314,6 +334,8 @@ function logout() {
 </body>
 </html>
 ```
+
+### 
 
 **✅ PHASE 1 STATUS**
 
