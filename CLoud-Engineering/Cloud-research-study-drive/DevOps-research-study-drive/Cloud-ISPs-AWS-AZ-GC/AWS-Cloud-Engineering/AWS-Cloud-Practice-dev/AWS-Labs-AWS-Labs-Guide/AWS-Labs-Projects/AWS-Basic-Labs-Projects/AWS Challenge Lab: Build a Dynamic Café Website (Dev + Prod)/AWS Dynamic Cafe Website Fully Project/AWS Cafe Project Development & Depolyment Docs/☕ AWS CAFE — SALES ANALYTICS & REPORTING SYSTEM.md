@@ -6523,7 +6523,251 @@ charlie-cafe-s3-bucket/daily_reports/
 
 ---
 
-## PHASE 1️⃣5️⃣  Test
+## 🖨 PHASE 1️⃣5️⃣ PDF BUTTON INTEGRATION
+
+> **FRONTEND → EXISTING LAMBDA**
+
+**🏷 You already did backend correctly ✅ Now we only connect buttons.**
+
+### 1️⃣ Order Status Page — PDF Button (ADMIN ONLY)
+
+#### WHERE TO EDIT 
+
+#### 1️⃣ File:
+
+```
+/var/www/html/order-status.html
+```
+
+#### 2️⃣ — ADD BUTTON (TOP RIGHT, NEXT TO PRINT)
+
+#### Find this area (you already have it):
+
+```
+<div class="col text-end">
+```
+
+#### ⬇️ ADD THIS BUTTON BELOW EXISTING PRINT BUTTONS
+
+```
+<!-- ADMIN ONLY PDF -->
+<button
+  class="btn btn-outline-primary ms-2 admin-only"
+  onclick="downloadOrderPDF()">
+  📄 Orders PDF
+</button>
+```
+
+#### 3️⃣ — ADD JS FUNCTION (NO CHANGES TO LAMBDA)
+
+#### 1️⃣ Add inside <script>:
+
+```
+function downloadOrderPDF() {
+  window.open(
+    "https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-status",
+    "_blank"
+  );
+}
+```
+
+#### 2️⃣ Replace:
+
+- API_ID
+
+- REGION
+
+#### 4️⃣ — HIDE FROM STAFF (RBAC UI)
+
+#### 1️⃣ Add CSS:
+
+```
+.admin-only {
+  display: none;
+}
+```
+
+#### 2️⃣ Add JS after JWT decode:
+
+```
+const token = localStorage.getItem("access_token");
+if (token) {
+  const claims = parseJwt(token);
+  const groups = claims["cognito:groups"] || [];
+  if (groups.includes("Admin")) {
+    document.querySelectorAll(".admin-only").forEach(b => b.style.display = "inline-block");
+  }
+}
+```
+
+#### ✅ Result:
+
+- Staff → NO PDF button
+
+- Admin → sees PDF button
+
+### 2️⃣ 📊 ANALYTICS LINK BUTTON (FROM ORDER STATUS)
+
+> **This is UI navigation only.**
+
+#### ▶️ — ADD BUTTON
+
+#### Place near top (header area):
+
+```
+<a href="analytics.html" class="btn btn-warning btn-sm ms-2 admin-only">
+  📊 Analytics Dashboard
+</a>
+```
+
+✅ Admin-only navigation
+
+❌ Staff never sees analytics
+
+### 3️⃣ 🎨 DARK / LIGHT CAFE THEME (NO BACKEND)
+
+#### WHY THIS IS SAFE
+
+- CSS only
+
+- No API
+
+- No auth change
+
+#### 1️⃣ — ADD THEME TOGGLE BUTTON
+
+```
+<button class="btn btn-secondary btn-sm ms-2" onclick="toggleTheme()">
+  🌙 / ☀️
+</button>
+```
+
+#### 2️⃣ — ADD CSS
+
+```
+body.dark {
+  background:
+    linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.75)),
+    url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+}
+
+body.light {
+  background:
+    linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6)),
+    url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+}
+```
+
+#### 3️⃣ — ADD JS
+
+```
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  document.body.classList.toggle("light");
+}
+```
+
+#### Default body class:
+
+```
+<body class="dark">
+```
+
+### 4️⃣ 📱 MOBILE RECEIPT LAYOUT (VERY IMPORTANT)
+
+> **This affects BOTH PRINT & PDF PREVIEW.**
+
+#### ADD THIS CSS (SAFE)
+
+```
+@media (max-width: 576px) {
+  .cafe-card {
+    padding: 15px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+}
+```
+
+✅ Mobile-friendly
+
+✅ Print-safe
+
+✅ No backend impact
+
+### 5️⃣ 🖥 ADMIN-ONLY BUTTONS (RBAC UI — FRONTEND ONLY)
+
+> **You already secured backend.**
+> **This is visual security.**
+
+####  RULE (VERY IMPORTANT)
+
+> **UI hiding ≠ security**
+> **Backend already enforces real security**
+
+#### HOW TO MARK ADMIN BUTTONS
+
+Just add class:
+
+```
+class="admin-only"
+```
+
+#### Examples:
+
+- PDF
+
+- Analytics
+
+- Monthly report
+
+- CSV export
+
+**JS already handles visibility.**
+
+
+
+### 🧪 FINAL TEST CHECKLIST (DO NOT SKIP)
+
+✔ Staff cannot see PDF
+
+✔ Admin sees PDF
+
+✔ Admin PDF opens
+
+✔ Staff print works
+
+✔ Mobile view OK
+
+✔ Dark/light toggle works
+
+✔ Analytics link opens
+
+✔ Lambda still works
+
+### ✅ CURRENT STATUS
+
+🟢 Frontend printing — COMPLETE
+
+🟢 Backend PDF — COMPLETE
+
+🟢 RBAC — COMPLETE
+
+🟢 UI professional — COMPLETE
+
+
+**✅ PHASE 15 STATUS**
+
+> **🟢 PHASE 15 COMPLETE & VERIFIED**
+---
+
+## PHASE 1️⃣6️⃣  Test
 
 ### 1️⃣  - 📄 PDF – HOW IT WORKS FROM ORDER STATUS PAGE
 
@@ -6586,9 +6830,9 @@ cron(0/10 * * * ? *)
 
 ✔ Production ready
 
-**✅ PHASE 15 STATUS**
+**✅ PHASE 16 STATUS**
 
-> **🟢 PHASE 15 COMPLETE & VERIFIED**
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
 
 ---
 
