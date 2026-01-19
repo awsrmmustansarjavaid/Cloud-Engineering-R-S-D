@@ -335,7 +335,23 @@ function logout() {
 </html>
 ```
 
-### 
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 3️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/dashboard.html
+```
+
+```
+sudo chmod 644 /var/www/html/dashboard.html
+```
+
 
 #### 3️⃣ Restart Apache (MANDATORY)
 
