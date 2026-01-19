@@ -392,3 +392,71 @@ http:// Your EC2 Public IP/dashboard.html
 You don’t have to rewrite login logic for every page. 
 It makes your architecture professional.
 
+### 1️⃣ auth.js template (reusable)
+
+```
+const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const REDIRECT_URI = window.location.origin;
+
+function parseJwt(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+  return parseJwt(token).exp * 1000 < Date.now();
+}
+
+function login() {
+  window.location.href = `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&scope=openid+email+profile&redirect_uri=${REDIRECT_URI}`;
+}
+
+function logout() {
+  localStorage.removeItem("access_token");
+  window.location.href = `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
+}
+
+function handleRedirect() {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get("access_token");
+  if (token) localStorage.setItem("access_token", token);
+  window.location.hash = "";
+}
+
+function securePage() {
+  handleRedirect();
+  const token = localStorage.getItem("access_token");
+  if (!token || isTokenExpired(token)) login();
+  else document.body.style.display = "block";
+}
+```
+
+- Include this script in dashboard.html, order-status.html, analytics.html.
+
+- Wrap body content with display:none to hide until auth passes.
+
+### 2️⃣ Secure Your Admin Pages
+
+#### Steps for each page:
+
+1️⃣ Add at the top:
+
+```
+<body style="display:none">
+<script src="auth.js"></script>
+<script>securePage();</script>
+```
+
+2️⃣ Replace manual logout functions with the logout() from auth.js.
+
+3️⃣ For all API calls, include the token:
+
+```
+fetch(API_URL, {
+  headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+})
+```
+
+4️⃣ Now, even if someone knows the URL of order-status.html or analytics.html, they can’t access data without login.
+
