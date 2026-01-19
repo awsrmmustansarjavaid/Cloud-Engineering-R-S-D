@@ -19,7 +19,7 @@ AWS Lambda (Order API)
 Database
 ```
 
-## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
+### PREREQUISITES (CHECK ONLY)
 
 #### Make sure you already have:
 
@@ -39,6 +39,10 @@ Database
 👉 If yes, continue
 
 👉 If no, stop here
+
+## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
+
+
 
 ### 🔐 — Secure Web Pages
 
