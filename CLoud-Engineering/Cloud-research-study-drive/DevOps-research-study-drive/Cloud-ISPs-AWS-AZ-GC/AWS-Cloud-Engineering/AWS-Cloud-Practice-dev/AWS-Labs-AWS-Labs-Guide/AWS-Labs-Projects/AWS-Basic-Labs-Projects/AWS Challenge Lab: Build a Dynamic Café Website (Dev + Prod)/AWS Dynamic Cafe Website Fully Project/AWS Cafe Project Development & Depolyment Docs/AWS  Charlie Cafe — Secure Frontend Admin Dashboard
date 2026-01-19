@@ -371,3 +371,24 @@ http:// Your EC2 Public IP/dashboard.html
 > **🟢 PHASE 1 COMPLETE & VERIFIED**
 
 ---
+
+## 🔐 PHASE  2️⃣ — Centralize Authentication
+
+✔️ Create one authentication script (auth.js) for all admin pages.
+
+✔️ It handles:
+
+- ✔️ Login redirect to Cognito
+
+- ✔️ Token extraction (access_token)
+
+- ✔️ Token validation (isTokenExpired)
+
+- ✔️ Conditional display of page (display:block only if valid)
+
+- ✔️ Logout redirect
+
+#### Benefit:
+You don’t have to rewrite login logic for every page. 
+It makes your architecture professional.
+
