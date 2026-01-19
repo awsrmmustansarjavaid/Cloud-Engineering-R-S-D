@@ -917,24 +917,38 @@ http:// Your EC2 Public IP/dashboard.html
 ### 2️⃣ Frontend Admin Order-Status Dashboard
 
 ```
+sudo nano /var/www/html/order-status.html
+```
+
+#### ✅ Commented order-status.html Version (Production-Ready & Lab-Friendly)
+
+```
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
+    <!-- Character encoding -->
     <meta charset="UTF-8">
+
+    <!-- Responsive behavior on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page title -->
     <title>Charlie Cafe ☕ | Order Status</title>
     
-    <!-- Bootstrap 5 -->
+    <!-- Bootstrap 5 CSS (UI framework) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Google Font - Poppins -->
+    <!-- Google Font: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
+        /* Global page styling */
         body {
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             margin: 0;
+
+            /* Dark overlay + background image */
             background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
                         url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
             background-size: cover;
@@ -943,7 +957,7 @@ http:// Your EC2 Public IP/dashboard.html
             color: #fff;
         }
 
-        /* Navbar */
+        /* Top navigation bar */
         .navbar {
             background-color: #3b1f0e !important;
         }
@@ -952,7 +966,7 @@ http:// Your EC2 Public IP/dashboard.html
             color: #fff !important;
         }
 
-        /* Main container */
+        /* Main dashboard container */
         .status-container {
             background: rgba(30, 30, 30, 0.75);
             border-radius: 20px;
@@ -963,58 +977,69 @@ http:// Your EC2 Public IP/dashboard.html
             max-width: 1100px;
         }
 
+        /* Page heading */
         h2 {
             font-weight: 600;
             text-shadow: 0 2px 10px rgba(0,0,0,0.6);
         }
 
-        /* Metrics Cards */
+        /* Dashboard metric cards (Total Orders, Sales, etc.) */
         .metric-card {
             background: linear-gradient(135deg, #4a2c1a, #3b1f0e);
             border: none;
             border-radius: 15px;
             transition: transform 0.3s ease;
         }
+
+        /* Hover animation */
         .metric-card:hover {
             transform: translateY(-8px);
         }
+
         .metric-card .card-body {
             text-align: center;
             padding: 25px;
         }
+
         .metric-card h5 {
             margin-bottom: 8px;
             font-weight: 500;
             color: #ff9800;
         }
+
         .metric-card .display-5 {
             font-weight: 700;
             color: white;
         }
 
-        /* Table Styling - Dark & Elegant */
+        /* Orders table styling */
         .table {
             background: rgba(40, 40, 40, 0.85);
             border-radius: 12px;
             overflow: hidden;
         }
+
         .table thead th {
             background: #3b1f0e;
             color: #ff9800;
             font-weight: 600;
             border-bottom: 2px solid #ff9800;
         }
+
         .table tbody tr {
             transition: background 0.2s;
         }
+
+        /* Row hover effect */
         .table tbody tr:hover {
             background: rgba(255,152,0,0.15);
         }
+
         .table td, .table th {
             border-color: rgba(255,255,255,0.08);
         }
 
-        /* Footer */
+        /* Footer section */
         footer {
             background: rgba(0,0,0,0.7);
             color: #ddd;
@@ -1024,6 +1049,7 @@ http:// Your EC2 Public IP/dashboard.html
             font-size: 0.95rem;
         }
 
+        /* Mobile responsiveness */
         @media (max-width: 768px) {
             .status-container {
                 padding: 25px;
@@ -1032,24 +1058,28 @@ http:// Your EC2 Public IP/dashboard.html
         }
     </style>
 </head>
+
 <body>
 
-<!-- Navbar -->
+<!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-expand-lg">
     <div class="container">
+        <!-- Brand / Home link -->
         <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
     </div>
 </nav>
 
-<!-- Main Content -->
+<!-- ===================== MAIN DASHBOARD ===================== -->
 <div class="container">
     <div class="status-container">
+
+        <!-- Dashboard heading -->
         <h2 class="text-center mb-5">📊 Live Order Status</h2>
 
-        <!-- Metrics (Cards) -->
+        <!-- Metrics cards will be injected here via JavaScript -->
         <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
 
-        <!-- Recent Orders Table -->
+        <!-- Orders table -->
         <div class="table-responsive">
             <table class="table table-hover text-white">
                 <thead>
@@ -1061,30 +1091,40 @@ http:// Your EC2 Public IP/dashboard.html
                         <th>Date</th>
                     </tr>
                 </thead>
+
+                <!-- Orders rows injected dynamically -->
                 <tbody id="orders"></tbody>
             </table>
         </div>
+
     </div>
 </div>
 
-<!-- Footer -->
+<!-- ===================== FOOTER ===================== -->
 <footer>
     © 2026 Charlie Cafe | Fresh Drinks • Made with ❤️
 </footer>
 
-<!-- Bootstrap JS -->
+<!-- Bootstrap JavaScript bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Fetch & Display Data -->
+<!-- ===================== DATA FETCH LOGIC ===================== -->
 <script>
-fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  // ← Replace with your real API endpoint
+/*
+  Fetch live order status data from API Gateway
+  Backend: API Gateway → Lambda → DynamoDB
+*/
+fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status") // Replace with real API
     .then(res => {
+        // Check HTTP response
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
     })
     .then(data => {
-        // Metrics Cards
+
+        /* ===== Render Metrics Cards ===== */
         const metricsContainer = document.getElementById("metrics");
+
         data.metrics.forEach(m => {
             metricsContainer.innerHTML += `
                 <div class="col-6 col-md-4 col-lg-3">
@@ -1097,8 +1137,9 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
                 </div>`;
         });
 
-        // Orders Table
+        /* ===== Render Orders Table ===== */
         const ordersBody = document.getElementById("orders");
+
         data.recent_orders.forEach(o => {
             ordersBody.innerHTML += `
                 <tr>
@@ -1111,10 +1152,13 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
         });
     })
     .catch(err => {
+        // Error handling UI
         document.getElementById("orders").innerHTML = `
-            <tr><td colspan="5" class="text-center text-danger py-4">
-                ⚠️ Failed to load orders: ${err.message}
-            </td></tr>`;
+            <tr>
+                <td colspan="5" class="text-center text-danger py-4">
+                    ⚠️ Failed to load orders: ${err.message}
+                </td>
+            </tr>`;
     });
 </script>
 
@@ -1125,6 +1169,9 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 
 ### 3️⃣ Frontend Admin Order-Status Dashboard
 
+```
+sudo nano /var/www/html/order-status.html
+```
 
 **✅ PHASE 1 STATUS**
 
