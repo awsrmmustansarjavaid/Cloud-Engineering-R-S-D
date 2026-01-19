@@ -7171,6 +7171,29 @@ sudo systemctl restart httpd
 http://EC2 Public IP/order-status.html
 ```
 
+### ✅ WHAT YOU CAN TEST NOW (DO NOT SKIP)
+
+1️⃣ Login as Staff
+
+  ❌ No Analytics
+
+  ❌ No PDF
+
+  ✅ Orders visible
+
+2️⃣ Login as Admin
+
+  ✅ Analytics button
+
+  ✅ PDF button
+
+  ✅ Charts load
+
+3️⃣ Theme toggle works
+
+4️⃣ Mobile view OK
+
+5️⃣ Backend untouched
 
 
 ### 🧪 FINAL TEST CHECKLIST (DO NOT SKIP)
