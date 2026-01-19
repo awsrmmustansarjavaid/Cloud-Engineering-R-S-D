@@ -1447,7 +1447,7 @@ sudo systemctl restart httpd
 
 ## PHASE 5️⃣  ☕ MULTI-PAGE SUPPORT PDF GENERATION LAMBDA (REPORTLAB)
 
-### 📄 METHOD 2 — Server PDF (Lambda + ReportLab)
+### 📄 Printing System 2 — Server PDF (Lambda + ReportLab)
 
 > **(PHASE 5 & 6)**
 

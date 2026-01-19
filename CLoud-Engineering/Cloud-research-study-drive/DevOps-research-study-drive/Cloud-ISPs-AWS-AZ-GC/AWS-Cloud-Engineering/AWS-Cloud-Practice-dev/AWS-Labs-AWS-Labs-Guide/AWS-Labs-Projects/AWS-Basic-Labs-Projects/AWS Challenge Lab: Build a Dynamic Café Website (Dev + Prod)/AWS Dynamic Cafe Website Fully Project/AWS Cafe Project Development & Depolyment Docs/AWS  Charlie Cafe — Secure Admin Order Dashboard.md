@@ -2738,7 +2738,7 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ## 🔐 PHASE 7️⃣ PRINTING (FRONTEND ONLY)
 
-### 🖨️ METHOD 1 — Browser Print (Frontend-only)
+### 🖨️ Printing System 1 — Browser Print (Frontend-only)
 
 #### How it works
 
