@@ -2770,6 +2770,12 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ❌ Not official report
 
+| Printing Type    | Where it runs | Technology         | Purpose                           |
+| ---------------- | ------------- | ------------------ | --------------------------------- |
+| 🖨 Browser Print | Frontend only | `window.print()`   | Quick, instant print / save PDF   |
+| 📄 Lambda PDF    | Backend       | ReportLab + Lambda | Official, stored, branded reports |
+
+
 ### 🧭 WHAT THIS PHASE DOES (CLEAR SCOPE)
 
 This phase allows:

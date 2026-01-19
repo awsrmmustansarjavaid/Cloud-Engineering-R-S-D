@@ -1485,6 +1485,12 @@ sudo systemctl restart httpd
 
 ❌ AWS cost (small)
 
+| Printing Type    | Where it runs | Technology         | Purpose                           |
+| ---------------- | ------------- | ------------------ | --------------------------------- |
+| 🖨 Browser Print | Frontend only | `window.print()`   | Quick, instant print / save PDF   |
+| 📄 Lambda PDF    | Backend       | ReportLab + Lambda | Official, stored, branded reports |
+
+
 ### Create Cafe PDF Report Lambda
 
 #### CREATE LAMBDA
