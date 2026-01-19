@@ -70,9 +70,20 @@ Database
 
 #### 📍 Location:
 
+> **dashboard.html (Recommanded)**
+
+```
+/var/www/html/dashboard.html
+```
+
+> **order-status.html**
+
 ```
 /var/www/html/order-status.html
 ```
+
+
+
 
 > **You NEVER modify this file again except 4 config values**
 
@@ -103,10 +114,331 @@ const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-
 
 - Auto-refresh every 10s maintained
 
-#### 1️⃣ Updated Order.html 
+#### 1️⃣ Updated Frontend (Order.html )
 
 #### Here’s the updated HTML/JS code:
 
+
+> **dashboard.html (Recommanded)**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================= ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- ================= CHART.JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* =================================================
+   GLOBAL THEME (DARK CAFE STYLE)
+   ================================================= */
+body {
+    background-color: #0f0f10;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* =================================================
+   SIDEBAR
+   ================================================= */
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+    display: none; /* Hidden until login */
+}
+
+.sidebar h4 {
+    font-weight: 700;
+}
+
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+    background: #ff9800;
+    color: #000;
+}
+
+/* =================================================
+   MAIN CONTENT
+   ================================================= */
+.main {
+    margin-left: 260px;
+    padding: 25px;
+    display: none; /* Hidden until login */
+}
+
+/* =================================================
+   HEADER BAR
+   ================================================= */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-box input {
+    background: #222;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: white;
+}
+
+/* =================================================
+   KPI CARDS
+   ================================================= */
+.kpi-card {
+    border-radius: 20px;
+    padding: 20px;
+    color: white;
+}
+
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+
+/* =================================================
+   CONTENT CARDS
+   ================================================= */
+.card-dark {
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* =================================================
+   TRENDING DRINKS
+   ================================================= */
+.drink-card {
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+}
+
+.drink-card img {
+    width: 100%;
+    border-radius: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- =================================================
+     SIDEBAR (Hidden until login)
+     ================================================= -->
+<div class="sidebar" id="sidebar">
+    <h4>☕ Charlie Cafe</h4>
+    <p class="text-muted">Admin Dashboard</p>
+
+    <!-- Navigation -->
+    <a class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="#"><i class="bi bi-cup-hot"></i> Menu</a>
+    <a href="#"><i class="bi bi-bag-check"></i> Orders</a>
+    <a href="#"><i class="bi bi-graph-up"></i> Analytics</a>
+    <a href="#"><i class="bi bi-gear"></i> Settings</a>
+
+    <hr>
+
+    <!-- Logout -->
+    <a onclick="logout()" style="cursor:pointer">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- =================================================
+     MAIN CONTENT (Hidden until login)
+     ================================================= -->
+<div class="main" id="mainContent">
+
+<!-- ================= HEADER ================= -->
+<div class="top-bar mb-4">
+    <h5>Welcome, Admin 👋</h5>
+
+    <div class="search-box">
+        <input type="text" placeholder="🔍 Search orders, drinks">
+    </div>
+
+    <div>
+        <i class="bi bi-bell"></i>
+        <span class="ms-3">Charlie Cafe</span>
+        <small class="text-muted">Admin</small>
+    </div>
+</div>
+
+<!-- ================= KPI ROW ================= -->
+<div class="row g-4 mb-4" id="kpiRow">
+    <!-- KPI Cards will be dynamically updated from API -->
+</div>
+
+<!-- ================= CHART PLACEHOLDERS ================= -->
+<div class="row g-4" id="chartRow">
+    <div class="col-md-6">
+        <div class="card-dark">
+            <h5>Sales Overview</h5>
+            <p class="text-muted">Daily / Weekly / Monthly</p>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card-dark">
+            <h5>Orders Trend</h5>
+            <canvas id="ordersChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ================= TRENDING DRINKS ================= -->
+<div class="mt-5">
+    <h5>🔥 Trending Drinks</h5>
+    <div class="row g-4 mt-2" id="trendingDrinks">
+        <!-- Cards remain static for now -->
+    </div>
+</div>
+
+</div>
+
+<!-- =================================================
+     JAVASCRIPT: COGNITO + DASHBOARD LOGIC
+     ================================================= -->
+<script>
+/* ================== CONFIG ================== */
+const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const REDIRECT_URI = window.location.origin;
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/dashboard";
+
+let salesChart, ordersChart, refreshTimer;
+
+/* ================== AUTH ================== */
+function parseJwt(token) {
+    return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+    const payload = parseJwt(token);
+    return payload.exp * 1000 < Date.now();
+}
+
+function login() {
+    const loginUrl = `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = loginUrl;
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    clearInterval(refreshTimer);
+    const logoutUrl = `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
+    window.location.href = logoutUrl;
+}
+
+function handleRedirect() {
+    const hash = window.location.hash.substr(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get("access_token");
+    if (token) {
+        localStorage.setItem("token", token);
+        window.location.hash = "";
+    }
+}
+
+/* ================== DASHBOARD ================== */
+function showDashboard() {
+    const token = localStorage.getItem("token");
+    if (!token || isTokenExpired(token)) {
+        login();
+        return;
+    }
+
+    document.getElementById("sidebar").style.display = "block";
+    document.getElementById("mainContent").style.display = "block";
+
+    loadData();
+    refreshTimer = setInterval(loadData, 10000);
+}
+
+/* ================== DATA FETCH ================== */
+function loadData() {
+    const token = localStorage.getItem("token");
+    if (!token || isTokenExpired(token)) return logout();
+
+    fetch(API_URL, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+        if (res.status === 401) logout();
+        return res.json();
+    })
+    .then(data => {
+        // Populate KPI Cards
+        const kpiRow = document.getElementById("kpiRow");
+        kpiRow.innerHTML = "";
+        data.metrics.forEach(m => {
+            kpiRow.innerHTML += `
+                <div class="col-md-3">
+                    <div class="kpi-card ${m.bgClass}">
+                        <h6>${m.metric}</h6>
+                        <h3>${m.count}</h3>
+                    </div>
+                </div>`;
+        });
+
+        // Sales Chart
+        if (salesChart) salesChart.destroy();
+        salesChart = new Chart(document.getElementById("salesChart"), {
+            type: 'line',
+            data: {
+                labels: data.sales.labels,
+                datasets: [{ label: 'Sales', data: data.sales.values, backgroundColor:'rgba(255,152,0,0.3)', borderColor:'orange', fill:true }]
+            }
+        });
+
+        // Orders Chart
+        if (ordersChart) ordersChart.destroy();
+        ordersChart = new Chart(document.getElementById("ordersChart"), {
+            type: 'bar',
+            data: {
+                labels: data.orders.labels,
+                datasets: [{ label: 'Orders', data: data.orders.values, backgroundColor:'rgba(0,123,255,0.7)' }]
+            }
+        });
+    });
+}
+
+/* ================== INIT ================== */
+handleRedirect();
+showDashboard();
+</script>
+
+</body>
+</html>
+```
+
+> **order-status.html**
 ```
 <!DOCTYPE html>
 <html lang="en">
