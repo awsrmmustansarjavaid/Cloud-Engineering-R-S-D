@@ -337,6 +337,14 @@ function logout() {
 
 ### 
 
+#### 3️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```a
+
+
+
 **✅ PHASE 1 STATUS**
 
 > **🟢 PHASE 1 COMPLETE & VERIFIED**
