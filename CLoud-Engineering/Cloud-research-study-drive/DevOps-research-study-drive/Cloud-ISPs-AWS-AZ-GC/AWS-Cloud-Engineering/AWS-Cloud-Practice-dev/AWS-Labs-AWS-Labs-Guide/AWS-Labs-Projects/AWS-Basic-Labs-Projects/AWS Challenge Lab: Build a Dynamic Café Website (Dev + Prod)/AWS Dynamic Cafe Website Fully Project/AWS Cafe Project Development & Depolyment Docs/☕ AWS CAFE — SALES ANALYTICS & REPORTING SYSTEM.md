@@ -1447,6 +1447,44 @@ sudo systemctl restart httpd
 
 ## PHASE 5️⃣  ☕ MULTI-PAGE SUPPORT PDF GENERATION LAMBDA (REPORTLAB)
 
+### 📄 METHOD 2 — Server PDF (Lambda + ReportLab)
+
+> **(PHASE 5 & 6)**
+
+#### How it works
+
+✔️ Button → API Gateway
+
+✔️ API → Lambda
+
+✔️ Lambda → ReportLab
+
+✔️ PDF saved in S3
+
+✔️ Browser downloads PDF
+
+#### Best for
+
+✔️ Admin
+
+✔️ Monthly reports
+
+✔️ Accounting
+
+✔️ Audit
+
+#### Automation (EventBridge)
+
+✅ Professional
+
+✅ Consistent layout
+
+✅ Can be automated
+
+❌ Slight delay
+
+❌ AWS cost (small)
+
 ### Create Cafe PDF Report Lambda
 
 #### CREATE LAMBDA
