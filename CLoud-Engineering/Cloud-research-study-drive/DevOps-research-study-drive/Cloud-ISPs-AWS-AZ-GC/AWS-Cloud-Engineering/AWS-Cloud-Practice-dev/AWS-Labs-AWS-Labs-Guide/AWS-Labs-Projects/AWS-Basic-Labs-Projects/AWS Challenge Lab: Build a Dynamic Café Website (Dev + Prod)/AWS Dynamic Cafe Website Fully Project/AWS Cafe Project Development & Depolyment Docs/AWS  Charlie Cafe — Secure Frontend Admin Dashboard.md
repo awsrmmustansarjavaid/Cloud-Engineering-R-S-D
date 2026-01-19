@@ -460,3 +460,5 @@ fetch(API_URL, {
 
 4️⃣ Now, even if someone knows the URL of order-status.html or analytics.html, they can’t access data without login.
 
+**✅ They are related but not the same.**
+
