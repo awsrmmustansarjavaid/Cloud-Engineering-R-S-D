@@ -7187,29 +7187,87 @@ sudo systemctl restart httpd
 http://EC2 Public IP/order-status.html
 ```
 
-### ✅ WHAT YOU CAN TEST NOW (DO NOT SKIP)
+### 6️⃣ Test (DO NOT SKIP)
 
-#### 1️⃣ Login as Staff
+#### ✅ TEST 1️⃣ — STAFF USER (RBAC + ORDER STATUS)
 
-  - ❌ No Analytics
+#### 🎯 Purpose
 
-  - ❌ No PDF
+#### Verify:
 
-  - ✅ Orders visible
+- Login works
 
-2️⃣ Login as Admin
+- Order dashboard loads
 
-  - ✅ Analytics button
+- Analytics & PDF are hidden
 
-  - ✅ PDF button
+#### Steps
 
-  - ✅ Charts load
+1️⃣ Open order-status.html in browser
 
-3️⃣ Theme toggle works
+2️⃣ You are redirected to Cognito Login
 
-4️⃣ Mobile view OK
+3️⃣ Login using a Staff user (belongs to Staff group)
 
-5️⃣ Backend untouched
+4️⃣ After login, confirm:
+
+✔ Orders table loads
+
+✔ Metrics cards show
+
+✔ Chart shows
+
+❌ Analytics button NOT visible
+
+❌ PDF button NOT visible
+
+**✅ PASS RESULT**
+
+> **Staff can see orders only**
+
+#### ✅ TEST 2️⃣ — ADMIN USER (Analytics + PDF)
+
+#### 🎯 Purpose
+
+#### Verify:
+
+- Admin privileges
+
+- Analytics + PDF access
+
+####  Steps
+
+1️⃣ Logout
+
+2️⃣ Open order-status.html again
+
+3️⃣ Login using an Admin user (belongs to Admin group)
+
+4️⃣ After login, confirm:
+
+✔ Orders dashboard loads
+
+✔ Analytics button visible
+
+✔ PDF button visible
+
+5️⃣ Click 📊 Analytics
+
+Metrics load
+
+No errors
+
+6️⃣ Click 📄 PDF
+
+New tab opens
+
+PDF downloads or opens
+
+**✅ PASS RESULT**
+
+> **Admin sees everything**
+
+
 
 
 ### 🧪 FINAL TEST CHECKLIST (DO NOT SKIP)
