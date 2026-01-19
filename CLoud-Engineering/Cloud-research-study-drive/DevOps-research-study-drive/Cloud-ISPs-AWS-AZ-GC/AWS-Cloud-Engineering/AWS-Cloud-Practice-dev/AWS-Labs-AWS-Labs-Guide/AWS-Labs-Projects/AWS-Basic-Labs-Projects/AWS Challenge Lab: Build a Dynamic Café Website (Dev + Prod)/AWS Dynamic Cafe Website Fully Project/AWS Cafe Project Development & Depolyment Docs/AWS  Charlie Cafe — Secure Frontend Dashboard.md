@@ -357,7 +357,7 @@ sudo chmod 644 /var/www/html/dashboard.html
 
 ```
 sudo systemctl restart httpd
-```a
+```
 
 
 
