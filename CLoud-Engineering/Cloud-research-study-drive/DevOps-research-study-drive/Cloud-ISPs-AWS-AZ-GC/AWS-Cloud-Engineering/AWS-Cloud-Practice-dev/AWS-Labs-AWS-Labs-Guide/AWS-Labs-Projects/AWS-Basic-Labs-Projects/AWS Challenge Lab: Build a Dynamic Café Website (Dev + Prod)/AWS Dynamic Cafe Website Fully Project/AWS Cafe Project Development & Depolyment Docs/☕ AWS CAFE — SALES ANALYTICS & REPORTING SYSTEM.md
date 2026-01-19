@@ -7180,7 +7180,7 @@ const COGNITO_DOMAIN = "charlie-cafe.auth.us-east-1.amazoncognito.com";
 
 - **AWS Console → Cognito → User Pool → App integration → Domain name**
 
-#### REMOVE https://
+- **REMOVE https://**
 
 #### 🧩 PLACE 2️⃣ — Cognito App Client ID
 
@@ -7216,11 +7216,9 @@ const REDIRECT_URI = "https://d123abc.cloudfront.net/order-status.html";
 
 #### 📍 Where to get it
 
-📍 Where
+- CloudFront domain OR S3 static website URL
 
-CloudFront domain OR S3 static website URL
-
-MUST exactly match Cognito callback URL
+- MUST exactly match Cognito callback URL
 
 #### 🧩 PLACE 4️⃣ — Order Status API (EXISTING)
 
@@ -7238,11 +7236,9 @@ const API_URL = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/order-s
 
 #### 📍 Where to get it
 
-📍 Where
+- API Gateway → Stages → prod → Invoke URL
 
-API Gateway → Stages → prod → Invoke URL
-
-Append /order-status
+- Append /order-status
 
 #### 🧩 PLACE 5️⃣ — Analytics API
 
@@ -7259,7 +7255,8 @@ const ANALYTICS_API = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/a
 ```
 
 #### 📍 Where to get it
-Same API Gateway → analytics resource
+
+- Same API Gateway → analytics resource
 
 #### 🧩 PLACE 6️⃣ — PDF Report API
 
@@ -7276,7 +7273,8 @@ const PDF_API = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/report/
 ```
 
 #### 📍 Where to get it
-API Gateway → report → pdf resource
+
+- API Gateway → report → pdf resource
 
 #### ✅ NOTHING ELSE NEEDS CHANGING
 
