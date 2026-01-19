@@ -7324,7 +7324,15 @@ http://EC2 Public IP/order-status.html
 
 ### 6️⃣ Test (DO NOT SKIP)
 
-#### ✅ TEST 1️⃣ — STAFF USER (RBAC + ORDER STATUS)
+#### 1️⃣ Open page
+
+```
+https://YOUR_EC2 Public IP/order-status.html
+```
+
+#### 2️⃣ You should be redirected to Cognito login
+
+#### 3️⃣ TEST 1️⃣ — STAFF USER (RBAC + ORDER STATUS)
 
 #### 🎯 Purpose
 
@@ -7360,7 +7368,9 @@ http://EC2 Public IP/order-status.html
 
 > **Staff can see orders only**
 
-#### ✅ TEST 2️⃣ — ADMIN USER (Analytics + PDF)
+#### 4️⃣ Logout as STAFF USER
+
+#### 5️⃣ TEST 2️⃣ — ADMIN USER (Analytics + PDF)
 
 #### 🎯 Purpose
 
@@ -7401,6 +7411,8 @@ http://EC2 Public IP/order-status.html
 **✅ PASS RESULT**
 
 > **Admin sees everything**
+
+#### 6️⃣ Logout as Admin USER
 
 #### 7️⃣ 🔴 IF ANYTHING FAILS (Quick Fix)
 
