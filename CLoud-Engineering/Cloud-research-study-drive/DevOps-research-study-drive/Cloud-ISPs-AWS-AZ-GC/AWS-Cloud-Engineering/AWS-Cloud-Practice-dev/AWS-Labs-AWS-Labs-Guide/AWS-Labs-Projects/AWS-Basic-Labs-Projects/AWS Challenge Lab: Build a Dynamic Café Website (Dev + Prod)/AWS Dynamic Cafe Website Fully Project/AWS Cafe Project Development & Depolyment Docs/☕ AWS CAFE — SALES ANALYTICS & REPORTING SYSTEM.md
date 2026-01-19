@@ -7253,15 +7253,15 @@ http://EC2 Public IP/order-status.html
 
 5️⃣ Click 📊 Analytics
 
-Metrics load
+  - Metrics load
 
-No errors
+  - No errors
 
 6️⃣ Click 📄 PDF
 
-New tab opens
+  - New tab opens
 
-PDF downloads or opens
+  - PDF downloads or opens
 
 **✅ PASS RESULT**
 
