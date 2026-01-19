@@ -21,8 +21,6 @@ Database
 
 ### 🔐 — Secure Web Pages
 
-
-
 ### 1️⃣ Centralize Authentication
 
 #### What it is: 
