@@ -19,19 +19,40 @@ AWS Lambda (Order API)
 Database
 ```
 
+## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
+
+#### Make sure you already have:
+
+✅ EC2 / S3 hosting HTML
+
+✅ API Gateway with GET /order-status
+
+✅ Lambda returning:
+
+```
+{
+  "metrics": [...],
+  "recent_orders": [...]
+}
+```
+
+👉 If yes, continue
+
+👉 If no, stop here
+
 ### 🔐 — Secure Web Pages
 
 ### 1️⃣ Centralize Authentication
 
-#### What it is: 
+#### ▶️ What it is: 
 
 The concept and implementation of creating one reusable authentication script (auth.js) that contains all the login/logout/validation logic.
 
-#### Purpose: 
+#### ▶️ Purpose: 
 
 Avoid repeating the same code on every page.
 
-#### What it includes:
+#### ▶️ What it includes:
 
 ✔️ Create one authentication script (auth.js) for all admin pages.
 
@@ -47,15 +68,14 @@ Avoid repeating the same code on every page.
 
 - ✔️ Logout redirect
 
-#### Outcome: 
+#### ▶️ Outcome: 
 
 One centralized script that any page can include.
 
-#### Benefit:
+#### ▶️ Benefit:
 You don’t have to rewrite login logic for every page. It makes your architecture professional.
 
-#### auth.js template (reusable)
-
+#### ▶️ auth.js template (reusable)
 
 ```
 const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
@@ -101,15 +121,15 @@ function securePage() {
 
 ### 2️⃣ Secure Your Admin Pages
 
-#### What it is: 
+#### ▶️ What it is: 
 
 The practical application of auth.js to every individual HTML page.
 
-#### Purpose: 
+#### ▶️ Purpose: 
 
 Actually protect each page (dashboard, order-status, analytics) so nobody can view it without logging in.
 
-#### Steps for each page:
+#### ▶️ Steps for each page:
 
 1️⃣ Add at the top:
 
@@ -145,28 +165,198 @@ fetch(API_URL, {
 
 - **Secure Your Admin Pages:**= “Here’s how to lock each door with the key.”
 
+**✅ A professional admin dashboard uses one shared auth module that all admin pages load.**
+
+**Below is the clean, scalable, industry-style solution 👇**
+
+### ✅ BEST & PROFESSIONAL WAY
+
+#### 👉 Create a shared auth.js (Single Source of Truth)
+
+#### 📁 Recommended folder structure
+
+```
+/var/www/html/
+│
+├── admin/
+│   ├── dashboard.html
+│   ├── order-status.html
+│   ├── analytics.html
+│   └── assets/
+│       ├── auth.js        👈 ONE FILE FOR ALL AUTH
+│       └── config.js     👈 OPTIONAL (constants only)
+```
+
+### 🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)
+
+#### 1️⃣ 📄 /admin/assets/auth.js
+
+```
+<script>
+/* ================= CONFIG ================= */
+const USER_POOL_ID = "CHANGE_ME";
+const CLIENT_ID = "CHANGE_ME";
+const COGNITO_DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
+const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+/* ================= TOKEN HELPERS ================= */
+function parseJwt(token) {
+    return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+    return parseJwt(token).exp * 1000 < Date.now();
+}
+
+/* ================= AUTH ACTIONS ================= */
+function login() {
+    const url =
+        `https://${COGNITO_DOMAIN}/login` +
+        `?response_type=token` +
+        `&client_id=${CLIENT_ID}` +
+        `&scope=openid+email+profile` +
+        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+    window.location.href = url;
+}
+
+function logout() {
+    localStorage.removeItem("access_token");
+
+    const url =
+        `https://${COGNITO_DOMAIN}/logout` +
+        `?client_id=${CLIENT_ID}` +
+        `&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+    window.location.href = url;
+}
+
+/* ================= HANDLE REDIRECT ================= */
+function handleAuthRedirect() {
+    if (!window.location.hash) return;
+
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const token = params.get("access_token");
+
+    if (token) {
+        localStorage.setItem("access_token", token);
+        window.location.hash = "";
+    }
+}
+
+/* ================= PAGE GUARD ================= */
+function protectPage() {
+    handleAuthRedirect();
+
+    const token = localStorage.getItem("access_token");
+    if (!token || isTokenExpired(token)) {
+        login();
+        return;
+    }
+
+    // page is safe now
+    document.body.style.display = "block";
+}
+
+/* ================= API FETCH HELPER ================= */
+function authFetch(url, options = {}) {
+    const token = localStorage.getItem("access_token");
+    if (!token || isTokenExpired(token)) logout();
+
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            Authorization: "Bearer " + token
+        }
+    });
+}
+</script>
+```
+
+#### 2️⃣  How to use it in ALL admin pages
+
+#### 🔐 STEP 1 — Hide page until auth passes
+
+At top of every admin HTML file:
+
+```
+<body style="display:none">
+```
+
+#### 🔐 STEP 2 — Load auth.js
+
+Before your page’s own JS:
+
+```
+<script src="assets/auth.js"></script>
+```
+
+#### 🔐 STEP 3 — Protect page
+
+At the bottom:
+
+```
+<script>
+protectPage();
+</script>
+```
+
+**✅ That’s it. Page is secured.**
+
+#### 🧪 Example: order-status.html
+
+```
+<body style="display:none">
+
+<script src="assets/auth.js"></script>
+
+<script>
+protectPage();
+
+authFetch(API_URL)
+    .then(res => res.json())
+    .then(data => console.log(data));
+</script>
+```
+
+#### 🧪 Example: analytics.html
+
+```
+<body style="display:none">
+
+<script src="assets/auth.js"></script>
+
+<script>
+protectPage();
+
+authFetch("https://api.example.com/admin/analytics")
+    .then(res => res.json())
+    .then(data => console.log(data));
+</script>
+```
+
+#### 🏆 WHY THIS IS PROFESSIONAL
+
+✅ Single source of truth
+
+✅ No duplicated auth logic
+
+✅ Easy maintenance
+
+✅ Enterprise-style page guard
+
+✅ Looks exactly like real SaaS dashboards
+
+**This is how production dashboards work.**
+
+
+
+**✅ PHASE 1 STATUS**
+
+> **🟢 PHASE 1 COMPLETE & VERIFIED**
+
 ---
 
-## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
-
-#### Make sure you already have:
-
-✅ EC2 / S3 hosting HTML
-
-✅ API Gateway with GET /order-status
-
-✅ Lambda returning:
-
-```
-{
-  "metrics": [...],
-  "recent_orders": [...]
-}
-```
-
-👉 If yes, continue
-
-👉 If no, stop here
+## 🔐 PHASE  2️⃣ — Frontend Web Admin Pages
 
 ### 1️⃣ Frontend dashboard 
 > **📄 File: dashboard.html**
@@ -494,13 +684,13 @@ http:// Your EC2 Public IP/dashboard.html
 ```
 
 
-**✅ PHASE 1 STATUS**
+**✅ PHASE 2 STATUS**
 
-> **🟢 PHASE 1 COMPLETE & VERIFIED**
+> **🟢 PHASE 2 COMPLETE & VERIFIED**
 
 ---
 
-## 🔐 PHASE 2️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
+## 🔐 PHASE 3️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
 
 #### (ONE FILE ONLY)
 
