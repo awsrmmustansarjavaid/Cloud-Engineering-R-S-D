@@ -4004,7 +4004,7 @@ Staff group     → Lambda restricted
 
 ---
 
-## 🔐 PHASE 9️⃣ — VERIFICATION (DO NOT SKIP)
+## 🔐 PHASE 🔟 — VERIFICATION (DO NOT SKIP)
 
 
 ### Test 1 — API Direct (NO LOGIN)
