@@ -7158,14 +7158,151 @@ showDashboard();
 </html>
 ```
 
-#### 4️⃣ Save File
+#### 4️⃣ ONLY 6 PLACES YOU EVER NEED TO CHANGE
+
+> **You DO NOT touch anything else.**
+
+#### 🧩 PLACE 1️⃣ — Cognito Hosted UI Domain
+
+#### 🔍 Find this in your code:
+
+```
+const COGNITO_DOMAIN = "REPLACE_WITH_YOUR_COGNITO_DOMAIN";
+```
+
+#### ✏️ Replace with:
+
+```
+const COGNITO_DOMAIN = "charlie-cafe.auth.us-east-1.amazoncognito.com";
+```
+
+#### 📍 Where to get it
+
+- **AWS Console → Cognito → User Pool → App integration → Domain name**
+
+#### REMOVE https://
+
+#### 🧩 PLACE 2️⃣ — Cognito App Client ID
+
+#### 🔍 Find:
+
+```
+const CLIENT_ID = "REPLACE_WITH_YOUR_APP_CLIENT_ID";
+```
+
+#### ✏️ Replace with:
+
+```
+const CLIENT_ID = "4f7x9exampleclientid";
+```
+
+#### 📍 Where to get it
+
+- **Cognito → App integration → App clients → Copy Client ID**
+
+#### 🧩 PLACE 3️⃣ — Redirect URL (IMPORTANT)
+
+#### 🔍 Find:
+
+```
+const REDIRECT_URI = "REPLACE_WITH_YOUR_REDIRECT_URL";
+```
+
+#### ✏️ Replace with:
+
+```
+const REDIRECT_URI = "https://d123abc.cloudfront.net/order-status.html";
+```
+
+#### 📍 Where to get it
+
+📍 Where
+
+CloudFront domain OR S3 static website URL
+
+MUST exactly match Cognito callback URL
+
+#### 🧩 PLACE 4️⃣ — Order Status API (EXISTING)
+
+#### 🔍 Find:
+
+```
+const API_URL = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+```
+
+#### ✏️ Replace with:
+
+```
+const API_URL = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/order-status";
+```
+
+#### 📍 Where to get it
+
+📍 Where
+
+API Gateway → Stages → prod → Invoke URL
+
+Append /order-status
+
+#### 🧩 PLACE 5️⃣ — Analytics API
+
+#### 🔍 Find:
+
+```
+const ANALYTICS_API = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/analytics";
+```
+
+#### ✏️ Replace with:
+
+```
+const ANALYTICS_API = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/analytics";
+```
+
+#### 📍 Where to get it
+Same API Gateway → analytics resource
+
+#### 🧩 PLACE 6️⃣ — PDF Report API
+
+#### 🔍 Find:
+
+```
+const PDF_API = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/report/pdf";
+```
+
+#### ✏️ Replace with:
+
+```
+const PDF_API = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/report/pdf";
+```
+
+#### 📍 Where to get it
+API Gateway → report → pdf resource
+
+#### ✅ NOTHING ELSE NEEDS CHANGING
+
+#### ❌ Do NOT touch:
+
+- RBAC logic
+
+- Chart.js
+
+- Dashboard HTML
+
+- CSS
+
+- PDF button
+
+- Theme toggle
+
+
+#### 5️⃣ Save File
 
 ```
 CTRL + O → ENTER
 CTRL + X
 ```
 
-#### 5️⃣ Fix File Permissions
+#### 6️⃣ Fix File Permissions
 
 ```
 sudo chown apache:apache /var/www/html/order-status.html
@@ -7175,13 +7312,13 @@ sudo chown apache:apache /var/www/html/order-status.html
 sudo chmod 644 /var/www/html/order-status.html
 ```
 
-#### 6️⃣ Restart Apache (MANDATORY)
+#### 7️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
 
-#### 7️⃣ Open page in browser
+#### 8️⃣ Open page in browser
 
 ```
 http://EC2 Public IP/order-status.html
