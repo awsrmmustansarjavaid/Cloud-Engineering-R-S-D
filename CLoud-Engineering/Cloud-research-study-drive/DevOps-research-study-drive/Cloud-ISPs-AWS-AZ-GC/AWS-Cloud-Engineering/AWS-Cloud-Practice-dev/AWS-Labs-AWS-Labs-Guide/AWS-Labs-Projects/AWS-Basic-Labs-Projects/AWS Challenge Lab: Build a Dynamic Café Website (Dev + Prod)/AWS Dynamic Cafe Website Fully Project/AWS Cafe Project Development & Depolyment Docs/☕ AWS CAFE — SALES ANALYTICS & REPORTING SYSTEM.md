@@ -7173,21 +7173,21 @@ http://EC2 Public IP/order-status.html
 
 ### ✅ WHAT YOU CAN TEST NOW (DO NOT SKIP)
 
-1️⃣ Login as Staff
+#### 1️⃣ Login as Staff
 
-  ❌ No Analytics
+  - ❌ No Analytics
 
-  ❌ No PDF
+  - ❌ No PDF
 
-  ✅ Orders visible
+  - ✅ Orders visible
 
 2️⃣ Login as Admin
 
-  ✅ Analytics button
+  - ✅ Analytics button
 
-  ✅ PDF button
+  - ✅ PDF button
 
-  ✅ Charts load
+  - ✅ Charts load
 
 3️⃣ Theme toggle works
 
