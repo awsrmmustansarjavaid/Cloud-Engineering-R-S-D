@@ -256,49 +256,56 @@ Lambda / DynamoDB
 > **✔️ ALB protects delivery**
 > **✔️ auth.js protects behavior**
 
-🔁 Real-World Example (Important)
-Scenario WITHOUT auth.js
+### 🔁 Real-World Example (Important)
 
-User logs in via ALB
+#### Scenario WITHOUT auth.js
 
-User opens dashboard.html
+- User logs in via ALB
 
-User copies URL of analytics.html
+- User opens dashboard.html
 
-Browser opens it directly
-❌ Page loads without frontend check
-❌ API may still be called
+- User copies URL of analytics.html
 
-Scenario WITH auth.js
+-  Browser opens it directly
+ ❌ Page loads without frontend check
 
-User opens ANY admin page
+ ❌ API may still be called
 
-auth.js runs first
+#### Scenario WITH auth.js
 
-Token missing or expired?
-➡ Redirect to Cognito login
-✔ Fully protected
+- User opens ANY admin page
 
-🌐 CloudFront + HTTP/2 — No Conflict at All
+- auth.js runs first
+
+- Token missing or expired?
+
+    ➡ Redirect to Cognito login
+
+    ✔ Fully protected
+
+### 🌐 CloudFront + HTTP/2 — No Conflict at All
 
 This is important:
 
-auth.js is just a static JS file
+- auth.js is just a static JS file
 
-CloudFront serves it over HTTPS / HTTP2
+- CloudFront serves it over HTTPS / HTTP2
 
-Browser executes it locally
+- Browser executes it locally
 
 ➡ Zero impact on HTTP/2
+
 ➡ Zero impact on caching
+
 ➡ Zero impact on ALB
 
-In fact:
+**📌 In fact:**
 
-Most modern SPAs work exactly like this
+> **Most modern SPAs work exactly like this**
 
-🏆 Professional Recommendation (Best Practice)
-✅ Best architecture for your lab:
+### 🏆 Professional Recommendation (Best Practice)
+
+#### ✅ Best architecture for your lab:
 
 | Layer          | Responsibility          |
 | -------------- | ----------------------- |
@@ -312,43 +319,50 @@ Most modern SPAs work exactly like this
 
 This is textbook cloud architecture.
 
-⚠️ One Important Rule (Please remember)
+### ⚠️ One Important Rule (Please remember)
 
-If you use ALB Cognito auth:
+#### If you use ALB Cognito auth:
 
 ✔ Good for protecting static files
+
 ❌ Not enough alone for multi-page admin apps
 
-If you use auth.js:
+#### If you use auth.js:
 
 ✔ Required for SPA-like navigation
+
 ✔ Required for API security
+
 ✔ Required for professional UX
 
 👉 Use both if you want enterprise-grade
+
 👉 Use auth.js minimum if you want clean architecture
 
-🧭 My Honest Advice for YOU
+### 🧭 My Honest Advice
 
-Because this is a learning lab:
+#### Because this is a learning lab:
 
 🔹 Keep CloudFront
+
 🔹 Keep Cognito
+
 🔹 Use auth.js as your primary auth logic
+
 🔹 Document ALB auth as optional enhancement
 
-This keeps:
+#### This keeps:
 
-Your docs clean
+✔ Your docs clean
 
-Your architecture understandable
+✔ Your architecture understandable
 
-Your lab impressive
+✔ Your lab impressive
 
-✅ You are doing the RIGHT thing
+**✅ You are doing the RIGHT thing**
 
-You didn’t make a mistake.
-You’re leveling up your design.
+> **You didn’t make a mistake.**
+> **You’re leveling up your design.**
 
 
 **✅ A professional admin dashboard uses one shared auth module that all admin pages load.**
