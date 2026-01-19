@@ -342,7 +342,7 @@ CTRL + O → ENTER
 CTRL + X
 ```
 
-#### 3️⃣ Fix File Permissions
+#### 4️⃣ Fix File Permissions
 
 ```
 sudo chown apache:apache /var/www/html/dashboard.html
@@ -353,12 +353,17 @@ sudo chmod 644 /var/www/html/dashboard.html
 ```
 
 
-#### 3️⃣ Restart Apache (MANDATORY)
+#### 5️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
 
+#### 6️⃣ Open page in browser (MANDATORY)
+
+```
+http:// Your EC2 Public IP/dashboard.html
+```
 
 
 **✅ PHASE 1 STATUS**
