@@ -348,6 +348,36 @@ authFetch("https://api.example.com/admin/analytics")
 
 **This is how production dashboards work.**
 
+### 🔒 EXTRA SECURITY (OPTIONAL BUT IMPRESSIVE)
+
+#### 🔐 1. Protect APIs (MANDATORY)
+
+- API Gateway → Cognito Authorizer
+
+- Reject requests without valid JWT
+
+#### 🔐 2. Cognito Groups
+
+- Admin
+
+- Staff
+
+- Manager
+
+Then in auth.js: 
+
+```
+parseJwt(token)["cognito:groups"]
+```
+
+#### 🔐 3. CloudFront
+
+- HTTPS only
+
+- Disable directory listing
+
+- Add security headers
+
 
 
 **✅ PHASE 1 STATUS**
