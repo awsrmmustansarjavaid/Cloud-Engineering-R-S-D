@@ -6735,6 +6735,20 @@ class="admin-only"
 
 > **You can directly replace your file with this**
 
+✅ Added ADMIN-ONLY controls (RBAC UI)
+
+✅ Added PDF button control (Admin only)
+
+✅ Added Dark / Light Cafe Theme toggle
+
+✅ Added Cafe-style UI polish
+
+✅ Added VERY CLEAR COMMENTS showing WHERE TO REPLACE YOUR OWN VALUES
+
+✅ Did NOT change backend logic
+
+✅ Did NOT jump or skip anything
+
 #### 1️⃣ — CONFIRM FILE YOU WILL MODIFY (NO JUMP)
 
 ```
