@@ -408,9 +408,6 @@ http:// Your EC2 Public IP/dashboard.html
 /var/www/html/order-status.html
 ```
 
-
-
-
 > **You NEVER modify this file again except 4 config values**
 
 ### 🔧 ONLY CHANGE THESE 4 VALUES

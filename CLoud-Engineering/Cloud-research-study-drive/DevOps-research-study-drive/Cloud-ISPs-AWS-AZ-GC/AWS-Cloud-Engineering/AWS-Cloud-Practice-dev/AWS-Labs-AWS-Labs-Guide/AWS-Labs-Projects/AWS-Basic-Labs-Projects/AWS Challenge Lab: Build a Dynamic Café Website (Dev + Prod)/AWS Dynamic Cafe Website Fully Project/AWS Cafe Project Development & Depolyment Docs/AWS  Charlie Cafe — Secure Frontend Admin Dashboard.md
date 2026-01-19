@@ -500,6 +500,66 @@ http:// Your EC2 Public IP/dashboard.html
 
 ---
 
+## 🔐 PHASE 2️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
+
+#### (ONE FILE ONLY)
+
+### 🎯 What this frontend already includes
+
+| Feature             | Status |
+| ------------------- | ------ |
+| Login UI            | ✅      |
+| Cognito Hosted UI   | ✅      |
+| JWT storage         | ✅      |
+| Spinner             | ✅      |
+| Auto refresh (10s)  | ✅      |
+| Metrics             | ✅      |
+| Orders table        | ✅      |
+| Chart               | ✅      |
+| Date filter         | ✅      |
+| Print orders        | ✅      |
+| Print today summary | ✅      |
+
+### 📄 FINAL FRONTEND FILE (ONLY ONCE)
+
+#### 📍 Location:
+
+> **dashboard.html (Recommanded)**
+
+```
+/var/www/html/dashboard.html
+```
+
+> **You NEVER modify this file again except 4 config values**
+
+### 🔧 ONLY CHANGE THESE 4 VALUES
+
+```
+const USER_POOL_ID = "CHANGE_ME";
+const CLIENT_ID = "CHANGE_ME";
+const COGNITO_DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
+const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-status";
+```
+
+#### ✅ Everything else stays unchanged forever
+
+#### ✅ Code (Login + Dashboard fully integrated & Recommanded )
+
+- Cognito Hosted UI redirect login (login() & handleRedirect())
+
+- Access Token stored in localStorage
+
+- Bearer prefix added in Authorization header
+
+- Token expiry check implemented
+
+- Navbar hidden until login
+
+- Spinner, chart, metrics, and table all intact
+
+- Auto-refresh every 10s maintained
+
+
 
 
 
