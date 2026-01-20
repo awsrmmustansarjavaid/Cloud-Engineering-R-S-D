@@ -2240,187 +2240,27 @@ const apiBase = CONFIG.API_BASE;
 
 **📌 Now config changes need only ONE file**
 
+### 🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control 
 
 
-### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control
-
-### 1️⃣ — STANDARD API CALL FUNCTION (FRONTEND)
-> **This function will be used everywhere (Admin & Employee).**
-
-#### ✅ Add this to BOTH pages (admin-dashboard.html, employee-portal.html)
-
-```
-<script>
-/* ===============================
-   GET JWT TOKEN FROM COGNITO
-================================ */
-async function getJWT() {
-    const user = userPool.getCurrentUser();
-    return new Promise((resolve, reject) => {
-        if (!user) reject("No active session");
-        user.getSession((err, session) => {
-            if (err) reject(err);
-            resolve(session.getIdToken().getJwtToken());
-        });
-    });
-}
-
-/* ===============================
-   SECURE API CALL HELPER
-================================ */
-async function secureFetch(url, method = "GET", body = null) {
-    const token = await getJWT();
-
-    const options = {
-        method: method,
-        headers: {
-            "Authorization": token,
-            "Content-Type": "application/json"
-        }
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    const response = await fetch(url, options);
-    if (!response.ok) {
-        throw new Error("API access denied or failed");
-    }
-
-    return response.json();
-}
-</script>
-```
-
-### 2️⃣ — ROLE DETECTION (ADMIN vs EMPLOYEE)
-
-Cognito puts groups inside the JWT.
-
-#### ✅ Add this function
-
-```
-<script>
-/* ===============================
-   DETECT USER ROLE FROM TOKEN
-================================ */
-async function getUserRole() {
-    const user = userPool.getCurrentUser();
-    return new Promise((resolve, reject) => {
-        user.getSession((err, session) => {
-            if (err) reject(err);
-            const payload = session.getIdToken().decodePayload();
-            const groups = payload["cognito:groups"] || [];
-            resolve(groups);
-        });
-    });
-}
-</script>
-```
-
-### 3️⃣ — ROLE-BASED UI CONTROL (FRONTEND)
-
-#### ✅ Admin Page (admin-dashboard.html)
-
-```
-<script>
-async function applyAdminUIRules() {
-    const roles = await getUserRole();
-
-    if (!roles.includes("Admin")) {
-        alert("Unauthorized access");
-        window.location.href = "login.html";
-    }
-
-    // Admin-only buttons
-    document.getElementById("admin-section").style.display = "block";
-}
-applyAdminUIRules();
-</script>
-```
-
-#### HTML Example
-
-```
-<div id="admin-section" style="display:none;">
-    <button class="btn btn-warning">Manage Employees</button>
-    <button class="btn btn-danger">View Payroll</button>
-</div>
-```
-
-#### ✅ Employee Page (employee-portal.html)
-
-```
-<script>
-async function applyEmployeeUIRules() {
-    const roles = await getUserRole();
-
-    if (!roles.includes("Employee")) {
-        alert("Unauthorized access");
-        window.location.href = "login.html";
-    }
-}
-applyEmployeeUIRules();
-</script>
-```
-
-- **📌 Employees never see admin buttons**
-
-- **📌 Even if they edit HTML → API still blocks them**
-
-### 4️⃣ — FRONTEND → API INTEGRATION (REAL DATA)
-
-#### Example: Employee Profile Load
-
-```
-<script>
-async function loadEmployeeProfile() {
-    try {
-        const data = await secureFetch(
-            apiBase + "/employee/profile"
-        );
-
-        document.getElementById("profile-name").innerText = data.name;
-        document.getElementById("profile-job").innerText = data.job_title;
-    } catch (err) {
-        alert("Failed to load profile");
-    }
-}
-loadEmployeeProfile();
-</script>
-```
-
-#### Example: Admin Fetch All Employees
-
-```
-<script>
-async function loadAllEmployees() {
-    const data = await secureFetch(
-        apiBase + "/admin/employees"
-    );
-
-    console.log("Employees:", data);
-}
-</script>
-```
-
-### 🌐 Frontend — Task 2️⃣ — Frontend → API Integration & Role-Based UI Control
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
 
 ### ➕ - A SHARED SCRIPT FILE (Recommanded)
 
