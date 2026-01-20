@@ -1072,19 +1072,293 @@ def lambda_handler(event, context):
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 3️⃣ — New AWS Lambda Functions (Full Configuration)
+## PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
 
+### 1️⃣ Step 1️⃣ – Update CafePDFReportLambda for HR & Attendance
 
+> *8We are going to add a new page_type branch for HR/Attendance reports.**
 
+#### Updated Lambda Code
 
+```
+import os
+import boto3
+import io
+import datetime
+import pymysql  # Required for RDS access
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 
+# =======================
+# ENVIRONMENT VARIABLES
+# =======================
+ORDERS_TABLE_NAME = os.environ.get("ORDERS_TABLE_NAME")  # Existing DynamoDB orders table
+REPORTS_BUCKET_NAME = os.environ.get("REPORTS_BUCKET_NAME")  # S3 bucket for storing PDFs
+LOGO_FILE_NAME = os.environ.get("LOGO_FILE_NAME", "")  # Optional logo file
+DB_HOST = os.environ.get("DB_HOST")  # RDS endpoint for HR/Attendance
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASS = os.environ.get("DB_PASS")
 
+# =======================
+# AWS CLIENTS
+# =======================
+dynamodb = boto3.resource("dynamodb")
+orders_table = dynamodb.Table(ORDERS_TABLE_NAME)
+s3 = boto3.client("s3")
 
+# =======================
+# DATABASE CONNECTION
+# =======================
+def get_db_connection():
+    """Return a pymysql connection to RDS"""
+    return pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME,
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
+def lambda_handler(event, context):
+    """Main Lambda Handler"""
+    
+    # Determine type of report to generate
+    page_type = event.get("queryStringParameters", {}).get("page", "analytics")
+    today = datetime.date.today()
 
+    # PDF buffer setup
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+    styles = getSampleStyleSheet()
+    elements = []
 
+    # =======================
+    # LOGO (OPTIONAL)
+    # =======================
+    if LOGO_FILE_NAME:
+        try:
+            elements.append(Image(LOGO_FILE_NAME, width=120, height=60))
+            elements.append(Spacer(1, 20))
+        except:
+            pass
 
+    # =======================
+    # CAFE SALES ANALYTICS PDF
+    # =======================
+    if page_type == "analytics":
+        elements.append(Paragraph("📊 Cafe Sales Analytics Report", styles["Title"]))
+        elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+        elements.append(Spacer(1, 15))
+        total_sales = 12000
+        total_cost = 8000
+        profit = total_sales - total_cost
+        data = [
+            ["Metric", "Amount"],
+            ["Total Sales", total_sales],
+            ["Total Cost", total_cost],
+            ["Profit", profit]
+        ]
+        table = Table(data, colWidths=[200, 150])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.brown),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+            ("ALIGN", (0,0), (-1,-1), "CENTER"),
+            ("GRID", (0,0), (-1,-1), 1, colors.black),
+            ("BACKGROUND", (0,1), (-1,-1), colors.beige)
+        ]))
+        elements.append(table)
 
+    # =======================
+    # ORDER STATUS PDF
+    # =======================
+    elif page_type == "order-status":
+        elements.append(Paragraph("📝 Cafe Order Status Report", styles["Title"]))
+        elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+        elements.append(Spacer(1, 15))
+        orders = orders_table.scan().get("Items", [])
+        table_data = [["Order ID", "Item", "Qty", "Cost", "Price", "Profit"]]
+        for o in orders:
+            qty = int(o.get("quantity", 1))
+            cost = float(o.get("item_cost", 0)) * qty
+            price = float(o.get("item_price", 0)) * qty
+            profit = price - cost
+            table_data.append([
+                o.get("order_id"),
+                o.get("item_name"),
+                qty,
+                cost,
+                price,
+                profit
+            ])
+        table = Table(table_data, colWidths=[80, 110, 50, 60, 60, 60])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.darkblue),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+            ("ALIGN", (0,0), (-1,-1), "CENTER"),
+            ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+            ("BACKGROUND", (0,1), (-1,-1), colors.lightgrey)
+        ]))
+        elements.append(table)
+
+    # =======================
+    # HR & ATTENDANCE PDF
+    # =======================
+    elif page_type == "attendance":
+        elements.append(Paragraph("📋 Employee Attendance Report", styles["Title"]))
+        elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+        elements.append(Spacer(1, 15))
+
+        # Connect to RDS and fetch attendance & employee data
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT e.name, e.job_title, a.attendance_date, a.checkin_time, a.checkout_time
+                FROM attendance a
+                JOIN employees e ON a.employee_id = e.employee_id
+                ORDER BY a.attendance_date DESC
+            """)
+            records = cursor.fetchall()
+
+        # Create table data
+        table_data = [["Employee", "Job Title", "Date", "Check-In", "Check-Out"]]
+        for r in records:
+            table_data.append([
+                r["name"],
+                r["job_title"],
+                str(r["attendance_date"]),
+                str(r.get("checkin_time") or ""),
+                str(r.get("checkout_time") or "")
+            ])
+
+        # Format table
+        table = Table(table_data, colWidths=[120, 100, 80, 60, 60])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.darkgreen),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+            ("ALIGN", (0,0), (-1,-1), "CENTER"),
+            ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+            ("BACKGROUND", (0,1), (-1,-1), colors.lightgrey)
+        ]))
+        elements.append(table)
+
+    # =======================
+    # BUILD PDF
+    # =======================
+    doc.build(elements)
+    buffer.seek(0)
+
+    # Upload to S3
+    s3_key = f"{page_type}_report_{today}.pdf"
+    s3.put_object(
+        Bucket=REPORTS_BUCKET_NAME,
+        Key=s3_key,
+        Body=buffer.getvalue(),
+        ContentType="application/pdf"
+    )
+
+    # Return PDF as response (for testing)
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/pdf"},
+        "body": buffer.getvalue().decode("latin1"),
+        "isBase64Encoded": False
+    }
+```
+
+#### ✅ What changed / added:
+
+- Added elif page_type == "attendance"
+
+    - Queries RDS attendance & employees table
+
+    - Generates a table PDF
+
+- Added pymysql connection inside Lambda (environment variables required)
+
+Fully commented code
+
+- No other code changes, still handles analytics and order-status
+
+### 2️⃣ Step 2️⃣ – Verify & Test Your HR Lambdas with PDF
+
+#### 1️⃣ A) Quick Unit Test (Lambda Console)
+
+- Go to AWS Lambda → CafePDFReportLambda → Test
+
+#### Sample test event:
+
+```
+{
+  "queryStringParameters": {
+    "page": "attendance"
+  }
+}
+```
+
+- Should return a PDF in response
+
+- Check S3 bucket for new file: attendance_report_2026-01-20.pdf
+
+#### 2️⃣ B) Test Individual HR Lambda Functions
+
+- hr-checkin → Invoke test with Cognito JWT in event
+
+- hr-checkout → Invoke test after check-in
+
+- hr-employee-profile → Should return employee info
+
+- hr-attendance-history → Should return attendance records
+
+- hr-leaves-holidays → Should return leaves + holidays
+
+#### Tips:
+
+Use Lambda console → Test events → Include requestContext.authorizer.claims.sub as a dummy Cognito user ID
+
+#### Example:
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+- Check logs in CloudWatch → Lambda → Logs if errors occur.
+
+#### 3️⃣ C) Verify PDF Integration
+
+- After generating some attendance records:
+
+    - hr-checkin and hr-checkout must have created today’s attendance
+
+- Invoke CafePDFReportLambda with page=attendance
+
+- Download PDF from S3 bucket → Verify:
+
+    - Employee name
+
+    - Job title
+
+    - Check-in time
+
+    - Check-out time
+
+### ✅ After this step:
+
+- Your HR & Attendance system is fully integrated with PDF generation
+
+- No need for a new PDF Lambda
+
+- All Lambda functions are ready for API Gateway integration
 
 
 **✅ PHASE 3️⃣ STATUS**
