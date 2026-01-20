@@ -1365,6 +1365,87 @@ All of them need backend hardening. Here’s what to do:
 | leaves          | Employee      | Only Employee can view/add leave  |
 | admin/employees | Admin         | Only Admin can view all employees |
 
+#### 🟢 About this Python Lambda code
+
+This code is not just from one phase, it is a combined / consolidated version of the Python Lambda code from both Phase 4 (role-based APIs) and Phase 5 (production hardening, logging, security).
+
+#### ✅ What it includes from both phases:
+
+| Feature                                                            | Phase 4 | Phase 5 | Present in this code? |
+| ------------------------------------------------------------------ | ------- | ------- | --------------------- |
+| Basic Lambda function for API                                      | ✔       | ✔       | ✔                     |
+| Role check (Cognito groups)                                        | ✔       | ✔       | ✔                     |
+| Blocking unauthorized roles                                        | ✔       | ✔       | ✔                     |
+| CloudWatch logging                                                 | ❌       | ✔       | ✔                     |
+| Return structured JSON                                             | ✔       | ✔       | ✔                     |
+| Placeholder for actual business logic (checkin/checkout/admin etc) | ✔       | ✔       | ✔                     |
+
+So yes — this Python template is ready to use as a combined “Phase 4 + Phase 5” Lambda function.
+
+#### 🟢 How to use this for your 5 Lambda functions
+
+You will copy this template for each Lambda and replace the business logic:
+
+#### Checkin Lambda
+
+- Allowed group → Employee
+
+- Logic → Save check-in timestamp to RDS
+
+#### Checkout Lambda
+
+- Allowed group → Employee
+
+- Logic → Save check-out timestamp to RDS
+
+#### employeeInfo Lambda
+
+- Allowed group → Employee
+
+- Logic → Query employee profile from RDS
+
+#### leaves Lambda
+
+- Allowed group → Employee
+
+- Logic → Query/add leave info
+
+#### admin/employees Lambda
+
+- Allowed group → Admin
+
+- Logic → Query all employee info from RDS
+
+#### 🟢 Deployment tip (Phase 4 + 5 together)
+
+- Treat Phase 4 as functional code + role check
+
+- Treat Phase 5 as security, logging, UX polish, production readiness
+
+- Combining them in one final template avoids confusion during deployment ✅
+
+- This is exactly what your current template does: role enforcement + logging + placeholder for business logic
+
+#### 🟢 Key Notes
+
+The line:
+
+```
+groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', [])
+```
+
+- works for all 5 Lambda functions if you set the Cognito Authorizer correctly in API Gateway.
+
+- You only need to change the if-check and replace the “Function logic goes here” for each Lambda.
+
+- This ensures:
+
+    - Unauthorized roles blocked
+
+    - Logging visible in CloudWatch
+
+    - Production-ready security ✅
+
 
 ---
 ### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
