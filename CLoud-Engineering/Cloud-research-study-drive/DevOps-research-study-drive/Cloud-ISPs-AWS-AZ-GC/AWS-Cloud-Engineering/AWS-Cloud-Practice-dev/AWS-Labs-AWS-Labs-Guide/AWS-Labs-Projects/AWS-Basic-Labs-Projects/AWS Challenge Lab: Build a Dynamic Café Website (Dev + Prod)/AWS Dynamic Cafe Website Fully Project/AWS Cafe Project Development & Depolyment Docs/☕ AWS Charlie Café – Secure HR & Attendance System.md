@@ -2308,7 +2308,8 @@ sudo mkdir -p js
 sudo nano js/auth-api.js
 ```
 
-#### 3️⃣ FINAL AUTH-API.JS (ALL-IN-ONE)
+#### 3️⃣ FINAL Updated AUTH-API.JS 
+> **(includ config.j & ALL-IN-ONE)**
 
 **👉 Paste your full auth-api.js code inside this file**
 > **(save with CTRL+O, exit CTRL+X)**
@@ -2318,21 +2319,25 @@ sudo nano js/auth-api.js
    AUTH & API SHARED UTILITIES
    Charlie Café HR System
    - Used by Admin & Employee pages
-   - Includes production hardening & UX polish
+   - Production hardened
 ===================================================== */
 
 /* ===============================
-   GLOBAL CONFIG (Use config.js)
+   GLOBAL CONFIG (FROM config.js)
+   IMPORTANT:
+   config.js MUST be loaded BEFORE this file
 ================================ */
 const poolData = {
     UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
     ClientId: CONFIG.COGNITO.CLIENT_ID
 };
+
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 const apiBase = CONFIG.API_BASE;
 
 /* ===============================
    PAGE PROTECTION
+   Blocks unauthenticated users
 ================================ */
 function protectPage() {
     const user = userPool.getCurrentUser();
@@ -2342,13 +2347,16 @@ function protectPage() {
 }
 
 /* ===============================
-   GET JWT TOKEN (WITH EXPIRATION CHECK)
+   GET JWT TOKEN (WITH EXPIRY CHECK)
 ================================ */
 async function getJWT() {
     const user = userPool.getCurrentUser();
 
     return new Promise((resolve, reject) => {
-        if (!user) reject("No active session");
+        if (!user) {
+            reject("No active session");
+            return;
+        }
 
         user.getSession((err, session) => {
             if (err || !session.isValid()) {
@@ -2356,6 +2364,7 @@ async function getJWT() {
                 user.signOut();
                 window.location.href = "login.html";
                 reject("Session expired");
+                return;
             }
 
             resolve(session.getIdToken().getJwtToken());
@@ -2365,6 +2374,7 @@ async function getJWT() {
 
 /* ===============================
    SECURE API CALL HELPER
+   Automatically attaches JWT
 ================================ */
 async function secureFetch(url, method = "GET", body = null) {
     const token = await getJWT();
@@ -2377,9 +2387,12 @@ async function secureFetch(url, method = "GET", body = null) {
         }
     };
 
-    if (body) options.body = JSON.stringify(body);
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
 
     const response = await fetch(url, options);
+
     if (!response.ok) {
         throw new Error("API request failed or unauthorized");
     }
@@ -2388,13 +2401,17 @@ async function secureFetch(url, method = "GET", body = null) {
 }
 
 /* ===============================
-   ROLE DETECTION
+   ROLE DETECTION FROM JWT
 ================================ */
 async function getUserRoles() {
     const user = userPool.getCurrentUser();
+
     return new Promise((resolve, reject) => {
+        if (!user) reject("No user");
+
         user.getSession((err, session) => {
             if (err) reject(err);
+
             const payload = session.getIdToken().decodePayload();
             resolve(payload["cognito:groups"] || []);
         });
@@ -2402,22 +2419,29 @@ async function getUserRoles() {
 }
 
 /* ===============================
-   ADMIN UI CONTROL
+   ADMIN UI ENFORCEMENT
 ================================ */
 async function enforceAdminAccess() {
     const roles = await getUserRoles();
+
     if (!roles.includes("Admin")) {
         alert("Unauthorized access");
         window.location.href = "login.html";
+        return;
     }
-    document.getElementById("admin-section").style.display = "block";
+
+    const adminSection = document.getElementById("admin-section");
+    if (adminSection) {
+        adminSection.style.display = "block";
+    }
 }
 
 /* ===============================
-   EMPLOYEE UI CONTROL
+   EMPLOYEE UI ENFORCEMENT
 ================================ */
 async function enforceEmployeeAccess() {
     const roles = await getUserRoles();
+
     if (!roles.includes("Employee")) {
         alert("Unauthorized access");
         window.location.href = "login.html";
@@ -2425,11 +2449,13 @@ async function enforceEmployeeAccess() {
 }
 
 /* ===============================
-   LOGOUT (Cognito)
+   LOGOUT (COGNITO)
 ================================ */
 function logout() {
     const user = userPool.getCurrentUser();
-    if (user) user.signOut();
+    if (user) {
+        user.signOut();
+    }
     window.location.href = "index.html";
 }
 
@@ -2442,25 +2468,28 @@ function handleError(error) {
 }
 
 /* ===============================
-   LOADER FUNCTIONS (UX)
+   LOADER (UX POLISH)
 ================================ */
 function showLoader() {
-    document.getElementById("loader").style.display = "block";
+    const loader = document.getElementById("loader");
+    if (loader) loader.style.display = "block";
 }
 
 function hideLoader() {
-    document.getElementById("loader").style.display = "none";
+    const loader = document.getElementById("loader");
+    if (loader) loader.style.display = "none";
 }
 
 /* ===============================
-   API EXAMPLES
+   API USAGE EXAMPLES
 ================================ */
 
-// Employee Profile Load
+/* Employee Profile */
 async function loadEmployeeProfile() {
     try {
         showLoader();
         const data = await secureFetch(apiBase + "/employee/profile");
+
         document.getElementById("profile-name").innerText = data.name;
         document.getElementById("profile-job").innerText = data.job_title;
         document.getElementById("profile-salary").innerText = data.salary;
@@ -2472,7 +2501,7 @@ async function loadEmployeeProfile() {
     }
 }
 
-// Admin Load All Employees
+/* Admin: Load All Employees */
 async function loadAllEmployees() {
     try {
         showLoader();
