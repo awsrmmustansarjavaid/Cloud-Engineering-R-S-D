@@ -2182,83 +2182,6 @@ sudo nano /var/www/html/employee-portal.html
 
 ✔ Perfect match with your AWS lab architecture
 
-#### ✅ PART B — HOW LOGOUT INTEGRATES WITH COGNITO (STEP-BY-STEP)
-
-#### 🔐 What Logout Actually Does
-
-Cognito stores the login session in browser storage.
-Logout means destroying that session.
-
-#### 🧠 Step-by-Step Cognito Logout Flow
-
-#### 1️⃣ Cognito keeps user session
-
-When user logs in:
-
-- ID Token
-
-- Access Token
-
-- Refresh Token
-
-are stored by Cognito SDK in browser (local/session storage)
-
-#### 2️⃣ This line logs the user out
-
-```
-user.signOut();
-```
-
-#### What happens:
-
-- Tokens are removed
-
-- Session invalidated
-
-- getCurrentUser() returns null
-
-#### 3️⃣ Protecting Pages (IMPORTANT)
-
-On every protected page, you already do:
-
-```
-const user = userPool.getCurrentUser();
-if (!user) {
-    window.location.href = "login.html";
-}
-```
-
-**👉 This prevents access after logout.**
-
-#### 4️⃣ Redirect After Logout
-
-```
-window.location.href = "index.html";
-```
-
-You can redirect to:
-
-- Login page
-
-- Landing page
-
-- Café homepage
-
-#### ✅ How to Test Logout (Verification)
-
-- Login to employee portal
-
-- Click Logout
-
-- Page redirects
-
-- Press browser back button
-
-❌ Portal should NOT load
-
-✅ Cognito session is gone
-
-
 ### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 File: admin-dashboard.html
 
@@ -2587,7 +2510,189 @@ http://<EC2-Public-IP>/admin-dashboard.html
 SELECT * FROM attendance ORDER BY attendance_date DESC;
 ```
 
+### 4️⃣ — HOW LOGOUT INTEGRATES WITH COGNITO (STEP-BY-STEP)
 
+> **✅ this logout design and logic applies to BOTH the Admin page and the Employee page in your Charlie Café HR system.**
+
+#### 🔐 What Logout Actually Does
+
+Cognito stores the login session in browser storage.
+Logout means destroying that session.
+
+#### ✅ CONFIRMATION: SAME LOGOUT LOGIC FOR ADMIN & EMPLOYEE
+
+✔ Admin Portal → uses Cognito Admin group
+
+✔ Employee Portal → uses Cognito Employee group
+
+✔ Logout behavior → IDENTICAL for both
+
+The difference is NOT logout, the difference is authorization (groups & APIs).
+
+#### 🔐 WHAT LOGOUT DOES (RECONFIRMED)
+
+Your understanding is correct 👇
+
+Cognito Stores These After Login:
+
+- ID Token
+
+- Access Token
+
+- Refresh Token
+
+**🌐 Stored by Amazon Cognito JS SDK in browser storage.**
+
+#### 🚪 SINGLE LINE THAT LOGS OUT THE USER
+
+```
+user.signOut();
+```
+
+#### What this instantly does:
+
+❌ Deletes tokens from browser
+
+❌ Invalidates Cognito session
+
+❌ getCurrentUser() becomes null
+
+This is true for admin and employee both.
+
+#### 🛡️ PAGE PROTECTION (MOST IMPORTANT PART)
+
+You already have (or must have) this on EVERY protected page:
+
+```
+const user = userPool.getCurrentUser();
+if (!user) {
+    window.location.href = "login.html";
+}
+```
+
+#### Why this matters
+
+- After logout → session gone
+
+- User presses Back button
+
+- ❌ Page must NOT load
+
+- ✅ Redirects to login / home page
+
+#### This is mandatory on:
+
+- admin-dashboard.html
+
+- employee-portal.html
+
+#### 🔘 STANDARD LOGOUT BUTTON (SAME FOR BOTH)
+> **HTML (Admin & Employee)**
+
+```
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
+
+#### JavaScript
+
+```
+function logout() {
+    const user = userPool.getCurrentUser();
+    if (user) {
+        user.signOut();
+    }
+    window.location.href = "index.html"; // café landing or login
+}
+```
+
+✔ Works for Admin
+
+✔ Works for Employee
+
+✔ Works on mobile / desktop
+
+✔ Secure & Cognito-approved
+
+#### 🧠 Step-by-Step Cognito Logout Flow
+
+#### 1️⃣ Cognito keeps user session
+
+When user logs in:
+
+- ID Token
+
+- Access Token
+
+- Refresh Token
+
+are stored by Cognito SDK in browser (local/session storage)
+
+#### 2️⃣ This line logs the user out
+
+```
+user.signOut();
+```
+
+#### What happens:
+
+- Tokens are removed
+
+- Session invalidated
+
+- getCurrentUser() returns null
+
+#### 3️⃣ Protecting Pages (IMPORTANT)
+
+On every protected page, you already do:
+
+```
+const user = userPool.getCurrentUser();
+if (!user) {
+    window.location.href = "login.html";
+}
+```
+
+**👉 This prevents access after logout.**
+
+#### 4️⃣ Redirect After Logout
+
+```
+window.location.href = "index.html";
+```
+
+You can redirect to:
+
+- Login page
+
+- Landing page
+
+- Café homepage
+
+#### 5️⃣ HOW TO TEST LOGOUT (VERIFICATION — VERY IMPORTANT)
+
+> **Do this test for both roles:**
+
+#### Test Steps
+
+1️⃣ Login as Admin or Employee
+
+2️⃣ Open dashboard
+
+3️⃣ Click Logout
+
+4️⃣ Redirect happens
+
+5️⃣ Press Browser Back Button
+
+#### Expected Result
+
+❌ Page does NOT load
+
+✅ Redirects again
+
+✅ Session fully destroyed
+
+**👉 This confirms Cognito is correctly integrated**
 
 **✅ PHASE 4️⃣ STATUS**
 
