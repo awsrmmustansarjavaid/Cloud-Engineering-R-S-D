@@ -2540,11 +2540,7 @@ def lambda_handler(event, context):
 
     - Burst 20
 
-
-
-
-### 4️⃣ 
-#### 🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
+### 4️⃣  🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
 > **📄 admin-dashboard.html**
 
 #### ✅ Add these BEFORE closing </body>
