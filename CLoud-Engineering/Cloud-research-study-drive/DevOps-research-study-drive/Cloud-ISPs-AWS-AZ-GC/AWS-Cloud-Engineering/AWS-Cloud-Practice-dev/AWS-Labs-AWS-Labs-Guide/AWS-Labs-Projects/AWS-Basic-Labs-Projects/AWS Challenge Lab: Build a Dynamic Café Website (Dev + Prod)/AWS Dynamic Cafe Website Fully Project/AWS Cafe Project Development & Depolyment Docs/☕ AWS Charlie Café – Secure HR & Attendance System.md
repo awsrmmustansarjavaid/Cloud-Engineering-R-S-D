@@ -1699,9 +1699,11 @@ You should see today’s check-in timestamp
 
 If IntegrityError occurs → already checked-in → remove row and retest
 
-2️⃣ Testing hr-checkout
-Step 1: Open Lambda → hr-checkout → Test tab
-Step 2: Create Test Event
+### 2️⃣ Testing hr-checkout
+
+#### Step 1: Open Lambda → hr-checkout → Test tab
+
+#### Step 2: Create Test Event
 
 ```
 {
@@ -1715,13 +1717,13 @@ Step 2: Create Test Event
 }
 ```
 
-Step 3: Run Test
+#### Step 3: Run Test
 
 Click Test
 
 Check Execution result
 
-✅ Expected:
+#### ✅ Expected:
 
 ```
 {
@@ -1730,7 +1732,7 @@ Check Execution result
 }
 ```
 
-Step 4: Verify DB
+#### Step 4: Verify DB
 
 ```
 SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
@@ -1740,9 +1742,11 @@ Check that checkout_time is filled
 
 If no check-in exists → error 400 as expected
 
-3️⃣ Testing hr-employee-profile
-Step 1: Open Lambda → hr-employee-profile → Test tab
-Step 2: Test Event
+### 3️⃣ Testing hr-employee-profile
+
+#### Step 1: Open Lambda → hr-employee-profile → Test tab
+
+#### Step 2: Test Event
 
 ```
 {
@@ -1756,9 +1760,9 @@ Step 2: Test Event
 }
 ```
 
-Step 3: Run Test
+#### Step 3: Run Test
 
-✅ Expected result:
+#### ✅ Expected result:
 
 ```
 {
@@ -1771,9 +1775,11 @@ Step 3: Run Test
 
 Verify matches RDS record
 
-4️⃣ Testing hr-attendance-history
-Step 1: Open Lambda → hr-attendance-history → Test tab
-Step 2: Test Event
+### 4️⃣ Testing hr-attendance-history
+
+#### Step 1: Open Lambda → hr-attendance-history → Test tab
+
+#### Step 2: Test Event
 
 ```
 {
@@ -1787,9 +1793,9 @@ Step 2: Test Event
 }
 ```
 
-Step 3: Run Test
+#### Step 3: Run Test
 
-✅ Expected result:
+#### ✅ Expected result:
 
 ```
 [
@@ -1806,9 +1812,11 @@ Cross-check with attendance table
 
 Ensure dates & times match
 
-5️⃣ Testing hr-leaves-holidays
-Step 1: Open Lambda → hr-leaves-holidays → Test tab
-Step 2: Test Event
+### 5️⃣ Testing hr-leaves-holidays
+
+#### Step 1: Open Lambda → hr-leaves-holidays → Test tab
+
+#### Step 2: Test Event
 
 ```
 {
@@ -1822,9 +1830,9 @@ Step 2: Test Event
 }
 ```
 
-Step 3: Run Test
+#### Step 3: Run Test
 
-✅ Expected result:
+#### ✅ Expected result:
 
 ```
 {
@@ -1839,7 +1847,7 @@ Step 3: Run Test
 
 Cross-check leaves table and holidays table
 
-⚠ Notes & Common Issues
+### ⚠ Notes & Common Issues
 
 | Problem                    | Fix                                                             |
 | -------------------------- | --------------------------------------------------------------- |
@@ -1850,13 +1858,6 @@ Cross-check leaves table and holidays table
 
 
 **✅ Now all 5 Lambdas are tested & verified**
-
-
-
-
-
-
-
 
 
 
