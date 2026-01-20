@@ -966,6 +966,8 @@ function logout() {
 
 ✅ Clean
 
+---
+
 ### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
 
 ### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
@@ -1130,9 +1132,29 @@ async function loadAllEmployees() {
 </script>
 ```
 
+
+---
 ### 🌐 Frontend — Task 2️⃣ — PRODUCTION HARDENING (ENTERPRISE-GRADE)
 
 
+
+
+---
+#### 🟢 STEP 5 — LOGOUT FLOW (BOTH PAGES)
+
+#### What Happens (Internally)
+
+✔ Cognito tokens destroyed
+
+✔ Session cleared
+
+✔ getCurrentUser() → null
+
+✔ Redirect happens
+
+✔ Back button blocked
+
+----
 
 > **🟢 PHASE 5️⃣  R & D COMPLETE**
 ---

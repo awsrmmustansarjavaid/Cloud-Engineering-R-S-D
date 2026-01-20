@@ -2289,6 +2289,10 @@ sudo nano js/auth-api.js
 **👉 Paste your full auth-api.js code inside this file**
 > **(save with CTRL+O, exit CTRL+X)**
 
+```
+
+
+```
 
 
 #### 4️⃣ Set correct permissions
@@ -2431,19 +2435,6 @@ async function loadEmployees() {
 ```
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
-
-#### What Happens (Internally)
-
-✔ Cognito tokens destroyed
-
-✔ Session cleared
-
-✔ getCurrentUser() → null
-
-✔ Redirect happens
-
-✔ Back button blocked
-
 
 ### ✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
 
