@@ -755,14 +755,313 @@ Python 3.12
 cafe-hr-lambda-role
 ```
 
+Click Create function
 
+Step 3: Configure Environment Variables
 
+Lambda → Configuration → Environment variables
 
+Add ALL:
 
+| Key     | Value             |
+| ------- | ----------------- |
+| DB_HOST | your-rds-endpoint |
+| DB_NAME | cafedb            |
+| DB_USER | your-db-user      |
+| DB_PASS | your-db-password  |
 
+Click Save
 
+Step 4: Add VPC Configuration (CRITICAL)
 
+Lambda → Configuration → VPC
 
+VPC: same VPC as RDS
+
+Subnets: private subnets used by RDS
+
+Security group: Lambda SG that allows RDS access
+
+Click Save
+
+Step 5: Lambda Code (Check-In)
+
+Replace entire code with this:
+
+```
+import json
+import os
+import pymysql
+from datetime import date, datetime
+
+# Database connection
+connection = pymysql.connect(
+    host=os.environ['DB_HOST'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASS'],
+    database=os.environ['DB_NAME'],
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+def lambda_handler(event, context):
+    try:
+        # Extract Cognito user ID from JWT
+        cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+
+        today = date.today()
+        now = datetime.now().time()
+
+        with connection.cursor() as cursor:
+            # Get employee ID
+            cursor.execute(
+                "SELECT employee_id FROM employees WHERE cognito_user_id=%s",
+                (cognito_user_id,)
+            )
+            employee = cursor.fetchone()
+
+            if not employee:
+                return response(404, "Employee not found")
+
+            employee_id = employee['employee_id']
+
+            # Insert attendance
+            cursor.execute("""
+                INSERT INTO attendance (employee_id, attendance_date, checkin_time)
+                VALUES (%s, %s, %s)
+            """, (employee_id, today, now))
+
+            connection.commit()
+
+        return response(200, "Check-in successful")
+
+    except pymysql.err.IntegrityError:
+        return response(400, "Already checked in today")
+
+    except Exception as e:
+        return response(500, str(e))
+
+def response(status, message):
+    return {
+        "statusCode": status,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps({"message": message})
+    }
+```
+
+Click Deploy
+
+3️⃣ Create Lambda: hr-checkout
+Repeat Steps Exactly Like hr-checkin
+
+Only change:
+
+Function name:
+
+```
+hr-checkout
+```
+
+Code:
+
+```
+import json
+import os
+import pymysql
+from datetime import date, datetime
+
+connection = pymysql.connect(
+    host=os.environ['DB_HOST'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASS'],
+    database=os.environ['DB_NAME'],
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+def lambda_handler(event, context):
+    try:
+        cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+        today = date.today()
+        now = datetime.now().time()
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE attendance a
+                JOIN employees e ON a.employee_id = e.employee_id
+                SET a.checkout_time=%s
+                WHERE e.cognito_user_id=%s
+                AND a.attendance_date=%s
+            """, (now, cognito_user_id, today))
+
+            if cursor.rowcount == 0:
+                return response(400, "Check-in required before checkout")
+
+            connection.commit()
+
+        return response(200, "Check-out successful")
+
+    except Exception as e:
+        return response(500, str(e))
+
+def response(status, message):
+    return {
+        "statusCode": status,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps({"message": message})
+    }
+```
+
+Deploy.
+
+4️⃣ Create Lambda: hr-employee-profile
+Function name
+
+```
+hr-employee-profile
+```
+
+Code:
+
+```
+import json
+import os
+import pymysql
+
+connection = pymysql.connect(
+    host=os.environ['DB_HOST'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASS'],
+    database=os.environ['DB_NAME'],
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+def lambda_handler(event, context):
+    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT name, job_title, salary, start_date
+            FROM employees
+            WHERE cognito_user_id=%s
+        """, (cognito_user_id,))
+        employee = cursor.fetchone()
+
+    return {
+        "statusCode": 200,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(employee)
+    }
+```
+
+Deploy.
+
+5️⃣ Create Lambda: hr-attendance-history
+Function name
+
+```
+hr-attendance-history
+```
+
+Code:
+
+```
+import json
+import os
+import pymysql
+
+connection = pymysql.connect(
+    host=os.environ['DB_HOST'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASS'],
+    database=os.environ['DB_NAME'],
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+def lambda_handler(event, context):
+    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT a.attendance_date, a.checkin_time, a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            WHERE e.cognito_user_id=%s
+            ORDER BY a.attendance_date DESC
+        """, (cognito_user_id,))
+        records = cursor.fetchall()
+
+    return {
+        "statusCode": 200,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(records)
+    }
+```
+
+Deploy.
+
+6️⃣ Create Lambda: hr-leaves-holidays
+Function name
+
+```
+hr-leaves-holidays
+```
+
+Code:
+
+```
+import json
+import os
+import pymysql
+
+connection = pymysql.connect(
+    host=os.environ['DB_HOST'],
+    user=os.environ['DB_USER'],
+    password=os.environ['DB_PASS'],
+    database=os.environ['DB_NAME'],
+    cursorclass=pymysql.cursors.DictCursor
+)
+
+def lambda_handler(event, context):
+    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT l.leave_date, l.leave_type
+            FROM leaves l
+            JOIN employees e ON l.employee_id = e.employee_id
+            WHERE e.cognito_user_id=%s
+        """, (cognito_user_id,))
+        leaves = cursor.fetchall()
+
+        cursor.execute("SELECT holiday_date, description FROM holidays")
+        holidays = cursor.fetchall()
+
+    return {
+        "statusCode": 200,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps({
+            "leaves": leaves,
+            "holidays": holidays
+        })
+    }
+```
+
+Deploy.
+
+7️⃣ What You Have Achieved
+
+✅ New HR-specific Lambda layer
+
+✅ Cognito-secured backend
+
+✅ RDS-integrated attendance logic
+
+✅ Real-world AWS job architecture
+
+✅ No duplication of existing lab
 
 
 
