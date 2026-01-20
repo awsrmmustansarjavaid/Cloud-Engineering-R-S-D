@@ -1655,112 +1655,178 @@ We will create 3 main pages:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Charlie Café HR System</title>
+    <title>Charlie Café | Attendance</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- Bootstrap CSS -->
+
+    <!-- ================= Bootstrap CSS ================= -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Cognito SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
-
+    <!-- ================= Café Theme Styling ================= -->
     <style>
-        body { padding: 20px; }
-        .btn-large { width: 150px; height: 50px; font-size: 1.2rem; }
-        .table-fixed { table-layout: fixed; width: 100%; }
+        /* ===== Full Page Café Background ===== */
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(40,25,15,0.85), rgba(40,25,15,0.85)),
+                url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        /* ===== Main Card ===== */
+        .attendance-card {
+            background-color: rgba(255, 255, 255, 0.96);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* ===== Café Heading ===== */
+        .attendance-card h2 {
+            font-family: Georgia, serif;
+            color: #2b1b12;
+        }
+
+        /* ===== Buttons ===== */
+        .btn-checkin {
+            background-color: #2b1b12;
+            color: #fff;
+        }
+
+        .btn-checkin:hover {
+            background-color: #3d261a;
+        }
+
+        .btn-checkout {
+            background-color: #8b0000;
+            color: #fff;
+        }
+
+        .btn-checkout:hover {
+            background-color: #a40000;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="container text-center">
-    <h2>Employee Attendance</h2>
-    <p id="welcome-msg"></p>
-    
-    <div class="my-4">
-        <button id="checkin-btn" class="btn btn-success btn-large me-3">Check-In</button>
-        <button id="checkout-btn" class="btn btn-danger btn-large">Check-Out</button>
+<!-- ================= Attendance Card ================= -->
+<div class="attendance-card text-center">
+
+    <!-- Café Title -->
+    <h2>☕ Charlie Café</h2>
+    <p class="text-muted">Employee Attendance System</p>
+
+    <hr>
+
+    <!-- ================= Employee ID Input ================= -->
+    <!-- Employee must enter ID before check-in/out -->
+    <div class="mb-3 text-start">
+        <label for="employeeId" class="form-label fw-bold">Employee ID</label>
+        <input
+            type="number"
+            id="employeeId"
+            class="form-control"
+            placeholder="Enter your Employee ID"
+            required
+        >
     </div>
 
-    <div id="status-msg" class="mt-3"></div>
+    <!-- ================= Action Buttons ================= -->
+    <div class="d-grid gap-3 mt-4">
+        <button class="btn btn-checkin btn-lg" onclick="submitCheckin()">
+            ✅ Check In
+        </button>
+
+        <button class="btn btn-checkout btn-lg" onclick="submitCheckout()">
+            ⏰ Check Out
+        </button>
+    </div>
+
+    <!-- ================= Status Message ================= -->
+    <div class="mt-4">
+        <div id="statusMsg" class="fw-bold"></div>
+    </div>
+
 </div>
 
+<!-- ================= JavaScript Logic ================= -->
 <script>
-    // ====== Cognito Configuration ======
-    const poolData = {
-        UserPoolId: 'us-east-1_XXXXXX', // your user pool ID
-        ClientId: 'XXXXXXXXXXXX' // your app client ID
-    };
-    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    /* ========= API Gateway Base URL ========= */
+    const apiBase = "https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod";
 
-    // ====== Helper: Get Cognito JWT Token ======
-    function getJWT() {
-        const cognitoUser = userPool.getCurrentUser();
-        return new Promise((resolve, reject) => {
-            if (cognitoUser) {
-                cognitoUser.getSession(function(err, session) {
-                    if (err) reject(err);
-                    resolve(session.getIdToken().getJwtToken());
-                });
-            } else {
-                reject("User not logged in");
-            }
-        });
+    /* ========= Utility: Show Status Messages ========= */
+    function showMessage(message, success = true) {
+        const msg = document.getElementById("statusMsg");
+        msg.innerText = message;
+        msg.style.color = success ? "green" : "red";
     }
 
-    // ====== API Gateway Base URL ======
-    const apiBase = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod';
+    /* ========= Validate Employee ID ========= */
+    function getEmployeeId() {
+        const empId = document.getElementById("employeeId").value.trim();
+        if (!empId) {
+            showMessage("❌ Please enter Employee ID", false);
+            return null;
+        }
+        return empId;
+    }
 
-    // ====== Check-In ======
-    document.getElementById('checkin-btn').addEventListener('click', async () => {
-        const token = await getJWT();
-        fetch(`${apiBase}/checkin`, {
-            method: 'POST',
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('status-msg').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-        })
-        .catch(err => {
-            document.getElementById('status-msg').innerHTML = `<div class="alert alert-danger">${err}</div>`;
-        });
-    });
+    /* ========= Submit Check-In ========= */
+    async function submitCheckin() {
+        const employeeId = getEmployeeId();
+        if (!employeeId) return;
 
-    // ====== Check-Out ======
-    document.getElementById('checkout-btn').addEventListener('click', async () => {
-        const token = await getJWT();
-        fetch(`${apiBase}/checkout`, {
-            method: 'POST',
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('status-msg').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-        })
-        .catch(err => {
-            document.getElementById('status-msg').innerHTML = `<div class="alert alert-danger">${err}</div>`;
-        });
-    });
+        try {
+            const response = await fetch(`${apiBase}/attendance/checkin`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ employee_id: employeeId })
+            });
 
-    // ====== Display Logged-in Employee Name ======
-    const cognitoUser = userPool.getCurrentUser();
-    if (cognitoUser) {
-        cognitoUser.getSession(function(err, session) {
-            if (!err) {
-                const name = session.getIdToken().payload['cognito:username'];
-                document.getElementById('welcome-msg').innerText = `Welcome, ${name}`;
+            const result = await response.json();
+
+            if (response.ok) {
+                showMessage("✅ Check-In successful. Have a great shift!");
+            } else {
+                showMessage(result.message || "❌ Check-In failed", false);
             }
-        });
+        } catch (error) {
+            showMessage("❌ Server error. Please contact admin.", false);
+        }
+    }
+
+    /* ========= Submit Check-Out ========= */
+    async function submitCheckout() {
+        const employeeId = getEmployeeId();
+        if (!employeeId) return;
+
+        try {
+            const response = await fetch(`${apiBase}/attendance/checkout`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ employee_id: employeeId })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showMessage("⏰ Check-Out successful. Thank you!");
+            } else {
+                showMessage(result.message || "❌ Check-Out failed", false);
+            }
+        } catch (error) {
+            showMessage("❌ Server error. Please contact admin.", false);
+        }
     }
 </script>
+
 </body>
 </html>
 ```
