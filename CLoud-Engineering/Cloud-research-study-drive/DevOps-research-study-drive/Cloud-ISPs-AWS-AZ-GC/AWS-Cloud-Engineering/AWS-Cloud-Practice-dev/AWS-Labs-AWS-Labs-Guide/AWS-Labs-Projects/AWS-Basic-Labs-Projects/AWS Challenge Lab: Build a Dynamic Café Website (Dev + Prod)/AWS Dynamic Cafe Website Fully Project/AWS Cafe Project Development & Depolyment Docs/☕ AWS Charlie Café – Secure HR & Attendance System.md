@@ -1290,7 +1290,7 @@ Fully commented code
 
 #### 2️⃣ Sample test event:
 
-- **1️⃣ attendance test event**
+#### 1️⃣ attendance test event
 
 ```
 {
@@ -1299,8 +1299,33 @@ Fully commented code
   }
 }
 ```
+#### Expected Result:
+- Lambda generates Employee Attendance PDF using RDS attendance + employees table
 
-- **2️⃣ analytics test event**
+#### PDF includes:
+
+    - Title: 📋 Employee Attendance Report
+
+    - Generated date
+
+    - Table with attendance records:
+```
+Employee | Job Title | Date       | Check-In | Check-Out
+Alice    | Barista   | 2026-01-19 | 09:00    | 17:00
+Bob      | Manager   | 2026-01-19 | 08:50    | 16:50
+...      | ...       | ...        | ...      | ...
+```
+- Sorted by attendance_date DESC (most recent first)
+
+#### PDF is:
+
+    - Stored in S3 bucket: attendance_report_<today>.pdf
+
+    - Returned in Lambda response body
+
+**✅ StatusCode 200, PDF content returned**
+
+#### 2️⃣ analytics test event
 
 ```
 {
@@ -1310,7 +1335,34 @@ Fully commented code
 }
 ```
 
-- **3️⃣ order-status test event**
+#### Expected Result:
+
+- Lambda generates a PDF for Cafe Sales Analytics
+
+#### PDF includes:
+
+    - Title: 📊 Cafe Sales Analytics Report
+
+    - Generated date (today)
+
+    - Table with:
+
+```
+Metric       | Amount
+Total Sales  | 12000
+Total Cost   | 8000
+Profit       | 4000
+```
+
+#### PDF is:
+
+    - Stored in S3 bucket: analytics_report_<today>.pdf
+
+    - Returned in Lambda response body (as Base64-ish content, decoded in console)
+
+**✅ Success: StatusCode 200, PDF content returned**
+
+#### 3️⃣ order-status test event
 
 ```
 {
@@ -1319,11 +1371,59 @@ Fully commented code
   }
 }
 ```
+#### Expected Result:
 
+- Lambda generates Order Status PDF using DynamoDB ORDERS_TABLE_NAME
 
-- Should return a PDF in response
+- PDF includes:
 
-- Check S3 bucket for new file: attendance_report_2026-01-20.pdf
+    - Title: 📝 Cafe Order Status Report
+
+    - Generated date
+
+    - Table with order details:
+```
+Order ID | Item | Qty | Cost | Price | Profit
+```
+
+#### Each row shows:
+
+    - order_id
+
+    - item_name
+
+    - quantity
+
+    - item_cost
+
+    - item_price
+
+    - calculated profit
+
+#### PDF is:
+
+    - Stored in S3 bucket: order-status_report_<today>.pdf
+
+    - Returned in Lambda response body
+
+**✅ Success: StatusCode 200, PDF content returned**
+
+#### 4️⃣ Notes for All Tests
+
+- If S3 bucket is missing, Lambda will throw a NoSuchBucket error
+
+- If RDS is inaccessible, the "attendance" test will fail
+
+- The PDF content returned in Lambda console is not human-readable (binary-ish), but downloading from S3 will give a normal PDF
+
+- All tests should return HTTP statusCode 200 if everything is correct
+
+##### ✅ In short:
+| Page Type      | PDF Contents                                     | S3 File Name                    | StatusCode |
+| -------------- | ------------------------------------------------ | ------------------------------- | ---------- |
+| `analytics`    | Cafe sales metrics table                         | analytics_report_<today>.pdf    | 200        |
+| `order-status` | Order table from DynamoDB                        | order-status_report_<today>.pdf | 200        |
+| `attendance`   | Attendance table from RDS (employees+attendance) | attendance_report_<today>.pdf   | 200        |
 
 **✅ This is enough — Lambda will handle the correct report.**
 
