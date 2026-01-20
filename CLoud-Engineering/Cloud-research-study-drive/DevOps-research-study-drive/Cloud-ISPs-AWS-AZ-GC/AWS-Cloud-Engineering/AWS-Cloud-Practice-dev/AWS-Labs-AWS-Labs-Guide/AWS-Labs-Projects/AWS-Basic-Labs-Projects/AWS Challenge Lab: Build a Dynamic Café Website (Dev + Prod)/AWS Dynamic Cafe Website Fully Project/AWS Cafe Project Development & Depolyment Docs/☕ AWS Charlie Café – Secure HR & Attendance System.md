@@ -318,3 +318,38 @@ All frontend and backend depend on the database. Once RDS is ready, everything b
 
 > **Note: If you do not have an existing RDS database, follow these steps in order.**
 
+Step,Sub-step / Action,Details / Settings,Important Notes
+1,Create Security Group for RDS (Very Important – do this first),"- Go to AWS Console → Search ""EC2"" → Click EC2 → Left menu: Security Groups → Create security group",This SG will be attached to RDS and later allow inbound access only from Lambda/EC2 security groups (least privilege).
+2,Security Group Details,"- Name: cafe-rds-sg
+- Description: Security group for Charlie Cafe RDS
+- VPC: Select the same VPC where your EC2 and Lambda already exist",Must match the VPC of your application resources.
+3,Inbound Rules (at creation),- NO inbound rules for now,"Rules will be added later (e.g., allow port 3306 from Lambda's security group or EC2's SG)."
+4,Create security group,Click Create security group,Finish this before proceeding to RDS creation.
+5,Create RDS Database,"- AWS Console → Search ""RDS"" → Click Amazon RDS → Create database",—
+6,Database Creation Method,- Select Standard create → Next,Gives full control (recommended over Easy create for custom VPC/SG).
+7,Engine Options,"- Engine type: MySQL
+- Version: MySQL 8.0.x (latest/default minor version) → Next",MySQL 8 is stable and widely used.
+8,Templates,- Select Free tier → Next,"Qualifies for db.t3.micro, 20 GB storage, etc. (if account is eligible)."
+9,Settings,"- DB instance identifier: charlie-cafe-db
+- Master username: admin
+- Master password: StrongPassword123! (or stronger)
+- Confirm password",Save the password securely — you cannot retrieve it later.
+10,Instance Configuration,"- DB instance class: db.t3.micro
+- Storage: 20 GB
+- Storage autoscaling: Disabled",Free tier compatible settings.
+11,Connectivity,"- VPC: Same VPC as EC2 & Lambda
+- Public access: No (private only)
+- VPC security group:
+  - Remove default SG
+  - Add/select: cafe-rds-sg","Keeps DB private; accessible only via VPC (e.g., from Lambda/EC2 in same VPC)."
+12,Additional Configuration,"- Initial database name: cafe_db
+- Backup retention: 1 day
+- Enhanced monitoring: Disabled
+- Maintenance & other settings: Keep defaults",cafe_db is created automatically on launch.
+13,Create & Wait,"- Click Create database
+- Wait 5–10 minutes until Status = Available",Check RDS dashboard for status updates.
+14,Create Database Tables (SQL),"Once RDS is Available, connect using one of these:
+- MySQL client from your EC2 instance (recommended)
+- MySQL Workbench (add bastion/EC2 tunnel if needed)
+- AWS CloudShell (if VPC endpoints or access configured)","Use endpoint from RDS console (e.g., charlie-cafe-db.xxxx.rds.amazonaws.com), port 3306, username admin, your password, database cafe_db."
+
