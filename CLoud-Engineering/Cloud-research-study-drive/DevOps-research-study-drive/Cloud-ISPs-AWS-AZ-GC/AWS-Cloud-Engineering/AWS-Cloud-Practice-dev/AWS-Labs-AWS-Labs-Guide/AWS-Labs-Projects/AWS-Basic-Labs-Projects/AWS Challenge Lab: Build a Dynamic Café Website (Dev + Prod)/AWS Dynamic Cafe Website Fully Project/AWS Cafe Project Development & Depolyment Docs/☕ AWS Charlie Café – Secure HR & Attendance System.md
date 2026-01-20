@@ -1646,34 +1646,7 @@ We will create 3 main pages:
 
 > **Optional: We will use Bootstrap 5 for styling and responsive UI.**
 
-### 1️⃣ Include Common Header / Scripts (for all pages)
-
-#### At the top of every HTML page:
-
-```
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Charlie Café HR System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Cognito SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
-
-    <style>
-        body { padding: 20px; }
-        .btn-large { width: 150px; height: 50px; font-size: 1.2rem; }
-        .table-fixed { table-layout: fixed; width: 100%; }
-    </style>
-</head>
-<body>
-```
-
-### 2️⃣ Employee Check-In / Check-Out Page (Tablet Friendly)
+### 1️⃣ Employee Check-In / Check-Out Page (Tablet Friendly)
 
 #### File: checkin.html
 
@@ -1791,8 +1764,10 @@ We will create 3 main pages:
 </body>
 </html>
 ```
+✅ This page allows employees to check in and check out and confirms success/failure messages.
 
 
+### 2️⃣ Employee Check-In / Check-Out Page (Tablet Friendly)
 
 
 **✅ PHASE 4️⃣ STATUS**
