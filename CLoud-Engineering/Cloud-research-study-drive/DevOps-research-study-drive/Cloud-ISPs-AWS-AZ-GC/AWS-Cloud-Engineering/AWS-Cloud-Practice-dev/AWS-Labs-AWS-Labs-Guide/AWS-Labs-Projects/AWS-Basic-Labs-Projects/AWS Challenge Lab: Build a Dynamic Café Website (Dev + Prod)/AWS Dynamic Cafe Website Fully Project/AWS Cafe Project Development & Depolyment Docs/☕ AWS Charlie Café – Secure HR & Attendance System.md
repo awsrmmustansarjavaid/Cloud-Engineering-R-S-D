@@ -755,13 +755,13 @@ Python 3.12
 cafe-hr-lambda-role
 ```
 
-Click Create function
+- Click Create function
 
-Step 3: Configure Environment Variables
+#### Step 3️⃣: Configure Environment Variables
 
-Lambda → Configuration → Environment variables
+- Lambda → Configuration → Environment variables
 
-Add ALL:
+#### Add ALL:
 
 | Key     | Value             |
 | ------- | ----------------- |
@@ -770,23 +770,23 @@ Add ALL:
 | DB_USER | your-db-user      |
 | DB_PASS | your-db-password  |
 
-Click Save
+- Click Save
 
-Step 4: Add VPC Configuration (CRITICAL)
+#### Step 4️⃣: Add VPC Configuration (CRITICAL)
 
-Lambda → Configuration → VPC
+- Lambda → Configuration → VPC
 
-VPC: same VPC as RDS
+- VPC: same VPC as RDS
 
-Subnets: private subnets used by RDS
+- Subnets: private subnets used by RDS
 
-Security group: Lambda SG that allows RDS access
+- Security group: Lambda SG that allows RDS access
 
-Click Save
+- Click Save
 
-Step 5: Lambda Code (Check-In)
+#### Step 5️⃣: Lambda Code (Check-In)
 
-Replace entire code with this:
+> **Replace entire code with this:**
 
 ```
 import json
@@ -850,20 +850,20 @@ def response(status, message):
     }
 ```
 
-Click Deploy
+- Click Deploy
 
-3️⃣ Create Lambda: hr-checkout
-Repeat Steps Exactly Like hr-checkin
+### 3️⃣ Create Lambda: hr-checkout
+> **Repeat Steps Exactly Like hr-checkin**
 
-Only change:
+#### Only change:
 
-Function name:
+#### 1️⃣ Function name:
 
 ```
 hr-checkout
 ```
 
-Code:
+#### 2️⃣ Code:
 
 ```
 import json
@@ -914,16 +914,17 @@ def response(status, message):
     }
 ```
 
-Deploy.
+- Deploy.
 
-4️⃣ Create Lambda: hr-employee-profile
-Function name
+### 4️⃣ Create Lambda: hr-employee-profile
+
+#### 1️⃣ Function name
 
 ```
 hr-employee-profile
 ```
 
-Code:
+#### 2️⃣ Code:
 
 ```
 import json
@@ -956,16 +957,17 @@ def lambda_handler(event, context):
     }
 ```
 
-Deploy.
+- Deploy.
 
-5️⃣ Create Lambda: hr-attendance-history
-Function name
+### 5️⃣ Create Lambda: hr-attendance-history
+
+#### 1️⃣ Function name
 
 ```
 hr-attendance-history
 ```
 
-Code:
+#### 2️⃣ Code:
 
 ```
 import json
@@ -1000,16 +1002,17 @@ def lambda_handler(event, context):
     }
 ```
 
-Deploy.
+- Deploy.
 
 6️⃣ Create Lambda: hr-leaves-holidays
-Function name
+
+#### 1️⃣ Function name
 
 ```
 hr-leaves-holidays
 ```
 
-Code:
+#### 2️⃣ Code:
 
 ```
 import json
@@ -1049,9 +1052,9 @@ def lambda_handler(event, context):
     }
 ```
 
-Deploy.
+- Deploy.
 
-7️⃣ What You Have Achieved
+### 7️⃣ What You Have Achieved
 
 ✅ New HR-specific Lambda layer
 
