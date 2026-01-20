@@ -1,49 +1,53 @@
 # ☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System
 
-1️⃣ System Scope
-Attendance Management
 
-Employee daily check-in and check-out
+## PHASE R&D ☕ Charlie Café Attendance System
 
-Automatic capture of:
+### 1️⃣ System Scope
 
-Date
+#### 1️⃣ Attendance Management
 
-Time
+- Employee daily check-in and check-out
 
-Employee ID
+- Automatic capture of:
 
-Centralized attendance records stored in RDS
+    - Date
 
-Admin/HR dashboard to view:
+    - Time
 
-Daily attendance
+    - Employee ID
 
-Weekly summary
+- Centralized attendance records stored in RDS
 
-Monthly summary
+- Admin/HR dashboard to view:
 
-Employee Portal
+    - Daily attendance
 
-Secure employee login using Amazon Cognito
+    - Weekly summary
 
-Employee can:
+    - Monthly summary
 
-View personal attendance history
+#### 2️⃣ Employee Portal
 
-View approved leaves
+- Secure employee login using Amazon Cognito
 
-View official café holidays
+- Employee can:
 
-View HR profile information:
+    - View personal attendance history
 
-Job title
+    - View approved leaves
 
-Salary
+    - View official café holidays
 
-Start date
+    - View HR profile information:
 
-Access Control & Security
+        - Job title
+
+        - Salary
+
+        - Start date
+
+#### Access Control & Security
 
 Application access restricted using Security Groups
 
