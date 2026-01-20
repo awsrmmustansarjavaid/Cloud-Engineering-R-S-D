@@ -3294,54 +3294,68 @@ async function loadEmployees() {
 #### 🧪 TEST 1 — Employee Normal Flow
 
 1️⃣ Login as Employee
+
 2️⃣ Open employee portal
+
 3️⃣ Profile loads
+
 4️⃣ Attendance loads
+
 5️⃣ Admin buttons NOT visible
 
 ✅ PASS
 
-🧪 TEST 2 — Employee Tries Admin URL
+#### 🧪 TEST 2 — Employee Tries Admin URL
 
 1️⃣ Login as Employee
+
 2️⃣ Open admin-dashboard.html manually
 
 ❌ Access denied
+
 ✅ Redirect to login
 
-🧪 TEST 3 — Admin Normal Flow
+#### 🧪 TEST 3 — Admin Normal Flow
 
 1️⃣ Login as Admin
+
 2️⃣ Open admin dashboard
+
 3️⃣ Admin buttons visible
+
 4️⃣ Employee list loads
 
 ✅ PASS
 
-🧪 TEST 4 — JWT Verification
+#### 🧪 TEST 4 — JWT Verification
 
 1️⃣ Open DevTools → Network
+
 2️⃣ Click any API call
+
 3️⃣ Check Headers
 
-You MUST see:
+#### You MUST see:
 
 ```
 Authorization: eyJraWQiOiJ...
 ```
 
 ✅ Token attached
+
 ✅ Cognito authorizer working
 
-🧪 TEST 5 — API Protection
+#### 🧪 TEST 5 — API Protection
 
 1️⃣ Copy API URL
+
 2️⃣ Open in browser without token
 
 ❌ 401 / 403 error
+
 ✅ Secure
 
-☕ WHAT YOU HAVE BUILT (REALITY CHECK)
+#### ☕ WHAT YOU HAVE BUILT (REALITY CHECK)
 
 ✔ Secure frontend → backend integration
 
@@ -3354,10 +3368,6 @@ Authorization: eyJraWQiOiJ...
 ✔ HR system architecture
 
 ✔ Resume + interview ready
-
-
-
-
 
 **✅ PHASE 5️⃣ STATUS**
 
