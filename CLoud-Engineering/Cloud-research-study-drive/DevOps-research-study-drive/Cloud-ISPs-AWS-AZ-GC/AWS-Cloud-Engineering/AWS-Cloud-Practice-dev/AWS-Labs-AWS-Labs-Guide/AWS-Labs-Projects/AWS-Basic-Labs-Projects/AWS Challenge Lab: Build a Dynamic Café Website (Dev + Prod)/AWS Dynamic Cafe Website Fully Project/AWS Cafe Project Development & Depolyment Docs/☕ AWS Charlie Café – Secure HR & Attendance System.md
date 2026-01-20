@@ -1288,7 +1288,9 @@ Fully commented code
 
 - Go to AWS Lambda → CafePDFReportLambda → Test
 
-#### Sample test event:
+#### 2️⃣ Sample test event:
+
+- **1️⃣ attendance test event**
 
 ```
 {
@@ -1298,9 +1300,32 @@ Fully commented code
 }
 ```
 
+- **2️⃣ analytics test event**
+
+```
+{
+  "queryStringParameters": {
+    "page": "analytics"
+  }
+}
+```
+
+- **3️⃣ order-status test event**
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+
+
 - Should return a PDF in response
 
 - Check S3 bucket for new file: attendance_report_2026-01-20.pdf
+
+**✅ This is enough — Lambda will handle the correct report.**
 
 #### 2️⃣ B) Test Individual HR Lambda Functions
 
