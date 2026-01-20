@@ -2482,7 +2482,39 @@ sudo chmod -R 755 js
 
 ### 3️⃣ BACKEND  - Lambda 
 
+#### 🔹 COMMON SECURITY TEMPLATE (Python)
 
+```
+import json
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+def lambda_handler(event, context):
+    logger.info("Request received")
+    logger.info(event)
+
+    # Role check from Cognito JWT
+    groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', [])
+    
+    # Example: Only Admin for admin function
+    if 'Admin' not in groups and event['resource'] == "/admin/employees":
+        return {
+            "statusCode": 403,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Forbidden"})
+        }
+
+    # Function logic goes here
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps({"message": "Success"})
+    }
+```
+
+**✅ Use this template in all Lambda functions and only adjust the logic for checkin/checkout vs admin/employee.**
 
 
 
