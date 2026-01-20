@@ -771,6 +771,35 @@ function logout() {
 
 > **📣 This structure makes the merged phase clear, self-contained, and professional — perfect for deployment, documentation, and research.**
 
+
+
+### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
+
+### 🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control
+
+### 1️⃣ — STANDARD API CALL FUNCTION (FRONTEND)
+> **This function will be used everywhere (Admin & Employee).**
+
+### 📌 Why this is important
+
+- No duplicate code
+
+- Easy debugging
+
+- JWT always attached
+
+- Same pattern used in real companies
+
+### 5️⃣ — BACKEND SECURITY (DOUBLE PROTECTION)
+
+✔ Frontend check
+
+✔ Backend check
+
+✔ Enterprise-grade security
+
+
+
 > **🟢 PHASE 5️⃣  R & D COMPLETE**
 ---
 

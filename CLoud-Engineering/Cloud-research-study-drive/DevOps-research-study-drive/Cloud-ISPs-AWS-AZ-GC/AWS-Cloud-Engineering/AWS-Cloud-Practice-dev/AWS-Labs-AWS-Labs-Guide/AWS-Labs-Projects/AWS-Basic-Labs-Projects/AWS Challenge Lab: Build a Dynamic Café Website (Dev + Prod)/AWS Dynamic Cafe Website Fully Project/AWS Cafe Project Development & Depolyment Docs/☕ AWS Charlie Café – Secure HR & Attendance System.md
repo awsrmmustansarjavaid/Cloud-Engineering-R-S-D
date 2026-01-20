@@ -2231,16 +2231,6 @@ async function secureFetch(url, method = "GET", body = null) {
 </script>
 ```
 
-### 📌 Why this is important
-
-- No duplicate code
-
-- Easy debugging
-
-- JWT always attached
-
-- Same pattern used in real companies
-
 ### 2️⃣ — ROLE DETECTION (ADMIN vs EMPLOYEE)
 
 Cognito puts groups inside the JWT.
@@ -2368,11 +2358,7 @@ if 'Admin' not in groups:
     }
 ```
 
-✔ Frontend check
 
-✔ Backend check
-
-✔ Enterprise-grade security
 
 ### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
 
