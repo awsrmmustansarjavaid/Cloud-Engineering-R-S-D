@@ -2927,8 +2927,258 @@ if 'Admin' not in groups:
 ✔ Backend check
 ✔ Enterprise-grade security
 
-✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
-🧪 TEST 1 — Employee Normal Flow
+### ✅ - A SHARED SCRIPT FILE
+
+#### ✅ Benefits of a Shared Script File (Industry Standard)
+
+By creating ONE shared JS file:
+
+✔ Clean HTML (UI only)
+
+✔ All security logic in one place
+
+✔ Easy debugging
+
+✔ Easy upgrades
+
+✔ Same pattern used in:
+
+AWS Amplify apps
+
+React / Vue projects
+
+Enterprise dashboards
+
+👉 This is how companies expect you to work
+
+#### 🧱 PROPOSED FILE STRUCTURE (VERY IMPORTANT)
+
+#### Create this structure:
+
+```
+/frontend
+ ├── admin-dashboard.html
+ ├── employee-portal.html
+ ├── login.html
+ ├── index.html
+ └── js/
+     └── auth-api.js   👈 (NEW SHARED FILE)
+```
+
+**📌 All Cognito + API + role logic goes into auth-api.js**
+
+#### 🟢 STEP 1 — CREATE SHARED SCRIPT FILE
+> **📄 js/auth-api.js (FINAL, PRODUCTION-READY)**
+
+```
+
+
+```
+/* =====================================================
+   AUTH & API SHARED UTILITIES
+   Used by: Admin + Employee pages
+   Project: Charlie Café HR System
+===================================================== */
+
+/* ===============================
+   COGNITO CONFIG
+================================ */
+const poolData = {
+    UserPoolId: 'us-east-1_XXXXXX',
+    ClientId: 'XXXXXXXXXXXX'
+};
+
+const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+const apiBase = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod';
+
+/* ===============================
+   SESSION GUARD (PAGE PROTECTION)
+================================ */
+function protectPage() {
+    const user = userPool.getCurrentUser();
+    if (!user) {
+        window.location.href = "login.html";
+    }
+}
+
+/* ===============================
+   GET JWT TOKEN
+================================ */
+async function getJWT() {
+    const user = userPool.getCurrentUser();
+    return new Promise((resolve, reject) => {
+        if (!user) reject("No active session");
+        user.getSession((err, session) => {
+            if (err) reject(err);
+            resolve(session.getIdToken().getJwtToken());
+        });
+    });
+}
+
+/* ===============================
+   SECURE API CALL HELPER
+================================ */
+async function secureFetch(url, method = "GET", body = null) {
+    const token = await getJWT();
+
+    const options = {
+        method: method,
+        headers: {
+            "Authorization": token,
+            "Content-Type": "application/json"
+        }
+    };
+
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        throw new Error("API request failed or unauthorized");
+    }
+
+    return response.json();
+}
+
+/* ===============================
+   ROLE DETECTION
+================================ */
+async function getUserRoles() {
+    const user = userPool.getCurrentUser();
+    return new Promise((resolve, reject) => {
+        user.getSession((err, session) => {
+            if (err) reject(err);
+            const payload = session.getIdToken().decodePayload();
+            resolve(payload["cognito:groups"] || []);
+        });
+    });
+}
+
+/* ===============================
+   ADMIN UI CONTROL
+================================ */
+async function enforceAdminAccess() {
+    const roles = await getUserRoles();
+    if (!roles.includes("Admin")) {
+        alert("Unauthorized access");
+        window.location.href = "login.html";
+    }
+    document.getElementById("admin-section").style.display = "block";
+}
+
+/* ===============================
+   EMPLOYEE UI CONTROL
+================================ */
+async function enforceEmployeeAccess() {
+    const roles = await getUserRoles();
+    if (!roles.includes("Employee")) {
+        alert("Unauthorized access");
+        window.location.href = "login.html";
+    }
+}
+
+/* ===============================
+   LOGOUT (Cognito)
+================================ */
+function logout() {
+    const user = userPool.getCurrentUser();
+    if (user) {
+        user.signOut();
+    }
+    window.location.href = "index.html";
+}
+```
+
+✅ One file
+
+✅ Reusable
+
+✅ Secure
+
+✅ Clean
+
+
+🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
+📄 admin-dashboard.html
+1️⃣ Add Cognito SDK
+
+```
+<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+```
+
+2️⃣ Add shared script
+
+```
+<script src="js/auth-api.js"></script>
+```
+
+3️⃣ Call required functions
+
+```
+<script>
+protectPage();
+enforceAdminAccess();
+</script>
+```
+
+🟢 STEP 3 — INCLUDE SCRIPT IN EMPLOYEE PAGE
+📄 employee-portal.html
+
+```
+<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+<script src="js/auth-api.js"></script>
+
+<script>
+protectPage();
+enforceEmployeeAccess();
+</script>
+```
+
+🟢 STEP 4 — USE API FUNCTIONS ANYWHERE
+Employee Profile Example
+
+```
+<script>
+async function loadProfile() {
+    const data = await secureFetch(apiBase + "/employee/profile");
+    document.getElementById("profile-name").innerText = data.name;
+}
+loadProfile();
+</script>
+```
+
+Admin Fetch Example
+
+```
+<script>
+async function loadEmployees() {
+    const data = await secureFetch(apiBase + "/admin/employees");
+    console.log(data);
+}
+</script>
+```
+
+🟢 STEP 5 — LOGOUT BUTTON (BOTH PAGES)
+HTML
+
+```
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
+
+What Happens
+
+✔ Cognito session destroyed
+
+✔ Tokens removed
+
+✔ Page redirected
+
+✔ Back button blocked
+
+### ✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
+
+#### 🧪 TEST 1 — Employee Normal Flow
 
 1️⃣ Login as Employee
 2️⃣ Open employee portal
