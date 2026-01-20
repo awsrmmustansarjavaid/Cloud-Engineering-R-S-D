@@ -2179,15 +2179,16 @@ You can redirect to:
 
 ### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
 
-### 📄 Create js/config.js
-> **Linux commands**
+### 1️⃣ 📄 Create js/config.js
 
 ```
 cd /var/www/html
+```
+```
 sudo nano js/config.js
 ```
 
-Add this code
+#### 2️⃣ Add this code
 
 ```
 /* ======================================
@@ -2206,7 +2207,7 @@ const CONFIG = {
 };
 ```
 
-Permissions
+#### 3️⃣ Permissions
 
 ```
 sudo chown www-data:www-data js/config.js
@@ -2215,9 +2216,9 @@ sudo chown www-data:www-data js/config.js
 sudo chmod 644 js/config.js
 ```
 
-✅ Update auth-api.js to use config
+#### 4️⃣ ✅ Update auth-api.js to use config
 
-Replace:
+#### Replace:
 
 ```
 const poolData = {
@@ -2226,7 +2227,7 @@ const poolData = {
 };
 ```
 
-With:
+#### With:
 
 ```
 const poolData = {
@@ -2238,6 +2239,8 @@ const apiBase = CONFIG.API_BASE;
 ```
 
 **📌 Now config changes need only ONE file**
+
+
 
 ### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
 
