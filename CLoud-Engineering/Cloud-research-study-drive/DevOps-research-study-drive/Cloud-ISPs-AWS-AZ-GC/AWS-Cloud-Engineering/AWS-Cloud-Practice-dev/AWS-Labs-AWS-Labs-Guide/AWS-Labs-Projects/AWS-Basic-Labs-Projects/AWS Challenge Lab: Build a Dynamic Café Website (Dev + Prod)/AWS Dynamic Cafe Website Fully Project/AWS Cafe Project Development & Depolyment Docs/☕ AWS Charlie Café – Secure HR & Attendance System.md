@@ -2482,7 +2482,7 @@ sudo chmod -R 755 js
 
 ### 3️⃣ BACKEND  - Lambda 
 
-#### 🔹 COMMON SECURITY TEMPLATE (Python)
+#### 1️⃣ COMMON SECURITY TEMPLATE (Python)
 
 ```
 import json
