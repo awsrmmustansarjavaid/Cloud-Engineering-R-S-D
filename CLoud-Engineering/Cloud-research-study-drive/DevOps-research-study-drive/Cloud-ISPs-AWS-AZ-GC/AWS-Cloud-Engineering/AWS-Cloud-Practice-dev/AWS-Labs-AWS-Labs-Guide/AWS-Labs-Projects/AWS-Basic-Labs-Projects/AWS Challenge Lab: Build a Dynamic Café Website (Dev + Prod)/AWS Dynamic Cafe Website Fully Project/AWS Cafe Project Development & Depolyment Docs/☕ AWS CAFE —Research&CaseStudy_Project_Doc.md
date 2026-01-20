@@ -822,6 +822,21 @@ Enterprise dashboards
 
 👉 This is how companies expect you to work
 
+### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
+
+#### ❓ Why this matters
+
+Hard-coding values everywhere is not professional.
+
+#### We will centralize:
+
+- API Base URL
+
+- Cognito IDs
+
+- App name
+
+
 > **🟢 PHASE 5️⃣  R & D COMPLETE**
 ---
 

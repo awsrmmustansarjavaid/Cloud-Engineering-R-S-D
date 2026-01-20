@@ -2179,18 +2179,6 @@ You can redirect to:
 
 ### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
 
-#### ❓ Why this matters
-
-Hard-coding values everywhere is not professional.
-
-#### We will centralize:
-
-- API Base URL
-
-- Cognito IDs
-
-- App name
-
 ### 📄 Create js/config.js
 > **Linux commands**
 
