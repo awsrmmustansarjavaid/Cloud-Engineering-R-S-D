@@ -2714,55 +2714,7 @@ Authorization: eyJraWQiOiJ...
 
 
 
-🟢 STEP 5 — BACKEND HARDENING (LAMBDA)
-❓ Why
 
-Frontend checks are not enough.
-
-✅ Enforce Role Check in Lambda (Python)
-
-```
-groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', '')
-
-if 'Admin' not in groups:
-    return {
-        "statusCode": 403,
-        "headers": {"Content-Type": "application/json"},
-        "body": '{"message":"Forbidden"}'
-    }
-```
-
-✔ API secure
-✔ HTML edits useless
-✔ Enterprise security
-
-🟢 STEP 6 — CLOUDWATCH LOGGING (MANDATORY)
-✅ Add Logging in Lambda
-
-```
-import logging
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-logger.info("Request received")
-logger.info(event)
-```
-
-✅ Verify Logs
-
-AWS Console → CloudWatch
-
-Log groups → Lambda function
-
-Confirm:
-
-Requests logged
-
-Errors visible
-
-Execution time visible
-
-📌 Interviewers love this
 
 🟢 STEP 7 — PERFORMANCE & SAFETY SETTINGS
 ✅ Lambda
