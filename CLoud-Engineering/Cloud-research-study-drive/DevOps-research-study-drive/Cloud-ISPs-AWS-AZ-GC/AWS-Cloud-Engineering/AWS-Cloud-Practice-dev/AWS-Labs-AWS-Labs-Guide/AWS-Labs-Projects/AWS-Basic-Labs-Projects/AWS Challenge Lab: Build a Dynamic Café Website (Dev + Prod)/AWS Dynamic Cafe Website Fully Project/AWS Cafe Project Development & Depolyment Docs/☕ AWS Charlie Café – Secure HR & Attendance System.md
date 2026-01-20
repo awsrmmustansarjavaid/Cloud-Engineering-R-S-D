@@ -67,71 +67,71 @@
 
 ### 2️⃣ Architecture Overview
 
-#### Frontend Layer
+#### 1️⃣ Frontend Layer
 
-Hosted on EC2 Apache Web Server
+- Hosted on **EC2 Apache Web Server**
 
-Pages:
+- Pages:
 
-Attendance Check-In / Check-Out page (tablet/kiosk style)
+    - Attendance Check-In / Check-Out page (tablet/kiosk style)
 
-Employee Portal page
+    - Employee Portal page
 
-Admin / HR Dashboard page
+    - Admin / HR Dashboard page
 
-Frontend communicates with backend using API Gateway endpoints
+- Frontend communicates with backend using API Gateway endpoints
 
-Backend Layer
+#### 2️⃣ Backend Layer
 
-AWS API Gateway (REST API)
+#### AWS API Gateway (REST API)
 
-AWS Lambda functions:
+#### AWS Lambda functions:
 
-checkin
+- checkin
 
-checkout
+- checkout
 
-employeeProfile
+- employeeProfile
 
-attendanceHistory
+- attendanceHistory
 
-leavesAndHolidays
+- leavesAndHolidays
 
-Amazon Cognito:
+#### Amazon Cognito:
 
-User authentication
+- User authentication
 
-JWT-based access control for APIs
+- JWT-based access control for APIs
 
-Database Layer (RDS)
+#### Database Layer (RDS)
 
-MySQL or PostgreSQL
+- MySQL or PostgreSQL
 
-Tables
+- Tables
 
-employees
+- employees
 
-employee_id
+- employee_id
 
-name
+- name
 
-job_title
+- job_title
 
-salary
+- salary
 
-start_date
+- start_date
 
-cognito_user_id
+- cognito_user_id
 
-attendance
+- attendance
 
-attendance_id
+- attendance_id
 
-employee_id
+- employee_id
 
-date
+- date
 
-checkin_time
+- checkin_time
 
 checkout_time
 
