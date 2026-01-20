@@ -2480,67 +2480,7 @@ sudo chmod -R 755 js
 ✅ Secure & production-ready
 
 
-### 3️⃣ BACKEND  - Lambda 
-
-#### 1️⃣ COMMON SECURITY TEMPLATE (Python)
-
-```
-import json
-import logging
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-def lambda_handler(event, context):
-    logger.info("Request received")
-    logger.info(event)
-
-    # Role check from Cognito JWT
-    groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', [])
-    
-    # Example: Only Admin for admin function
-    if 'Admin' not in groups and event['resource'] == "/admin/employees":
-        return {
-            "statusCode": 403,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"message": "Forbidden"})
-        }
-
-    # Function logic goes here
-    return {
-        "statusCode": 200,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps({"message": "Success"})
-    }
-```
-
-**✅ Use this template in all Lambda functions and only adjust the logic for checkin/checkout vs admin/employee.**
-
-
-
-#### 2️⃣ — PERFORMANCE & SAFETY SETTINGS
-
-#### ✅ Lambda
-
-- Timeout: 10 seconds
-
-- Memory: 512 MB
-
-- Enable X-Ray tracing
-
-#### ✅ API Gateway
-
-- Enable Access Logging
-
-- Enable Execution Logs
-
-- Throttle (optional):
-
-    - 10 req/sec
-
-    - Burst 20
-
-### 4️⃣  🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
+### 3️⃣  🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
 > **📄 admin-dashboard.html**
 
 #### ✅ Add these BEFORE closing </body>
@@ -2666,6 +2606,65 @@ async function loadEmployees() {
 ```
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
+### 4️⃣ BACKEND  - Lambda 
+
+#### 1️⃣ COMMON SECURITY TEMPLATE (Python)
+
+```
+import json
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+def lambda_handler(event, context):
+    logger.info("Request received")
+    logger.info(event)
+
+    # Role check from Cognito JWT
+    groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', [])
+    
+    # Example: Only Admin for admin function
+    if 'Admin' not in groups and event['resource'] == "/admin/employees":
+        return {
+            "statusCode": 403,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Forbidden"})
+        }
+
+    # Function logic goes here
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps({"message": "Success"})
+    }
+```
+
+**✅ Use this template in all Lambda functions and only adjust the logic for checkin/checkout vs admin/employee.**
+
+
+
+#### 2️⃣ — PERFORMANCE & SAFETY SETTINGS
+
+#### ✅ Lambda
+
+- Timeout: 10 seconds
+
+- Memory: 512 MB
+
+- Enable X-Ray tracing
+
+#### ✅ API Gateway
+
+- Enable Access Logging
+
+- Enable Execution Logs
+
+- Throttle (optional):
+
+    - 10 req/sec
+
+    - Burst 20
 
 ### ✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
 
