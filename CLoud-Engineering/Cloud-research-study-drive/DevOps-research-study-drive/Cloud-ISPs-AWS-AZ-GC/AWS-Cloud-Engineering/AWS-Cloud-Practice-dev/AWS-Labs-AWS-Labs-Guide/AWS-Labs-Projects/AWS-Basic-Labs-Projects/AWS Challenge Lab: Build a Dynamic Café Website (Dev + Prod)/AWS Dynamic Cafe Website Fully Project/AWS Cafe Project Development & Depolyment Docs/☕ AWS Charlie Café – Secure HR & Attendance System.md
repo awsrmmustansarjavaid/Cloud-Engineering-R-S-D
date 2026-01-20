@@ -2170,6 +2170,18 @@ sudo nano /var/www/html/employee-portal.html
 
 ✅ Employees can view profile, attendance, leaves, and holidays.
 
+#### ✅ What This Page Now Represents (Job-Ready)
+
+✔ Consistent Charlie Café branding
+
+✔ Secure Cognito-protected employee portal
+
+✔ Clean, readable UI for non-technical staff
+
+✔ Fully responsive (mobile / tablet / desktop)
+
+✔ Perfect match with your AWS lab architecture
+
 
 ### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 File: admin-dashboard.html
