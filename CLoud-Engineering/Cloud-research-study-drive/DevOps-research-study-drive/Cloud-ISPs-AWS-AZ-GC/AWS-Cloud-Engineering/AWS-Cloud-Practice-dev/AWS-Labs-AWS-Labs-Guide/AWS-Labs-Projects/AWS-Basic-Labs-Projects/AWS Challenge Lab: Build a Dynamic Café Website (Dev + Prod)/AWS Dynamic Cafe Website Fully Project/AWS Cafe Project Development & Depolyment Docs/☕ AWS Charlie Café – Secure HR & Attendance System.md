@@ -2759,7 +2759,17 @@ ALLOWED_ROLE = "Admin"
 
 ### 5️⃣ — FULL TEST & VERIFICATION (NO SKIP)
 
-#### 🧪 TEST 1️⃣ — Employee Normal Flow
+#### 🧪 TEST 1️⃣ — Browser Console
+
+1️⃣ Open DevTools → Console
+
+2️⃣ You should NOT see:
+
+```
+CONFIG is not defined
+```
+
+#### 🧪 TEST 2️⃣ — Employee Normal Flow
 
 1️⃣ Login as Employee
 
@@ -2773,7 +2783,7 @@ ALLOWED_ROLE = "Admin"
 
 ✅ PASS
 
-#### 🧪 TEST 2️⃣ — Employee Tries Admin URL
+#### 🧪 TEST 3️⃣ — Employee Tries Admin URL
 
 1️⃣ Login as Employee
 
@@ -2783,7 +2793,7 @@ ALLOWED_ROLE = "Admin"
 
 ✅ Redirect to login
 
-#### 🧪 TEST 3️⃣ — Admin Normal Flow
+#### 🧪 TEST 4️⃣ — Admin Normal Flow
 
 1️⃣ Login as Admin
 
@@ -2795,7 +2805,7 @@ ALLOWED_ROLE = "Admin"
 
 ✅ PASS
 
-#### 🧪 TEST 4️⃣ — JWT Verification
+#### 🧪 TEST 5️⃣ — JWT Verification
 
 1️⃣ Open DevTools → Network
 
@@ -2813,7 +2823,7 @@ Authorization: eyJraWQiOiJ...
 
 ✅ Cognito authorizer working
 
-#### 🧪 TEST 5️⃣ — API Protection
+#### 🧪 TEST 6️⃣ — API Protection
 
 1️⃣ Copy API URL
 
@@ -2823,7 +2833,7 @@ Authorization: eyJraWQiOiJ...
 
 ✅ Secure
 
-#### 🧪 TEST 6️⃣ — Authentication
+#### 🧪 TEST 7️⃣ — Authentication
 
 - Token expires → auto logout
 
@@ -2831,7 +2841,7 @@ Authorization: eyJraWQiOiJ...
 
 - Back button blocked
 
-#### 🧪 TEST 7️⃣  Authorization
+#### 🧪 TEST 8️⃣  Authorization
 
 Admin cannot be Employee
 
@@ -2839,7 +2849,7 @@ Employee cannot be Admin
 
 Backend blocks unauthorized API calls
 
-#### 🧪 TEST 8️⃣ UX
+#### 🧪 TEST 9️⃣ UX
 
 Loader visible
 
@@ -2847,13 +2857,21 @@ Errors friendly
 
 No raw error messages
 
-#### 🧪 TEST 9️⃣ Observability
+#### 🧪 TEST 🔟 Observability
 
 CloudWatch logs visible
 
 Errors traceable
 
 Requests traceable
+
+#### 🧪 TEST 1️⃣1️⃣ Token Expiry
+
+Wait 1 hour OR invalidate session
+
+API call triggers auto logout
+
+Redirects to login
 
 
 ### 🏁 CONGRATULATIONS
