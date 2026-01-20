@@ -2486,6 +2486,29 @@ sudo chmod -R 755 js
 
 
 
+#### 2️⃣ — PERFORMANCE & SAFETY SETTINGS
+
+#### ✅ Lambda
+
+- Timeout: 10 seconds
+
+- Memory: 512 MB
+
+- Enable X-Ray tracing
+
+#### ✅ API Gateway
+
+- Enable Access Logging
+
+- Enable Execution Logs
+
+- Throttle (optional):
+
+    - 10 req/sec
+
+    - Burst 20
+
+
 
 
 ### 4️⃣ 
@@ -2716,26 +2739,7 @@ Authorization: eyJraWQiOiJ...
 
 
 
-🟢 STEP 7 — PERFORMANCE & SAFETY SETTINGS
-✅ Lambda
 
-Timeout: 10 seconds
-
-Memory: 512 MB
-
-Enable X-Ray tracing
-
-✅ API Gateway
-
-Enable Access Logging
-
-Enable Execution Logs
-
-Throttle (optional):
-
-10 req/sec
-
-Burst 20
 
 🧪 FINAL VERIFICATION CHECKLIST (CRITICAL)
 ✅ Authentication
