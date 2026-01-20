@@ -1899,8 +1899,43 @@ File: employee-portal.html
 ### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 File: admin-dashboard.html
 
+✅ Features of This Admin Dashboard
+
+Responsive sidebar using Bootstrap
+
+Sidebar buttons:
+
+Dashboard (default view)
+
+Attendance Management
+
+Employees
+
+Leaves & Holidays
+
+Reports
+
+Logout button at bottom of sidebar
+
+Main content area:
+
+Attendance summary table (dynamic)
+
+Leaves & Holidays table (dynamic)
+
+Placeholder for Employees & Reports pages
+
+Café theme colors (dark sidebar + gold hover)
+
+Fully responsive — works on mobile and desktop
+
+Fully commented for easy future development
+
 ✅ You can directly upload this file to /var/www/html/
+
 ✅ No backend changes required
+
+
 
 ```
 <!DOCTYPE html>
