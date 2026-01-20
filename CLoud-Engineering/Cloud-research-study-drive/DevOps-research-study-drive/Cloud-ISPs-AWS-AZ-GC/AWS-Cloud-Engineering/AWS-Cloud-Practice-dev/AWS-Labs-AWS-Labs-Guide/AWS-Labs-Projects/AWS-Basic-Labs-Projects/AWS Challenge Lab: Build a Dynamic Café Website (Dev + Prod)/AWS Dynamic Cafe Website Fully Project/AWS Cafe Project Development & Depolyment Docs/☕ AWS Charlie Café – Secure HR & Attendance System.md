@@ -293,3 +293,28 @@ Leaves:
 ---
 
 # ☕ Charlie Café SECTION 2️⃣ - Attendance System
+
+## 🌐 TASK 1 — Database (RDS) Configuration (Foundation)
+
+#### 📢 Why we start here
+
+All frontend and backend depend on the database. Once RDS is ready, everything becomes easy.
+
+### 1️⃣ Decide Database Engine (Aligned with Your Lab)
+
+#### We will use:
+
+- Amazon RDS
+
+- MySQL
+
+- Private access only
+
+- Connected only from Lambda
+
+- Free Tier compatible
+
+### 
+
+> **Note: If you do not have an existing RDS database, follow these steps in order.**
+
