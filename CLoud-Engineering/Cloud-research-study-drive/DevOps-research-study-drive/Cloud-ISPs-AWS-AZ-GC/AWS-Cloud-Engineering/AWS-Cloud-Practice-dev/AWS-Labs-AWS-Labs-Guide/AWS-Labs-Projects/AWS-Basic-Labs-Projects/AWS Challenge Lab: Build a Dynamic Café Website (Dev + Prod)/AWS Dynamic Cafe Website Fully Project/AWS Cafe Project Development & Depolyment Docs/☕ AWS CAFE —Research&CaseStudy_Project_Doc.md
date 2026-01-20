@@ -966,6 +966,38 @@ function logout() {
 
 ✅ Clean
 
+### 🟢 FINAL AUTH-API.JS (ALL-IN-ONE)
+
+#### ✅ What this file contains
+
+#### Phase 4 — Frontend API integration & role-based UI
+
+- protectPage() → Protects pages from unauthenticated users
+
+- getJWT() → Fetches Cognito JWT
+
+- secureFetch() → Central API call function
+
+- getUserRoles() → Reads Cognito groups
+
+- enforceAdminAccess() / enforceEmployeeAccess() → Role-based UI control
+
+- loadEmployeeProfile() / loadAllEmployees() → Example API calls
+
+- logout() → Cognito logout
+
+#### Phase 5 — Production Hardening
+
+- getJWT() updated to handle token expiration and auto logout
+
+- handleError() → Global error handler
+
+- showLoader() / hideLoader() → Loading indicator for smooth UX
+
+- All API calls updated to use loader + error handler
+
+- Now uses CONFIG for centralized config (API URL & Cognito IDs)
+
 ---
 
 ### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
