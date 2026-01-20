@@ -200,56 +200,57 @@ Leaves:
 - 2026-01-01 | Public Holiday
 ```
 
-C) Admin / HR Dashboard
+#### 2️⃣ C) Admin / HR Dashboard
 
-Secure Cognito-admin access
+    - Secure Cognito-admin access
 
-View:
+    - View:
 
-Daily attendance
+        - Daily attendance
 
-Weekly summary
+        - Weekly summary
 
-Monthly summary
+        - Monthly summary
 
-Employee-wise filtering
+    - Employee-wise filtering
 
-Export-ready table structure (future use)
+    - Export-ready table structure (future use)
 
-4️⃣ API Endpoints (API Gateway + Lambda)
+### 4️⃣ API Endpoints (API Gateway + Lambda)
 
-POST /api/checkin
+    - POST /api/checkin
 
-POST /api/checkout
+    - POST /api/checkout
 
-GET /api/employee/profile
+    - GET /api/employee/profile
 
-GET /api/attendance
+    - GET /api/attendance
 
-GET /api/leaves-holidays
+    - GET /api/leaves-holidays
 
-Security
+#### Security
 
-Cognito Authorizer enabled
+    - Cognito Authorizer enabled
 
-JWT required for all endpoints
+    - JWT required for all endpoints
 
-5️⃣ Security Configuration
-Security Groups
+### 5️⃣ Security Configuration
 
-Frontend EC2
+#### 1️⃣ Security Groups
 
-Allow HTTP/HTTPS from allowed IP ranges
+#### 1️⃣ Frontend EC2
 
-Lambda
+    - Allow HTTP/HTTPS from allowed IP ranges
 
-Allow outbound access to RDS
+#### 2️⃣ Lambda
 
-RDS
+    - Allow outbound access to RDS
 
-Allow inbound only from Lambda security group
+#### 3️⃣ RDS
 
-Authentication & Authorization
+    - Allow inbound only from Lambda security group
+
+#### 2️⃣ Authentication & Authorization
 
 Amazon Cognito User Pool
 
