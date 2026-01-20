@@ -2177,7 +2177,7 @@ You can redirect to:
 ## ☕ Charlie Café PHASE 5️⃣ Secure Frontend & API Integration with Production Hardening
 > **Frontend & Backend Security, API Integration, and Role-Based UI (Production Ready)**
 
-### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
+### 1️⃣ — CENTRAL CONFIG FILE (FRONTEND)
 
 ### 1️⃣ 📄 Create js/config.js
 
@@ -2240,7 +2240,8 @@ const apiBase = CONFIG.API_BASE;
 
 **📌 Now config changes need only ONE file**
 
-### 🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control 
+### 2️⃣ Frontend  - auth-api.js
+> **🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control**
 > **➕ - A SHARED SCRIPT FILE (Recommanded)**
 
 #### 🧱 PROPOSED FILE STRUCTURE (VERY IMPORTANT)
@@ -2477,6 +2478,13 @@ sudo chmod -R 755 js
 ✅ Apache can now read this file
 
 ✅ Secure & production-ready
+
+
+### 3️⃣ Backend  - Lambda 
+
+
+
+
 
 
 #### 🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
