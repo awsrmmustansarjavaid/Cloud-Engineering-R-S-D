@@ -2642,8 +2642,6 @@ def lambda_handler(event, context):
 
 **✅ Use this template in all Lambda functions and only adjust the logic for checkin/checkout vs admin/employee.**
 
-
-
 #### 2️⃣ — PERFORMANCE & SAFETY SETTINGS
 
 #### ✅ Lambda
@@ -2666,9 +2664,9 @@ def lambda_handler(event, context):
 
     - Burst 20
 
-### ✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
+### 5️⃣ — FULL TEST & VERIFICATION (NO SKIP)
 
-#### 🧪 TEST 1 — Employee Normal Flow
+#### 🧪 TEST 1️⃣ — Employee Normal Flow
 
 1️⃣ Login as Employee
 
@@ -2682,7 +2680,7 @@ def lambda_handler(event, context):
 
 ✅ PASS
 
-#### 🧪 TEST 2 — Employee Tries Admin URL
+#### 🧪 TEST 2️⃣ — Employee Tries Admin URL
 
 1️⃣ Login as Employee
 
@@ -2692,7 +2690,7 @@ def lambda_handler(event, context):
 
 ✅ Redirect to login
 
-#### 🧪 TEST 3 — Admin Normal Flow
+#### 🧪 TEST 3️⃣ — Admin Normal Flow
 
 1️⃣ Login as Admin
 
@@ -2704,7 +2702,7 @@ def lambda_handler(event, context):
 
 ✅ PASS
 
-#### 🧪 TEST 4 — JWT Verification
+#### 🧪 TEST 4️⃣ — JWT Verification
 
 1️⃣ Open DevTools → Network
 
@@ -2722,7 +2720,7 @@ Authorization: eyJraWQiOiJ...
 
 ✅ Cognito authorizer working
 
-#### 🧪 TEST 5 — API Protection
+#### 🧪 TEST 5️⃣ — API Protection
 
 1️⃣ Copy API URL
 
@@ -2732,52 +2730,15 @@ Authorization: eyJraWQiOiJ...
 
 ✅ Secure
 
-#### ☕ WHAT YOU HAVE BUILT (REALITY CHECK)
+#### 🧪 TEST 6️⃣ — Authentication
 
-✔ Secure frontend → backend integration
+- Token expires → auto logout
 
-✔ Cognito JWT handled correctly
+- Logout destroys session
 
-✔ Role-based UI control
+- Back button blocked
 
-✔ Role-based API security
-
-✔ HR system architecture
-
-✔ Resume + interview ready
-
-**✅ PHASE 5️⃣ STATUS**
-
-> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
----
-## ☕ Charlie Café PHASE 6️⃣ — PRODUCTION HARDENING (ENTERPRISE-GRADE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-🧪 FINAL VERIFICATION CHECKLIST (CRITICAL)
-✅ Authentication
-
-Token expires → auto logout
-
-Logout destroys session
-
-Back button blocked
-
-✅ Authorization
+#### 🧪 TEST 7️⃣  Authorization
 
 Admin cannot be Employee
 
@@ -2785,7 +2746,7 @@ Employee cannot be Admin
 
 Backend blocks unauthorized API calls
 
-✅ UX
+#### 🧪 TEST 8️⃣ UX
 
 Loader visible
 
@@ -2793,7 +2754,7 @@ Errors friendly
 
 No raw error messages
 
-✅ Observability
+#### 🧪 TEST 9️⃣ Observability
 
 CloudWatch logs visible
 
@@ -2801,13 +2762,8 @@ Errors traceable
 
 Requests traceable
 
-🎓 HOW YOU EXPLAIN THIS IN INTERVIEW
 
-“I hardened the system by centralizing configuration, implementing JWT expiration handling, role-based access at both frontend and backend, global error handling, UX loaders, and CloudWatch observability.”
-
-That answer = strong hire signal.
-
-🏁 CONGRATULATIONS
+### 🏁 CONGRATULATIONS
 
 You now have:
 
@@ -2818,15 +2774,9 @@ You now have:
 ✔ Production-level frontend
 ✔ Job-ready project
 
+**✅ PHASE 5️⃣ STATUS**
 
-
-
-
-
-
-**✅ PHASE 6️⃣ STATUS**
-
-> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
 ## ☕ Charlie Café PHASE 6️⃣ — Update CafePDFReportLambda for HR & Attendance
 

@@ -1539,6 +1539,13 @@ logger.info(event)
 
 - Frontend & backend are fully secure, job-ready, and maintainable.
 
+### 🎓 HOW YOU EXPLAIN THIS IN INTERVIEW
+
+“I hardened the system by centralizing configuration, implementing JWT expiration handling, role-based access at both frontend and backend, global error handling, UX loaders, and CloudWatch observability.”
+
+That answer = strong hire signal.
+
+
 
 > **🟢 PHASE 5️⃣  R & D COMPLETE**
 ---
