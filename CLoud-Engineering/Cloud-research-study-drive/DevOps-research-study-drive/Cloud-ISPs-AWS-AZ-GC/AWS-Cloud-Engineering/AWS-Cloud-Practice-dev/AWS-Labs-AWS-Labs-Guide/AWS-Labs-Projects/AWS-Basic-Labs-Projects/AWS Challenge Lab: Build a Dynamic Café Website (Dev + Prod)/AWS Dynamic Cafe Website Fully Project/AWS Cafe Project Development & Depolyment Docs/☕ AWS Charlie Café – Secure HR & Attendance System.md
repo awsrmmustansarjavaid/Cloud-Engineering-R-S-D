@@ -1,11 +1,11 @@
 # ☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System
 
+# ☕ Charlie Café SECTION 1️⃣ - Research & Development
 
-## PHASE R&D ☕ Charlie Café Attendance System
 
-### 1️⃣ System Scope
+## PHASE 1️⃣ System Scope
 
-#### 1️⃣ Attendance Management
+### 1️⃣ Attendance Management
 
 - Employee daily check-in and check-out
 
@@ -27,7 +27,7 @@
 
     - Monthly summary
 
-#### 2️⃣ Employee Portal
+### 2️⃣ Employee Portal
 
 - Secure employee login using Amazon Cognito
 
@@ -47,7 +47,7 @@
 
         - Start date
 
-#### 3️⃣ Access Control & Security
+### 3️⃣ Access Control & Security
 
 - Application access restricted using Security Groups
 
@@ -65,9 +65,9 @@
 
     - RDS accessible only from Lambda security group
 
-### 2️⃣ Architecture Overview
+## PHASE 2️⃣ Architecture Overview   
 
-#### 1️⃣ Frontend Layer
+### 1️⃣ Frontend Layer
 
 - Hosted on **EC2 Apache Web Server**
 
@@ -81,7 +81,7 @@
 
 - Frontend communicates with backend using API Gateway endpoints
 
-#### 2️⃣ Backend Layer
+### 2️⃣ Backend Layer
 
 #### 1️⃣ AWS API Gateway (REST API)
 
@@ -103,13 +103,14 @@
 
     - JWT-based access control for APIs
 
-#### 3️⃣ Database Layer (RDS)
 
-#### 1️⃣ Database Type
+## PHASE 3️⃣ Database Layer (RDS)
+
+### 1️⃣ Database Type
 
     - MySQL or PostgreSQL
 
-#### 2️⃣ Tables
+### 2️⃣ Tables
 
 #### 1️⃣ employees
 
@@ -153,9 +154,9 @@
 
     - description
 
-### 3️⃣ Frontend Pages
+## PHASE 4️⃣ Frontend Pages
 
-#### 1️⃣ A) Attendance Check-In / Check-Out Page
+### 1️⃣ A) Attendance Check-In / Check-Out Page
 
     - Tablet-friendly layout
 
@@ -171,7 +172,7 @@
 
     - Success / error notification
 
-#### 2️⃣ B) Employee Portal Page
+### 2️⃣ B) Employee Portal Page
 
     - Authenticated access only
 
@@ -200,7 +201,7 @@ Leaves:
 - 2026-01-01 | Public Holiday
 ```
 
-#### 2️⃣ C) Admin / HR Dashboard
+### 2️⃣ C) Admin / HR Dashboard
 
     - Secure Cognito-admin access
 
@@ -216,7 +217,8 @@ Leaves:
 
     - Export-ready table structure (future use)
 
-### 4️⃣ API Endpoints (API Gateway + Lambda)
+
+## PHASE 5️⃣ API Endpoints (API Gateway + Lambda)
 
     - POST /api/checkin
 
@@ -234,9 +236,9 @@ Leaves:
 
     - JWT required for all endpoints
 
-### 5️⃣ Security Configuration
+## PHASE 6️⃣ Security Configuration
 
-#### 1️⃣ Security Groups
+### 1️⃣ Security Groups
 
 #### 1️⃣ Frontend EC2
 
@@ -250,7 +252,7 @@ Leaves:
 
     - Allow inbound only from Lambda security group
 
-#### 2️⃣ Authentication & Authorization
+### 2️⃣ Authentication & Authorization
 
     - Amazon Cognito User Pool
 
@@ -262,7 +264,7 @@ Leaves:
 
     - JWT validation enforced at API Gateway
 
-### 6️⃣ Deployment Alignment
+## PHASE 7️⃣ Deployment Alignment
 
     - Frontend deployed on existing EC2 Apache server
 
@@ -274,7 +276,7 @@ Leaves:
 
     - Logging via CloudWatch
 
-### 7️⃣ Completion Outcome
+## PHASE 8️⃣ Completion Outcome
 
     - Fully integrated internal café attendance system
 
@@ -284,9 +286,10 @@ Leaves:
 
     - Completes the final 20% of the Charlie Café lab
 
-**✅ PHASE R & D STATUS**
+**✅ SECTION 1️⃣ R & D STATUS**
 
-> **🟢 PHASE R & D COMPLETE & VERIFIED**
+> **🟢 SECTION 1️⃣  R & D COMPLETE & VERIFIED**
 
 ---
 
+# ☕ Charlie Café SECTION 2️⃣ - Attendance System
