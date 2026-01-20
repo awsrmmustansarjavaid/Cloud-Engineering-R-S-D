@@ -2698,59 +2698,8 @@ You can redirect to:
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 5️⃣ Secure Frontend + Backend Integration with Role-Based Access
+## ☕ Charlie Café PHASE 5️⃣ Secure Frontend & API Integration with Production Hardening
 > **Frontend & Backend Security, API Integration, and Role-Based UI (Production Ready)**
-
-
-
-
-
-
-
-### 🎯 WHAT YOU WILL ACHIEVE IN PART 4
-
-By the end of this part:
-
-✔ Frontend calls API Gateway securely
-
-✔ JWT token is attached correctly
-
-✔ Admin sees Admin-only buttons
-
-✔ Employee sees Employee-only data
-
-✔ Cognito Groups control UI visibility
-
-✔ APIs reject wrong roles
-
-✔ Full test & verification done
-
-### 🔹  — UNDERSTAND THE FLOW (VERY IMPORTANT)
-
-#### 🔐 Secure Request Flow
-
-```
-User Login (Cognito)
-        ↓
-Cognito issues JWT
-        ↓
-Frontend stores session (SDK)
-        ↓
-Frontend sends JWT → API Gateway
-        ↓
-API Gateway validates JWT (Authorizer)
-        ↓
-Lambda executes with user context
-        ↓
-RDS queried
-        ↓
-Response returned to frontend
-```
-
-👉 Frontend never talks directly to RDS
-
-👉 JWT controls EVERYTHING
-
 
 
 ### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
