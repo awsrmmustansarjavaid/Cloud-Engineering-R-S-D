@@ -2378,11 +2378,11 @@ if 'Admin' not in groups:
 
 
 
+
+
 ### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
 
 ### ➕ - A SHARED SCRIPT FILE (Recommanded)
-
-
 
 #### 🧱 PROPOSED FILE STRUCTURE (VERY IMPORTANT)
 
