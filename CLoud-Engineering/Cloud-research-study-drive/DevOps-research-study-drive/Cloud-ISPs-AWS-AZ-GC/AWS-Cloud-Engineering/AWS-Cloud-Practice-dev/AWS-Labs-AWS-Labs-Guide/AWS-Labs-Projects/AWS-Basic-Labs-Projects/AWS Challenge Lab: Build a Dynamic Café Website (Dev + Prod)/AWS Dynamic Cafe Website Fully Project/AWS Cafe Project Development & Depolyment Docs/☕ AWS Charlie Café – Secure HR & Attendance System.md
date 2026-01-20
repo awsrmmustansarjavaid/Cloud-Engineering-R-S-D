@@ -3191,54 +3191,88 @@ enforceAdminAccess();
 
 ```
 <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
-<script src="js/auth-api.js"></script>
+```
 
+2️⃣ Shared Script
+
+```
+<script src="js/auth-api.js"></script>
+```
+
+3️⃣ Page Protection + Employee Role Check
+
+```
 <script>
+/* Block unauthenticated users */
 protectPage();
+
+/* Allow only Employee users */
 enforceEmployeeAccess();
 </script>
 ```
 
-🟢 STEP 4 — USE API FUNCTIONS ANYWHERE
-Employee Profile Example
-
-```
-<script>
-async function loadProfile() {
-    const data = await secureFetch(apiBase + "/employee/profile");
-    document.getElementById("profile-name").innerText = data.name;
-}
-loadProfile();
-</script>
-```
-
-Admin Fetch Example
-
-```
-<script>
-async function loadEmployees() {
-    const data = await secureFetch(apiBase + "/admin/employees");
-    console.log(data);
-}
-</script>
-```
-
-🟢 STEP 5 — LOGOUT BUTTON (BOTH PAGES)
-HTML
+4️⃣ Logout Button (Employee)
 
 ```
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
 
-What Happens
+🟢 STEP 4 — USING API FUNCTIONS (REAL DATA)
+✅ Employee Profile (Employee Page)
 
-✔ Cognito session destroyed
+```
+<script>
+async function loadProfile() {
+    try {
+        const data = await secureFetch(apiBase + "/employee/profile");
 
-✔ Tokens removed
+        document.getElementById("profile-name").innerText = data.name;
+        document.getElementById("profile-job").innerText = data.job_title;
+        document.getElementById("profile-salary").innerText = data.salary;
+        document.getElementById("profile-start").innerText = data.start_date;
+    } catch (err) {
+        alert("Failed to load profile");
+    }
+}
 
-✔ Page redirected
+loadProfile();
+</script>
+```
+
+✅ Admin Fetch All Employees (Admin Page)
+
+```
+<script>
+async function loadEmployees() {
+    try {
+        const data = await secureFetch(apiBase + "/admin/employees");
+        console.log("Employees:", data);
+    } catch (err) {
+        alert("Unauthorized or failed request");
+    }
+}
+</script>
+```
+
+🟢 STEP 5 — LOGOUT FLOW (BOTH PAGES)
+Button
+
+```
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
+
+What Happens (Internally)
+
+✔ Cognito tokens destroyed
+
+✔ Session cleared
+
+✔ getCurrentUser() → null
+
+✔ Redirect happens
 
 ✔ Back button blocked
+
 
 ### ✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
 
