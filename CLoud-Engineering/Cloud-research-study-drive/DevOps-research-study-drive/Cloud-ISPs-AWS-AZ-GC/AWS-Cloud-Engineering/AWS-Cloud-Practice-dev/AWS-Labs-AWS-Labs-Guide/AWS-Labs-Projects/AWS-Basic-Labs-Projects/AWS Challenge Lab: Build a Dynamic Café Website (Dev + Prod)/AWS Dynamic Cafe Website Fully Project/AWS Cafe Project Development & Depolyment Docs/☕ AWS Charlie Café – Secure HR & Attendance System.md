@@ -2544,6 +2544,29 @@ sudo chmod -R 755 js
     └── auth-api.js
 ```
 
+#### 🟢 FINAL DIRECTORY CHECK
+
+```
+ls -l /var/www/html/js
+```
+
+#### You should see:
+
+```
+config.js
+auth-api.js
+```
+
+#### Permissions should look like:
+
+```
+-rw-r--r--  config.js
+```
+```
+-rwxr-xr-x  auth-api.js
+```
+
+
 #### 1️⃣ ADMIN PAGE (FINAL)
 > **📄 admin-dashboard.html**
 
