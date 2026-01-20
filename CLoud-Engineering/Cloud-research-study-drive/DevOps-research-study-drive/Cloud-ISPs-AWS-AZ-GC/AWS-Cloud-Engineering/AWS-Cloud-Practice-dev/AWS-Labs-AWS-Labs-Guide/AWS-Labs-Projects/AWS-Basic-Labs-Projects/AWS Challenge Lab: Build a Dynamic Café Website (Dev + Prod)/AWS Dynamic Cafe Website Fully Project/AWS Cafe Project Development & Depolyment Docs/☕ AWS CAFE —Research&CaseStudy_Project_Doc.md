@@ -101,23 +101,23 @@
 
 #### Testing Tasks
 
-Frontend: Login, logout, access control, loader, error handling
+- Frontend: Login, logout, access control, loader, error handling
 
-Backend: Authorized vs unauthorized role access, CloudWatch logging
+- Backend: Authorized vs unauthorized role access, CloudWatch logging
 
 ### 5️⃣ Anything else helpful for research / case study
 
-Show centralized config improves maintainability
+- Show centralized config improves maintainability
 
-Explain role enforcement both frontend & backend prevents security bypass
+- Explain role enforcement both frontend & backend prevents security bypass
 
-Include JWT expiration handling as production-ready feature
+- Include JWT expiration handling as production-ready feature
 
-Highlight CloudWatch logging as audit & monitoring
+- Highlight CloudWatch logging as audit & monitoring
 
-Emphasize loader + error handling for professional UX
+- Emphasize loader + error handling for professional UX
 
-Include flow diagram of merged phase for documentation / case study
+- Include flow diagram of merged phase for documentation / case study
 
 ---
 
