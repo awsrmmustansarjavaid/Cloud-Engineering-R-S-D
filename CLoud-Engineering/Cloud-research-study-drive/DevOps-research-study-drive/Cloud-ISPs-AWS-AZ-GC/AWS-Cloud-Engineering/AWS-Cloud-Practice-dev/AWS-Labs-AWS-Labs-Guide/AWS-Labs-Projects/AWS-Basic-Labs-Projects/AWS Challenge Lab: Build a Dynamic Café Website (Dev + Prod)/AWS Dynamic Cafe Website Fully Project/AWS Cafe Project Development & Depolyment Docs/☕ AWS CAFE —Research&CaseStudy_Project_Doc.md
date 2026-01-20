@@ -838,6 +838,22 @@ auth-api.js uses CONFIG
 
 If CONFIG is not loaded → ❌ JavaScript error
 
+#### ❗ Problem
+
+auth-api.js USES CONFIG, but CONFIG is defined in config.js
+
+➡️ JavaScript loads files in order
+
+➡️ If config.js is NOT loaded before auth-api.js, you will get:
+
+```
+Uncaught ReferenceError: CONFIG is not defined
+```
+
+#### ✅ THE FIX (MANDATORY)
+
+You must include config.js BEFORE auth-api.js on every page that uses it.
+
 
 
 ### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
