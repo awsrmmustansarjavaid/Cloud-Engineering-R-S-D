@@ -1767,7 +1767,135 @@ We will create 3 main pages:
 ✅ This page allows employees to check in and check out and confirms success/failure messages.
 
 
-### 2️⃣ Employee Check-In / Check-Out Page (Tablet Friendly)
+### 2️⃣ Employee Portal Page
+File: employee-portal.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Café HR System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Cognito SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+    <style>
+        body { padding: 20px; }
+        .btn-large { width: 150px; height: 50px; font-size: 1.2rem; }
+        .table-fixed { table-layout: fixed; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Employee Portal</h2>
+    <p id="emp-name"></p>
+
+    <h4 class="mt-4">Profile</h4>
+    <table class="table table-bordered">
+        <tr><th>Name</th><td id="profile-name"></td></tr>
+        <tr><th>Job Title</th><td id="profile-job"></td></tr>
+        <tr><th>Salary</th><td id="profile-salary"></td></tr>
+        <tr><th>Start Date</th><td id="profile-start"></td></tr>
+    </table>
+
+    <h4 class="mt-4">Attendance History</h4>
+    <table class="table table-striped table-fixed" id="attendance-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <h4 class="mt-4">Leaves & Holidays</h4>
+    <table class="table table-striped table-fixed" id="leaves-table">
+        <thead>
+            <tr><th>Date</th><th>Type / Description</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    const poolData = {
+        UserPoolId: 'us-east-1_XXXXXX',
+        ClientId: 'XXXXXXXXXXXX'
+    };
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    const apiBase = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod';
+
+    async function getJWT() {
+        const cognitoUser = userPool.getCurrentUser();
+        return new Promise((resolve, reject) => {
+            if (cognitoUser) {
+                cognitoUser.getSession(function(err, session) {
+                    if (err) reject(err);
+                    resolve(session.getIdToken().getJwtToken());
+                });
+            } else reject("Not logged in");
+        });
+    }
+
+    async function loadProfile() {
+        const token = await getJWT();
+        const res = await fetch(`${apiBase}/employee/profile`, {
+            headers: {'Authorization': token}
+        });
+        const data = await res.json();
+        document.getElementById('profile-name').innerText = data.name;
+        document.getElementById('profile-job').innerText = data.job_title;
+        document.getElementById('profile-salary').innerText = data.salary;
+        document.getElementById('profile-start').innerText = data.start_date;
+        document.getElementById('emp-name').innerText = `Welcome, ${data.name}`;
+    }
+
+    async function loadAttendance() {
+        const token = await getJWT();
+        const res = await fetch(`${apiBase}/attendance/history`, { headers: {'Authorization': token}});
+        const records = await res.json();
+        const tbody = document.querySelector('#attendance-table tbody');
+        tbody.innerHTML = '';
+        records.forEach(r => {
+            tbody.innerHTML += `<tr><td>${r.attendance_date}</td><td>${r.checkin_time}</td><td>${r.checkout_time}</td></tr>`;
+        });
+    }
+
+    async function loadLeaves() {
+        const token = await getJWT();
+        const res = await fetch(`${apiBase}/leaves-holidays`, { headers: {'Authorization': token}});
+        const data = await res.json();
+        const tbody = document.querySelector('#leaves-table tbody');
+        tbody.innerHTML = '';
+        data.leaves.forEach(l => {
+            tbody.innerHTML += `<tr><td>${l.leave_date}</td><td>${l.leave_type}</td></tr>`;
+        });
+        data.holidays.forEach(h => {
+            tbody.innerHTML += `<tr><td>${h.holiday_date}</td><td>${h.description}</td></tr>`;
+        });
+    }
+
+    // Load all data
+    loadProfile();
+    loadAttendance();
+    loadLeaves();
+</script>
+
+</body>
+</html>
+```
+
+✅ Employees can view profile, attendance, leaves, and holidays.
+
+
 
 
 
