@@ -83,9 +83,9 @@
 
 #### 2️⃣ Backend Layer
 
-#### AWS API Gateway (REST API)
+#### 1️⃣ AWS API Gateway (REST API)
 
-#### AWS Lambda functions:
+#### 2️⃣ AWS Lambda functions:
 
 - checkin
 
@@ -97,19 +97,21 @@
 
 - leavesAndHolidays
 
-#### Amazon Cognito:
+#### 3️⃣ Amazon Cognito:
 
 - User authentication
 
 - JWT-based access control for APIs
 
-#### Database Layer (RDS)
+#### 3️⃣ Database Layer (RDS)
+
+#### 1️⃣ Database Type
 
 - MySQL or PostgreSQL
 
-- Tables
+#### 2️⃣ Tables
 
-- employees
+#### 1️⃣ employees
 
 - employee_id
 
@@ -123,7 +125,7 @@
 
 - cognito_user_id
 
-- attendance
+#### 2️⃣ attendance
 
 - attendance_id
 
@@ -133,25 +135,26 @@
 
 - checkin_time
 
-checkout_time
+- checkout_time
 
-leaves
+#### 3️⃣ leaves
 
-leave_id
+- leave_id
 
-employee_id
+- employee_id
 
-leave_date
+- leave_date
 
-leave_type
+- leave_type
 
-holidays
+#### 4️⃣ holidays
 
-holiday_date
+- holiday_date
 
-description
+- description
 
-3️⃣ Frontend Pages
+### 3️⃣ Frontend Pages
+
 A) Attendance Check-In / Check-Out Page
 
 Tablet-friendly layout
