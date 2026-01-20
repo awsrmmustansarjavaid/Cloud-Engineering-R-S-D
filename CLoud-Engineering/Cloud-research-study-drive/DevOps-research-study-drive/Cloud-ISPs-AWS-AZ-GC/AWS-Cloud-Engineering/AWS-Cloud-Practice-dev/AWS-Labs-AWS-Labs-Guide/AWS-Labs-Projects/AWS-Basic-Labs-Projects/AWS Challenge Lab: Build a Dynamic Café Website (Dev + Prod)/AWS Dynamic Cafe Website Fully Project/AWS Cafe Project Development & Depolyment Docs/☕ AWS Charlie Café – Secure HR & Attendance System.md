@@ -252,34 +252,41 @@ Leaves:
 
 #### 2️⃣ Authentication & Authorization
 
-Amazon Cognito User Pool
+    - Amazon Cognito User Pool
 
-Role-based access:
+    - Role-based access:
 
-Employee
+        - Employee
 
-Admin / HR
+        - Admin / HR
 
-JWT validation enforced at API Gateway
+    - JWT validation enforced at API Gateway
 
-6️⃣ Deployment Alignment
+### 6️⃣ Deployment Alignment
 
-Frontend deployed on existing EC2 Apache server
+    - Frontend deployed on existing EC2 Apache server
 
-Backend integrated into existing API Gateway + Lambda
+    - Backend integrated into existing API Gateway + Lambda
 
-Authentication integrated with existing Cognito
+    - Authentication integrated with existing Cognito
 
-Database hosted in existing RDS
+    - Database hosted in existing RDS
 
-Logging via CloudWatch
+    - Logging via CloudWatch
 
-7️⃣ Completion Outcome
+### 7️⃣ Completion Outcome
 
-Fully integrated internal café attendance system
+    - Fully integrated internal café attendance system
 
-Professional AWS architecture aligned with real job requirements
+    - Professional AWS architecture aligned with real job requirements
 
-Secure, scalable, and production-style setup
+    - Secure, scalable, and production-style setup
 
-Completes the final 20% of the Charlie Café lab
+    - Completes the final 20% of the Charlie Café lab
+
+**✅ PHASE R & D STATUS**
+
+> **🟢 PHASE R & D COMPLETE & VERIFIED**
+
+---
+
