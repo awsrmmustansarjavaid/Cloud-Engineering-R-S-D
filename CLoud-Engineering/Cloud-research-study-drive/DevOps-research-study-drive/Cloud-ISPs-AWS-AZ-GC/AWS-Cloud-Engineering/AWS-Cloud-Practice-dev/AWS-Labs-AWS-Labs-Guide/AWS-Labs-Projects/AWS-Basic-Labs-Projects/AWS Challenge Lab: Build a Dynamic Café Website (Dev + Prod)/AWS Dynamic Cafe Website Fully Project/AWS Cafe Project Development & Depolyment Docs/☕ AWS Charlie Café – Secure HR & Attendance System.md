@@ -3137,30 +3137,57 @@ sudo chmod -R 755 js
 
 
 🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
-📄 admin-dashboard.html
-1️⃣ Add Cognito SDK
+> **📄 admin-dashboard.html**
+
+✅ Add these BEFORE closing </body>
+
+1️⃣ Add Cognito SDK (REQUIRED)
 
 ```
 <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
 ```
 
-2️⃣ Add shared script
+2️⃣ Add Shared Auth & API Script
 
 ```
 <script src="js/auth-api.js"></script>
 ```
 
-3️⃣ Call required functions
+3️⃣ Page Protection + Role Enforcement
+> **Call required functions**
 
 ```
 <script>
+/* Protect page from unauthenticated access */
 protectPage();
+
+/* Allow only Admin users */
 enforceAdminAccess();
 </script>
 ```
 
+4️⃣ Admin-Only HTML Section
+
+```
+<div id="admin-section" style="display:none;">
+    <button class="btn btn-warning">Manage Employees</button>
+    <button class="btn btn-danger">View Payroll</button>
+</div>
+```
+
+5️⃣ Logout Button (Admin)
+
+```
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
+
+
 🟢 STEP 3 — INCLUDE SCRIPT IN EMPLOYEE PAGE
-📄 employee-portal.html
+> **📄 employee-portal.html**
+
+✅ Add these BEFORE closing </body>
+
+1️⃣ Cognito SDK
 
 ```
 <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
