@@ -2182,6 +2182,82 @@ sudo nano /var/www/html/employee-portal.html
 
 ✔ Perfect match with your AWS lab architecture
 
+#### ✅ PART B — HOW LOGOUT INTEGRATES WITH COGNITO (STEP-BY-STEP)
+
+#### 🔐 What Logout Actually Does
+
+Cognito stores the login session in browser storage.
+Logout means destroying that session.
+
+#### 🧠 Step-by-Step Cognito Logout Flow
+
+#### 1️⃣ Cognito keeps user session
+
+When user logs in:
+
+- ID Token
+
+- Access Token
+
+- Refresh Token
+
+are stored by Cognito SDK in browser (local/session storage)
+
+#### 2️⃣ This line logs the user out
+
+```
+user.signOut();
+```
+
+#### What happens:
+
+- Tokens are removed
+
+- Session invalidated
+
+- getCurrentUser() returns null
+
+#### 3️⃣ Protecting Pages (IMPORTANT)
+
+On every protected page, you already do:
+
+```
+const user = userPool.getCurrentUser();
+if (!user) {
+    window.location.href = "login.html";
+}
+```
+
+**👉 This prevents access after logout.**
+
+#### 4️⃣ Redirect After Logout
+
+```
+window.location.href = "index.html";
+```
+
+You can redirect to:
+
+- Login page
+
+- Landing page
+
+- Café homepage
+
+#### ✅ How to Test Logout (Verification)
+
+- Login to employee portal
+
+- Click Logout
+
+- Page redirects
+
+- Press browser back button
+
+❌ Portal should NOT load
+
+✅ Cognito session is gone
+
 
 ### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 File: admin-dashboard.html
