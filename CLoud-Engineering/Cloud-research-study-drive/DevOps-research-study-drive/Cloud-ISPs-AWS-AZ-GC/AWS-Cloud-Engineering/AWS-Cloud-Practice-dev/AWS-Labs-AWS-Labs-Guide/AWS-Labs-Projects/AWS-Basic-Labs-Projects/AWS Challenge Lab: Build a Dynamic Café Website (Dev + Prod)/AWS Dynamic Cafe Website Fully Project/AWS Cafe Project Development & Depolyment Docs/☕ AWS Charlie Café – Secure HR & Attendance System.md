@@ -1662,6 +1662,14 @@ We will create 3 main pages:
 
 ✅ Fully commented (no guessing later)
 
+#### 1️⃣ Create file to EC2:
+
+```
+sudo nano /var/www/html/checkin.html
+```
+
+#### 2️⃣ Code
+
 ```
 <!DOCTYPE html>
 <html lang="en">
@@ -1843,6 +1851,21 @@ We will create 3 main pages:
 </html>
 ```
 ✅ This page allows employees to check in and check out and confirms success/failure messages.
+
+#### ✅ Why This Is Correct for a REAL Café Lab
+
+✔ No Cognito needed (kiosk logic)
+
+✔ Works inside Security Group–restricted EC2
+
+✔ Simple for staff (ID + 1 tap)
+
+✔ Backend already handles validation
+
+✔ Tablet-friendly (big buttons)
+
+✔ Professional café branding
+
 
 
 ### 2️⃣ Employee Portal Page
@@ -2265,7 +2288,23 @@ Fully commented for easy future development
 </html>
 ```
 
+#### 3️⃣ Set permissions:
 
+```
+sudo chown apache:apache *.html
+```
+
+```
+sudo chmod 644 *.html
+```
+
+#### 4️⃣ Open browser:
+
+```
+http://<EC2-Public-IP>/checkin.html
+http://<EC2-Public-IP>/employee-portal.html
+http://<EC2-Public-IP>/admin-dashboard.html
+```
 
 **✅ PHASE 4️⃣ STATUS**
 
