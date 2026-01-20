@@ -1150,19 +1150,19 @@ Example:
 SELECT * FROM attendance WHERE employee_id = 1;
 ```
 
-Should see today’s date with checkin_time populated
+- Should see today’s date with checkin_time populated
 
-checkout_time should be NULL
+- checkout_time should be NULL
 
-### 2️⃣ Test hr-checkout Lambda
+### 3️⃣ Test hr-checkout Lambda
 
 #### Step 1 — Open Lambda Console
 
-Lambda → hr-checkout → Test
+- Lambda → hr-checkout → Test
 
 #### Step 2 — Create Test Event
 
-Same template as hr-checkin:
+- Same template as hr-checkin:
 
 ```
 {
@@ -1176,11 +1176,11 @@ Same template as hr-checkin:
 }
 ```
 
-Step 3 — Invoke Test
+#### Step 3 — Invoke Test
 
-Click Test
+- Click Test
 
-Expected success:
+#### Expected success:
 
 ```
 {
@@ -1188,7 +1188,90 @@ Expected success:
   "body": "{\"message\": \"Check-out successful\"}"
 }
 ```
+#### If not checked in yet:
 
+```
+{
+  "statusCode": 400,
+  "body": "{\"message\": \"Check-in required before checkout\"}"
+}
+```
+
+#### Step 4 — Verify in RDS
+
+```
+SELECT * FROM attendance WHERE employee_id = 1;
+```
+
+> **checkout_time should now be populated**
+
+### 4️⃣ Test hr-employee-profile Lambda
+
+#### Step 1 — Open Lambda Console → hr-employee-profile → Test
+
+#### Step 2 — Test Event (same as above)
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3 — Invoke Test
+
+#### Expected output:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"name\": \"Alice\", \"job_title\": \"Barista\", \"salary\": 40000.00, \"start_date\": \"2025-12-01\"}"
+}
+```
+
+> **Confirms Lambda can read employees table from RDS**
+
+### 5️⃣ Test hr-attendance-history Lambda
+
+#### Step 1 — Open Lambda → hr-attendance-history → Test
+
+#### Step 2 — Test Event
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3 — Invoke Test
+
+#### Expected output:
+
+```
+{
+  "statusCode": 200,
+  "body": "[{\"attendance_date\": \"2026-01-19\", \"checkin_time\": \"09:00:00\", \"checkout_time\": \"17:00:00\"}]"
+}
+```
+
+> **Confirms RDS attendance table integration**
+
+### 6️⃣ Test hr-leaves-holidays Lambda
+
+#### Step 1 — Open Lambda → hr-leaves-holidays → Test
+
+#### Step 2 — Test Event
 
 
 
