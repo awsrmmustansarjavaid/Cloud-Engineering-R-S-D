@@ -656,99 +656,100 @@ sudo ./setup_cafe_hr_attendance.sh
 
 ## PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
-🎯 What We Are Creating in This Part
+### 🎯 What We Are Creating in This Part
 
-You will create 5 NEW Lambda functions:
+#### You will create 5 NEW Lambda functions:
 
-hr-checkin
+- hr-checkin
 
-hr-checkout
+- hr-checkout
 
-hr-employee-profile
+- hr-employee-profile
 
-hr-attendance-history
+- hr-attendance-history
 
-hr-leaves-holidays
+- hr-leaves-holidays
 
-Each Lambda will:
+#### Each Lambda will:
 
-Use existing RDS (cafedb)
+- Use existing RDS (cafedb)
 
-Be protected by existing Cognito
+- Be protected by existing Cognito
 
-Be callable from existing API Gateway
+- Be callable from existing API Gateway
 
-Follow real job-level backend standards
+- Follow real job-level backend standards
 
-1️⃣ IAM Role for HR Lambdas (ONE TIME ONLY)
+### 1️⃣ IAM Role for HR Lambdas (ONE TIME ONLY)
 
 If you already have a Lambda role that accesses RDS + CloudWatch, reuse it.
 If not, follow every step below.
 
-Step 1: Open IAM
+#### Step 1️⃣: Open IAM
 
-AWS Console → IAM
+- AWS Console → IAM
 
-Roles → Create role
+- Roles → Create role
 
-Step 2: Select Trusted Entity
+#### Step 2️⃣: Select Trusted Entity
 
-Trusted entity type: AWS service
+- Trusted entity type: AWS service
 
-Service: Lambda
+- Service: Lambda
 
-Click Next
+- Click Next
 
-Step 3: Attach Permissions
+#### Step 3️⃣: Attach Permissions
 
-Attach exactly these policies:
+- Attach exactly these policies:
 
-AWSLambdaBasicExecutionRole
+    - AWSLambdaBasicExecutionRole
 
-AmazonRDSDataFullAccess (or your custom RDS policy)
+    - AmazonRDSDataFullAccess (or your custom RDS policy)
 
-Click Next
+- Click Next
 
-Step 4: Role Name
+#### Step 4️⃣: Role Name
 
-Role name:
+#### Role name:
 
 ```
 cafe-hr-lambda-role
 ```
 
-Create role
+- Create role
 
-2️⃣ Create Lambda: hr-checkin
-Step 1: Open Lambda
+### 2️⃣ Create Lambda: hr-checkin
 
-AWS Console → Lambda
+#### Step 1️⃣: Open Lambda
 
-Click Create function
+- AWS Console → Lambda
 
-Step 2: Function Basics
+- Click Create function
 
-Author from scratch
+#### Step 2️⃣: Function Basics
 
-Function name:
+- Author from scratch
+
+#### Function name:
 
 ```
 hr-checkin
 ```
 
-Runtime:
+#### Runtime:
 
 ```
 Python 3.12
 ```
 
-Architecture: x86_64
+- Architecture: x86_64
 
-Execution role:
+#### Execution role:
 
-Use existing role
+- Use existing role
 
-Select:
+#### Select:
 
 ```
 cafe-hr-lambda-role
