@@ -2620,10 +2620,6 @@ loadEmployeeProfile();
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
 
-
-
-
-
 ### 4️⃣ BACKEND  - Lambda 
 
 #### 1️⃣ FINAL COMMON LAMBDA TEMPLATE (USE IN ALL 5)
