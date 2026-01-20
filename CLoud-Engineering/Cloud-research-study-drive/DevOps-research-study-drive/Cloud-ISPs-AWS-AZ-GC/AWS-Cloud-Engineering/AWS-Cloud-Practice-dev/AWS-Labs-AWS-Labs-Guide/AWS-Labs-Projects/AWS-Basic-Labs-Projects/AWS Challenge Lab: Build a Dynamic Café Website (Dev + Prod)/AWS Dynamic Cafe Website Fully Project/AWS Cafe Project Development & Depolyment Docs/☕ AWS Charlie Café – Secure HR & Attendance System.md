@@ -2889,7 +2889,336 @@ You now have:
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 6️⃣ — Update CafePDFReportLambda for HR & Attendance
+## ☕ Charlie Café PHASE 6️⃣ — ADMIN ATTENDANCE ANALYTICS
+
+### 1️⃣ — Database Preparation (RDS)
+
+We need to ensure our database has the right structure for analytics.
+
+#### 1️⃣ Tables Needed
+
+You already have:
+
+- **employees (employee_id, name, job_title, salary, start_date)**
+
+- **attendance (attendance_id, employee_id, date, checkin_time, checkout_time)**
+
+#### 2️⃣ Verify / Add Index for Fast Queries
+
+#### Run this SQL on your RDS (MySQL example):
+
+```
+-- Index for faster aggregation
+CREATE INDEX idx_attendance_date ON attendance(date);
+CREATE INDEX idx_attendance_employee ON attendance(employee_id);
+```
+
+**✅ Purpose: Queries for daily, weekly, monthly summaries will be faster.**
+
+### 2️⃣ — Lambda Functions
+
+We will create 3 separate Lambda functions:
+
+- attendance_daily_summary
+
+- attendance_weekly_summary
+
+- attendance_monthly_summary
+
+All will query RDS and return JSON data to API Gateway.
+
+#### 1️⃣ — Daily Attendance Lambda
+> **📄 Filename: attendance_daily_summary.py**
+
+```
+import json
+import pymysql
+import os
+from datetime import date
+
+# Database configuration (set in Lambda environment variables)
+DB_HOST = os.environ['DB_HOST']
+DB_USER = os.environ['DB_USER']
+DB_PASSWORD = os.environ['DB_PASSWORD']
+DB_NAME = os.environ['DB_NAME']
+
+def lambda_handler(event, context):
+    try:
+        connection = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
+        )
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        
+        # Get today's date
+        today = date.today().strftime('%Y-%m-%d')
+        
+        # SQL query: daily attendance
+        sql = """
+            SELECT e.employee_id, e.name, a.checkin_time, a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            WHERE a.date = %s
+        """
+        cursor.execute(sql, (today,))
+        result = cursor.fetchall()
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'date': today, 'attendance': result})
+        }
+
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+    finally:
+        cursor.close()
+        connection.close()
+```
+
+#### 2️⃣ — Weekly Attendance Lambda
+> **📄 Filename: attendance_weekly_summary.py**
+
+```
+import json
+import pymysql
+import os
+from datetime import date, timedelta
+
+DB_HOST = os.environ['DB_HOST']
+DB_USER = os.environ['DB_USER']
+DB_PASSWORD = os.environ['DB_PASSWORD']
+DB_NAME = os.environ['DB_NAME']
+
+def lambda_handler(event, context):
+    try:
+        connection = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
+        )
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        
+        # Get last 7 days
+        today = date.today()
+        week_ago = today - timedelta(days=6)
+        
+        sql = """
+            SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            WHERE a.date BETWEEN %s AND %s
+            ORDER BY a.date ASC
+        """
+        cursor.execute(sql, (week_ago, today))
+        result = cursor.fetchall()
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'start_date': str(week_ago), 'end_date': str(today), 'attendance': result})
+        }
+
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+    finally:
+        cursor.close()
+        connection.close()
+```
+
+#### 3️⃣ — Monthly Attendance Lambda
+> **📄 Filename: attendance_monthly_summary.py**
+
+```
+import json
+import pymysql
+import os
+from datetime import date
+
+DB_HOST = os.environ['DB_HOST']
+DB_USER = os.environ['DB_USER']
+DB_PASSWORD = os.environ['DB_PASSWORD']
+DB_NAME = os.environ['DB_NAME']
+
+def lambda_handler(event, context):
+    try:
+        connection = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
+        )
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        
+        # First and last day of current month
+        today = date.today()
+        start_month = today.replace(day=1)
+        end_month = today
+        
+        sql = """
+            SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            WHERE a.date BETWEEN %s AND %s
+            ORDER BY a.date ASC
+        """
+        cursor.execute(sql, (start_month, end_month))
+        result = cursor.fetchall()
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'start_date': str(start_month), 'end_date': str(end_month), 'attendance': result})
+        }
+
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+    finally:
+        cursor.close()
+        connection.close()
+```
+
+### 3️⃣ — Lambda Environment Variables
+
+Set the following for all three Lambdas:
+
+| Key         | Value                 |
+| ----------- | --------------------- |
+| DB_HOST     | `<your-RDS-endpoint>` |
+| DB_USER     | `<your-RDS-username>` |
+| DB_PASSWORD | `<your-RDS-password>` |
+| DB_NAME     | `cafedb`              |
+
+**✅ Purpose: Lambda connects securely to RDS without hardcoding credentials.**
+
+### 4️⃣ — API Gateway Setup
+
+- Open API Gateway → Existing API (used for HR system)
+
+- Create new resources:
+
+| Resource                    | Method | Lambda Integration           |
+| --------------------------- | ------ | ---------------------------- |
+| `/admin/attendance/daily`   | GET    | `attendance_daily_summary`   |
+| `/admin/attendance/weekly`  | GET    | `attendance_weekly_summary`  |
+| `/admin/attendance/monthly` | GET    | `attendance_monthly_summary` |
+
+- Enable Cognito Authorizer for all three endpoints
+
+- Enable CORS → Allow origin: * (or your EC2 frontend)
+
+- Deploy API → Stage: prod
+
+### 5️⃣ — Frontend Integration (Admin Dashboard)
+
+
+#### 1️⃣ — HTML Buttons (Admin Dashboard)
+
+```
+<div id="admin-attendance-summary">
+    <button class="btn btn-info" onclick="loadDailySummary()">Daily</button>
+    <button class="btn btn-warning" onclick="loadWeeklySummary()">Weekly</button>
+    <button class="btn btn-success" onclick="loadMonthlySummary()">Monthly</button>
+</div>
+
+<div id="summary-result">
+    <!-- Summary Table will be populated here -->
+</div>
+```
+
+#### 2️⃣ — Shared Script Functions (auth-api.js or separate admin.js)
+
+```
+// Load Daily Attendance
+async function loadDailySummary() {
+    const data = await secureFetch(apiBase + "/admin/attendance/daily");
+    displaySummary(data.attendance);
+}
+
+// Load Weekly Attendance
+async function loadWeeklySummary() {
+    const data = await secureFetch(apiBase + "/admin/attendance/weekly");
+    displaySummary(data.attendance);
+}
+
+// Load Monthly Attendance
+async function loadMonthlySummary() {
+    const data = await secureFetch(apiBase + "/admin/attendance/monthly");
+    displaySummary(data.attendance);
+}
+
+// Display function
+function displaySummary(records) {
+    const container = document.getElementById("summary-result");
+    let html = `<table class="table table-striped">
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                    </tr>`;
+    records.forEach(r => {
+        html += `<tr>
+                    <td>${r.employee_id}</td>
+                    <td>${r.name}</td>
+                    <td>${r.date}</td>
+                    <td>${r.checkin_time}</td>
+                    <td>${r.checkout_time}</td>
+                 </tr>`;
+    });
+    html += `</table>`;
+    container.innerHTML = html;
+}
+```
+
+### 6️⃣ — Testing & Verification
+
+#### 1️⃣ . Lambda Test
+
+- Open each Lambda in AWS Console
+
+- Click Test → Use Empty JSON {}
+
+- Check JSON output → Should return today/weekly/monthly attendance
+
+#### 2️⃣ . API Gateway Test
+
+- Open API Gateway Console → Resource → GET /admin/attendance/daily
+
+- Click Test → Should return JSON array of attendance
+
+- Repeat for weekly & monthly
+
+#### 3️⃣ . Admin Frontend Test
+
+- Login as Admin → Open Dashboard
+
+- Click Daily / Weekly / Monthly buttons
+
+- Check that table populates correctly
+
+- Verify that non-admin users cannot see these buttons or API data
+
+**✅ After this, Admin Attendance Analytics will be fully functional — daily, weekly, monthly summaries with frontend display.**
+
+
+
+
+
+
+
+
+
 
 
 
