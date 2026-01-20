@@ -2698,7 +2698,309 @@ You can redirect to:
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
+## ☕ Charlie Café PHASE 5️⃣ — Frontend → API Integration & Role-Based UI Control
+
+🎯 WHAT YOU WILL ACHIEVE IN PART 4
+
+By the end of this part:
+
+✔ Frontend calls API Gateway securely
+✔ JWT token is attached correctly
+✔ Admin sees Admin-only buttons
+✔ Employee sees Employee-only data
+✔ Cognito Groups control UI visibility
+✔ APIs reject wrong roles
+✔ Full test & verification done
+
+🔹 STEP 1 — UNDERSTAND THE FLOW (VERY IMPORTANT)
+
+🔐 Secure Request Flow
+
+```
+User Login (Cognito)
+        ↓
+Cognito issues JWT
+        ↓
+Frontend stores session (SDK)
+        ↓
+Frontend sends JWT → API Gateway
+        ↓
+API Gateway validates JWT (Authorizer)
+        ↓
+Lambda executes with user context
+        ↓
+RDS queried
+        ↓
+Response returned to frontend
+```
+
+👉 Frontend never talks directly to RDS
+
+👉 JWT controls EVERYTHING
+
+🔹 STEP 2 — STANDARD API CALL FUNCTION (FRONTEND)
+
+This function will be used everywhere (Admin & Employee).
+
+✅ Add this to BOTH pages (admin-dashboard.html, employee-portal.html)
+
+```
+<script>
+/* ===============================
+   GET JWT TOKEN FROM COGNITO
+================================ */
+async function getJWT() {
+    const user = userPool.getCurrentUser();
+    return new Promise((resolve, reject) => {
+        if (!user) reject("No active session");
+        user.getSession((err, session) => {
+            if (err) reject(err);
+            resolve(session.getIdToken().getJwtToken());
+        });
+    });
+}
+
+/* ===============================
+   SECURE API CALL HELPER
+================================ */
+async function secureFetch(url, method = "GET", body = null) {
+    const token = await getJWT();
+
+    const options = {
+        method: method,
+        headers: {
+            "Authorization": token,
+            "Content-Type": "application/json"
+        }
+    };
+
+    if (body) {
+        options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        throw new Error("API access denied or failed");
+    }
+
+    return response.json();
+}
+</script>
+```
+
+📌 Why this is important
+
+No duplicate code
+
+Easy debugging
+
+JWT always attached
+
+Same pattern used in real companies
+
+🔹 STEP 3 — ROLE DETECTION (ADMIN vs EMPLOYEE)
+
+Cognito puts groups inside the JWT.
+
+✅ Add this function
+
+```
+<script>
+/* ===============================
+   DETECT USER ROLE FROM TOKEN
+================================ */
+async function getUserRole() {
+    const user = userPool.getCurrentUser();
+    return new Promise((resolve, reject) => {
+        user.getSession((err, session) => {
+            if (err) reject(err);
+            const payload = session.getIdToken().decodePayload();
+            const groups = payload["cognito:groups"] || [];
+            resolve(groups);
+        });
+    });
+}
+</script>
+```
+
+🔹 STEP 4 — ROLE-BASED UI CONTROL (FRONTEND)
+✅ Admin Page (admin-dashboard.html)
+
+```
+<script>
+async function applyAdminUIRules() {
+    const roles = await getUserRole();
+
+    if (!roles.includes("Admin")) {
+        alert("Unauthorized access");
+        window.location.href = "login.html";
+    }
+
+    // Admin-only buttons
+    document.getElementById("admin-section").style.display = "block";
+}
+applyAdminUIRules();
+</script>
+```
+
+HTML Example
+
+```
+<div id="admin-section" style="display:none;">
+    <button class="btn btn-warning">Manage Employees</button>
+    <button class="btn btn-danger">View Payroll</button>
+</div>
+```
+
+✅ Employee Page (employee-portal.html)
+
+```
+<script>
+async function applyEmployeeUIRules() {
+    const roles = await getUserRole();
+
+    if (!roles.includes("Employee")) {
+        alert("Unauthorized access");
+        window.location.href = "login.html";
+    }
+}
+applyEmployeeUIRules();
+</script>
+```
+
+📌 Employees never see admin buttons
+
+📌 Even if they edit HTML → API still blocks them
+
+🔹 STEP 5 — FRONTEND → API INTEGRATION (REAL DATA)
+Example: Employee Profile Load
+
+```
+<script>
+async function loadEmployeeProfile() {
+    try {
+        const data = await secureFetch(
+            apiBase + "/employee/profile"
+        );
+
+        document.getElementById("profile-name").innerText = data.name;
+        document.getElementById("profile-job").innerText = data.job_title;
+    } catch (err) {
+        alert("Failed to load profile");
+    }
+}
+loadEmployeeProfile();
+</script>
+```
+
+Example: Admin Fetch All Employees
+
+```
+<script>
+async function loadAllEmployees() {
+    const data = await secureFetch(
+        apiBase + "/admin/employees"
+    );
+
+    console.log("Employees:", data);
+}
+</script>
+```
+
+🔹 STEP 6 — BACKEND SECURITY (DOUBLE PROTECTION)
+
+Even if UI fails, Lambda still protects.
+
+Lambda Check Example
+
+```
+groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', '')
+
+if 'Admin' not in groups:
+    return {
+        "statusCode": 403,
+        "body": "Forbidden"
+    }
+```
+
+✔ Frontend check
+✔ Backend check
+✔ Enterprise-grade security
+
+✅ STEP 7 — FULL TEST & VERIFICATION (NO SKIP)
+🧪 TEST 1 — Employee Normal Flow
+
+1️⃣ Login as Employee
+2️⃣ Open employee portal
+3️⃣ Profile loads
+4️⃣ Attendance loads
+5️⃣ Admin buttons NOT visible
+
+✅ PASS
+
+🧪 TEST 2 — Employee Tries Admin URL
+
+1️⃣ Login as Employee
+2️⃣ Open admin-dashboard.html manually
+
+❌ Access denied
+✅ Redirect to login
+
+🧪 TEST 3 — Admin Normal Flow
+
+1️⃣ Login as Admin
+2️⃣ Open admin dashboard
+3️⃣ Admin buttons visible
+4️⃣ Employee list loads
+
+✅ PASS
+
+🧪 TEST 4 — JWT Verification
+
+1️⃣ Open DevTools → Network
+2️⃣ Click any API call
+3️⃣ Check Headers
+
+You MUST see:
+
+```
+Authorization: eyJraWQiOiJ...
+```
+
+✅ Token attached
+✅ Cognito authorizer working
+
+🧪 TEST 5 — API Protection
+
+1️⃣ Copy API URL
+2️⃣ Open in browser without token
+
+❌ 401 / 403 error
+✅ Secure
+
+☕ WHAT YOU HAVE BUILT (REALITY CHECK)
+
+✔ Secure frontend → backend integration
+
+✔ Cognito JWT handled correctly
+
+✔ Role-based UI control
+
+✔ Role-based API security
+
+✔ HR system architecture
+
+✔ Resume + interview ready
+
+
+
+
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 6️⃣ — Update CafePDFReportLambda for HR & Attendance
 
 ### 📃 Research and Development (Just for CaseStudy)
 
