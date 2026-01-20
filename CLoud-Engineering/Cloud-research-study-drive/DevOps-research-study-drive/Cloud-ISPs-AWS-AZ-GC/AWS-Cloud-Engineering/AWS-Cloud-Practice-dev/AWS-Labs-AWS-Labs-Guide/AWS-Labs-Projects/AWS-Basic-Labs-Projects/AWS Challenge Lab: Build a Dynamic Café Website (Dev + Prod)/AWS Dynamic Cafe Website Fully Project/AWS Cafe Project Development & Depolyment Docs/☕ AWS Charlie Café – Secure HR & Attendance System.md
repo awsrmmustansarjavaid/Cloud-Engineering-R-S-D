@@ -1896,11 +1896,7 @@ File: employee-portal.html
 ✅ Employees can view profile, attendance, leaves, and holidays.
 
 
-
-
-
-
-☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
+### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 File: admin-dashboard.html
 
 ✅ You can directly upload this file to /var/www/html/
