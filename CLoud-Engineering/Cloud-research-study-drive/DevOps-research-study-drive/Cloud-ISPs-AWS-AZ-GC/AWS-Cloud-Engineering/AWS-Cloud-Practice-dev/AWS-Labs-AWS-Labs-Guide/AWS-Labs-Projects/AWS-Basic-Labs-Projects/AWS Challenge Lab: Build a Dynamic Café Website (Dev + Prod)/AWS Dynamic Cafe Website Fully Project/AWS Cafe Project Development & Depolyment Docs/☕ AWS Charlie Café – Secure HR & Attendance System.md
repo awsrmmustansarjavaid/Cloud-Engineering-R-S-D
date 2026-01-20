@@ -2700,21 +2700,27 @@ You can redirect to:
 ---
 ## ☕ Charlie Café PHASE 5️⃣ — Frontend → API Integration & Role-Based UI Control
 
-🎯 WHAT YOU WILL ACHIEVE IN PART 4
+### 🎯 WHAT YOU WILL ACHIEVE IN PART 4
 
 By the end of this part:
 
 ✔ Frontend calls API Gateway securely
+
 ✔ JWT token is attached correctly
+
 ✔ Admin sees Admin-only buttons
+
 ✔ Employee sees Employee-only data
+
 ✔ Cognito Groups control UI visibility
+
 ✔ APIs reject wrong roles
+
 ✔ Full test & verification done
 
-🔹 STEP 1 — UNDERSTAND THE FLOW (VERY IMPORTANT)
+### 🔹  — UNDERSTAND THE FLOW (VERY IMPORTANT)
 
-🔐 Secure Request Flow
+#### 🔐 Secure Request Flow
 
 ```
 User Login (Cognito)
@@ -2738,11 +2744,12 @@ Response returned to frontend
 
 👉 JWT controls EVERYTHING
 
-🔹 STEP 2 — STANDARD API CALL FUNCTION (FRONTEND)
+### 🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control
 
-This function will be used everywhere (Admin & Employee).
+### 1️⃣ — STANDARD API CALL FUNCTION (FRONTEND)
+> **This function will be used everywhere (Admin & Employee).**
 
-✅ Add this to BOTH pages (admin-dashboard.html, employee-portal.html)
+#### ✅ Add this to BOTH pages (admin-dashboard.html, employee-portal.html)
 
 ```
 <script>
@@ -2788,21 +2795,21 @@ async function secureFetch(url, method = "GET", body = null) {
 </script>
 ```
 
-📌 Why this is important
+### 📌 Why this is important
 
-No duplicate code
+- No duplicate code
 
-Easy debugging
+- Easy debugging
 
-JWT always attached
+- JWT always attached
 
-Same pattern used in real companies
+- Same pattern used in real companies
 
-🔹 STEP 3 — ROLE DETECTION (ADMIN vs EMPLOYEE)
+### 2️⃣ — ROLE DETECTION (ADMIN vs EMPLOYEE)
 
 Cognito puts groups inside the JWT.
 
-✅ Add this function
+#### ✅ Add this function
 
 ```
 <script>
@@ -2823,8 +2830,9 @@ async function getUserRole() {
 </script>
 ```
 
-🔹 STEP 4 — ROLE-BASED UI CONTROL (FRONTEND)
-✅ Admin Page (admin-dashboard.html)
+### 3️⃣ — ROLE-BASED UI CONTROL (FRONTEND)
+
+#### ✅ Admin Page (admin-dashboard.html)
 
 ```
 <script>
@@ -2843,7 +2851,7 @@ applyAdminUIRules();
 </script>
 ```
 
-HTML Example
+#### HTML Example
 
 ```
 <div id="admin-section" style="display:none;">
@@ -2852,7 +2860,7 @@ HTML Example
 </div>
 ```
 
-✅ Employee Page (employee-portal.html)
+#### ✅ Employee Page (employee-portal.html)
 
 ```
 <script>
@@ -2868,12 +2876,13 @@ applyEmployeeUIRules();
 </script>
 ```
 
-📌 Employees never see admin buttons
+- **📌 Employees never see admin buttons**
 
-📌 Even if they edit HTML → API still blocks them
+- **📌 Even if they edit HTML → API still blocks them**
 
-🔹 STEP 5 — FRONTEND → API INTEGRATION (REAL DATA)
-Example: Employee Profile Load
+### 4️⃣ — FRONTEND → API INTEGRATION (REAL DATA)
+
+#### Example: Employee Profile Load
 
 ```
 <script>
@@ -2893,7 +2902,7 @@ loadEmployeeProfile();
 </script>
 ```
 
-Example: Admin Fetch All Employees
+#### Example: Admin Fetch All Employees
 
 ```
 <script>
@@ -2907,7 +2916,7 @@ async function loadAllEmployees() {
 </script>
 ```
 
-🔹 STEP 6 — BACKEND SECURITY (DOUBLE PROTECTION)
+### 5️⃣ — BACKEND SECURITY (DOUBLE PROTECTION)
 
 Even if UI fails, Lambda still protects.
 
@@ -2924,10 +2933,14 @@ if 'Admin' not in groups:
 ```
 
 ✔ Frontend check
+
 ✔ Backend check
+
 ✔ Enterprise-grade security
 
-### ✅ - A SHARED SCRIPT FILE
+### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
+
+### ➕ - A SHARED SCRIPT FILE (Recommanded)
 
 #### ✅ Benefits of a Shared Script File (Industry Standard)
 
@@ -2976,26 +2989,26 @@ Enterprise dashboards
 
 - Your project already exists
 
-1️⃣ Go to your web root
+#### 1️⃣ Go to your web root
 
 ```
 cd /var/www/html
 ```
 
-2️⃣ Create js folder (if not exists)
+#### 2️⃣ Create js folder (if not exists)
 
 ```
 sudo mkdir -p js
 ```
 
-3️⃣ Create the shared file
+#### 3️⃣ Create the shared file
 
 ```
 sudo nano js/auth-api.js
 ```
 
-👉 Paste your full auth-api.js code inside this file
-(save with CTRL+O, exit CTRL+X)
+**👉 Paste your full auth-api.js code inside this file**
+> **(save with CTRL+O, exit CTRL+X)**
 
 ```
 /* =====================================================
@@ -3122,7 +3135,7 @@ function logout() {
 
 ✅ Clean
 
-4️⃣ Set correct permissions
+#### 4️⃣ Set correct permissions
 
 ```
 sudo chown -R www-data:www-data js
@@ -3136,24 +3149,24 @@ sudo chmod -R 755 js
 ✅ Secure & production-ready
 
 
-🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
+#### 🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
 > **📄 admin-dashboard.html**
 
-✅ Add these BEFORE closing </body>
+#### ✅ Add these BEFORE closing </body>
 
-1️⃣ Add Cognito SDK (REQUIRED)
+#### 1️⃣ Add Cognito SDK (REQUIRED)
 
 ```
 <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
 ```
 
-2️⃣ Add Shared Auth & API Script
+#### 2️⃣ Add Shared Auth & API Script
 
 ```
 <script src="js/auth-api.js"></script>
 ```
 
-3️⃣ Page Protection + Role Enforcement
+#### 3️⃣ Page Protection + Role Enforcement
 > **Call required functions**
 
 ```
@@ -3166,7 +3179,7 @@ enforceAdminAccess();
 </script>
 ```
 
-4️⃣ Admin-Only HTML Section
+#### 4️⃣ Admin-Only HTML Section
 
 ```
 <div id="admin-section" style="display:none;">
@@ -3175,31 +3188,31 @@ enforceAdminAccess();
 </div>
 ```
 
-5️⃣ Logout Button (Admin)
+#### 5️⃣ Logout Button (Admin)
 
 ```
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
 
 
-🟢 STEP 3 — INCLUDE SCRIPT IN EMPLOYEE PAGE
+#### 🟢 STEP 3 — INCLUDE SCRIPT IN EMPLOYEE PAGE
 > **📄 employee-portal.html**
 
-✅ Add these BEFORE closing </body>
+#### ✅ Add these BEFORE closing </body>
 
-1️⃣ Cognito SDK
+#### 1️⃣ Cognito SDK
 
 ```
 <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
 ```
 
-2️⃣ Shared Script
+#### 2️⃣ Shared Script
 
 ```
 <script src="js/auth-api.js"></script>
 ```
 
-3️⃣ Page Protection + Employee Role Check
+#### 3️⃣ Page Protection + Employee Role Check
 
 ```
 <script>
@@ -3211,14 +3224,15 @@ enforceEmployeeAccess();
 </script>
 ```
 
-4️⃣ Logout Button (Employee)
+#### 4️⃣ Logout Button (Employee)
 
 ```
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
 
-🟢 STEP 4 — USING API FUNCTIONS (REAL DATA)
-✅ Employee Profile (Employee Page)
+#### 🟢 STEP 4 — USING API FUNCTIONS (REAL DATA)
+
+#### ✅ Employee Profile (Employee Page)
 
 ```
 <script>
@@ -3239,7 +3253,7 @@ loadProfile();
 </script>
 ```
 
-✅ Admin Fetch All Employees (Admin Page)
+#### ✅ Admin Fetch All Employees (Admin Page)
 
 ```
 <script>
@@ -3254,14 +3268,15 @@ async function loadEmployees() {
 </script>
 ```
 
-🟢 STEP 5 — LOGOUT FLOW (BOTH PAGES)
-Button
+#### 🟢 STEP 5 — LOGOUT FLOW (BOTH PAGES)
+
+#### Button
 
 ```
 <button class="btn btn-outline-light" onclick="logout()">Logout</button>
 ```
 
-What Happens (Internally)
+#### What Happens (Internally)
 
 ✔ Cognito tokens destroyed
 
