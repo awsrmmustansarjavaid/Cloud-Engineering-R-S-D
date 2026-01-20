@@ -1074,7 +1074,7 @@ def lambda_handler(event, context):
 ---
 ## PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
 
-### Research and Development (Just for CaseStudy)
+### 📃 Research and Development (Just for CaseStudy)
 
 #### 1️⃣ Can we reuse the existing PDF Lambda?
 
