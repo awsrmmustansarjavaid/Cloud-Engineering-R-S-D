@@ -1566,132 +1566,31 @@ logger.info(event)
 **📌 Interviewers love this**
 ---
 
-### 3️⃣  🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
-> **📄 admin-dashboard.html**
+### 3️⃣  🔐 PART 4 – Frontend → API Integration & Role-Based UI Control
 
-#### ✅ Add these BEFORE closing </body>
+#### 🟢 OVERVIEW
 
-#### 1️⃣ Add Cognito SDK (REQUIRED)
+#### This section connects:
 
-```
-<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
-```
+- Frontend pages (Admin & Employee)
 
-#### 2️⃣ Add Shared Auth & API Script
+- Amazon Cognito authentication
 
-```
-<script src="js/auth-api.js"></script>
-```
+- API Gateway + Lambda (secureFetch)
 
-#### 3️⃣ Page Protection + Role Enforcement
-> **Call required functions**
+- Role-based UI access control
 
-```
-<script>
-/* Protect page from unauthenticated access */
-protectPage();
+- All protected pages MUST:
 
-/* Allow only Admin users */
-enforceAdminAccess();
-</script>
-```
+- Block unauthenticated users
 
-#### 4️⃣ Admin-Only HTML Section
+- Enforce role access (Admin / Employee)
 
-```
-<div id="admin-section" style="display:none;">
-    <button class="btn btn-warning">Manage Employees</button>
-    <button class="btn btn-danger">View Payroll</button>
-</div>
-```
+- Use Cognito tokens securely
 
-#### 5️⃣ Logout Button (Admin)
-
-```
-<button class="btn btn-outline-light" onclick="logout()">Logout</button>
-```
+- Call backend APIs safely
 
 
-#### 🟢 STEP 3 — INCLUDE SCRIPT IN EMPLOYEE PAGE
-> **📄 employee-portal.html**
-
-#### ✅ Add these BEFORE closing </body>
-
-#### 1️⃣ Cognito SDK
-
-```
-<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
-```
-
-#### 2️⃣ Shared Script
-
-```
-<script src="js/auth-api.js"></script>
-```
-
-#### 3️⃣ Page Protection + Employee Role Check
-
-```
-<script>
-/* Block unauthenticated users */
-protectPage();
-
-/* Allow only Employee users */
-enforceEmployeeAccess();
-</script>
-```
-
-#### 4️⃣ Logout Button (Employee)
-
-```
-<button class="btn btn-outline-light" onclick="logout()">Logout</button>
-```
-
-#### 🟢 STEP 4 — USING API FUNCTIONS (REAL DATA)
-
-#### ✅ Employee Profile (Employee Page)
-
-```
-<script>
-async function loadProfile() {
-    try {
-        const data = await secureFetch(apiBase + "/employee/profile");
-
-        document.getElementById("profile-name").innerText = data.name;
-        document.getElementById("profile-job").innerText = data.job_title;
-        document.getElementById("profile-salary").innerText = data.salary;
-        document.getElementById("profile-start").innerText = data.start_date;
-    } catch (err) {
-        alert("Failed to load profile");
-    }
-}
-
-loadProfile();
-</script>
-```
-
-#### ✅ Admin Fetch All Employees (Admin Page)
-
-```
-<script>
-async function loadEmployees() {
-    try {
-        const data = await secureFetch(apiBase + "/admin/employees");
-        console.log("Employees:", data);
-    } catch (err) {
-        alert("Unauthorized or failed request");
-    }
-}
-</script>
-```
-
-#### 🟢 STEP 5 — LOGOUT FLOW (BOTH PAGES)
-
-#### Button
-
-```
-<button class="btn btn-outline-light" onclick="logout()">Logout</button>
-```
 
 ---
 

@@ -2529,6 +2529,23 @@ sudo chmod -R 755 js
 
 ✅ Secure & production-ready
 
+### 3️⃣ Frontend → API Integration & Role-Based UI Control
+
+#### 🟢 REQUIRED FILES STRUCTURE
+
+```
+/project-root
+│
+├── admin-dashboard.html
+├── employee-portal.html
+│
+└── js/
+    ├── config.js
+    └── auth-api.js
+```
+
+
+
 
 
 
