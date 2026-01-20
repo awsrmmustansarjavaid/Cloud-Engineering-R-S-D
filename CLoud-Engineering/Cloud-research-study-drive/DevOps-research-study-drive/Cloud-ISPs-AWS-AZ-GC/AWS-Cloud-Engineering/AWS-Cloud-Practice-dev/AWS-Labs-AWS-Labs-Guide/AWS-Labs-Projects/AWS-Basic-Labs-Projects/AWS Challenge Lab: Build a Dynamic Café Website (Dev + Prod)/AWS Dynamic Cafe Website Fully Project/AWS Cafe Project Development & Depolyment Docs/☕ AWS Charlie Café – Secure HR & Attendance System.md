@@ -1273,6 +1273,49 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 #### Step 2 — Test Event
 
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3 — Invoke Test
+
+#### Expected output:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"leaves\": [{\"leave_date\": \"2026-01-15\", \"leave_type\": \"Sick Leave\"}], \"holidays\": [{\"holiday_date\": \"2026-01-01\", \"description\": \"New Year\"}]}"
+}
+```
+
+> **Confirms Lambda reads both leaves and holidays tables**
+
+### ✅ Verification Checklist
+
+#### All 5 Lambdas invoke without error
+
+✔️ Database writes/reads are successful
+
+✔️ Test attendance table shows:
+
+    ✔️ Today’s check-in
+
+    ✔️ Today’s check-out
+
+✔️ Employee profile matches employees table
+
+✔️ Leaves and holidays return correct rows
+
+**✔️  If all pass → Lambdas are fully integrated with RDS**
+> **We are ready to move to API Gateway to expose them to the frontend securely.**
 
 
 ### 📥 What You Have Achieved
