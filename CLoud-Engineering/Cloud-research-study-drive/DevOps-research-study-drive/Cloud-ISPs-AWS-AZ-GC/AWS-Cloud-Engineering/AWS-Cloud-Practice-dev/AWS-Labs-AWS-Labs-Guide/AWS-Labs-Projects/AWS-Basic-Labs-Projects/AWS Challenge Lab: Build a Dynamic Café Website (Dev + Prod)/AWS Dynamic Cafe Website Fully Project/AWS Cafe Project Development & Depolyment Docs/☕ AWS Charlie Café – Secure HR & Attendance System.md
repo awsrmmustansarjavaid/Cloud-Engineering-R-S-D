@@ -155,35 +155,35 @@
 
 ### 3️⃣ Frontend Pages
 
-A) Attendance Check-In / Check-Out Page
+#### 1️⃣ A) Attendance Check-In / Check-Out Page
 
-Tablet-friendly layout
+    - Tablet-friendly layout
 
-Employee authentication via Cognito
+    - Employee authentication via Cognito
 
-Buttons:
+    - Buttons:
 
-Check-In
+        - Check-In
 
-Check-Out
+        - Check-Out
 
-Auto timestamp capture
+    - Auto timestamp capture
 
-Success / error notification
+    - Success / error notification
 
-B) Employee Portal Page
+#### 2️⃣ B) Employee Portal Page
 
-Authenticated access only
+    - Authenticated access only
 
-Sections:
+    - Sections:
 
-Employee profile summary
+        - Employee profile summary
 
-Attendance table
+        - Attendance table
 
-Leaves and holidays list
+        - Leaves and holidays list
 
-Displayed Data Example
+#### Displayed Data Example
 
 ```
 Employee Name: Alice
