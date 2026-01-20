@@ -656,7 +656,103 @@ sudo ./setup_cafe_hr_attendance.sh
 
 ## PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
+🎯 What We Are Creating in This Part
 
+You will create 5 NEW Lambda functions:
+
+hr-checkin
+
+hr-checkout
+
+hr-employee-profile
+
+hr-attendance-history
+
+hr-leaves-holidays
+
+Each Lambda will:
+
+Use existing RDS (cafedb)
+
+Be protected by existing Cognito
+
+Be callable from existing API Gateway
+
+Follow real job-level backend standards
+
+1️⃣ IAM Role for HR Lambdas (ONE TIME ONLY)
+
+If you already have a Lambda role that accesses RDS + CloudWatch, reuse it.
+If not, follow every step below.
+
+Step 1: Open IAM
+
+AWS Console → IAM
+
+Roles → Create role
+
+Step 2: Select Trusted Entity
+
+Trusted entity type: AWS service
+
+Service: Lambda
+
+Click Next
+
+Step 3: Attach Permissions
+
+Attach exactly these policies:
+
+AWSLambdaBasicExecutionRole
+
+AmazonRDSDataFullAccess (or your custom RDS policy)
+
+Click Next
+
+Step 4: Role Name
+
+Role name:
+
+```
+cafe-hr-lambda-role
+```
+
+Create role
+
+2️⃣ Create Lambda: hr-checkin
+Step 1: Open Lambda
+
+AWS Console → Lambda
+
+Click Create function
+
+Step 2: Function Basics
+
+Author from scratch
+
+Function name:
+
+```
+hr-checkin
+```
+
+Runtime:
+
+```
+Python 3.12
+```
+
+Architecture: x86_64
+
+Execution role:
+
+Use existing role
+
+Select:
+
+```
+cafe-hr-lambda-role
+```
 
 
 
