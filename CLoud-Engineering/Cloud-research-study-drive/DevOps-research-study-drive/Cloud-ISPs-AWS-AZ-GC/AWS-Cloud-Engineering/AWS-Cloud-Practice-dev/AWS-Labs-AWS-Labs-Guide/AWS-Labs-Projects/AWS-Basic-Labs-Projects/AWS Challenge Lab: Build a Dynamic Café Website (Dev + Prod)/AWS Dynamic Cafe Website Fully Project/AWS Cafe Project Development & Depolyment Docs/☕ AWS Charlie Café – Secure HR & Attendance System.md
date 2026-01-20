@@ -1330,13 +1330,293 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 ✅ No duplication of existing lab
 
-
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
 ## ☕ Charlie Café PHASE 3️⃣ — API Gateway Setup for HR Secure Attendance System
+
+### 🔹 Step 0 — Assumptions
+
+#### We already have:
+
+- EC2 Apache frontend
+
+- Lambda functions (5 HR Lambdas) fully working and tested
+
+- RDS database with employees, attendance, leaves, holidays
+
+- Cognito User Pool already created
+
+### 1️⃣ Open API Gateway
+
+- Go to AWS Console → API Gateway → Create API
+
+- Choose REST API (not HTTP API)
+
+- API Name:
+
+```
+cafe-hr-api
+```
+
+Description:
+
+```
+HR Secure Attendance & Employee Management API
+```
+
+Endpoint Type: Regional
+
+Click Create API
+
+2️⃣ Create Resources (Paths)
+
+We will create 5 resources, one for each Lambda.
+
+| Resource           | Path                  | Lambda Function         |
+| ------------------ | --------------------- | ----------------------- |
+| Check-In           | `/checkin`            | `hr-checkin`            |
+| Check-Out          | `/checkout`           | `hr-checkout`           |
+| Employee Profile   | `/employee/profile`   | `hr-employee-profile`   |
+| Attendance History | `/attendance/history` | `hr-attendance-history` |
+| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
+
+Step 1 — Add /checkin
+
+Click Actions → Create Resource
+
+Resource Name: CheckIn
+
+Resource Path: /checkin
+
+Click Create Resource
+
+Step 2 — Repeat for remaining resources
+
+/checkout
+
+/employee/profile
+
+/attendance/history
+
+/leaves-holidays
+
+3️⃣ Create Methods
+
+For each resource:
+
+Click on Resource → Actions → Create Method
+
+Select POST for /checkin and /checkout
+
+Select GET for /employee/profile, /attendance/history, /leaves-holidays
+
+4️⃣ Integrate Lambda Function
+
+For each method:
+
+Integration type: Lambda Function
+
+Check Use Lambda Proxy Integration
+
+Lambda Region: your Lambda region
+
+Lambda Function:
+
+/checkin → hr-checkin
+
+/checkout → hr-checkout
+
+/employee/profile → hr-employee-profile
+
+/attendance/history → hr-attendance-history
+
+/leaves-holidays → hr-leaves-holidays
+
+Click Save
+
+Grant permissions when prompted → Yes
+
+5️⃣ Enable Cognito Authorizer
+Step 1 — Create Authorizer
+
+API Gateway → Authorizers → Create New Authorizer
+
+Name: HR-Cognito-Authorizer
+
+Type: Cognito
+
+Cognito User Pool: Select your café User Pool
+
+Token Source: Authorization (Header)
+
+Click Create
+
+Step 2 — Attach Authorizer to Methods
+
+For each resource method:
+
+Click on Method → Method Request
+
+Authorization: select HR-Cognito-Authorizer
+
+Save
+
+6️⃣ Enable CORS (Cross-Origin Resource Sharing)
+
+For each resource method:
+
+Click Method → Actions → Enable CORS
+
+Settings:
+
+Access-Control-Allow-Headers: Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+
+Access-Control-Allow-Methods: GET,POST,OPTIONS
+
+Access-Control-Allow-Origin: *
+
+Click Enable CORS and replace existing CORS headers
+
+Deploy API (Step 7)
+
+7️⃣ Deploy API
+
+Actions → Deploy API
+
+Deployment stage: prod
+
+Stage description: HR Secure API
+
+Deploy
+
+Copy the Invoke URL. Example:
+
+```
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod
+```
+
+8️⃣ Test Each API Endpoint
+
+We will test using Postman or Lambda Test Console.
+
+8.1 Test /checkin (POST)
+
+Request:
+
+URL:
+
+```
+https://<API-ID>.execute-api.<region>.amazonaws.com/prod/checkin
+```
+
+Method: POST
+
+Headers:
+
+```
+Authorization: <Cognito JWT token>
+Content-Type: application/json
+```
+
+Body: Empty JSON {}
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-in successful\"}"
+}
+```
+
+Verify in RDS:
+
+```
+SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
+```
+
+8.2 Test /checkout (POST)
+
+Request:
+
+URL: /checkout
+
+Headers same as above
+
+Body: {}
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-out successful\"}"
+}
+```
+
+Verify in RDS: checkout_time populated for today
+
+8.3 Test /employee/profile (GET)
+
+URL: /employee/profile
+
+Method: GET
+
+Headers: Authorization: <Cognito JWT>
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"name\": \"Alice\",\"job_title\": \"Barista\",\"salary\": 40000.0,\"start_date\": \"2025-12-01\"}"
+}
+```
+
+8.4 Test /attendance/history (GET)
+
+URL: /attendance/history
+
+Headers: Authorization: <Cognito JWT>
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "body": "[{\"attendance_date\": \"2026-01-19\",\"checkin_time\": \"09:00:00\",\"checkout_time\": \"17:00:00\"}]"
+}
+```
+
+8.5 Test /leaves-holidays (GET)
+
+URL: /leaves-holidays
+
+Headers: Authorization: <Cognito JWT>
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"leaves\": [{\"leave_date\": \"2026-01-15\", \"leave_type\": \"Sick Leave\"}], \"holidays\": [{\"holiday_date\": \"2026-01-01\", \"description\": \"New Year\"}]}"
+}
+```
+
+9️⃣ Verification Checklist
+
+✅ All endpoints secured by Cognito JWT
+
+✅ Lambda functions triggered via API Gateway
+
+✅ RDS integration works for attendance, check-in/out, employee profile, leaves, holidays
+
+✅ CORS enabled for frontend
+
+✅ Can call endpoints from EC2 frontend or Postman
+
 
 
 
