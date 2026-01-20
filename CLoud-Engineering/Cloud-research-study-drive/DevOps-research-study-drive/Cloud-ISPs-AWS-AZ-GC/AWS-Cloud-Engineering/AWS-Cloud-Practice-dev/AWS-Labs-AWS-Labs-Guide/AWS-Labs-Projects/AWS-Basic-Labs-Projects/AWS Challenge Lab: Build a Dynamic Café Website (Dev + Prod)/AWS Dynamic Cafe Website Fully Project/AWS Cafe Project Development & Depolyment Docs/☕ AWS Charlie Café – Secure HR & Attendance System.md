@@ -2342,7 +2342,18 @@ async function loadAllEmployees() {
 </script>
 ```
 
-### 5️⃣ — BACKEND SECURITY (DOUBLE PROTECTION)
+### 🌐 Frontend — Task 2️⃣ — Frontend → API Integration & Role-Based UI Control
+
+
+
+
+
+
+
+
+### ☢️ BACKEND— Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
+
+### 1️⃣ — BACKEND SECURITY (DOUBLE PROTECTION)
 
 Even if UI fails, Lambda still protects.
 
@@ -2357,6 +2368,13 @@ if 'Admin' not in groups:
         "body": "Forbidden"
     }
 ```
+
+✔ Frontend check
+
+✔ Backend check
+
+✔ Enterprise-grade security
+
 
 
 
