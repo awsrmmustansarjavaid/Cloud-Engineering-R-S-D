@@ -3217,10 +3217,292 @@ function displaySummary(records) {
 ---
 ## ☕ Charlie Café PHASE 7️⃣ — ADMIN DASHBOARD ENHANCEMENTS
 
+STEP 1 — Database & Backend Preparation
+1️⃣ Verify RDS Tables
 
+You already have:
 
+employees (employee_id, name, job_title)
 
+attendance (attendance_id, employee_id, date, checkin_time, checkout_time)
 
+leaves (leave_id, employee_id, leave_date, leave_type)
+
+✅ No changes needed here; all data is ready for filtering and summary.
+
+2️⃣ Optional: Add Indexes (Performance)
+
+```
+CREATE INDEX idx_attendance_employee_date ON attendance(employee_id, date);
+CREATE INDEX idx_leaves_employee_date ON leaves(employee_id, leave_date);
+```
+
+✅ Purpose: Fast filtering by employee and date.
+
+STEP 2 — Lambda Functions for Admin Dashboard Enhancements
+
+We will create one main Lambda that supports filtering and summary cards.
+
+Filename: admin_dashboard_data.py
+
+```
+import json
+import pymysql
+import os
+from datetime import date
+
+# RDS connection details from Lambda environment variables
+DB_HOST = os.environ['DB_HOST']
+DB_USER = os.environ['DB_USER']
+DB_PASSWORD = os.environ['DB_PASSWORD']
+DB_NAME = os.environ['DB_NAME']
+
+def lambda_handler(event, context):
+    """
+    Returns:
+    - Filtered attendance records (optionally by employee_id)
+    - Summary counts: total present, absent, leaves
+    """
+
+    # Optional query parameter for employee filtering
+    employee_id = event.get('queryStringParameters', {}).get('employee_id')
+
+    try:
+        connection = pymysql.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
+        )
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+        # 1️⃣ Attendance Records
+        if employee_id:
+            sql_attendance = """
+                SELECT a.date, e.employee_id, e.name, a.checkin_time, a.checkout_time
+                FROM attendance a
+                JOIN employees e ON a.employee_id = e.employee_id
+                WHERE e.employee_id = %s
+                ORDER BY a.date DESC
+            """
+            cursor.execute(sql_attendance, (employee_id,))
+        else:
+            sql_attendance = """
+                SELECT a.date, e.employee_id, e.name, a.checkin_time, a.checkout_time
+                FROM attendance a
+                JOIN employees e ON a.employee_id = e.employee_id
+                ORDER BY a.date DESC
+            """
+            cursor.execute(sql_attendance)
+
+        attendance_records = cursor.fetchall()
+
+        # 2️⃣ Summary Cards
+        sql_summary = """
+            SELECT 
+                COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL THEN a.employee_id END) AS total_present,
+                COUNT(DISTINCT e.employee_id) - COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL THEN a.employee_id END) AS total_absent,
+                (SELECT COUNT(*) FROM leaves) AS total_leaves
+            FROM employees e
+            LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.date = CURDATE()
+        """
+        cursor.execute(sql_summary)
+        summary = cursor.fetchone()
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'attendance': attendance_records, 'summary': summary})
+        }
+
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
+    finally:
+        cursor.close()
+        connection.close()
+```
+
+✅ This Lambda:
+
+Supports optional employee filter
+
+Returns attendance records + summary cards (present / absent / leaves)
+
+STEP 3 — API Gateway Integration
+
+Open API Gateway → Existing HR API
+
+Create Resource: /admin/dashboard
+
+Method: GET → Lambda integration → admin_dashboard_data
+
+Enable Cognito Authorizer → Admin-only access
+
+Enable CORS → Allowed origin: your EC2 frontend
+
+Deploy → Stage: prod
+
+STEP 4 — Admin Frontend — HTML Enhancements
+4️⃣1 — Add Filter Dropdown & Summary Cards
+
+```
+<div class="container my-4">
+    <!-- Summary Cards -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="card bg-success text-white p-3">
+                <h5>Total Present</h5>
+                <p id="card-present">0</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white p-3">
+                <h5>Total Absent</h5>
+                <p id="card-absent">0</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark p-3">
+                <h5>Total Leaves</h5>
+                <p id="card-leaves">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Filter -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="employeeFilter" class="form-label">Filter by Employee</label>
+            <select id="employeeFilter" class="form-select" onchange="loadDashboardData()">
+                <option value="">All Employees</option>
+                <!-- Employee options populated dynamically -->
+            </select>
+        </div>
+    </div>
+
+    <!-- Attendance Table -->
+    <div id="dashboard-table-container"></div>
+
+    <!-- Export Button -->
+    <button class="btn btn-primary mt-3" onclick="exportCSV()">Export CSV</button>
+</div>
+```
+
+STEP 5 — Admin Frontend — JS Functions
+
+Add these to your shared script (admin.js or auth-api.js):
+
+```
+// Load Employee Filter Options
+async function loadEmployeeFilter() {
+    const employees = await secureFetch(apiBase + "/admin/employees");
+    const select = document.getElementById("employeeFilter");
+    employees.forEach(emp => {
+        const option = document.createElement("option");
+        option.value = emp.employee_id;
+        option.text = emp.name;
+        select.add(option);
+    });
+}
+
+// Load Dashboard Data
+async function loadDashboardData() {
+    const empId = document.getElementById("employeeFilter").value;
+    let url = apiBase + "/admin/dashboard";
+    if (empId) url += "?employee_id=" + empId;
+
+    const data = await secureFetch(url);
+
+    // Populate summary cards
+    document.getElementById("card-present").innerText = data.summary.total_present;
+    document.getElementById("card-absent").innerText = data.summary.total_absent;
+    document.getElementById("card-leaves").innerText = data.summary.total_leaves;
+
+    // Populate attendance table
+    const container = document.getElementById("dashboard-table-container");
+    let html = `<table class="table table-striped table-bordered">
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                    </tr>`;
+    data.attendance.forEach(r => {
+        html += `<tr>
+                    <td>${r.employee_id}</td>
+                    <td>${r.name}</td>
+                    <td>${r.date}</td>
+                    <td>${r.checkin_time}</td>
+                    <td>${r.checkout_time}</td>
+                 </tr>`;
+    });
+    html += `</table>`;
+    container.innerHTML = html;
+}
+
+// Export CSV Function
+function exportCSV() {
+    const table = document.querySelector("#dashboard-table-container table");
+    let csv = [];
+    for (let row of table.rows) {
+        let cols = Array.from(row.cells).map(cell => '"' + cell.innerText + '"');
+        csv.push(cols.join(","));
+    }
+    const csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "attendance_dashboard.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Initialize dashboard
+async function initAdminDashboard() {
+    await loadEmployeeFilter();
+    await loadDashboardData();
+}
+
+initAdminDashboard();
+```
+
+✅ What this JS does:
+
+Populates employee dropdown dynamically
+
+Fetches attendance + summary cards
+
+Filters by employee
+
+Exports table as CSV
+
+STEP 6 — Testing & Verification
+
+Login as Admin → Open Dashboard
+
+Check Summary Cards → Total Present / Absent / Leaves
+
+Filter by Employee → Table updates
+
+Export CSV → Open downloaded file, verify data matches table
+
+Unauthorized Access Test → Employee account cannot see dashboard or API results
+
+🎯 Outcome:
+
+Admin dashboard now has employee-wise filtering
+
+Export-ready table via CSV
+
+Summary cards for quick metrics
+
+Fully integrated with existing Lambda + RDS
+
+Fully job-ready
 
 
 **✅ PHASE 7️⃣ STATUS**
