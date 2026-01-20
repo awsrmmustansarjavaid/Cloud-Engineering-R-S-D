@@ -294,7 +294,7 @@ Leaves:
 
 # ☕ Charlie Café SECTION 2️⃣ - Attendance System
 
-## PHASE 1️⃣ — Database Layer (RDS) Configuration
+## ☕ Charlie Café PHASE 1️⃣ — Database Layer (RDS) Configuration
 
 #### 📢 Goal: Prepare database objects so Lambda can store and read attendance, employees, leaves, holidays.
 
@@ -654,7 +654,7 @@ sudo ./setup_cafe_hr_attendance.sh
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
+## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
 ### 🎯 What We Are Creating in This Part
 
@@ -1336,7 +1336,7 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
+## ☕ Charlie Café PHASE 3️⃣ — API Gateway Setup for HR Secure Attendance System
 
 
 
@@ -1345,7 +1345,7 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
+## ☕ Charlie Café PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
 
 ### 📃 Research and Development (Just for CaseStudy)
 
