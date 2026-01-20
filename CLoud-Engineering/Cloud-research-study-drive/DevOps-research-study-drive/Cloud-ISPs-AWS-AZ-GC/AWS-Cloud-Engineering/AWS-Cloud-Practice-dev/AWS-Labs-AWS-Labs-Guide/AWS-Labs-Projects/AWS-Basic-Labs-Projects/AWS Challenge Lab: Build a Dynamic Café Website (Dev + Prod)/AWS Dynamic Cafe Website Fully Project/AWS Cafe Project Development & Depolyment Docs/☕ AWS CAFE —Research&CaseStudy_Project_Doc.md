@@ -1590,7 +1590,157 @@ logger.info(event)
 
 - Call backend APIs safely
 
+#### 🟢 GLOBAL RULE (VERY IMPORTANT)
 
+#### ✅ SCRIPT LOAD ORDER (NON-NEGOTIABLE)
+
+Every protected page MUST load scripts in this exact order:
+
+```
+<!-- 1️⃣ Cognito SDK -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+<!-- 2️⃣ Global Config (MUST come first) -->
+<script src="js/config.js"></script>
+
+<!-- 3️⃣ Auth & API Logic -->
+<script src="js/auth-api.js"></script>
+```
+
+❌ Do NOT change this order
+❌ Do NOT skip config.js
+
+🟢 STEP 1 — GLOBAL CONFIG FILE
+📄 js/config.js
+
+```
+/* ===== GLOBAL CONFIGURATION ===== */
+
+const CONFIG = {
+    region: "us-east-1",
+    userPoolId: "us-east-1_XXXXXXXXX",
+    clientId: "XXXXXXXXXXXXXXXXXXXXXXXXXX"
+};
+
+/* Base API Gateway URL */
+const apiBase = "https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prod";
+```
+
+🟢 STEP 2 — SHARED AUTH & API LOGIC
+📄 js/auth-api.js
+
+```
+/* ===== COGNITO SETUP ===== */
+
+const poolData = {
+    UserPoolId: CONFIG.userPoolId,
+    ClientId: CONFIG.clientId
+};
+
+const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+/* ===== PAGE PROTECTION ===== */
+
+function protectPage() {
+    const user = userPool.getCurrentUser();
+    if (!user) {
+        window.location.href = "login.html";
+    }
+}
+
+/* ===== ROLE CHECK HELPERS ===== */
+
+function getUserRole(callback) {
+    const user = userPool.getCurrentUser();
+    if (!user) return;
+
+    user.getSession((err, session) => {
+        if (err) return;
+
+        const token = session.getIdToken().payload;
+        callback(token["custom:role"]);
+    });
+}
+
+function enforceAdminAccess() {
+    getUserRole(role => {
+        if (role !== "admin") {
+            alert("Access denied: Admins only");
+            window.location.href = "employee-portal.html";
+        }
+        document.getElementById("admin-section").style.display = "block";
+    });
+}
+
+function enforceEmployeeAccess() {
+    getUserRole(role => {
+        if (role !== "employee") {
+            alert("Access denied: Employees only");
+            window.location.href = "admin-dashboard.html";
+        }
+    });
+}
+
+/* ===== SECURE API FETCH ===== */
+
+async function secureFetch(url, options = {}) {
+    const user = userPool.getCurrentUser();
+
+    return new Promise((resolve, reject) => {
+        user.getSession(async (err, session) => {
+            if (err) reject(err);
+
+            const token = session.getIdToken().getJwtToken();
+
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    "Authorization": token,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            resolve(response.json());
+        });
+    });
+}
+
+/* ===== LOGOUT ===== */
+
+function logout() {
+    const user = userPool.getCurrentUser();
+    if (user) {
+        user.signOut();
+    }
+    window.location.href = "index.html";
+}
+```
+
+#### 🟢 STEP 5 — TEST & VERIFICATION (MANDATORY)
+
+#### ✅ Authentication Tests
+
+- Open admin page without login → ❌ Redirect
+
+- Login as employee → admin page → ❌ blocked
+
+- Login as admin → admin page → ✅ allowed
+
+#### ✅ API Security Test
+
+- Remove Authorization header → ❌ 401
+
+- Valid token → ✅ data loads
+
+#### ✅ Logout Test
+
+- Click Logout
+
+- Redirect occurs
+
+- Press browser Back
+
+❌ Page must NOT load
 
 ---
 

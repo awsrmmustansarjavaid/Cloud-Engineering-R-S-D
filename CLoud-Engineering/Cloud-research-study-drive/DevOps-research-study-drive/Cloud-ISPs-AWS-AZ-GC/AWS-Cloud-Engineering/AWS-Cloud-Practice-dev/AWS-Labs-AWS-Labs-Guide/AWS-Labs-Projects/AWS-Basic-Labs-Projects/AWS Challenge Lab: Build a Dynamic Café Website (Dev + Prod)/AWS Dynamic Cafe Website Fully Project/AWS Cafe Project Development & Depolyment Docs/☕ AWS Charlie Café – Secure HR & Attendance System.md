@@ -2544,7 +2544,81 @@ sudo chmod -R 755 js
     └── auth-api.js
 ```
 
+#### 1️⃣ ADMIN PAGE (FINAL)
+> **📄 admin-dashboard.html**
 
+#### Add BEFORE </body>
+
+```
+<!-- Cognito SDK -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+<!-- Global Config -->
+<script src="js/config.js"></script>
+
+<!-- Shared Auth & API -->
+<script src="js/auth-api.js"></script>
+
+<script>
+/* Protect page */
+protectPage();
+
+/* Enforce admin-only access */
+enforceAdminAccess();
+
+/* Optional admin API call */
+async function loadAllEmployees() {
+    const data = await secureFetch(apiBase + "/admin/employees");
+    console.log("Employees:", data);
+}
+</script>
+
+<!-- Admin-only UI -->
+<div id="admin-section" style="display:none;">
+    <button class="btn btn-warning">Manage Employees</button>
+    <button class="btn btn-danger">View Payroll</button>
+</div>
+
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
+
+#### 2️⃣ EMPLOYEE PAGE (FINAL)
+> **📄 employee-portal.html**
+
+#### Add BEFORE </body>
+
+```
+<!-- Cognito SDK -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+<!-- Global Config -->
+<script src="js/config.js"></script>
+
+<!-- Shared Auth & API -->
+<script src="js/auth-api.js"></script>
+
+<script>
+/* Protect page */
+protectPage();
+
+/* Enforce employee-only access */
+enforceEmployeeAccess();
+
+/* Load employee profile */
+async function loadEmployeeProfile() {
+    const data = await secureFetch(apiBase + "/employee/profile");
+
+    document.getElementById("profile-name").innerText = data.name;
+    document.getElementById("profile-job").innerText = data.job_title;
+    document.getElementById("profile-salary").innerText = data.salary;
+    document.getElementById("profile-start").innerText = data.start_date;
+}
+
+loadEmployeeProfile();
+</script>
+
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
 
 
 
