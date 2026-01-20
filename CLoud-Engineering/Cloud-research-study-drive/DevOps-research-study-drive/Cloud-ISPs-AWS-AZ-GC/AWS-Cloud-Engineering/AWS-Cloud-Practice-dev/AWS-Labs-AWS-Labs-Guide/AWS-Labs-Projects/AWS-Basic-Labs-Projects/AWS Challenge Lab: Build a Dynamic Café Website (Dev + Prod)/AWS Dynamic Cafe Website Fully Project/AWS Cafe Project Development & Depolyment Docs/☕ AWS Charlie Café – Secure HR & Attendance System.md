@@ -2382,27 +2382,7 @@ if 'Admin' not in groups:
 
 ### ➕ - A SHARED SCRIPT FILE (Recommanded)
 
-#### ✅ Benefits of a Shared Script File (Industry Standard)
 
-By creating ONE shared JS file:
-
-✔ Clean HTML (UI only)
-
-✔ All security logic in one place
-
-✔ Easy debugging
-
-✔ Easy upgrades
-
-✔ Same pattern used in:
-
-AWS Amplify apps
-
-React / Vue projects
-
-Enterprise dashboards
-
-👉 This is how companies expect you to work
 
 #### 🧱 PROPOSED FILE STRUCTURE (VERY IMPORTANT)
 
