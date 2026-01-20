@@ -1442,55 +1442,55 @@ HR Secure Attendance & Employee Management API
 
 #### Step 1 — Create Authorizer
 
-API Gateway → Authorizers → Create New Authorizer
+- API Gateway → Authorizers → Create New Authorizer
 
-Name: HR-Cognito-Authorizer
+- Name: HR-Cognito-Authorizer
 
-Type: Cognito
+- Type: Cognito
 
-Cognito User Pool: Select your café User Pool
+- Cognito User Pool: Select your café User Pool
 
-Token Source: Authorization (Header)
+- Token Source: Authorization (Header)
 
-Click Create
+- Click Create
 
 #### Step 2 — Attach Authorizer to Methods
 
 #### For each resource method:
 
-Click on Method → Method Request
+    - Click on Method → Method Request
 
-Authorization: select HR-Cognito-Authorizer
+    - Authorization: select HR-Cognito-Authorizer
 
-Save
+    - Save
 
 ### 6️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
 #### For each resource method:
 
-Click Method → Actions → Enable CORS
+    - Click Method → Actions → Enable CORS
 
 #### Settings:
 
-Access-Control-Allow-Headers: Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+    - Access-Control-Allow-Headers: Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
 
-Access-Control-Allow-Methods: GET,POST,OPTIONS
+    - Access-Control-Allow-Methods: GET,POST,OPTIONS
 
-#### Access-Control-Allow-Origin: *
+    - Access-Control-Allow-Origin: *
 
-Click Enable CORS and replace existing CORS headers
+- Click Enable CORS and replace existing CORS headers
 
-Deploy API (Step 7)
+- Deploy API (Step 7)
 
 ### 7️⃣ Deploy API
 
-Actions → Deploy API
+- Actions → Deploy API
 
-Deployment stage: prod
+- Deployment stage: prod
 
-Stage description: HR Secure API
+- Stage description: HR Secure API
 
-Deploy
+- Deploy
 
 #### Copy the Invoke URL. Example:
 
@@ -1500,28 +1500,28 @@ https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod
 
 ### 8️⃣ Test Each API Endpoint
 
-We will test using Postman or Lambda Test Console.
+> **We will test using Postman or Lambda Test Console.**
 
 #### 8.1 Test /checkin (POST)
 
 #### Request:
 
-#### URL:
+    - URL:
 
 ```
 https://<API-ID>.execute-api.<region>.amazonaws.com/prod/checkin
 ```
 
-#### Method: POST
+    - Method: POST
 
-#### Headers:
+    - Headers:
 
 ```
 Authorization: <Cognito JWT token>
 Content-Type: application/json
 ```
 
-Body: Empty JSON {}
+    - Body: Empty JSON {}
 
 #### Expected Response:
 
@@ -1542,11 +1542,11 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 
 #### Request:
 
-URL: /checkout
+    - URL: /checkout
 
-Headers same as above
+    - Headers same as above
 
-Body: {}
+    - Body: {}
 
 #### Expected Response:
 
@@ -1557,15 +1557,16 @@ Body: {}
 }
 ```
 
-Verify in RDS: checkout_time populated for today
+#### Verify in RDS: 
+- checkout_time populated for today
 
 #### 8.3 Test /employee/profile (GET)
 
-URL: /employee/profile
+- URL: /employee/profile
 
-Method: GET
+- Method: GET
 
-Headers: Authorization: <Cognito JWT>
+- Headers: Authorization: <Cognito JWT>
 
 #### Expected Response:
 
@@ -1578,9 +1579,9 @@ Headers: Authorization: <Cognito JWT>
 
 #### 8.4 Test /attendance/history (GET)
 
-URL: /attendance/history
+- URL: /attendance/history
 
-Headers: Authorization: <Cognito JWT>
+- Headers: Authorization: <Cognito JWT>
 
 #### Expected Response:
 
@@ -1593,9 +1594,9 @@ Headers: Authorization: <Cognito JWT>
 
 #### 8.5 Test /leaves-holidays (GET)
 
-URL: /leaves-holidays
+- URL: /leaves-holidays
 
-Headers: Authorization: <Cognito JWT>
+- Headers: Authorization: <Cognito JWT>
 
 #### Expected Response:
 
