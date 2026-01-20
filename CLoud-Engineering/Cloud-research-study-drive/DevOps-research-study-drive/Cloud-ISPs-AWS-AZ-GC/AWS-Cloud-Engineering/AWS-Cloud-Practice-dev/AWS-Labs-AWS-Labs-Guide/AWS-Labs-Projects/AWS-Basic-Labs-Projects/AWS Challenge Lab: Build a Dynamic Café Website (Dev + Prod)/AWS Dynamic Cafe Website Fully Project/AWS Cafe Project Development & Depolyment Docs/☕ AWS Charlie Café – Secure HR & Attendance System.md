@@ -2970,8 +2970,32 @@ Enterprise dashboards
 #### 🟢 STEP 1 — CREATE SHARED SCRIPT FILE
 > **📄 js/auth-api.js (FINAL, PRODUCTION-READY)**
 
+#### Assuming:
+
+- Your Apache web root = /var/www/html
+
+- Your project already exists
+
+1️⃣ Go to your web root
+
+```
+cd /var/www/html
 ```
 
+2️⃣ Create js folder (if not exists)
+
+```
+sudo mkdir -p js
+```
+
+3️⃣ Create the shared file
+
+```
+sudo nano js/auth-api.js
+```
+
+👉 Paste your full auth-api.js code inside this file
+(save with CTRL+O, exit CTRL+X)
 
 ```
 /* =====================================================
@@ -3097,6 +3121,19 @@ function logout() {
 ✅ Secure
 
 ✅ Clean
+
+4️⃣ Set correct permissions
+
+```
+sudo chown -R www-data:www-data js
+```
+```
+sudo chmod -R 755 js
+```
+
+✅ Apache can now read this file
+
+✅ Secure & production-ready
 
 
 🟢 STEP 2 — INCLUDE SCRIPT IN ADMIN PAGE
