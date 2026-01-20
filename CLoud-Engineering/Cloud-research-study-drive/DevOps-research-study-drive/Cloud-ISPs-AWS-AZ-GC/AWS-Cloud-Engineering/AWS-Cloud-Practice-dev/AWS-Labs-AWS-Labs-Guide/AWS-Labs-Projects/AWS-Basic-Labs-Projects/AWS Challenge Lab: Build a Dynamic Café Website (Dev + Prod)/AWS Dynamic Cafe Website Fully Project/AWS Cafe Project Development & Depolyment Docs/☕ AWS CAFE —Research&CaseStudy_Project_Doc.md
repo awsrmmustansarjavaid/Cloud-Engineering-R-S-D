@@ -59,53 +59,53 @@
 
 ### 4️⃣ Tasks List
 
-- Frontend Tasks
+#### 1️⃣ Frontend Tasks
 
 - Centralize config (API URL, Cognito IDs)
 
 - Create auth-api.js with:
 
-- JWT token fetch
+    - JWT token fetch
 
-- Secure API helper
+    - Secure API helper
 
-- Role detection
+    - Role detection
 
-- UI enforcement for Admin/Employee
+    - UI enforcement for Admin/Employee
 
-- Global error handler
+    - Global error handler
 
-- Loader functions
+    - Loader functions
 
-- Logout function
+    - Logout function
 
 - Update Admin & Employee pages:
 
-Include Cognito SDK
+    - Include Cognito SDK
 
-Include config.js + auth-api.js
+    - Include config.js + auth-api.js
 
-Call protectPage() + enforceAdminAccess() / enforceEmployeeAccess()
+    - Call protectPage() + enforceAdminAccess() / enforceEmployeeAccess()
 
-Replace API calls in pages with secureFetch
+- Replace API calls in pages with secureFetch
 
-Backend Tasks (Lambdas)
+#### 1️⃣ Backend Tasks (Lambdas)
 
-Add logging (CloudWatch)
+- Add logging (CloudWatch)
 
-Enforce role check using JWT claims
+- Enforce role check using JWT claims
 
-Replace “Function logic goes here” with specific business logic (checkin, checkout, profile, leaves, admin employees)
+- Replace “Function logic goes here” with specific business logic (checkin, checkout, profile, leaves, admin employees)
 
-Return structured JSON responses
+- Return structured JSON responses
 
-Testing Tasks
+#### Testing Tasks
 
 Frontend: Login, logout, access control, loader, error handling
 
 Backend: Authorized vs unauthorized role access, CloudWatch logging
 
-5️⃣ Anything else helpful for research / case study
+### 5️⃣ Anything else helpful for research / case study
 
 Show centralized config improves maintainability
 
