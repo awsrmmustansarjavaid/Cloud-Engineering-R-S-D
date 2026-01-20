@@ -49,24 +49,25 @@
 
 #### Access Control & Security
 
-Application access restricted using Security Groups
+- Application access restricted using Security Groups
 
-Frontend EC2:
+- Frontend EC2:
 
-HTTP/HTTPS allowed only from allowed IP ranges (practice lab)
+    - HTTP/HTTPS allowed only from allowed IP ranges (practice lab)
 
-Backend services protected using:
+- Backend services protected using:
 
-API Gateway authorization
+    - API Gateway authorization
 
-Cognito JWT validation
+    - Cognito JWT validation
 
-Database access:
+- Database access:
 
-RDS accessible only from Lambda security group
+    - RDS accessible only from Lambda security group
 
-2️⃣ Architecture Overview
-Frontend Layer
+### 2️⃣ Architecture Overview
+
+#### Frontend Layer
 
 Hosted on EC2 Apache Web Server
 
