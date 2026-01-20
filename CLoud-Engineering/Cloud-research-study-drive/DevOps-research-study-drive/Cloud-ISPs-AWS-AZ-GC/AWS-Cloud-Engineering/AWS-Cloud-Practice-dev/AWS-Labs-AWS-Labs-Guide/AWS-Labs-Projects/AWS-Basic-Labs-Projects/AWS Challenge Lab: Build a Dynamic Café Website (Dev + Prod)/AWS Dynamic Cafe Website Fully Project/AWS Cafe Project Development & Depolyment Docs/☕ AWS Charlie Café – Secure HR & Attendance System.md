@@ -87,71 +87,71 @@
 
 #### 2️⃣ AWS Lambda functions:
 
-- checkin
+    - checkin
 
-- checkout
+    - checkout
 
-- employeeProfile
+    - employeeProfile
 
-- attendanceHistory
+    - attendanceHistory
 
-- leavesAndHolidays
+    - leavesAndHolidays
 
 #### 3️⃣ Amazon Cognito:
 
-- User authentication
+    - User authentication
 
-- JWT-based access control for APIs
+    - JWT-based access control for APIs
 
 #### 3️⃣ Database Layer (RDS)
 
 #### 1️⃣ Database Type
 
-- MySQL or PostgreSQL
+    - MySQL or PostgreSQL
 
 #### 2️⃣ Tables
 
 #### 1️⃣ employees
 
-- employee_id
+    - employee_id
 
-- name
+    - name
 
-- job_title
+    - job_title
 
-- salary
+    - salary
 
-- start_date
+    - start_date
 
-- cognito_user_id
+    - cognito_user_id
 
 #### 2️⃣ attendance
 
-- attendance_id
+    - attendance_id
 
-- employee_id
+    - employee_id
 
-- date
+    - date
 
-- checkin_time
+    - checkin_time
 
-- checkout_time
+    - checkout_time
 
 #### 3️⃣ leaves
 
-- leave_id
+    - leave_id
 
-- employee_id
+    - employee_id
 
-- leave_date
+    - leave_date
 
-- leave_type
+    - leave_type
 
 #### 4️⃣ holidays
 
-- holiday_date
+    - holiday_date
 
-- description
+    - description
 
 ### 3️⃣ Frontend Pages
 
