@@ -1650,6 +1650,18 @@ We will create 3 main pages:
 
 #### File: checkin.html
 
+✅ Designed for tablet / kiosk
+
+✅ Uses Bootstrap 5
+
+✅ Café-style background
+
+✅ Works with API Gateway + Lambda + RDS
+
+✅ Employee ID input + Submit
+
+✅ Fully commented (no guessing later)
+
 ```
 <!DOCTYPE html>
 <html lang="en">
