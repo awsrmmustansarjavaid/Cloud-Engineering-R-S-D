@@ -822,6 +822,13 @@ Enterprise dashboards
 
 👉 This is how companies expect you to work
 
+1️⃣ config.js
+➡ Holds only configuration (API URL, Cognito IDs)
+
+2️⃣ auth-api.js
+➡ Holds logic (Cognito, JWT, roles, API calls, logout, loader)
+
+
 ### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
 
 #### ❓ Why this matters
