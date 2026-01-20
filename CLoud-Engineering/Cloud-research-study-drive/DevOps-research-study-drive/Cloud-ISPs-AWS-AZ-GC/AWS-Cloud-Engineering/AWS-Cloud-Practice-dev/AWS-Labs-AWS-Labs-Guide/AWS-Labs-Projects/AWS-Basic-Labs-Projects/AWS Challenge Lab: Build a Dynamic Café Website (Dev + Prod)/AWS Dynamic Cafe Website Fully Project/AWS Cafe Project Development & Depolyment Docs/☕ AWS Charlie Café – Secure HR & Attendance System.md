@@ -2286,20 +2286,10 @@ sudo mkdir -p js
 sudo nano js/auth-api.js
 ```
 
+#### 3️⃣ FINAL AUTH-API.JS (ALL-IN-ONE)
+
 **👉 Paste your full auth-api.js code inside this file**
 > **(save with CTRL+O, exit CTRL+X)**
-
-### 🟢 FINAL AUTH-API.JS (ALL-IN-ONE)
-Linux command to open or create the file
-
-```
-cd /var/www/html/js
-```
-```
-sudo nano auth-api.js
-```
-
-#### Paste this complete code:
 
 ```
 /* =====================================================

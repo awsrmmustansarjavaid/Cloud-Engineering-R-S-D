@@ -998,6 +998,14 @@ function logout() {
 
 - Now uses CONFIG for centralized config (API URL & Cognito IDs)
 
+
+```
+cd /var/www/html/js
+```
+```
+sudo nano auth-api.js
+```
+
 ---
 
 ### 🌐 Method 2️⃣ Frontend → API Integration & Role-Based UI Control
