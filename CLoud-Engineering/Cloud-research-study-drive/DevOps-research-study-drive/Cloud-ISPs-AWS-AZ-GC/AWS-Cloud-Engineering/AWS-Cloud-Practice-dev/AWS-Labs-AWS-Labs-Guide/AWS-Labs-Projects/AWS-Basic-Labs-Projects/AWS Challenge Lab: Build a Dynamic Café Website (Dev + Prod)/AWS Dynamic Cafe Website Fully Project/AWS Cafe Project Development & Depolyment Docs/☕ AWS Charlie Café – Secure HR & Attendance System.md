@@ -2701,9 +2701,11 @@ You can redirect to:
 ## ☕ Charlie Café PHASE 5️⃣ Secure Frontend + Backend Integration with Role-Based Access
 > **Frontend & Backend Security, API Integration, and Role-Based UI (Production Ready)**
 
-### 🌐 Frontend 
 
-### Task 1 — Frontend → API Integration & Role-Based UI Control
+
+
+
+
 
 ### 🎯 WHAT YOU WILL ACHIEVE IN PART 4
 
@@ -2748,6 +2750,10 @@ Response returned to frontend
 👉 Frontend never talks directly to RDS
 
 👉 JWT controls EVERYTHING
+
+
+
+### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
 
 ### 🌐 Method 1️⃣ Frontend → API Integration & Role-Based UI Control
 
