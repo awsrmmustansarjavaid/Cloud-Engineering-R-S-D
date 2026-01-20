@@ -2298,6 +2298,17 @@ File: admin-dashboard.html
 
 ☑️  No backend changes required
 
+✅ Newly Added to ADMIN page
+
+    1️⃣ Cognito Logout button
+
+    2️⃣ Today’s café attendance status badge
+
+    3️⃣ Download attendance report (PDF)
+
+    4️⃣ Dark / Light café theme toggle
+
+
 #### 1️⃣ Create file to EC2:
 
 ```
