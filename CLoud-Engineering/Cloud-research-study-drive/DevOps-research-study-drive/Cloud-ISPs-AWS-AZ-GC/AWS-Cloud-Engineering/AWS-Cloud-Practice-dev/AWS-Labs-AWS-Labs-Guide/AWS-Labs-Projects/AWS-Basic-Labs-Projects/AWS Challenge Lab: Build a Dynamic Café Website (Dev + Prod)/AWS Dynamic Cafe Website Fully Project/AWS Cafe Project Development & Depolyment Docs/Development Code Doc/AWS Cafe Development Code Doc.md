@@ -5433,3 +5433,259 @@ function logout() {
 </html>
 ```
 
+---
+1️⃣ Create file to EC2:
+sudo nano /var/www/html/admin-dashboard.html
+2️⃣ admin-dashboard.html Code
+
+
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Café | Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ================= Bootstrap CSS ================= -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ================= Cognito SDK ================= -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+    <!-- ================= Custom Café Styling ================= -->
+    <style>
+        /* ===== Page Background (Café Theme) ===== */
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: 
+                linear-gradient(rgba(40,25,15,0.85), rgba(40,25,15,0.85)),
+                url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        /* ===== Sidebar Styling ===== */
+        #sidebar {
+            width: 230px;
+            background-color: #2b1b12; /* dark coffee */
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        #sidebar h3 {
+            font-family: Georgia, serif;
+            color: #f5c16c;
+        }
+
+        #sidebar .nav-link {
+            color: #f1f1f1;
+            margin-bottom: 5px;
+            border-radius: 6px;
+        }
+
+        #sidebar .nav-link:hover {
+            background-color: #3d261a;
+            color: #f5c16c;
+        }
+
+        #sidebar .nav-link.active {
+            background-color: #f5c16c;
+            color: #2b1b12;
+            font-weight: bold;
+        }
+
+        /* ===== Main Content Area ===== */
+        #content {
+            flex-grow: 1;
+            padding: 30px;
+        }
+
+        /* ===== Card / Panel Styling ===== */
+        .content-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        /* ===== Tables ===== */
+        table th {
+            background-color: #2b1b12;
+            color: #fff;
+        }
+
+        table td {
+            vertical-align: middle;
+        }
+
+        /* ===== Responsive Fix ===== */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 100%;
+                position: fixed;
+                height: auto;
+                z-index: 1000;
+            }
+            #content {
+                margin-top: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= Sidebar (ADMIN ONLY) ================= -->
+<nav id="sidebar" class="d-flex flex-column p-3">
+    <h3 class="text-center mb-4">☕ Charlie Café</h3>
+
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="#" class="nav-link active" id="dashboard-btn">Dashboard</a>
+        </li>
+        <li>
+            <a href="#" class="nav-link" id="attendance-btn">Attendance</a>
+        </li>
+        <li>
+            <a href="#" class="nav-link" id="employees-btn">Employees</a>
+        </li>
+        <li>
+            <a href="#" class="nav-link" id="leaves-btn">Leaves & Holidays</a>
+        </li>
+        <li>
+            <a href="#" class="nav-link" id="reports-btn">Reports</a>
+        </li>
+    </ul>
+
+    <hr class="text-light">
+
+    <div class="text-center">
+        <button class="btn btn-warning w-100" id="logout-btn">Logout</button>
+    </div>
+</nav>
+
+<!-- ================= Main Content ================= -->
+<div id="content">
+    <div class="content-card">
+        <h2 id="page-title">Dashboard</h2>
+        <p class="text-muted">Charlie Café – HR & Attendance Management</p>
+
+        <!-- ===== Dynamic Content Area ===== -->
+        <div id="dashboard-content">
+
+            <!-- Attendance Summary Table -->
+            <h4 class="mt-4">Today’s Attendance</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="admin-attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Date</th>
+                            <th>Check-In</th>
+                            <th>Check-Out</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= JavaScript Logic ================= -->
+<script>
+    /* ========= Cognito Configuration ========= */
+    const poolData = {
+        UserPoolId: 'us-east-1_XXXXXX',   // <-- replace
+        ClientId: 'XXXXXXXXXXXX'          // <-- replace
+    };
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+    /* ========= API Gateway Base URL ========= */
+    const apiBase = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod';
+
+    /* ========= Get JWT Token ========= */
+    async function getJWT() {
+        const user = userPool.getCurrentUser();
+        return new Promise((resolve, reject) => {
+            if (!user) reject("Not logged in");
+            user.getSession((err, session) => {
+                if (err) reject(err);
+                resolve(session.getIdToken().getJwtToken());
+            });
+        });
+    }
+
+    /* ========= Load Attendance Summary ========= */
+    async function loadAttendanceSummary() {
+        const token = await getJWT();
+        const res = await fetch(`${apiBase}/attendance/history`, {
+            headers: { Authorization: token }
+        });
+        const data = await res.json();
+
+        const tbody = document.querySelector("#admin-attendance-table tbody");
+        tbody.innerHTML = "";
+
+        data.forEach(r => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${r.employee_name || "Employee"}</td>
+                    <td>${r.attendance_date}</td>
+                    <td>${r.checkin_time || "-"}</td>
+                    <td>${r.checkout_time || "-"}</td>
+                </tr>
+            `;
+        });
+    }
+
+    /* ========= Sidebar Button Logic ========= */
+    document.getElementById("dashboard-btn").onclick = () => {
+        document.getElementById("page-title").innerText = "Dashboard";
+        loadAttendanceSummary();
+    };
+
+    document.getElementById("attendance-btn").onclick = () => {
+        document.getElementById("page-title").innerText = "Attendance";
+        loadAttendanceSummary();
+    };
+
+    document.getElementById("employees-btn").onclick = () => {
+        document.getElementById("page-title").innerText = "Employees";
+        document.getElementById("dashboard-content").innerHTML =
+            "<p>Employee management coming soon ☕</p>";
+    };
+
+    document.getElementById("leaves-btn").onclick = () => {
+        document.getElementById("page-title").innerText = "Leaves & Holidays";
+        document.getElementById("dashboard-content").innerHTML =
+            "<p>Leaves & holidays view coming soon ☕</p>";
+    };
+
+    document.getElementById("reports-btn").onclick = () => {
+        document.getElementById("page-title").innerText = "Reports";
+        document.getElementById("dashboard-content").innerHTML =
+            "<p>Reports & analytics coming soon ☕</p>";
+    };
+
+    document.getElementById("logout-btn").onclick = () => {
+        const user = userPool.getCurrentUser();
+        if (user) user.signOut();
+        alert("Logged out successfully");
+        location.reload();
+    };
+
+    /* ========= Initial Load ========= */
+    loadAttendanceSummary();
+</script>
+
+</body>
+</html>
+```
