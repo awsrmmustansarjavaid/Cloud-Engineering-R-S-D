@@ -2273,8 +2273,10 @@ ls -R js
 js/
  ├── config.js
  └── auth-api.js
+```
 
 If yes → ✅ continue
+
 If not → stop and fix paths
 
 **📌 All Cognito + API + role logic goes into auth-api.js**
