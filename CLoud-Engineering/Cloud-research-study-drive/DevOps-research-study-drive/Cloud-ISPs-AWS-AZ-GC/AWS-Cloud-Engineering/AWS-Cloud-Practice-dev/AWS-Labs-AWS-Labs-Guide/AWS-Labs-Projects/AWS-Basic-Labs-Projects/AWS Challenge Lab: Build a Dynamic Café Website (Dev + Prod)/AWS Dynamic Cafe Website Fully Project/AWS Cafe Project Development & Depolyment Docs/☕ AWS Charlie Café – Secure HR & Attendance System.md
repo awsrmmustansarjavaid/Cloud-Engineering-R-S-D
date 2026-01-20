@@ -3373,6 +3373,349 @@ Authorization: eyJraWQiOiJ...
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ Charlie Café PHASE 6️⃣ — PRODUCTION HARDENING (ENTERPRISE-GRADE)
+
+### 🎯 What PART 5 Achieves
+
+By the end of this part, your system will have:
+
+✔ Token expiration handling
+
+✔ Centralized frontend config
+
+✔ Global error handling
+
+✔ Loading indicators (UX polish)
+
+✔ Secure backend validation
+
+✔ CloudWatch logging & tracing
+
+✔ Interview-ready explanations
+
+### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
+
+#### ❓ Why this matters
+
+Hard-coding values everywhere is not professional.
+
+#### We will centralize:
+
+- API Base URL
+
+- Cognito IDs
+
+- App name
+
+### 📄 Create js/config.js
+> **Linux commands**
+
+```
+cd /var/www/html
+sudo nano js/config.js
+```
+
+Add this code
+
+```
+/* ======================================
+   GLOBAL CONFIGURATION
+   Charlie Café HR System
+====================================== */
+
+const CONFIG = {
+    APP_NAME: "Charlie Café HR System",
+    API_BASE: "https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod",
+
+    COGNITO: {
+        USER_POOL_ID: "us-east-1_XXXXXX",
+        CLIENT_ID: "XXXXXXXXXXXX"
+    }
+};
+```
+
+Permissions
+
+```
+sudo chown www-data:www-data js/config.js
+```
+```
+sudo chmod 644 js/config.js
+```
+
+✅ Update auth-api.js to use config
+
+Replace:
+
+```
+const poolData = {
+    UserPoolId: 'us-east-1_XXXXXX',
+    ClientId: 'XXXXXXXXXXXX'
+};
+```
+
+With:
+
+```
+const poolData = {
+    UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
+    ClientId: CONFIG.COGNITO.CLIENT_ID
+};
+
+const apiBase = CONFIG.API_BASE;
+```
+
+**📌 Now config changes need only ONE file**
+
+🟢 STEP 2 — TOKEN EXPIRATION HANDLING (VERY IMPORTANT)
+❓ Problem
+
+JWT tokens expire (usually 1 hour).
+
+If expired:
+
+API calls fail
+
+Users see random errors
+
+✅ Add Token Expiry Check
+Update getJWT() in auth-api.js
+
+```
+async function getJWT() {
+    const user = userPool.getCurrentUser();
+
+    return new Promise((resolve, reject) => {
+        if (!user) reject("No active session");
+
+        user.getSession((err, session) => {
+            if (err || !session.isValid()) {
+                alert("Session expired. Please login again.");
+                user.signOut();
+                window.location.href = "login.html";
+                reject("Session expired");
+            }
+
+            resolve(session.getIdToken().getJwtToken());
+        });
+    });
+}
+```
+
+✔ Auto logout
+✔ Clean redirect
+✔ No broken UI
+
+🟢 STEP 3 — GLOBAL ERROR HANDLER (FRONTEND)
+❓ Why
+
+You must not handle errors randomly in every function.
+
+✅ Central Error Handler
+
+Add this to auth-api.js
+
+```
+function handleError(error) {
+    console.error("Application Error:", error);
+    alert("Something went wrong. Please try again.");
+}
+```
+
+✅ Use it in API calls
+
+```
+async function loadProfile() {
+    try {
+        const data = await secureFetch(apiBase + "/employee/profile");
+        document.getElementById("profile-name").innerText = data.name;
+    } catch (err) {
+        handleError(err);
+    }
+}
+```
+
+**📌 One error handler → clean & consistent UX**
+
+🟢 STEP 4 — LOADING INDICATOR (UX POLISH)
+❓ Why this matters
+
+Interviewers notice UX details.
+
+✅ Add Loader HTML (Both Pages)
+
+```
+<div id="loader" class="text-center mt-3" style="display:none;">
+    <div class="spinner-border text-warning"></div>
+    <p>Loading...</p>
+</div>
+```
+
+✅ Loader Control Functions
+
+Add to auth-api.js
+
+```
+function showLoader() {
+    document.getElementById("loader").style.display = "block";
+}
+
+function hideLoader() {
+    document.getElementById("loader").style.display = "none";
+}
+```
+
+✅ Use in API calls
+
+```
+async function loadProfile() {
+    try {
+        showLoader();
+        const data = await secureFetch(apiBase + "/employee/profile");
+        document.getElementById("profile-name").innerText = data.name;
+    } catch (err) {
+        handleError(err);
+    } finally {
+        hideLoader();
+    }
+}
+```
+
+✔ Professional
+✔ Smooth UX
+✔ Real-world polish
+
+🟢 STEP 5 — BACKEND HARDENING (LAMBDA)
+❓ Why
+
+Frontend checks are not enough.
+
+✅ Enforce Role Check in Lambda (Python)
+
+```
+groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', '')
+
+if 'Admin' not in groups:
+    return {
+        "statusCode": 403,
+        "headers": {"Content-Type": "application/json"},
+        "body": '{"message":"Forbidden"}'
+    }
+```
+
+✔ API secure
+✔ HTML edits useless
+✔ Enterprise security
+
+🟢 STEP 6 — CLOUDWATCH LOGGING (MANDATORY)
+✅ Add Logging in Lambda
+
+```
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+logger.info("Request received")
+logger.info(event)
+```
+
+✅ Verify Logs
+
+AWS Console → CloudWatch
+
+Log groups → Lambda function
+
+Confirm:
+
+Requests logged
+
+Errors visible
+
+Execution time visible
+
+📌 Interviewers love this
+
+🟢 STEP 7 — PERFORMANCE & SAFETY SETTINGS
+✅ Lambda
+
+Timeout: 10 seconds
+
+Memory: 512 MB
+
+Enable X-Ray tracing
+
+✅ API Gateway
+
+Enable Access Logging
+
+Enable Execution Logs
+
+Throttle (optional):
+
+10 req/sec
+
+Burst 20
+
+🧪 FINAL VERIFICATION CHECKLIST (CRITICAL)
+✅ Authentication
+
+Token expires → auto logout
+
+Logout destroys session
+
+Back button blocked
+
+✅ Authorization
+
+Admin cannot be Employee
+
+Employee cannot be Admin
+
+Backend blocks unauthorized API calls
+
+✅ UX
+
+Loader visible
+
+Errors friendly
+
+No raw error messages
+
+✅ Observability
+
+CloudWatch logs visible
+
+Errors traceable
+
+Requests traceable
+
+🎓 HOW YOU EXPLAIN THIS IN INTERVIEW
+
+“I hardened the system by centralizing configuration, implementing JWT expiration handling, role-based access at both frontend and backend, global error handling, UX loaders, and CloudWatch observability.”
+
+That answer = strong hire signal.
+
+🏁 CONGRATULATIONS
+
+You now have:
+
+✔ Real AWS architecture
+✔ Secure Cognito auth
+✔ Role-based UI
+✔ Hardened APIs
+✔ Production-level frontend
+✔ Job-ready project
+
+
+
+
+
+
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
 ## ☕ Charlie Café PHASE 6️⃣ — Update CafePDFReportLambda for HR & Attendance
 
 ### 📃 Research and Development (Just for CaseStudy)
