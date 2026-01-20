@@ -1360,19 +1360,19 @@ SELECT * FROM attendance WHERE employee_id = 1;
 cafe-hr-api
 ```
 
-Description:
+- Description:
 
 ```
 HR Secure Attendance & Employee Management API
 ```
 
-Endpoint Type: Regional
+- Endpoint Type: Regional
 
-Click Create API
+- Click Create API
 
-2️⃣ Create Resources (Paths)
+### 2️⃣ Create Resources (Paths)
 
-We will create 5 resources, one for each Lambda.
+> **We will create 5 resources, one for each Lambda.**
 
 | Resource           | Path                  | Lambda Function         |
 | ------------------ | --------------------- | ----------------------- |
@@ -1382,64 +1382,65 @@ We will create 5 resources, one for each Lambda.
 | Attendance History | `/attendance/history` | `hr-attendance-history` |
 | Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
 
-Step 1 — Add /checkin
+#### Step 1 — Add /checkin
 
-Click Actions → Create Resource
+- Click Actions → Create Resource
 
-Resource Name: CheckIn
+- Resource Name: CheckIn
 
-Resource Path: /checkin
+- Resource Path: /checkin
 
-Click Create Resource
+- Click Create Resource
 
-Step 2 — Repeat for remaining resources
+#### Step 2 — Repeat for remaining resources
 
-/checkout
+- /checkout
 
-/employee/profile
+- /employee/profile
 
-/attendance/history
+- /attendance/history
 
-/leaves-holidays
+- /leaves-holidays
 
-3️⃣ Create Methods
+### 3️⃣ Create Methods
 
-For each resource:
+#### For each resource:
 
-Click on Resource → Actions → Create Method
+    - Click on Resource → Actions → Create Method
 
-Select POST for /checkin and /checkout
+    - Select POST for /checkin and /checkout
 
-Select GET for /employee/profile, /attendance/history, /leaves-holidays
+    - Select GET for /employee/profile, /attendance/history, /leaves-holidays
 
-4️⃣ Integrate Lambda Function
+### 4️⃣ Integrate Lambda Function
 
-For each method:
+#### For each method:
 
-Integration type: Lambda Function
+    - Integration type: Lambda Function
 
-Check Use Lambda Proxy Integration
+    - Check Use Lambda Proxy Integration
 
-Lambda Region: your Lambda region
+    - Lambda Region: your Lambda region
 
-Lambda Function:
+#### Lambda Function:
 
-/checkin → hr-checkin
+    - /checkin → hr-checkin
 
-/checkout → hr-checkout
+    - /checkout → hr-checkout
 
-/employee/profile → hr-employee-profile
+    - /employee/profile → hr-employee-profile
 
-/attendance/history → hr-attendance-history
+    - /attendance/history → hr-attendance-history
 
-/leaves-holidays → hr-leaves-holidays
+    - /leaves-holidays → hr-leaves-holidays
 
-Click Save
+- Click Save
 
-Grant permissions when prompted → Yes
+- Grant permissions when prompted → Yes
 
-5️⃣ Enable Cognito Authorizer
-Step 1 — Create Authorizer
+### 5️⃣ Enable Cognito Authorizer
+
+#### Step 1 — Create Authorizer
 
 API Gateway → Authorizers → Create New Authorizer
 
@@ -1453,9 +1454,9 @@ Token Source: Authorization (Header)
 
 Click Create
 
-Step 2 — Attach Authorizer to Methods
+#### Step 2 — Attach Authorizer to Methods
 
-For each resource method:
+#### For each resource method:
 
 Click on Method → Method Request
 
@@ -1463,25 +1464,25 @@ Authorization: select HR-Cognito-Authorizer
 
 Save
 
-6️⃣ Enable CORS (Cross-Origin Resource Sharing)
+### 6️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
-For each resource method:
+#### For each resource method:
 
 Click Method → Actions → Enable CORS
 
-Settings:
+#### Settings:
 
 Access-Control-Allow-Headers: Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
 
 Access-Control-Allow-Methods: GET,POST,OPTIONS
 
-Access-Control-Allow-Origin: *
+#### Access-Control-Allow-Origin: *
 
 Click Enable CORS and replace existing CORS headers
 
 Deploy API (Step 7)
 
-7️⃣ Deploy API
+### 7️⃣ Deploy API
 
 Actions → Deploy API
 
@@ -1491,29 +1492,29 @@ Stage description: HR Secure API
 
 Deploy
 
-Copy the Invoke URL. Example:
+#### Copy the Invoke URL. Example:
 
 ```
 https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod
 ```
 
-8️⃣ Test Each API Endpoint
+### 8️⃣ Test Each API Endpoint
 
 We will test using Postman or Lambda Test Console.
 
-8.1 Test /checkin (POST)
+#### 8.1 Test /checkin (POST)
 
-Request:
+#### Request:
 
-URL:
+#### URL:
 
 ```
 https://<API-ID>.execute-api.<region>.amazonaws.com/prod/checkin
 ```
 
-Method: POST
+#### Method: POST
 
-Headers:
+#### Headers:
 
 ```
 Authorization: <Cognito JWT token>
@@ -1522,7 +1523,7 @@ Content-Type: application/json
 
 Body: Empty JSON {}
 
-Expected Response:
+#### Expected Response:
 
 ```
 {
@@ -1531,15 +1532,15 @@ Expected Response:
 }
 ```
 
-Verify in RDS:
+#### Verify in RDS:
 
 ```
 SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 ```
 
-8.2 Test /checkout (POST)
+#### 8.2 Test /checkout (POST)
 
-Request:
+#### Request:
 
 URL: /checkout
 
@@ -1547,7 +1548,7 @@ Headers same as above
 
 Body: {}
 
-Expected Response:
+#### Expected Response:
 
 ```
 {
@@ -1558,7 +1559,7 @@ Expected Response:
 
 Verify in RDS: checkout_time populated for today
 
-8.3 Test /employee/profile (GET)
+#### 8.3 Test /employee/profile (GET)
 
 URL: /employee/profile
 
@@ -1566,7 +1567,7 @@ Method: GET
 
 Headers: Authorization: <Cognito JWT>
 
-Expected Response:
+#### Expected Response:
 
 ```
 {
@@ -1575,13 +1576,13 @@ Expected Response:
 }
 ```
 
-8.4 Test /attendance/history (GET)
+#### 8.4 Test /attendance/history (GET)
 
 URL: /attendance/history
 
 Headers: Authorization: <Cognito JWT>
 
-Expected Response:
+#### Expected Response:
 
 ```
 {
@@ -1590,13 +1591,13 @@ Expected Response:
 }
 ```
 
-8.5 Test /leaves-holidays (GET)
+#### 8.5 Test /leaves-holidays (GET)
 
 URL: /leaves-holidays
 
 Headers: Authorization: <Cognito JWT>
 
-Expected Response:
+#### Expected Response:
 
 ```
 {
@@ -1605,7 +1606,7 @@ Expected Response:
 }
 ```
 
-9️⃣ Verification Checklist
+### 9️⃣ Verification Checklist
 
 ✅ All endpoints secured by Cognito JWT
 
