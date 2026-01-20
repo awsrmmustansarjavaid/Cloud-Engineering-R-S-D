@@ -1054,8 +1054,140 @@ def lambda_handler(event, context):
 
 - Deploy.
 
+### 7️⃣ Lambda Testing & Verification
 
+#### 1️⃣ Test Environment Variables
 
+- Lambda → Configuration → Environment variables
+
+- Ensure:
+
+```
+DB_HOST, DB_NAME, DB_USER, DB_PASS
+```
+
+- Double-check spelling and values (typos will break RDS connection).
+
+#### 2️⃣ — VPC Settings
+
+- Lambda → Configuration → VPC
+
+- Must be in the same VPC as RDS
+
+- Use private subnets that can reach RDS
+
+- Security group: allows outbound TCP 3306 to RDS
+
+#### 3️⃣ — Install PyMySQL Layer (if missing)
+
+- If your Lambda environment doesn’t have pymysql, create a Lambda Layer:
+
+- Create a folder python/lib/python3.12/site-packages/
+
+- pip install pymysql -t python/lib/python3.12/site-packages/
+
+- Zip and upload as Layer
+
+- Attach Layer to all HR Lambdas
+
+### 2️⃣ Test hr-checkin Lambda
+
+#### Step 1 — Open Lambda Console
+
+- Navigate: Lambda → hr-checkin → Test
+
+#### Step 2 — Create Test Event
+
+- Event template: API Gateway AWS Proxy (JSON)
+
+Example:
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+> **Replace "sub" with an actual Cognito user ID mapped to your employees table.**
+
+- Name: TestCheckIn
+
+- Save
+
+#### Step 3 — Invoke Test
+
+- Click Test
+
+- Observe output:
+
+#### Expected success:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-in successful\"}"
+}
+```
+
+#### If already checked in:
+
+```
+{
+  "statusCode": 400,
+  "body": "{\"message\": \"Already checked in today\"}"
+}
+```
+
+#### Step 4 — Verify in RDS
+
+```
+SELECT * FROM attendance WHERE employee_id = 1;
+```
+
+Should see today’s date with checkin_time populated
+
+checkout_time should be NULL
+
+### 2️⃣ Test hr-checkout Lambda
+
+#### Step 1 — Open Lambda Console
+
+Lambda → hr-checkout → Test
+
+#### Step 2 — Create Test Event
+
+Same template as hr-checkin:
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+Step 3 — Invoke Test
+
+Click Test
+
+Expected success:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-out successful\"}"
+}
+```
 
 
 
