@@ -2608,7 +2608,8 @@ async function loadEmployees() {
 ```
 ### 4️⃣ BACKEND  - Lambda 
 
-#### 1️⃣ COMMON SECURITY TEMPLATE (Python)
+#### 1️⃣ FINAL COMMON LAMBDA TEMPLATE (USE IN ALL 5)
+> **This goes into EVERY HR & Attendance Lambda function.**
 
 ```
 import json
@@ -2621,18 +2622,34 @@ def lambda_handler(event, context):
     logger.info("Request received")
     logger.info(event)
 
-    # Role check from Cognito JWT
-    groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', [])
-    
-    # Example: Only Admin for admin function
-    if 'Admin' not in groups and event['resource'] == "/admin/employees":
+    # -------------------------------
+    # AUTHORIZATION (Cognito Groups)
+    # -------------------------------
+    claims = event['requestContext']['authorizer']['claims']
+    groups = claims.get('cognito:groups', [])
+
+    # -------------------------------
+    # ROLE CHECK (CHANGE PER FUNCTION)
+    # -------------------------------
+    ALLOWED_ROLE = "Employee"   # or "Admin"
+
+    if ALLOWED_ROLE not in groups:
         return {
             "statusCode": 403,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps({"message": "Forbidden"})
         }
 
-    # Function logic goes here
+    # -------------------------------
+    # BUSINESS LOGIC (CHANGE PER FUNCTION)
+    # -------------------------------
+    # Example:
+    # - Check-in
+    # - Check-out
+    # - Fetch attendance
+    # - Fetch employees
+    # - Fetch leaves
+
     return {
         "statusCode": 200,
         "headers": {"Content-Type": "application/json"},
@@ -2642,7 +2659,46 @@ def lambda_handler(event, context):
 
 **✅ Use this template in all Lambda functions and only adjust the logic for checkin/checkout vs admin/employee.**
 
-#### 2️⃣ — PERFORMANCE & SAFETY SETTINGS
+#### 2️⃣ HOW TO APPLY THIS TO EACH LAMBDA
+
+#### 1️⃣ Check-In Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# Insert check-in record
+```
+
+#### 2️⃣ Check-Out Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# Update checkout time
+```
+
+#### 3️⃣ Employee Info Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# Select leaves + holidays
+```
+
+#### 4️⃣ Leaves & Holidays Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# Select leaves + holidays
+```
+
+5️⃣ Admin Employees Lambda
+
+```
+ALLOWED_ROLE = "Admin"
+# Select all employees
+```
+
+**📌 Nothing else changes.**
+
+#### 3️⃣ — PERFORMANCE & SAFETY SETTINGS
 
 #### ✅ Lambda
 
