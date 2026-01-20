@@ -2177,6 +2177,79 @@ You can redirect to:
 ## ☕ Charlie Café PHASE 5️⃣ Secure Frontend & API Integration with Production Hardening
 > **Frontend & Backend Security, API Integration, and Role-Based UI (Production Ready)**
 
+### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
+
+#### ❓ Why this matters
+
+Hard-coding values everywhere is not professional.
+
+#### We will centralize:
+
+- API Base URL
+
+- Cognito IDs
+
+- App name
+
+### 📄 Create js/config.js
+> **Linux commands**
+
+```
+cd /var/www/html
+sudo nano js/config.js
+```
+
+Add this code
+
+```
+/* ======================================
+   GLOBAL CONFIGURATION
+   Charlie Café HR System
+====================================== */
+
+const CONFIG = {
+    APP_NAME: "Charlie Café HR System",
+    API_BASE: "https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod",
+
+    COGNITO: {
+        USER_POOL_ID: "us-east-1_XXXXXX",
+        CLIENT_ID: "XXXXXXXXXXXX"
+    }
+};
+```
+
+Permissions
+
+```
+sudo chown www-data:www-data js/config.js
+```
+```
+sudo chmod 644 js/config.js
+```
+
+✅ Update auth-api.js to use config
+
+Replace:
+
+```
+const poolData = {
+    UserPoolId: 'us-east-1_XXXXXX',
+    ClientId: 'XXXXXXXXXXXX'
+};
+```
+
+With:
+
+```
+const poolData = {
+    UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
+    ClientId: CONFIG.COGNITO.CLIENT_ID
+};
+
+const apiBase = CONFIG.API_BASE;
+```
+
+**📌 Now config changes need only ONE file**
 
 ### 🌐 Frontend — Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
 
@@ -2771,97 +2844,9 @@ Authorization: eyJraWQiOiJ...
 ---
 ## ☕ Charlie Café PHASE 6️⃣ — PRODUCTION HARDENING (ENTERPRISE-GRADE)
 
-### 🎯 What PART 5 Achieves
 
-By the end of this part, your system will have:
 
-✔ Token expiration handling
 
-✔ Centralized frontend config
-
-✔ Global error handling
-
-✔ Loading indicators (UX polish)
-
-✔ Secure backend validation
-
-✔ CloudWatch logging & tracing
-
-✔ Interview-ready explanations
-
-### 🟢 STEP 1 — CENTRAL CONFIG FILE (FRONTEND)
-
-#### ❓ Why this matters
-
-Hard-coding values everywhere is not professional.
-
-#### We will centralize:
-
-- API Base URL
-
-- Cognito IDs
-
-- App name
-
-### 📄 Create js/config.js
-> **Linux commands**
-
-```
-cd /var/www/html
-sudo nano js/config.js
-```
-
-Add this code
-
-```
-/* ======================================
-   GLOBAL CONFIGURATION
-   Charlie Café HR System
-====================================== */
-
-const CONFIG = {
-    APP_NAME: "Charlie Café HR System",
-    API_BASE: "https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod",
-
-    COGNITO: {
-        USER_POOL_ID: "us-east-1_XXXXXX",
-        CLIENT_ID: "XXXXXXXXXXXX"
-    }
-};
-```
-
-Permissions
-
-```
-sudo chown www-data:www-data js/config.js
-```
-```
-sudo chmod 644 js/config.js
-```
-
-✅ Update auth-api.js to use config
-
-Replace:
-
-```
-const poolData = {
-    UserPoolId: 'us-east-1_XXXXXX',
-    ClientId: 'XXXXXXXXXXXX'
-};
-```
-
-With:
-
-```
-const poolData = {
-    UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
-    ClientId: CONFIG.COGNITO.CLIENT_ID
-};
-
-const apiBase = CONFIG.API_BASE;
-```
-
-**📌 Now config changes need only ONE file**
 
 🟢 STEP 2 — TOKEN EXPIRATION HANDLING (VERY IMPORTANT)
 ❓ Problem
