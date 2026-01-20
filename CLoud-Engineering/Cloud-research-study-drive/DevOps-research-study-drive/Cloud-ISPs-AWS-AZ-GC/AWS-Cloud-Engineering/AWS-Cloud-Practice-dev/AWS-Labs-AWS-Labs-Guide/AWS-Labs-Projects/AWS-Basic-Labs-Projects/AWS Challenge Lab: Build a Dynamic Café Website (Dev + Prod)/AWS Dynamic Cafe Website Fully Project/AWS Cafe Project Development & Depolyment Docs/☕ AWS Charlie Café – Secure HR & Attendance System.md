@@ -1871,6 +1871,14 @@ sudo nano /var/www/html/checkin.html
 ### 2️⃣ Employee Portal Page
 File: employee-portal.html
 
+#### 1️⃣ Create file to EC2:
+
+```
+sudo nano /var/www/html/employee-portal.html
+```
+
+#### 2️⃣ Code
+
 ```
 <!DOCTYPE html>
 <html lang="en">
@@ -2000,43 +2008,49 @@ File: employee-portal.html
 ### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 File: admin-dashboard.html
 
-✅ Features of This Admin Dashboard
+#### ✅ Features of This Admin Dashboard
 
-Responsive sidebar using Bootstrap
+☑️ Responsive sidebar using Bootstrap
 
-Sidebar buttons:
+☑️ Sidebar buttons:
 
-Dashboard (default view)
+    ✔️ Dashboard (default view)
 
-Attendance Management
+    ✔️ Attendance Management
 
-Employees
+    ✔️ Employees
 
-Leaves & Holidays
+    ✔️ Leaves & Holidays
 
-Reports
+    ✔️ Reports
 
-Logout button at bottom of sidebar
+    ✔️ Logout button at bottom of sidebar
 
-Main content area:
+☑️ Main content area:
 
-Attendance summary table (dynamic)
+    ✔️ Attendance summary table (dynamic)
 
-Leaves & Holidays table (dynamic)
+    ✔️ Leaves & Holidays table (dynamic)
 
-Placeholder for Employees & Reports pages
+    ✔️ Placeholder for Employees & Reports pages
 
-Café theme colors (dark sidebar + gold hover)
+☑️ Café theme colors (dark sidebar + gold hover)
 
-Fully responsive — works on mobile and desktop
+☑️ Fully responsive — works on mobile and desktop
 
-Fully commented for easy future development
+☑️ Fully commented for easy future development
 
-✅ You can directly upload this file to /var/www/html/
+☑️  You can directly upload this file to /var/www/html/
 
-✅ No backend changes required
+☑️  No backend changes required
 
+#### 1️⃣ Create file to EC2:
 
+```
+sudo nano /var/www/html/employee-portal.html
+```
+
+#### 2️⃣ Code
 
 ```
 <!DOCTYPE html>
