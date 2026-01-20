@@ -1695,9 +1695,9 @@ Use Lambda console → Test events → Include requestContext.authorizer.claims.
 SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 ```
 
-You should see today’s check-in timestamp
+- You should see today’s check-in timestamp
 
-If IntegrityError occurs → already checked-in → remove row and retest
+- If IntegrityError occurs → already checked-in → remove row and retest
 
 ### 2️⃣ Testing hr-checkout
 
@@ -1719,9 +1719,9 @@ If IntegrityError occurs → already checked-in → remove row and retest
 
 #### Step 3: Run Test
 
-Click Test
+- Click Test
 
-Check Execution result
+- Check Execution result
 
 #### ✅ Expected:
 
@@ -1738,9 +1738,9 @@ Check Execution result
 SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 ```
 
-Check that checkout_time is filled
+- Check that checkout_time is filled
 
-If no check-in exists → error 400 as expected
+- If no check-in exists → error 400 as expected
 
 ### 3️⃣ Testing hr-employee-profile
 
@@ -1773,7 +1773,7 @@ If no check-in exists → error 400 as expected
 }
 ```
 
-Verify matches RDS record
+- Verify matches RDS record
 
 ### 4️⃣ Testing hr-attendance-history
 
@@ -1808,9 +1808,9 @@ Verify matches RDS record
 ]
 ```
 
-Cross-check with attendance table
+- Cross-check with attendance table
 
-Ensure dates & times match
+- Ensure dates & times match
 
 ### 5️⃣ Testing hr-leaves-holidays
 
@@ -1845,7 +1845,7 @@ Ensure dates & times match
 }
 ```
 
-Cross-check leaves table and holidays table
+- Cross-check leaves table and holidays table
 
 ### ⚠ Notes & Common Issues
 
