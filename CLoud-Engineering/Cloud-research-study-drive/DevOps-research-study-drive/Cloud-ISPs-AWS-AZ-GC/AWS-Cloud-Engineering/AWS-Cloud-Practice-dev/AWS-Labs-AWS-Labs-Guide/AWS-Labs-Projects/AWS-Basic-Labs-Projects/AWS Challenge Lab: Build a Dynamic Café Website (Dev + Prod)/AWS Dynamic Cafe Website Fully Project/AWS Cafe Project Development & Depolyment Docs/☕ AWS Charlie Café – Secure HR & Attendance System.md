@@ -1074,6 +1074,130 @@ def lambda_handler(event, context):
 ---
 ## PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
 
+### Research and Development (Just for CaseStudy)
+
+#### 1️⃣ Can we reuse the existing PDF Lambda?
+
+✅ Yes, you can reuse it, because:
+
+- Your current Lambda already:
+
+    - Generates a PDF using ReportLab
+
+    - Uploads it to S3
+
+    - Handles dynamic content based on page_type
+
+- It’s generic enough to handle any tabular report, including attendance or employee reports
+
+- It already has environment variables for S3 bucket and files, so you don’t need a new Lambda for PDF generation unless you want totally separate deployment for HR.
+
+#### 2️⃣ How to integrate HR/Attendance into existing Lambda
+
+#### Step 1: Add a new page_type for HR
+
+#### In your Lambda:
+
+```
+page_type = event.get("queryStringParameters", {}).get("page", "analytics")
+```
+
+- Right now it checks "analytics" or "order-status"
+
+- We can add "attendance":
+
+```
+elif page_type == "attendance":
+    elements.append(Paragraph("📋 Employee Attendance Report", styles["Title"]))
+    elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+    elements.append(Spacer(1, 15))
+
+    # Fetch attendance data from RDS
+    import pymysql
+
+    connection = pymysql.connect(
+        host=os.environ['DB_HOST'],
+        user=os.environ['DB_USER'],
+        password=os.environ['DB_PASS'],
+        database=os.environ['DB_NAME'],
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT e.name, e.job_title, a.attendance_date, a.checkin_time, a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            ORDER BY a.attendance_date DESC
+        """)
+        records = cursor.fetchall()
+
+    table_data = [["Employee", "Job Title", "Date", "Check-In", "Check-Out"]]
+    for r in records:
+        table_data.append([
+            r["name"],
+            r["job_title"],
+            str(r["attendance_date"]),
+            str(r.get("checkin_time") or ""),
+            str(r.get("checkout_time") or "")
+        ])
+
+    table = Table(table_data, colWidths=[120, 100, 80, 60, 60])
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.darkgreen),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+        ("ALIGN", (0,0), (-1,-1), "CENTER"),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+        ("BACKGROUND", (0,1), (-1,-1), colors.lightgrey)
+    ]))
+
+    elements.append(table)
+```
+
+#### Step 2: Add HR-specific environment variables
+
+- DB_HOST → RDS endpoint
+
+- DB_NAME → cafedb
+
+- DB_USER / DB_PASS → credentials
+
+- S3 bucket can remain the same (or use a new folder hr/attendance/ for organization)
+
+#### Step 3: Use page=attendance in your API call
+
+Example URL from frontend:
+
+```
+https://<your-api-gateway>/generate-pdf?page=attendance
+```
+
+- Lambda will detect page_type="attendance" and generate Attendance PDF
+
+- No need for new Lambda function
+
+- You save time and resources
+
+#### ✅ My Recommendation (Time-Saving, Professional)
+
+- Do not create a new Lambda for PDF yet
+
+- Use your existing PDF Lambda
+
+- Just add a new page_type branch for "attendance" (and optionally "employee-profile" if needed)
+
+- Hook your HR Lambda data (attendance, leaves, profile) via RDS queries inside this branch
+
+#### This way:
+
+- 1 Lambda handles all PDF generation
+
+- No duplication
+
+- Easy maintenance
+
+---
+
 ### 1️⃣ Step 1️⃣ – Update CafePDFReportLambda for HR & Attendance
 
 > *8We are going to add a new page_type branch for HR/Attendance reports.**
