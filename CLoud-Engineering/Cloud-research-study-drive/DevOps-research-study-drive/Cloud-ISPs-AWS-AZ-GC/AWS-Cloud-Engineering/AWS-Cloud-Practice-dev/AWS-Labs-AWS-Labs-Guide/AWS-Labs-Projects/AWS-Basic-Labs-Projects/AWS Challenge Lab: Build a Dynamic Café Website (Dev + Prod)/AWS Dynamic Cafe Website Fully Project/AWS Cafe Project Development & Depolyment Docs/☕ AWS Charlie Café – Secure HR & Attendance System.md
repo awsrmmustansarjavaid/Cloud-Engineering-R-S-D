@@ -1620,12 +1620,184 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 ✅ Can call endpoints from EC2 frontend or Postman
 
 
-
-
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 4️⃣ — Frontend Pages for HR System
+
+We will create 3 main pages:
+
+- Employee Check-In / Check-Out Page (Tablet / Employee)
+
+- Employee Portal Page (Desktop / Employee)
+
+- Admin Dashboard Page (Desktop / HR/Admin)
+
+### 🔹 Step 0 — Assumptions
+
+- Your EC2 Apache server is already hosting other café pages.
+
+- Your API Gateway endpoints are ready (PART 3).
+
+- Cognito User Pool exists, and employees/admin users are registered.
+
+- We will use JavaScript fetch API to call API Gateway with JWT from Cognito.
+
+> **Optional: We will use Bootstrap 5 for styling and responsive UI.**
+
+### 1️⃣ Include Common Header / Scripts (for all pages)
+
+#### At the top of every HTML page:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Café HR System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Cognito SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+    <style>
+        body { padding: 20px; }
+        .btn-large { width: 150px; height: 50px; font-size: 1.2rem; }
+        .table-fixed { table-layout: fixed; width: 100%; }
+    </style>
+</head>
+<body>
+```
+
+### 2️⃣ Employee Check-In / Check-Out Page (Tablet Friendly)
+
+#### File: checkin.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Café HR System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Cognito SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
+
+    <style>
+        body { padding: 20px; }
+        .btn-large { width: 150px; height: 50px; font-size: 1.2rem; }
+        .table-fixed { table-layout: fixed; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container text-center">
+    <h2>Employee Attendance</h2>
+    <p id="welcome-msg"></p>
+    
+    <div class="my-4">
+        <button id="checkin-btn" class="btn btn-success btn-large me-3">Check-In</button>
+        <button id="checkout-btn" class="btn btn-danger btn-large">Check-Out</button>
+    </div>
+
+    <div id="status-msg" class="mt-3"></div>
+</div>
+
+<script>
+    // ====== Cognito Configuration ======
+    const poolData = {
+        UserPoolId: 'us-east-1_XXXXXX', // your user pool ID
+        ClientId: 'XXXXXXXXXXXX' // your app client ID
+    };
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+    // ====== Helper: Get Cognito JWT Token ======
+    function getJWT() {
+        const cognitoUser = userPool.getCurrentUser();
+        return new Promise((resolve, reject) => {
+            if (cognitoUser) {
+                cognitoUser.getSession(function(err, session) {
+                    if (err) reject(err);
+                    resolve(session.getIdToken().getJwtToken());
+                });
+            } else {
+                reject("User not logged in");
+            }
+        });
+    }
+
+    // ====== API Gateway Base URL ======
+    const apiBase = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/prod';
+
+    // ====== Check-In ======
+    document.getElementById('checkin-btn').addEventListener('click', async () => {
+        const token = await getJWT();
+        fetch(`${apiBase}/checkin`, {
+            method: 'POST',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('status-msg').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+        })
+        .catch(err => {
+            document.getElementById('status-msg').innerHTML = `<div class="alert alert-danger">${err}</div>`;
+        });
+    });
+
+    // ====== Check-Out ======
+    document.getElementById('checkout-btn').addEventListener('click', async () => {
+        const token = await getJWT();
+        fetch(`${apiBase}/checkout`, {
+            method: 'POST',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('status-msg').innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+        })
+        .catch(err => {
+            document.getElementById('status-msg').innerHTML = `<div class="alert alert-danger">${err}</div>`;
+        });
+    });
+
+    // ====== Display Logged-in Employee Name ======
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+        cognitoUser.getSession(function(err, session) {
+            if (!err) {
+                const name = session.getIdToken().payload['cognito:username'];
+                document.getElementById('welcome-msg').innerText = `Welcome, ${name}`;
+            }
+        });
+    }
+</script>
+</body>
+</html>
+```
+
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 ## ☕ Charlie Café PHASE 3️⃣ — Update CafePDFReportLambda for HR & Attendance
 
