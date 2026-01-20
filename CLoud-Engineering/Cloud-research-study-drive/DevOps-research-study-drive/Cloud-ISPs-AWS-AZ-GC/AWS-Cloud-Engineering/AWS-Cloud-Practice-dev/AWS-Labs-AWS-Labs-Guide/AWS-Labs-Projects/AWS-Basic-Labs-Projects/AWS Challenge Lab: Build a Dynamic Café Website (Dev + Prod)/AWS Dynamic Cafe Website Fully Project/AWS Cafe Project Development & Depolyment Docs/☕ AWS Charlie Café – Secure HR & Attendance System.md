@@ -2351,30 +2351,6 @@ async function loadAllEmployees() {
 
 
 
-### ☢️ BACKEND— Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
-
-### 1️⃣ — BACKEND SECURITY (DOUBLE PROTECTION)
-
-Even if UI fails, Lambda still protects.
-
-Lambda Check Example
-
-```
-groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', '')
-
-if 'Admin' not in groups:
-    return {
-        "statusCode": 403,
-        "body": "Forbidden"
-    }
-```
-
-✔ Frontend check
-
-✔ Backend check
-
-✔ Enterprise-grade security
-
 
 
 
@@ -3231,6 +3207,30 @@ async function loadAllEmployees() {
 - You do not need to add anything else in this file
 
 - You can now include this single file in both admin-dashboard.html and employee-portal.html
+
+### ☢️ BACKEND— Task 1️⃣ — Frontend → API Integration & Role-Based UI Control
+
+### 1️⃣ — BACKEND SECURITY (DOUBLE PROTECTION)
+
+Even if UI fails, Lambda still protects.
+
+Lambda Check Example
+
+```
+groups = event['requestContext']['authorizer']['claims'].get('cognito:groups', '')
+
+if 'Admin' not in groups:
+    return {
+        "statusCode": 403,
+        "body": "Forbidden"
+    }
+```
+
+✔ Frontend check
+
+✔ Backend check
+
+✔ Enterprise-grade security
 
 
 🟢 STEP 5 — BACKEND HARDENING (LAMBDA)
