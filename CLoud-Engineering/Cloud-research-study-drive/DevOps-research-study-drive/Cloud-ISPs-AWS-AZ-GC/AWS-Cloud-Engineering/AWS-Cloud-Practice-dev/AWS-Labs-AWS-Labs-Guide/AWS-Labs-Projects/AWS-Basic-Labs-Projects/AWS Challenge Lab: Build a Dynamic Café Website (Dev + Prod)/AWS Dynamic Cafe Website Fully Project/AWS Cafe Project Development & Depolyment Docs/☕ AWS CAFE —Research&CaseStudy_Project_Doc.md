@@ -323,10 +323,220 @@ Leaves:
 
 > **🟢 PHASE 2️⃣  R & D COMPLETE**
 ---
-## ☕ Charlie Café PHASE 3️⃣ — API Gateway Setup for HR Secure Attendance System
+## ☕ Charlie Café PHASE 4️⃣ — Frontend Pages for HR System
 
+### 1️⃣ Employee Check-In / Check-Out Page (Tablet Friendly)
 
+#### 1️⃣ File: checkin.html
 
+✅ Designed for tablet / kiosk
+
+✅ Uses Bootstrap 5
+
+✅ Café-style background
+
+✅ Works with API Gateway + Lambda + RDS
+
+✅ Employee ID input + Submit
+
+✅ Fully commented (no guessing later)
+
+#### 2️⃣ ✅ Why This Is Correct for a REAL Café Lab
+
+✔ No Cognito needed (kiosk logic)
+
+✔ Works inside Security Group–restricted EC2
+
+✔ Simple for staff (ID + 1 tap)
+
+✔ Backend already handles validation
+
+✔ Tablet-friendly (big buttons)
+
+✔ Professional café branding
+
+### 2️⃣ Employee Portal Page
+
+☕ Café-style look (same visual identity as admin & check-in pages)
+
+📱 Fully responsive Bootstrap 5 layout
+
+🔐 Cognito + API Gateway logic preserved (no backend changes)
+
+🧱 Clean cards instead of plain tables
+
+💬 Detailed comments everywhere (frontend-learning friendly)
+
+1️⃣ Logout button (Cognito-based)
+
+2️⃣ Today’s attendance status badge
+
+3️⃣ Download attendance as PDF (client-side)
+
+4️⃣ Dark / Light café mode toggle
+
+#### ✅ What This Page Now Represents (Job-Ready)
+
+✔ Consistent Charlie Café branding
+
+✔ Secure Cognito-protected employee portal
+
+✔ Clean, readable UI for non-technical staff
+
+✔ Fully responsive (mobile / tablet / desktop)
+
+✔ Perfect match with your AWS lab architecture
+
+### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
+
+#### ✅ Features of This Admin Dashboard
+
+☑️ Responsive sidebar using Bootstrap
+
+☑️ Sidebar buttons:
+
+    ✔️ Dashboard (default view)
+
+    ✔️ Attendance Management
+
+    ✔️ Employees
+
+    ✔️ Leaves & Holidays
+
+    ✔️ Reports
+
+    ✔️ Logout button at bottom of sidebar
+
+☑️ Main content area:
+
+    ✔️ Attendance summary table (dynamic)
+
+    ✔️ Leaves & Holidays table (dynamic)
+
+    ✔️ Placeholder for Employees & Reports pages
+
+☑️ Café theme colors (dark sidebar + gold hover)
+
+☑️ Fully responsive — works on mobile and desktop
+
+☑️ Fully commented for easy future development
+
+☑️  You can directly upload this file to /var/www/html/
+
+☑️  No backend changes required
+
+✅ Newly Added to ADMIN page
+
+    1️⃣ Cognito Logout button
+
+    2️⃣ Today’s café attendance status badge
+
+    3️⃣ Download attendance report (PDF)
+
+    4️⃣ Dark / Light café theme toggle
+
+### 4️⃣ — HOW LOGOUT INTEGRATES WITH COGNITO (STEP-BY-STEP)
+
+> **✅ this logout design and logic applies to BOTH the Admin page and the Employee page in your Charlie Café HR system.**
+
+#### 🔐 What Logout Actually Does
+
+Cognito stores the login session in browser storage.
+Logout means destroying that session.
+
+#### ✅ CONFIRMATION: SAME LOGOUT LOGIC FOR ADMIN & EMPLOYEE
+
+✔ Admin Portal → uses Cognito Admin group
+
+✔ Employee Portal → uses Cognito Employee group
+
+✔ Logout behavior → IDENTICAL for both
+
+The difference is NOT logout, the difference is authorization (groups & APIs).
+
+#### 🔐 WHAT LOGOUT DOES (RECONFIRMED)
+
+Your understanding is correct 👇
+
+Cognito Stores These After Login:
+
+- ID Token
+
+- Access Token
+
+- Refresh Token
+
+**🌐 Stored by Amazon Cognito JS SDK in browser storage.**
+
+#### 🚪 SINGLE LINE THAT LOGS OUT THE USER
+
+```
+user.signOut();
+```
+
+#### What this instantly does:
+
+❌ Deletes tokens from browser
+
+❌ Invalidates Cognito session
+
+❌ getCurrentUser() becomes null
+
+This is true for admin and employee both.
+
+#### 🛡️ PAGE PROTECTION (MOST IMPORTANT PART)
+
+You already have (or must have) this on EVERY protected page:
+
+```
+const user = userPool.getCurrentUser();
+if (!user) {
+    window.location.href = "login.html";
+}
+```
+
+#### Why this matters
+
+- After logout → session gone
+
+- User presses Back button
+
+- ❌ Page must NOT load
+
+- ✅ Redirects to login / home page
+
+#### This is mandatory on:
+
+- admin-dashboard.html
+
+- employee-portal.html
+
+#### 🔘 STANDARD LOGOUT BUTTON (SAME FOR BOTH)
+> **HTML (Admin & Employee)**
+
+```
+<button class="btn btn-outline-light" onclick="logout()">Logout</button>
+```
+
+#### JavaScript
+
+```
+function logout() {
+    const user = userPool.getCurrentUser();
+    if (user) {
+        user.signOut();
+    }
+    window.location.href = "index.html"; // café landing or login
+}
+```
+
+✔ Works for Admin
+
+✔ Works for Employee
+
+✔ Works on mobile / desktop
+
+✔ Secure & Cognito-approved
 
 > **🟢 PHASE 3️⃣  R & D COMPLETE**
 ---
