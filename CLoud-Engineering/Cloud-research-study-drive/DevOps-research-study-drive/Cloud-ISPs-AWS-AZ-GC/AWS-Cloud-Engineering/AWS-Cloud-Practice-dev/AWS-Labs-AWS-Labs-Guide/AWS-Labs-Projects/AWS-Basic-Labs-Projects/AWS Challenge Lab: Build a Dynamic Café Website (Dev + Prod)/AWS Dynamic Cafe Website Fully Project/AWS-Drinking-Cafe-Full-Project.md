@@ -96,7 +96,7 @@ Allow Lambda to read menu items from DynamoDB
 #### 1️⃣ Create IAM Policy for  PRODUCER LAMBDA
 > **Your API Lambda must be allowed to send messages.**
 
-- **Policy name:** 
+- **Custom Policy name:** 
 
 ```
 SendOrderToSQS
@@ -122,7 +122,7 @@ SendOrderToSQS
 #### 2️⃣ Create IAM Policy for DynamoDB Access
 > **Now Lambda needs permission to read from DynamoDB.**
 
-- **Policy name:** 
+- **Custom Policy name:** 
 
 ```        
 CafeMenuDynamoDBReadPolicy
@@ -157,11 +157,20 @@ arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
 #### 3️⃣ Create IAM Policy FOR WORKER LAMBDA
 > **Your worker needs 3 permissions**
 
-- **Policy name:** 
+**AWS IAM Policies:**
+
+```
+AmazonDynamoDBFullAccess
+AWSSecretsManagerReadOnly
+AmazonSQSFullAccess
+```
+
+- **Custom Policy name:** 
 
 ```
 CafeOrderWorkerPermissions
 ```
+
 #### Add inline policy with:
 > **Attach These Permissions**
 
@@ -200,6 +209,55 @@ CafeOrderWorkerPermissions
 }
 ```
 
+**✔️ Click Create policy**
+
+#### 3️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
+
+- **Custom Policy name:** 
+
+```
+CafeSecretsManagerReadOnly
+```
+
+- **Description:**
+
+```
+Read-only access to Secrets Manager for Lambda
+```
+
+#### Add inline policy with:
+> **Attach These Permissions**
+
+#### JSON
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+#### ✅ This allows:
+
+- Read secret value
+
+- Describe secret
+
+- ❌ No delete
+
+- ❌ No update
+
+
+**✔️ Click Create policy**
 
 - **✔️ Click Create IAM ROLE**
 

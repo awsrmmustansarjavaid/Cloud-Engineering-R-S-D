@@ -644,6 +644,30 @@ Browser (order-status.html)
                       |--> RDS (orders table)
                       |--> DynamoDB (order_metrics)
 ```
+## PHASE 2️⃣ — DYNAMODB METRICS TABLE (FULL)
+
+### 1️⃣ Worker Lambda IAM Role
+
+**AWS IAM Policies:**
+
+```
+AmazonDynamoDBFullAccess
+AWSSecretsManagerReadOnly
+AmazonSQSFullAccess
+```
+
+### REQUIRED Additional Policies
+
+#### Your Worker Lambda / API Lambda should have:
+
+| Purpose         | Policy                                 |
+| --------------- | -------------------------------------- |
+| Secrets Manager | `CafeSecretsManagerReadOnly` (custom)  |
+| RDS access      | `AWSLambdaVPCAccessExecutionRole`      |
+| CloudWatch logs | `AWSLambdaBasicExecutionRole`          |
+| SQS (worker)    | `AmazonSQSFullAccess` or scoped policy |
+| DynamoDB        | `AmazonDynamoDBFullAccess` (lab)       |
+
 
 
 
