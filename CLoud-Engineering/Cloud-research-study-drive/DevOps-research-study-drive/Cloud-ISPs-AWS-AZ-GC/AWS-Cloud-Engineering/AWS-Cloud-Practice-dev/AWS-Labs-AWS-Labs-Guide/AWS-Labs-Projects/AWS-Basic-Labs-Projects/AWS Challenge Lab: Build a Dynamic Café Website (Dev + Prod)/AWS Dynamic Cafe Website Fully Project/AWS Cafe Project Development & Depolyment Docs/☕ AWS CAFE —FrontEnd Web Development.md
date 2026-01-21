@@ -273,8 +273,6 @@ if [ $FAILURES -gt 0 ]; then
 fi
 ```
 
-
-
 ### 2️⃣ Method 2 – Manual Step-by-Step Testing (One by One)
 
 ### 1️⃣ Apache Test
@@ -450,8 +448,6 @@ sudo nano /var/www/html/index.php
 ```
 
 ### 2️⃣ Paste this clean landing page code:
-
-
 
 ```
 <!DOCTYPE html>
@@ -640,3 +636,8 @@ sudo nano /var/www/html/index.php
 ```
 
 **⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
+
+---
+
+## ☕ AWS CAFE - PHASE 2️⃣ HOME PAGE (index.php)
+
