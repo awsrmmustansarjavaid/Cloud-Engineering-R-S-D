@@ -1671,7 +1671,6 @@ def lambda_handler(event, context):
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
 
-
 # 🟢 SECTION 2️⃣ COMPLETE & VERIFIED
 ---
 # SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
