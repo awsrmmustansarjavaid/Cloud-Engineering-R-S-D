@@ -84,12 +84,61 @@ sudo ./test-api-and-rds.sh
 
 > **🟢 Method 1️⃣ COMPLETE & VERIFIED**  ✅ 
 ---
-### Method 2️⃣ Cafe Order API + RDS Tests 
+### Method 2️⃣ RDS Quick Test Script — One-command style
 > **📄 File name : ☕ AWS Café — API Gateway + rds-secret-test.sh**
 
+#### 📢 Note: RDS Quick TestRDS Test Script using Secrets Manager
 
+#### 1️⃣ IAM role
 
+- The EC2 instance must have an IAM role attached with permission to call secretsmanager:GetSecretValue for your specific secret
+
+- Recommended minimal policy example:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:your-region:your-account:secret:your-secret-name-*"
+    }
+  ]
+}
+```
+
+#### 2️⃣ Install JSON processor
+
+Install jq (JSON processor) — very common & small tool:
+
+#### 1️⃣ Amazon Linux 2023
+
+```
+sudo dnf install -y jq
+```
+
+#### 2️⃣ older Amazon Linux 2
+
+```
+sudo yum install -y jq 
+```
+
+#### 3️⃣ RDS Test Script using Secrets Manager
+
+#### 📢 Quick Usage
+
+#### 1️⃣ Create & edit
+
+```
+sudo nano rds-secret-test.sh
+```
+
+#### 2️⃣ Paste script, change only SECRET_NAME and RDS_DB
+
+##### Save as rds-secret-test.sh
 
 
 ### PHASE 2️⃣ — COMPLETE & VERIFIED**  ✅ 
----
+
+
