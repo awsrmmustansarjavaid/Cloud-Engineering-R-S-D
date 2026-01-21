@@ -227,56 +227,7 @@ If one layer misses a field, the pipeline breaks.
 
 
 
-### 1️⃣ Create Lambda Function
 
-- **Lambda → Create function**
-
-- **Select Author from scratch**
-
-| Field          | Value                         |
-| -------------- | ----------------------------- |
-| Function name  | `CafeOrderWorker`             |
-| Runtime        | Python 3.12                   |
-| Architecture   | x86_64                        |
-| Execution role | Use existing role             |
-| Role           | Same role with RDS + DynamoDB |
-
-
-**✔️ Click Create function**
-
-### 2️⃣ Add SQS Trigger (VERY IMPORTANT)
-
-- Scroll to Function overview
-
-- Click Add trigger
-
-- Select SQS
-
-```
-your SQS arn url
-```
-
-
-#### Trigger settings:
-
-| Field                      | Value         |
-| -------------------------- | ------------- |
-| Activate trigger           | ✅ Checked     |
-| Batch size                 | 1             |
-| Batch window               | 0             |
-| Maximum concurrency        | (leave empty) |
-| Report batch item failures | ❌ unchecked   |
-
-
-**✔️ Click Add**
-
-#### ⚠️ CRITICAL:
-
-- AWS automatically:
-
-- Creates event source mapping
-
-- Adds ReceiveMessage permissions
 
 
 ### 3️⃣ IAM PERMISSIONS FOR WORKER LAMBDA
