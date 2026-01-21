@@ -2566,21 +2566,85 @@ WorkerTest | Coffee | 2
 
 # SECTION 4️⃣ — ORDER STATUS DASHBOARD
 
-## PHASE 1️⃣ — SQS/LAMBDA (Producer)
+## PHASE 1️⃣ — DYNAMODB METRICS TABLE (FULL)
 
+### 1️⃣ Open DynamoDB Console
 
+#### AWS Console → DynamoDB → Tables → Create table
 
+### 2️⃣ CREATE DYNAMODB METRICS TABLE
+
+#### 1️⃣ Table configuration
+
+| Field         | Value              |
+| ------------- | ------------------ |
+| Table name    | `CafeOrderMetrics` |
+| Partition key | `metric` (String)  |
+| Sort key      | ❌ None             |
+| Table class   | Standard           |
+| Capacity      | On-demand          |
+| Encryption    | Default            |
+
+#### Sample items:
+
+```
+{ "metric": "TOTAL_ORDERS", "count": 120 }
+{ "metric": "TODAY_ORDERS", "count": 25 }
+```
+
+Click Create table
+
+**🕐 WAIT until status = ACTIVE**
+
+### 3️⃣ Insert initial items (VERY IMPORTANT)
+
+**Click table → Explore table → Create item**
+
+#### Item 1
+
+```
+{
+  "metric": {
+    "S": "TOTAL_ORDERS"
+  },
+  "count": {
+    "N": "0"
+  }
+}
+```
+
+Click Create item
+
+#### Item 2
+
+```
+{
+  "metric": {
+    "S": "TOTAL_ORDERS"
+  },
+  "count": {
+    "N": "0"
+  }
+}
+```
+
+Click Create item
 
 
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+## PHASE 2️⃣ — DYNAMODB METRICS TABLE (FULL)
 
 
 
 
 
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
 
 # 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 ---
