@@ -111,7 +111,52 @@ EC2-Cafe-Secrets-Role
 ---
 ## PHASE 2️⃣ — Development and Delopment LAMP Server 
 
+### 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
+
+```
+chmod 400 CafeDevKey.pem
+ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
+```
+
+### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+
+
 [Development and Delopment LAMP Server ](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—FrontEnd%20Web%20Development.md)
+
+
+### 3️⃣ Verify IAM Role is Attached
+
+#### Run this on EC2:
+
+###### If an IAM role is attached correctly to an EC2 instance, these MUST work:
+
+```
+curl http://169.254.169.254/latest/meta-data/iam/info
+```
+
+#### Expected output (example):
+
+```
+{
+  "Code" : "Success",
+  "LastUpdated" : "2026-01-04T10:22:18Z",
+  "InstanceProfileArn" : "arn:aws:iam::123456789012:instance-profile/EC2-Cafe-Secrets-Role",
+  "InstanceProfileId" : "AIPAXXXXXXXXX"
+}
+```
+
+```
+curl http://169.254.169.254/latest/meta-data/iam/security-credentials/
+```
+
+#### Expected output (example):
+
+```
+EC2-Cafe-Secrets-Role
+```
+
+###### ✅ If role is attached, you will see JSON output.
+
 
 
 **✅ PHASE 2️⃣ STATUS**

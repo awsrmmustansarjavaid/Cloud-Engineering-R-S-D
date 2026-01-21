@@ -40,24 +40,13 @@ sudo ./lamp-verify.sh
 sudo systemctl restart httpd
 ```
 
-
-
-
-
-
-
 ## PHASE 2️⃣ — Development and Delopment LAMP Server 
 
 ### 1️⃣  EC2 LAMP Server USER DATA
 
+
 [AWS-LAMP Server-Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
 
-### 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
-
-```
-chmod 400 CafeDevKey.pem
-ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
-```
 
 ### 3️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
