@@ -501,10 +501,238 @@ For example !
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
-# 🛠 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS
+# ☕ AWS CAFE — Order_Async_Processing_Tracking_System 
+
+# 🛠 SECTION 1️⃣ Cafe Order Processor
+
+## PHASE 7️⃣ — Test & Verification
+
+### 1️⃣  FRONTEND → BACKEND VERIFICATION
+
+#### 1️⃣ Submit order from orders.php
+
+📊 Table Number: 2
+
+☕ Item: Tea
+
+👨🏾‍🍳 Quantity: 1
+
+### 2️⃣  BACKEND VERIFICATION (MANDATORY)
+
+### 1️⃣ Test Lambda Directly (Console)
+
+- Check your Lambda CloudWatch logs to ensure the function executed correctly.
+
+- Verify new orders appear in your MariaDB database.
+
+- In Lambda → Test
+
+- **Event name:** Test_CafeOrderProcessor
+
+#### Test Event JSON:
+
+```
+{
+  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\":\"Order saved successfully\"}"
+}
+```
+#### Test Updated Event JSON:
+
+```
+{
+  "body": "{\"table_number\":1,\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+#### Expected result:
+
+```
+1 | LambdaTest | Coffee | 2 | 2026-01-10 10:32:11
+```
+---
+
+### Method 2️⃣ Cafe Order API + RDS Tests
+
+### 1️⃣ Test API Gateway
+
+#### Test via CURL
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
+```
+
+#### Expected result:
+
+```
+{
+  "message": "Order placed successfully"
+}
+```
+
+#### ✅ New UPDATED API GATEWAY CURL TEST AFTER ADDED TABLE NUMBER (REQUIRED)
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "table_number": 3,
+    "customer_name": "TestUser",
+    "item": "Latte",
+    "quantity": 1
+  }'
+```
+
+#### 🟢 Expected Response (SUCCESS)
+
+```
+{
+  "message": "Order saved successfully",
+  "table_number": 3
+}
+```
+
+#### 🟢 API GATEWAY TEST (MANDATORY)
+
+- **go to  CafeOrderAPI > post method > Test Event Body**
+
+```
+{
+  "table_number": 5,
+  "customer_name": "Charlie",
+  "item": "Coffee",
+  "quantity": 2
+}
+```
+
+#### Expected Result
+
+```
+{
+  "message": "Order saved successfully",
+  "table_number": 5
+}
+```
+
+### 2️⃣ Verify Database
+
+### Method 1 Simple 1-To-1 RDS Test
+
+```
+mysql -u cafe_user -p cafe_db
+```
+
+or
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p
+```
+
+```sql
+SELECT * FROM orders ORDER BY id DESC;
+```
+or 
+```
+use cafe_db;
+```
+```
+SELECT * FROM orders;
+```
+
+#### You should see:
+
+```
+EC2-Test | Latte | 1
+```
+
+#### Updated RDS
+
+```
+SELECT id, table_number, customer_name, item, quantity, created_at
+FROM orders
+ORDER BY id DESC;
+```
+
+✔ table_number populated
+
+✔ created_at auto-generated
+
+✔ No duplicate or missing fields
+
+---
+
+#### 3️⃣ Check CloudWatch Logs
+
+- **Lambda → Monitor → Logs**
+
+### You should see:
+
+```
+START RequestId:
+END RequestId:
+```
+
+❌ No SQL errors
+
+---
+
+### 🟢 Common Mistakes (Avoid These)
+
+| Mistake                | Result             |
+| ---------------------- | ------------------ |
+| Missing `table_number` | 500 error          |
+| table_number as string | Type error         |
+| quantity ≤ 0           | Validation failure |
+| Wrong API stage        | Order not inserted |
+
+### 🟢 SYSTEM STATUS CHECK
+
+✔ API Gateway updated
+
+✔ Lambda aligned
+
+✔ RDS schema aligned
+
+✔ Frontend orders.php aligned
+
+Your system is now schema-consistent from browser → DB.
+
+---
+
+### 🏆 Result
+
+#### You now have:
+
+☕ Restaurant-style table orders
+
+📊 Future-ready analytics
+
+🧱 No backend breakage
+
+🚀 Production-safe change
 
 
-## PHASE 1️⃣ — VERIFY Secrets Manager
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
+---
+
+
+
 
 
 
