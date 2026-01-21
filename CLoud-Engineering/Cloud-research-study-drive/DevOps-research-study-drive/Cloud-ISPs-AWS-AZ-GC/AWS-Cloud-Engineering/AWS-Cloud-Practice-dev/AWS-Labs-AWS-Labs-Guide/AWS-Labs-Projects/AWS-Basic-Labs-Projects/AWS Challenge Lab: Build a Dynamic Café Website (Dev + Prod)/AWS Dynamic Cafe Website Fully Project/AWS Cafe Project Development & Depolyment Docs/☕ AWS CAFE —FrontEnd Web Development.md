@@ -1,18 +1,78 @@
 # ☕ AWS CAFE —FrontEnd Web Development and Delopment
 
+**Dev → Serverless → Secure → Scalable → Cost-Controlled**
 
-## SEC
+**Author & Architecture Designer:** Charlie
 
-## PHASE 2 — Development and Delopment LAMP Server 
+**Level:** Beginner → Advanced (Production-grade)
 
-### 1️⃣ Launch EC2 Instance (Amazon Linux 2023)
+**Approach:** AWS Console First • No Skipped Steps • Exam + Real-World Safe
+
+---
+
+
+
+# ☕ AWS CAFE - SECTION 1️⃣ BASIC CONFIGURATIONS
+
+## PHASE 1️⃣ — Development and Delopment LAMP Server 
+
+### 1️⃣  EC2 LAMP Server USER DATA
+
+```
+#!/bin/bash
+# --------------------------------------------
+# EC2 User Data Script
+# Amazon Linux 2023
+# Installs LAMP Stack + MySQL Client
+# --------------------------------------------
+
+# 1️⃣ Update OS (MANDATORY FIRST)
+dnf update -y
+
+# 2️⃣ Install Apache (httpd)
+dnf install -y httpd
+systemctl enable httpd
+systemctl start httpd
+
+# 3️⃣ Install PHP + MySQL Support
+dnf install -y \
+php \
+php-mysqlnd \
+php-cli \
+php-common \
+php-mbstring \
+php-xml
+
+# 4️⃣ Fix Web Directory Permissions (MANDATORY)
+chown -R apache:apache /var/www
+chmod -R 755 /var/www
+
+# 5️⃣ Install MySQL Client (MariaDB)
+dnf install -y mariadb105
+
+# 6️⃣ Create a PHP Info Page (Optional Verification)
+echo "<?php phpinfo(); ?>" > /var/www/html/info.php
+
+# 7️⃣ Restart Apache to Apply PHP
+systemctl restart httpd
+
+# 8️⃣ Install AWS CLI
+sudo dnf install -y awscli
+
+
+# --------------------------------------------
+# END OF USER DATA
+# --------------------------------------------
+```
+
+### 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
 ```
 chmod 400 CafeDevKey.pem
 ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ```
 
-### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+### 3️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
 ### 1️⃣ Method 1 – Automated Verification Using One Bash Script
 
@@ -181,7 +241,7 @@ sudo ./lamp-verify.sh
 
 
 
-### 1️⃣ Method 2 – Manual Step-by-Step Testing (One by One)
+### 2️⃣ Method 2 – Manual Step-by-Step Testing (One by One)
 
 ### 1️⃣ Apache Test
 
@@ -340,14 +400,26 @@ php -m | grep mysql
 mysqlnd
 ```
 
-### 3️⃣ Frontend Development
+### 4️⃣ Restart Apache (MANDATORY)
 
-### 1️⃣  ✅ Full Responsive Bootstrap Landing Page (index.php)
+```
+sudo systemctl restart httpd
+```
+
+---
+
+# ☕ AWS CAFE - SECTION 2️⃣ Frontend Development
+
+## ☕ AWS CAFE - PHASE 1️⃣ HOME PAGE (index.php)
+> **🌐 Full Responsive Bootstrap Landing Page (index.php)**
+
+### 1️⃣ Create index.php
 
 ```
 sudo nano /var/www/html/index.php
 ```
-#### 💻 Paste this clean landing page code:
+
+### 2️⃣ Paste this clean landing page code:
 
 
 
@@ -538,12 +610,3 @@ sudo nano /var/www/html/index.php
 ```
 
 **⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
-
-### 4️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-## 
-
