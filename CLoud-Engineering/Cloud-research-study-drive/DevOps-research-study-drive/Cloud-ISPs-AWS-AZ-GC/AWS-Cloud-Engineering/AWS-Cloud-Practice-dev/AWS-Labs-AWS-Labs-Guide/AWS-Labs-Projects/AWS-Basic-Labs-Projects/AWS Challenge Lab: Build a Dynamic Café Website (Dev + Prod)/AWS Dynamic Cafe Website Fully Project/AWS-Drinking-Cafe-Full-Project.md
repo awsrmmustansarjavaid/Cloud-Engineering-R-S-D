@@ -119,7 +119,6 @@ SendOrderToSQS
 
 **✔️ Click Create policy**
 
-
 #### 2️⃣ Create IAM Policy for DynamoDB Access
 > **Now Lambda needs permission to read from DynamoDB.**
 
@@ -154,6 +153,52 @@ CafeMenuDynamoDBReadPolicy
 arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
 ```
 **✔️ Click Create policy**
+
+#### 3️⃣ Create IAM Policy FOR WORKER LAMBDA
+> **Your worker needs 3 permissions**
+
+- **Policy name:** 
+
+```
+CafeOrderWorkerPermissions
+```
+#### Add inline policy with:
+> **Attach These Permissions**
+
+#### JSON
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes"
+      ],
+      "Resource": "your SQS arn url"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "your secrets manager arn url*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:GetItem"
+      ],
+      "Resource": "your DynamoDB arn url"
+    }
+  ]
+}
+```
 
 
 - **✔️ Click Create IAM ROLE**
