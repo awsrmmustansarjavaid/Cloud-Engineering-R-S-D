@@ -5,41 +5,7 @@
 
 
 
-# PHASE 2 — Store DB Credentials in Secrets Manager
 
-## 1️⃣ Store DB Credentials in Secrets Manager
-
-- Go to Secrets Manager → Store a new secret
-
-- Type: Other type of secret → Key/Value
-
-- Secret name:
-
-```
-CafeDevDBSM
-```
-
-### Keys:
-
-```text
-username
-password
-host
-dbname
-```
-
-### Values:
-
-```text
-cafe_user
-StrongPassword123
-RDS endpoint
-cafe_db
-```
-
-- Retrieve Secret ARN for later use in the app
-
----
 
 ## 2️⃣ IAM Role for EC2 (Secrets Access)
 

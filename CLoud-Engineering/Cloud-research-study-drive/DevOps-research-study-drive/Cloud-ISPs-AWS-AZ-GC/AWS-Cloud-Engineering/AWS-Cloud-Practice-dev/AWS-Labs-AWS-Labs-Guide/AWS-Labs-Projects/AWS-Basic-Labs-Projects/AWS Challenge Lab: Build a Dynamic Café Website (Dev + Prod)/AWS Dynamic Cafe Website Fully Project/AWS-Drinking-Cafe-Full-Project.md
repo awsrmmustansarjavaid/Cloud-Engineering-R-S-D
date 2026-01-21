@@ -262,6 +262,48 @@ EXIT;
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
+## PHASE 4️⃣ — Store DB Credentials in Secrets Manager
+
+
+### 1️⃣ Store DB Credentials in Secrets Manager
+
+- Go to Secrets Manager → Store a new secret
+
+- Type: Other type of secret → Key/Value
+
+- Secret name:
+
+```
+CafeDevDBSM
+```
+
+### 1️⃣ Keys:
+
+```text
+username
+password
+host
+dbname
+```
+
+### 2️⃣ Values:
+
+```text
+cafe_user
+StrongPassword123
+RDS endpoint
+cafe_db
+```
+
+- Retrieve Secret ARN for later use in the app
+
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
 
 ## PHASE 3️⃣ — S3 Bucket
 
