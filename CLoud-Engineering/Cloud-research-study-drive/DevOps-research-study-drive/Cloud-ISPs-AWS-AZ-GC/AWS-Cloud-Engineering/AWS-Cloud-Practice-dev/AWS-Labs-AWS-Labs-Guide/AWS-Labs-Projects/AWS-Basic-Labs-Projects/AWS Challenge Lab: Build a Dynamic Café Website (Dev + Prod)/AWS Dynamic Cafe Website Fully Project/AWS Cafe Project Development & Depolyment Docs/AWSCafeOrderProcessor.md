@@ -1306,9 +1306,7 @@ Your system is now schema-consistent from browser → DB.
 
 ## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
 
-
-
-## 1️⃣ Create DynamoDB Table
+### 1️⃣ Create DynamoDB Table
 
 - **DynamoDB → Create table**
 
@@ -1366,7 +1364,7 @@ Status = ACTIVE
 
 ##### ⏳ This may take 20–60 seconds
 
-## 2️⃣ Insert Menu Items
+### 2️⃣ Insert Menu Items
 
 - **DynamoDB → CafeMenu → Explore table → Create item**
 
@@ -1559,7 +1557,13 @@ You should now see 5 items in the table. You should now see:
 ✅ DynamoDB table is ready
 
 
-## 3️⃣ Create IAM Policy for DynamoDB Access
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+
+### 3️⃣ Create IAM Policy for DynamoDB Access
 
 Now Lambda needs permission to read from DynamoDB.
 
@@ -1633,7 +1637,7 @@ CafeMenuDynamoDBReadPolicy
 ✅ Lambda now has DynamoDB access
 
 
-## 4️⃣ CREATE NEW LAMBDA (MENU API)
+### 4️⃣ CREATE NEW LAMBDA (MENU API)
 
 - Open AWS Lambda
 
@@ -1649,7 +1653,7 @@ CafeMenuDynamoDBReadPolicy
 
 **✔️ Click Create function**
 
-## 5️⃣ Lambda Code: Read Menu from DynamoDB (Python)
+### 5️⃣ Lambda Code: Read Menu from DynamoDB (Python)
 
 Now we implement the logic.
 
@@ -1686,7 +1690,7 @@ def lambda_handler(event, context):
 
 **✔️ Click Deploy**
 
-## 6️⃣ TEST LAMBDA (MANDATORY)
+### 6️⃣ TEST LAMBDA (MANDATORY)
 
 - Click Test
 
@@ -1712,6 +1716,15 @@ def lambda_handler(event, context):
 }
 ```
 
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+
+
+
+
+
+# 🟢 SECTION 2️⃣ COMPLETE & VERIFIED
 ---
 
 
