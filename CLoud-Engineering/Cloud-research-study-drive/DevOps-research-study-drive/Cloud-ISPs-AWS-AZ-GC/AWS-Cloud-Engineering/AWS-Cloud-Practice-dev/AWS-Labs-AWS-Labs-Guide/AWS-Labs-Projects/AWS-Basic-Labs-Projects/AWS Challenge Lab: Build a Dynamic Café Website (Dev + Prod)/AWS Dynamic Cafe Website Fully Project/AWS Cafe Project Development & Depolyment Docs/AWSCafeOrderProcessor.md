@@ -1499,8 +1499,6 @@ id | table_number | customer_name | item  | quantity | created_at
 12 | 1            | ConsoleTest   | Latte | 2        | 2026-01-xx
 ```
 
-
-
 #### 2️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
 
 - AWS Console → SQS
