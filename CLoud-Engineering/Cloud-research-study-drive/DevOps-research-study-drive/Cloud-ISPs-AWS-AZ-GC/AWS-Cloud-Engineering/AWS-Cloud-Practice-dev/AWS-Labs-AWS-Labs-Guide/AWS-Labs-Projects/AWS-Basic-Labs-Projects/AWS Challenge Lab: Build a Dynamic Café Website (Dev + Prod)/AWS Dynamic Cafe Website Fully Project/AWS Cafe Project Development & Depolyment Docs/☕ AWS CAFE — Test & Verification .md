@@ -341,6 +341,24 @@ php -m | grep mysql
 mysqlnd
 ```
 
+### 8️⃣ 🧪 VERIFICATION 2 (MANDATORY)
+
+#### 1️⃣ Test Landing Page
+
+```
+http://<EC2_PUBLIC_IP>/
+```
+
+#### ☑️ Confirm:
+
+✔️ Logo visible
+
+✔️ “Charlie Cafe” title visible
+
+✔️ Hero image loads from S3
+
+✔️ “Order Now” button works
+
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
@@ -494,6 +512,7 @@ For example !
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
 # 🛠 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS
+
 
 
 

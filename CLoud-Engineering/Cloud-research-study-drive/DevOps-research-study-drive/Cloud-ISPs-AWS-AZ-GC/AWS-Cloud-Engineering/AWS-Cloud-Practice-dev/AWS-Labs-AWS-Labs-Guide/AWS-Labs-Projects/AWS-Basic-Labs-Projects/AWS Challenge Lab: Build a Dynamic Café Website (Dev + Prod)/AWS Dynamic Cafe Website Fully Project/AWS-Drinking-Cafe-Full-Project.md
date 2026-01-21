@@ -497,9 +497,6 @@ cafe_db
 
 - Retrieve Secret ARN for later use in the app
 
-
-
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
@@ -584,25 +581,6 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 ✅ No backend impact
 
 ✅ No API involved
-
-### 4️⃣ 🧪 VERIFICATION 2 (MANDATORY)
-
-#### 1️⃣ Test Landing Page
-
-```
-http://<EC2_PUBLIC_IP>/
-```
-
-#### ☑️ Confirm:
-
-✔️ Logo visible
-
-✔️ “Charlie Cafe” title visible
-
-✔️ Hero image loads from S3
-
-✔️ “Order Now” button works
-
 
 
 **✅ PHASE 3️⃣ STATUS**
