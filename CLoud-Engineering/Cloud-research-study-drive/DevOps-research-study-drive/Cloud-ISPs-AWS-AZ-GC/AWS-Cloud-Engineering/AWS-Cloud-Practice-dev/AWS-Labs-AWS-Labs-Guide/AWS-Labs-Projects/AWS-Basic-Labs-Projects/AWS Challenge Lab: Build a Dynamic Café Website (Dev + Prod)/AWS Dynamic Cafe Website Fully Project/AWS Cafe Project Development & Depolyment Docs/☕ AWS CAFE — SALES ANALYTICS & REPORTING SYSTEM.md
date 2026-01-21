@@ -450,13 +450,6 @@ Function name: CafeAnalyticsLambda
 Runtime: Python 3.10
 Execution role: Create new role
 ```
-
-#### 2️⃣ IAM Permissions
-
-
-
-
-
 ### 2️⃣ DEPLOY CODE
 
 **FULL CafeAnalyticsLambda PYTHON CODE (COPY-PASTE)**
@@ -649,8 +642,6 @@ def response(code, body):
         "body": json.dumps(body)
     }
 ```
-
-
 ### 3️⃣ 🔐 Environment Variable Required
 
 - Open Lambda → Your Function
@@ -858,7 +849,6 @@ GET /analytics?period=today
 ####  1️⃣ Create Resource
 
 - **Go to API Gateway → Your Existing API → Resources → Create Resource**
-
 
 ```
 Resource Name: analytics
