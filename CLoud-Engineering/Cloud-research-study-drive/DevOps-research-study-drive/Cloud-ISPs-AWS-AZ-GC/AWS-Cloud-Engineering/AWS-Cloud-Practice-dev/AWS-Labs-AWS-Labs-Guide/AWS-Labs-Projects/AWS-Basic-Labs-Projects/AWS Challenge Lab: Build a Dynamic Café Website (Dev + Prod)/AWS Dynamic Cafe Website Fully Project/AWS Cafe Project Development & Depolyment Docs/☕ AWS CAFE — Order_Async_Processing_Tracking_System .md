@@ -566,8 +566,6 @@ Click Deploy (top right)
 
 Create endpoint ✅
 
-
-
 **✅ PHASE 6️⃣ STATUS**
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
@@ -593,8 +591,6 @@ _ **Please refer to the Test & Verification documentation for detailed procedure
 | Table name    | `CafeMenu` |
 | Partition key | `item`     |
 | Type          | `String`   |
-
-
 
 ##### ⚠️ Do NOT add Sort key
 
