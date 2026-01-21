@@ -93,7 +93,11 @@ Allow Lambda to read menu items from DynamoDB
 
 - **IAM Role for Charlie Cafe Policies**
 
-#### 1️⃣ Create IAM Policy for DynamoDB Access
+#### 1️⃣ Create IAM Policy for
+
+
+
+#### 2️⃣ Create IAM Policy for DynamoDB Access
 > **Now Lambda needs permission to read from DynamoDB.**
 
 - **Policy name:** 
@@ -126,12 +130,6 @@ CafeMenuDynamoDBReadPolicy
 ```
 arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
 ```
-
-#### 2️⃣ Create IAM Policy for DynamoDB Access
-> **Now Lambda needs permission to read from DynamoDB.**
-
-
-
 
 
 - **✔️ Click Create IAM ROLE**
