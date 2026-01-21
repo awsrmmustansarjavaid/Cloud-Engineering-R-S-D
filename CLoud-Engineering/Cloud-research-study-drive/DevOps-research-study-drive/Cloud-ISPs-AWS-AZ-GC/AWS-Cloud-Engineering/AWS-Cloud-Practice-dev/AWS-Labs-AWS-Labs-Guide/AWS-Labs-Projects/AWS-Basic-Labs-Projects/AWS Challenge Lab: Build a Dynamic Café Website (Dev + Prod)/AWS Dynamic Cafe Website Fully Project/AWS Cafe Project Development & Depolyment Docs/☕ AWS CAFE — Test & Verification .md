@@ -1794,6 +1794,121 @@ DynamoDB counts updated ✅
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
+## 🔔 PHASE 2️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)
+
+### 🧪 STEP 5 — TEST LAMBDA (MANDATORY)
+
+#### Create test event:
+
+```
+{
+  "queryStringParameters": {
+    "order_id": "ORD-TEST-123"
+  }
+}
+```
+
+#### Expected output:
+
+```
+statusCode: 200
+status: RECEIVED
+```
+
+### 🧪 STEP 7 — TEST API (CRITICAL)
+
+#### Browser test:
+
+```
+https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=ORD-123
+```
+
+You should get JSON response.
+
+### 🧪 STEP 9 — END-TO-END TEST
+
+1️⃣ Place order
+
+2️⃣ Copy order link
+
+3️⃣ Open link in new tab
+
+4️⃣ Status page loads
+
+5️⃣ Print works
+
+#### 🧪 TEST THIS FILE (DO NOT SKIP)
+
+STEP 1️⃣ Place an order
+
+→ Order created in DynamoDB
+
+STEP 2️⃣ Copy order status URL
+
+Example:
+
+```
+https://your EC2 Public IP/order-status.php?order_id=12345
+```
+
+STEP 3️⃣ Open link in browser
+
+✔ Page loads
+
+✔ Cafe background visible
+
+✔ Order data shown
+
+STEP 4️⃣ Click Print Receipt
+
+✔ Browser print opens
+
+✔ Looks like a cafe receipt
+
+#### 🟢 SAFE CONFIRMATION
+
+✔ Frontend-only
+
+✔ No backend change
+
+✔ No Lambda change
+
+✔ No API Gateway change
+
+#### ✅ STATUS
+
+🟢 Order Status Page Fully Updated
+
+🟢 Cafe Theme Applied
+
+🟢 Print Working
+
+🟢 Ready for Production
+
+
+### ✅ WHAT YOU ACHIEVED
+
+✔ Real customer tracking
+
+✔ Read-only safe backend
+
+✔ No regression risk
+
+✔ Production interview-ready
+
+✔ Clean separation of concerns
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
 
 
 
+
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
