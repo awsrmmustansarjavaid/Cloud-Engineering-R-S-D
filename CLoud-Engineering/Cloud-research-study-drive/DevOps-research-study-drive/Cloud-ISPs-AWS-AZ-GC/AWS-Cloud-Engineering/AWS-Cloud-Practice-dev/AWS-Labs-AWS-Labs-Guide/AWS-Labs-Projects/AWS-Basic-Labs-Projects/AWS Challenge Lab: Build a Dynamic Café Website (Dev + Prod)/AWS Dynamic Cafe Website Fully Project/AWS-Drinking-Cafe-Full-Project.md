@@ -58,7 +58,8 @@
   * HTTP (80) → 0.0.0.0/0
 * Name tag: `CafeDevWebServer`
 
-#### ✅ EC2 USER DATA
+#### ✅ EC2 LAMP Server USER DATA
+> **📍 File Location: ☕ AWS CAFE —FrontEnd Web Development.md**
 
 ```
 #!/bin/bash
