@@ -1686,7 +1686,7 @@ your SQS arn url
 
 - Adds ReceiveMessage permissions
 
-### 4️⃣ WORKER LAMBDA CODE Production Safe (Recommended)
+### 3️⃣ WORKER LAMBDA CODE Production Safe (Recommended)
 
 #### 💻 Code:
 
@@ -1773,7 +1773,7 @@ def lambda_handler(event, context):
 
 **Click Deploy**
 
-### 5️⃣ Attach Layer to Worker Lambda
+### 4️⃣ Attach Layer to Worker Lambda
 
 - Lambda → CafeOrderWorker
 
@@ -1791,7 +1791,7 @@ def lambda_handler(event, context):
 
 - Click Add
 
-### 6️⃣ Attach Lambda to VPC (MANDATORY)
+### 5️⃣ Attach Lambda to VPC (MANDATORY)
 
 #### 1️⃣ Attach Lambda to VPC
 
@@ -1861,7 +1861,14 @@ Set EXACTLY like this:
 
 Click Save
 
-#### 4️⃣ VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 5️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
+
+
+
 
 You already have Secrets Manager endpoint ✅
 
@@ -1922,14 +1929,20 @@ com.amazonaws.us-east-1.dynamodb
 
 Click Create
 
+**✅ PHASE 5️⃣ STATUS**
 
-
-
-**✅ PHASE 4️⃣ STATUS**
-
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
+## PHASE 6️⃣ — AMAZON DYNAMODB (Menu + Cache Layer)
 
+
+
+
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
