@@ -5,7 +5,7 @@
 ### PHASE 1️⃣ — Basic RDS CONFIGURATIONS
 
 ## Method 1️⃣ - ☕ AWS Café — RDS MySQL Setup Bash Script
-> **📄 File name : ☕ AWS Café — RDS MySQL Setup Bash Script.sh **
+> **📄 File name : ☕ AWS Café — RDS MySQL Setup Bash Script.sh**
 
 ```
 sudo nano setup_cafe_rds.sh
@@ -57,7 +57,7 @@ SECRET_ARN="arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSM-NSi
 ### PHASE 2️⃣ Cafe Order API + RDS Tests (API Gateway + rds-secret-test.sh)
 
 ### Method 1️⃣ Cafe Order API + RDS Tests 
-> **📄 File name : ☕ AWS Café — RDS MySQL Setup Bash Script.sh **
+> **📄 File name : ☕ AWS Café — API Gateway + rds-secret-test.sh**
 
 #### 1️⃣ Create & edit file
 
@@ -69,3 +69,27 @@ sudo nano test-api-and-rds.sh
 
 
 
+#### 3️⃣ Make the script executable
+
+```
+sudo chmod +x test-api-and-rds.sh
+```
+This command gives permission to run the file as a program/script.
+
+#### 4️⃣ Run the script (with root privileges)
+
+```
+sudo ./test-api-and-rds.sh
+```
+
+> **🟢 Method 1️⃣ COMPLETE & VERIFIED**  ✅ 
+---
+### Method 2️⃣ Cafe Order API + RDS Tests 
+> **📄 File name : ☕ AWS Café — API Gateway + rds-secret-test.sh**
+
+
+
+
+
+### PHASE 2️⃣ — COMPLETE & VERIFIED**  ✅ 
+---
