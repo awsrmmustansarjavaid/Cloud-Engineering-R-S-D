@@ -326,6 +326,8 @@ ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 [Development and Delopment LAMP Server ](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—FrontEnd%20Web%20Development.md)
 
 
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
@@ -516,10 +518,29 @@ cafe_db
 
 # 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE
 ---
-# 📢 SECTION 2️⃣ CAFE FRONTEND CONFIGURATIONS
+# 📢 SECTION 3️⃣ CAFE FRONTEND CONFIGURATIONS
+
+## ☕ AWS CAFE - PHASE 1️⃣ HOME PAGE (index.php)
+> **🌐 Full Responsive Bootstrap Landing Page (index.php)**
+
+### 1️⃣ Create index.php
+
+```
+sudo nano /var/www/html/index.php
+```
+
+### 2️⃣ Paste this clean landing page code:
 
 
+[index.php](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Frontend%20Code%20Script/Index.php)
 
+
+**⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
 
 ## PHASE 3️⃣ — S3 Bucket
 
