@@ -1,18 +1,21 @@
 
-# PHASE 1 — AMAZON RDS (Replace EC2 MariaDB)
+# ☕ AWS CAFE —FrontEnd Web Development and Delopment
 
+**Dev → Serverless → Secure → Scalable → Cost-Controlled**
 
+**Author & Architecture Designer:** Charlie
 
+**Level:** Beginner → Advanced (Production-grade)
 
-
-
-
+**Approach:** AWS Console First • No Skipped Steps • Exam + Real-World Safe
 
 ---
 
-# PHASE 3 — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+## SECTION 1️⃣ Cafe Order Processor
 
-## 1️⃣ Create Lambda Role
+### PHASE 1️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+
+### 1️⃣ Create Lambda Role
 
 * Name: `Lambda-Cafe-Order-Role`
 * Policies:
@@ -22,7 +25,7 @@
 
 ---
 
-## 2️⃣ Create Lambda Function
+### 2️⃣ Create Lambda Function
 
 * Name: `CafeOrderProcessor`
 * Runtime: Python 3.12
@@ -30,7 +33,7 @@
 
 ---
 
-## 3️⃣ Lambda Layer (pymysql)
+### 3️⃣ Lambda Layer (pymysql)
 
 ### Method 1️⃣ - PyMySQL Lambda Layer
 
@@ -67,7 +70,7 @@ echo "and attach the layer to your Lambda function."
 echo ""
 ```
 
-### 2️⃣ How to create, give permission, and run the script on EC2
+#### 2️⃣ How to create, give permission, and run the script on EC2
 
 #### 1️⃣ Create the file
 
@@ -127,9 +130,12 @@ zip -r pymysql-layer.zip python
 ls -lh pymysql-layer.zip
 ```
 
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
-# PHASE 4 — S3 Bucket - Upload ZIP
+### PHASE 2️⃣ — S3 Bucket - Upload ZIP
 
 ## 1️⃣ S3 Bucket - Upload ZIP to Lambda
 
@@ -195,7 +201,13 @@ upload: ./pymysql-layer.zip to s3://mn-cafe-s3-bucket/layers/pymysql-layer.zip
 * Add file → select `pymysql-layer.zip`
 * Click **Upload**
 
-# PHASE 5 — Lambda Layer
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+
+### PHASE 3️⃣ — Lambda Layer
 
 ### 1️⃣ Create Lambda Layer Using S3
 
@@ -237,9 +249,12 @@ Click **Create**
 
 Click **Add**
 
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 
-# PHASE 6 — API Gateway
+### PHASE 4️⃣ — API Gateway
 
 
 ## Objective:
