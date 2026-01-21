@@ -209,13 +209,15 @@ EC2-Cafe-Secrets-Role
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+# 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS COMPLETE
 ---
 
-## PHASE 3️⃣ — RDS CONFIGURATIONS
+# 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS
 
-### 1️⃣ — Basic RDS CONFIGURATIONS
+## PHASE 1️⃣ — Basic RDS CONFIGURATIONS
 
-#### 1️⃣ Create DB Subnet Group
+### 1️⃣ Create DB Subnet Group
 AWS Console → RDS → Subnet groups → Create
 
 - Name: CafeRDSSubnetGroup
@@ -226,7 +228,7 @@ AWS Console → RDS → Subnet groups → Create
 
 - **✔️ Create**
 
-#### 2️⃣ Create Security Group for RDS
+### 2️⃣ Create Security Group for RDS
 VPC → Security Groups → Create
 
 - Name: CafeRDS-SG
@@ -238,7 +240,7 @@ VPC → Security Groups → Create
 
 - **✔️ Create**
 
-#### 3️⃣ Create RDS Instance
+### 3️⃣ Create RDS Instance
 
 RDS → Databases → Create database
 
@@ -264,11 +266,15 @@ RDS → Databases → Create database
 
 - **✔️ Create database ⏳**
 
-#### 4️⃣ Create Schema in RDS
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 2️⃣ — Basic RDS Schema CONFIGURATIONS
+
+### 1️⃣ Create Schema in RDS
 
 - **✔️ Connect from EC2:**
-
----
 
 ### 2️⃣ — Basic RDS CONFIGURATIONS
 
@@ -291,7 +297,9 @@ mysql -h <rds-endpoint> -u cafe_user -p
 ```
 ---
 
-#### 2️⃣ Create Café Database
+### 2️⃣ cafe_db
+
+#### 1️⃣ Create Café Database
 
 ```sql
 CREATE DATABASE cafe_db;
@@ -309,13 +317,13 @@ GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-#### 3️⃣ Use the correct database
+#### 2️⃣ Use the correct database
 
 ```
 USE cafe_db;
 ```
 
-#### 4️⃣ Orders Table
+#### 3️⃣ Orders Table
 
 ```sql
 CREATE TABLE orders (
@@ -343,7 +351,7 @@ CREATE TABLE orders (
 );
 ```
 
-### 5️⃣ Verify table exists
+#### 4️⃣ Verify table exists
 
 ```
 SHOW TABLES;
@@ -355,7 +363,7 @@ SHOW TABLES;
 orders
 ```
 
-### 6️⃣ Test insert manually (CLI)
+### 5️⃣ Test insert manually (CLI)
 
 ```
 INSERT INTO orders (customer_name, item, quantity)
@@ -375,7 +383,7 @@ VALUES
     (5, 'Ahmed Raza', 'Croissant + Tea', 1);
 ``` 
 
-### 7️⃣ Verify:
+### 6️⃣ Verify:
 
 ```
 SELECT * FROM orders;
@@ -391,11 +399,11 @@ EXIT;
 
 
 
-**✅ PHASE 3️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 4️⃣ — Store DB Credentials in Secrets Manager
+## PHASE 3️⃣ — Store DB Credentials in Secrets Manager
 
 
 ### 1️⃣ Store DB Credentials in Secrets Manager
@@ -464,10 +472,17 @@ For example !
 ```
 
 
-**✅ PHASE 4️⃣ STATUS**
+**✅ PHASE 3️⃣ STATUS**
 
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+
+# 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE
 ---
+# 📢 SECTION 2️⃣ CAFE FRONTEND CONFIGURATIONS
+
+
+
+
 ## PHASE 3️⃣ — S3 Bucket
 
 
