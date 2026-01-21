@@ -1862,7 +1862,7 @@ order.php  →  order_old.php
 #### Create a new file:
 
 ```
-order.php
+place-order.php
 ```
 
 Paste the FULL code below
@@ -1875,7 +1875,7 @@ Paste the FULL code below
 
 #### 📌 Copy-paste exactly as is
 
-[place-order.php](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/place-order.php)
+[place-order.php](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Frontend%20Code%20Script/place-order.php)
 
 ### 🧪 STEP 3 — TESTING (DO NOT SKIP)
 
@@ -1939,67 +1939,7 @@ Click Save
 
 > **⚠️ COPY EXACTLY — do NOT modify**
 
-```
-import json
-import os
-import pymysql
-
-def get_connection():
-    return pymysql.connect(
-        host=os.environ["DB_HOST"],
-        user=os.environ["DB_USER"],
-        password=os.environ["DB_PASS"],
-        database=os.environ["DB_NAME"],
-        cursorclass=pymysql.cursors.DictCursor
-    )
-
-def lambda_handler(event, context):
-    params = event.get("queryStringParameters") or {}
-    order_id = params.get("order_id")
-
-    if not order_id:
-        return {
-            "statusCode": 400,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"error": "order_id required"})
-        }
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute("""
-            SELECT table_number, customer_name, item, quantity, created_at
-            FROM orders
-            ORDER BY created_at DESC
-            LIMIT 1
-        """)
-        order = cursor.fetchone()
-
-        if not order:
-            return {
-                "statusCode": 404,
-                "headers": {"Access-Control-Allow-Origin": "*"},
-                "body": json.dumps({"status": "NOT FOUND"})
-            }
-
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type": "application/json"
-            },
-            "body": json.dumps({
-                "order_id": order_id,
-                "status": "RECEIVED",
-                "order": order
-            }, default=str)
-        }
-
-    finally:
-        cursor.close()
-        conn.close()
-```
+[CafeOrderStatusLambda.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CafeOrderStatusLambda.py)
 
 Click Deploy
 
