@@ -459,6 +459,47 @@ RDS + DynamoDB
 
 - You are using Standard Queue (NOT FIFO)
 
+## 2️⃣ CREATE API Lambda Function (Producer)
+> **(ORDER API → SQS)**
+
+### 🎯 PURPOSE 
+
+This Lambda will:
+
+- Receive HTTP request from API Gateway
+
+- Read order JSON
+
+- Send order to SQS
+
+- Respond immediately (202 Accepted)
+
+### 🧱 ARCHITECTURE POSITION
+
+```
+Browser / EC2 PHP App
+        ↓
+    API Gateway
+        ↓
+CafeOrderApiLambda   ← (YOU ARE CREATING THIS NOW)
+        ↓
+   CafeOrdersQueue (SQS)
+```
+
+### ✅ PRE-CHECK (DO THIS ONCE)
+
+Make sure SQS Queue already exists:
+
+- AWS Console → SQS
+
+- Queue name: CafeOrdersQueue
+
+- Type: Standard
+
+✔ If exists → Continue
+
+❌ If not → STOP and create it first
+
 
 
 
