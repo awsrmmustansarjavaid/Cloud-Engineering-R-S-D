@@ -224,6 +224,8 @@ flowchart TD
 # 🟢 SECTION INTRO CHARLIE CAFE -  COMPLETE & VERIFIED
 ---
 
+# ☕ Charlie Café - Doc:  Cafe Order Processor 
+
 # ☕ Charlie Café SECTION 1️⃣ Cafe Order Processor 
 
 ## PHASE 7️⃣ — Test & Verification
@@ -436,7 +438,12 @@ DynamoDB (CafeMenu)
 
 
 
+# ☕ Doc:Cafe Order Processor - COMPLETE & VERIFIED
+
 ---
+
+# ☕ Charlie Café  Doc:Secure HR & Attendance System
+
 # ☕ Charlie Café SECTION 5️⃣ – Secure HR & Attendance System
 > **📄 ☕ AWS Charlie Café – Secure HR & Attendance System.md
 
@@ -2137,4 +2144,7 @@ This is exactly how real AWS + frontend projects are reviewed in interviews.
 
 
 > **🟢 PHASE 9️⃣ COMPLETE**
+
+
+# ☕ Doc:Secure HR & Attendance System - COMPLETE & VERIFIED---
 ---
