@@ -3509,8 +3509,168 @@ Fully job-ready
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ Charlie Café PHASE 8️⃣ — Update Cafe Security Configuration
 
-## ☕ Charlie Café PHASE 7️⃣ — Update CafePDFReportLambda for HR & Attendance
+Step 4.1 — EC2 Frontend Security Group
+Step 4.1.1: Identify your EC2 SG
+
+Go to EC2 → Instances → Select your frontend EC2.
+
+Scroll to Security → Security groups → Click on SG name.
+
+Note Inbound and Outbound rules.
+
+Step 4.1.2: EC2 Inbound Rules
+
+SSH (optional, admin only)
+
+Type: SSH
+
+Protocol: TCP
+
+Port: 22
+
+Source: Your IP only (example: 203.0.113.25/32)
+
+HTTP / HTTPS (frontend access)
+
+Type: HTTP → Port 80 → Source: 0.0.0.0/0
+
+Type: HTTPS → Port 443 → Source: 0.0.0.0/0
+
+Document in a table like this:
+
+| Port | Protocol | Source    | Purpose      |
+| ---- | -------- | --------- | ------------ |
+| 22   | TCP      | Your IP   | SSH Admin    |
+| 80   | TCP      | 0.0.0.0/0 | Frontend Web |
+| 443  | TCP      | 0.0.0.0/0 | Frontend Web |
+
+Step 4.1.3: EC2 Outbound Rules
+
+Usually default is All traffic → 0.0.0.0/0.
+
+If restrictive, ensure outbound allows Lambda to connect to EC2 if needed, e.g., API calls.
+
+Step 4.2 — Lambda Security Group
+Step 4.2.1: Identify Lambda SG
+
+Go to Lambda → Functions → Your Lambda → Configuration → VPC.
+
+Check VPC / Subnets / Security Groups.
+
+Lambda must have an SG that allows outbound to RDS SG on the database port (default MySQL 3306 or Postgres 5432).
+
+Step 4.2.2: Lambda Outbound Rule
+
+Type: MySQL/Aurora (or Postgres)
+
+Protocol: TCP
+
+Port: 3306 (or 5432)
+
+Destination: RDS SG ID
+
+Lambda should not allow 0.0.0.0/0 outbound to database — security best practice.
+
+Step 4.3 — RDS Security Group
+Step 4.3.1: Identify RDS SG
+
+Go to RDS → Databases → Select your DB → Connectivity & security → VPC security groups.
+
+Step 4.3.2: RDS Inbound Rules
+
+Allow access only from Lambda SG:
+
+Type: MySQL/Aurora (or Postgres)
+
+Protocol: TCP
+
+Port: 3306 (or 5432)
+
+Source: Lambda SG ID
+
+Example Table:
+
+| Port | Protocol | Source    | Purpose               |
+| ---- | -------- | --------- | --------------------- |
+| 3306 | TCP      | Lambda SG | Lambda DB Access Only |
+
+Step 4.3.3: RDS Outbound Rules
+
+Usually default “All traffic → 0.0.0.0/0” is fine.
+
+No need to modify if DB is only accessed by Lambda.
+
+Step 4.4 — Verification Steps
+
+EC2 Verification
+
+Try connecting via SSH from your IP → should work.
+
+Access frontend in browser → should work.
+
+Lambda Verification
+
+Test Lambda function in AWS console.
+
+Ensure it can connect to RDS (e.g., query SELECT 1).
+
+RDS Verification
+
+Check Connectivity & Security → VPC security groups.
+
+Optional: Test from another EC2 → should fail if SG is correct.
+
+Step 4.5 — Documentation for Audit
+
+Create a security document (Markdown or Excel) listing:
+
+All SG names
+
+Inbound/outbound rules
+
+Purpose for each rule
+
+Example Markdown snippet:
+
+```
+# Security Group Documentation
+
+## EC2 Frontend SG
+- Port 22 (SSH) → Your IP
+- Port 80 (HTTP) → 0.0.0.0/0
+- Port 443 (HTTPS) → 0.0.0.0/0
+
+## Lambda SG
+- Outbound → RDS SG: 3306/TCP
+
+## RDS SG
+- Inbound → Lambda SG: 3306/TCP
+```
+
+✅ Result:
+
+Your environment is now locked down.
+
+Only Lambda can access the database.
+
+Frontend EC2 is secure for admin & public traffic.
+
+
+**✅ PHASE 8️⃣ STATUS**
+
+> **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 9️⃣ — Update CafePDFReportLambda for HR & Attendance
+
+
+
+**✅ PHASE 9️⃣ STATUS**
+
+> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 🔟 — Update CafePDFReportLambda for HR & Attendance
 
 ### 📃 Research and Development (Just for CaseStudy)
 

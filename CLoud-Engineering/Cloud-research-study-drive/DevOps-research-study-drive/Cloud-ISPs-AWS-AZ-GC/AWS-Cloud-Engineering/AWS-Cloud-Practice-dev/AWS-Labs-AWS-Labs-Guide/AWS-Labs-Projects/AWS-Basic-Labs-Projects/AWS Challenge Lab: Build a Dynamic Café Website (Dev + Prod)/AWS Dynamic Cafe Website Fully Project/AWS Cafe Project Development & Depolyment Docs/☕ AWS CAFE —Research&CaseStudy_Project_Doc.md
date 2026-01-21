@@ -1763,4 +1763,11 @@ That answer = strong hire signal.
 > **🟢 PHASE 5️⃣  R & D COMPLETE**
 ---
 
+---
+## ☕ Charlie Café PHASE 8️⃣ — Update Cafe Security Configuration
 
+### Objective
+
+Ensure all EC2, Lambda, and RDS components are properly secured via Security Groups (SGs).
+
+Document rules for future audits and maintenance.
