@@ -138,9 +138,71 @@ sudo nano rds-secret-test.sh
 
 ##### Save as rds-secret-test.sh
 
+#### 3️⃣ Make the script executable
+
+```
+sudo chmod +x rds-secret-test.sh
+```
+This command gives permission to run the file as a program/script.
+
+#### 4️⃣ Run the script (with root privileges)
+
+```
+sudo ./rds-secret-test.sh
+```
+
+#### Common Secret JSON structures (choose correct jq paths)
+
+| Secret format (what you see in console)                  | jq path for host | jq path for username | jq path for password |
+|----------------------------------------------------------|------------------|----------------------|----------------------|
+| `{"host":"...","username":"...","password":"..."}`       | `.host`          | `.username`          | `.password`          |
+| `{"endpoint":"...","user":"...","pwd":"..."}`            | `.endpoint`      | `.user`              | `.pwd`               |
+| RDS auto-generated rotation format                       | `.host`          | `.username`          | `.password`          |
+
+- Adjust the three jq -r lines if your secret has different key names.
+
+> **🟢 Method 2️⃣ COMPLETE & VERIFIED**  ✅ 
 
 ### PHASE 2️⃣ — COMPLETE & VERIFIED**  ✅ 
+---
+### PHASE 3️⃣ — PyMySQL Lambda Layer
+
+### Method 1️⃣ - PyMySQL Lambda Layer
+
+#### 2️⃣ How to create, give permission, and run the script on EC2
+
+#### 1️⃣ Create the file
+
+```
+nano pymysql-layer.sh
+```
+
+→ paste the script above
+
+→ press Ctrl + O → Enter (save)
+
+→ Ctrl + X (exit)
 
 
+#### 2️⃣ Give execute permission
 
+```
+sudo chmod +x pymysql-layer.sh
+```
+
+#### 3️⃣ Run it
+
+```
+sudo ./pymysql-layer.sh
+```
+
+> **After it finishes → you will see pymysql-layer.zip in the current folder (or in ./lambda-layer/ if you cd'ed manually).**
+> **You can now upload it to S3 using AWS console (or aws s3 cp if you have AWS CLI configured on the EC2).**
+
+**✔️ Good luck with your Lambda + pymysql setup!**
+
+> **🟢 Method 1️⃣ COMPLETE & VERIFIED**  ✅ 
+
+### PHASE 3️⃣ — COMPLETE & VERIFIED**  ✅ 
+---
 
