@@ -3579,21 +3579,21 @@ Fully job-ready
 
 #### 1️⃣ Identify RDS SG
 
-Go to RDS → Databases → Select your DB → Connectivity & security → VPC security groups.
+- Go to RDS → Databases → Select your DB → Connectivity & security → VPC security groups.
 
 #### 2️⃣ RDS Inbound Rules
 
-Allow access only from Lambda SG:
+- Allow access only from Lambda SG:
 
-Type: MySQL/Aurora (or Postgres)
+    - Type: MySQL/Aurora (or Postgres)
 
-Protocol: TCP
+    - Protocol: TCP
 
-Port: 3306 (or 5432)
+    - Port: 3306 (or 5432)
 
-Source: Lambda SG ID
+    - Source: Lambda SG ID
 
-Example Table:
+#### Example Table:
 
 | Port | Protocol | Source    | Purpose               |
 | ---- | -------- | --------- | --------------------- |
@@ -3601,41 +3601,41 @@ Example Table:
 
 #### 3️⃣ RDS Outbound Rules
 
-Usually default “All traffic → 0.0.0.0/0” is fine.
+- Usually default “All traffic → 0.0.0.0/0” is fine.
 
-No need to modify if DB is only accessed by Lambda.
+- No need to modify if DB is only accessed by Lambda.
 
 ### 4️⃣ — Verification Steps
 
-EC2 Verification
+- EC2 Verification
 
-Try connecting via SSH from your IP → should work.
+    - Try connecting via SSH from your IP → should work.
 
-Access frontend in browser → should work.
+    - Access frontend in browser → should work.
 
-Lambda Verification
+- Lambda Verification
 
-Test Lambda function in AWS console.
+    - Test Lambda function in AWS console.
 
-Ensure it can connect to RDS (e.g., query SELECT 1).
+    - Ensure it can connect to RDS (e.g., query SELECT 1).
 
-RDS Verification
+- RDS Verification
 
-Check Connectivity & Security → VPC security groups.
+    - Check Connectivity & Security → VPC security groups.
 
-Optional: Test from another EC2 → should fail if SG is correct.
+    - Optional: Test from another EC2 → should fail if SG is correct.
 
-Step 4.5 — Documentation for Audit
+### 5️⃣ — Documentation for Audit
 
-Create a security document (Markdown or Excel) listing:
+- Create a security document (Markdown or Excel) listing:
 
-All SG names
+    - All SG names
 
-Inbound/outbound rules
+    - Inbound/outbound rules
 
-Purpose for each rule
+    - Purpose for each rule
 
-Example Markdown snippet:
+#### Example Markdown snippet:
 
 ```
 # Security Group Documentation
@@ -3652,13 +3652,13 @@ Example Markdown snippet:
 - Inbound → Lambda SG: 3306/TCP
 ```
 
-✅ Result:
+#### ✅ Result:
 
-Your environment is now locked down.
+- Your environment is now locked down.
 
-Only Lambda can access the database.
+- Only Lambda can access the database.
 
-Frontend EC2 is secure for admin & public traffic.
+- Frontend EC2 is secure for admin & public traffic.
 
 
 **✅ PHASE 8️⃣ STATUS**
