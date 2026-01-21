@@ -221,26 +221,6 @@ If one layer misses a field, the pipeline breaks.
 
 ---
 
-# PHASE 3 — SQS/Worker LAMBDA (Consumer)
-
-## 1️⃣ Create Worker Lambda (Consumer)
-
-### 3️⃣ WORKER LAMBDA CODE Production Safe (Recommended)
-
-
-
-
-#### 4️⃣ Verify IAM Role (YOU ARE ALREADY OK)
-
-You already have correct policies ✅
-
-Nothing to change here.
-
-
-# PHASE 4 — Update Lambda Function Cafe Order Processor
-
----
-
 # PHASE 5 — Test
 
 
