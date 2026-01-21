@@ -4,6 +4,30 @@
 
 ### PHASE 1️⃣ — Basic RDS CONFIGURATIONS
 
+### 1️⃣ Create index.php
+
+```
+sudo nano /var/www/html/index.php
+```
+
+####  2️⃣ Make executable
+
+```
+sudo chmod +x lamp-verify.sh
+```
+
+####  3️⃣ Run (best as root/sudo)
+
+```
+sudo ./lamp-verify.sh
+```
+
+### 4️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
 ## Method 1️⃣ - ☕ AWS Café — RDS MySQL Setup Bash Script
 > **📄 File name : ☕ AWS Café — RDS MySQL Setup Bash Script.sh**
 
