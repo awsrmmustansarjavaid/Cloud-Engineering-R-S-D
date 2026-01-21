@@ -3363,7 +3363,6 @@ $apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-st
 ---
 ## 🔄 PHASE 3️⃣ — Real Order State Machine (RECEIVED → PREPARING → READY → COMPLETED)
 
-
 ### 🧑‍💻 STEP 1 — MODIFY DATABASE (ONE TIME)
 
 #### 1️⃣ Open RDS → Query Editor (or MySQL client)
@@ -3489,18 +3488,7 @@ Click Deploy
 
 ### 🧪 STEP 3 — TEST ORDER CREATION
 
-Place order from frontend.
-
-#### Expected response:
-
-```
-{
-  "order_id": "ORD-20260114-8392",
-  "status": "RECEIVED",
-  "total": 9.00,
-  "track_url": "/order-status.php?order_id=..."
-}
-```
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
 ### 🧑‍💻 STEP 4 — CREATE WORKER (KITCHEN) LAMBDA
 
@@ -4224,51 +4212,6 @@ setInterval(() => {
 </html>
 ```
 
-### 🧩 STEP 6 — FINAL TEST (DO NOT SKIP)
-
-#### 1️⃣ Place order
-
-```
-order.php → submit
-```
-
-#### 2️⃣ Get order ID
-
-```
-ORD-XXXX
-```
-
-#### 3️⃣ Open tracking link
-
-```
-order-status.php?order_id=ORD-XXXX
-```
-
-#### 4️⃣ Verify
-
-✅ Status visible
-
-✅ Auto refresh works
-
-✅ QR opens same page
-
-✅ Print hides buttons
-
-✅ Mobile friendly
-
-✅ PHASE 13 COMPLETE
-
-#### You now have:
-
-- Real customer tracking
-
-- Unique order URLs
-
-- Billing + receipt
-
-- Production-grade frontend
-
-- Zero risk to existing system
 
 
 **✅ PHASE 4️⃣ STATUS**

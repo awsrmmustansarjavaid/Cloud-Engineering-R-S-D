@@ -1902,13 +1902,76 @@ STEP 4️⃣ Click Print Receipt
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
+## 🔄 PHASE 3️⃣ — Real Order State Machine (RECEIVED → PREPARING → READY → COMPLETED)
 
+### 🧪 STEP 3 — TEST ORDER CREATION
 
+Place order from frontend.
 
+#### Expected response:
 
+```
+{
+  "order_id": "ORD-20260114-8392",
+  "status": "RECEIVED",
+  "total": 9.00,
+  "track_url": "/order-status.php?order_id=..."
+}
+```
 
+**✅ PHASE 3️⃣ STATUS**
 
-**✅ PHASE 2️⃣ STATUS**
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## 🔄 PHASE 4️⃣  — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
 
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+### 🧩 STEP 6 — FINAL TEST (DO NOT SKIP)
+
+#### 1️⃣ Place order
+
+```
+order.php → submit
+```
+
+#### 2️⃣ Get order ID
+
+```
+ORD-XXXX
+```
+
+#### 3️⃣ Open tracking link
+
+```
+order-status.php?order_id=ORD-XXXX
+```
+
+#### 4️⃣ Verify
+
+✅ Status visible
+
+✅ Auto refresh works
+
+✅ QR opens same page
+
+✅ Print hides buttons
+
+✅ Mobile friendly
+
+✅ PHASE 13 COMPLETE
+
+#### You now have:
+
+- Real customer tracking
+
+- Unique order URLs
+
+- Billing + receipt
+
+- Production-grade frontend
+
+- Zero risk to existing system
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
