@@ -1867,14 +1867,11 @@ Click Save
 ---
 ## PHASE 5️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
 
-
-
-
 You already have Secrets Manager endpoint ✅
 
 Now add the remaining REQUIRED endpoints.
 
-#### 1️⃣ Create SQS Interface Endpoint
+### 1️⃣ Create SQS Interface Endpoint
 
 **VPC → Endpoints → Create endpoint**
 
@@ -1888,7 +1885,7 @@ Now add the remaining REQUIRED endpoints.
 | Security group | Lambda-SG                     |
 | Private DNS    | ✅ ENABLE                      |
 
-#### 2️⃣ Create CloudWatch Logs Interface Endpoint
+### 2️⃣ Create CloudWatch Logs Interface Endpoint
 
 - **Name:**
 
@@ -1906,7 +1903,7 @@ Same settings as above
 
 Private DNS ✅
 
-#### 3️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
+### 3️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
 
 - **Name:**
 
@@ -1929,19 +1926,265 @@ com.amazonaws.us-east-1.dynamodb
 
 Click Create
 
+### 4️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
+
+Your secret must contain EXACT keys:
+
+```
+{
+  "host": "your-rds-endpoint",
+  "username": "cafe_user",
+  "password": "********",
+  "dbname": "cafe_db"
+}
+```
+
+❌ If even ONE key name differs → connection fails silently
+
+### 5️⃣ Add DEBUG LOGS (TEMPORARY - Optional)
+
+Update your Lambda code temporarily:
+
+```
+print("DEBUG: Lambda invoked")
+print("DEBUG: Event =", event)
+
+secret = get_db_secret()
+print("DEBUG: Secret fetched")
+
+connection = pymysql.connect(
+    host=secret["host"],
+    user=secret["username"],
+    password=secret["password"],
+    database=secret["dbname"],
+    connect_timeout=5
+)
+
+print("DEBUG: RDS connected")
+```
+
+This lets us see exactly where it stops.
+
 **✅ PHASE 5️⃣ STATUS**
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 6️⃣ — AMAZON DYNAMODB (Menu + Cache Layer)
+## PHASE 6️⃣ — Update Lambda Function Cafe Order Processor
+
+### 1️⃣ Updated Code 
+
+```
+import json
+import pymysql
+import boto3
+import os  # Added for environment variables
+
+# ---------- GET DB SECRET ----------
+def get_db_secret():
+    client = boto3.client('secretsmanager')
+    response = client.get_secret_value(SecretId='CafeDevDBSM')
+    return json.loads(response['SecretString'])
+
+# ---------- SQS CLIENT (outside handler for reuse) ----------
+sqs = boto3.client('sqs')
+# Load SQS queue URL from Lambda environment variables (already set to https://sqs.us-east-1.amazonaws.com/910599465397/CafeOrdersQueue)
+SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+# ---------- LAMBDA HANDLER ----------
+def lambda_handler(event, context):
+    try:
+        # Parse API Gateway body
+        body = json.loads(event['body'])
+        
+        # NEW: Table Number
+        table_number = int(body['table_number'])
+        customer_name = body.get('customer_name', None)
+        item = body['item']
+        quantity = int(body['quantity'])
+
+        # Fetch DB credentials
+        secret = get_db_secret()
+
+        # Connect to RDS
+        connection = pymysql.connect(
+            host=secret['host'],
+            user=secret['username'],
+            password=secret['password'],
+            database=secret['dbname'],
+            connect_timeout=5
+        )
+
+        # Insert order into RDS
+        with connection.cursor() as cursor:
+            sql = """
+                INSERT INTO orders (table_number, customer_name, item, quantity)
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(
+                sql,
+                (table_number, customer_name, item, quantity)
+            )
+            connection.commit()
+
+        connection.close()
+
+        # ────────────────────────────────────────────────
+        # NEW: Send message to SQS → triggers Worker Lambda → updates DynamoDB
+        # ────────────────────────────────────────────────
+        order_data = {
+            "source": "web",                    # helps Worker know it's from website
+            "table_number": table_number,
+            "customer_name": customer_name,
+            "item": item,
+            "quantity": quantity,
+            # Optional: add timestamp, order_id (if you fetch it), etc.
+            # "timestamp": str(datetime.now().isoformat())
+        }
+
+        sqs.send_message(
+            QueueUrl=SQS_QUEUE_URL,
+            MessageBody=json.dumps(order_data),
+            # Optional: DelaySeconds=2, MessageGroupId="cafe-orders" (if FIFO queue)
+        )
+
+        # Return success to API Gateway / frontend
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "message": "Order saved successfully",
+                "table_number": table_number
+            })
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
+#### 2️⃣ Add Environment Variable:
+
+- **Configuration → Environment variables**
+
+- Click Edit
+
+#### Add:
+
+| Key           | Value                  |
+| ------------- | ---------------------- |
+| SQS_QUEUE_URL | (paste your Queue URL) |
+
+#### 📍 How to get Queue URL:
+
+- Open SQS
+
+- Click CafeOrdersQueue
+
+- Copy Queue URL
+
+**✔️ Click Save**
 
 
+#### 3️⃣ Test Lambda Code:
 
+#### Event name: 
+
+```
+test-new order processing SQS
+```
+
+#### Paste JSON
+
+```
+{
+      "body": "{\"table_number\": 1, \"customer_name\": \"WorkerTest\", \"item\": \"Tea\", \"quantity\": 2}"
+}
+```
 
 
 **✅ PHASE 6️⃣ STATUS**
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 7️⃣ — Verification SQS/Worker LAMBDA (Consumer)
+
+### 1️⃣ Test manually from Lambda console
+
+#### 1️⃣ You must wrap the test event in Records:
+
+- **Event name:** Test_CafeOrderWorker
+
+```
+{
+  "Records": [
+    {
+      "body": "{\"table_number\": 1, \"customer_name\": \"WorkerTest\", \"item\": \"Coffee\", \"quantity\": 2}"
+    }
+  ]
+}
+```
+
+✔ Inserts into RDS
+
+✔ Updates DynamoDB
+
+✔ No retries
+
+✔ No errors
+
+- This mimics SQS event structure
+
+- Now the Lambda code won’t fail with 'Records'
+
+
+#### ✅ EXPECTED CLOUDWATCH LOGS (SUCCESS)
+
+You should see:
+
+```
+DEBUG: Lambda invoked
+DEBUG: Event = {...}
+DEBUG: Secret fetched
+DEBUG: RDS connected
+✅ Order processed: {...}
+```
+
+#### 2️⃣ Verify RDS
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p cafe_db
+```
+
+```
+SELECT * FROM orders ORDER BY id DESC;
+```
+
+#### Expected row:
+
+```
+WorkerTest | Coffee | 2
+```
+
+#### 3️⃣ Verify DynamoDB
+
+- DynamoDB → CafeMenu → Coffee
+
+- Attribute orders increased
+
+
+
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 ---
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
