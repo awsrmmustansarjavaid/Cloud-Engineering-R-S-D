@@ -61,7 +61,7 @@
 #### ✅ EC2 LAMP Server USER DATA
 > **📍 File Location: ☕ AWS CAFE —FrontEnd Web Development.md**
 
-[Test](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—FrontEnd%20Web%20Development/#phase-2-development-and-deployment-lamp-server)
+[Test](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—FrontEnd%20Web%20Development.md/#phase-2-development-and-deployment-lamp-server)
 
 ```
 #!/bin/bash
