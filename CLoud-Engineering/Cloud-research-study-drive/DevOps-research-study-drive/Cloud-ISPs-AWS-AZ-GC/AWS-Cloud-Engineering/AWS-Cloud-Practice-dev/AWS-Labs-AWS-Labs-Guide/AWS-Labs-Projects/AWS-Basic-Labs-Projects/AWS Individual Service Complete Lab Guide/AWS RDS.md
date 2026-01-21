@@ -868,5 +868,62 @@ EXIT;
 | Set/change default value            | `ALTER TABLE orders ALTER COLUMN status SET DEFAULT 'pending';` | Low    |
 
 
+##  PHASE 1️⃣ — RDS DATABASE
+
+### 1️⃣ ADD DATE & TIME TO RDS (NO SKIP)
+
+#### 1️⃣ Connect to RDS
+
+#### From EC2 or local MySQL client:
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p cafe_db
+```
+
+#### You should see:
+
+```
+mysql>
+```
+#### 2️⃣ Check current table
+
+```
+DESCRIBE orders;
+```
+
+#### ❗ Look carefully
+
+- If you do NOT see created_at → continue
+- If you already see it → skip to Step 2
+
+
+
+#### 3️⃣ Add created_at column
+
+```
+ALTER TABLE orders
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+```
+
+✔️ No breaking change
+
+✔️ Automatically tracks date & time
+
+#### 4️⃣ VERIFY (MANDATORY)
+
+```
+DESCRIBE orders;
+```
+
+#### You MUST see:
+
+```
+created_at | timestamp | DEFAULT CURRENT_TIMESTAMP
+```
+
+✅ Phase 1 complete
+
+---
+
 ---
 
