@@ -11,9 +11,9 @@
 
 ---
 
-## SECTION 1️⃣ Cafe Order Processor
+# SECTION 1️⃣ Cafe Order Processor
 
-### PHASE 1️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+## PHASE 1️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
 
 ### 1️⃣ Create Lambda Role
 
@@ -135,7 +135,7 @@ ls -lh pymysql-layer.zip
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
-### PHASE 2️⃣ — S3 Bucket - Upload ZIP
+## PHASE 2️⃣ — S3 Bucket - Upload ZIP
 
 ## 1️⃣ S3 Bucket - Upload ZIP to Lambda
 
@@ -207,7 +207,7 @@ upload: ./pymysql-layer.zip to s3://mn-cafe-s3-bucket/layers/pymysql-layer.zip
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
 
-### PHASE 3️⃣ — Lambda Layer
+## PHASE 3️⃣ — Lambda Layer
 
 ### 1️⃣ Create Lambda Layer Using S3
 
@@ -254,7 +254,7 @@ Click **Add**
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 
-### PHASE 4️⃣ — API Gateway
+## PHASE 4️⃣ — API Gateway
 
 
 ## Objective:
@@ -335,7 +335,7 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 
-### PHASE 5️⃣ — Frontend Development Code
+## PHASE 5️⃣ — Frontend Development Code
 
 ##  Modify orders.php (Automation)
 
@@ -568,7 +568,7 @@ sudo systemctl restart httpd
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
 
-### PHASE 6️⃣ — Backend Development Code
+## PHASE 6️⃣ — Backend Development Code
 
 ### 1️⃣ Lambda Payload Code (INSERT INTO MariaDB)
 
@@ -709,7 +709,7 @@ Create endpoint ✅
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
 
-### PHASE 7️⃣ — Test & Verification
+## PHASE 7️⃣ — Test & Verification
 
 ### 1️⃣  FRONTEND → BACKEND VERIFICATION
 
@@ -1455,17 +1455,17 @@ Your system is now schema-consistent from browser → DB.
 **✅ PHASE 7️⃣ STATUS**
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+
+
+
+
+
+# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
 
 
 
-
-> **🟢 SECTION 1️⃣ COMPLETE & VERIFIED**
-
---- > **🟢 SECTION 1️⃣ COMPLETE & VERIFIED** ---
-
-
-## SECTION 2️⃣ Cafe Order Processor
+# SECTION 2️⃣ Cafe Order Processor
 
 
 
