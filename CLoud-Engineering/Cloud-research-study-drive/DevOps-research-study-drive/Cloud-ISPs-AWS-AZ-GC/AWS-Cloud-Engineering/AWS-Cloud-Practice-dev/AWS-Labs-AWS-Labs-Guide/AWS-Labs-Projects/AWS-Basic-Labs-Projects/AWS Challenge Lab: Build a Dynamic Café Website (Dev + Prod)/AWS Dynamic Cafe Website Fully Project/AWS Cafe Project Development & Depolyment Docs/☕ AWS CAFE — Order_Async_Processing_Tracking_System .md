@@ -2968,52 +2968,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 ### 🧪 STEP 3 — TESTING (DO NOT SKIP)
 
-#### Test 1 — Form submission
-
-✔ Fill form
-
-✔ Click Place Order
-
-✔ Page reloads
-
-#### Test 2 — Backend unchanged
-
-✔ API returns 202
-
-✔ SQS receives message
-
-✔ Worker inserts into RDS
-
-#### Test 3 — Receipt
-
-✔ Order ID visible
-
-✔ Status = RECEIVED
-
-✔ Total calculated correctly
-
-#### Test 4 — Print
-
-✔ Click Print
-
-✔ Browser print dialog opens
-
----
-
-
-### 🔍 WHAT YOU SHOULD SEE IN AWS (UNCHANGED)
-
-SQS messages consumed ✅
-
-
-Worker Lambda logs appear ✅
-
-
-RDS orders table updated ✅
-
-
-DynamoDB counts updated ✅
-
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
 **✅ PHASE 1️⃣ STATUS**
 
