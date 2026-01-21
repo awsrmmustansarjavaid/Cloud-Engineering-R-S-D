@@ -8,7 +8,6 @@
 
 ## 3️⃣ CREATE API Lambda Function (Producer)
 
-
 ### 🔍 METHOD A — TEST USING LAMBDA CONSOLE (EASIEST)
 
 > **This tests only the Lambda logic, not API Gateway.**
@@ -226,27 +225,7 @@ If one layer misses a field, the pipeline breaks.
 
 ## 1️⃣ Create Worker Lambda (Consumer)
 
-### 📢 Worker Responsibilities:
 
-- Read message
-- Insert into RDS
-- Update DynamoDB cache
-
-### 🟡 ARCHITECTURE FLOW:
-
-```
-Client
- ↓
-API Gateway
- ↓
-Order API Lambda
- ↓
-SQS Queue
- ↓
-Worker Lambda
- ↓
-RDS + DynamoDB
-```
 
 ### 1️⃣ Create Lambda Function
 

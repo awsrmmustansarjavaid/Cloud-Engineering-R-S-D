@@ -1631,7 +1631,10 @@ curl -X POST \
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 4️⃣ — AMAZON DYNAMODB (Menu + Cache Layer)
+## PHASE 4️⃣ — SQS/Worker LAMBDA (Consumer)
+
+## 1️⃣ Create Worker Lambda (Consumer)
+
 
 
 
