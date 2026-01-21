@@ -2992,6 +2992,190 @@ Click **Add**
 ---
 ## PHASE 5️⃣ — API GATEWAY ENDPOINT
 
+👉 Use your EXISTING API
+
+👉 Create a NEW METHOD (GET /order-status) on it
+
+❌ Do NOT create a new API
+
+### 🧠 WHY YOU SHOULD USE THE EXISTING API
+
+#### You already have something like:
+
+```
+CafeOrdersAPI
+https://xxxxx.execute-api.us-east-1.amazonaws.com/dev
+```
+
+#### And inside it you probably have:
+
+```
+POST /orders        → CreateOrderLambda
+```
+
+#### ✔️ This is CORRECT architecture
+
+One API = One backend system
+Multiple resources/methods inside it
+
+**Creating multiple APIs would be:**
+
+❌ Hard to manage
+
+❌ Bad practice
+
+❌ Confusing for frontend
+
+### STRUCTURE (VISUAL)
+
+```
+CafeOrdersAPI
+│
+├── POST /orders
+│     └── CreateOrderLambda
+│
+└── GET /order-status
+      └── GetOrderStatusLambda
+```
+
+✔️ SAME API
+
+✔️ SAME stage (/dev)
+
+✔️ DIFFERENT Lambda functions
+
+### 1️⃣ Open API Gateway
+
+#### API Gateway → Open Your Existing API (example: CafeOrdersAPI) → Resources
+
+### 2️⃣ Create Resource
+
+```
+Resource name: order-status
+Resource path: /order-status
+```
+
+Click Create resource
+
+### 3️⃣ Create NEW METHOD
+
+Select /order-status
+
+Click Create Method
+
+```
+GET /order-status
+```
+
+- **Method:** GET
+
+- **Integration:** Lambda
+
+- **Select GetOrderStatusLambda**
+
+- **Lambda name:** GetOrderStatusLambda
+
+✔️ Enable Lambda proxy integration
+
+Click Create method
+
+
+### 4️⃣ Enable CORS (VERY IMPORTANT)
+
+Select /order-status
+
+Actions → Enable CORS
+
+✔️ GET
+
+✔️ OPTIONS
+
+Click Enable CORS and replace existing CORS headers
+
+
+
+### 5️⃣ Deploy API (MOST MISSED STEP 🚨)
+
+API Gateway → Actions → Deploy API
+
+| Field            | Value                 |
+| ---------------- | --------------------- |
+| Deployment stage | New stage             |
+| Stage name       | status                |
+| Description      | Order status endpoint |
+
+
+Click Deploy
+
+### 6️⃣ VERIFY API
+
+#### 🌐 FINAL API URL
+
+```
+GET https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
+```
+
+#### 🧪 TEST IT (MUST WORK)
+
+```
+curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
+```
+
+#### ✅ You MUST see JSON like:
+
+```
+{
+  "metrics": [
+    {"metric":"Total Orders","count":15}
+  ],
+  "recent_orders": [
+    {
+      "customer_name":"Ali",
+      "item":"Coffee",
+      "quantity":2,
+      "created_at":"2026-01-09 12:30:00"
+    }
+  ]
+}
+```
+
+❌ If this does not work → STOP. Fix backend first.
+
+
+
+#### Open browser:
+
+```
+https://API_ID.execute-api.region.amazonaws.com/status/order-status
+```
+
+✔ JSON visible
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 6️⃣ — API GATEWAY ENDPOINT
+
+
+
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 5️⃣ — API GATEWAY ENDPOINT
+
+
+
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 5️⃣ — API GATEWAY ENDPOINT
 
 
 
