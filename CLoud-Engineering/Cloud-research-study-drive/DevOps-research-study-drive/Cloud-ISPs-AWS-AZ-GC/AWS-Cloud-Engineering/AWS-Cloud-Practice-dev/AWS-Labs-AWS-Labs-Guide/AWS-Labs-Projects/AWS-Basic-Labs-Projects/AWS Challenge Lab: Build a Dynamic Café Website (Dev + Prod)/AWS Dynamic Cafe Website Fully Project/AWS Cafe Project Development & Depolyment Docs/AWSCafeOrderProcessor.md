@@ -1562,54 +1562,7 @@ You should now see 5 items in the table. You should now see:
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
-
-### 3️⃣ Create IAM Policy for DynamoDB Access
-
-Now Lambda needs permission to read from DynamoDB.
-
-- **Go to IAM → Policies → Create policy** 
-
-- **Policy name:** 
-
-```        
-CafeMenuDynamoDBReadPolicy
-```
-
-- **Description:**
-
-```
-Allow Lambda to read menu items from DynamoDB
-```
-
-### 1️⃣ Create Policy (JSON Mode)
-
-```
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:PutItem"
-      ],
-      "Resource": "arn:aws:dynamodb:YOUR-REGION:YOUR-ACCOUNT-ID:table/CafeMenu"
-    }
-  ]
-}
-```
-
-#### 📌 Example:
-
-```
-arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
-```
-
-- Click Create policy
-
-
-### 2️⃣ Attach Policy to Lambda Role
+### 3️⃣ Attach Policy to Lambda Role
 
 You likely have two Lambdas:
 

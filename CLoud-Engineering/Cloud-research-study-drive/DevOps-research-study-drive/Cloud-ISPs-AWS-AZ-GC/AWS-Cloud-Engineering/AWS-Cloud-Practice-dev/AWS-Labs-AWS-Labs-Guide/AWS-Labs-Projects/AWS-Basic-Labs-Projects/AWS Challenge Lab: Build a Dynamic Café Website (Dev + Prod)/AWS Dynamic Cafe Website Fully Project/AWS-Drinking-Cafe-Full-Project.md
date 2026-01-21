@@ -75,17 +75,66 @@ EC2-Cafe-Secrets-Role
 
 **⚠️ Attach role to EC2 (NO reboot).**
 
-#### 2️⃣ Charlie ☕  Cafe IAM Policies
+- **✔️ Click Create IAM ROLE**
+
+#### 2️⃣ IAM Role for Charlie Cafe
+
+- **IAM Role Name:**
+
+```
+CafeAPILambdaRole
+```
+
+- **Description:**
+
+```
+Allow Lambda to read menu items from DynamoDB
+```
+
+- **IAM Role for Charlie Cafe Policies**
+
+#### 1️⃣ Create IAM Policy for DynamoDB Access
+> **Now Lambda needs permission to read from DynamoDB.**
+
+- **Policy name:** 
+
+```        
+CafeMenuDynamoDBReadPolicy
+```
+
+#### JSON
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:PutItem"
+      ],
+      "Resource": "arn:aws:dynamodb:YOUR-REGION:YOUR-ACCOUNT-ID:table/CafeMenu"
+    }
+  ]
+}
+```
+
+#### 📌 Example:
+
+```
+arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
+```
+
+#### 2️⃣ Create IAM Policy for DynamoDB Access
+> **Now Lambda needs permission to read from DynamoDB.**
 
 
 
 
 
-
-
-
-
-
+- **✔️ Click Create IAM ROLE**
 
 
 ### 6️⃣ EC2 Instance (Amazon Linux 2023)
