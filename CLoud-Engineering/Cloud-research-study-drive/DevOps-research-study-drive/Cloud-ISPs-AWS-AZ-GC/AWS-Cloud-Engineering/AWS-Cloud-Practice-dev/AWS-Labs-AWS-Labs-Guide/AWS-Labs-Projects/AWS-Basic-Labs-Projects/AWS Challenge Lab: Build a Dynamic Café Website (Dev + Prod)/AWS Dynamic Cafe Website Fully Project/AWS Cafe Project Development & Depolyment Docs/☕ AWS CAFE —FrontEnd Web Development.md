@@ -50,7 +50,7 @@ sudo systemctl restart httpd
 
 ### 1️⃣  EC2 LAMP Server USER DATA
 
-[AWSCafeOrderProcessor](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—FrontEnd%20Web%20Development.md)
+[AWS-LAMP Server-Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
 
 ### 2️⃣ Launch EC2 Instance (Amazon Linux 2023)
 
