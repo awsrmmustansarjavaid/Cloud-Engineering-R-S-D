@@ -1,5 +1,5 @@
 
-# ☕ AWS CAFE — Cafe Order Processor
+# ☕ AWS CAFE — Cafe Order Development & Deployment
 
 **Dev → Serverless → Secure → Scalable → Cost-Controlled**
 
