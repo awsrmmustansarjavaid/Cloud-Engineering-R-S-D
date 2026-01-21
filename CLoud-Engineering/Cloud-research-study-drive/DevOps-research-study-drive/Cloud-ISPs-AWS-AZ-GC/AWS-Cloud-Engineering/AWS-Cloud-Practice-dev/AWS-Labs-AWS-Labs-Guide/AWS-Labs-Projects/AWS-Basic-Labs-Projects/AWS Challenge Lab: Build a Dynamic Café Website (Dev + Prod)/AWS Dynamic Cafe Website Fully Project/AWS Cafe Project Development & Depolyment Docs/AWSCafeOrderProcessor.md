@@ -1345,6 +1345,149 @@ Your system is now schema-consistent from browser → DB.
 - Copy Queue URL (IMPORTANT — save it)
 
 
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 2️⃣ CREATE API Lambda Function (Producer)
+> **(ORDER API → SQS)**
+
+### 1️⃣ Create Lambda Function
+
+- Open Lambda Console
+
+- Click Functions
+
+- Click Create function
+
+#### 1️⃣ Basic Information:
+
+| Field         | Value                          |
+| ------------- | --------------------           |
+| Function name | `CafeOrderApiLambda`           |
+| Runtime        | Python 3.12                   |
+| Architecture   | x86_64                        |
+| Execution role | Use existing role             |
+| Role           | Same role with RDS + DynamoDB |
+
+Click Create function
+
+⏳ Wait until status shows Active
+
+### 2️⃣ Update API Lambda (Producer)
+
+#### 1️⃣ Open Order API Lambda
+
+- AWS Console → Lambda
+
+- Click your Order API Lambda
+
+#### 2️⃣ Add Environment Variable:
+
+- Configuration → Environment variables
+
+- Click Edit
+
+- Add:
+
+| Key           | Value                  |
+| ------------- | ---------------------- |
+| SQS_QUEUE_URL | (paste your Queue URL) |
+
+#### 📍 How to get Queue URL:
+
+- Open SQS
+
+- Click CafeOrdersQueue
+
+- Copy Queue URL
+
+**✔️ Click Save**
+
+### 3️⃣ Update Lambda Code (FULL)
+
+#### 1️⃣ Replace your order insert logic with this:
+
+#### 📣 CafeOrderApiLambda  — Production-Ready (Recommended for This Lab)
+
+#### 💻 Code (Recommended for This Lab)
+
+```
+import json
+import boto3
+import os
+
+sqs = boto3.client('sqs')
+QUEUE_URL = os.environ['SQS_QUEUE_URL']
+
+def lambda_handler(event, context):
+    try:
+        # ---------- Parse request body ----------
+        body = json.loads(event.get("body", "{}"))
+
+        # ---------- Validate required fields ----------
+        required_fields = ["table_number", "item", "quantity"]
+        for field in required_fields:
+            if field not in body:
+                return {
+                    "statusCode": 400,
+                    "headers": {"Access-Control-Allow-Origin": "*"},
+                    "body": json.dumps({
+                        "error": f"Missing required field: {field}"
+                    })
+                }
+
+        # ---------- Validate data ----------
+        table_number = int(body["table_number"])
+        quantity = int(body["quantity"])
+
+        if table_number <= 0:
+            raise ValueError("Invalid table number")
+
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero")
+
+        # ---------- Build order payload ----------
+        order = {
+            "table_number": table_number,
+            "customer_name": body.get("customer_name", "Guest"),
+            "item": body["item"],
+            "quantity": quantity
+        }
+
+        # ---------- Send message to SQS ----------
+        sqs.send_message(
+            QueueUrl=QUEUE_URL,
+            MessageBody=json.dumps(order)
+        )
+
+        return {
+            "statusCode": 202,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({
+                "message": "Order accepted",
+                "order": order
+            })
+        }
+
+    except ValueError as e:
+        return {
+            "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
+        }
+```
+
+**✔️ Click Deploy**
+
+---
 
 
 
