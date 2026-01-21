@@ -3511,34 +3511,35 @@ Fully job-ready
 ---
 ## ☕ Charlie Café PHASE 8️⃣ — Update Cafe Security Configuration
 
-Step 4.1 — EC2 Frontend Security Group
-Step 4.1.1: Identify your EC2 SG
+### 1️⃣ — EC2 Frontend Security Group
 
-Go to EC2 → Instances → Select your frontend EC2.
+#### 1️⃣ Identify your EC2 SG
 
-Scroll to Security → Security groups → Click on SG name.
+- Go to EC2 → Instances → Select your frontend EC2.
 
-Note Inbound and Outbound rules.
+- Scroll to Security → Security groups → Click on SG name.
 
-Step 4.1.2: EC2 Inbound Rules
+- Note Inbound and Outbound rules.
 
-SSH (optional, admin only)
+#### 2️⃣  EC2 Inbound Rules
 
-Type: SSH
+- SSH (optional, admin only)
 
-Protocol: TCP
+    - Type: SSH
 
-Port: 22
+    - Protocol: TCP
 
-Source: Your IP only (example: 203.0.113.25/32)
+    - Port: 22
 
-HTTP / HTTPS (frontend access)
+    - Source: Your IP only (example: 203.0.113.25/32)
 
-Type: HTTP → Port 80 → Source: 0.0.0.0/0
+- HTTP / HTTPS (frontend access)
 
-Type: HTTPS → Port 443 → Source: 0.0.0.0/0
+    - Type: HTTP → Port 80 → Source: 0.0.0.0/0
 
-Document in a table like this:
+    - Type: HTTPS → Port 443 → Source: 0.0.0.0/0
+
+#### Document in a table like this:
 
 | Port | Protocol | Source    | Purpose      |
 | ---- | -------- | --------- | ------------ |
@@ -3546,39 +3547,41 @@ Document in a table like this:
 | 80   | TCP      | 0.0.0.0/0 | Frontend Web |
 | 443  | TCP      | 0.0.0.0/0 | Frontend Web |
 
-Step 4.1.3: EC2 Outbound Rules
+#### 3️⃣  EC2 Outbound Rules
 
-Usually default is All traffic → 0.0.0.0/0.
+- Usually default is All traffic → 0.0.0.0/0.
 
-If restrictive, ensure outbound allows Lambda to connect to EC2 if needed, e.g., API calls.
+- If restrictive, ensure outbound allows Lambda to connect to EC2 if needed, e.g., API calls.
 
-Step 4.2 — Lambda Security Group
-Step 4.2.1: Identify Lambda SG
+### 2️⃣  Lambda Security Group
 
-Go to Lambda → Functions → Your Lambda → Configuration → VPC.
+#### 1️⃣ Identify Lambda SG
 
-Check VPC / Subnets / Security Groups.
+- Go to Lambda → Functions → Your Lambda → Configuration → VPC.
 
-Lambda must have an SG that allows outbound to RDS SG on the database port (default MySQL 3306 or Postgres 5432).
+- Check VPC / Subnets / Security Groups.
 
-Step 4.2.2: Lambda Outbound Rule
+- Lambda must have an SG that allows outbound to RDS SG on the database port (default MySQL 3306 or Postgres 5432).
 
-Type: MySQL/Aurora (or Postgres)
+#### 2️⃣  Lambda Outbound Rule
 
-Protocol: TCP
+- Type: MySQL/Aurora (or Postgres)
 
-Port: 3306 (or 5432)
+- Protocol: TCP
 
-Destination: RDS SG ID
+- Port: 3306 (or 5432)
 
-Lambda should not allow 0.0.0.0/0 outbound to database — security best practice.
+- Destination: RDS SG ID
 
-Step 4.3 — RDS Security Group
-Step 4.3.1: Identify RDS SG
+> **Lambda should not allow 0.0.0.0/0 outbound to database — security best practice.**
+
+### 3️⃣ RDS Security Group
+
+#### 1️⃣ Identify RDS SG
 
 Go to RDS → Databases → Select your DB → Connectivity & security → VPC security groups.
 
-Step 4.3.2: RDS Inbound Rules
+#### 2️⃣ RDS Inbound Rules
 
 Allow access only from Lambda SG:
 
@@ -3596,13 +3599,13 @@ Example Table:
 | ---- | -------- | --------- | --------------------- |
 | 3306 | TCP      | Lambda SG | Lambda DB Access Only |
 
-Step 4.3.3: RDS Outbound Rules
+#### 3️⃣ RDS Outbound Rules
 
 Usually default “All traffic → 0.0.0.0/0” is fine.
 
 No need to modify if DB is only accessed by Lambda.
 
-Step 4.4 — Verification Steps
+### 4️⃣ — Verification Steps
 
 EC2 Verification
 
