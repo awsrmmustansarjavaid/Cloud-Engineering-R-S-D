@@ -211,7 +211,7 @@ CafeOrderWorkerPermissions
 
 **✔️ Click Create policy**
 
-#### 3️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
+#### 4️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
 
 - **Custom Policy name:** 
 
@@ -258,6 +258,20 @@ Read-only access to Secrets Manager for Lambda
 
 
 **✔️ Click Create policy**
+
+#### 5️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
+
+**AWS IAM Policies:**
+
+```
+AmazonDynamoDBReadOnlyAccess
+```
+
+**✔️ Click Create policy**
+
+#### 6️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
+
+
 
 - **✔️ Click Create IAM ROLE**
 

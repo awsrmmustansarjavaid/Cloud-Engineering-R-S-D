@@ -22,7 +22,7 @@
 
 #### Add:
 
-- AmazonDynamoDBReadOnlyAccess
+
 
 - RDS access (same as Worker)
 
