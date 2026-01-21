@@ -6,60 +6,7 @@
 
 # PHASE 1 — SQS/LAMBDA (Producer)
 
-## 🧠 WHY SQS EXISTS (VERY IMPORTANT)
 
-### ➖ Without SQS:
-
-- API waits for DB insert ❌
-
-- API fails if DB is slow ❌
-
-- Users get errors ❌
-
-### ➕ With SQS:
-
-- API responds instantly ✅
-
-- Orders are processed in background ✅
-
-- System scales safely ✅
-
----
-
-## 🏁 ARCHITECTURE STATE (SUCCESS)
-
-```
-Client
-  ↓
-API Gateway
-  ↓
-CafeOrderApiLambda
-  ↓
-SQS (CafeOrdersQueue)
-  ↓
-CafeOrderWorker Lambda
-  ↓
-RDS + DynamoDB
-```
-
-✔ Fully asynchronous
-
-✔ Decoupled
-
-✔ Scalable
-
-✔ Production-ready
-
----
-## 📢 PRE-CHECK (DO NOT SKIP)
-
-#### Before starting, confirm:
-
-- Region is same for Lambda + SQS + RDS
-
-- You have IAM role for Lambda
-
-- You are using Standard Queue (NOT FIFO)
 
 ## 1️⃣ Create SQS Queue
 

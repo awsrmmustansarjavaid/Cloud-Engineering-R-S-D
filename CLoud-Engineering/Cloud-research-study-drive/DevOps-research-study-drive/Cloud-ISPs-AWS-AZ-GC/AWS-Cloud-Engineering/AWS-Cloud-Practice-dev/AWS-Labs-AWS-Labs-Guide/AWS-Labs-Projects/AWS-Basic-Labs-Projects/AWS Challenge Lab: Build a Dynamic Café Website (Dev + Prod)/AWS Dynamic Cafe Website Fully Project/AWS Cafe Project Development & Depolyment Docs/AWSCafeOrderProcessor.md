@@ -1299,7 +1299,9 @@ Your system is now schema-consistent from browser → DB.
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
-# SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
+# SECTION 2️⃣ — AWS CAFE SQS (Async Order Processing)
+
+## PHASE 1️⃣ — SQS/LAMBDA (Producer)
 
 
 
