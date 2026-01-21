@@ -47,7 +47,48 @@
 ### 4️⃣ Security Group and NACL
 
 
-### 5️⃣ EC2 Instance (Amazon Linux 2023)
+
+
+
+### 5️⃣ IAM Role & Policies
+
+#### 1️⃣ IAM Role for EC2 (Secrets Access)
+
+- **IAM Role Name:**
+
+```
+EC2-Cafe-Secrets-Role
+```
+
+- **IAM Role for EC2 (Secrets Access) Policies**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": "secretsmanager:GetSecretValue",
+    "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*"
+  }]
+}
+```
+
+**⚠️ Attach role to EC2 (NO reboot).**
+
+#### 2️⃣ Charlie ☕  Cafe IAM Policies
+
+
+
+
+
+
+
+
+
+
+
+
+### 6️⃣ EC2 Instance (Amazon Linux 2023)
 
 * AMI: Amazon Linux 2023
 * Type: `t2.micro`
@@ -297,6 +338,14 @@ cafe_db
 
 - Retrieve Secret ARN for later use in the app
 
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 3️⃣ — S3 Bucket
 
 
 

@@ -4,34 +4,6 @@
 
 
 
-
-
-
-## 2️⃣ IAM Role for EC2 (Secrets Access)
-
-### Step 1: Create IAM Role
-
-Policy:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": "secretsmanager:GetSecretValue",
-    "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*"
-  }]
-}
-```
-
-Role name:
-
-```
-EC2-Cafe-Secrets-Role
-```
-
-Attach role to EC2 (NO reboot).
-
 ### Step 2: Verify IAM Role is Attached
 
 #### Run this on EC2:
