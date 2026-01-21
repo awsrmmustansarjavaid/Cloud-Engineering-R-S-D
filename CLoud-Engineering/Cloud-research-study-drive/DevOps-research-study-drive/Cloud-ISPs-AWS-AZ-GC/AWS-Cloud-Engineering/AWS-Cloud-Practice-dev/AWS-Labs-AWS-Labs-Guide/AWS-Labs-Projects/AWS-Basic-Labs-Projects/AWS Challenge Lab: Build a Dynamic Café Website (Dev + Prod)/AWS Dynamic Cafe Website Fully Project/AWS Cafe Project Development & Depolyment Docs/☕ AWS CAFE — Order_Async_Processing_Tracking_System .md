@@ -1805,16 +1805,6 @@ sudo chown apache:apache /var/www/html/order-status.html
 sudo chmod 644 /var/www/html/order-status.html
 ```
 
-✅ 2.2 Open Security Group (MANDATORY)
-
-Ensure EC2 Security Group allows:
-
-
-| Type | Port | Source    |
-| ---- | ---- | --------- |
-| HTTP | 80   | 0.0.0.0/0 |
-
-
 ### 3️⃣ Restart Apache (MANDATORY)
 
 ```

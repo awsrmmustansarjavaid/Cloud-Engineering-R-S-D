@@ -47,7 +47,14 @@
 ### 4️⃣ Security Group and NACL
 
 
+#### ✅ 2.2 Open Security Group (MANDATORY)
 
+Ensure EC2 Security Group allows:
+
+
+| Type | Port | Source    |
+| ---- | ---- | --------- |
+| HTTP | 80   | 0.0.0.0/0 |
 
 
 ### 5️⃣ IAM Role & Policies
