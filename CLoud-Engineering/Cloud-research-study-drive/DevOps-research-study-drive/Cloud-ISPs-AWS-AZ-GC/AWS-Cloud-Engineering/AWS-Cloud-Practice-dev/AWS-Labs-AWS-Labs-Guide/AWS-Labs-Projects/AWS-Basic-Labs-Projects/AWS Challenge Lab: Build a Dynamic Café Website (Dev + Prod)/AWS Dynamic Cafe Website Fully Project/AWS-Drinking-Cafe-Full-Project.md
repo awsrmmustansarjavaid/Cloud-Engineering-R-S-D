@@ -631,9 +631,9 @@ sudo nano /var/www/html/Order.php
 
 
 
-**✅ PHASE 4️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
 
 
