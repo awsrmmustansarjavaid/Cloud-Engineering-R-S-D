@@ -59,7 +59,10 @@
 * Name tag: `CafeDevWebServer`
 
 #### ✅ EC2 LAMP Server USER DATA
-> **📍 File Location: ☕ AWS CAFE —FrontEnd Web Development.md**
+> **📍 File Location: AWS-LAMP Server-Bash-Script.md**
+
+[AWS-LAMP Server-Bash-Script](Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
+
 
 ```
 #!/bin/bash
