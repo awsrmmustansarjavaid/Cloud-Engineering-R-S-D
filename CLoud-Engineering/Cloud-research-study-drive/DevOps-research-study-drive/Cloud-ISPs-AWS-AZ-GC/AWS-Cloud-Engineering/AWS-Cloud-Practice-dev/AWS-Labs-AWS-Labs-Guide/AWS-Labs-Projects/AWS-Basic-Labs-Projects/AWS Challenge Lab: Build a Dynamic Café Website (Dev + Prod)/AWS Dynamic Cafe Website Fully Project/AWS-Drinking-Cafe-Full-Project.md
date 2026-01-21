@@ -52,7 +52,7 @@
 
 ### 5️⃣ IAM Role & Policies
 
-#### 1️⃣ IAM Role for EC2 (Secrets Access)
+### 1️⃣ IAM Role for EC2 (Secrets Access)
 
 - **IAM Role Name:**
 
@@ -77,7 +77,7 @@ EC2-Cafe-Secrets-Role
 
 - **✔️ Click Create IAM ROLE**
 
-#### 2️⃣ IAM Role for Charlie Cafe
+### 2️⃣ IAM Role for Charlie Cafe
 
 - **IAM Role Name:**
 
@@ -93,8 +93,31 @@ Allow Lambda to read menu items from DynamoDB
 
 - **IAM Role for Charlie Cafe Policies**
 
-#### 1️⃣ Create IAM Policy for
+#### 1️⃣ Create IAM Policy for  PRODUCER LAMBDA
+> **Your API Lambda must be allowed to send messages.**
 
+- **Policy name:** 
+
+```
+SendOrderToSQS
+```
+
+#### Paste exactly:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "sqs:SendMessage",
+      "Resource": "arn:aws:sqs:*:*:CafeOrdersQueue"
+    }
+  ]
+}
+```
+
+**✔️ Click Create policy**
 
 
 #### 2️⃣ Create IAM Policy for DynamoDB Access
@@ -130,6 +153,7 @@ CafeMenuDynamoDBReadPolicy
 ```
 arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu
 ```
+**✔️ Click Create policy**
 
 
 - **✔️ Click Create IAM ROLE**

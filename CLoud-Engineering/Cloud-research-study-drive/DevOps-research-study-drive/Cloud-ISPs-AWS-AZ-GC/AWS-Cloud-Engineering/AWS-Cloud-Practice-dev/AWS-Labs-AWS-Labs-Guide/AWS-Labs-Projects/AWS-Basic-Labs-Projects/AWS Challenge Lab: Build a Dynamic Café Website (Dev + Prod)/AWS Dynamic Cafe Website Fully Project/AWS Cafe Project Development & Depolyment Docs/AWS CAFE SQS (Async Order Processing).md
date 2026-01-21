@@ -11,33 +11,11 @@
 
 ## 2️⃣ IAM PERMISSIONS FOR PRODUCER LAMBDA
 
-**Your API Lambda must be allowed to send messages.**
 
-- **Go to IAM → Policies → Create inline policy**
 
-#### Paste exactly:
 
-```
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "sqs:SendMessage",
-      "Resource": "arn:aws:sqs:*:*:CafeOrdersQueue"
-    }
-  ]
-}
-```
-- Save Policy
 
-- **Name:**
 
-```
-SendOrderToSQS
-```
-
-**✔️ Click Create policy**
 
 
 ## 3️⃣ CREATE API Lambda Function (Producer)
