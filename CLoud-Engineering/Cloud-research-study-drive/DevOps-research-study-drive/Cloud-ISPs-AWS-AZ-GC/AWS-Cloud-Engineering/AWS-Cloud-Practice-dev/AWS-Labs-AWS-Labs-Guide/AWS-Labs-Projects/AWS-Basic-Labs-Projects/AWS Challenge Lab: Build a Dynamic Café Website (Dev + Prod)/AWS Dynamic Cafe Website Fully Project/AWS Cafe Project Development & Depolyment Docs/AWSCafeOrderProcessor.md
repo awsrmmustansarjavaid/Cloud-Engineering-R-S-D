@@ -1226,7 +1226,6 @@ This command gives permission to run the file as a program/script.
 sudo ./rds-secret-test.sh
 ```
 
-
 #### Common Secret JSON structures (choose correct jq paths)
 
 | Secret format (what you see in console)                  | jq path for host | jq path for username | jq path for password |
