@@ -8,46 +8,6 @@
 
 
 
-## 1️⃣ Create SQS Queue
-
-- **SQS → Create queue**
-
-- **Queue Type:** Standard
-
-    ⚠️ Do NOT select FIFO
-
-- **Name:** CafeOrdersQueue
-
-**Configuration:**
-
-- **Visibility timeout:** 60
-
-> **💡 Why: Worker Lambda must finish DB insert within this time**
-
-- **Message retention:** 4 days **(Leave default)**
-
-- **Maximum message size:** 256 KB **(Leave default)**
-
-- **Delivery delay:** 0 seconds **(Leave default)**
-
-- **Receive message wait time:** 0 seconds **(Leave default)**
-
-- **Dead-letter queue:** ❌ Disable for now **(we’ll add later)**
-
-- **Encryption:** Select: Disabled **(Free tier friendly)**
-
-- **Access Policy:** Leave Basic **(Do NOT change)**
-
-**✔️ Click Create queue**
-
-### ✅ Verify
-
-- Queue status should be Available
-
-- Copy Queue ARN
-
-- Copy Queue URL (IMPORTANT — save it)
-
 
 ## 2️⃣ IAM PERMISSIONS FOR PRODUCER LAMBDA
 
