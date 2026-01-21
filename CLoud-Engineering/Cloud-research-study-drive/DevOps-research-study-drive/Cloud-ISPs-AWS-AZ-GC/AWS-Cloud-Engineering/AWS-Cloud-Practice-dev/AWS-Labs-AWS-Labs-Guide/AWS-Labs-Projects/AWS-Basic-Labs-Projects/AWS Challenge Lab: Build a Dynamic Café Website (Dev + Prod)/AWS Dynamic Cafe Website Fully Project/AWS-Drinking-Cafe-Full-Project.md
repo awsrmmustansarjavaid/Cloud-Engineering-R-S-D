@@ -663,26 +663,6 @@ sudo nano /var/www/html/Order.php
 
 ---
 
-🚀 *Next Sections*: RDS, DynamoDB, SQS, WAF, CI/CD
-
----
-
-
-# 📢 SECTION 5 — AWS CAFE SQS (Async Order Processing)
-
-
-
-[AWS CAFE SQS (Async Order Processing)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20CAFE%20SQS%20(Async%20Order%20Processing).md)
-
-
-
----
-# 📢 SECTION 6 — ORDER STATUS DASHBOARD
-
-[AWS CAFE ORDER STATUS DASHBOARD](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWSCafeORDERSTATUSDASHBOARD.md)
-
----
-
 # 📢 SECTION 7 — AWS  Charlie Cafe — Secure Admin Order Dashboard
 
 [AWS  Charlie Cafe — Secure Admin Order Dashboard](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/AWS%20%20Charlie%20Cafe%20—%20Secure%20Admin%20Order%20Dashboard.md)
@@ -695,12 +675,6 @@ sudo nano /var/www/html/Order.php
 
 [CAFE LAB – SALES ANALYTICS & REPORTING SYSTEM](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—%20SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
 
-
----
-
-# 📢 SECTION 9 — AWS CAFE Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
-
-[AWS CAFE Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—%20CUSTOMER%20ORDER%20TRACKING%20%26%20BILLING.md)
 
 ---
 # SECTION 10 — CloudFront with EC2 (Apache + ALB) AND API Gateway (Dual Architecture)
