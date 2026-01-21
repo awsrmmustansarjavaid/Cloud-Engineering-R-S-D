@@ -230,8 +230,6 @@ flowchart TD
 
 ## PHASE 7️⃣ — Test & Verification
 
-
-
 ### Method 2 RDS Quick Test Script — One-command style
 
 #### Save this as rds-quick-test.sh
@@ -394,13 +392,50 @@ This command gives permission to run the file as a program/script.
 ```
 sudo ./rds-quick-test.sh
 ```
-**✅ PHASE 7️⃣ STATUS**
+
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
+---
+# SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
 
-# SECTION 2️⃣ — AWS CAFE SQS (Async Order Processing)
+## PHASE 1️⃣ — AMAZON DYNAMODB (Menu + Cache Layer)
+
+## 🎯 Purpose of This Phase (IMPORTANT)
+
+### In your architecture:
+
+- DynamoDB is NOT replacing RDS
+
+- DynamoDB is used for:
+
+    - Menu data (Coffee, Latte, Tea)
+
+    - Fast reads
+
+    - Cache-like behavior
+
+- Lambda reads menu price from DynamoDB
+
+- RDS is still used for orders & transactions
+
+So the flow is:
+
+```
+CloudFront
+   ↓
+API Gateway
+   ↓
+Lambda (Menu API)
+   ↓
+DynamoDB (CafeMenu)
+```
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
+---
+# SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
 
 ## PHASE 1️⃣ — SQS/LAMBDA (Producer)
 
@@ -459,6 +494,7 @@ RDS + DynamoDB
 
 - You are using Standard Queue (NOT FIFO)
 
+
 ## 2️⃣ CREATE API Lambda Function (Producer)
 > **(ORDER API → SQS)**
 
@@ -500,11 +536,9 @@ Make sure SQS Queue already exists:
 
 ❌ If not → STOP and create it first
 
-
-**✅ PHASE 1️⃣ STATUS**
-
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+
 ## PHASE 4️⃣ — SQS/Worker LAMBDA (Consumer)
 
 ## 1️⃣ Create Worker Lambda (Consumer)
@@ -531,10 +565,85 @@ Worker Lambda
 RDS + DynamoDB
 ```
 
-**✅ PHASE 4️⃣ STATUS**
-
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
+# SECTION 4️⃣ — ORDER STATUS DASHBOARD
+
+### 🎯 WHAT YOU WANT (CLARIFIED)
+
+#### You want a new frontend page:
+
+```
+/order-status
+```
+
+#### That shows:
+
+✅ Total orders count
+
+✅ Orders synced through:
+
+- API Gateway
+
+- Lambda
+
+- SQS
+
+- RDS
+
+- DynamoDB
+
+  ✅ Date & time per order
+
+  ✅ Auto-updated (near real-time)
+
+  ✅ Existing order system remains UNTOUCHED
+
+### 🧠 IMPORTANT REALITY CHECK
+
+**You cannot directly “count” orders from SQS because:**
+
+**🔴 SQS is a temporary transport layer**
+**Messages are deleted after processing**
+
+#### So in real systems:
+
+- RDS = Source of truth (orders history)
+
+- DynamoDB = Fast counters / dashboard cache
+
+- SQS = Invisible to users (internal)
+
+✔️ This is NORMAL and CORRECT architecture.
+
+
+
+### 🏆 RECOMMENDED DESIGN (PRODUCTION)
+
+✅ RDS = Order Records
+
+✅ DynamoDB = Order Counters + Status
+
+✅ Lambda = Aggregator
+
+✅ API Gateway = Dashboard API
+
+✅ Frontend = Order Status Page
+
+### 📐 FINAL ARCHITECTURE (ORDER STATUS DASHBOARD)
+
+```
+Browser (order-status.html)
+      |
+      |--> API Gateway /order-status
+              |
+              |--> Lambda (OrderStatusLambda)
+                      |
+                      |--> RDS (orders table)
+                      |--> DynamoDB (order_metrics)
+```
 
 
 
@@ -542,41 +651,13 @@ RDS + DynamoDB
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
-# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 
-# SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
 
-## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
 
-## 🎯 Purpose of This Phase (IMPORTANT)
 
-### In your architecture:
+# 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 
-- DynamoDB is NOT replacing RDS
 
-- DynamoDB is used for:
-
-    - Menu data (Coffee, Latte, Tea)
-
-    - Fast reads
-
-    - Cache-like behavior
-
-- Lambda reads menu price from DynamoDB
-
-- RDS is still used for orders & transactions
-
-So the flow is:
-
-```
-CloudFront
-   ↓
-API Gateway
-   ↓
-Lambda (Menu API)
-   ↓
-DynamoDB (CafeMenu)
-```
 
 
 

@@ -2,79 +2,7 @@
 
 # ☕ SECTION 1 — ORDER STATUS DASHBOARD
 
-### 🎯 WHAT YOU WANT (CLARIFIED)
 
-#### You want a new frontend page:
-
-```
-/order-status
-```
-
-#### That shows:
-
-✅ Total orders count
-
-✅ Orders synced through:
-
-- API Gateway
-
-- Lambda
-
-- SQS
-
-- RDS
-
-- DynamoDB
-
-  ✅ Date & time per order
-
-  ✅ Auto-updated (near real-time)
-
-  ✅ Existing order system remains UNTOUCHED
-
-### 🧠 IMPORTANT REALITY CHECK
-
-**You cannot directly “count” orders from SQS because:**
-
-**🔴 SQS is a temporary transport layer**
-**Messages are deleted after processing**
-
-#### So in real systems:
-
-- RDS = Source of truth (orders history)
-
-- DynamoDB = Fast counters / dashboard cache
-
-- SQS = Invisible to users (internal)
-
-✔️ This is NORMAL and CORRECT architecture.
-
-
-
-### 🏆 RECOMMENDED DESIGN (PRODUCTION)
-
-✅ RDS = Order Records
-
-✅ DynamoDB = Order Counters + Status
-
-✅ Lambda = Aggregator
-
-✅ API Gateway = Dashboard API
-
-✅ Frontend = Order Status Page
-
-### 📐 FINAL ARCHITECTURE (ORDER STATUS DASHBOARD)
-
-```
-Browser (order-status.html)
-      |
-      |--> API Gateway /order-status
-              |
-              |--> Lambda (OrderStatusLambda)
-                      |
-                      |--> RDS (orders table)
-                      |--> DynamoDB (order_metrics)
-```
 
 ##  PHASE 1️⃣ — RDS DATABASE
 
