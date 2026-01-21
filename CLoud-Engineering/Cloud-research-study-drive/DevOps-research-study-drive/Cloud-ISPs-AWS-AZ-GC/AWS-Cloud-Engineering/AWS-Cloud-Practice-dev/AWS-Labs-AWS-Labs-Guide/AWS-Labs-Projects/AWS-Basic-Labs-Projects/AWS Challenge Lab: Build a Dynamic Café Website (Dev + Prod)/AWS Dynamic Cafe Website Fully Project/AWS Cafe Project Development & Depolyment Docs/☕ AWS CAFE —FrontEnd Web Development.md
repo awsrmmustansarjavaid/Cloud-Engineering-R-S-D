@@ -14,7 +14,25 @@
 
 # ☕ AWS CAFE - SECTION 1️⃣ BASIC CONFIGURATIONS
 
-## PHASE 1️⃣ — Development and Delopment LAMP Server 
+## PHASE 1️⃣ — BASIC CONFIGURATIONS
+
+### 1️⃣ Create index.php
+
+```
+sudo nano /var/www/html/index.php
+```
+
+### 2️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+
+
+
+
+## PHASE 2️⃣ — Development and Delopment LAMP Server 
 
 ### 1️⃣  EC2 LAMP Server USER DATA
 
@@ -400,11 +418,7 @@ php -m | grep mysql
 mysqlnd
 ```
 
-### 4️⃣ Restart Apache (MANDATORY)
 
-```
-sudo systemctl restart httpd
-```
 
 ---
 
