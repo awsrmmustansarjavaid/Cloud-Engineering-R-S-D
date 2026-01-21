@@ -1573,6 +1573,173 @@ The issue was INFRASTRUCTURE, not logic.
 
 # SECTION 4️⃣ — ORDER STATUS DASHBOARD
 
+## PHASE 2️⃣ — VERIFICATION (MANDATORY)
+
+### 🔎 Test in Lambda
+
+- **Go to Lambda → Test**
+
+#### If secret access works:
+
+- ❌ No timeout
+
+- ❌ No access denied
+
+- ✅ DB connects successfully
+
+### 🔎 CloudWatch Log
+
+#### You should see:
+
+```
+Fetching DB secret...
+```
+
+#### No error like:
+
+```
+AccessDeniedException: User is not authorized to perform secretsmanager:GetSecretValue
+```
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 7️⃣ — FEATURE VERIFICATION (IMPORTANT)
+
+### 1️⃣ Send order from frontend / API
+
+✔ Order placed
+
+### 2️⃣ Check SQS
+
+✔ Message disappears (consumed)
+
+### 3️⃣ Check RDS
+
+```
+SELECT * FROM orders ORDER BY created_at DESC;
+```
+
+✔ New row present
+
+### 4️⃣ Check DynamoDB → CafeMenu
+
+✔ orders increased for item
+
+### 5️⃣ Check DynamoDB → CafeOrderMetrics
+
+✔ TOTAL_ORDERS increased by 1
+
+### 6️⃣ Check CloudWatch Logs
+
+✔ "Order processed successfully"
+
+
+### 7️⃣ Verify Apache is Running
+
+```
+sudo systemctl status httpd
+```
+
+#### If not running:
+
+```
+sudo systemctl start httpd
+```
+
+```
+sudo systemctl enable httpd
+```
+
+### 8️⃣ Verify Web Root
+
+```
+ls /var/www/html
+```
+
+This IS THE CORRECT LOCATION ✅
+
+✔ /var/www/html/ is Apache’s default public directory
+
+
+### 🔁 Auto Refresh
+
+#### ✔ Implemented here:
+
+```
+setInterval(loadData,10000);
+```
+
+### ⏳ Loading Spinner
+
+✔ Enabled before fetch
+
+✔ Hidden after response
+
+```
+document.getElementById("loader").style.display="block";
+```
+
+### 📊 Chart (Orders per Item)
+
+✔ Chart.js used
+
+✔ Auto re-draws on refresh
+
+✔ No page reload
+
+### 📅 Date Filter
+
+✔ Frontend ready
+
+```
+<input type="date" id="filterDate">
+```
+
+#### 👉 Backend enhancement later:
+
+#### Pass date as query param:
+
+```
+/order-status?date=2026-01-09
+```
+---
+
+### 🏆 RESULT
+
+You now have:
+
+✅ Event-driven backend
+
+✅ Reliable order processing
+
+✅ Real-time metrics
+
+✅ Production-safe SQS worker
+
+✅ Zero backend breakage
+
+---
+
+### 🧪 FINAL VERIFICATION
+
+| Check                     | Result |
+| ------------------------- | ------ |
+| Place new order           | ✅      |
+| RDS updated               | ✅      |
+| DynamoDB count +1         | ✅      |
+| Order-status page updated | ✅      |
+
+
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
+---
+
+# ☕ SECTION 5️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
 
 
 
