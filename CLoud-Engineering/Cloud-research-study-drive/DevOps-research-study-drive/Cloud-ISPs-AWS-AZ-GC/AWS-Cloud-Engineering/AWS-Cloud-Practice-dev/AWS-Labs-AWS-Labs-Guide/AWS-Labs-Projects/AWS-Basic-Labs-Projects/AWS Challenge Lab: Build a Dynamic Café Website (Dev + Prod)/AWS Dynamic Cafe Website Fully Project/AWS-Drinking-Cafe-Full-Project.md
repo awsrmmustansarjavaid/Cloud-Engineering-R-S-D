@@ -137,8 +137,124 @@ RDS → Databases → Create database
 
 ---
 
+### 2️⃣ — Basic RDS CONFIGURATIONS
+
+#### 1️⃣ Install & Login MySQL Client
+
+```
+sudo dnf install -y mariadb105
+```
+
+##### Verify mysql
+
+```
+mysql --version
+```
+
+##### Login to MariaDB:
+
+```
+mysql -h <rds-endpoint> -u cafe_user -p
+```
+---
+
+#### 2️⃣ Create Café Database
+
+```sql
+CREATE DATABASE cafe_db;
+```
+
+```
+CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
+```
+
+```
+GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
+```
+
+```
+FLUSH PRIVILEGES;
+```
+
+#### 3️⃣ Use the correct database
+
+```
+USE cafe_db;
+```
+
+#### 4️⃣ Orders Table
+
+```sql
+CREATE TABLE orders (
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ customer_name VARCHAR(100),
+ item VARCHAR(50),
+ quantity INT,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### 📢 Recommended Final CREATE TABLE with table_number
+
+```
+CREATE TABLE orders (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    table_number    INT NOT NULL,                    -- ← Added: table number (1, 2, 3, ...)
+    customer_name   VARCHAR(100),
+    item            VARCHAR(50),
+    quantity        INT NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_table_number (table_number),           -- optional: faster queries by table
+    INDEX idx_created_at (created_at)                -- optional: good for time-based reports
+);
+```
+
+### 5️⃣ Verify table exists
+
+```
+SHOW TABLES;
+```
+
+##### You should see:
+
+```
+orders
+```
+
+### 6️⃣ Test insert manually (CLI)
+
+```
+INSERT INTO orders (customer_name, item, quantity)
+VALUES ('CLI-Test', 'Coffee', 1);
+```
+#### 📢 Multi Values (with table_number)
 
 
+```
+-- For your first (simpler) table
+INSERT INTO orders (table_number, customer_name, item, quantity) 
+VALUES 
+    (1, 'Ali Khan', 'Espresso', 2),
+    (1, 'Sara Ahmed', 'Cappuccino', 1),
+    (2, 'CLI-Test', 'Coffee', 1),
+    (3, NULL, 'Latte', 3),
+    (5, 'Ahmed Raza', 'Croissant + Tea', 1);
+``` 
+
+### 7️⃣ Verify:
+
+```
+SELECT * FROM orders;
+```
+
+###### ✅ If you see the row → DB is READY
+
+#### Exit MySQL:
+
+```
+EXIT;
+```
 
 
 
