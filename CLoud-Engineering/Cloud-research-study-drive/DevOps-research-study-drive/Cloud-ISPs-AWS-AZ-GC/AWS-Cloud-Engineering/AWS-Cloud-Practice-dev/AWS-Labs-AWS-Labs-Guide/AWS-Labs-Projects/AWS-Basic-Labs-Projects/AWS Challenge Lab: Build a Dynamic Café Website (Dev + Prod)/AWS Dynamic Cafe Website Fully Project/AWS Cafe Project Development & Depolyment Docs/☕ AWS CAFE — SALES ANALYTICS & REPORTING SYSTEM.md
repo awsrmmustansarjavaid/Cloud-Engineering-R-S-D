@@ -453,14 +453,9 @@ Execution role: Create new role
 
 #### 2️⃣ IAM Permissions
 
-```
-AmazonDynamoDBReadOnlyAccess
-CloudWatchLogsFullAccess
-```
 
-✅ Without this → Lambda fails silently
 
-✅ With this → Lambda can read DynamoDB + write logs
+
 
 ### 2️⃣ DEPLOY CODE
 

@@ -270,7 +270,20 @@ AmazonDynamoDBReadOnlyAccess
 
 **✔️ Click Create policy**
 
-#### 6️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
+#### 6️⃣ Create IAM Policy FOR CafeAnalyticsLambda
+
+**AWS IAM Policies:**
+
+```
+AmazonDynamoDBReadOnlyAccess
+CloudWatchLogsFullAccess
+```
+
+✅ Without this → Lambda fails silently
+
+✅ With this → Lambda can read DynamoDB + write logs
+
+**✔️ Click Create policy**
 
 
 
