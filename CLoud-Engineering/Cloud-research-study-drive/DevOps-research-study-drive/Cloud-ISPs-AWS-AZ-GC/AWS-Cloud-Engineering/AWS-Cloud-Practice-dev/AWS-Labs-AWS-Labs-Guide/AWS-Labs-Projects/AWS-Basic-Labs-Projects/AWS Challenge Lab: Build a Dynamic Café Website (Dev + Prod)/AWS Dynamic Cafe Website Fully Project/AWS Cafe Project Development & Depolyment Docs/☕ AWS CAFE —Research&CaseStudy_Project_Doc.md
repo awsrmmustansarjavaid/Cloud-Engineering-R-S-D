@@ -1032,7 +1032,53 @@ We will ADD COLUMNS ONLY
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
+## 🔔 PHASE 4️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
 
+### Goal:
+> Allow customers to:
+
+- Track their own order status
+
+- View billing details
+
+- Use a unique order URL
+
+- Print receipt
+
+- Auto-refresh status
+
+- Scan QR code to reopen order
+
+- No modification to existing order flow
+
+### 🧱 ARCHITECTURE (IMPORTANT — READ FIRST)
+
+#### ✅ What already exists (UNCHANGED)
+
+- order.php → places order
+
+- API Gateway → /orders
+
+- Lambda → inserts order
+
+- Database → orders table
+
+### 🆕 What this phase adds
+
+- New read-only page: order-status.php
+
+- New read-only API: /order-status
+
+- No breaking changes
+
+- No auth required (public tracking link)
+
+
+
+
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
 
 # 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 
