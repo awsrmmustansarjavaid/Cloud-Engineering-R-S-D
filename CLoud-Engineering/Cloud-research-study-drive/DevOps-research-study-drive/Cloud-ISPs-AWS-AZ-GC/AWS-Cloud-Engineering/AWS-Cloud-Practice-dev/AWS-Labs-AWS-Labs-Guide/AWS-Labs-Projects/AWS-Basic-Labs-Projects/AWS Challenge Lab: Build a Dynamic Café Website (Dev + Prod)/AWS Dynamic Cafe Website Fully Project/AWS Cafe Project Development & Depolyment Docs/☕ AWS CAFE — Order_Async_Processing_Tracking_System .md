@@ -1705,77 +1705,9 @@ test-new order processing SQS
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 7️⃣ — Verification SQS/Worker LAMBDA (Consumer)
+## PHASE 7️⃣ — Verification SQS/Worker LAMBDA (Consumer - Must)
 
-### 1️⃣ Test manually from Lambda console
-
-#### 1️⃣ You must wrap the test event in Records:
-
-- **Event name:** Test_CafeOrderWorker
-
-```
-{
-  "Records": [
-    {
-      "body": "{\"table_number\": 1, \"customer_name\": \"WorkerTest\", \"item\": \"Coffee\", \"quantity\": 2}"
-    }
-  ]
-}
-```
-
-✔ Inserts into RDS
-
-✔ Updates DynamoDB
-
-✔ No retries
-
-✔ No errors
-
-- This mimics SQS event structure
-
-- Now the Lambda code won’t fail with 'Records'
-
-
-#### ✅ EXPECTED CLOUDWATCH LOGS (SUCCESS)
-
-You should see:
-
-```
-DEBUG: Lambda invoked
-DEBUG: Event = {...}
-DEBUG: Secret fetched
-DEBUG: RDS connected
-✅ Order processed: {...}
-```
-
-#### 2️⃣ Verify RDS
-
-```
-mysql -h <rds-endpoint> -u cafe_user -p cafe_db
-```
-
-```
-SELECT * FROM orders ORDER BY id DESC;
-```
-
-#### Expected row:
-
-```
-WorkerTest | Coffee | 2
-```
-
-#### 3️⃣ Verify DynamoDB
-
-- DynamoDB → CafeMenu → Coffee
-
-- Attribute orders increased
-
-
-
-**✅ PHASE 7️⃣ STATUS**
-
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
-
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
 # 🟢 SECTION 3️⃣ COMPLETE & VERIFIED
 ---
