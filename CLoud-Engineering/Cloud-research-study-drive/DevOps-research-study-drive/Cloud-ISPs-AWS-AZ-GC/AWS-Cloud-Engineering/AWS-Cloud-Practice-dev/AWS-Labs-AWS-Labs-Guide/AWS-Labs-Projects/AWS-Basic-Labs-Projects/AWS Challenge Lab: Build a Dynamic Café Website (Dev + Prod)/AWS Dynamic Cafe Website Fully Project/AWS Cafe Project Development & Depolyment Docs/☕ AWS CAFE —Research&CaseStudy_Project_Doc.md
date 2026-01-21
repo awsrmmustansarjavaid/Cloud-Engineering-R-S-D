@@ -669,23 +669,198 @@ AmazonSQSFullAccess
 | DynamoDB        | `AmazonDynamoDBFullAccess` (lab)       |
 
 
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
+
+---
+# ☕ SECTION 5️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
+
+### 🧠 WHY THIS LAB EXISTS
+
+#### In real cafés and food apps:
+
+- Customers expect confirmation
+
+- They want:
+
+    - Order ID
+
+    - Order status
+
+    - Bill details
+
+    - A link they can reopen
+
+    - Print / share receipt
+
+This lab adds all of that
+**WITHOUT touching your existing AWS backend.**
+
+### 🏗️ ARCHITECTURE (UPDATED)
+
+```
+Customer Browser
+   ↓
+order.php  (THIS LAB)
+   ↓
+API Gateway  (EXISTING)
+   ↓
+CafeOrderApiLambda (EXISTING)
+   ↓
+SQS (EXISTING)
+   ↓
+CafeOrderWorker Lambda (EXISTING)
+   ↓
+RDS + DynamoDB (EXISTING)
+```
+
+### 🆕 Frontend Enhancements Only
+
+- Unique Order ID
+
+- Order Status Page URL
+
+- Billing calculation
+
+- Printable receipt
+
+## 🧩 LAB PHASE NAME
+
+### 🎯 LAB OBJECTIVES
+
+### By the end of this phase:
+
+✔ Customers receive a unique order ID
+
+✔ Customers see order status (RECEIVED)
+
+✔ Customers get billing details
+
+✔ Each order has a unique URL
+
+✔ Customers can print their receipt
+
+✔ Backend remains 100% untouched
+
+### 🎯 WHAT EXACTLY WE ARE ADDING
+
+| Feature                 | Where    |
+| ----------------------- | -------- |
+| Unique Order ID         | Frontend |
+| Billing Calculation     | Frontend |
+| Order Status (RECEIVED) | Frontend |
+| Order Tracking Link     | Frontend |
+| Print Receipt           | Frontend |
+
+
+### 📁 FILES USED IN THIS LAB
+
+| File               | Purpose                       |
+| ------------------ | ----------------------------- |
+| `order.php`        | Order placement + receipt     |
+| `order-status.php` | (Future) Status tracking page |
+| Existing API       | **UNCHANGED**                 |
+
+#### 📁 FILES USED
+
+You will work with ONLY ONE FILE in this phase:
+
+```
+order.php
+```
+
+- No new backend files
+
+- No Lambda changes
+
+- No DB changes
+
+### 🚫 RULES (DO NOT BREAK)
+
+❌ Do NOT modify API Gateway
+
+❌ Do NOT modify Lambda
+
+❌ Do NOT modify SQS
+
+❌ Do NOT modify RDS or DynamoDB
+
+✅ Frontend changes only
+
+### 🧪 DATA FLOW (IMPORTANT)
+
+- Customer fills order form
+
+- Frontend sends JSON to API (already working)
+
+- Backend responds 202 Accepted
+
+#### Frontend immediately:
+
+    - Generates Order ID
+
+    - Calculates bill
+
+    - Displays receipt
+
+    - Shows status link
+
+**👉 Backend continues processing asynchronously via SQS**    
+
+### 🔑 ORDER STATUS MODEL (FRONTEND)
+
+| Status    | Meaning                  |
+| --------- | ------------------------ |
+| RECEIVED  | Order accepted by system |
+| PREPARING | (Future) Kitchen started |
+| READY     | (Future) Ready to serve  |
+| COMPLETED | (Future) Order closed    |
+
+#### 🔐 ORDER STATUS LOGIC (FOR NOW)
+
+In this phase, order status is:
+
+```
+RECEIVED
+```
+
+#### Why?
+
+- Order accepted by system
+
+- Async processing is happening
+
+- This matches real systems (Uber Eats, Foodpanda)
+
+
+### 🧾 BILLING MODEL (FRONTEND)
+
+#### Price list (static for lab):
+
+| Item        | Price |
+| ----------- | ----- |
+| Coffee      | $3    |
+| Tea         | $2    |
+| Latte       | $4    |
+| Cappuccino  | $4    |
+| Fresh Juice | $5    |
+
+#### Total formula:
+
+```
+Total = price × quantity
+```
+
 
 
 
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
-
-
-
-
 # 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 
-
-
-
-
-
+---
 
 # ☕ Doc:Cafe Order Processor - COMPLETE & VERIFIED
 
