@@ -1306,35 +1306,7 @@ Your system is now schema-consistent from browser → DB.
 
 ## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
 
-## 🎯 Purpose of This Phase (IMPORTANT)
 
-### In your architecture:
-
-- DynamoDB is NOT replacing RDS
-
-- DynamoDB is used for:
-
-    - Menu data (Coffee, Latte, Tea)
-
-    - Fast reads
-
-    - Cache-like behavior
-
-- Lambda reads menu price from DynamoDB
-
-- RDS is still used for orders & transactions
-
-So the flow is:
-
-```
-CloudFront
-   ↓
-API Gateway
-   ↓
-Lambda (Menu API)
-   ↓
-DynamoDB (CafeMenu)
-```
 
 ## 1️⃣ Create DynamoDB Table
 

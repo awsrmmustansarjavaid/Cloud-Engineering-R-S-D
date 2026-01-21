@@ -397,6 +397,45 @@ sudo ./rds-quick-test.sh
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
+
+# SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
+
+## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
+
+## 🎯 Purpose of This Phase (IMPORTANT)
+
+### In your architecture:
+
+- DynamoDB is NOT replacing RDS
+
+- DynamoDB is used for:
+
+    - Menu data (Coffee, Latte, Tea)
+
+    - Fast reads
+
+    - Cache-like behavior
+
+- Lambda reads menu price from DynamoDB
+
+- RDS is still used for orders & transactions
+
+So the flow is:
+
+```
+CloudFront
+   ↓
+API Gateway
+   ↓
+Lambda (Menu API)
+   ↓
+DynamoDB (CafeMenu)
+```
+
+
+
+
+
 ---
 # ☕ Charlie Café SECTION 5️⃣ – Secure HR & Attendance System
 > **📄 ☕ AWS Charlie Café – Secure HR & Attendance System.md
