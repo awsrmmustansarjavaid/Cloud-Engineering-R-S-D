@@ -2120,68 +2120,7 @@ Function: CreateOrderLambda
 
 #### 2️⃣ Replace Code (100% COPY)
 
-```
-import json
-import pymysql
-import os
-import random
-from datetime import datetime
-
-def generate_order_id():
-    return f"ORD-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000,9999)}"
-
-def get_connection():
-    return pymysql.connect(
-        host=os.environ["DB_HOST"],
-        user=os.environ["DB_USER"],
-        password=os.environ["DB_PASS"],
-        database=os.environ["DB_NAME"]
-    )
-
-def lambda_handler(event, context):
-    data = json.loads(event["body"])
-
-    order_id = generate_order_id()
-    table_number = data["table_number"]
-    customer_name = data["customer_name"]
-    item = data["item"]
-    quantity = int(data["quantity"])
-
-    PRICE_LIST = {
-        "Coffee": 3.00,
-        "Tea": 2.50,
-        "Latte": 4.00,
-        "Cappuccino": 4.50,
-        "Fresh Juice": 5.00
-    }
-
-    total_amount = PRICE_LIST[item] * quantity
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        INSERT INTO orders
-        (order_id, table_number, customer_name, item, quantity, total_amount, status)
-        VALUES (%s,%s,%s,%s,%s,%s,'RECEIVED')
-    """, (order_id, table_number, customer_name, item, quantity, total_amount))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return {
-        "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({
-            "message": "Order placed",
-            "order_id": order_id,
-            "status": "RECEIVED",
-            "total": total_amount,
-            "track_url": f"/order-status.php?order_id={order_id}"
-        })
-    }
-```
+[CreateOrderLambda.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CreateOrderLambda.py)
 
 #### 3️⃣ Deploy Lambda
 
