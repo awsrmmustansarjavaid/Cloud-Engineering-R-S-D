@@ -1074,20 +1074,94 @@ We will ADD COLUMNS ONLY
 - No auth required (public tracking link)
 
 
-
-
-
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
----
 
 # 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 
----
 
 # ☕ Doc:Cafe Order Processor - COMPLETE & VERIFIED
 
 ---
+# ☕ Charlie Café  Doc:# SALES ANALYTICS & REPORTING SYSTEM
 
+### 🎯 WHAT YOU ARE BUILDING (CLEAR SCOPE)
+
+You will build ONE analytics system that:
+
+✔ Reads data from existing Order Status DynamoDB table
+
+✔ Calculates Today / Weekly / Monthly Sales
+
+✔ Calculates Cost, Profit, Loss
+
+✔ Displays professional Bootstrap analytics dashboard
+
+✔ Generates PDF reports (custom date OR month-end)
+
+✔ Supports manual PDF download
+
+✔ Supports monthly auto-PDF generation
+
+✔ Uses existing API Gateway + Lambda (minimal additions)
+
+### 🧱 ARCHITECTURE (FINAL)
+
+```
+Order Status Page (Existing)
+        |
+        |--- GET /order-status        (existing)
+        |--- GET /analytics           (new)
+        |--- GET /analytics/csv       (new)
+        |--- POST /report/pdf         (new)
+        |
+API Gateway (Existing)
+        |
+        |--- OrderStatusLambda        (existing)
+        |--- CafeAnalyticsLambda     (new)
+        |--- CafePDFReportLambda     (new)
+        |
+DynamoDB
+        |
+        |--- CafeOrders              (existing)
+        |--- CafeMenu                (new – cost only)
+        |
+EventBridge
+        |
+        |--- Daily / Monthly PDF
+```
+
+## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
+
+### WHY THIS INDEX WORKS (MENTAL MODEL)
+
+- **order_date → filters day ranges**
+
+- **order_timestamp → sorts results chronologically**
+
+- BETWEEN start_date AND end_date → enables:
+
+    - Today
+
+    - Last 7 days
+
+    - Month to date
+
+This avoids full table scans (very important).
+
+
+
+
+
+
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
+
+
+# ☕ Doc:Cafe Order Processor - COMPLETE & VERIFIED
+
+---
 # ☕ Charlie Café  Doc:Secure HR & Attendance System
 
 # ☕ Charlie Café SECTION 5️⃣ – Secure HR & Attendance System

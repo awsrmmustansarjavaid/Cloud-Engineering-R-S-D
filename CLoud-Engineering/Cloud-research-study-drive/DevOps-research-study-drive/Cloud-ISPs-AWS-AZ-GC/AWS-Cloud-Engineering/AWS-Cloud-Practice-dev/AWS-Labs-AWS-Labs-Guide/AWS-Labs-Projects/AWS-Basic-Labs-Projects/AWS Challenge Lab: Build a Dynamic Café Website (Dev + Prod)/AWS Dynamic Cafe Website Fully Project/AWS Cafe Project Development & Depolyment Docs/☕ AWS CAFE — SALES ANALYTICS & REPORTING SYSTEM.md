@@ -1,52 +1,6 @@
 # ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
 > **(Using Existing Order Status System)**
 
-### 🎯 WHAT YOU ARE BUILDING (CLEAR SCOPE)
-
-You will build ONE analytics system that:
-
-✔ Reads data from existing Order Status DynamoDB table
-
-✔ Calculates Today / Weekly / Monthly Sales
-
-✔ Calculates Cost, Profit, Loss
-
-✔ Displays professional Bootstrap analytics dashboard
-
-✔ Generates PDF reports (custom date OR month-end)
-
-✔ Supports manual PDF download
-
-✔ Supports monthly auto-PDF generation
-
-✔ Uses existing API Gateway + Lambda (minimal additions)
-
-### 🧱 ARCHITECTURE (FINAL)
-
-```
-Order Status Page (Existing)
-        |
-        |--- GET /order-status        (existing)
-        |--- GET /analytics           (new)
-        |--- GET /analytics/csv       (new)
-        |--- POST /report/pdf         (new)
-        |
-API Gateway (Existing)
-        |
-        |--- OrderStatusLambda        (existing)
-        |--- CafeAnalyticsLambda     (new)
-        |--- CafePDFReportLambda     (new)
-        |
-DynamoDB
-        |
-        |--- CafeOrders              (existing)
-        |--- CafeMenu                (new – cost only)
-        |
-EventBridge
-        |
-        |--- Daily / Monthly PDF
-```
-
 ## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
 
 > **⚠️ This phase is mandatory before Lambda works.**
@@ -160,22 +114,6 @@ AWS Console → DynamoDB → CafeOrders → Indexes → Create index
 ⚠️ Do not continue until ACTIVE.
 
 ❌ Do not deploy Lambda before this
-
-### WHY THIS INDEX WORKS (MENTAL MODEL)
-
-- **order_date → filters day ranges**
-
-- **order_timestamp → sorts results chronologically**
-
-- BETWEEN start_date AND end_date → enables:
-
-    - Today
-
-    - Last 7 days
-
-    - Month to date
-
-This avoids full table scans (very important).
 
 ### 3️⃣ – EXACT DYNAMODB QUERY CODE (REQUIRED)
 
