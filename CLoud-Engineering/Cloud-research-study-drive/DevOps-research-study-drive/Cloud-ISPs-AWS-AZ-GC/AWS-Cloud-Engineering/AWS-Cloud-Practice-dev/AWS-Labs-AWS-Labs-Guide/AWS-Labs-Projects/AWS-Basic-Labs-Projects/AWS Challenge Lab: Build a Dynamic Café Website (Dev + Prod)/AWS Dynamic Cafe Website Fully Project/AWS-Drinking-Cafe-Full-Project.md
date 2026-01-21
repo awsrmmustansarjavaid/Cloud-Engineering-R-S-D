@@ -260,6 +260,7 @@ Read-only access to Secrets Manager for Lambda
 **✔️ Click Create policy**
 
 #### 5️⃣ Create IAM Policy FOR DYNAMODB METRICS TABLE (FULL)
+> **RDS access (same as Worker)**
 
 **AWS IAM Policies:**
 

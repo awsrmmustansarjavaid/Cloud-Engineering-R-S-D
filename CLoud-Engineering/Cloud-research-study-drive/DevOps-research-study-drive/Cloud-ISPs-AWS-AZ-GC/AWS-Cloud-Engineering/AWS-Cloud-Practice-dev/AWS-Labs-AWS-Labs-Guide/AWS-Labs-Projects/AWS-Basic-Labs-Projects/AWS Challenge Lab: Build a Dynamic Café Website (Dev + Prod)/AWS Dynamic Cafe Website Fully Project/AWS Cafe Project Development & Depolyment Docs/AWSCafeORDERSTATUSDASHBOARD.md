@@ -24,7 +24,7 @@
 
 
 
-- RDS access (same as Worker)
+
 
 ### 3️⃣ Lambda Status Order Code
 
