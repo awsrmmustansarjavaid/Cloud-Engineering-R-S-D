@@ -18,9 +18,9 @@
 * SSH client or Cloud9
 
 ---
-# 📢 SECTION 1 CAFE BASIC CONFIGURATIONS
+# 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS
 
-## PHASE 1 — NETWORK & COMPUTE (FOUNDATION)
+## PHASE 1️⃣ — NETWORK & COMPUTE (FOUNDATION)
 
 ### 1️⃣ Create Development VPC (us‑east‑1)
 
@@ -107,14 +107,71 @@ sudo dnf install -y awscli
 # --------------------------------------------
 ```
 
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 2 — Development and Delopment LAMP Server 
+## PHASE 2️⃣ — Development and Delopment LAMP Server 
 
 [AWSCafeOrderProcessor](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—FrontEnd%20Web%20Development.md)
 
 
-### 5️⃣ Upload Images to S3 
+**✅ PHASE 2️⃣ STATUS**
 
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 3️⃣ — RDS CONFIGURATIONS
+
+### 1️⃣ Create DB Subnet Group
+AWS Console → RDS → Subnet groups → Create
+- Name: CafeRDSSubnetGroup
+- VPC: CafeDevVPC
+- Subnets: **PRIVATE subnets (2 AZs)**
+
+Create
+
+### 2️⃣ Create Security Group for RDS
+VPC → Security Groups → Create
+- Name: CafeRDS-SG
+- Inbound:
+  - MySQL/Aurora (3306) → Source: Lambda-SG
+  - MySQL/Aurora (3306) → Source: EC2-Web-SG
+- Outbound: All
+
+Create
+
+### 3️⃣ Create RDS Instance
+RDS → Databases → Create database
+- Engine: MySQL (or MariaDB)
+- Template: Free tier
+- DB identifier: cafedb
+- Username: cafe_user
+- Password: StrongPassword123
+- VPC: CafeDevVPC
+- Subnet group: CafeRDSSubnetGroup
+- Public access: ❌ No
+- Security group: CafeRDS-SG
+- Backup: Enabled
+
+Create database ⏳
+
+### 4️⃣ Create Schema in RDS
+Connect from EC2:
+
+
+
+
+
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 3️⃣ — S3 Bucket
 
 ### 1️⃣ Create S3 Bucket
 
@@ -143,7 +200,7 @@ Click **Create bucket**
 
 ✔️ Acknowledge
 
-### 6️⃣ Upload Images to S3 
+### 2️⃣ Upload Images to S3 
 
 #### 1️⃣ Upload Images
 
@@ -161,7 +218,7 @@ latte.jpg
 
 - Actions → Make public
 
-### 7️⃣ Link S3 Images to index.php
+### 3️⃣ Link S3 Images to index.php
 
 #### Copy S3 Object URL:
 
@@ -179,7 +236,7 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 ✅ No API involved
 
-### 8️⃣ 🧪 VERIFICATION 2 (MANDATORY)
+### 4️⃣ 🧪 VERIFICATION 2 (MANDATORY)
 
 #### 1️⃣ Test Landing Page
 
@@ -199,6 +256,9 @@ http://<EC2_PUBLIC_IP>/
 
 
 
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 
 # 📢 SECTION 2 — AWSCafeOrderProcessor

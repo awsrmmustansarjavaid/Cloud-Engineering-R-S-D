@@ -1,41 +1,7 @@
 
 # PHASE 1 — AMAZON RDS (Replace EC2 MariaDB)
 
-## 1️⃣ Create DB Subnet Group
-AWS Console → RDS → Subnet groups → Create
-- Name: CafeRDSSubnetGroup
-- VPC: CafeDevVPC
-- Subnets: **PRIVATE subnets (2 AZs)**
 
-Create
-
-## 2️⃣ Create Security Group for RDS
-VPC → Security Groups → Create
-- Name: CafeRDS-SG
-- Inbound:
-  - MySQL/Aurora (3306) → Source: Lambda-SG
-  - MySQL/Aurora (3306) → Source: EC2-Web-SG
-- Outbound: All
-
-Create
-
-## 3️⃣ Create RDS Instance
-RDS → Databases → Create database
-- Engine: MySQL (or MariaDB)
-- Template: Free tier
-- DB identifier: cafedb
-- Username: cafe_user
-- Password: StrongPassword123
-- VPC: CafeDevVPC
-- Subnet group: CafeRDSSubnetGroup
-- Public access: ❌ No
-- Security group: CafeRDS-SG
-- Backup: Enabled
-
-Create database ⏳
-
-## 4️⃣ Create Schema in RDS
-Connect from EC2:
 
 ## Method 1 - ☕ AWS Café — RDS MySQL Setup Bash Script
 
