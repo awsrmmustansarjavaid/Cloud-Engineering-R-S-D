@@ -458,10 +458,6 @@ CREATE TABLE orders (
 );
 ```
 
-
-
-
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
@@ -501,38 +497,7 @@ cafe_db
 
 - Retrieve Secret ARN for later use in the app
 
-### 4️⃣ Test Secrets Manager Access from EC2
 
-#### Install AWS CLI if not present:
-
-```
-sudo dnf install -y awscli
-```
-
-#### Run:
-
-```
-aws secretsmanager get-secret-value \
-  --secret-id CafeDevDBSM \
-  --region us-east-1
-```
-
-##### ✅ If secret value is returned → IAM role works
-
-For example !
-
-```
-{
-    "ARN": "arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSecret-OgLDg9",
-    "Name": "CafeDevDBSM",
-    "VersionId": "bbdf3ecb-5d93-46ae-8049-5e4d4164fc10",
-    "SecretString": "{\"username\":\"cafe_user\",\"password\":\"StrongPassword123\",\"host\":\"10.0.0.130\",\"dbname\":\"cafe_db\"}",
-    "VersionStages": [
-        "AWSCURRENT"
-    ],
-    "CreatedDate": "2025-12-27T10:25:34.199000+00:00"
-}
-```
 
 
 **✅ PHASE 3️⃣ STATUS**
