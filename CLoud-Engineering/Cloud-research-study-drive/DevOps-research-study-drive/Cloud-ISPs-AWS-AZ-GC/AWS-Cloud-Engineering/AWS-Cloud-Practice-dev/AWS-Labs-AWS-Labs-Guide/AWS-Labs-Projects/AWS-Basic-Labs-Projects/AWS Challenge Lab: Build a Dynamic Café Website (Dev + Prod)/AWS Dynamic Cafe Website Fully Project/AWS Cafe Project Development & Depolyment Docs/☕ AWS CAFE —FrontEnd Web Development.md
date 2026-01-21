@@ -22,11 +22,25 @@
 sudo nano /var/www/html/index.php
 ```
 
-### 2️⃣ Restart Apache (MANDATORY)
+####  2️⃣ Make executable
+
+```
+sudo chmod +x lamp-verify.sh
+```
+
+####  3️⃣ Run (best as root/sudo)
+
+```
+sudo ./lamp-verify.sh
+```
+
+### 4️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
+
+
 
 
 
@@ -93,6 +107,27 @@ ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ### 3️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
 ### 1️⃣ Method 1 – Automated Verification Using One Bash Script
+> **📄 lamp-verify.sh**
+
+
+#### 📣 How to use:
+
+####  1️⃣ Save the script
+```
+sudo nano lamp-verify.sh
+```
+
+####  2️⃣ Make executable
+
+```
+sudo chmod +x lamp-verify.sh
+```
+
+####  3️⃣ Run (best as root/sudo)
+
+```
+sudo ./lamp-verify.sh
+```
 
 ```
 #!/bin/bash
@@ -236,25 +271,6 @@ if [ $FAILURES -gt 0 ]; then
     echo "                       → sudo chmod -R 755 /var/www"
     echo
 fi
-```
-
-#### 📣 How to use:
-
-####  1️⃣ Save the script
-```
-sudo nano lamp-verify.sh
-```
-
-####  2️⃣ Make executable
-
-```
-sudo chmod +x lamp-verify.sh
-```
-
-####  3️⃣ Run (best as root/sudo)
-
-```
-sudo ./lamp-verify.sh
 ```
 
 
