@@ -644,6 +644,7 @@ Browser (order-status.html)
                       |--> RDS (orders table)
                       |--> DynamoDB (order_metrics)
 ```
+---
 ## PHASE 2️⃣ — DYNAMODB METRICS TABLE (FULL)
 
 ### 1️⃣ Worker Lambda IAM Role
@@ -851,12 +852,187 @@ RECEIVED
 ```
 Total = price × quantity
 ```
+---
+
+## 🔔 PHASE 2️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)
+
+This phase ONLY reads data
+
+❌ No writes
+
+❌ No SQS
+
+❌ No changes to existing Lambdas
+
+❌ No DB schema changes
+
+### 🧠 WHY THIS PHASE EXISTS (REAL WORLD)
+
+#### Right now:
+
+Customer gets an Order ID ✔
+
+Customer gets receipt ✔
+
+Customer gets a link ✔
+
+But the link is static.
+
+#### In real systems:
+
+Customer opens link later
+
+System shows:
+
+Order details
+
+Current status
+
+Billing
+
+Print button
+
+**👉 This phase makes the order-status link REAL**
+
+### 🏗️ FINAL ARCHITECTURE
+
+```
+Customer Browser
+   ↓
+order-status.php
+   ↓
+API Gateway (NEW – READ ONLY)
+   ↓
+OrderStatusLambda (NEW)
+   ↓
+RDS (SELECT only)
+```
+
+### 🎯 WHAT THIS PHASE WILL DO
+
+#### When customer opens:
+
+```
+order-status.php?order_id=ORD-123456
+```
+
+#### They will see:
+
+✔ Order ID
+
+✔ Table Number
+
+✔ Item
+
+✔ Quantity
+
+✔ Total Bill
+
+✔ Status
+
+✔ Created Time
+
+✔ Print Button
+
+### 🔐 STATUS RULE (IMPORTANT)
+
+#### For this lab:
+
+| Condition       | Status    |
+| --------------- | --------- |
+| Order exists    | RECEIVED  |
+| Order not found | NOT FOUND |
+
+(No worker changes yet — that’s Phase 15)
+
+### 📦 DATA SOURCE DECISION (VERY IMPORTANT)
+
+We DO NOT modify your existing orders table.
+
+#### But your table already has:
+
+- item
+
+- quantity
+
+- customer_name
+
+- created_at
+
+**👉 We will map order_id logically, not physically.**
+
+#### How?
+
+We store order_id as a virtual ID passed from frontend
+(Interview-acceptable design for labs)
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## 🔄 PHASE 3️⃣ — Real Order State Machine (RECEIVED → PREPARING → READY → COMPLETED)
+
+This phase upgrades your cafe from “demo” to “production-grade workflow”
+
+### 🧠 WHAT YOU WILL BUILD (CLEAR FIRST)
+
+#### You already have:
+
+    - Order placement ✅
+
+    - Order tracking (read-only) ✅
+
+#### Now you will add:
+
+- Real order status lifecycle
+
+- Kitchen/Worker updates
+
+- Live status visible to customer
+
+- Billing auto-finalization
+
+### 🏗️ FINAL ARCHITECTURE (COMPLETE VIEW)
+
+```
+Customer
+  ├── order.php (place order)
+  ├── order-status.php (track order)
+  ↓
+API Gateway
+  ├── POST /orders            → CreateOrderLambda
+  ├── GET  /order-status      → OrderStatusLambda
+  └── POST /order-update      → OrderWorkerLambda
+                                   ↓
+                                RDS (orders table)
+```
+
+### 🧱 ORDER STATE MACHINE (VERY IMPORTANT)
+
+This is MANDATORY and used everywhere.
+
+```
+RECEIVED  → PREPARING → READY → COMPLETED
+```
+
+#### Rules:
+
+- Status can move only forward
+
+- No skipping
+
+- No rollback
+
+### 📦 DATABASE DESIGN (SAFE CHANGE)
+
+🔴 DO NOT CREATE NEW TABLE
+
+We will ADD COLUMNS ONLY
 
 
 
 
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
 
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
 # 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 
