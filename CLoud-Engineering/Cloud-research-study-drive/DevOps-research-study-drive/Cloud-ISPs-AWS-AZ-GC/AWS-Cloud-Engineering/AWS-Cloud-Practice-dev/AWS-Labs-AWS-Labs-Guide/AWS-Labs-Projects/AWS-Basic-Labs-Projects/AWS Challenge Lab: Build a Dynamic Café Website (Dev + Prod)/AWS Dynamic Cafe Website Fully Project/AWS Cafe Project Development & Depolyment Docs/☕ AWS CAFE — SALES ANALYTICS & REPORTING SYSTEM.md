@@ -7466,8 +7466,9 @@ cron(0/10 * * * ? *)
 
 # SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
 
-🟦 PHASE 1 — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
-STEP 1.1 — Create Stripe Account
+## 🟦 PHASE 1 — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
+
+### STEP 1.1 — Create Stripe Account
 
 Go to stripe.com
 
@@ -7479,7 +7480,7 @@ Verify email
 
 👉 No company info needed for Test Mode
 
-STEP 1.2 — Enable Test Mode
+### STEP 1.2 — Enable Test Mode
 
 Login to Stripe Dashboard
 
@@ -7487,7 +7488,7 @@ Top-right toggle → Test Mode ON
 
 You should see “TEST MODE” label
 
-STEP 1.3 — Get API Keys
+### STEP 1.3 — Get API Keys
 
 Go to Developers → API Keys
 
@@ -7503,8 +7504,13 @@ pk_test_ → frontend only
 
 sk_test_ → backend only (NEVER frontend)
 
-🟦 PHASE 2 — DATABASE (NO PAYMENT WORKS WITHOUT THIS)
-STEP 2.1 — Open Your RDS Database
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 2 — DATABASE (NO PAYMENT WORKS WITHOUT THIS)
+
+### STEP 2.1 — Open Your RDS Database
 
 Login to RDS
 
@@ -7512,7 +7518,7 @@ Open Query Editor / MySQL client
 
 Select your charlie_cafe database
 
-STEP 2.2 — Understand Why We Add Columns
+### STEP 2.2 — Understand Why We Add Columns
 
 Stripe returns:
 
@@ -7522,12 +7528,13 @@ payment status
 
 payment time
 
-We MUST store these for:
+#### We MUST store these for:
+
 ✔ audit
 ✔ dashboard
 ✔ real-world credibility
 
-STEP 2.3 — ALTER TABLE (RUN THIS EXACTLY)
+### STEP 2.3 — ALTER TABLE (RUN THIS EXACTLY)
 
 ```
 ALTER TABLE orders
@@ -7538,7 +7545,7 @@ ADD COLUMN payment_method VARCHAR(50) NULL,
 ADD COLUMN payment_time TIMESTAMP NULL;
 ```
 
-STEP 2.4 — Allowed Payment Status Values
+### STEP 2.4 — Allowed Payment Status Values
 
 Use ONLY these values (case-sensitive):
 
@@ -7550,14 +7557,19 @@ FAILED    → payment failed
 
 ⚠️ Do NOT invent new values
 
-🟦 PHASE 3 — AWS SECRETS MANAGER (NO HARD-CODED KEYS)
-STEP 3.1 — Open Secrets Manager
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 3 — AWS SECRETS MANAGER (NO HARD-CODED KEYS)
+
+### STEP 3.1 — Open Secrets Manager
 
 AWS Console → Secrets Manager
 
 Click Store a new secret
 
-STEP 3.2 — Choose Secret Type
+### STEP 3.2 — Choose Secret Type
 
 Select: Other type of secret
 
@@ -7567,7 +7579,7 @@ Value: sk_test_xxxxxxxxx
 
 Click Next
 
-STEP 3.3 — Name the Secret
+### STEP 3.3 — Name the Secret
 
 Secret name:
 
@@ -7577,8 +7589,13 @@ stripe/charlie-cafe
 
 Click Next → Next → Store
 
-🟦 PHASE 4 — IAM ROLE (THIS IS WHERE MOST PEOPLE FAIL)
-STEP 4.1 — Open IAM
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 4 — IAM ROLE (THIS IS WHERE MOST PEOPLE FAIL)
+
+### STEP 4.1 — Open IAM
 
 AWS Console → IAM
 
@@ -7587,7 +7604,7 @@ Click Roles
 Open role used by Payment Lambda
 (or your common Lambda role)
 
-STEP 4.2 — Attach Secrets Manager Policy
+### STEP 4.2 — Attach Secrets Manager Policy
 
 Click Add permissions → Inline policy
 
@@ -7608,8 +7625,13 @@ Paste this:
 
 Click Review → Save
 
-🟦 PHASE 5 — CREATE PAYMENT LAMBDA (NO ASSUMPTIONS)
-STEP 5.1 — Create Lambda
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 5 — CREATE PAYMENT LAMBDA (NO ASSUMPTIONS)
+
+### STEP 5.1 — Create Lambda
 
 AWS Lambda → Create function
 
@@ -7633,7 +7655,7 @@ Use existing role (same as Place Order)
 
 Click Create
 
-STEP 5.2 — Add Dependencies
+### STEP 5.2 — Add Dependencies
 
 Stripe SDK is REQUIRED.
 
@@ -7643,12 +7665,17 @@ Add Stripe library
 
 (For lab: inline example is acceptable)
 
-STEP 5.3 — FULLY COMMENTED LAMBDA CODE
+### STEP 5.3 — FULLY COMMENTED LAMBDA CODE
 
 [CreatePaymentIntent.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CreatePaymentIntent.py)
 
-🟦 PHASE 6 — API GATEWAY (NO SKIPPED CLICKS)
-STEP 6.1 — Open API Gateway
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 6 — API GATEWAY (NO SKIPPED CLICKS)
+
+### STEP 6.1 — Open API Gateway
 
 API Gateway → your existing API
 
@@ -7660,7 +7687,7 @@ Resource name:
 payment
 ```
 
-STEP 6.2 — Create Method
+### STEP 6.2 — Create Method
 
 Resource: /payment
 
@@ -7672,7 +7699,7 @@ Method name:
 /payment/create-intent
 ```
 
-STEP 6.3 — Integration Settings
+### STEP 6.3 — Integration Settings
 
 Integration type: Lambda
 
@@ -7680,7 +7707,7 @@ Lambda function: CreatePaymentIntent
 
 Enable Lambda proxy integration
 
-STEP 6.4 — Authorization
+### STEP 6.4 — Authorization
 
 Authorization: Cognito Authorizer
 
@@ -7688,8 +7715,13 @@ Same authorizer as Place Order
 
 Deploy API.
 
-🟦 PHASE 7 — MODIFY EXISTING PLACE ORDER (SAFE CHANGE)
-STEP 7.1 — What Changes?
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 7 — MODIFY EXISTING PLACE ORDER (SAFE CHANGE)
+
+### STEP 7.1 — What Changes?
 
 ONLY this:
 
@@ -7697,7 +7729,7 @@ Set payment_status = 'PENDING'
 
 Return orderId
 
-STEP 7.2 — Example Update (COMMENTED)
+### STEP 7.2 — Example Update (COMMENTED)
 
 ```
 // After inserting order into DB
@@ -7713,20 +7745,26 @@ return {
 };
 ```
 
-🟦 PHASE 8 — FRONTEND PAYMENT (VERY DETAILED)
-STEP 8.1 — Add Stripe Script
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 8 — FRONTEND PAYMENT (VERY DETAILED)
+
+### STEP 8.1 — Add Stripe Script
 
 ```
 <script src="https://js.stripe.com/v3/"></script>
 ```
 
-STEP 8.2 — Initialize Stripe
+### STEP 8.2 — Initialize Stripe
+
 ```
 // Initialize Stripe with TEST publishable key
 const stripe = Stripe("pk_test_xxxxxxxxx");
 ```
 
-STEP 8.3 — FULL PAYMENT FLOW FUNCTION
+### STEP 8.3 — FULL PAYMENT FLOW FUNCTION
 
 ```
 async function placeOrder() {
@@ -7781,8 +7819,13 @@ async function placeOrder() {
 }
 ```
 
-🟦 PHASE 9 — STRIPE WEBHOOK (BACKEND TRUST ONLY)
-STEP 9.1 — Create Webhook Lambda
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 9 — STRIPE WEBHOOK (BACKEND TRUST ONLY)
+
+### STEP 9.1 — Create Webhook Lambda
 
 Name:
 
@@ -7790,11 +7833,15 @@ Name:
 StripeWebhookHandler
 ```
 
-STEP 9.2 — Webhook Code (COMMENTED)
+### STEP 9.2 — Webhook Code (COMMENTED)
 
 [StripeWebhookHandler.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/StripeWebhookHandler.py)
 
-🟦 PHASE 10 — UPDATE ORDER STATUS IN DB
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 10 — UPDATE ORDER STATUS IN DB
 
 ```
 UPDATE orders
@@ -7804,7 +7851,11 @@ SET payment_status = 'PAID',
 WHERE order_id = ?;
 ```
 
-🟦 PHASE 11 — SECURITY (MANDATORY)
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 11 — SECURITY (MANDATORY)
 
 ✔ Secrets Manager
 ✔ HTTPS
@@ -7812,7 +7863,11 @@ WHERE order_id = ?;
 ✔ No card data
 ✔ API throttling
 
-🟦 PHASE 12 — TESTING
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 12 — TESTING
 
 Test card:
 
@@ -7822,7 +7877,11 @@ Any future date
 Any CVC
 ```
 
-🟦 PHASE 13 — DASHBOARD
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+## 🟦 PHASE 13 — DASHBOARD
 
 Show ONLY:
 
@@ -7832,3 +7891,6 @@ daily revenue
 
 weekly revenue
 
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
