@@ -1670,7 +1670,6 @@ Paste the FULL code below
 
 ## 🔔 PHASE 2️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)
 
-
 ### 🧑‍💻 STEP 1 — CREATE NEW LAMBDA (READ-ONLY)
 
 #### 1️⃣ Open AWS Lambda
