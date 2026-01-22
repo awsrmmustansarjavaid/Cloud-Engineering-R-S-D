@@ -7759,73 +7759,172 @@ return {
 
 ## 🟦 PHASE 8️⃣ — FRONTEND PAYMENT (VERY DETAILED)
 
-### 1️⃣ — Add Stripe Script
+### 1️⃣ — Add Stripe JS SDK (MANDATORY)
+
+#### 📍 Where:
+
+Inside <head> or before </body> of your order page HTML
 
 ```
+<!-- Stripe official JavaScript SDK -->
 <script src="https://js.stripe.com/v3/"></script>
 ```
 
-### 2️⃣ — Initialize Stripe
+### 2️⃣ — Create Payment HTML UI (NO JS YET)
+
+#### 📍 Add this inside <body>
 
 ```
-// Initialize Stripe with TEST publishable key
+<!-- Payment section -->
+<div id="payment-section">
+
+    <h3>Pay with Card</h3>
+
+    <!-- Stripe will inject secure card input here -->
+    <div id="card-element"></div>
+
+    <!-- Show card errors here -->
+    <div id="card-errors" style="color:red; margin-top:10px;"></div>
+
+    <!-- Submit order + payment -->
+    <button onclick="placeOrder()">Place Order & Pay</button>
+
+</div>
+```
+
+### 3️⃣ — Initialize Stripe (GLOBAL STEP)
+
+📍 In your JS file or <script> block
+
+```
+// Initialize Stripe using TEST publishable key
+// This key is SAFE to expose in frontend
 const stripe = Stripe("pk_test_xxxxxxxxx");
 ```
+### 4️⃣ — Create Stripe Elements Object
 
-### 3️⃣ — FULL PAYMENT FLOW FUNCTION
+```
+// Create Stripe Elements instance
+const elements = stripe.elements();
+```
+
+### 5️⃣ — Create Card Input Element (THIS WAS MISSING BEFORE)
+
+```
+// Create a card input field
+const cardElement = elements.create('card', {
+    style: {
+        base: {
+            fontSize: '16px',
+            color: '#ffffff',
+            '::placeholder': {
+                color: '#cccccc'
+            }
+        },
+        invalid: {
+            color: '#ff0000'
+        }
+    }
+});
+```
+
+### 6️⃣ — Mount Card Element into HTML
+
+```
+// Attach Stripe card UI to <div id="card-element">
+cardElement.mount('#card-element');
+```
+
+### 7️⃣ — Mount Card Element into HTML
+
+```
+// Listen for validation errors in real-time
+cardElement.on('change', function(event) {
+
+    const displayError = document.getElementById('card-errors');
+
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
+```
+
+### 8️⃣ — FINAL placeOrder() FUNCTION (NOW FULLY CORRECT)
+
+This is the COMPLETE FUNCTION, now that cardElement exists.
 
 ```
 async function placeOrder() {
 
-    // 1️⃣ Call existing Place Order API
-    const orderResponse = await fetch('/place-order', {
-        method: 'POST',
-        headers: {
-            'Authorization': localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(cartData)
-    });
+    try {
 
-    const orderResult = await orderResponse.json();
-    const orderId = orderResult.orderId;
+        // 1️⃣ Call EXISTING Place Order backend
+        const orderResponse = await fetch('/place-order', {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cartData)
+        });
 
-    // 2️⃣ Calculate total (convert to cents)
-    const amount = calculateTotalAmount() * 100;
+        const orderResult = await orderResponse.json();
+        const orderId = orderResult.orderId;
 
-    // 3️⃣ Create payment intent
-    const paymentResponse = await fetch('/payment/create-intent', {
-        method: 'POST',
-        headers: {
-            'Authorization': localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            orderId: orderId,
-            amount: amount
-        })
-    });
+        // 2️⃣ Calculate total amount (Stripe requires cents)
+        const amount = calculateTotalAmount() * 100;
 
-    const paymentData = await paymentResponse.json();
+        // 3️⃣ Create Payment Intent (backend)
+        const paymentResponse = await fetch('/payment/create-intent', {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                orderId: orderId,
+                amount: amount
+            })
+        });
 
-    // 4️⃣ Confirm payment using Stripe UI
-    const result = await stripe.confirmCardPayment(
-        paymentData.clientSecret,
-        {
-            payment_method: {
-                card: cardElement
+        const paymentData = await paymentResponse.json();
+
+        // 4️⃣ Confirm card payment using Stripe
+        const result = await stripe.confirmCardPayment(
+            paymentData.clientSecret,
+            {
+                payment_method: {
+                    card: cardElement
+                }
             }
-        }
-    );
+        );
 
-    // 5️⃣ Handle result
-    if (result.error) {
-        alert("Payment failed");
-    } else {
-        alert("Payment successful");
+        // 5️⃣ Handle result
+        if (result.error) {
+
+            // Payment failed
+            alert("Payment failed: " + result.error.message);
+
+        } else {
+
+            // Payment succeeded
+            alert("Payment successful! Order confirmed.");
+
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Something went wrong during payment.");
     }
 }
 ```
+
+
+
+
+
 
 **✅ PHASE 8️⃣ STATUS**
 
