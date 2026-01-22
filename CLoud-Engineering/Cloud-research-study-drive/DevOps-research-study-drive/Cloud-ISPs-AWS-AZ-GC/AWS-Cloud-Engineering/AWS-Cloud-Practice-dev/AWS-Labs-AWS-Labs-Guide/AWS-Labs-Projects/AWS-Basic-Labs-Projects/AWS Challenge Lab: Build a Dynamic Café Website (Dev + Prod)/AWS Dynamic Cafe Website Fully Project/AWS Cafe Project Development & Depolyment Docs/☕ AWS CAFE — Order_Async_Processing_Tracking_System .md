@@ -1974,7 +1974,6 @@ GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?or
 
 #### ☕ order-status.php (FINAL VERSION)
 
-
 #### ✅ FULL Final order-status.php FILE
 
 ```
