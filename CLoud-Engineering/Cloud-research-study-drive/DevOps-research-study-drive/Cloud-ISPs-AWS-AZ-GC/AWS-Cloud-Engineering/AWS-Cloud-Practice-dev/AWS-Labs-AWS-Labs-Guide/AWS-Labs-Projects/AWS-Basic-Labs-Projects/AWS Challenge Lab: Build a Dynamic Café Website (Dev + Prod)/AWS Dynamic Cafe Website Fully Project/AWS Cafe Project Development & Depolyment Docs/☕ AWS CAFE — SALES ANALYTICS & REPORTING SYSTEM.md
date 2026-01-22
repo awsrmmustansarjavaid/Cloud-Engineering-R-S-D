@@ -7922,7 +7922,6 @@ async function placeOrder() {
 ```
 
 
-
 **✅ PHASE 8️⃣ STATUS**
 
 > **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
@@ -7932,15 +7931,98 @@ async function placeOrder() {
 
 ### 1️⃣ — Create Webhook Lambda
 
-#### Name:
+- Function name:
 
 ```
 StripeWebhookHandler
 ```
 
+- Runtime:
+
+```
+Python 3.11
+```
+
+- Execution role:
+
+```
+Use existing Lambda role
+```
+
+- Click Create
+
+
+
+
 ### 2️⃣ — Webhook Code (COMMENTED)
 
 [StripeWebhookHandler.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/StripeWebhookHandler.py)
+
+### 3️⃣ — Environment Variables (CRITICAL)
+
+- In StripeWebhookHandler Lambda → Configuration → Environment variables
+
+- Add:
+
+```
+DB_HOST = your-rds-endpoint
+DB_USER = db-username
+DB_PASSWORD = db-password
+DB_NAME = charlie_cafe
+```
+
+### 3️⃣ — API Gateway for Webhook
+
+Open API Gateway
+
+Create new resource:
+
+```
+/stripe-webhook
+```
+
+Add method:
+
+```
+POST
+```
+
+Integration:
+
+Lambda
+
+Function: StripeWebhookHandler
+
+Authorization:
+
+```
+NONE
+```
+
+⚠️ Stripe cannot use Cognito
+
+🔹 STEP 9.7 — Configure Webhook in Stripe Dashboard
+
+Stripe Dashboard → Developers → Webhooks
+
+Click Add endpoint
+
+Endpoint URL:
+
+```
+https://your-api-id.execute-api.region.amazonaws.com/prod/stripe-webhook
+```
+
+Events to listen:
+
+```
+payment_intent.succeeded
+```
+
+
+
+
+
 
 **✅ PHASE 9️⃣ STATUS**
 
