@@ -8173,7 +8173,15 @@ payment_status = FAILED
 
 ## 🟦 PHASE 1️⃣3️⃣ — DASHBOARD
 
-### 1️⃣ Orders Query (Correct)
+### 1️⃣ — Why Dashboard Uses PAID Only
+
+❌ Pending orders ≠ revenue
+
+❌ Failed orders ≠ revenue
+
+✅ Paid orders = revenue
+
+### 2️⃣ Orders Query (Correct)
 
 ```
 SELECT *
@@ -8181,7 +8189,7 @@ FROM orders
 WHERE payment_status = 'PAID';
 ```
 
-### 2️⃣ Daily Revenue
+### 3️⃣ Daily Revenue
 
 ```
 SELECT DATE(payment_time) AS day,
@@ -8191,7 +8199,7 @@ WHERE payment_status = 'PAID'
 GROUP BY day;
 ```
 
-### 2️⃣ Weekly Revenue
+### 4️⃣ Weekly Revenue
 
 ```
 SELECT WEEK(payment_time) AS week,
