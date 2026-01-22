@@ -1461,6 +1461,19 @@ Dashboard shows numbers
 ⚠️ Dashboard does NOT talk to Stripe
 ⚠️ Dashboard does NOT care about PENDING orders
 
+🟦 STEP 13.0 — WHY YOU FEEL CONFUSED
+
+Because you are mixing these 3 layers:
+
+| Layer                     | Job                |
+| ------------------------- | ------------------ |
+| Database                  | Stores orders      |
+| Backend (Lambda)          | Calculates numbers |
+| Frontend (Dashboard page) | Shows numbers      |
+
+We will now separate them one by one.
+
+
 🔹 STEP 13.2 — Where These SQL Queries Are Used
 
 This is VERY important 👇
