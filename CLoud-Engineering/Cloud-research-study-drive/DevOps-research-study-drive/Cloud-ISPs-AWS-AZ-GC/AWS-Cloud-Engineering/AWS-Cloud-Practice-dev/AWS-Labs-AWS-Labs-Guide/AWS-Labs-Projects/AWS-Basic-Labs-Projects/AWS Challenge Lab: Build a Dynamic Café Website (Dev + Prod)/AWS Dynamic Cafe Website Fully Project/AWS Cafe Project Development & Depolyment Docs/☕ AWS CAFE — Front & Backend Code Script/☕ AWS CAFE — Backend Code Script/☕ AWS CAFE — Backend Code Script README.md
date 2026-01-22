@@ -96,9 +96,9 @@ Use boto3 to fetch menu/prices before processing orders.
 [CafeMenuLambda.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CafeMenuLambda.py)
 
 
-**✅ PHASE 6️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
 ## PHASE 2️⃣ — CafeMenuLambda
 
