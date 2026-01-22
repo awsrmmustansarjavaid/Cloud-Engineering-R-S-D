@@ -7466,22 +7466,184 @@ cron(0/10 * * * ? *)
 
 # SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
 
-### 🔹 PHASE 1 — Stripe Setup (One-Time)
-STEP 1
+🟦 PHASE 1 — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
+STEP 1.1 — Create Stripe Account
 
-Create a Stripe account → Enable Test Mode
+Go to stripe.com
 
-STEP 2
+Click Sign Up
 
-Get keys:
+Use email + password
 
-Publishable key → frontend
+Verify email
 
-Secret key → backend
+👉 No company info needed for Test Mode
 
-🔹 PHASE 2 — Database Changes (Very Important)
-STEP 3
+STEP 1.2 — Enable Test Mode
 
-Add payment-related columns to your existing orders table
+Login to Stripe Dashboard
+
+Top-right toggle → Test Mode ON
+
+You should see “TEST MODE” label
+
+STEP 1.3 — Get API Keys
+
+Go to Developers → API Keys
+
+Copy:
+
+Publishable key → starts with pk_test_
+
+Secret key → starts with sk_test_
+
+⚠️ VERY IMPORTANT
+
+pk_test_ → frontend only
+
+sk_test_ → backend only (NEVER frontend)
+
+🟦 PHASE 2 — DATABASE (NO PAYMENT WORKS WITHOUT THIS)
+STEP 2.1 — Open Your RDS Database
+
+Login to RDS
+
+Open Query Editor / MySQL client
+
+Select your charlie_cafe database
+
+STEP 2.2 — Understand Why We Add Columns
+
+Stripe returns:
+
+payment ID
+
+payment status
+
+payment time
+
+We MUST store these for:
+✔ audit
+✔ dashboard
+✔ real-world credibility
+
+STEP 2.3 — ALTER TABLE (RUN THIS EXACTLY)
 
 ```
+ALTER TABLE orders
+ADD COLUMN payment_status VARCHAR(20) DEFAULT 'PENDING',
+ADD COLUMN payment_intent_id VARCHAR(100) NULL,
+ADD COLUMN payment_amount DECIMAL(10,2) NULL,
+ADD COLUMN payment_method VARCHAR(50) NULL,
+ADD COLUMN payment_time TIMESTAMP NULL;
+```
+
+STEP 2.4 — Allowed Payment Status Values
+
+Use ONLY these values (case-sensitive):
+
+```
+PENDING   → order created, not paid
+PAID      → payment successful
+FAILED    → payment failed
+```
+
+⚠️ Do NOT invent new values
+
+🟦 PHASE 3 — AWS SECRETS MANAGER (NO HARD-CODED KEYS)
+STEP 3.1 — Open Secrets Manager
+
+AWS Console → Secrets Manager
+
+Click Store a new secret
+
+STEP 3.2 — Choose Secret Type
+
+Select: Other type of secret
+
+Key: STRIPE_SECRET_KEY
+
+Value: sk_test_xxxxxxxxx
+
+Click Next
+
+STEP 3.3 — Name the Secret
+
+Secret name:
+
+```
+stripe/charlie-cafe
+```
+
+Click Next → Next → Store
+
+🟦 PHASE 4 — IAM ROLE (THIS IS WHERE MOST PEOPLE FAIL)
+STEP 4.1 — Open IAM
+
+AWS Console → IAM
+
+Click Roles
+
+Open role used by Payment Lambda
+(or your common Lambda role)
+
+STEP 4.2 — Attach Secrets Manager Policy
+
+Click Add permissions → Inline policy
+
+Paste this:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+Click Review → Save
+
+🟦 PHASE 5 — CREATE PAYMENT LAMBDA (NO ASSUMPTIONS)
+STEP 5.1 — Create Lambda
+
+AWS Lambda → Create function
+
+Name:
+
+```
+CreatePaymentIntent
+```
+
+Runtime:
+
+```
+Node.js 18.x
+```
+
+Execution role:
+
+```
+Use existing role (same as Place Order)
+```
+
+Click Create
+
+STEP 5.2 — Add Dependencies
+
+Stripe SDK is REQUIRED.
+
+If using Lambda Layers:
+
+Add Stripe library
+
+(For lab: inline example is acceptable)
+
+STEP 5.3 — FULLY COMMENTED LAMBDA CODE
+
+link here
+
