@@ -1384,6 +1384,22 @@ Good for interview explanation
 
 > **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
 
+🟦 PHASE 🔟 — UPDATE ORDER STATUS (DB LOGIC)
+🔹 STEP 10.1 — Why Update in Webhook Only?
+
+❌ Frontend success ≠ real payment
+✅ Webhook success = real payment
+
+So ONLY webhook updates DB.
+
+
+
+
+
+> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
+
+
+
 # 🟢 SECTION 8️⃣ COMPLETE & VERIFIED
 
 

@@ -8026,6 +8026,8 @@ payment_intent.succeeded
 
 ## 🟦 PHASE 🔟 — UPDATE ORDER STATUS IN DB
 
+### 1️⃣ SQL Used (FINAL)
+
 ```
 UPDATE orders
 SET payment_status = 'PAID',
@@ -8033,6 +8035,30 @@ SET payment_status = 'PAID',
     payment_time = NOW()
 WHERE order_id = ?;
 ```
+
+### 2️⃣ Payment Failure Case
+
+If Stripe sends:
+
+```
+payment_intent.payment_failed
+```
+
+#### You update:
+
+```
+UPDATE orders
+SET payment_status = 'FAILED'
+WHERE order_id = ?;
+```
+
+**✅(You can add later)**
+
+### ✅ PHASE 🔟 STATUS
+
+🟢 DB reflects real payment
+
+🟢 No fake PAID orders
 
 **✅ PHASE 🔟 STATUS**
 
