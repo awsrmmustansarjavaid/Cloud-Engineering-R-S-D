@@ -7793,3 +7793,42 @@ StripeWebhookHandler
 STEP 9.2 — Webhook Code (COMMENTED)
 
 [StripeWebhookHandler.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/StripeWebhookHandler.py)
+
+🟦 PHASE 10 — UPDATE ORDER STATUS IN DB
+
+```
+UPDATE orders
+SET payment_status = 'PAID',
+    payment_intent_id = ?,
+    payment_time = NOW()
+WHERE order_id = ?;
+```
+
+🟦 PHASE 11 — SECURITY (MANDATORY)
+
+✔ Secrets Manager
+✔ HTTPS
+✔ Cognito JWT
+✔ No card data
+✔ API throttling
+
+🟦 PHASE 12 — TESTING
+
+Test card:
+
+```
+4242 4242 4242 4242
+Any future date
+Any CVC
+```
+
+🟦 PHASE 13 — DASHBOARD
+
+Show ONLY:
+
+payment_status = PAID
+
+daily revenue
+
+weekly revenue
+
