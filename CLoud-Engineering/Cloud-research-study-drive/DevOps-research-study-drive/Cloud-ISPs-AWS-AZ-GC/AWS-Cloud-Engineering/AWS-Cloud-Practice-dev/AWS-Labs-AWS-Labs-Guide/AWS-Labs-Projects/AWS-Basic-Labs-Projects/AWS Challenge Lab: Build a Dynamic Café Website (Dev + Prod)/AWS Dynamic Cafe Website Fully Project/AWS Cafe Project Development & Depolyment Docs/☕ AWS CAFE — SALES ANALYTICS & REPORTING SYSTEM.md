@@ -7645,5 +7645,151 @@ Add Stripe library
 
 STEP 5.3 — FULLY COMMENTED LAMBDA CODE
 
-[CreatePaymentIntent.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Frontend%20Code%20Script/orders.php)
+[CreatePaymentIntent.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CreatePaymentIntent.py)
 
+🟦 PHASE 6 — API GATEWAY (NO SKIPPED CLICKS)
+STEP 6.1 — Open API Gateway
+
+API Gateway → your existing API
+
+Click Create Resource
+
+Resource name:
+
+```
+payment
+```
+
+STEP 6.2 — Create Method
+
+Resource: /payment
+
+Create Method → POST
+
+Method name:
+
+```
+/payment/create-intent
+```
+
+STEP 6.3 — Integration Settings
+
+Integration type: Lambda
+
+Lambda function: CreatePaymentIntent
+
+Enable Lambda proxy integration
+
+STEP 6.4 — Authorization
+
+Authorization: Cognito Authorizer
+
+Same authorizer as Place Order
+
+Deploy API.
+
+🟦 PHASE 7 — MODIFY EXISTING PLACE ORDER (SAFE CHANGE)
+STEP 7.1 — What Changes?
+
+ONLY this:
+
+Set payment_status = 'PENDING'
+
+Return orderId
+
+STEP 7.2 — Example Update (COMMENTED)
+
+```
+// After inserting order into DB
+const orderId = result.insertId;
+
+// Return order ID for payment
+return {
+    statusCode: 200,
+    body: JSON.stringify({
+        orderId: orderId,
+        message: "Order created. Payment pending."
+    })
+};
+```
+
+🟦 PHASE 8 — FRONTEND PAYMENT (VERY DETAILED)
+STEP 8.1 — Add Stripe Script
+
+```
+<script src="https://js.stripe.com/v3/"></script>
+```
+
+STEP 8.2 — Initialize Stripe
+```
+// Initialize Stripe with TEST publishable key
+const stripe = Stripe("pk_test_xxxxxxxxx");
+```
+
+STEP 8.3 — FULL PAYMENT FLOW FUNCTION
+
+```
+async function placeOrder() {
+
+    // 1️⃣ Call existing Place Order API
+    const orderResponse = await fetch('/place-order', {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cartData)
+    });
+
+    const orderResult = await orderResponse.json();
+    const orderId = orderResult.orderId;
+
+    // 2️⃣ Calculate total (convert to cents)
+    const amount = calculateTotalAmount() * 100;
+
+    // 3️⃣ Create payment intent
+    const paymentResponse = await fetch('/payment/create-intent', {
+        method: 'POST',
+        headers: {
+            'Authorization': localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            orderId: orderId,
+            amount: amount
+        })
+    });
+
+    const paymentData = await paymentResponse.json();
+
+    // 4️⃣ Confirm payment using Stripe UI
+    const result = await stripe.confirmCardPayment(
+        paymentData.clientSecret,
+        {
+            payment_method: {
+                card: cardElement
+            }
+        }
+    );
+
+    // 5️⃣ Handle result
+    if (result.error) {
+        alert("Payment failed");
+    } else {
+        alert("Payment successful");
+    }
+}
+```
+
+🟦 PHASE 9 — STRIPE WEBHOOK (BACKEND TRUST ONLY)
+STEP 9.1 — Create Webhook Lambda
+
+Name:
+
+```
+StripeWebhookHandler
+```
+
+STEP 9.2 — Webhook Code (COMMENTED)
+
+[StripeWebhookHandler.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/StripeWebhookHandler.py)
