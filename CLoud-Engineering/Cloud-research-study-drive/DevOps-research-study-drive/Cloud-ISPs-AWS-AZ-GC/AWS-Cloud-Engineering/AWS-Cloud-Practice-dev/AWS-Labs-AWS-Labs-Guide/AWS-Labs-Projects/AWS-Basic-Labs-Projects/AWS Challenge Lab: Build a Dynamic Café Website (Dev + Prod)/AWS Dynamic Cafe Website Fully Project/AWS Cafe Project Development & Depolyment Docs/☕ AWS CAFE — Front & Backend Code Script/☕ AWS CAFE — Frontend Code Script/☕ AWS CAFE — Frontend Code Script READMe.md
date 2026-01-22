@@ -258,5 +258,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## 🔔 PHASE 2️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)
+
+### 🧑‍💻 STEP 8 — CREATE order-status.php
+
+This file is frontend-only and SAFE
+
+```
+<?php
+$orderId = $_GET['order_id'] ?? '';
+$apiUrl = "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=$orderId";
+$response = file_get_contents($apiUrl);
+$data = json_decode($response, true);
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Order Status</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+
+<h3>☕ Order Status</h3>
+
+<?php if (!$data || isset($data['error'])): ?>
+<p class="text-danger">Order not found</p>
+<?php else: ?>
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+<p><strong>Status:</strong> <?= $data['status'] ?></p>
+<p><strong>Item:</strong> <?= $data['order']['item'] ?></p>
+<p><strong>Quantity:</strong> <?= $data['order']['quantity'] ?></p>
+<p><strong>Date:</strong> <?= $data['order']['created_at'] ?></p>
+
+<button onclick="window.print()" class="btn btn-dark">Print</button>
+<?php endif; ?>
+
+</body>
+</html>
+```
+
+#### ☕ FINAL order-status.php with print button (CAFE STYLED - Recommanded)
+
+[FINAL-order-status-with-print-button.php](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Frontend%20Code%20Script/FINAL-order-status-with-print-button.php)
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+
+
+
+
+
+
 # 🟢 SECTION 5️⃣ COMPLETE & VERIFIED
 ---
