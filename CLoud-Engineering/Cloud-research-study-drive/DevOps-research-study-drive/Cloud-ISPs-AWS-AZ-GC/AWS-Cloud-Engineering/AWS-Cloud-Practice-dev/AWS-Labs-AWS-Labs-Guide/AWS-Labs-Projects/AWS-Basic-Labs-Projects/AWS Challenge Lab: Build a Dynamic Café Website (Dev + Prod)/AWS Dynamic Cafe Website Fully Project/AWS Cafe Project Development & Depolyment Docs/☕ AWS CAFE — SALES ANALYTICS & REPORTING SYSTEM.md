@@ -8108,10 +8108,13 @@ WHERE order_id = ?;
 **✅ PHASE 1️⃣1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣1️⃣ COMPLETE & VERIFIED**
+---
 
-## 🟦 PHASE 1️⃣ — TESTING
+## 🟦 PHASE 1️⃣2️⃣ — TESTING
 
-### Test card:
+### 1️⃣ Stripe Test Card
+
+#### Use ONLY this:
 
 ```
 4242 4242 4242 4242
@@ -8119,9 +8122,54 @@ Any future date
 Any CVC
 ```
 
+### 2️⃣ Full Test Flow
+
+- Open frontend
+
+- Add items to cart
+
+- Click Place Order & Pay
+
+- Enter test card
+
+- Confirm payment
+
+- Check:
+
+  - Stripe Dashboard → Payments
+
+  - RDS → orders table
+
+- Verify:
+
+```
+payment_status = PAID
+```
+
+### 3️⃣ Failure Test
+
+- Use:
+
+```
+4000 0000 0000 9995
+```
+
+- Result:
+
+```
+payment_status = FAILED
+```
+
+###  ✅ PHASE 1️⃣2️⃣ STATUS
+
+🟢 Payment success verified
+
+🟢 Payment failure verified
+
 **✅ PHASE 1️⃣2️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣2️⃣ COMPLETE & VERIFIED**
+---
 
 ## 🟦 PHASE 1️⃣3️⃣ — DASHBOARD
 
