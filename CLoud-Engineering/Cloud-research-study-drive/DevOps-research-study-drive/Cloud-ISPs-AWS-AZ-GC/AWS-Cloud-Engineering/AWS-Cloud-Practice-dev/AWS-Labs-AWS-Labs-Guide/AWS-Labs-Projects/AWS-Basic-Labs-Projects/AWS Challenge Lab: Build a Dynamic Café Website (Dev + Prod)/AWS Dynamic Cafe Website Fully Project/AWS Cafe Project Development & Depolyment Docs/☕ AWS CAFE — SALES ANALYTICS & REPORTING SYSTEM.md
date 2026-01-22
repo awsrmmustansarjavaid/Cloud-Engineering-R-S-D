@@ -1,6 +1,9 @@
 # ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
 > **(Using Existing Order Status System)**
 
+
+# SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM
+
 ## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
 
 > **⚠️ This phase is mandatory before Lambda works.**
@@ -7458,5 +7461,27 @@ cron(0/10 * * * ? *)
 
 > **🟢 PHASE 16 COMPLETE & VERIFIED**
 
+# SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM COMPLETE & VERIFIED ✅
 ---
 
+# SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
+
+### 🔹 PHASE 1 — Stripe Setup (One-Time)
+STEP 1
+
+Create a Stripe account → Enable Test Mode
+
+STEP 2
+
+Get keys:
+
+Publishable key → frontend
+
+Secret key → backend
+
+🔹 PHASE 2 — Database Changes (Very Important)
+STEP 3
+
+Add payment-related columns to your existing orders table
+
+```

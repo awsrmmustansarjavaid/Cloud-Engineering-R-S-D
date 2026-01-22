@@ -1162,6 +1162,108 @@ This avoids full table scans (very important).
 # ☕ Doc:Cafe Order Processor - COMPLETE & VERIFIED
 
 ---
+# ☕ Charlie Café  Doc:SALES ANALYTICS & REPORTING SYSTEM
+
+
+
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
+
+# SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM COMPLETE & VERIFIED ✅
+---
+
+# SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
+> **(Using Existing Place Order Flow)**
+
+### Tech Stack (Your Existing Lab):
+
+- Frontend: EC2 + Apache (HTML / JS)
+
+- Auth: Amazon Cognito (JWT)
+
+- API: API Gateway
+
+- Backend: AWS Lambda (Node.js)
+
+- DB: Amazon RDS (MySQL / PostgreSQL)
+
+- Payment: Stripe (Test Mode)
+
+- Security: HTTPS + JWT + Secrets Manager
+
+### 🧠 FINAL PAYMENT FLOW (REAL WORLD)
+
+```
+Customer clicks "Place Order"
+↓
+Order saved as PAYMENT_PENDING
+↓
+Stripe payment starts
+↓
+Payment succeeds
+↓
+Order updated to PAID
+↓
+Order visible in dashboard
+```
+
+### 🧠 FIRST – WHAT WE ARE ACTUALLY BUILDING (VERY IMPORTANT)
+
+Before touching AWS or code, understand the final behavior:
+
+#### Current (Your Existing System)
+
+```
+Customer clicks Place Order
+→ Order saved
+→ Done
+```
+#### New (Professional Payment Flow)
+
+```
+Customer clicks Place Order
+→ Order saved as PAYMENT_PENDING
+→ Payment page opens
+→ Customer pays
+→ Stripe confirms payment
+→ Order updated to PAID
+```
+
+#### 💡 Rule:
+👉 Order is NEVER PAID by frontend
+
+👉 Only Stripe → Backend → DB can mark PAID
+
+### 🟦 PHASE 0 — PREREQUISITES (DO THIS FIRST)
+
+#### STEP 0.1 — Confirm What You Already Have
+
+You MUST already have:
+
+✔ Place Order frontend (HTML/JS)
+
+✔ Place Order backend Lambda
+
+✔ API Gateway endpoint for Place Order
+
+✔ Orders table in RDS
+
+✔ Cognito authentication working
+
+#### ⚠️ If any of these are missing → STOP and fix first
+
+
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
+
+
+# ☕ Doc:SALES ANALYTICS & REPORTING SYSTEM - COMPLETE & VERIFIED
+
+---
+
 # ☕ Charlie Café  Doc:Secure HR & Attendance System
 
 # ☕ Charlie Café SECTION 5️⃣ – Secure HR & Attendance System
