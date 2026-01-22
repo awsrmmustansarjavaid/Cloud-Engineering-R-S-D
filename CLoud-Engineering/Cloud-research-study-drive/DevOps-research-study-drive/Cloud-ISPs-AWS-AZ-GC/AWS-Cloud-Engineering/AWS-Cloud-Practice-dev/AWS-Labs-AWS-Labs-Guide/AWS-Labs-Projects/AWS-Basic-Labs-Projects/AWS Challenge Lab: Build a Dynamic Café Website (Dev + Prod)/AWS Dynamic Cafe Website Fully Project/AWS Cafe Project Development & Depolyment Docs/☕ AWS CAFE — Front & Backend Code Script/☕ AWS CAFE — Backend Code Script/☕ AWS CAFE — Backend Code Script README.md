@@ -104,11 +104,39 @@ Use boto3 to fetch menu/prices before processing orders.
 # 🟢 SECTION 2️⃣ COMPLETE & VERIFIED
 ---
 # SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
-## PHASE 2️⃣ — CafeMenuLambda
+
+## PHASE 2️⃣ CREATE API Lambda Function (Producer)
+
+#### 1️⃣ Replace your order insert logic with this:
+
+#### 📣 CafeOrderApiLambda  — Production-Ready (Recommended for This Lab)
+
+#### 💻 Code (Recommended for This Lab)
+
+[CafeOrderApiLambda.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CafeOrderApiLambda.py)
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 4️⃣ — SQS/Worker LAMBDA (Consumer)
+
+### 3️⃣ WORKER LAMBDA CODE Production Safe (Recommended)
+
+#### 💻 Code:
+
+[CafeOrderWorker.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/CafeOrderWorker.py)
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
 
 
 
-**✅ PHASE 6️⃣ STATUS**
 
-> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
