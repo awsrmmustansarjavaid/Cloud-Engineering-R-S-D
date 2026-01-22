@@ -7968,57 +7968,55 @@ DB_PASSWORD = db-password
 DB_NAME = charlie_cafe
 ```
 
-### 3️⃣ — API Gateway for Webhook
+### 4️⃣ — API Gateway for Webhook
 
-Open API Gateway
+- Open API Gateway
 
-Create new resource:
+- Create new resource:
 
 ```
 /stripe-webhook
 ```
 
-Add method:
+- Add method:
 
 ```
 POST
 ```
 
-Integration:
+- Integration:
 
-Lambda
+  - Lambda
 
-Function: StripeWebhookHandler
+  - Function: StripeWebhookHandler
 
-Authorization:
+- Authorization:
 
 ```
 NONE
 ```
 
-⚠️ Stripe cannot use Cognito
+**⚠️ Stripe cannot use Cognito**
 
-### 3️⃣ — Configure Webhook in Stripe Dashboard
+### 5️⃣ — Configure Webhook in Stripe Dashboard
 
-Stripe Dashboard → Developers → Webhooks
+- Stripe Dashboard → Developers → Webhooks
 
-Click Add endpoint
+- Click Add endpoint
 
-Endpoint URL:
+- Endpoint URL:
 
 ```
 https://your-api-id.execute-api.region.amazonaws.com/prod/stripe-webhook
 ```
 
-Events to listen:
+- Events to listen:
 
 ```
 payment_intent.succeeded
 ```
 
-
-
-
+- Save
 
 
 **✅ PHASE 9️⃣ STATUS**
