@@ -624,8 +624,8 @@ You should now see 5 items in the table. You should now see:
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-
-### 3️⃣ Attach Policy to Lambda Role
+## PHASE 2️⃣ — CafeMenuLambda
+### 1️⃣ Attach Policy to Lambda Role
 
 You likely have two Lambdas:
 
@@ -653,7 +653,7 @@ CafeMenuDynamoDBReadPolicy
 ✅ Lambda now has DynamoDB access
 
 
-### 4️⃣ CREATE NEW LAMBDA (MENU API)
+### 2️⃣ CREATE NEW LAMBDA (MENU API)
 
 - Open AWS Lambda
 
