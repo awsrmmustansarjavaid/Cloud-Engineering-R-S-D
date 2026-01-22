@@ -8173,13 +8173,41 @@ payment_status = FAILED
 
 ## 🟦 PHASE 1️⃣3️⃣ — DASHBOARD
 
-- Show ONLY:
+### 1️⃣ Orders Query (Correct)
 
-- payment_status = PAID
+```
+SELECT *
+FROM orders
+WHERE payment_status = 'PAID';
+```
 
-- daily revenue
+### 2️⃣ Daily Revenue
 
-- weekly revenue
+```
+SELECT DATE(payment_time) AS day,
+       SUM(payment_amount) AS total
+FROM orders
+WHERE payment_status = 'PAID'
+GROUP BY day;
+```
+
+### 2️⃣ Weekly Revenue
+
+```
+SELECT WEEK(payment_time) AS week,
+       SUM(payment_amount) AS total
+FROM orders
+WHERE payment_status = 'PAID'
+GROUP BY week;
+```
+
+### ✅ PHASE 1️⃣3️⃣ STATUS
+
+🟢 Accurate revenue
+
+🟢 Real café metrics
+
+🟢 Professional reporting
 
 **✅ PHASE 1️⃣3️⃣ STATUS**
 
