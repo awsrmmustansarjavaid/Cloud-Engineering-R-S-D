@@ -1393,12 +1393,19 @@ Good for interview explanation
 So ONLY webhook updates DB.
 
 
-
-
-
 > **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
 
+🟦 PHASE 1️⃣3️⃣ — DASHBOARD (BUSINESS VIEW)
+🔹 STEP 13.1 — Why Dashboard Uses PAID Only
 
+❌ Pending orders ≠ revenue
+❌ Failed orders ≠ revenue
+✅ Paid orders = revenue
+
+
+
+
+> **🟢 PHASE 1️⃣3️⃣ COMPLETE & VERIFIED**
 
 # 🟢 SECTION 8️⃣ COMPLETE & VERIFIED
 
