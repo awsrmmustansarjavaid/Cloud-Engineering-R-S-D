@@ -85,6 +85,7 @@ def lambda_handler(event, context):
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
+# SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
 ## PHASE 2️⃣ — CafeMenuLambda
 
 ### 5️⃣ Lambda Code: Read Menu from DynamoDB (Python)
@@ -99,7 +100,10 @@ Use boto3 to fetch menu/prices before processing orders.
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 2️⃣ COMPLETE & VERIFIED
 ---
+# SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
 ## PHASE 2️⃣ — CafeMenuLambda
 
 
