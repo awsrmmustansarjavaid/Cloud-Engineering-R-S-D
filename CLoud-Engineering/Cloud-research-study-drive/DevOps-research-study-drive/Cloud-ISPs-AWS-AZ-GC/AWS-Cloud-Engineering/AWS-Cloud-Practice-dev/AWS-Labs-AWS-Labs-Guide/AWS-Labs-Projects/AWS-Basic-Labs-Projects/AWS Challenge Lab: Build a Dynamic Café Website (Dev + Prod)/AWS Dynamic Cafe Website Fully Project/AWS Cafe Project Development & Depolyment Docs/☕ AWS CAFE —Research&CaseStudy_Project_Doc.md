@@ -1429,6 +1429,38 @@ Money comes ONLY from PAID orders
 
 So dashboard = filtered view of orders
 
+🧠 Explained Like You’re Building It for the First Time
+🔴 FIRST: WHAT PHASE 13 IS NOT
+
+❌ It is NOT Stripe
+❌ It is NOT payment processing
+❌ It is NOT customer order page
+
+👉 PHASE 13 = BUSINESS REPORTING
+
+🟢 WHAT PHASE 13 ACTUALLY IS
+
+Think of Charlie Café owner asking:
+
+“How much money did my café make today and this week?”
+
+That is PHASE 13.
+
+🧠 VERY IMPORTANT MENTAL MODEL (READ TWICE)
+
+```
+Stripe → confirms payment
+↓
+Order marked PAID in database
+↓
+Dashboard reads database
+↓
+Dashboard shows numbers
+```
+
+⚠️ Dashboard does NOT talk to Stripe
+⚠️ Dashboard does NOT care about PENDING orders
+
 🔹 STEP 13.2 — Where These SQL Queries Are Used
 
 This is VERY important 👇
