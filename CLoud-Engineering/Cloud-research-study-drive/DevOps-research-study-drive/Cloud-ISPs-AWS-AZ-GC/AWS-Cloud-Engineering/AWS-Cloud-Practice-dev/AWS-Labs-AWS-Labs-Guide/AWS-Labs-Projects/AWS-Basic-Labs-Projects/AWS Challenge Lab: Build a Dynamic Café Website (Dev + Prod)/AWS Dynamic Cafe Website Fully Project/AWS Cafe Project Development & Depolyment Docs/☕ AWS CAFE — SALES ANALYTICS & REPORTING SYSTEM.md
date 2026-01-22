@@ -8067,15 +8067,43 @@ WHERE order_id = ?;
 
 ## 🟦 PHASE 1️⃣1️⃣ — SECURITY (MANDATORY)
 
-✔ Secrets Manager
+### 1️⃣ — Card Data Handling
 
-✔ HTTPS
+✔ Stripe handles card UI
 
-✔ Cognito JWT
+✔ Your system NEVER sees card number
 
-✔ No card data
+✔ PCI compliance achieved
 
-✔ API throttling
+### 2️⃣ — Secrets
+
+✔ Stripe secret key in Secrets Manager
+
+✔ DB credentials in Lambda env vars
+
+✔ No hard-coded secrets
+
+### 3️⃣ — Network Security
+
+✔ HTTPS enforced
+
+✔ API Gateway throttling enabled
+
+✔ Lambda security group → RDS only
+
+### 4️⃣ — Authorization Summary
+
+| API                    | Auth               |
+| ---------------------- | ------------------ |
+| /place-order           | Cognito            |
+| /payment/create-intent | Cognito            |
+| /stripe-webhook        | NONE (Stripe only) |
+
+### ✅ PHASE 1️⃣1️⃣ STATUS
+
+🟢 Production-grade security
+
+🟢 Interview-ready explanation
 
 **✅ PHASE 1️⃣1️⃣ STATUS**
 
