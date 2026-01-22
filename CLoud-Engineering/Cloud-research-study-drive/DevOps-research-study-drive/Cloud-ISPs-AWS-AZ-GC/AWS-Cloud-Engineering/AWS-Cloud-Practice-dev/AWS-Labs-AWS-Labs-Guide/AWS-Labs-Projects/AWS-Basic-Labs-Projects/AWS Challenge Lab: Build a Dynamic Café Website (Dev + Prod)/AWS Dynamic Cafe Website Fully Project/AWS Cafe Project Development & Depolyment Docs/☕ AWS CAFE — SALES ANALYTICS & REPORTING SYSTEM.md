@@ -8173,13 +8173,138 @@ payment_status = FAILED
 
 ## 🟦 PHASE 1️⃣3️⃣ — DASHBOARD
 
+### 🟦 PRE-CHECK (VERY IMPORTANT)
+
+Before dashboard works, confirm this in DB:
+
+#### Run:
+
+```
+SELECT order_id, payment_status, payment_amount, payment_time
+FROM orders;
+```
+
+#### You MUST see rows like:
+
+| order_id | payment_status | payment_amount | payment_time     |
+| -------- | -------------- | -------------- | ---------------- |
+| 101      | PAID           | 25.00          | 2026-01-22 18:30 |
+| 102      | PENDING        | NULL           | NULL             |
+
+**⚠️ If payment_amount or payment_time is NULL for PAID, dashboard will not work ❌**
+
 ### 1️⃣ — Why Dashboard Uses PAID Only
 
-❌ Pending orders ≠ revenue
+#### Think like café owner:
 
-❌ Failed orders ≠ revenue
+| Status  | Meaning              | Count as money? |
+| ------- | -------------------- | --------------- |
+| PENDING | Customer hasn’t paid | ❌ NO            |
+| FAILED  | Payment failed       | ❌ NO            |
+| PAID    | Money received       | ✅ YES           |
 
-✅ Paid orders = revenue
+#### So rule is:
+
+```
+Dashboard = SUM of PAID orders only
+```
+
+**⚠️ This is business logic, not AWS logic.**
+
+### 2️⃣ Create Dashboard Backend (Lambda)
+
+#### 1️⃣ — Create Lambda
+
+- Name:
+
+```
+GetDashboardStats
+```
+
+- Runtime:
+
+```
+Node.js 18
+```
+
+- Role:
+
+```
+Same role as other Lambdas
+```
+
+#### 2️⃣ — Dashboard Lambda Code (COMMENTED)
+
+[GetDashboardStats.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/GetDashboardStats.py)
+
+### 3️⃣ — API Gateway for Dashboard
+
+#### 1️⃣ Create API:
+
+```
+GET /dashboard
+``` 
+
+#### 2️⃣ Integration:
+
+- Lambda: GetDashboardStats
+
+- Authorization: Cognito (Admin users only)
+
+### 4️⃣ — Frontend Dashboard Page (SIMPLE)
+
+#### 1️⃣ — HTML
+
+```
+<h2>Charlie Café Dashboard</h2>
+
+<h3>Daily Revenue</h3>
+<div id="daily-revenue"></div>
+
+<h3>Weekly Revenue</h3>
+<div id="weekly-revenue"></div>
+```
+
+#### 2️⃣ Dashboard JS (COMMENTED)
+
+```
+async function loadDashboard() {
+
+    // Call dashboard API
+    const response = await fetch('/dashboard', {
+        headers: {
+            'Authorization': localStorage.getItem('token')
+        }
+    });
+
+    const data = await response.json();
+
+    // Show daily revenue
+    let dailyHtml = '';
+    data.dailyRevenue.forEach(row => {
+        dailyHtml += `<p>${row.day}: $${row.total}</p>`;
+    });
+    document.getElementById('daily-revenue').innerHTML = dailyHtml;
+
+    // Show weekly revenue
+    let weeklyHtml = '';
+    data.weeklyRevenue.forEach(row => {
+        weeklyHtml += `<p>Week ${row.week}: $${row.total}</p>`;
+    });
+    document.getElementById('weekly-revenue').innerHTML = weeklyHtml;
+}
+```
+
+#### Call this on page load:
+
+```
+loadDashboard();
+```
+
+
+
+
+
 
 ### 2️⃣ Orders Query (Correct)
 

@@ -1395,12 +1395,71 @@ So ONLY webhook updates DB.
 
 > **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
 
-🟦 PHASE 1️⃣3️⃣ — DASHBOARD (BUSINESS VIEW)
-🔹 STEP 13.1 — Why Dashboard Uses PAID Only
+🧠 FIRST: WHAT IS “DASHBOARD” IN YOUR PROJECT?
 
-❌ Pending orders ≠ revenue
-❌ Failed orders ≠ revenue
-✅ Paid orders = revenue
+In Charlie Café, a Dashboard means:
+
+A page for Admin / Owner / HR
+that shows business numbers, not customer orders.
+
+Examples:
+
+How much money did we earn today?
+
+How much this week?
+
+Which orders are actually paid?
+
+👉 This is NOT the customer order page
+👉 This is Admin-only view
+
+🧠 WHY YOU ARE CONFUSED (IMPORTANT)
+
+You are thinking:
+
+“I already have orders in DB… why new queries?”
+
+Because:
+
+Orders table contains ALL orders
+
+Business cares ONLY about money
+
+Money comes ONLY from PAID orders
+
+So dashboard = filtered view of orders
+
+🔹 STEP 13.2 — Where These SQL Queries Are Used
+
+This is VERY important 👇
+You do NOT run these queries in browser.
+
+Correct place:
+
+```
+Dashboard Page (HTML)
+   ↓ calls
+Dashboard API (API Gateway)
+   ↓ triggers
+Dashboard Lambda
+   ↓ runs
+SQL Queries on RDS
+```
+
+So SQL = backend only
+
+🧠 SIMPLE MENTAL MODEL (REMEMBER THIS)
+
+
+```
+Orders table
+ ├── PENDING (ignored)
+ ├── FAILED  (ignored)
+ └── PAID    → Dashboard numbers
+```
+Dashboard = filtered math on PAID orders
+
+
 
 
 
