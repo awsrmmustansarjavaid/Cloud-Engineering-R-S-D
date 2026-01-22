@@ -7595,6 +7595,7 @@ stripe/charlie-cafe
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
 
 ## 🟦 PHASE 4️⃣ — IAM ROLE (THIS IS WHERE MOST PEOPLE FAIL)
 
@@ -7632,39 +7633,40 @@ Click Review → Save
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
+
 ## 🟦 PHASE 5️⃣ — CREATE PAYMENT LAMBDA (NO ASSUMPTIONS)
 
 ### 1️⃣ — Create Lambda
 
-AWS Lambda → Create function
+- AWS Lambda → Create function
 
-Name:
+- Name:
 
 ```
 CreatePaymentIntent
 ```
 
-Runtime:
+- Runtime:
 
 ```
 Node.js 18.x
 ```
 
-Execution role:
+- Execution role:
 
 ```
 Use existing role (same as Place Order)
 ```
 
-Click Create
+- Click Create
 
 ### 2️⃣ — Add Dependencies
 
-Stripe SDK is REQUIRED.
+- Stripe SDK is REQUIRED.
 
-If using Lambda Layers:
+- If using Lambda Layers:
 
-Add Stripe library
+- Add Stripe library
 
 (For lab: inline example is acceptable)
 
@@ -7675,6 +7677,7 @@ Add Stripe library
 **✅ PHASE 5️⃣ STATUS**
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
 
 ## 🟦 PHASE 6️⃣ — API GATEWAY (NO SKIPPED CLICKS)
 
@@ -7710,7 +7713,7 @@ payment
 
 - Enable Lambda proxy integration
 
-### STEP 6.4 — Authorization
+### 4️⃣ — Authorization
 
 - Authorization: Cognito Authorizer
 
@@ -7721,8 +7724,9 @@ payment
 **✅ PHASE 6️⃣ STATUS**
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
 
-## 🟦 PHASE 7 — MODIFY EXISTING PLACE ORDER (SAFE CHANGE)
+## 🟦 PHASE 7️⃣ — MODIFY EXISTING PLACE ORDER (SAFE CHANGE)
 
 ### 1️⃣ — What Changes?
 
@@ -7748,11 +7752,12 @@ return {
 };
 ```
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 7️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+---
 
-## 🟦 PHASE 8 — FRONTEND PAYMENT (VERY DETAILED)
+## 🟦 PHASE 8️⃣ — FRONTEND PAYMENT (VERY DETAILED)
 
 ### 1️⃣ — Add Stripe Script
 
@@ -7822,11 +7827,12 @@ async function placeOrder() {
 }
 ```
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 8️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
+---
 
-## 🟦 PHASE 9 — STRIPE WEBHOOK (BACKEND TRUST ONLY)
+## 🟦 PHASE 9️⃣ — STRIPE WEBHOOK (BACKEND TRUST ONLY)
 
 ### 1️⃣ — Create Webhook Lambda
 
@@ -7840,11 +7846,12 @@ StripeWebhookHandler
 
 [StripeWebhookHandler.py](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Backend%20Code%20Script/StripeWebhookHandler.py)
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 9️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
+---
 
-## 🟦 PHASE 10 — UPDATE ORDER STATUS IN DB
+## 🟦 PHASE 🔟 — UPDATE ORDER STATUS IN DB
 
 ```
 UPDATE orders
@@ -7854,11 +7861,12 @@ SET payment_status = 'PAID',
 WHERE order_id = ?;
 ```
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 🔟 STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 🔟 COMPLETE & VERIFIED**
+---
 
-## 🟦 PHASE 11 — SECURITY (MANDATORY)
+## 🟦 PHASE 1️⃣1️⃣ — SECURITY (MANDATORY)
 
 ✔ Secrets Manager
 
@@ -7870,11 +7878,11 @@ WHERE order_id = ?;
 
 ✔ API throttling
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 1️⃣1️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣1️⃣ COMPLETE & VERIFIED**
 
-## 🟦 PHASE 12 — TESTING
+## 🟦 PHASE 1️⃣ — TESTING
 
 ### Test card:
 
@@ -7884,11 +7892,11 @@ Any future date
 Any CVC
 ```
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 1️⃣2️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣2️⃣ COMPLETE & VERIFIED**
 
-## 🟦 PHASE 13 — DASHBOARD
+## 🟦 PHASE 1️⃣3️⃣ — DASHBOARD
 
 - Show ONLY:
 
@@ -7898,6 +7906,8 @@ Any CVC
 
 - weekly revenue
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 1️⃣3️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣3️⃣ COMPLETE & VERIFIED**
+
+---
