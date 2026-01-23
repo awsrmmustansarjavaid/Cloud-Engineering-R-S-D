@@ -365,25 +365,18 @@ VPC → Security Groups → Create
 
 RDS → Databases → Create database
 
-- Engine: MySQL (or MariaDB)
-
-- Template: Free tier
-
-- DB identifier: cafedb
-
-- Username: cafe_user
-
-- Password: StrongPassword123
-
-- VPC: CafeDevVPC
-
-- Subnet group: CafeRDSSubnetGroup
-
-- Public access: ❌ No
-
-- Security group: CafeRDS-SG
-
-- Backup: Enabled
+| Setting              | Value                  |
+|----------------------|------------------------|
+| Engine               | MySQL (or MariaDB)     |
+| Template             | Free tier              |
+| DB identifier        | cafedb                 |
+| Username             | cafe_user              |
+| Password             | StrongPassword123      |
+| VPC                  | CafeDevVPC             |
+| Subnet group         | CafeRDSSubnetGroup     |
+| Public access        | ❌ No                  |
+| Security group       | CafeRDS-SG             |
+| Backup               | Enabled                |
 
 - **✔️ Create database ⏳**
 
