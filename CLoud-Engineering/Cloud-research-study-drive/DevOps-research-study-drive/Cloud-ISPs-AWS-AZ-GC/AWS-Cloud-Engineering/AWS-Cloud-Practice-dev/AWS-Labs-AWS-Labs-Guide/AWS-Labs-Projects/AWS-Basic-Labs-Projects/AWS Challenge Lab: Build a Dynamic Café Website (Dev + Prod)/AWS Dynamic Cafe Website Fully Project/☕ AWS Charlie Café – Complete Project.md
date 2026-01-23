@@ -354,10 +354,11 @@ VPC → Security Groups → Create
 
 - Name: CafeRDS-SG
 
-- Inbound:
-  - MySQL/Aurora (3306) → Source: Lambda-SG
-  - MySQL/Aurora (3306) → Source: EC2-Web-SG
-- Outbound: All
+| Direction | Type              | Protocol | Port | Source          | Description (suggested)          |
+|-----------|-------------------|----------|------|-----------------|----------------------------------|
+| Inbound   | MySQL/Aurora      | TCP      | 3306 | Lambda-SG       | Allow access from Lambda functions |
+| Inbound   | MySQL/Aurora      | TCP      | 3306 | EC2-Web-SG      | Allow access from web/application EC2 instances |
+| Outbound  | All traffic       | All      | All  | 0.0.0.0/0       | Default outbound (all destinations allowed) |
 
 - **✔️ Create**
 
