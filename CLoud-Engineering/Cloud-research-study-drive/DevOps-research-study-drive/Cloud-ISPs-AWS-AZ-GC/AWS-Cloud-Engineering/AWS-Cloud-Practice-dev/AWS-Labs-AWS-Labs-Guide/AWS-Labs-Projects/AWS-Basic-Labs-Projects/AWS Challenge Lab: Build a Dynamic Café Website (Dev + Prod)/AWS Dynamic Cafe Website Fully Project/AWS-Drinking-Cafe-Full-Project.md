@@ -604,7 +604,7 @@ sudo nano /var/www/html/index.php
 
 ### 2️⃣ Paste this clean landing page code:
 
-[index.php](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/91c3c7dbcee808c3b8b8c9806be2b8d62c1758fc/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Frontend%20Code%20Script/Index.php)
+[index.php](.//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Index.php/Index.php)
 
 **⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
 
