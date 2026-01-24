@@ -563,33 +563,34 @@ RDS (Orders Table)
 
 ## Backend-Verified Order Success Notification (RDS-Confirmed UX)
 
-Goal:
+#### Goal:
 Show the notification
 “✅ Your order has been sent to the kitchen!”
 ONLY when the order is successfully stored in RDS, not just when the form is submitted.
 
-🧠 WHY THIS IMPROVEMENT IS IMPORTANT
-❌ Current Problem (Logical Bug)
+### 🧠 WHY THIS IMPROVEMENT IS IMPORTANT
 
-Right now:
+#### ❌ Current Problem (Logical Bug)
 
-Frontend shows success when:
+#### Right now:
 
-API responds
+- Frontend shows success when:
 
-BUT:
+     - API responds
 
-API response ≠ DB insert success guaranteed
+- BUT:
+
+    - API response ≠ DB insert success guaranteed
 
 This can cause:
 
-False success messages
+    - False success messages
 
-Data loss without user knowing
+    - Data loss without user knowing
 
-Unprofessional UX
+    - Unprofessional UX
 
-✅ Correct Professional Behavior
+### ✅ Correct Professional Behavior
 
 Success message should appear only if ALL of this happens:
 
@@ -609,26 +610,28 @@ Frontend reads flag
 Show success toast
 ```
 
-🟦 REQUIRED BACKEND CHANGE (VERY SMALL BUT CRITICAL)
-🔧 What Needs to Change
+### 🟦 REQUIRED BACKEND CHANGE (VERY SMALL BUT CRITICAL)
+
+#### 🔧 What Needs to Change
 
 Your Lambda already inserts into RDS correctly 👍
 We only need to:
 
-Return a clear success indicator
+- Return a clear success indicator
 
-Return HTTP 200 only after commit
+- Return HTTP 200 only after commit
 
-Return HTTP 500 if insert fails
+- Return HTTP 500 if insert fails
 
-✅ UPDATED LAMBDA CODE (MINIMAL MODIFICATION)
-🔹 What’s new?
+### ✅ UPDATED LAMBDA CODE (MINIMAL MODIFICATION)
 
-Explicit success: true
+#### 🔹 What’s new?
 
-Clear backend contract for frontend
+- Explicit success: true
 
-No logic change, only response clarity
+- Clear backend contract for frontend
+
+- No logic change, only response clarity
 
 ```
 import json
@@ -700,16 +703,17 @@ def lambda_handler(event, context):
         }
 ```
 
-✅ Why This Matters
+### ✅ Why This Matters
 
-Frontend can now trust the backend
+- Frontend can now trust the backend
 
-No guessing
+- No guessing
 
-No fake success
+- No fake success
 
-🟦 FRONTEND LOGIC CHANGE (IMPORTANT)
-🔁 Old Frontend Logic (WRONG)
+### 🟦 FRONTEND LOGIC CHANGE (IMPORTANT)
+
+#### 🔁 Old Frontend Logic (WRONG)
 
 ```
 if ($response !== false) {
@@ -717,22 +721,23 @@ if ($response !== false) {
 }
 ```
 
-❌ API reachable ≠ DB success
+**❌ API reachable ≠ DB success**
 
-✅ New Frontend Logic (CORRECT)
+### ✅ New Frontend Logic (CORRECT)
 
-Decode JSON response
+- Decode JSON response
 
-Check:
+- Check:
 
 ```
 "success": true
 ```
 
-Only then show toast
+- Only then show toast
 
-🟦 LATEST UPDATED orders.php (FINAL, VERIFIED UX)
-🔔 Success toast appears ONLY after RDS insert
+### 🟦 LATEST UPDATED orders.php (FINAL, VERIFIED UX)
+
+#### 🔔 Success toast appears ONLY after RDS insert
 
 ```
 <?php
@@ -772,7 +777,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 ```
 
-🔔 Toast Trigger (SAFE & CORRECT)
+### 🔔 Toast Trigger (SAFE & CORRECT)
 
 ```
 <?php if ($orderSuccess): ?>
@@ -787,8 +792,9 @@ document.addEventListener("DOMContentLoaded", () => {
 <?php endif; ?>
 ```
 
-🟦 COMPLETE STEP-BY-STEP CONFIGURATION SUMMARY
-✅ Phase Verification Checklist
+### 🟦 COMPLETE STEP-BY-STEP CONFIGURATION SUMMARY
+
+#### ✅ Phase Verification Checklist
 
 | Phase                  | Status |
 | ---------------------- | ------ |
@@ -803,8 +809,9 @@ document.addEventListener("DOMContentLoaded", () => {
 | Backend-verified UX    | ✅      |
 
 
-🟦 OLD vs NEW BEHAVIOR (VERY IMPORTANT)
-❌ OLD FLOW
+### 🟦 OLD vs NEW BEHAVIOR (VERY IMPORTANT)
+
+#### ❌ OLD FLOW
 
 ```
 Submit Form
@@ -813,7 +820,7 @@ Submit Form
  → (RDS insert might fail)
 ```
 
-✅ NEW FLOW (PRODUCTION-READY)
+#### ✅ NEW FLOW (PRODUCTION-READY)
 
 ```
 Submit Form
@@ -824,24 +831,25 @@ Submit Form
  → Toast shown
 ```
 
-🟦 WHERE YOU IMPROVED & WHY (INTERVIEW-READY)
-🔹 Improvements
+### 🟦 WHERE YOU IMPROVED & WHY (INTERVIEW-READY)
 
-Backend-verified UX
+#### 🔹 Improvements
 
-Correct async logic
+- Backend-verified UX
 
-Clear API contract
+- Correct async logic
 
-Production-grade success handling
+- Clear API contract
 
-🔹 Why It Matters
+- Production-grade success handling
+
+#### 🔹 Why It Matters
 
 “I ensured the frontend only shows success after backend confirmation, preventing false positives and improving reliability.”
 
 This is senior-level thinking, not beginner.
 
-✅ You are now doing:
+### ✅ You are now doing:
 
 Real serverless architecture
 
@@ -851,4 +859,5 @@ Production-grade UX logic
 
 Interview-ready AWS project
 
+---
 
