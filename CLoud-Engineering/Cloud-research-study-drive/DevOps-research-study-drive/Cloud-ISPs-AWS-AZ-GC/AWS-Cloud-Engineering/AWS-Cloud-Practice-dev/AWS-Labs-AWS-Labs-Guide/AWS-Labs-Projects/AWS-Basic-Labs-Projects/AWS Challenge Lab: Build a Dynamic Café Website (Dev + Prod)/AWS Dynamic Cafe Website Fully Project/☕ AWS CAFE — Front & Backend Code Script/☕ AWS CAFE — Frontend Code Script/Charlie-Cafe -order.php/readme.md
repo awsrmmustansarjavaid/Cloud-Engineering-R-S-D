@@ -1277,6 +1277,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
 ✔️ Frontend is modern, clean, animated
 
+### 1️⃣ Backend (Lambda)
+
+- No major changes needed if your Lambda already:
+
+- Inserts order into RDS correctly
+
+- Commits after insert
+
+- Returns a JSON response
+
+- Only required backend addition:
+
+- Return a clear success flag after DB commit:
+
+```
+{
+  "success": true,
+  "message": "Order saved successfully",
+  "table_number": 1
+}
+```
+
+- No DB or Lambda logic change is needed besides this small addition if it isn’t already returning success: true.
+
+#### ✅ This ensures frontend can trust that the RDS insert actually succeeded.
+
+### 2️⃣ Frontend (orders.php)
+
+- All modifications happen here:
+
+- Use the $orderSuccess PHP variable to trigger the success toast only if success: true is returned from backend.
+
+- Implement dual notifications:
+
+- Welcome toast on page load
+
+- Success toast only after verified order
+
+- No need to change PHP cURL logic much, just check success: true.
+
+### ✅ Conclusion
+
+- Backend: minor response tweak (success: true) → optional if not already there
+
+- Frontend: full modification (orders.php) → required to implement dual toggle notifications, modern UX, toast notifications, and proper RDS-verified success display
+
 ### 🟦 COMPLETE STEP-BY-STEP CONFIGURATION SUMMARY
 
 #### ✅ Phase Verification Checklist
@@ -1336,13 +1382,14 @@ This is senior-level thinking, not beginner.
 
 ### ✅ You are now doing:
 
-Real serverless architecture
+- Real serverless architecture
 
-Correct frontend-backend contracts
+- Correct frontend-backend contracts
 
-Production-grade UX logic
+- Production-grade UX logic
 
-Interview-ready AWS project
+- Interview-ready AWS project
+
 
 ---
 
