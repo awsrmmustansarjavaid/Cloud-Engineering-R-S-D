@@ -1630,6 +1630,31 @@ document.addEventListener("DOMContentLoaded", () => {
 </html>
 ```
 
+### 📌 Features of This Final File
+
+✔️ Place Order via Form – Table number, customer name, item, quantity.
+
+✔️ Generate Unique Order ID – Every order gets a distinct ID.
+
+✔️ Calculate Total Price – Based on item and quantity.
+
+✔️ Send Order to Backend – Lambda API via cURL.
+
+✔️ Order Receipt Displayed Immediately – Shows order summary with total price, status badge, and order status link.
+
+✔️ Print Receipt Button – Users can print the receipt.
+
+✔️ Toast Notifications –
+
+✔️ Welcome toast when page loads.
+
+✔️ Success toast if order is successfully sent to Lambda.
+
+✔️ Responsive & Stylish UI – Bootstrap + custom CSS for cafe feel.
+
+✔️ Full Comments – Easy to understand and modify for developers.
+
+
 
 
 
