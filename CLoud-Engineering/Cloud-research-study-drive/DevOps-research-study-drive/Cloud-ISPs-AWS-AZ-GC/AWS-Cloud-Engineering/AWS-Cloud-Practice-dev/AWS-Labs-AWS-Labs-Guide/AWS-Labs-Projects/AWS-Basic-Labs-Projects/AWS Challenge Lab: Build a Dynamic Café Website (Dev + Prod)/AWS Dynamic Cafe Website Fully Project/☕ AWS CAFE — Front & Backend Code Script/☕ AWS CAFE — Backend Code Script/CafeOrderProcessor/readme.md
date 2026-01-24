@@ -127,9 +127,6 @@ Receives an API Gateway request with JSON body:
 
 - No queueing → frontend waits for DB insert before receiving response.
 
-
-
-
 ---
 
 ## 2️⃣ Second Version — Advanced Lambda with SQS
