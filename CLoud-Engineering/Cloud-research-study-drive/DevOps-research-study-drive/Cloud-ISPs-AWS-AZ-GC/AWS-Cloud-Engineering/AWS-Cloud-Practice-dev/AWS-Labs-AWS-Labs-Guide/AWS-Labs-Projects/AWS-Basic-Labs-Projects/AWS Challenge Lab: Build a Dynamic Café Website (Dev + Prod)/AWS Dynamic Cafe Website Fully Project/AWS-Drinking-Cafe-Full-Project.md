@@ -624,9 +624,9 @@ sudo nano /var/www/html/index.php
 # 📢 SECTION 5️⃣ — ☕ AWS CAFE — Order_Async_Processing_Tracking_System COMPLETE ✅
 ---
 
-# 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Admin Order Dashboard
+# 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System
 
-[AWS ☕ Charlie Cafe — Secure Admin Order Dashboard ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—Secure%20Admin%20Order%20Dashboard.md)
+[AWS ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 
 # 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Admin Order Dashboard COMPLETE ✅
 ---
