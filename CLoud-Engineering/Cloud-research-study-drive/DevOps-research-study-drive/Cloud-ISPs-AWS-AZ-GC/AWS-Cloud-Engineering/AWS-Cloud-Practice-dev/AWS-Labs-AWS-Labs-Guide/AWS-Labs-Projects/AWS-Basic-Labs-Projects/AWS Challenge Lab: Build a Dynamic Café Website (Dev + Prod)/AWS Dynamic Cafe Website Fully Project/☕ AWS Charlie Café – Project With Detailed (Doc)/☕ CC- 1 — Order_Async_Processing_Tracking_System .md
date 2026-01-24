@@ -1657,7 +1657,7 @@ Paste the FULL code below
 
 #### 📌 Copy-paste exactly as is
 
-[place-order.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20place-order/place-order.php)
+[orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
 ### 🧪 STEP 3 — TESTING (DO NOT SKIP)
 
