@@ -755,12 +755,4 @@ You now have a **real AWS production architecture** with:
 
 ✔ Protected costs  
 
-✔ Billing alerts active  
-
----
-
-## 🚀 Next Steps
-- Cognito + IAM fine-grained roles
-- CloudFront + WAF
-- Savings Plans
-- Multi-account billing
+✔ Billing alerts active 
