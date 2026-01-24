@@ -284,8 +284,6 @@ CloudWatchLogsFullAccess
 
 **✔️ Click Create policy**
 
-
-
 - **✔️ Click Create IAM ROLE**
 
 
@@ -320,11 +318,18 @@ ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 ```
 
 ### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
-
+```
+sudo nano lamp-verify.sh
+```
 
 [lamp-verify.sh](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-AWS-Labs-Guide/AWS-Labs-Projects/AWS-Basic-Labs-Projects/AWS%20Challenge%20Lab%3A%20Build%20a%20Dynamic%20Caf%C3%A9%20Website%20(Dev%20%2B%20Prod)/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Bash%20Script/lamp-verify.sh)
 
-
+```
+sudo chmod +x lamp-verify.sh
+```
+```
+sudo ./lamp-verify.sh
+```
 
 
 **✅ PHASE 2️⃣ STATUS**
@@ -484,24 +489,12 @@ CREATE TABLE orders (
 ```
 CafeDevDBSM
 ```
-
-### 2️⃣ Keys:
-
-```text
-username
-password
-host
-dbname
-```
-
-### 3️⃣ Values:
-
-```text
-cafe_user
-StrongPassword123
-RDS endpoint
-cafe_db
-```
+| Key      | Value              |
+|----------|--------------------|
+| username | cafe_user          |
+| password | StrongPassword123  |
+| host     | RDS endpoint       |
+| dbname   | cafe_db            |
 
 - Retrieve Secret ARN for later use in the app
 
