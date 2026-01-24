@@ -499,23 +499,12 @@ CREATE TABLE orders (
 CafeDevDBSM
 ```
 
-### 2️⃣ Keys:
-
-```text
-username
-password
-host
-dbname
-```
-
-### 3️⃣ Values:
-
-```text
-cafe_user
-StrongPassword123
-RDS endpoint
-cafe_db
-```
+| Key      | Value              |
+|----------|--------------------|
+| username | cafe_user          |
+| password | StrongPassword123  |
+| host     | RDS endpoint       |
+| dbname   | cafe_db            |
 
 - Retrieve Secret ARN for later use in the app
 
@@ -605,7 +594,6 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 # 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
-
 # 📢 SECTION 4️⃣ CAFE FRONTEND CONFIGURATIONS
 
 ## ☕ AWS CAFE - PHASE 1️⃣ HOME PAGE (index.php)
@@ -626,21 +614,6 @@ sudo nano /var/www/html/index.php
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-## PHASE 2️⃣ — Order.php
-
-### 1️⃣ Create Order.php
-
-```
-sudo nano /var/www/html/Order.php
-```
-
-
-
-
-**✅ PHASE 2️⃣ STATUS**
-
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 
 # 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
@@ -648,10 +621,36 @@ sudo nano /var/www/html/Order.php
 # 📢 SECTION 5️⃣ — ☕ AWS CAFE — Order_Async_Processing_Tracking_System 
 
 
-[☕ AWS CAFE — Order_Async_Processing_Tracking_System ](./AWS%20Cafe%20Project%20Development%20%26%20Depolyment%20Docs/☕%20AWS%20CAFE%20—%20Order_Async_Processing_Tracking_System%20.md)
+[☕ AWS CAFE — Order_Async_Processing_Tracking_System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%201%20—%20Order_Async_Processing_Tracking_System%20.md)
 
 
 # 📢 SECTION 5️⃣ — ☕ AWS CAFE — Order_Async_Processing_Tracking_System COMPLETE ✅
+---
+
+# 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Admin Order Dashboard
+
+[AWS ☕ Charlie Cafe — Secure Admin Order Dashboard ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—Secure%20Admin%20Order%20Dashboard.md)
+
+# 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Admin Order Dashboard COMPLETE ✅
+---
+
+# 📢 SECTION 7️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
+
+[☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
+
+# 📢 SECTION 7️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM ✅
+---
+# 📢 SECTION 8️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
+
+[☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
+
+# 📢 SECTION 8️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM ✅
+---
+# 📢 SECTION 9️⃣ — ☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System
+
+[☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%204%20—Secure%20HR%20%26%20Attendance%20System.md)
+
+# 📢 SECTION 9️⃣ — ☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System ✅
 ---
 
 # 📢 SECTION 3 — AWS Cafe PRODUCTION
