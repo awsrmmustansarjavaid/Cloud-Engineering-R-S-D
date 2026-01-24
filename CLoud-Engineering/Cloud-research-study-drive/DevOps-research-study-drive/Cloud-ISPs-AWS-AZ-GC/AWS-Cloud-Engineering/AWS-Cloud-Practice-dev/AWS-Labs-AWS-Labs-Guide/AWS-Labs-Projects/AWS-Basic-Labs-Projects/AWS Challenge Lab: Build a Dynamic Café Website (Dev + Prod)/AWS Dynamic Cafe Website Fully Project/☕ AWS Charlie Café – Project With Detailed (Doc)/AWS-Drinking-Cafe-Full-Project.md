@@ -619,7 +619,7 @@ sudo nano /var/www/html/index.php
 
 ### 2️⃣ Paste this clean landing page code:
 
-[index.php](./%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Front%20%26%20Backend%20Code%20Script/%E2%98%95%20AWS%20CAFE%20%E2%80%94%20Frontend%20Code%20Script/Index.php)
+[index.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Index.php)
 
 **⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
 
