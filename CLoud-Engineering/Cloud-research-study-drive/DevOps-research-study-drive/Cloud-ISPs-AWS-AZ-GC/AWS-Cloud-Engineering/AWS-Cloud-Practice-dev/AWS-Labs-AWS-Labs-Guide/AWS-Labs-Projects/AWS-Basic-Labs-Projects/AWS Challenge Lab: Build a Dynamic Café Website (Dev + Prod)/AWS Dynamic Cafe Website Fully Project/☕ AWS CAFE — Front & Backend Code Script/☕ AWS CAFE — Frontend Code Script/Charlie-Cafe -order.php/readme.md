@@ -1054,6 +1054,39 @@ document.addEventListener("DOMContentLoaded", () => {
 </html>
 ```
 
+### ✅ How This Works
+
+#### 1️⃣ Welcome Notification
+
+- Triggers immediately when the page loads
+
+- Bootstrap toast appears top-right
+
+- Auto-dismisses after 2.5 seconds
+
+#### 2️⃣ Order Success Notification
+
+- Form submission is intercepted using AJAX (fetch)
+
+- Sends POST JSON to your Lambda API Gateway
+
+- Only after Lambda responds with HTTP 200 → triggers success toast
+
+- Form resets automatically
+
+- No page reload
+
+#### 3️⃣ Why This is Safe & Professional
+
+- Frontend validation only for UX
+
+- Backend Lambda still validates & inserts into RDS
+
+- Avoids direct PHP curl_exec output in HTML
+
+- Clean separation: frontend UX vs backend DB logic
+
+- Provides dual notifications as requested
 
 ### 🟦 COMPLETE STEP-BY-STEP CONFIGURATION SUMMARY
 
