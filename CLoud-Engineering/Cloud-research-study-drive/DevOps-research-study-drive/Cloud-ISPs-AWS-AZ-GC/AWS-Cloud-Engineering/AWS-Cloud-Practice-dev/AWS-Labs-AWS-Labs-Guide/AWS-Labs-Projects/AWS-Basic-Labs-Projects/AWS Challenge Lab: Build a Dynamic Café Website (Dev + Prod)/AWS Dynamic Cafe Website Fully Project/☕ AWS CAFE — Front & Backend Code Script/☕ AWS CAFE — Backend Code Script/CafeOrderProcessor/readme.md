@@ -13,8 +13,6 @@
 
 > **1️⃣ Lambda Payload Code (INSERT INTO MariaDB)**
 
-> **📄 File Name: CafeOrderProcessor(1st-V-1stTime_create_code).py**
-
 
 ```
 import json
