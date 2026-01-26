@@ -11,10 +11,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ===================== BODY & BACKGROUND ===================== */
+/* ===================== GLOBAL BODY ===================== */
 body {
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
   background:
     linear-gradient(rgba(58,44,31,0.75), rgba(58,44,31,0.75)),
     url('https://images.unsplash.com/photo-1509042239860-f550ce710b93');
@@ -23,13 +24,59 @@ body {
   color: #fff;
 }
 
-/* ===================== MAIN CONTAINER ===================== */
-.container {
+/* ===================== NAVBAR ===================== */
+.navbar {
+  background-color: #3b1f0e !important;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #2b160a;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 80px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 14px 24px;
+  color: #ddd;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sidebar a:hover {
+  background: #3b1f0e;
+  color: #ff9800;
+}
+
+.sidebar a.active {
+  background: #3b1f0e;
+  color: #ff9800;
+  border-left: 4px solid #ff9800;
+}
+
+/* ===================== MAIN CONTENT ===================== */
+.main-content {
+  margin-left: 240px;
+  padding-top: 100px;
+}
+
+/* ===================== CONTAINER ===================== */
+.container-box {
   backdrop-filter: blur(6px);
   background-color: rgba(0,0,0,0.45);
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  max-width: 1100px;
+  margin: auto;
 }
 
 /* ===================== HEADINGS ===================== */
@@ -37,22 +84,19 @@ h3 {
   text-align: center;
   font-weight: bold;
   color: #ffddaa;
-  text-shadow: 1px 1px 2px #000;
 }
 
-/* ===================== INPUTS & BUTTONS ===================== */
+/* ===================== BUTTONS ===================== */
 .form-select, .btn {
   border-radius: 50px;
   font-weight: bold;
 }
 
-/* Load Data button */
 .btn-primary {
   background: linear-gradient(45deg, #a0522d, #d2b48c);
   border: none;
 }
 
-/* PDF button */
 .btn-success {
   background: linear-gradient(45deg, #8b4513, #f4a460);
   border: none;
@@ -66,138 +110,161 @@ h3 {
   border-radius: 12px;
   background: rgba(255,255,255,0.1);
   color: #fff;
-  text-align: center;
   font-weight: bold;
+  text-align: center;
   transition: transform 0.2s;
 }
 .card:hover { transform: translateY(-5px); }
 
-/* ===================== CHART ===================== */
-canvas {
-  background: rgba(0,0,0,0.1);
-  border-radius: 12px;
-  padding: 15px;
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+  }
+  .main-content {
+    margin-left: 0;
+    padding-top: 140px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===================== MAIN PAGE ===================== -->
-<div class="container mt-4 position-relative">
-
-  <!-- Page Title -->
-  <h3>☕ Cafe Sales Analytics</h3>
-
-  <!-- ===================== PERIOD SELECT ===================== -->
-  <div class="d-flex justify-content-center align-items-center mt-4 gap-3 flex-wrap">
-    <select id="period" class="form-select w-auto">
-      <option value="today">Today</option>
-      <option value="week">Last 7 Days</option>
-      <option value="month">This Month</option>
-    </select>
-
-    <button class="btn btn-primary" onclick="loadData()">Load Data</button>
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
   </div>
+</nav>
 
-  <!-- ===================== METRICS ===================== -->
-  <div class="row mt-4 g-4">
-    <div class="col-md-4"><div class="card p-3">Sales: <span id="sales">0</span></div></div>
-    <div class="col-md-4"><div class="card p-3">Cost: <span id="cost">0</span></div></div>
-    <div class="col-md-4"><div class="card p-3">Profit: <span id="profit">0</span></div></div>
-  </div>
-
-  <!-- ===================== CHART ===================== -->
-  <canvas id="chart" class="mt-4" height="120"></canvas>
-
-  <!-- ===================== PDF DOWNLOAD ===================== -->
-  <button class="btn btn-success" onclick="downloadPDF()">📄 Download PDF</button>
-
+<!-- ===================== SIDEBAR ===================== -->
+<div class="sidebar">
+  <a href="dashboard.html">🏠 Main Dashboard</a>
+  <a href="analytics.html" class="active">📈 Analytics</a>
+  <a href="order-status.html">📦 Order Status</a>
 </div>
 
-<!-- ===================== WELCOME TOAST ===================== -->
-<!-- Shows once when analytics page is opened -->
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-content">
+  <div class="container-box position-relative">
+
+    <h3>☕ Cafe Sales Analytics</h3>
+
+    <!-- ===================== FILTER ===================== -->
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      <select id="period" class="form-select w-auto">
+        <option value="today">Today</option>
+        <option value="week">Last 7 Days</option>
+        <option value="month">This Month</option>
+      </select>
+      <button class="btn btn-primary" onclick="loadData()">Load Data</button>
+    </div>
+
+    <!-- ===================== METRICS ===================== -->
+    <div class="row mt-4 g-4">
+      <div class="col-md-4"><div class="card p-3">Sales: <span id="sales">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">Cost: <span id="cost">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">Profit: <span id="profit">0</span></div></div>
+    </div>
+
+    <!-- ===================== CHART ===================== -->
+    <canvas id="chart" class="mt-4" height="120"></canvas>
+
+    <!-- ===================== PDF ===================== -->
+    <button class="btn btn-success" onclick="downloadPDF()">📄 Download PDF</button>
+  </div>
+</div>
+
+<!-- ===================== TOASTS ===================== -->
+
+<!-- Welcome (Once Per Day) -->
 <div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="analyticsWelcomeToast" class="toast">
+  <div id="welcomeToast" class="toast">
     <div class="toast-header">
-      <strong class="me-auto">📊 Analytics Dashboard</strong>
+      <strong class="me-auto">📊 Analytics</strong>
       <button class="btn-close" data-bs-dismiss="toast"></button>
     </div>
     <div class="toast-body">
-      Welcome to Cafe Analytics! Select a period to view performance insights.
+      Welcome to the Analytics Dashboard!
     </div>
   </div>
 </div>
 
+<!-- Data Loaded -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="dataToast" class="toast">
+    <div class="toast-header bg-success text-white">
+      <strong class="me-auto">Data Loaded</strong>
+      <button class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body">
+      ✅ Analytics updated successfully!
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
 <script>
-/* ============================================================
-   ENVIRONMENT CONFIG
-   ============================================================ */
+/* ===================== API CONFIG ===================== */
 const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod";
 const ANALYTICS_API = `${API_BASE_URL}/analytics`;
 const PDF_API = `${API_BASE_URL}/report/pdf`;
 
-/* ============================================================
-   SHOW WELCOME TOAST ON PAGE LOAD
-   ============================================================ */
+/* ===================== WELCOME TOAST (ONCE PER DAY) ===================== */
 document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split("T")[0];
+  const lastSeen = localStorage.getItem("analyticsWelcome");
 
-  // Toggle flag (future use: localStorage / user preferences)
-  const showWelcomeToast = true;
-
-  if (showWelcomeToast) {
-    new bootstrap.Toast(
-      document.getElementById("analyticsWelcomeToast"),
-      { delay: 2500 }
-    ).show();
+  if (lastSeen !== today) {
+    new bootstrap.Toast(document.getElementById("welcomeToast"), {
+      delay: 2500
+    }).show();
+    localStorage.setItem("analyticsWelcome", today);
   }
 });
 
-/* ============================================================
-   LOAD ANALYTICS DATA
-   ============================================================ */
+/* ===================== LOAD ANALYTICS DATA ===================== */
 function loadData() {
-  const period = document.getElementById('period').value;
+  const period = document.getElementById("period").value;
 
   fetch(`${ANALYTICS_API}?period=${period}`)
     .then(res => res.json())
     .then(data => {
 
-      document.getElementById('sales').innerText = data.total_sales;
-      document.getElementById('cost').innerText = data.total_cost;
-      document.getElementById('profit').innerText = data.profit;
+      document.getElementById("sales").innerText = data.total_sales;
+      document.getElementById("cost").innerText = data.total_cost;
+      document.getElementById("profit").innerText = data.profit;
 
-      const ctx = document.getElementById('chart').getContext('2d');
-
+      const ctx = document.getElementById("chart").getContext("2d");
       if (window.salesChart) window.salesChart.destroy();
 
       window.salesChart = new Chart(ctx, {
-        type: 'line',
+        type: "line",
         data: {
-          labels: ['Sales', 'Cost', 'Profit'],
+          labels: ["Sales", "Cost", "Profit"],
           datasets: [{
             data: [data.total_sales, data.total_cost, data.profit],
-            borderColor: '#ffddaa',
-            backgroundColor: 'rgba(255,221,170,0.3)',
-            borderWidth: 3,
-            tension: 0.3,
-            fill: true
+            borderColor: "#ffddaa",
+            backgroundColor: "rgba(255,221,170,0.3)",
+            fill: true,
+            tension: 0.3
           }]
         },
         options: {
           plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true },
-            x: {}
-          }
+          scales: { y: { beginAtZero: true } }
         }
       });
+
+      /* ---- Show success toast AFTER data loads ---- */
+      new bootstrap.Toast(document.getElementById("dataToast")).show();
     });
 }
 
-/* ============================================================
-   DOWNLOAD PDF REPORT
-   ============================================================ */
+/* ===================== DOWNLOAD PDF ===================== */
 function downloadPDF() {
   window.open(PDF_API);
 }
