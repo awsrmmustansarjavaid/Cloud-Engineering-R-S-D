@@ -20,19 +20,19 @@ Customer-facing order receipt + live tracking
 
 - Displays:
 
-- Order ID
+    - Order ID
 
-- Customer name
+    - Customer name
 
-- Table number
+    - Table number
 
-- Date & time
+    - Date & time
 
-- Item & quantity
+    - Item & quantity
 
-- Total amount
+    - Total amount
 
-- Order status
+    - Order status
 
 #### ✅ Status lifecycle awareness
 
