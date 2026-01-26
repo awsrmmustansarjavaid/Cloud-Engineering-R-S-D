@@ -1654,10 +1654,587 @@ document.addEventListener("DOMContentLoaded", () => {
 
 ✔️ Full Comments – Easy to understand and modify for developers.
 
+---
+
+# Place-order.php 
+
+### place-order.php (with comments- Recommanded)
 
 
 
 
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===================== META CONFIG ===================== -->
+    <meta charset="UTF-8">
+    <title>Charlie Cafe ☕ | Place Order</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===================== BOOTSTRAP CSS ===================== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ===================== GOOGLE FONT ===================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- ===================== CUSTOM CAFE STYLES ===================== -->
+    <style>
+        /* Global body styling with cafe background */
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+        }
+
+        /* Cafe navbar color */
+        .navbar {
+            background-color: #3b1f0e;
+        }
+
+        /* Cafe brand styling */
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        /* Order form card */
+        .order-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Place order button styling */
+        .btn-order {
+            background-color: #ff9800;
+            font-weight: 600;
+            border-radius: 30px;
+        }
+
+        /* Receipt container */
+        .receipt {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        /* Order status badge */
+        .status-badge {
+            background: #0d6efd;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ===================== TOP NAVBAR ===================== -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <!-- Cafe home link -->
+        <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- ===================== ORDER FORM CONTAINER ===================== -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+<div class="col-md-6">
+<div class="order-card">
+
+<!-- ===================== PAGE HEADING ===================== -->
+<h2 class="text-center">Place Your Order</h2>
+<p class="text-center text-muted">Fresh • Hot • Made with Love</p>
+
+<!-- ===================== ORDER FORM ===================== -->
+<form method="POST">
+
+    <!-- Table number input -->
+    <label>Table Number</label>
+    <input type="number" name="table_number" min="1" class="form-control" required>
+
+    <!-- Customer name input -->
+    <label>Customer Name</label>
+    <input type="text" name="name" class="form-control">
+
+    <!-- Item selection -->
+    <label>Select Item</label>
+    <select name="item" class="form-select">
+        <option>Coffee</option>
+        <option>Tea</option>
+        <option>Latte</option>
+        <option>Cappuccino</option>
+        <option>Fresh Juice</option>
+    </select>
+
+    <!-- Quantity input -->
+    <label>Quantity</label>
+    <input type="number" name="quantity" min="1" value="1" class="form-control">
+
+    <!-- Submit order -->
+    <button type="submit" class="btn btn-order w-100 mt-4">
+        ☕ Place Order
+    </button>
+</form>
+
+<?php
+/* =========================================================
+   SERVER-SIDE ORDER PROCESSING (PHP)
+   ========================================================= */
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    /* Generate unique Order ID */
+    $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+    /* Item price list */
+    $prices = [
+        "Coffee" => 3,
+        "Tea" => 2,
+        "Latte" => 4,
+        "Cappuccino" => 4,
+        "Fresh Juice" => 5
+    ];
+
+    /* Extract submitted values */
+    $item = $_POST["item"];
+    $qty = (int)$_POST["quantity"];
+
+    /* Calculate total price */
+    $total = $prices[$item] * $qty;
+
+    /* API Gateway endpoint to create order */
+    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+    /* Payload sent to Lambda (JSON) */
+    $payload = json_encode([
+        "table_number" => (int)$_POST["table_number"],
+        "customer_name" => $_POST["name"],
+        "item" => $item,
+        "quantity" => $qty
+    ]);
+
+    /* Send order to backend using cURL */
+    $ch = curl_init($apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_exec($ch);
+    curl_close($ch);
+
+    /* Order status page link */
+    $statusUrl = "order-status.php?order_id=$orderId";
+?>
+
+<!-- ===================== ORDER RECEIPT ===================== -->
+<div class="receipt">
+    <h5>🧾 Order Receipt</h5>
+
+    <!-- Order summary -->
+    <p><strong>Order ID:</strong> <?= $orderId ?></p>
+    <p><strong>Status:</strong> <span class="status-badge">RECEIVED</span></p>
+
+    <hr>
+
+    <p><strong>Item:</strong> <?= $item ?></p>
+    <p><strong>Quantity:</strong> <?= $qty ?></p>
+    <p><strong>Total:</strong> $<?= $total ?></p>
+
+    <hr>
+
+    <!-- Order status tracking link -->
+    <p><strong>Order Status Link:</strong><br>
+        <a href="<?= $statusUrl ?>" target="_blank"><?= $statusUrl ?></a>
+    </p>
+
+    <!-- Browser print button -->
+    <button onclick="window.print()" class="btn btn-outline-dark w-100 mt-3">
+        🖨️ Print Receipt
+    </button>
+</div>
+
+<?php } ?>
+
+</div>
+</div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="text-center text-white mt-4">
+    © 2026 Charlie Cafe | Serverless Orders ☁️
+</footer>
+
+</body>
+</html>
+```
+
+
+
+### place-order-without-comments
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe ☕ | Place Order</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+        }
+        .navbar { background-color: #3b1f0e; }
+        .navbar-brand { color: #fff !important; font-weight: 600; }
+        .order-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .btn-order {
+            background-color: #ff9800;
+            font-weight: 600;
+            border-radius: 30px;
+        }
+        .receipt {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        .status-badge {
+            background: #0d6efd;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+<div class="col-md-6">
+<div class="order-card">
+
+<h2 class="text-center">Place Your Order</h2>
+<p class="text-center text-muted">Fresh • Hot • Made with Love</p>
+
+<form method="POST">
+<label>Table Number</label>
+<input type="number" name="table_number" min="1" class="form-control" required>
+
+<label>Customer Name</label>
+<input type="text" name="name" class="form-control">
+
+<label>Select Item</label>
+<select name="item" class="form-select">
+<option>Coffee</option>
+<option>Tea</option>
+<option>Latte</option>
+<option>Cappuccino</option>
+<option>Fresh Juice</option>
+</select>
+
+<label>Quantity</label>
+<input type="number" name="quantity" min="1" value="1" class="form-control">
+
+<button type="submit" class="btn btn-order w-100 mt-4">☕ Place Order</button>
+</form>
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+$orderId = "ORD-" . time() . "-" . rand(100,999);
+
+$prices = [
+"Coffee"=>3,"Tea"=>2,"Latte"=>4,"Cappuccino"=>4,"Fresh Juice"=>5
+];
+
+$item = $_POST["item"];
+$qty = (int)$_POST["quantity"];
+$total = $prices[$item] * $qty;
+
+$apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+$payload = json_encode([
+"table_number"=>(int)$_POST["table_number"],
+"customer_name"=>$_POST["name"],
+"item"=>$item,
+"quantity"=>$qty
+]);
+
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+curl_exec($ch);
+curl_close($ch);
+
+$statusUrl = "order-status.php?order_id=$orderId";
+?>
+
+<div class="receipt">
+<h5>🧾 Order Receipt</h5>
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+<p><strong>Status:</strong> <span class="status-badge">RECEIVED</span></p>
+<hr>
+<p><strong>Item:</strong> <?= $item ?></p>
+<p><strong>Quantity:</strong> <?= $qty ?></p>
+<p><strong>Total:</strong> $<?= $total ?></p>
+<hr>
+<p><strong>Order Status Link:</strong><br>
+<a href="<?= $statusUrl ?>" target="_blank"><?= $statusUrl ?></a></p>
+
+<button onclick="window.print()" class="btn btn-outline-dark w-100 mt-3">🖨️ Print Receipt</button>
+</div>
+
+<?php } ?>
+
+</div>
+</div>
+</div>
+
+<footer class="text-center text-white mt-4">
+© 2026 Charlie Cafe | Serverless Orders ☁️
+</footer>
+
+</body>
+</html>
+```
+
+1️⃣ High-level answer (short & clear)
+
+orders.php (first file)
+👉 More advanced, safer, better UX, better backend awareness
+
+place-orders.php (second file)
+👉 Simpler, beginner-friendly, fewer checks, fewer features
+
+✅ You CAN start with the first file (orders.php) even at basic deployment
+❌ The second file is not better, it’s just simpler
+
+2️⃣ What is COMMON between both files (same core purpose)
+
+Both files:
+
+✔ Submit order to API Gateway → Lambda
+✔ Generate Order ID
+✔ Calculate total price
+✔ Show receipt
+✔ Provide order-status link
+✔ Allow print receipt
+
+So yes — business goal is the same.
+
+3️⃣ REAL differences (this is where it matters)
+🔹 A. Backend handling & reliability
+| Feature               | orders.php                 | place-orders.php |
+| --------------------- | -------------------------- | ---------------- |
+| Request success check | ✅ Yes                      | ❌ No             |
+| Response validation   | ✅ Yes (`success === true`) | ❌ No             |
+| Failure awareness     | ✅ Possible                 | ❌ Silent         |
+| Order success flag    | ✅ `$orderSuccess`          | ❌ None           |
+
+📌 orders.php is safer for real systems
+
+🔹 B. UX & Professional UI
+
+| Feature             | orders.php | place-orders.php |
+| ------------------- | ---------- | ---------------- |
+| Toast notifications | ✅ Yes      | ❌ No             |
+| Welcome feedback    | ✅ Yes      | ❌ No             |
+| Success feedback    | ✅ Yes      | ❌ No             |
+| Smooth animations   | ✅ Yes      | ❌ No             |
+
+📌 orders.php feels like a real product
+
+🔹 C. Security & hygiene
+
+| Feature              | orders.php | place-orders.php |
+| -------------------- | ---------- | ---------------- |
+| `htmlspecialchars()` | ✅ Yes      | ❌ No             |
+| Input sanitization   | ✅ Partial  | ❌ Minimal        |
+| Defensive coding     | ✅ Better   | ❌ Basic          |
+
+📌 orders.php is safer
+
+🔹 D. Code structure & maintainability
+
+| Feature        | orders.php | place-orders.php |
+| -------------- | ---------- | ---------------- |
+| Logic at top   | ✅ Yes      | ❌ Mixed in HTML  |
+| Clear sections | ✅ Yes      | ⚠️ Partial       |
+| Comments       | ✅ Strong   | ⚠️ Medium        |
+| Scalable       | ✅ Yes      | ❌ Needs refactor |
+
+📌 orders.php is production-ready
+
+4️⃣ Which one should YOU use (step-by-step roadmap)
+✅ Phase 1 – Basic deployment (YOU ARE HERE)
+
+👉 Use orders.php
+
+It already includes basic + advanced concepts
+
+You won’t need to rewrite later
+
+Good for AWS demos & LinkedIn
+
+✅ Phase 2 – Intermediate
+
+Add:
+
+Validation messages
+
+Payment status
+
+Disable duplicate submits
+
+✅ Phase 3 – Advanced
+
+Add:
+
+CSRF token
+
+Auth (JWT / Cognito)
+
+Rate limiting
+
+Separate frontend/backend
+
+5️⃣ Final verdict (no sugarcoating)
+🏆 BEST FILE: orders.php (FIRST ONE)
+
+Reasons:
+
+✔ More features
+
+✔ Better UX
+
+✔ Backend-aware
+
+✔ Safer
+
+✔ Scales cleanly
+
+✔ No rewrite needed later
+
+The second file is not an upgrade — it’s a simplified earlier draft.
+
+6️⃣ BONUS: One final unified & improved version (recommended)
+
+Below is a clean, final, future-proof place-order.php
+It includes ALL features, properly commented, and suitable from basic → advanced deployment.
+
+✅ FINAL place-order.php (recommended)
+
+```
+<?php
+/* =========================================================
+   CHARLIE CAFE — PLACE ORDER (FINAL VERSION)
+   Beginner → Production Ready
+   ========================================================= */
+
+$orderSuccess = false;
+
+/* ===================== PROCESS ORDER ===================== */
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    // Generate unique Order ID
+    $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+    // Price list (can later move to DB)
+    $prices = [
+        "Coffee" => 3,
+        "Tea" => 2,
+        "Latte" => 4,
+        "Cappuccino" => 4,
+        "Fresh Juice" => 5
+    ];
+
+    // Sanitize & collect inputs
+    $tableNumber  = (int) $_POST["table_number"];
+    $customerName = htmlspecialchars($_POST["name"] ?? '');
+    $item         = $_POST["item"];
+    $quantity     = (int) $_POST["quantity"];
+
+    // Calculate total
+    $total = $prices[$item] * $quantity;
+
+    // Prepare payload for Lambda
+    $payload = json_encode([
+        "table_number"  => $tableNumber,
+        "customer_name" => $customerName,
+        "item"          => $item,
+        "quantity"      => $quantity
+    ]);
+
+    // API Gateway endpoint
+    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+    // Send request via cURL
+    $ch = curl_init($apiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_HTTPHEADER     => ["Content-Type: application/json"],
+        CURLOPT_POSTFIELDS     => $payload
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    // Check backend response
+    if ($response) {
+        $result = json_decode($response, true);
+        if (!empty($result["success"])) {
+            $orderSuccess = true;
+        }
+    }
+
+    // Order status link
+    $statusUrl = "order-status.php?order_id=$orderId";
+}
+?>
+```
+
+(Frontend HTML + toasts remain same as your orders.php — you already did it well.)
+
+7️⃣ Features of FINAL version
+
+✔ Serverless-ready
+✔ Toast notifications
+✔ Receipt generation
+✔ Print support
+✔ Secure inputs
+✔ Backend response awareness
+✔ Beginner friendly
+✔ Advanced-ready
 
 
 

@@ -1628,13 +1628,13 @@ sudo systemctl restart httpd
 3️⃣ File Name
 
 ```
-order.php
+orders.php
 ```
 
 4️⃣ Rename your file:
 
 ```
-order.php  →  order_old.php
+orders.php  →  order_old.php
 ```
 
 **✅ This guarantees rollback safety**
