@@ -6,61 +6,9 @@
 
 # SECTION 1️⃣ Secure & Security ARCHITECTURE Dashboard
 
+### 1️⃣ Centralize Authentication -  auth.js template (reusable)
 
-
-#### ▶️ auth.js template (reusable)
-
-```
-const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
-const CLIENT_ID = "YOUR_APP_CLIENT_ID";
-const REDIRECT_URI = window.location.origin;
-
-function parseJwt(token) {
-  return JSON.parse(atob(token.split('.')[1]));
-}
-
-function isTokenExpired(token) {
-  return parseJwt(token).exp * 1000 < Date.now();
-}
-
-function login() {
-  window.location.href = `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&scope=openid+email+profile&redirect_uri=${REDIRECT_URI}`;
-}
-
-function logout() {
-  localStorage.removeItem("access_token");
-  window.location.href = `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
-}
-
-function handleRedirect() {
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const token = params.get("access_token");
-  if (token) localStorage.setItem("access_token", token);
-  window.location.hash = "";
-}
-
-function securePage() {
-  handleRedirect();
-  const token = localStorage.getItem("access_token");
-  if (!token || isTokenExpired(token)) login();
-  else document.body.style.display = "block";
-}
-```
-
-- Include this script in dashboard.html, order-status.html, analytics.html.
-
-- Wrap body content with display:none to hide until auth passes.
-
-### 2️⃣ Secure Your Admin Pages
-
-#### ▶️ What it is: 
-
-The practical application of auth.js to every individual HTML page.
-
-#### ▶️ Purpose: 
-
-Actually protect each page (dashboard, order-status, analytics) so nobody can view it without logging in.
+[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 #### ▶️ Steps for each page:
 
