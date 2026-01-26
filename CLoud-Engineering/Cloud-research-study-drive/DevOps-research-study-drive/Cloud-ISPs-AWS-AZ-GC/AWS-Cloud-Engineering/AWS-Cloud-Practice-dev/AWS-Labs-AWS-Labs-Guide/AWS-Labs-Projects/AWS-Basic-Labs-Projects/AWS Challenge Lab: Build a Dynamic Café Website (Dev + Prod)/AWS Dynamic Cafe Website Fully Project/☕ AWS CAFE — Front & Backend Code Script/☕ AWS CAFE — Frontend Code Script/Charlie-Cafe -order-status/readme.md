@@ -5,11 +5,11 @@
 
 ### 1️⃣ order-status.html (Previous & Simple)
 
-> **# SECTION 4️⃣ — ORDER STATUS DASHBOARD**
+> **SECTION 4️⃣ — ORDER STATUS DASHBOARD**
 
-> **## PHASE 6️⃣ — FRONTEND ORDER STATUS PAGE**
+> **PHASE 6️⃣ — FRONTEND ORDER STATUS PAGE**
 
-> **#### 1️⃣ Simple order-status.html**
+> **1️⃣ Simple order-status.html**
 
 #### 1️⃣ First Code (JavaScript + API Fetch)
 
@@ -534,9 +534,9 @@ The new order-status.php is interactive, modern, professional, and UX-friendly, 
 
 ### 🧑‍💻 STEP 8 — CREATE order-status.php
 
-> **# ☕ SECTION 5️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)**
+> **☕ SECTION 5️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)**
 
-> **## 🔔 PHASE 1️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)**
+> **🔔 PHASE 2️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)**
 
 > **#### 1️⃣ FINAL-single-order-status-with-print-button.php**
 
