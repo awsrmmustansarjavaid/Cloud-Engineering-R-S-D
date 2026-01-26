@@ -419,3 +419,125 @@ setInterval(() => {
 
 ---
 
+
+### 🧩 STEP 5 — FINAL order-receipt.php (LATEST VERSION)
+
+✅ Includes ALL required features
+
+✅ Copy–paste ready
+
+✅ No backend changes required
+
+#### ✅ FULL FILE — COPY & PASTE
+
+```
+<?php
+$apiBaseUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+
+if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
+    die("❌ Invalid order reference");
+}
+
+$orderId = $_GET['order_id'];
+
+function fetchOrder($url, $orderId) {
+    $ch = curl_init($url . "?order_id=" . urlencode($orderId));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($res, true);
+}
+
+$data = fetchOrder($apiBaseUrl, $orderId);
+if (!isset($data['order'])) {
+    die("❌ Order not found");
+}
+
+$order = $data['order'];
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Status | Charlie Cafe ☕</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+<style>
+body { background:#f4f6f9; }
+.receipt {
+  max-width:520px;
+  margin:20px auto;
+  background:#fff;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 15px 30px rgba(0,0,0,.15);
+}
+@media print {
+  button, #qrBox { display:none; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="receipt">
+
+<h4 class="text-center">☕ Charlie Cafe</h4>
+<p class="text-center text-muted">Order Receipt</p>
+<hr>
+
+<p><b>Order ID:</b> <?= $order['order_id'] ?></p>
+<p><b>Customer:</b> <?= $order['customer_name'] ?></p>
+<p><b>Table:</b> <?= $order['table_number'] ?></p>
+<p><b>Date:</b> <?= $order['created_at'] ?></p>
+
+<hr>
+
+<p><b>Item:</b> <?= $order['item'] ?></p>
+<p><b>Quantity:</b> <?= $order['quantity'] ?></p>
+
+<hr>
+
+<p><b>Status:</b>
+<span class="badge bg-info"><?= $order['status'] ?></span>
+</p>
+
+<hr>
+
+<p class="fw-bold">Total: $<?= number_format($order['total_amount'],2) ?></p>
+
+<div id="qrBox" class="text-center my-3">
+  <div id="qrcode"></div>
+  <small class="text-muted">Scan to reopen this order</small>
+</div>
+
+<button onclick="window.print()" class="btn btn-dark w-100">
+🖨️ Print Receipt
+</button>
+
+</div>
+
+<script>
+new QRCode(document.getElementById("qrcode"), {
+  text: window.location.href,
+  width:120,
+  height:120
+});
+
+// Auto refresh every 10 seconds
+setInterval(() => {
+  fetch(window.location.href, { cache:'no-store' })
+    .then(r => r.text())
+    .then(html => {
+      document.open(); document.write(html); document.close();
+    });
+}, 10000);
+</script>
+
+</body>
+</html>
+```
