@@ -7,115 +7,11 @@
 # SECTION 1️⃣ Secure & Security ARCHITECTURE Dashboard
 
 ### 1️⃣ Centralize Authentication -  auth.js template (reusable)
-
-[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
-
-#### ▶️ Steps for each page:
-
-1️⃣ Add at the top:
-
-```
-<body style="display:none">
-<script src="auth.js"></script>
-<script>securePage();</script>
-```
-
-2️⃣ Replace manual logout functions with the logout() from auth.js.
-
-3️⃣ For all API calls, include the token:
-
-```
-fetch(API_URL, {
-  headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
-})
-```
-
-4️⃣ Now, even if someone knows the URL of order-status.html or analytics.html, they can’t access data without login.
-
-### 🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)
+> **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
 
 #### 1️⃣ 📄 /admin/assets/auth.js
 
-```
-<script>
-/* ================= CONFIG ================= */
-const USER_POOL_ID = "CHANGE_ME";
-const CLIENT_ID = "CHANGE_ME";
-const COGNITO_DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
-const REDIRECT_URI = window.location.origin + window.location.pathname;
-
-/* ================= TOKEN HELPERS ================= */
-function parseJwt(token) {
-    return JSON.parse(atob(token.split('.')[1]));
-}
-
-function isTokenExpired(token) {
-    return parseJwt(token).exp * 1000 < Date.now();
-}
-
-/* ================= AUTH ACTIONS ================= */
-function login() {
-    const url =
-        `https://${COGNITO_DOMAIN}/login` +
-        `?response_type=token` +
-        `&client_id=${CLIENT_ID}` +
-        `&scope=openid+email+profile` +
-        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
-    window.location.href = url;
-}
-
-function logout() {
-    localStorage.removeItem("access_token");
-
-    const url =
-        `https://${COGNITO_DOMAIN}/logout` +
-        `?client_id=${CLIENT_ID}` +
-        `&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
-    window.location.href = url;
-}
-
-/* ================= HANDLE REDIRECT ================= */
-function handleAuthRedirect() {
-    if (!window.location.hash) return;
-
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    const token = params.get("access_token");
-
-    if (token) {
-        localStorage.setItem("access_token", token);
-        window.location.hash = "";
-    }
-}
-
-/* ================= PAGE GUARD ================= */
-function protectPage() {
-    handleAuthRedirect();
-
-    const token = localStorage.getItem("access_token");
-    if (!token || isTokenExpired(token)) {
-        login();
-        return;
-    }
-
-    // page is safe now
-    document.body.style.display = "block";
-}
-
-/* ================= API FETCH HELPER ================= */
-function authFetch(url, options = {}) {
-    const token = localStorage.getItem("access_token");
-    if (!token || isTokenExpired(token)) logout();
-
-    return fetch(url, {
-        ...options,
-        headers: {
-            ...(options.headers || {}),
-            Authorization: "Bearer " + token
-        }
-    });
-}
-</script>
-```
+[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
 
 #### 2️⃣  How to use it in ALL admin pages
 
