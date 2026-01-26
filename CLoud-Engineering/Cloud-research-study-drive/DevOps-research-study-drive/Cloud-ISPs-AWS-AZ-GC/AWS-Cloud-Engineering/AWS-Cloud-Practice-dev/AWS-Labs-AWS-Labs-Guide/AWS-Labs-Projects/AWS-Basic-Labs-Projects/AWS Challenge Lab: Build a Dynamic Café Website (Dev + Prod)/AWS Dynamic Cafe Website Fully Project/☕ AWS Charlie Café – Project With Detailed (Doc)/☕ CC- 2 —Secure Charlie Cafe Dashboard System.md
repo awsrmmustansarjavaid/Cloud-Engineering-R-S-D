@@ -172,6 +172,7 @@ sudo nano /var/www/html/order-status.html
 sudo nano /var/www/html/analytics.html
 ```
 
+[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 
 **✅ PHASE 1 STATUS**
