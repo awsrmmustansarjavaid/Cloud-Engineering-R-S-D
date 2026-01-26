@@ -88,8 +88,6 @@ Customer-facing order receipt + live tracking
 Customer → Place Order → Receipt + Live Tracking → Print / QR
 ```
 
-
-
 ### 1️⃣ ☕ order-receipt.php (FINAL VERSION)
 
 #### ✅ FULL Final order-status.php FILE
