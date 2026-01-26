@@ -1,5 +1,8 @@
 # Charlie Cafe - order-receipt.php
 
+### 🎯 Purpose
+
+Customer-facing order receipt + live tracking
 
 ### 1️⃣ ☕ order-receipt.php (FINAL VERSION)
 
