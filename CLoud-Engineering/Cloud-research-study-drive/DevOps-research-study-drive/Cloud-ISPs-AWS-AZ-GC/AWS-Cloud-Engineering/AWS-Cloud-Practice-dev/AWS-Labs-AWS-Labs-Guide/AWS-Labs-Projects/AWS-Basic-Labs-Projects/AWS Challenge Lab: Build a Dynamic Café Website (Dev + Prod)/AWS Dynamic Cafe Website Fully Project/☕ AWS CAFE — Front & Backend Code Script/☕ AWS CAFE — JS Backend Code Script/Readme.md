@@ -135,3 +135,87 @@ The practical application of auth.js to every individual HTML page.
 #### ▶️ Purpose: 
 
 Actually protect each page (dashboard, order-status, analytics) so nobody can view it without logging in.
+
+#### ▶️ Steps for each page:
+
+1️⃣ Add at the top:
+
+```
+<body style="display:none">
+<script src="auth.js"></script>
+<script>securePage();</script>
+```
+
+2️⃣ Replace manual logout functions with the logout() from auth.js.
+
+3️⃣ For all API calls, include the token:
+
+```
+fetch(API_URL, {
+  headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+})
+```
+
+4️⃣ Now, even if someone knows the URL of order-status.html or analytics.html, they can’t access data without login.
+
+### ✅ In short
+
+**✅ They are related but not the same.**
+
+- **Centralize Authentication:** the reusable code/tool (auth.js)
+
+- **Secure Your Admin Pages:** the practical steps to use that tool on every page
+
+#### Think of it like:
+
+- **Centralize Authentication:**  = “Here’s the key.”
+
+- **Secure Your Admin Pages:**= “Here’s how to lock each door with the key.”
+
+### 🔐 Big Picture (Very Important)
+
+#### 1️⃣ ALB / CloudFront / HTTP/2
+
+👉 Handle network-level access & delivery
+
+#### 2️⃣ auth.js (Cognito JS)
+
+👉 Handles application-level authentication
+
+**They live at different layers and work together, not against each other.**
+
+### 🧱 Layered Security Model (Professional Way)
+
+#### Think in layers, like real production systems:
+
+```
+User Browser
+   │
+   ▼
+CloudFront (HTTPS + HTTP/2 + Cache + WAF)
+   │
+   ▼
+ALB (optional auth / routing)
+   │
+   ▼
+Static Files (dashboard.html, auth.js)
+   │
+   ▼
+JavaScript Auth (Cognito tokens)
+   │
+   ▼
+API Gateway (Cognito Authorizer)
+   │
+   ▼
+Lambda / DynamoDB
+```
+
+**⚠️ Each layer has its own job.**
+
+### ❓ Your Core Confusion — Answered Directly
+
+> **“I already protected order-status.html using ALB + Cognito, so how does auth.js work?”**
+
+#### ✅ Short answer:
+
+**ALB and auth.js do NOT replace each other. They complement each other.**

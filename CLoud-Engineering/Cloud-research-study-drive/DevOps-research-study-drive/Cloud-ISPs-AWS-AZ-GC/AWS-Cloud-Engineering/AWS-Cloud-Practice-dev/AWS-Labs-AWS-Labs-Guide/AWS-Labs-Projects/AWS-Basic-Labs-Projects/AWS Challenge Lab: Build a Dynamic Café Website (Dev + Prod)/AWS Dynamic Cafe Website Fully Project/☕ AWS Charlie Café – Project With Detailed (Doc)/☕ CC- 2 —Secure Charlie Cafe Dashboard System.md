@@ -8,7 +8,7 @@
 
 ### 1️⃣ Centralize Authentication -  auth.js template (reusable)
 
-[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
 
 #### ▶️ Steps for each page:
 
@@ -31,68 +31,6 @@ fetch(API_URL, {
 ```
 
 4️⃣ Now, even if someone knows the URL of order-status.html or analytics.html, they can’t access data without login.
-
-### ✅ In short
-
-**✅ They are related but not the same.**
-
-- **Centralize Authentication:** the reusable code/tool (auth.js)
-
-- **Secure Your Admin Pages:** the practical steps to use that tool on every page
-
-#### Think of it like:
-
-- **Centralize Authentication:**  = “Here’s the key.”
-
-- **Secure Your Admin Pages:**= “Here’s how to lock each door with the key.”
-
-### 🔐 Big Picture (Very Important)
-
-#### 1️⃣ ALB / CloudFront / HTTP/2
-
-👉 Handle network-level access & delivery
-
-#### 2️⃣ auth.js (Cognito JS)
-
-👉 Handles application-level authentication
-
-**They live at different layers and work together, not against each other.**
-
-### 🧱 Layered Security Model (Professional Way)
-
-#### Think in layers, like real production systems:
-
-```
-User Browser
-   │
-   ▼
-CloudFront (HTTPS + HTTP/2 + Cache + WAF)
-   │
-   ▼
-ALB (optional auth / routing)
-   │
-   ▼
-Static Files (dashboard.html, auth.js)
-   │
-   ▼
-JavaScript Auth (Cognito tokens)
-   │
-   ▼
-API Gateway (Cognito Authorizer)
-   │
-   ▼
-Lambda / DynamoDB
-```
-
-**⚠️ Each layer has its own job.**
-
-### ❓ Your Core Confusion — Answered Directly
-
-> **“I already protected order-status.html using ALB + Cognito, so how does auth.js work?”**
-
-#### ✅ Short answer:
-
-**ALB and auth.js do NOT replace each other. They complement each other.**
 
 ###  🌐 What ALB Cognito Authentication Does
 
