@@ -6,78 +6,89 @@ Customer-facing order receipt + live tracking
 
 ### 🔧 Features
 
-✅ Backend robustness
+#### ✅ Backend robustness
 
-Uses cURL (industry standard)
+- Uses cURL (industry standard)
 
-Validates order_id
+- Validates order_id
 
-Gracefully fails if order not found
+- Gracefully fails if order not found
 
-Sanitizes output (htmlspecialchars)
+- Sanitizes output (htmlspecialchars)
 
-✅ Complete order data
+#### ✅ Complete order data
 
-Displays:
+- Displays:
 
-Order ID
+- Order ID
 
-Customer name
+- Customer name
 
-Table number
+- Table number
 
-Date & time
+- Date & time
 
-Item & quantity
+- Item & quantity
 
-Total amount
+- Total amount
 
-Order status
+- Order status
 
-✅ Status lifecycle awareness
+#### ✅ Status lifecycle awareness
 
-Handles:
+- Handles:
 
-RECEIVED
+    - RECEIVED
 
-PREPARING
+    - PREPARING
 
-READY
+    - READY
 
-COMPLETED
+    - COMPLETED
 
-Each status has visual meaning (badge colors)
+- Each status has visual meaning (badge colors)
 
-✅ QR Code (Very Important)
+#### ✅ QR Code (Very Important)
 
-Allows:
+- Allows:
 
-Mobile scanning
+    - Mobile scanning
 
-Quick re-open order status
+    - Quick re-open order status
 
-Future expansion (POS / KDS)
+    - Future expansion (POS / KDS)
 
-✅ Auto refresh (Live updates)
+#### ✅ Auto refresh (Live updates)
 
-Page refreshes every 10 seconds
+- Page refreshes every 10 seconds
 
-Customer sees status change without reloading manually
+- Customer sees status change without reloading manually
 
-✅ Print-friendly receipt
+#### ✅ Print-friendly receipt
 
-Clean invoice layout
+- Clean invoice layout
 
-Print button hidden on print
+- Print button hidden on print
 
-Looks professional on thermal printers
+- Looks professional on thermal printers
 
-🧠 Real-World Use
+### 🧠 Real-World Use
 
 ✔ Customer confirmation page
+
 ✔ QR receipt
+
 ✔ Mobile order tracking
+
 ✔ POS receipt screen
+
+### 🧠 ARCHITECTURAL
+
+```
+Customer → Place Order → Receipt + Live Tracking → Print / QR
+```
+
+
 
 ### 1️⃣ ☕ order-receipt.php (FINAL VERSION)
 
