@@ -530,7 +530,7 @@ The new order-status.php is interactive, modern, professional, and UX-friendly, 
 
 ---
 
-## 1️⃣ Single order only (via order_id - order-status.html)
+## 1️⃣ Single order only (via order_id - single-order-status-with-print-button.php)
 
 ### 1️⃣ Second Code (PHP + Static API Fetch)
 
@@ -713,4 +713,22 @@ function printPage() {
 </body>
 </html>
 ```
+
+---
+
+## 3️⃣ Comparison Table 
+
+### Between Order-Status.html VS Single-Order-Status.php
+
+| Feature / Task             | First Code                             | Second Code                            |
+| -------------------------- | -------------------------------------- | -------------------------------------- |
+| **View Scope**             | Metrics + all recent orders            | Single order only (via order_id)       |
+| **Live Updates**           | Yes, dynamic fetch via JS              | No, static fetch via PHP               |
+| **Print Option**           | ❌ Not included                         | ✅ Included                             |
+| **Error Handling**         | Yes, shows error in table              | Yes, shows alert                       |
+| **Frontend Complexity**    | High (cards, table, animations)        | Medium (simple card layout)            |
+| **Use Case**               | Admin dashboard / overview             | Customer receipt / order-specific view |
+| **API Requirement**        | API returning metrics + orders array   | API returning single order JSON        |
+| **Deployment Flexibility** | Frontend-heavy, can integrate anywhere | PHP server required                    |
+
 
