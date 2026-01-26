@@ -254,7 +254,7 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")  //
 </html>
 ```
 
-### 2️⃣ updated order-status.php ( Updated - Recommanded)
+### 2️⃣ updated order-status.html ( Updated - Recommanded)
 
 ```
 <!DOCTYPE html>
@@ -532,6 +532,15 @@ The new order-status.php is interactive, modern, professional, and UX-friendly, 
 
 ## 1️⃣ Single order only (via order_id - single-order-status-with-print-button.php)
 
+### 🧑‍💻 STEP 8 — CREATE order-status.php
+
+> **# ☕ SECTION 5️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)**
+
+> **## 🔔 PHASE 1️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)**
+
+> **#### 1️⃣ FINAL-single-order-status-with-print-button.php**
+
+
 ### 1️⃣ Second Code (PHP + Static API Fetch)
 
 #### Primary Tasks & Features:
@@ -731,4 +740,6 @@ function printPage() {
 | **API Requirement**        | API returning metrics + orders array   | API returning single order JSON        |
 | **Deployment Flexibility** | Frontend-heavy, can integrate anywhere | PHP server required                    |
 
+
+---
 
