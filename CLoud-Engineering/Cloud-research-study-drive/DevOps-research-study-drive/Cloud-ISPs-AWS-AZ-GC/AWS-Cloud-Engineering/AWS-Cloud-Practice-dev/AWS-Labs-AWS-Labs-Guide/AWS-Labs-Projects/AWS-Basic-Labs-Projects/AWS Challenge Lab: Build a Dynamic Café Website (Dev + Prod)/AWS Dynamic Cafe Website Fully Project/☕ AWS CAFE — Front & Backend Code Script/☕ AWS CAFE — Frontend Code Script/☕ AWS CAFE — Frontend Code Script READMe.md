@@ -7,7 +7,6 @@
 sudo systemctl restart httpd
 ```
 
-
 ---
 
 # SECTION 1️⃣ Cafe Order Processor
