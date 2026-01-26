@@ -254,3 +254,123 @@ You are now building:
 ✅ Cloud-ready UIs
 
 ✅ Cognito-ready architecture
+
+
+
+### Solution: Create a single secure-dashboard.js file
+
+#### This JS file will handle:
+
+- Hiding the page until authentication succeeds.
+
+- Loading and using auth.js.
+
+- Running protectPage().
+
+- Providing a secure API call helper (authFetch()).
+
+- Adding a secure logout button functionality (cognitoLogout()).
+
+- Logging and placeholder for dynamic KPI updates.
+
+- All comments explaining why each part exists.
+
+#### Then, in your new dashboard HTML, you only need:
+
+```
+<div id="secure-dashboard"></div>
+<script src="secure-dashboard.js"></script>
+```
+
+…and it will automatically handle everything.
+
+Example secure-dashboard.js
+
+```
+/* =================================================
+   SECURE DASHBOARD MODULE
+   =================================================
+   This JS file packages:
+   ✅ Page hidden until auth success
+   ✅ auth.js loaded
+   ✅ protectPage() applied
+   ✅ Secure API call placeholder
+   ✅ Cognito-ready logout()
+   ✅ Comments explaining each step
+================================================= */
+
+(function() {
+    // ================== PAGE HIDDEN INITIALLY ==================
+    document.body.style.display = "none"; // Hide until auth
+
+    // ================== LOAD AUTH.JS ==================
+    const authScript = document.createElement('script');
+    authScript.src = 'assets/auth.js'; // Make sure path is correct
+    authScript.onload = () => initSecureDashboard();
+    document.head.appendChild(authScript);
+
+    // ================== INIT FUNCTION ==================
+    function initSecureDashboard() {
+        // Protect the page
+        protectPage();
+
+        // Show body only after auth success
+        document.body.style.display = "block";
+
+        // Example secure API call placeholder
+        const API_URL = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/dashboard";
+        authFetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                console.log("Secure dashboard data:", data);
+                // TODO: update KPI cards dynamically
+            })
+            .catch(err => console.error("API error:", err));
+
+        // Attach logout functionality to all buttons with class .logout-btn
+        document.querySelectorAll('.logout-btn').forEach(btn => {
+            btn.addEventListener('click', () => cognitoLogout());
+        });
+    }
+
+})();
+```
+
+### How to use in your new HTML
+
+#### Add a logout button wherever you want:
+
+```
+<button class="logout-btn">Logout</button>
+```
+
+#### Include the script:
+
+```
+<script src="secure-dashboard.js"></script>
+```
+
+#### Optional: Wrap your dashboard in a <div> if you want:
+
+```
+<div id="dashboard-container">
+   <!-- All dashboard content -->
+</div>
+```
+
+No other changes needed. ✅
+
+#### ✅ Benefits
+
+- Only one JS file to maintain auth logic.
+
+- Can be reused across multiple dashboard pages.
+
+- Keeps your new dashboard clean.
+
+- Automatically shows/hides page based on Cognito auth.
+
+- Secure API call placeholders included.
+
+- Logout works anywhere you add .logout-btn.
+
