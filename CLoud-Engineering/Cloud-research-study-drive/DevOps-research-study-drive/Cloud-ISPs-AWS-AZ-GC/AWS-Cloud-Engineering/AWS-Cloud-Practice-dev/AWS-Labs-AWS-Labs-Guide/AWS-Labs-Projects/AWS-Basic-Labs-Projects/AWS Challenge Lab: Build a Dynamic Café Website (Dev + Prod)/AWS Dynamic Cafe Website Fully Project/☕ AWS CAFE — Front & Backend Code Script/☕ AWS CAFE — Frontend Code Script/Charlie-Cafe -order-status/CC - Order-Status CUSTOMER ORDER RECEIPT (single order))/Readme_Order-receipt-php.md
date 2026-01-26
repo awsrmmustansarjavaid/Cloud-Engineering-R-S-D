@@ -4,6 +4,81 @@
 
 Customer-facing order receipt + live tracking
 
+### 🔧 Features
+
+✅ Backend robustness
+
+Uses cURL (industry standard)
+
+Validates order_id
+
+Gracefully fails if order not found
+
+Sanitizes output (htmlspecialchars)
+
+✅ Complete order data
+
+Displays:
+
+Order ID
+
+Customer name
+
+Table number
+
+Date & time
+
+Item & quantity
+
+Total amount
+
+Order status
+
+✅ Status lifecycle awareness
+
+Handles:
+
+RECEIVED
+
+PREPARING
+
+READY
+
+COMPLETED
+
+Each status has visual meaning (badge colors)
+
+✅ QR Code (Very Important)
+
+Allows:
+
+Mobile scanning
+
+Quick re-open order status
+
+Future expansion (POS / KDS)
+
+✅ Auto refresh (Live updates)
+
+Page refreshes every 10 seconds
+
+Customer sees status change without reloading manually
+
+✅ Print-friendly receipt
+
+Clean invoice layout
+
+Print button hidden on print
+
+Looks professional on thermal printers
+
+🧠 Real-World Use
+
+✔ Customer confirmation page
+✔ QR receipt
+✔ Mobile order tracking
+✔ POS receipt screen
+
 ### 1️⃣ ☕ order-receipt.php (FINAL VERSION)
 
 #### ✅ FULL Final order-status.php FILE
