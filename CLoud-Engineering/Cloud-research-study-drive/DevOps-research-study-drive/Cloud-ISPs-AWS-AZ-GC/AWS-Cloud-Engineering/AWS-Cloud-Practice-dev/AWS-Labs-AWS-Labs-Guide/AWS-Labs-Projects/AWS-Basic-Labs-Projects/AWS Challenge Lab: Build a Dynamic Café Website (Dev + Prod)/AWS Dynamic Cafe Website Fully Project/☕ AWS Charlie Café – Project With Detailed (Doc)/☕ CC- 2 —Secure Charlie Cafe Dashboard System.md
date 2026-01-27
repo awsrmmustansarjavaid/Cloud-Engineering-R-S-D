@@ -415,14 +415,6 @@ xxxxx.cloudfront.net
 
 - **Turn OFF IPv6**
 
-#### Why
-
-- ALB and EC2 work perfectly on IPv4
-
-- Avoids DNS and routing edge-case issues during labs
-
-- Keeps troubleshooting simple
-
 ✅ Recommended for learning & labs
 
 🔁 Can be enabled later in production
@@ -432,28 +424,6 @@ xxxxx.cloudfront.net
 ```
 order-status.html
 ```
-
-#### What this does
-
-When users open the root URL:
-
-```
-https://xxxxx.cloudfront.net/
-```
-
-CloudFront automatically serves:
-
-```
-order-status.html
-```
-
-#### Benefits
-
-- Cleaner URL
-
-- Better user experience
-
-- No impact on Cognito authentication
 
 **⚠️ Do NOT add /order-status.html to Origin Path**
 **Origin Path must remain empty.**
@@ -474,9 +444,6 @@ CloudFront → ALB → EC2 Apache → order-status.html
 ```
 
 #### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
-
-> **CloudFront caches content at edge locations worldwide.
-When you update a file on EC2 (like order-status.html), CloudFront may still serve the old cached version.**
 
 **👉 Invalidation tells CloudFront to delete cached copies immediately.**
 
@@ -507,57 +474,6 @@ In Progress → Completed
 ```
 
 Usually completes in 1–3 minutes.
-
-#### When to Use Invalidation
-
-Use invalidation only when you change frontend files, such as:
-
-| Change               | Invalidate? |
-| -------------------- | ----------- |
-| HTML changes         | ✅ Yes       |
-| JS logic             | ✅ Yes       |
-| Cognito redirect URL | ✅ Yes       |
-| API Gateway backend  | ❌ No        |
-| DynamoDB data        | ❌ No        |
-
-#### Best Practice for Your Project
-
-For admin dashboards like Charlie Cafe:
-
-- Invalidate specific files
-
-- Avoid /* unless necessary
-
-✅ Recommended invalidation paths
-
-```
-/order-status.html
-/login.html
-/css/*
-/js/*
-```
-
-#### ❌ Avoid unless emergency
-
-```
-/*
-```
-
-(Uses more invalidation quota)
-
-#### Cost & Limits (Important to Know)
-
-- First 1,000 invalidation paths/month → FREE
-
-- After that → small cost per path
-
-Your usage:
-
-```
-/order-status.html → 1 path ✅
-```
-
-Perfect.
 
 #### How to Confirm Invalidation Worked
 
@@ -702,17 +618,6 @@ This is your Return URL
 | HTTPS      | ALB                            |
 | Return URL | ALB DNS + `/order-status.html` |
 | CloudFront | Later (optional)               |
-
-
-### 🧠 WHY THIS IS THE CORRECT APPROACH
-
-- Matches real AWS projects
-
-- Works with Cognito HTTPS rule
-
-- Simple & debuggable
-
-- No unnecessary complexity
 
 **✅ PHASE 2️⃣ STATUS**
 
