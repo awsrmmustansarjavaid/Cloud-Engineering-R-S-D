@@ -359,36 +359,7 @@ hr-employee-profile
 
 #### 2️⃣ Code:
 
-```
-import json
-import os
-import pymysql
-
-connection = pymysql.connect(
-    host=os.environ['DB_HOST'],
-    user=os.environ['DB_USER'],
-    password=os.environ['DB_PASS'],
-    database=os.environ['DB_NAME'],
-    cursorclass=pymysql.cursors.DictCursor
-)
-
-def lambda_handler(event, context):
-    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
-
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT name, job_title, salary, start_date
-            FROM employees
-            WHERE cognito_user_id=%s
-        """, (cognito_user_id,))
-        employee = cursor.fetchone()
-
-    return {
-        "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps(employee)
-    }
-```
+[hr-employee-profile.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/hr-employee-profile.py)
 
 - Deploy.
 
@@ -402,38 +373,7 @@ hr-attendance-history
 
 #### 2️⃣ Code:
 
-```
-import json
-import os
-import pymysql
-
-connection = pymysql.connect(
-    host=os.environ['DB_HOST'],
-    user=os.environ['DB_USER'],
-    password=os.environ['DB_PASS'],
-    database=os.environ['DB_NAME'],
-    cursorclass=pymysql.cursors.DictCursor
-)
-
-def lambda_handler(event, context):
-    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
-
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT a.attendance_date, a.checkin_time, a.checkout_time
-            FROM attendance a
-            JOIN employees e ON a.employee_id = e.employee_id
-            WHERE e.cognito_user_id=%s
-            ORDER BY a.attendance_date DESC
-        """, (cognito_user_id,))
-        records = cursor.fetchall()
-
-    return {
-        "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps(records)
-    }
-```
+[hr-attendance-history.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/hr-attendance-history.py)
 
 - Deploy.
 
@@ -447,43 +387,7 @@ hr-leaves-holidays
 
 #### 2️⃣ Code:
 
-```
-import json
-import os
-import pymysql
-
-connection = pymysql.connect(
-    host=os.environ['DB_HOST'],
-    user=os.environ['DB_USER'],
-    password=os.environ['DB_PASS'],
-    database=os.environ['DB_NAME'],
-    cursorclass=pymysql.cursors.DictCursor
-)
-
-def lambda_handler(event, context):
-    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
-
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT l.leave_date, l.leave_type
-            FROM leaves l
-            JOIN employees e ON l.employee_id = e.employee_id
-            WHERE e.cognito_user_id=%s
-        """, (cognito_user_id,))
-        leaves = cursor.fetchall()
-
-        cursor.execute("SELECT holiday_date, description FROM holidays")
-        holidays = cursor.fetchall()
-
-    return {
-        "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({
-            "leaves": leaves,
-            "holidays": holidays
-        })
-    }
-```
+[hr-leaves-holidays.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/hr-leaves-holidays.py)
 
 - Deploy.
 
