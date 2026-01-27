@@ -605,38 +605,6 @@ d2og2zrs47voou.cloudfront.net
 https://d2og2zrs47voou.cloudfront.net/order-status.html
 ```
 
-#### 🎯 WHAT “Return URL” REALLY MEANS (IN SIMPLE WORDS)
-
-> **Return URL = the web page where Cognito sends the user AFTER login**
-
-#### So after admin logs in:
-
-```
-Cognito Login → SUCCESS → redirect to order-status.html
-```
-
-**📢 Cognito does NOT host your page**
-
-**👉 YOU must host order-status.html somewhere public**
-
-#### 🧠 YOUR CURRENT SITUATION (BASED ON YOUR MESSAGE)
-
-#### You said:
-
-✅ You already have EC2
-
-✅ Apache HTTP is running
-
-❌ No ALB yet
-
-❌ No CloudFront yet
-
-#### 👉 GOOD NEWS:
-
-**💯 You DO NOT NEED ALB or CloudFront right now**
-
-> **We will do this in the EASIEST possible way first (You can add ALB + CloudFront later)**
-
 #### Now click the button at bottom-right:
 
 ```
