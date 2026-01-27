@@ -369,6 +369,37 @@ function printSummary() {
 </html>
 ```
 
+### ✅ What’s new/added:
+
+➕ Auto-refresh KPIs + chart + orders table every 10s.
+
+➕ Dynamic chart for sales trend.
+
+➕ Orders table summary in dashboard.
+
+➕ Date filter to change metrics (today / week / month).
+
+➕ Loading spinner while data fetches.
+
+➕ Print today summary button.
+
+This dashboard.html is now feature-complete and matches your table:
+
+| Feature             | Status |
+| ------------------- | ------ |
+| Login UI            | ✅      |
+| Cognito Hosted UI   | ✅      |
+| JWT storage         | ✅      |
+| Spinner             | ✅      |
+| Auto refresh (10s)  | ✅      |
+| Metrics             | ✅      |
+| Orders table        | ✅      |
+| Chart               | ✅      |
+| Date filter         | ✅      |
+| Print orders        | ✅      |
+| Print today summary | ✅      |
+
+----
 
 # SECTION 2️⃣  Previous Versions dashboard.html
 
