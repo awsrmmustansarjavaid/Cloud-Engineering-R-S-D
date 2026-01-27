@@ -1255,6 +1255,48 @@ Cognito Login → SUCCESS → redirect to order-status.html
 
 > **🟢 PHASE 2️⃣ & 3️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 6️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+### 🎯 Goal
+
+- Validate JWT token via API Gateway.
+
+- Filter orders by date in Lambda.
+
+- Return metrics and recent orders.
+
+- Ensure no frontend hacks are needed.
+
+- Fully test before moving to next phase.
+
+### 2️⃣ FINAL LAMBDA LOGIC
+
+```
+params = event.get("queryStringParameters") or {}
+filter_date = params.get("date")
+
+sql = """
+SELECT customer_name, item, quantity, table_number, created_at
+FROM orders
+"""
+values = []
+
+if filter_date:
+    sql += " WHERE DATE(created_at) = %s"
+    values.append(filter_date)
+
+sql += " ORDER BY created_at DESC LIMIT 20"
+
+cursor.execute(sql, values)
+orders = cursor.fetchall()
+```
+
+> **🚫 No more backend changes needed**
 
 
 
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
