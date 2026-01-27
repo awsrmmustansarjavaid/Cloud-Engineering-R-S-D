@@ -12,7 +12,7 @@
 <style>
 /* =================================================
    GLOBAL STYLES
-   ================================================= */
+================================================= */
 body {
     background-color: #0f0f10;
     color: #ffffff;
@@ -64,6 +64,43 @@ body {
 .bg-purple { background: #9b59b6; }
 .bg-blue { background: #3498db; }
 .bg-orange { background: #e67e22; }
+
+/* Orders table */
+.table-container {
+    margin-top: 30px;
+    background: #1c1c1e;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* Spinner */
+#spinnerOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15,15,16,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    display: none;
+}
+
+#spinnerOverlay .spinner-border {
+    width: 4rem;
+    height: 4rem;
+    color: #ff9800;
+}
+
+/* Chart */
+#metricsChart {
+    margin-top: 20px;
+    background: #1c1c1e;
+    border-radius: 15px;
+    padding: 20px;
+}
 </style>
 </head>
 
@@ -71,10 +108,6 @@ body {
 
 <!-- =================================================
      🔐 SECURE DASHBOARD CONTAINER
-     Everything inside this div will:
-     ✅ stay hidden until Cognito auth succeeds
-     ✅ become visible after protectPage()
-     (controlled by secure-dashboard.js)
 ================================================= -->
 <div id="dashboard-container">
 
@@ -97,9 +130,7 @@ body {
 
     <hr>
 
-    <!-- 🔐 SECURE LOGOUT
-         secure-dashboard.js will automatically
-         attach Cognito logout logic -->
+    <!-- 🔐 SECURE LOGOUT -->
     <a class="logout-btn" style="cursor:pointer">
         <i class="bi bi-box-arrow-left"></i> Logout
     </a>
@@ -129,31 +160,30 @@ body {
     </div>
 </div>
 
+<!-- DATE FILTER -->
+<div class="d-flex gap-3 mb-4 flex-wrap">
+    <label class="mt-2">Filter:</label>
+    <select id="dateFilter" class="form-select w-auto">
+        <option value="today">Today</option>
+        <option value="week">Last 7 Days</option>
+        <option value="month">This Month</option>
+    </select>
+    <button class="btn btn-warning" onclick="printSummary()">🖨 Print Today Summary</button>
+</div>
+
 <!-- KPI CARDS -->
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-4" id="kpiCards">
     <div class="col-md-3">
-        <div class="kpi-card bg-green">
-            <h6>Sales</h6>
-            <h3>$1,250</h3>
-        </div>
+        <div class="kpi-card bg-green"><h6>Sales</h6><h3 id="sales">0</h3></div>
     </div>
     <div class="col-md-3">
-        <div class="kpi-card bg-purple">
-            <h6>Orders</h6>
-            <h3>86</h3>
-        </div>
+        <div class="kpi-card bg-purple"><h6>Orders</h6><h3 id="ordersCount">0</h3></div>
     </div>
     <div class="col-md-3">
-        <div class="kpi-card bg-blue">
-            <h6>Drinks</h6>
-            <h3>142</h3>
-        </div>
+        <div class="kpi-card bg-blue"><h6>Drinks</h6><h3 id="drinksCount">0</h3></div>
     </div>
     <div class="col-md-3">
-        <div class="kpi-card bg-orange">
-            <h6>Avg</h6>
-            <h3>$14.50</h3>
-        </div>
+        <div class="kpi-card bg-orange"><h6>Avg</h6><h3 id="avgPrice">$0</h3></div>
     </div>
 </div>
 
@@ -162,10 +192,38 @@ body {
     <p class="text-muted">Analytics & reports coming next</p>
 </div>
 
+<!-- ================= ORDERS TABLE ================= -->
+<div class="table-container">
+    <h5>Latest Orders</h5>
+    <div class="table-responsive">
+        <table class="table table-hover text-white">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Table</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= CHART ================= -->
+<div id="metricsChart">
+    <canvas id="kpiChart" height="120"></canvas>
+</div>
+
 </div> <!-- END MAIN -->
 
+</div> <!-- END DASHBOARD CONTAINER -->
+
+<!-- ================= LOADING SPINNER ================= -->
+<div id="spinnerOverlay">
+    <div class="spinner-border" role="status"></div>
 </div>
-<!-- 🔐 END SECURE DASHBOARD CONTAINER -->
 
 <!-- ================= WELCOME TOAST ================= -->
 <div class="toast-container position-fixed top-0 end-0 p-3">
@@ -182,31 +240,11 @@ body {
 
 <!-- ================= JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- ================= TOAST LOGIC ================= -->
-<script>
-function showToast(id, key = null) {
-    const toast = document.getElementById(id);
-    if (!toast) return;
-
-    if (key) {
-        const today = new Date().toISOString().split("T")[0];
-        if (localStorage.getItem(key) === today) return;
-        localStorage.setItem(key, today);
-    }
-
-    new bootstrap.Toast(toast).show();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    showToast("welcomeToast", "dashboardWelcome");
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- ================= ROLE HANDLING ================= -->
 <script>
 localStorage.setItem("userRole", "ADMIN");
-
 if (localStorage.getItem("userRole") === "STAFF") {
     document.querySelectorAll(".admin-only").forEach(e => e.remove());
     document.getElementById("roleLabel").innerText = "Staff";
@@ -215,35 +253,93 @@ if (localStorage.getItem("userRole") === "STAFF") {
 
 <!-- ================= NOTIFICATIONS ================= -->
 <script>
-const notifications = [
-    "☕ New order received",
-    "📊 Sales updated",
-    "⚠️ Low stock alert"
-];
-
+const notifications = ["☕ New order received", "📊 Sales updated", "⚠️ Low stock alert"];
 const list = document.getElementById("notificationList");
 const badge = document.getElementById("notificationBadge");
-
 notifications.forEach(n => {
     const li = document.createElement("li");
     li.className = "dropdown-item text-white";
     li.innerText = n;
     list.appendChild(li);
 });
-
 badge.innerText = notifications.length;
 </script>
 
-<!-- =================================================
-     🔐 CENTRAL AUTH & SECURITY LAYER
-     This ONE file enables:
-     ✅ Page hidden until auth success
-     ✅ auth.js auto-loaded
-     ✅ protectPage()
-     ✅ Secure API calls (authFetch)
-     ✅ Cognito logout
-================================================= -->
+<!-- ================= CENTRAL AUTH & SECURE DASHBOARD ================= -->
 <script src="secure-dashboard.js"></script>
+
+<!-- ================= DYNAMIC DASHBOARD SCRIPT ================= -->
+<script>
+const spinner = document.getElementById("spinnerOverlay");
+const salesEl = document.getElementById("sales");
+const ordersEl = document.getElementById("ordersCount");
+const drinksEl = document.getElementById("drinksCount");
+const avgEl = document.getElementById("avgPrice");
+const ordersTable = document.getElementById("ordersTable");
+
+let kpiChart;
+
+function fetchDashboardData() {
+    spinner.style.display = "flex";
+
+    const filter = document.getElementById("dateFilter").value;
+    authFetch(`https://YOUR_API_ID.execute-api.region.amazonaws.com/prod/dashboard?filter=${filter}`)
+        .then(res => res.json())
+        .then(data => {
+            // Update KPIs
+            salesEl.innerText = `$${data.sales}`;
+            ordersEl.innerText = data.orders;
+            drinksEl.innerText = data.drinks;
+            avgEl.innerText = `$${data.avg}`;
+
+            // Update Orders Table
+            ordersTable.innerHTML = "";
+            data.latest_orders.forEach(o => {
+                ordersTable.innerHTML += `
+                    <tr>
+                        <td>${o.customer_name || 'Anonymous'}</td>
+                        <td>${o.item}</td>
+                        <td>${o.quantity}</td>
+                        <td>${o.table_number || '-'}</td>
+                        <td>${o.date}</td>
+                    </tr>`;
+            });
+
+            // Update Chart
+            const ctx = document.getElementById("kpiChart").getContext("2d");
+            if(kpiChart) kpiChart.destroy();
+            kpiChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.chart.labels,
+                    datasets: [{
+                        label: 'Sales',
+                        data: data.chart.sales,
+                        backgroundColor: 'rgba(26, 188, 156, 0.3)',
+                        borderColor: '#1abc9c',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+        }).catch(err => console.error(err))
+        .finally(() => spinner.style.display = "none");
+}
+
+// Auto-refresh every 10s
+fetchDashboardData();
+setInterval(fetchDashboardData, 10000);
+
+// Print today summary
+function printSummary() {
+    window.print();
+}
+</script>
 
 </body>
 </html>
