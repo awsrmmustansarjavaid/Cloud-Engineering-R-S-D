@@ -1426,8 +1426,6 @@ cron(0 0/1 * * ? *)
 
 - * → every year
 
-
-
 #### 🔘 Explanation (DO NOT CHANGE):
 
 - Runs every day
@@ -1668,7 +1666,6 @@ Uploaded to S3: cafe-reports
 ✔ Cleaner setup
 
 ✔ Same result as EventBridge console
-
 
 ### 3️⃣ METHOD 2- EVENTBRIDGE
 
@@ -2009,35 +2006,11 @@ analytics_2026-01-01.pdf
 
 🧠 Enterprise-grade design
 
-
-
 **✅ PHASE 7 STATUS**
 
 > **🟢 PHASE 7 COMPLETE & VERIFIED**
 ---
-
 ## PHASE 8️⃣  MODIFY ORDER STATUS PAGE
-
-### 🎯 GOAL
-
-Add a professional “Analytics & Reports” button on the existing Order Status page
-This button opens your Analytics Dashboard page.
-
-### ✅ MINIMAL CHANGE ONLY
-
-✔️ Add ONE button → “📊 Analytics”
-
-✔️ Add ONE modal (popup) → Analytics dashboard
-
-✔️ Add ONE API call → /analytics
-
-✔️ Reuse existing auth, token, layout, chart.js
-
-✔️ ZERO backend change to order-status Lambda
-
-✔️ NO new page required
-
-
 
 #### 1️⃣ – IDENTIFY ORDER STATUS PAGE FILE
 
@@ -2254,7 +2227,6 @@ function downloadPDF() {
 ✔ A SIMPLE REPLACEMENT GUIDE after the code
 
 **📢 You can paste this file as-is, then replace only the marked values.**
-
 
 ```
 <!DOCTYPE html>
