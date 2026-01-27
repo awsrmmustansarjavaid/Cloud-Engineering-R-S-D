@@ -321,4 +321,80 @@ ADMIN USES → Lambda PDF
 
 **✅ You are building a REAL PRODUCTION SYSTEM**
 
+**✅ PHASE 5 STATUS**
+
+> **🟢 PHASE 5 COMPLETE & VERIFIED**
+---
+## PHASE 6️⃣  CONNECT PDF BUTTON WITH API ( API GATEWAY)
+
+### Goal :
+
+> **When you click PDF button from**
+
+    - analytics.html 
+    
+            OR
+
+    - order-status.html
+
+➡️ API Gateway must call CafePDFReportLambda
+
+➡️ Lambda must know which page requested the PDF
+
+➡️ Browser must download/open the PDF
+
+### 🧠 BEFORE YOU START – VERIFY THESE EXIST
+
+#### STOP and verify ALL of these are already done:
+
+| Item            | Must Exist                 |
+| --------------- | -------------------------- |
+| Lambda          | `CafePDFReportLambda`      |
+| Runtime         | Python 3.10                |
+| ReportLab layer | Attached                   |
+| API Gateway     | Same API used by analytics |
+| Region          | Known (ex: `us-east-1`)    |
+
+**❗ If any item is missing → DO NOT continue**
+
+**✅ PHASE 6 STATUS**
+
+> **🟢 PHASE 6 COMPLETE & VERIFIED**
+---
+## PHASE 7️⃣  Automation Monthly Auto Report
+
+### 1️⃣ PREREQUISITE CHECK (DO THIS FIRST)
+
+**📢 Before starting, make sure:**
+
+- **Lambda exists:** CafePDFReportLambda & CafeAnalyticsLambda
+
+- Lambda already works in Test Event (manual test passed)
+
+- **Lambda IAM Role includes:**
+
+    - AmazonS3FullAccess OR
+
+    - Custom policy with s3:PutObject
+
+- S3 bucket exists (example):
+
+```
+Your S3 Bucket
+```
+    - CloudWatchLogsFullAccess
+
+- Lambda code is already working when tested manually
+
+**✅ If all above are true → continue.**
+
+**❗ If Lambda test does not work, STOP and fix Lambda first.**
+
+**This will automatically generate PDFs:**
+
+- Daily → Order Status PDF
+
+- Monthly → Analytics PDF
+
+
 
