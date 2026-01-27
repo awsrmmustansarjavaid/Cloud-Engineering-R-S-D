@@ -157,35 +157,36 @@ const CLIENT_ID = "YOUR_APP_CLIENT_ID";
 const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.region.amazoncognito.com";
 ```
 
-🧩 STEP 2 — API Gateway Integration
+### 🧩 STEP 2 — API Gateway Integration
 
-Create API → CharlieCafeDashboardAPI
+#### 1️⃣ Create API → CharlieCafeDashboardAPI
 
-Protocol: REST
+- Protocol: REST
 
-Resources: /dashboard, /analytics, /order-status
+- Resources: /dashboard, /analytics, /order-status
 
-Add Cognito Authorizer
+#### 2️⃣ Add Cognito Authorizer
 
-Type: Cognito User Pool
+- Type: Cognito User Pool
 
-Attach to all /admin/* endpoints
+- Attach to all /admin/* endpoints
 
-Method Request
+#### 3️⃣ Method Request
 
-Enable Authorization
+- Enable Authorization
 
-Authorization: Bearer <JWT>
+- Authorization: Bearer <JWT>
 
-Test API Call
+#### 4️⃣ Test API Call
 
-Using authFetch(API_URL) from auth.js
+- Using authFetch(API_URL) from auth.js
 
 ```
 authFetch("https://YOUR_API_ID.execute-api.region.amazonaws.com/prod/dashboard")
    .then(res => res.json())
    .then(data => console.log(data));
 ```
+
 
 
 
