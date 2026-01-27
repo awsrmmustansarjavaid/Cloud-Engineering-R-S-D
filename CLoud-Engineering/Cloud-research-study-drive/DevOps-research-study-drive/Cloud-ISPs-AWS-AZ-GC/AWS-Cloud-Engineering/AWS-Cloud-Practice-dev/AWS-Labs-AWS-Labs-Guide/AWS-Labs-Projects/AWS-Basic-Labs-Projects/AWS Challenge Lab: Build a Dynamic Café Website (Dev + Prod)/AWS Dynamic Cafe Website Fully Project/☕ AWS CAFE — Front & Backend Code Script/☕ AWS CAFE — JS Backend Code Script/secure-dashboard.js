@@ -1,46 +1,62 @@
 /* =================================================
    SECURE DASHBOARD MODULE
    =================================================
-   This JS file packages:
-   ✅ Page hidden until auth success
-   ✅ auth.js loaded
-   ✅ protectPage() applied
+   This JS file handles:
+   ✅ Page hidden until authentication succeeds
+   ✅ auth.js loading
+   ✅ protectPage() enforcement
    ✅ Secure API call placeholder
-   ✅ Cognito-ready logout()
-   ✅ Comments explaining each step
+   ✅ Cognito logout handling
+   ✅ Clean reusable design
 ================================================= */
 
-(function() {
-    // ================== PAGE HIDDEN INITIALLY ==================
-    document.body.style.display = "none"; // Hide until auth
+(function () {
 
-    // ================== LOAD AUTH.JS ==================
-    const authScript = document.createElement('script');
-    authScript.src = 'assets/auth.js'; // Make sure path is correct
+    /* ================= PAGE HIDDEN INIT =================
+       Prevents dashboard content from flashing
+       before authentication validation completes
+    ===================================================== */
+    document.body.style.display = "none";
+
+    /* ================= LOAD AUTH.JS =================
+       Dynamically loads Cognito authentication logic
+       Ensures auth functions exist before execution
+    ================================================== */
+    const authScript = document.createElement("script");
+    authScript.src = "assets/auth.js"; // Adjust path if needed
     authScript.onload = () => initSecureDashboard();
     document.head.appendChild(authScript);
 
-    // ================== INIT FUNCTION ==================
+    /* ================= INIT SECURE DASHBOARD ================= */
     function initSecureDashboard() {
-        // Protect the page
+
+        /* ---- Enforce authentication ---- */
         protectPage();
 
-        // Show body only after auth success
+        /* ---- Auth successful → show dashboard ---- */
         document.body.style.display = "block";
 
-        // Example secure API call placeholder
-        const API_URL = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/dashboard";
+        /* ================= SECURE API CALL =================
+           All dashboard APIs should be accessed
+           using authFetch() for token injection
+        ==================================================== */
+        const API_URL =
+            "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/dashboard";
+
         authFetch(API_URL)
             .then(res => res.json())
             .then(data => {
-                console.log("Secure dashboard data:", data);
-                // TODO: update KPI cards dynamically
+                console.log("✅ Secure dashboard data:", data);
+                // TODO: Update KPI cards dynamically
             })
-            .catch(err => console.error("API error:", err));
+            .catch(err => console.error("❌ Secure API error:", err));
 
-        // Attach logout functionality to all buttons with class .logout-btn
-        document.querySelectorAll('.logout-btn').forEach(btn => {
-            btn.addEventListener('click', () => cognitoLogout());
+        /* ================= LOGOUT HANDLER =================
+           Any button with class `.logout-btn`
+           will automatically log user out
+        =================================================== */
+        document.querySelectorAll(".logout-btn").forEach(btn => {
+            btn.addEventListener("click", () => cognitoLogout());
         });
     }
 
