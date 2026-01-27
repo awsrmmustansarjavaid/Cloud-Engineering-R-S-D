@@ -1227,239 +1227,7 @@ Redirect back with JWT
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 4️⃣ Secure & Security ARCHITECTURE Dashboard — Secure Admin Pages
-
-### 1️⃣ Centralize Authentication -  auth.js template (reusable)
-> **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
-
-### 1️⃣ 📄 /admin/assets/auth.js
-
-[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
-
-### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
-
-```
-/* ================= CONFIG ================= */
-const USER_POOL_ID = "YOUR_COGNITO_USER_POOL_ID";   // Replace with your Cognito User Pool ID
-const CLIENT_ID = "YOUR_APP_CLIENT_ID";             // Replace with your App Client ID (no secret)
-const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.ap-south-1.amazoncognito.com"; // Replace with your Cognito Hosted UI domain
-const REDIRECT_URI = window.location.origin + window.location.pathname; // Usually fine as-is
-```
-
-#### ✅ Notes:
-
-- USER_POOL_ID → from AWS Cognito → User Pool → General settings → Pool ID
-
-- CLIENT_ID → from App client inside your Cognito User Pool → App client ID
-
-- COGNITO_DOMAIN → Cognito Hosted UI domain you set up (e.g., charliecafe-admin.auth.ap-south-1.amazoncognito.com)
-
-- REDIRECT_URI → usually leave as-is, unless you are using a custom domain or CloudFront URL.
-
-- No other changes are required in your existing auth.js. This will fully connect it to your own lab environment.
-
-### 3️⃣  How to use it in ALL admin pages
-
-#### 🔐 STEP 1 — Hide page until auth passes
-
-At top of every admin HTML file:
-
-```
-<body style="display:none">
-```
-
-#### 🔐 STEP 2 — Load auth.js
-
-Before your page’s own JS:
-
-```
-<script src="assets/auth.js"></script>
-```
-
-#### 🔐 STEP 3 — Protect page
-
-At the bottom:
-
-```
-<script>
-protectPage();
-</script>
-```
-
-**✅ That’s it. Page is secured.**
-
-#### 🧪 Example: order-status.html
-
-```
-<body style="display:none">
-
-<script src="assets/auth.js"></script>
-
-<script>
-protectPage();
-
-authFetch(API_URL)
-    .then(res => res.json())
-    .then(data => console.log(data));
-</script>
-```
-
-#### 🧪 Example: analytics.html
-
-```
-<body style="display:none">
-
-<script src="assets/auth.js"></script>
-
-<script>
-protectPage();
-
-authFetch("https://api.example.com/admin/analytics")
-    .then(res => res.json())
-    .then(data => console.log(data));
-</script>
-```
-
-### 🔒 EXTRA SECURITY (OPTIONAL BUT IMPRESSIVE)
-
-#### 🔐 1. Protect APIs (MANDATORY)
-
-- API Gateway → Cognito Authorizer
-
-- Reject requests without valid JWT
-
-#### 🔐 2. Cognito Groups
-
-- Admin
-
-- Staff
-
-- Manager
-
-Then in auth.js: 
-
-```
-parseJwt(token)["cognito:groups"]
-```
-
-#### 🔐 3. CloudFront
-
-- HTTPS only
-
-- Disable directory listing
-
-- Add security headers
-
-
-### 2️⃣ SECURE DASHBOARD AUTH MODULE (Cognito Protection - secure-dashboard.js)
-> **DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)**
-
-### 🧩 STEP 1 — Create secure-dashboard.js
-
-Create a new file:
-
-```
-secure-dashboard.js
-```
-
-**📌 This file becomes the security engine for all dashboards.**
-
-
-### 🧩 STEP 2 — Add Full Secure Dashboard Module Code
-> **📄 /admin/assets/secure-dashboard.js**
-
-[secure-dashboard.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/secure-dashboard.js)
-
-
-### 🧩 STEP 3 — Update Dashboard HTML (Minimal Change)
-
-#### ⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps of phase 1.
-
-####  Frontend Web Admin Pages
-
-#### 1️⃣ Frontend Admin Dashboard 
-> **📄 File: dashboard.html**
-
-#### 1️⃣ Create dashboard.html
-
-```
-sudo nano /var/www/html/dashboard.html
-```
-
-#### 2️⃣ Paste Code
-
-[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
-
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/dashboard.html
-```
-
-```
-sudo chmod 644 /var/www/html/dashboard.html
-```
-
-
-#### 5️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-#### 6️⃣ Open page in browser (MANDATORY)
-
-```
-http:// Your EC2 Public IP/dashboard.html
-```
-
-#### 2️⃣ Frontend Admin Order-Status Dashboard
-
-```
-sudo nano /var/www/html/order-status.html
-```
-
-[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
-
-
-#### 3️⃣ Frontend Admin Analytics Dashboard
-
-```
-sudo nano /var/www/html/analytics.html
-```
-
-[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
-
-
-#### 🏆 FINAL RESULT (Big Picture)
-
-You now have enterprise-grade frontend security:
-
-✅ One auth.js for all pages
-
-✅ Cognito Hosted UI login
-
-✅ JWT → API Gateway Authorizer → Lambda
-
-✅ CloudFront + ALB compatible
-
-✅ Clean architecture (no inline hacks)
-
-✅ Admin dashboard, order status, analytics fully secured
-
-**✅ PHASE 4️⃣ STATUS**
-
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
----
-
-## 🔐 PHASE 5️⃣ — SECURE API GATEWAY AUTH (MOST IMPORTANT) 
+## 🔐 PHASE 4️⃣ — SECURE API GATEWAY AUTH (MOST IMPORTANT) 
 
 ### 1️⃣ Create Cognito Authorizer
 
@@ -1595,12 +1363,12 @@ API_URL = ".../admin/order-status"
 | Update frontend API_URL  | ✅     | Matches the stage URL             |
 
 
-**✅ PHASE 5️⃣ STATUS**
+**✅ PHASE 4️⃣ STATUS**
 
-> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 
-## 🔐 PHASE 6️⃣ — BACKEND DATE FILTER (LAMBDA)
+## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 ### 1️⃣ CREATE OR UPDATE LAMBDA
 
@@ -1771,7 +1539,7 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 **✔ Everything works → Phase Complete**
 
-### ✅ PHASE 6 COMPLETION CHECKLIST
+### ✅ PHASE 5️⃣ COMPLETION CHECKLIST
 
 ✔️ Lambda created/updated
 
@@ -1789,12 +1557,12 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ✔️ Tested manually via API & frontend
 
-**✅ PHASE 6 STATUS**
+**✅ PHASE 5️⃣ STATUS**
 
-> **🟢 PHASE 6 COMPLETE & VERIFIED**
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
 
-## 🔐 PHASE 7️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
+## 🔐 PHASE 6️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
 
 ### 🖊 Goal
 
@@ -2140,7 +1908,7 @@ Admin group     → Lambda allows
 Staff group     → Lambda restricted
 ```
 
-### 🧪 PHASE 8 TEST CHECKLIST (ALL MUST PASS)
+### 🧪 PHASE 6️⃣ TEST CHECKLIST (ALL MUST PASS)
 
 ✔ Token issued
 
@@ -2156,19 +1924,250 @@ Staff group     → Lambda restricted
 
 ✔ Staff restricted
 
-### ✅ PHASE 7️⃣ STATUS
+### ✅ PHASE 6️⃣ STATUS
 
-🟢 PHASE 7️⃣ COMPLETE
+🟢 PHASE 6️⃣ COMPLETE
 
-🟢 PHASE 7️⃣ FULLY TESTED
+🟢 PHASE 6️⃣ FULLY TESTED
 
 🟢 SAFE TO MOVE NEXT
 
 
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+
+---
+## 🔐 PHASE 7️⃣ Secure & Security ARCHITECTURE Dashboard — Secure Admin Pages
+
+### 1️⃣ Centralize Authentication -  auth.js template (reusable)
+> **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
+
+### 1️⃣ 📄 /admin/assets/auth.js
+
+[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
+
+### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
+
+```
+/* ================= CONFIG ================= */
+const USER_POOL_ID = "YOUR_COGNITO_USER_POOL_ID";   // Replace with your Cognito User Pool ID
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";             // Replace with your App Client ID (no secret)
+const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.ap-south-1.amazoncognito.com"; // Replace with your Cognito Hosted UI domain
+const REDIRECT_URI = window.location.origin + window.location.pathname; // Usually fine as-is
+```
+
+#### ✅ Notes:
+
+- USER_POOL_ID → from AWS Cognito → User Pool → General settings → Pool ID
+
+- CLIENT_ID → from App client inside your Cognito User Pool → App client ID
+
+- COGNITO_DOMAIN → Cognito Hosted UI domain you set up (e.g., charliecafe-admin.auth.ap-south-1.amazoncognito.com)
+
+- REDIRECT_URI → usually leave as-is, unless you are using a custom domain or CloudFront URL.
+
+- No other changes are required in your existing auth.js. This will fully connect it to your own lab environment.
+
+### 3️⃣  How to use it in ALL admin pages
+
+#### 🔐 STEP 1 — Hide page until auth passes
+
+At top of every admin HTML file:
+
+```
+<body style="display:none">
+```
+
+#### 🔐 STEP 2 — Load auth.js
+
+Before your page’s own JS:
+
+```
+<script src="assets/auth.js"></script>
+```
+
+#### 🔐 STEP 3 — Protect page
+
+At the bottom:
+
+```
+<script>
+protectPage();
+</script>
+```
+
+**✅ That’s it. Page is secured.**
+
+#### 🧪 Example: order-status.html
+
+```
+<body style="display:none">
+
+<script src="assets/auth.js"></script>
+
+<script>
+protectPage();
+
+authFetch(API_URL)
+    .then(res => res.json())
+    .then(data => console.log(data));
+</script>
+```
+
+#### 🧪 Example: analytics.html
+
+```
+<body style="display:none">
+
+<script src="assets/auth.js"></script>
+
+<script>
+protectPage();
+
+authFetch("https://api.example.com/admin/analytics")
+    .then(res => res.json())
+    .then(data => console.log(data));
+</script>
+```
+
+### 🔒 EXTRA SECURITY (OPTIONAL BUT IMPRESSIVE)
+
+#### 🔐 1. Protect APIs (MANDATORY)
+
+- API Gateway → Cognito Authorizer
+
+- Reject requests without valid JWT
+
+#### 🔐 2. Cognito Groups
+
+- Admin
+
+- Staff
+
+- Manager
+
+Then in auth.js: 
+
+```
+parseJwt(token)["cognito:groups"]
+```
+
+#### 🔐 3. CloudFront
+
+- HTTPS only
+
+- Disable directory listing
+
+- Add security headers
+
+
+### 2️⃣ SECURE DASHBOARD AUTH MODULE (Cognito Protection - secure-dashboard.js)
+> **DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)**
+
+### 🧩 STEP 1 — Create secure-dashboard.js
+
+Create a new file:
+
+```
+secure-dashboard.js
+```
+
+**📌 This file becomes the security engine for all dashboards.**
+
+
+### 🧩 STEP 2 — Add Full Secure Dashboard Module Code
+> **📄 /admin/assets/secure-dashboard.js**
+
+[secure-dashboard.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/secure-dashboard.js)
+
+
+### 🧩 STEP 3 — Update Dashboard HTML (Minimal Change)
+
+#### ⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps of phase 1.
+
+####  Frontend Web Admin Pages
+
+#### 1️⃣ Frontend Admin Dashboard 
+> **📄 File: dashboard.html**
+
+#### 1️⃣ Create dashboard.html
+
+```
+sudo nano /var/www/html/dashboard.html
+```
+
+#### 2️⃣ Paste Code
+
+[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 4️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/dashboard.html
+```
+
+```
+sudo chmod 644 /var/www/html/dashboard.html
+```
+
+
+#### 5️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 6️⃣ Open page in browser (MANDATORY)
+
+```
+http:// Your EC2 Public IP/dashboard.html
+```
+
+#### 2️⃣ Frontend Admin Order-Status Dashboard
+
+```
+sudo nano /var/www/html/order-status.html
+```
+
+[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+
+
+#### 3️⃣ Frontend Admin Analytics Dashboard
+
+```
+sudo nano /var/www/html/analytics.html
+```
+
+[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
+
+
+#### 🏆 FINAL RESULT (Big Picture)
+
+You now have enterprise-grade frontend security:
+
+✅ One auth.js for all pages
+
+✅ Cognito Hosted UI login
+
+✅ JWT → API Gateway Authorizer → Lambda
+
+✅ CloudFront + ALB compatible
+
+✅ Clean architecture (no inline hacks)
+
+✅ Admin dashboard, order status, analytics fully secured
+
 **✅ PHASE 7️⃣ STATUS**
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
-
 ---
 
 ## 🔐 PHASE 8️⃣ — VERIFICATION (DO NOT SKIP)
