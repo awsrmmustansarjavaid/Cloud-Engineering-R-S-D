@@ -1,8 +1,15 @@
 # AWS  ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System
 
+### READ Me About
+
+☕ CC- 2 —Secure Charlie Cafe Dashboard System.md
+[order-receipt.php](./order-receipt.php)
+
 ### Goal: Production-ready Admin Dashboard
 
 #### Secure, auto-refreshing, printable, Cognito-protected
+
+
 
 # SECTION 2️⃣ Secure Admin Order Dashboard
 
