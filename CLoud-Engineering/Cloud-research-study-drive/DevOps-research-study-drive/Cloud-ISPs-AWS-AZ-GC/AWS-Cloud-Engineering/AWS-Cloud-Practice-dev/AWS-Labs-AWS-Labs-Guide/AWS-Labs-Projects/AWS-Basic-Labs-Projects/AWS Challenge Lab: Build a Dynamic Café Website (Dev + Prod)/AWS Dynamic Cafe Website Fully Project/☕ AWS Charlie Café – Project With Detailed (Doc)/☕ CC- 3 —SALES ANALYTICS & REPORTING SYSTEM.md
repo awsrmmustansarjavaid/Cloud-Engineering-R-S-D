@@ -2727,89 +2727,6 @@ AWSSecretsManagerReadWrite
 
 ### 5️⃣ — CONNECT CafeMenu TABLE IN LAMBDA
 
-#### 1️⃣ LOCATE DYNAMODB SETUP CODE
-
-Find existing code like:
-
-```
-dynamodb = boto3.resource('dynamodb')
-orders_table = dynamodb.Table('CafeOrders')
-```
-
-#### 2️⃣ ADD THIS LINE DIRECTLY BELOW
-
-```
-menu_table = dynamodb.Table('CafeMenu')
-```
-
-**⚠️ Do not rename CafeMenu**
-
-#### 3️⃣ — ADD COST FETCH FUNCTION (EXACT)
-
-#### ADD THIS FUNCTION (COPY-PASTE)
-
-```
-def get_item_cost(item_name):
-    response = menu_table.get_item(
-        Key={'item_name': item_name}
-    )
-
-    if 'Item' not in response:
-        raise Exception(f"Cost not found for item: {item_name}")
-
-    return float(response['Item']['base_cost'])
-```
-
-✔ Handles missing item
-
-✔ Prevents silent errors
-
-#### 4️⃣ — MODIFY ORDER SAVE LOGIC (CRITICAL STEP)
-
-#### 1️⃣ FIND WHERE ORDER IS SAVED
-
-You will see code similar to:
-
-```
-item_name = body['item_name']
-quantity = int(body['quantity'])
-selling_price = float(body['price'])
-```
-
-#### 2️⃣ ADD COST CALCULATION IMMEDIATELY AFTER
-
-```
-item_cost = get_item_cost(item_name)
-```
-
-#### 3️⃣ CALCULATE TOTAL COST (IMPORTANT)
-
-```
-total_cost = item_cost * quantity
-```
-
-#### 4️⃣ SAVE ORDER WITH COST INCLUDED
-
-Modify DynamoDB put_item:
-
-```
-orders_table.put_item(
-    Item={
-        "order_id": order_id,
-        "item_name": item_name,
-        "quantity": quantity,
-        "item_price": selling_price,
-        "item_cost": item_cost,
-        "total_cost": total_cost,
-        "order_date": order_date,
-        "order_timestamp": order_timestamp,
-        "order_status": "COMPLETED"
-    }
-)
-```
-
-**⚠️ Do NOT remove existing fields**
-
 ### 🌐 FINAL UPDATED FULL CafeOrderProcessor CODE   (Recommanded)
 
 > **🔒 This is the ONLY CODE you should use**
@@ -2990,8 +2907,6 @@ def lambda_handler(event, context):
         }
 ```
 
-
-
 #### 2️⃣ — DEPLOY LAMBDA (DO NOT SKIP)
 
 - Click Deploy
@@ -3009,12 +2924,7 @@ def lambda_handler(event, context):
 | MENU_TABLE_NAME | CafeMenu   |
 | AWS_REGION      | ap-south-1 |
 
-
 - Save
-
-
-
-
 
 ### 9️⃣ — TEST THIS PHASE (MANDATORY)
 
