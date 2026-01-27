@@ -6,9 +6,7 @@
 
 
 ---
-
-# SECTION 2️⃣ Secure Admin Order Dashboard
-
+# SECTION 1️⃣ Secure Admin Order Dashboard
 
 ## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
 
