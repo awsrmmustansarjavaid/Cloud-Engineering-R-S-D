@@ -1122,7 +1122,7 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=
 sudo nano /var/www/html/dashboard.html
 ```
 
-[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
 
 
 #### 1️⃣ Edit file on EC2:
@@ -1130,6 +1130,8 @@ sudo nano /var/www/html/dashboard.html
 ```
 sudo nano /var/www/html/order-status.html
 ```
+
+[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 #### 2️⃣ Code order-status.html
 
