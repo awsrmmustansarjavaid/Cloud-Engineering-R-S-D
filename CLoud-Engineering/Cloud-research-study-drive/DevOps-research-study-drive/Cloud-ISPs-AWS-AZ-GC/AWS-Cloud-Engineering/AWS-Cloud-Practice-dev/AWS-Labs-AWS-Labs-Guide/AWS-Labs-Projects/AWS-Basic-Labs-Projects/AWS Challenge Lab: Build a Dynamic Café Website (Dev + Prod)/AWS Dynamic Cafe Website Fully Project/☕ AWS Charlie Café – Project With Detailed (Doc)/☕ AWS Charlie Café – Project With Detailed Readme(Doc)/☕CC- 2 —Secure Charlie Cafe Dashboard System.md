@@ -909,4 +909,48 @@ Default CloudFront certificate (*.cloudfront.net)
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 
 ---
+## 🔐 PHASE 3️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
+
+This phase is used to secure the Admin Order Dashboard of your Charlie Cafe project.
+
+### Goal 
+
+- Only admin users can access the admin dashboard
+
+- Login handled by Amazon Cognito
+
+- Frontend receives a JWT token
+
+- Backend (API Gateway + Lambda) validates the token
+
+### Charlie Café Admin Login (SPA-based)
+
+#### You are on this page:
+
+> **Amazon Cognito → Set up resources for your application**
+
+#### This wizard creates BOTH:
+
+- User Pool
+
+- App Client
+
+- Hosted UI
+
+- in one flow
+
+
+### 🧭 BIG PICTURE (IMPORTANT)
+
+| Old Guide Term | New Cognito UI Equivalent    |
+| -------------- | ---------------------------- |
+| User Pool      | Created automatically        |
+| App Client     | “Application”                |
+| Public client  | SPA / Web app                |
+| Auth flows     | Selected by Application type |
+| Hosted UI      | “Managed login pages”        |
+| Callback URL   | Return URL                   |
+
+---
+
 
