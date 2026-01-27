@@ -1832,7 +1832,7 @@ sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
 
 #### ⬇️ IMMEDIATELY BELOW IT, PASTE THIS:
 
-[PRINT-ONLY.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[PRINT-ONLY.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.html)
 
 ❌ Do NOT remove anything
 
@@ -1848,7 +1848,7 @@ sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
 
 #### ⬆️ JUST ABOVE IT, PASTE:
 
-[PRINT-ONLY.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[PRINT-ONLY.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.css)
 
 ✔ Ensures clean PDF
 
@@ -1862,7 +1862,7 @@ sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
 
 #### ⬇️ PASTE THIS FULL CODE:
 
-[PRINT-ONLY.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[PRINT-ONLY.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.js)
 
 ❌ Do NOT change function names
 
