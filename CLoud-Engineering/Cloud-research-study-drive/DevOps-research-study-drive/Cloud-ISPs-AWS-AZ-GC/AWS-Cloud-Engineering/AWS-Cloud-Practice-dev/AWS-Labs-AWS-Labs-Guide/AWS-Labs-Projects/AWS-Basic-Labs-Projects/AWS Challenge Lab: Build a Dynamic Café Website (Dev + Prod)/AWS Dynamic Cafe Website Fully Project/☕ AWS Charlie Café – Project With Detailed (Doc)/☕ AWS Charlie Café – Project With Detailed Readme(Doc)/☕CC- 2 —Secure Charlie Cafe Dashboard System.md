@@ -772,6 +772,107 @@ rgba(0,0,0,.55)
 ## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
 > **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
+**⚠️ ACM is FREE**
+
+#### ACM -  Optional - Request SSL Certificate (ACM) 
+
+> **⚠️ Try when do not want to use cloudFront**
+
+#### 1️⃣ Go to:
+
+```
+AWS Console → Certificate Manager (ACM)
+```
+
+> **⚠️ Make sure region is us-east-1 (same as ALB)**
+
+#### 2️⃣ Click:
+
+- Request a certificate
+
+#### 3️⃣ Choose:
+
+- Public certificate → Next
+
+#### 4️⃣ Domain name:
+
+You have two choices:
+
+✅ EASIEST (Recommended for lab)
+
+```
+*.us-east-1.elb.amazonaws.com
+```
+
+OR (more strict, also works):
+
+```
+charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com
+```
+
+#### 5️⃣ Validation:
+
+- DNS validation (default)
+
+- Click Request
+
+**👉 ACM will auto-validate (for ELB domains it’s fast)**
+
+Wait until status shows:
+
+```
+Issued ✅
+```
+
+#### 6️⃣ Add HTTPS Listener to ALB
+
+#### 1️⃣ Go to:
+
+```
+EC2 → Load Balancers → Your ALB
+```
+
+#### 2️⃣ Listeners → Add listener
+
+| Setting        | Value                        |
+| -------------- | ---------------------------- |
+| Protocol       | **HTTPS**                    |
+| Port           | **443**                      |
+| Default action | Forward to same Target Group |
+
+
+#### 3️⃣ Certificate:
+
+- Choose ACM certificate
+
+- Select the certificate you just created
+
+👉 Save
+
+#### 🟡 Now your ALB supports:
+
+- HTTP : 80
+
+- HTTPS : 443 ✅
+
+#### 7️⃣ (Optional but Recommended) Redirect HTTP → HTTPS
+
+#### Still inside ALB:
+
+- Edit HTTP (80) listener
+
+- Change action to:
+
+```
+Redirect to HTTPS : 443
+```
+
+#### 🟡 This ensures:
+
+- Users always end up on HTTPS
+
+- Cognito stays happy
+
 ### 3️⃣ — CLOUD FRONT
 
 #### 1️⃣ IPv6
