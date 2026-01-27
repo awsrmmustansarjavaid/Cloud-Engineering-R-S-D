@@ -8,7 +8,7 @@
 ---
 # SECTION 1️⃣ Secure Admin Order Dashboard
 
-## 🔐 — PREREQUISITES (CHECK ONLY)
+### 🔐 — PREREQUISITES (CHECK ONLY)
 
 ✔️ 📄 File: dashboard.html
 
