@@ -679,27 +679,7 @@ CharlieCafeAdminSPA
 ☐ Enable self-registration (DISABLED)
 ```
 
-#### Why?
-
-Your Charlie Café Admin Dashboard must be:
-
-🔐 Admin-only
-
-❌ No public sign-up
-
-👤 Users created manually by you
-
 > **So: Unchecking self-registration is 100% correct and production-ready**
-
-#### 🔍 What Happens After Disabling Self-Registration
-
-| Feature                  | Result        |
-| ------------------------ | ------------- |
-| Public sign-up page      | ❌ Disabled    |
-| “Create account” link    | ❌ Hidden      |
-| Admin-created users      | ✅ Allowed     |
-| Temporary password login | ✅ Allowed     |
-| Hosted UI login          | ✅ Still works |
 
 #### 3️⃣ Required attributes for sign-up
 
