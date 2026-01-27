@@ -88,6 +88,14 @@ Customer-facing order receipt + live tracking
 Customer → Place Order → Receipt + Live Tracking → Print / QR
 ```
 
+# SECTION 1️⃣  Latest Updated Advance order-receipt.php
+
+
+[order-receipt.php](./order-receipt.php)
+
+---
+# SECTION 2️⃣  Previous Versions order-receipt.php
+
 ### 1️⃣ ☕ order-receipt.php (FINAL VERSION)
 
 #### ✅ FULL Final order-status.php FILE
