@@ -2,131 +2,117 @@ import json
 import os
 import boto3
 from collections import defaultdict
-from datetime import datetime, timedelta
+from decimal import Decimal
 
-# ===============================
-# ENVIRONMENT VARIABLES
-# ===============================
-TABLE_NAME = os.environ['ORDERS_TABLE_NAME']
-GSI_NAME = os.environ['ORDERS_GSI_NAME']
-ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '*')
+# ==================================================
+# ✅ ENVIRONMENT VARIABLES (DO NOT HARD-CODE)
+# ==================================================
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(TABLE_NAME)
+DYNAMODB_TABLE_NAME = os.environ["DYNAMODB_TABLE_NAME"]
+AWS_REGION = os.environ["AWS_REGION"]
+
+# ==================================================
+# DO NOT CHANGE BELOW
+# ==================================================
+
+dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
+table = dynamodb.Table(DYNAMODB_TABLE_NAME)
+
+def response(status_code, body):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps(body, default=str)
+    }
 
 def lambda_handler(event, context):
 
-    # ===============================
-    # 1. READ QUERY PARAMETER
-    # ===============================
-    params = event.get('queryStringParameters') or {}
-    period = params.get('period')
+    # =====================================================
+    # 🔐 PHASE 12 — ROLE-BASED ACCESS (ADMIN ONLY)
+    # =====================================================
 
-    if not period:
-        return response(400, "Missing period parameter")
+    try:
+        claims = event["requestContext"]["authorizer"]["claims"]
+        groups = claims.get("cognito:groups", "")
+    except KeyError:
+        return response(401, "Unauthorized")
 
-    # ===============================
-    # 2. CALCULATE DATE RANGE
-    # ===============================
-    today = datetime.utcnow().date()
+    if "Admin" not in groups:
+        return response(403, "Access denied")
 
-    if period == 'today':
-        start = end = today
-    elif period == 'week':
-        start = today - timedelta(days=7)
-        end = today
-    elif period == 'month':
-        start = today.replace(day=1)
-        end = today
-    else:
-        return response(400, "Invalid period value")
+    # =====================================================
+    # 📅 GET PERIOD (day / week / month)
+    # =====================================================
 
-    # ===============================
-    # 3. QUERY DYNAMODB USING GSI
-    # ===============================
-    db_response = table.query(
-        IndexName=GSI_NAME,
-        KeyConditionExpression='order_date BETWEEN :s AND :e',
-        ExpressionAttributeValues={
-            ':s': str(start),
-            ':e': str(end)
-        }
-    )
+    period = "day"
+    if event.get("queryStringParameters"):
+        period = event["queryStringParameters"].get("period", "day")
 
-    items = db_response.get('Items', [])
+    # =====================================================
+    # 📦 READ ORDERS FROM DYNAMODB
+    # =====================================================
 
-    # ===============================
-    # 4. INITIALIZE CALCULATIONS
-    # ===============================
-    total_sales = 0
-    total_cost = 0
+    scan = table.scan()
+    orders = scan.get("Items", [])
+
+    # =====================================================
+    # 📊 PHASE 11 — PROFIT PER ITEM
+    # =====================================================
+
+    total_sales = Decimal("0")
+    total_cost = Decimal("0")
 
     item_stats = defaultdict(lambda: {
         "quantity": 0,
-        "sales": 0,
-        "cost": 0
+        "sales": Decimal("0"),
+        "cost": Decimal("0")
     })
 
-    daily_sales = defaultdict(float)
+    for o in orders:
 
-    # ===============================
-    # 5. PROCESS EACH ORDER
-    # ===============================
-    for o in items:
-        qty = int(o['quantity'])
-        sale = float(o['item_price']) * qty
-        cost = float(o['item_cost']) * qty
+        # ✅ Only COMPLETED orders
+        if o.get("order_status") != "COMPLETED":
+            continue
 
-        total_sales += sale
-        total_cost += cost
+        qty = int(o["quantity"])
+        price = Decimal(str(o["item_price"]))
+        cost = Decimal(str(o["item_cost"]))
 
-        item = o['item_name']
-        item_stats[item]['quantity'] += qty
-        item_stats[item]['sales'] += sale
-        item_stats[item]['cost'] += cost
+        item_name = o["item_name"]
 
-        daily_sales[o['order_date']] += sale
+        sales_value = price * qty
+        cost_value = cost * qty
 
-    # ===============================
-    # 6. FORMAT PROFIT PER ITEM
-    # ===============================
-    profit_items = []
-    for item, v in item_stats.items():
-        profit_items.append({
+        total_sales += sales_value
+        total_cost += cost_value
+
+        item_stats[item_name]["quantity"] += qty
+        item_stats[item_name]["sales"] += sales_value
+        item_stats[item_name]["cost"] += cost_value
+
+    profit_per_item = []
+
+    for item, data in item_stats.items():
+        profit_per_item.append({
             "item": item,
-            "quantity": v["quantity"],
-            "sales": v["sales"],
-            "cost": v["cost"],
-            "profit": v["sales"] - v["cost"]
+            "quantity": data["quantity"],
+            "sales": float(data["sales"]),
+            "cost": float(data["cost"]),
+            "profit": float(data["sales"] - data["cost"])
         })
 
-    # ===============================
-    # 7. FINAL RESPONSE FORMAT
-    # ===============================
-    response_body = {
+    # =====================================================
+    # 📤 FINAL RESPONSE (EXACT FORMAT)
+    # =====================================================
+
+    return response(200, {
         "period": period,
-        "total_sales": total_sales,
-        "total_cost": total_cost,
-        "profit": total_sales - total_cost,
-        "orders_count": len(items),
-        "profit_per_item": profit_items,
-        "daily_sales": [
-            {"date": d, "sales": s}
-            for d, s in sorted(daily_sales.items())
-        ]
-    }
-
-    return response(200, response_body)
-
-# ===============================
-# COMMON RESPONSE HANDLER
-# ===============================
-def response(code, body):
-    return {
-        "statusCode": code,
-        "headers": {
-            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-            "Content-Type": "application/json"
-        },
-        "body": json.dumps(body)
-    }
+        "total_sales": float(total_sales),
+        "total_cost": float(total_cost),
+        "profit": float(total_sales - total_cost),
+        "orders_count": len(orders),
+        "profit_per_item": profit_per_item
+    })
