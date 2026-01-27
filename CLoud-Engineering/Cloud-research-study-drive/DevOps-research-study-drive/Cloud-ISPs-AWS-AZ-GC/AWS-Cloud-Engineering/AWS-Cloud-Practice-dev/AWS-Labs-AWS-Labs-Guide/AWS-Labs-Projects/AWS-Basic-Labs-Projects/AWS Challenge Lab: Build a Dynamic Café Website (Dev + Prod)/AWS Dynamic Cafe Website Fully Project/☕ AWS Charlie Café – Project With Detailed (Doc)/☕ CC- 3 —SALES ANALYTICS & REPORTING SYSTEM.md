@@ -256,6 +256,10 @@ AmazonDynamoDBReadOnlyAccess
 
 CloudWatchLogsFullAccess
 ```
+#### ✅ FINAL UPDATED CODE 
+
+> **(Same Logic + Comments + Env Variables)**
+
 [CafeDynamoTestLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeDynamoTestLambda.py)
 
 #### 3️⃣ Run Test
