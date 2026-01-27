@@ -1,198 +1,78 @@
-/* =====================================================
-   AUTH & API SHARED UTILITIES
-   Charlie Café HR System
-   - Used by Admin & Employee pages
-   - Production hardened
-===================================================== */
+<script>
+/* ================= CONFIG ================= */
+const USER_POOL_ID = "CHANGE_ME";
+const CLIENT_ID = "CHANGE_ME";
+const COGNITO_DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
+const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-/* ===============================
-   GLOBAL CONFIG (FROM config.js)
-   IMPORTANT:
-   config.js MUST be loaded BEFORE this file
-================================ */
-const poolData = {
-    UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
-    ClientId: CONFIG.COGNITO.CLIENT_ID
-};
+/* ================= TOKEN HELPERS ================= */
+function parseJwt(token) {
+    return JSON.parse(atob(token.split('.')[1]));
+}
 
-const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-const apiBase = CONFIG.API_BASE;
+function isTokenExpired(token) {
+    return parseJwt(token).exp * 1000 < Date.now();
+}
 
-/* ===============================
-   PAGE PROTECTION
-   Blocks unauthenticated users
-================================ */
+/* ================= AUTH ACTIONS ================= */
+function login() {
+    const url =
+        `https://${COGNITO_DOMAIN}/login` +
+        `?response_type=token` +
+        `&client_id=${CLIENT_ID}` +
+        `&scope=openid+email+profile` +
+        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+    window.location.href = url;
+}
+
+function logout() {
+    localStorage.removeItem("access_token");
+
+    const url =
+        `https://${COGNITO_DOMAIN}/logout` +
+        `?client_id=${CLIENT_ID}` +
+        `&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+    window.location.href = url;
+}
+
+/* ================= HANDLE REDIRECT ================= */
+function handleAuthRedirect() {
+    if (!window.location.hash) return;
+
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const token = params.get("access_token");
+
+    if (token) {
+        localStorage.setItem("access_token", token);
+        window.location.hash = "";
+    }
+}
+
+/* ================= PAGE GUARD ================= */
 function protectPage() {
-    const user = userPool.getCurrentUser();
-    if (!user) {
-        window.location.href = "login.html";
-    }
-}
+    handleAuthRedirect();
 
-/* ===============================
-   GET JWT TOKEN (WITH EXPIRY CHECK)
-================================ */
-async function getJWT() {
-    const user = userPool.getCurrentUser();
-
-    return new Promise((resolve, reject) => {
-        if (!user) {
-            reject("No active session");
-            return;
-        }
-
-        user.getSession((err, session) => {
-            if (err || !session.isValid()) {
-                alert("Session expired. Please login again.");
-                user.signOut();
-                window.location.href = "login.html";
-                reject("Session expired");
-                return;
-            }
-
-            resolve(session.getIdToken().getJwtToken());
-        });
-    });
-}
-
-/* ===============================
-   SECURE API CALL HELPER
-   Automatically attaches JWT
-================================ */
-async function secureFetch(url, method = "GET", body = null) {
-    const token = await getJWT();
-
-    const options = {
-        method: method,
-        headers: {
-            "Authorization": token,
-            "Content-Type": "application/json"
-        }
-    };
-
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    const response = await fetch(url, options);
-
-    if (!response.ok) {
-        throw new Error("API request failed or unauthorized");
-    }
-
-    return response.json();
-}
-
-/* ===============================
-   ROLE DETECTION FROM JWT
-================================ */
-async function getUserRoles() {
-    const user = userPool.getCurrentUser();
-
-    return new Promise((resolve, reject) => {
-        if (!user) reject("No user");
-
-        user.getSession((err, session) => {
-            if (err) reject(err);
-
-            const payload = session.getIdToken().decodePayload();
-            resolve(payload["cognito:groups"] || []);
-        });
-    });
-}
-
-/* ===============================
-   ADMIN UI ENFORCEMENT
-================================ */
-async function enforceAdminAccess() {
-    const roles = await getUserRoles();
-
-    if (!roles.includes("Admin")) {
-        alert("Unauthorized access");
-        window.location.href = "login.html";
+    const token = localStorage.getItem("access_token");
+    if (!token || isTokenExpired(token)) {
+        login();
         return;
     }
 
-    const adminSection = document.getElementById("admin-section");
-    if (adminSection) {
-        adminSection.style.display = "block";
-    }
+    // page is safe now
+    document.body.style.display = "block";
 }
 
-/* ===============================
-   EMPLOYEE UI ENFORCEMENT
-================================ */
-async function enforceEmployeeAccess() {
-    const roles = await getUserRoles();
+/* ================= API FETCH HELPER ================= */
+function authFetch(url, options = {}) {
+    const token = localStorage.getItem("access_token");
+    if (!token || isTokenExpired(token)) logout();
 
-    if (!roles.includes("Employee")) {
-        alert("Unauthorized access");
-        window.location.href = "login.html";
-    }
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            Authorization: "Bearer " + token
+        }
+    });
 }
-
-/* ===============================
-   LOGOUT (COGNITO)
-================================ */
-function logout() {
-    const user = userPool.getCurrentUser();
-    if (user) {
-        user.signOut();
-    }
-    window.location.href = "index.html";
-}
-
-/* ===============================
-   GLOBAL ERROR HANDLER
-================================ */
-function handleError(error) {
-    console.error("Application Error:", error);
-    alert("Something went wrong. Please try again.");
-}
-
-/* ===============================
-   LOADER (UX POLISH)
-================================ */
-function showLoader() {
-    const loader = document.getElementById("loader");
-    if (loader) loader.style.display = "block";
-}
-
-function hideLoader() {
-    const loader = document.getElementById("loader");
-    if (loader) loader.style.display = "none";
-}
-
-/* ===============================
-   API USAGE EXAMPLES
-================================ */
-
-/* Employee Profile */
-async function loadEmployeeProfile() {
-    try {
-        showLoader();
-        const data = await secureFetch(apiBase + "/employee/profile");
-
-        document.getElementById("profile-name").innerText = data.name;
-        document.getElementById("profile-job").innerText = data.job_title;
-        document.getElementById("profile-salary").innerText = data.salary;
-        document.getElementById("profile-start").innerText = data.start_date;
-    } catch (err) {
-        handleError(err);
-    } finally {
-        hideLoader();
-    }
-}
-
-/* Admin: Load All Employees */
-async function loadAllEmployees() {
-    try {
-        showLoader();
-        const data = await secureFetch(apiBase + "/admin/employees");
-        console.log("Employees:", data);
-    } catch (err) {
-        handleError(err);
-    } finally {
-        hideLoader();
-    }
-}
+</script>
