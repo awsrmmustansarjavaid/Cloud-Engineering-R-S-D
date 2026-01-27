@@ -4,629 +4,6 @@
 
 #### Secure, auto-refreshing, printable, Cognito-protected
 
-# SECTION 1️⃣ Secure & Security ARCHITECTURE Dashboard
-
-## ## 🔐 PHASE  1️⃣ Secure Admin Pages
-
-### 1️⃣ Centralize Authentication -  auth.js template (reusable)
-> **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
-
-#### 1️⃣ 📄 /admin/assets/auth.js
-
-[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
-
-#### 2️⃣  How to use it in ALL admin pages
-
-#### 🔐 STEP 1 — Hide page until auth passes
-
-At top of every admin HTML file:
-
-```
-<body style="display:none">
-```
-
-#### 🔐 STEP 2 — Load auth.js
-
-Before your page’s own JS:
-
-```
-<script src="assets/auth.js"></script>
-```
-
-#### 🔐 STEP 3 — Protect page
-
-At the bottom:
-
-```
-<script>
-protectPage();
-</script>
-```
-
-**✅ That’s it. Page is secured.**
-
-#### 🧪 Example: order-status.html
-
-```
-<body style="display:none">
-
-<script src="assets/auth.js"></script>
-
-<script>
-protectPage();
-
-authFetch(API_URL)
-    .then(res => res.json())
-    .then(data => console.log(data));
-</script>
-```
-
-#### 🧪 Example: analytics.html
-
-```
-<body style="display:none">
-
-<script src="assets/auth.js"></script>
-
-<script>
-protectPage();
-
-authFetch("https://api.example.com/admin/analytics")
-    .then(res => res.json())
-    .then(data => console.log(data));
-</script>
-```
-
-### 🔒 EXTRA SECURITY (OPTIONAL BUT IMPRESSIVE)
-
-#### 🔐 1. Protect APIs (MANDATORY)
-
-- API Gateway → Cognito Authorizer
-
-- Reject requests without valid JWT
-
-#### 🔐 2. Cognito Groups
-
-- Admin
-
-- Staff
-
-- Manager
-
-Then in auth.js: 
-
-```
-parseJwt(token)["cognito:groups"]
-```
-
-#### 🔐 3. CloudFront
-
-- HTTPS only
-
-- Disable directory listing
-
-- Add security headers
-
-
-### 2️⃣ SECURE DASHBOARD AUTH MODULE (Cognito Protection - secure-dashboard.js)
-> **DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)**
-
-### 🧩 STEP 1 — Create secure-dashboard.js
-
-Create a new file:
-
-```
-secure-dashboard.js
-```
-
-**📌 This file becomes the security engine for all dashboards.**
-
-
-### 🧩 STEP 2 — Add Full Secure Dashboard Module Code
-> **📄 /admin/assets/secure-dashboard.js**
-
-[secure-dashboard.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/secure-dashboard.js)
-
-
-### 🧩 STEP 3 — Update Dashboard HTML (Minimal Change)
-
-#### ⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps of phase 1.
-
-####  Frontend Web Admin Pages
-
-#### 1️⃣ Frontend Admin Dashboard 
-> **📄 File: dashboard.html**
-
-#### 1️⃣ Create dashboard.html
-
-```
-sudo nano /var/www/html/dashboard.html
-```
-
-#### 2️⃣ Paste Code
-
-[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
-
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/dashboard.html
-```
-
-```
-sudo chmod 644 /var/www/html/dashboard.html
-```
-
-
-#### 5️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-#### 6️⃣ Open page in browser (MANDATORY)
-
-```
-http:// Your EC2 Public IP/dashboard.html
-```
-
-#### 2️⃣ Frontend Admin Order-Status Dashboard
-
-```
-sudo nano /var/www/html/order-status.html
-```
-
-[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
-
-
-#### 3️⃣ Frontend Admin Analytics Dashboard
-
-```
-sudo nano /var/www/html/analytics.html
-```
-
-[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
-
-
-#### 🏆 FINAL RESULT (Big Picture)
-
-You now have enterprise-grade frontend security:
-
-✅ One auth.js for all pages
-
-✅ Cognito Hosted UI login
-
-✅ JWT → API Gateway Authorizer → Lambda
-
-✅ CloudFront + ALB compatible
-
-✅ Clean architecture (no inline hacks)
-
-✅ Admin dashboard, order status, analytics fully secured
-
-
-**✅ PHASE 1 STATUS**
-
-> **🟢 PHASE 1 COMPLETE & VERIFIED**
-
----
-## 🔐 PHASE 2️⃣ — 
-
-
-**✅ PHASE 2 STATUS**
-
-> **🟢 PHASE 2 COMPLETE & VERIFIED**
----
-## 🔐 PHASE 3️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
-
-#### (ONE FILE ONLY)
-
-### 🎯 What this frontend already includes
-
-| Feature             | Status |
-| ------------------- | ------ |
-| Login UI            | ✅      |
-| Cognito Hosted UI   | ✅      |
-| JWT storage         | ✅      |
-| Spinner             | ✅      |
-| Auto refresh (10s)  | ✅      |
-| Metrics             | ✅      |
-| Orders table        | ✅      |
-| Chart               | ✅      |
-| Date filter         | ✅      |
-| Print orders        | ✅      |
-| Print today summary | ✅      |
-
-### 📄 FINAL FRONTEND FILE (ONLY ONCE)
-
-#### 📍 Location:
-
-> **dashboard.html (Recommanded)**
-
-```
-/var/www/html/dashboard.html
-```
-
-> **You NEVER modify this file again except 4 config values**
-
-### 🔧 ONLY CHANGE THESE 4 VALUES
-
-```
-const USER_POOL_ID = "CHANGE_ME";
-const CLIENT_ID = "CHANGE_ME";
-const COGNITO_DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
-const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-status";
-```
-
-#### ✅ Everything else stays unchanged forever
-
-#### ✅ Code (Login + Dashboard fully integrated & Recommanded )
-
-- Cognito Hosted UI redirect login (login() & handleRedirect())
-
-- Access Token stored in localStorage
-
-- Bearer prefix added in Authorization header
-
-- Token expiry check implemented
-
-- Navbar hidden until login
-
-- Spinner, chart, metrics, and table all intact
-
-- Auto-refresh every 10s maintained
-
-#### 1️⃣ Updated Frontend Pages
-
-#### Here’s the updated HTML/JS code:
-
-### ✅ What We Added / Changed
-
-- Sidebar & main content initially hidden → display:none until login.
-
-- Cognito config → COGNITO_DOMAIN, CLIENT_ID, REDIRECT_URI.
-
-- Login function → redirects to Cognito Hosted UI.
-
-- Logout function → clears token + redirect to Cognito logout.
-
-- handleRedirect → extracts JWT from URL hash after login.
-
-- Token validation → isTokenExpired() ensures user cannot access dashboard with expired token.
-
-- Fetch dashboard data with Authorization header → secure API calls.
-
-- Auto-refresh every 10 seconds → charts and KPI cards update dynamically.
-
-
-> **dashboard.html (Recommanded)**
-
-```
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Charlie Cafe ☕ | Admin Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- ================= BOOTSTRAP ================= -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- ================= ICONS ================= -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-<!-- ================= CHART.JS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-/* =================================================
-   GLOBAL THEME (DARK CAFE STYLE)
-   ================================================= */
-body {
-    background-color: #0f0f10;
-    color: #ffffff;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-/* =================================================
-   SIDEBAR
-   ================================================= */
-.sidebar {
-    width: 250px;
-    background: #151515;
-    min-height: 100vh;
-    position: fixed;
-    padding: 20px;
-    display: none; /* Hidden until login */
-}
-
-.sidebar h4 {
-    font-weight: 700;
-}
-
-.sidebar a {
-    display: block;
-    color: #bbb;
-    padding: 12px;
-    border-radius: 10px;
-    text-decoration: none;
-    margin-bottom: 8px;
-}
-
-.sidebar a.active,
-.sidebar a:hover {
-    background: #ff9800;
-    color: #000;
-}
-
-/* =================================================
-   MAIN CONTENT
-   ================================================= */
-.main {
-    margin-left: 260px;
-    padding: 25px;
-    display: none; /* Hidden until login */
-}
-
-/* =================================================
-   HEADER BAR
-   ================================================= */
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-box input {
-    background: #222;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 20px;
-    color: white;
-}
-
-/* =================================================
-   KPI CARDS
-   ================================================= */
-.kpi-card {
-    border-radius: 20px;
-    padding: 20px;
-    color: white;
-}
-
-.bg-green { background: #1abc9c; }
-.bg-purple { background: #9b59b6; }
-.bg-blue { background: #3498db; }
-.bg-orange { background: #e67e22; }
-
-/* =================================================
-   CONTENT CARDS
-   ================================================= */
-.card-dark {
-    background: #1c1c1e;
-    border-radius: 20px;
-    padding: 20px;
-}
-
-/* =================================================
-   TRENDING DRINKS
-   ================================================= */
-.drink-card {
-    background: #1c1c1e;
-    border-radius: 20px;
-    padding: 15px;
-    text-align: center;
-}
-
-.drink-card img {
-    width: 100%;
-    border-radius: 15px;
-}
-</style>
-</head>
-
-<body>
-
-<!-- =================================================
-     SIDEBAR (Hidden until login)
-     ================================================= -->
-<div class="sidebar" id="sidebar">
-    <h4>☕ Charlie Cafe</h4>
-    <p class="text-muted">Admin Dashboard</p>
-
-    <!-- Navigation -->
-    <a class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <a href="#"><i class="bi bi-cup-hot"></i> Menu</a>
-    <a href="#"><i class="bi bi-bag-check"></i> Orders</a>
-    <a href="#"><i class="bi bi-graph-up"></i> Analytics</a>
-    <a href="#"><i class="bi bi-gear"></i> Settings</a>
-
-    <hr>
-
-    <!-- Logout -->
-    <a onclick="logout()" style="cursor:pointer">
-        <i class="bi bi-box-arrow-left"></i> Logout
-    </a>
-</div>
-
-<!-- =================================================
-     MAIN CONTENT (Hidden until login)
-     ================================================= -->
-<div class="main" id="mainContent">
-
-<!-- ================= HEADER ================= -->
-<div class="top-bar mb-4">
-    <h5>Welcome, Admin 👋</h5>
-
-    <div class="search-box">
-        <input type="text" placeholder="🔍 Search orders, drinks">
-    </div>
-
-    <div>
-        <i class="bi bi-bell"></i>
-        <span class="ms-3">Charlie Cafe</span>
-        <small class="text-muted">Admin</small>
-    </div>
-</div>
-
-<!-- ================= KPI ROW ================= -->
-<div class="row g-4 mb-4" id="kpiRow">
-    <!-- KPI Cards will be dynamically updated from API -->
-</div>
-
-<!-- ================= CHART PLACEHOLDERS ================= -->
-<div class="row g-4" id="chartRow">
-    <div class="col-md-6">
-        <div class="card-dark">
-            <h5>Sales Overview</h5>
-            <p class="text-muted">Daily / Weekly / Monthly</p>
-            <canvas id="salesChart"></canvas>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card-dark">
-            <h5>Orders Trend</h5>
-            <canvas id="ordersChart"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- ================= TRENDING DRINKS ================= -->
-<div class="mt-5">
-    <h5>🔥 Trending Drinks</h5>
-    <div class="row g-4 mt-2" id="trendingDrinks">
-        <!-- Cards remain static for now -->
-    </div>
-</div>
-
-</div>
-
-<!-- =================================================
-     JAVASCRIPT: COGNITO + DASHBOARD LOGIC
-     ================================================= -->
-<script>
-/* ================== CONFIG ================== */
-const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
-const CLIENT_ID = "YOUR_APP_CLIENT_ID";
-const REDIRECT_URI = window.location.origin;
-const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/dashboard";
-
-let salesChart, ordersChart, refreshTimer;
-
-/* ================== AUTH ================== */
-function parseJwt(token) {
-    return JSON.parse(atob(token.split('.')[1]));
-}
-
-function isTokenExpired(token) {
-    const payload = parseJwt(token);
-    return payload.exp * 1000 < Date.now();
-}
-
-function login() {
-    const loginUrl = `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
-    window.location.href = loginUrl;
-}
-
-function logout() {
-    localStorage.removeItem("token");
-    clearInterval(refreshTimer);
-    const logoutUrl = `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
-    window.location.href = logoutUrl;
-}
-
-function handleRedirect() {
-    const hash = window.location.hash.substr(1);
-    const params = new URLSearchParams(hash);
-    const token = params.get("access_token");
-    if (token) {
-        localStorage.setItem("token", token);
-        window.location.hash = "";
-    }
-}
-
-/* ================== DASHBOARD ================== */
-function showDashboard() {
-    const token = localStorage.getItem("token");
-    if (!token || isTokenExpired(token)) {
-        login();
-        return;
-    }
-
-    document.getElementById("sidebar").style.display = "block";
-    document.getElementById("mainContent").style.display = "block";
-
-    loadData();
-    refreshTimer = setInterval(loadData, 10000);
-}
-
-/* ================== DATA FETCH ================== */
-function loadData() {
-    const token = localStorage.getItem("token");
-    if (!token || isTokenExpired(token)) return logout();
-
-    fetch(API_URL, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => {
-        if (res.status === 401) logout();
-        return res.json();
-    })
-    .then(data => {
-        // Populate KPI Cards
-        const kpiRow = document.getElementById("kpiRow");
-        kpiRow.innerHTML = "";
-        data.metrics.forEach(m => {
-            kpiRow.innerHTML += `
-                <div class="col-md-3">
-                    <div class="kpi-card ${m.bgClass}">
-                        <h6>${m.metric}</h6>
-                        <h3>${m.count}</h3>
-                    </div>
-                </div>`;
-        });
-
-        // Sales Chart
-        if (salesChart) salesChart.destroy();
-        salesChart = new Chart(document.getElementById("salesChart"), {
-            type: 'line',
-            data: {
-                labels: data.sales.labels,
-                datasets: [{ label: 'Sales', data: data.sales.values, backgroundColor:'rgba(255,152,0,0.3)', borderColor:'orange', fill:true }]
-            }
-        });
-
-        // Orders Chart
-        if (ordersChart) ordersChart.destroy();
-        ordersChart = new Chart(document.getElementById("ordersChart"), {
-            type: 'bar',
-            data: {
-                labels: data.orders.labels,
-                datasets: [{ label: 'Orders', data: data.orders.values, backgroundColor:'rgba(0,123,255,0.7)' }]
-            }
-        });
-    });
-}
-
-/* ================== INIT ================== */
-handleRedirect();
-showDashboard();
-</script>
-
-</body>
-</html>
-```
-
-# SECTION 2️⃣ Secure & Security ARCHITECTURE Dashboard 🟢 COMPLETE ✅
----
 # SECTION 2️⃣ Secure Admin Order Dashboard
 
 
@@ -5798,5 +5175,628 @@ if(!userGroups.includes("Admin")){
 
 > **🟢 PHASE 2 COMPLETE & VERIFIED**
 
-# SECTION 2️⃣ Secure Admin Order Dashboard 🟢 COMPLETE ✅
+# SECTION 1️⃣ Secure Admin Order Dashboard 🟢 COMPLETE ✅
+---
+# SECTION 2️⃣ Secure & Security ARCHITECTURE Dashboard
+
+## ## 🔐 PHASE  1️⃣ Secure Admin Pages
+
+### 1️⃣ Centralize Authentication -  auth.js template (reusable)
+> **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
+
+#### 1️⃣ 📄 /admin/assets/auth.js
+
+[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
+
+#### 2️⃣  How to use it in ALL admin pages
+
+#### 🔐 STEP 1 — Hide page until auth passes
+
+At top of every admin HTML file:
+
+```
+<body style="display:none">
+```
+
+#### 🔐 STEP 2 — Load auth.js
+
+Before your page’s own JS:
+
+```
+<script src="assets/auth.js"></script>
+```
+
+#### 🔐 STEP 3 — Protect page
+
+At the bottom:
+
+```
+<script>
+protectPage();
+</script>
+```
+
+**✅ That’s it. Page is secured.**
+
+#### 🧪 Example: order-status.html
+
+```
+<body style="display:none">
+
+<script src="assets/auth.js"></script>
+
+<script>
+protectPage();
+
+authFetch(API_URL)
+    .then(res => res.json())
+    .then(data => console.log(data));
+</script>
+```
+
+#### 🧪 Example: analytics.html
+
+```
+<body style="display:none">
+
+<script src="assets/auth.js"></script>
+
+<script>
+protectPage();
+
+authFetch("https://api.example.com/admin/analytics")
+    .then(res => res.json())
+    .then(data => console.log(data));
+</script>
+```
+
+### 🔒 EXTRA SECURITY (OPTIONAL BUT IMPRESSIVE)
+
+#### 🔐 1. Protect APIs (MANDATORY)
+
+- API Gateway → Cognito Authorizer
+
+- Reject requests without valid JWT
+
+#### 🔐 2. Cognito Groups
+
+- Admin
+
+- Staff
+
+- Manager
+
+Then in auth.js: 
+
+```
+parseJwt(token)["cognito:groups"]
+```
+
+#### 🔐 3. CloudFront
+
+- HTTPS only
+
+- Disable directory listing
+
+- Add security headers
+
+
+### 2️⃣ SECURE DASHBOARD AUTH MODULE (Cognito Protection - secure-dashboard.js)
+> **DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)**
+
+### 🧩 STEP 1 — Create secure-dashboard.js
+
+Create a new file:
+
+```
+secure-dashboard.js
+```
+
+**📌 This file becomes the security engine for all dashboards.**
+
+
+### 🧩 STEP 2 — Add Full Secure Dashboard Module Code
+> **📄 /admin/assets/secure-dashboard.js**
+
+[secure-dashboard.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/secure-dashboard.js)
+
+
+### 🧩 STEP 3 — Update Dashboard HTML (Minimal Change)
+
+#### ⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps of phase 1.
+
+####  Frontend Web Admin Pages
+
+#### 1️⃣ Frontend Admin Dashboard 
+> **📄 File: dashboard.html**
+
+#### 1️⃣ Create dashboard.html
+
+```
+sudo nano /var/www/html/dashboard.html
+```
+
+#### 2️⃣ Paste Code
+
+[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 4️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/dashboard.html
+```
+
+```
+sudo chmod 644 /var/www/html/dashboard.html
+```
+
+
+#### 5️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 6️⃣ Open page in browser (MANDATORY)
+
+```
+http:// Your EC2 Public IP/dashboard.html
+```
+
+#### 2️⃣ Frontend Admin Order-Status Dashboard
+
+```
+sudo nano /var/www/html/order-status.html
+```
+
+[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+
+
+#### 3️⃣ Frontend Admin Analytics Dashboard
+
+```
+sudo nano /var/www/html/analytics.html
+```
+
+[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
+
+
+#### 🏆 FINAL RESULT (Big Picture)
+
+You now have enterprise-grade frontend security:
+
+✅ One auth.js for all pages
+
+✅ Cognito Hosted UI login
+
+✅ JWT → API Gateway Authorizer → Lambda
+
+✅ CloudFront + ALB compatible
+
+✅ Clean architecture (no inline hacks)
+
+✅ Admin dashboard, order status, analytics fully secured
+
+
+**✅ PHASE 1 STATUS**
+
+> **🟢 PHASE 1 COMPLETE & VERIFIED**
+
+---
+## 🔐 PHASE 2️⃣ — 
+
+
+**✅ PHASE 2 STATUS**
+
+> **🟢 PHASE 2 COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 3️⃣ — DEPLOY FINAL FRONTEND (WRITE ONCE ✅)
+
+#### (ONE FILE ONLY)
+
+### 🎯 What this frontend already includes
+
+| Feature             | Status |
+| ------------------- | ------ |
+| Login UI            | ✅      |
+| Cognito Hosted UI   | ✅      |
+| JWT storage         | ✅      |
+| Spinner             | ✅      |
+| Auto refresh (10s)  | ✅      |
+| Metrics             | ✅      |
+| Orders table        | ✅      |
+| Chart               | ✅      |
+| Date filter         | ✅      |
+| Print orders        | ✅      |
+| Print today summary | ✅      |
+
+### 📄 FINAL FRONTEND FILE (ONLY ONCE)
+
+#### 📍 Location:
+
+> **dashboard.html (Recommanded)**
+
+```
+/var/www/html/dashboard.html
+```
+
+> **You NEVER modify this file again except 4 config values**
+
+### 🔧 ONLY CHANGE THESE 4 VALUES
+
+```
+const USER_POOL_ID = "CHANGE_ME";
+const CLIENT_ID = "CHANGE_ME";
+const COGNITO_DOMAIN = "CHANGE_ME.auth.ap-south-1.amazoncognito.com";
+const API_URL = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/admin/order-status";
+```
+
+#### ✅ Everything else stays unchanged forever
+
+#### ✅ Code (Login + Dashboard fully integrated & Recommanded )
+
+- Cognito Hosted UI redirect login (login() & handleRedirect())
+
+- Access Token stored in localStorage
+
+- Bearer prefix added in Authorization header
+
+- Token expiry check implemented
+
+- Navbar hidden until login
+
+- Spinner, chart, metrics, and table all intact
+
+- Auto-refresh every 10s maintained
+
+#### 1️⃣ Updated Frontend Pages
+
+#### Here’s the updated HTML/JS code:
+
+### ✅ What We Added / Changed
+
+- Sidebar & main content initially hidden → display:none until login.
+
+- Cognito config → COGNITO_DOMAIN, CLIENT_ID, REDIRECT_URI.
+
+- Login function → redirects to Cognito Hosted UI.
+
+- Logout function → clears token + redirect to Cognito logout.
+
+- handleRedirect → extracts JWT from URL hash after login.
+
+- Token validation → isTokenExpired() ensures user cannot access dashboard with expired token.
+
+- Fetch dashboard data with Authorization header → secure API calls.
+
+- Auto-refresh every 10 seconds → charts and KPI cards update dynamically.
+
+
+> **dashboard.html (Recommanded)**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================= ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- ================= CHART.JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* =================================================
+   GLOBAL THEME (DARK CAFE STYLE)
+   ================================================= */
+body {
+    background-color: #0f0f10;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* =================================================
+   SIDEBAR
+   ================================================= */
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+    display: none; /* Hidden until login */
+}
+
+.sidebar h4 {
+    font-weight: 700;
+}
+
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+    background: #ff9800;
+    color: #000;
+}
+
+/* =================================================
+   MAIN CONTENT
+   ================================================= */
+.main {
+    margin-left: 260px;
+    padding: 25px;
+    display: none; /* Hidden until login */
+}
+
+/* =================================================
+   HEADER BAR
+   ================================================= */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-box input {
+    background: #222;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: white;
+}
+
+/* =================================================
+   KPI CARDS
+   ================================================= */
+.kpi-card {
+    border-radius: 20px;
+    padding: 20px;
+    color: white;
+}
+
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+
+/* =================================================
+   CONTENT CARDS
+   ================================================= */
+.card-dark {
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* =================================================
+   TRENDING DRINKS
+   ================================================= */
+.drink-card {
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+}
+
+.drink-card img {
+    width: 100%;
+    border-radius: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- =================================================
+     SIDEBAR (Hidden until login)
+     ================================================= -->
+<div class="sidebar" id="sidebar">
+    <h4>☕ Charlie Cafe</h4>
+    <p class="text-muted">Admin Dashboard</p>
+
+    <!-- Navigation -->
+    <a class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="#"><i class="bi bi-cup-hot"></i> Menu</a>
+    <a href="#"><i class="bi bi-bag-check"></i> Orders</a>
+    <a href="#"><i class="bi bi-graph-up"></i> Analytics</a>
+    <a href="#"><i class="bi bi-gear"></i> Settings</a>
+
+    <hr>
+
+    <!-- Logout -->
+    <a onclick="logout()" style="cursor:pointer">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- =================================================
+     MAIN CONTENT (Hidden until login)
+     ================================================= -->
+<div class="main" id="mainContent">
+
+<!-- ================= HEADER ================= -->
+<div class="top-bar mb-4">
+    <h5>Welcome, Admin 👋</h5>
+
+    <div class="search-box">
+        <input type="text" placeholder="🔍 Search orders, drinks">
+    </div>
+
+    <div>
+        <i class="bi bi-bell"></i>
+        <span class="ms-3">Charlie Cafe</span>
+        <small class="text-muted">Admin</small>
+    </div>
+</div>
+
+<!-- ================= KPI ROW ================= -->
+<div class="row g-4 mb-4" id="kpiRow">
+    <!-- KPI Cards will be dynamically updated from API -->
+</div>
+
+<!-- ================= CHART PLACEHOLDERS ================= -->
+<div class="row g-4" id="chartRow">
+    <div class="col-md-6">
+        <div class="card-dark">
+            <h5>Sales Overview</h5>
+            <p class="text-muted">Daily / Weekly / Monthly</p>
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card-dark">
+            <h5>Orders Trend</h5>
+            <canvas id="ordersChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ================= TRENDING DRINKS ================= -->
+<div class="mt-5">
+    <h5>🔥 Trending Drinks</h5>
+    <div class="row g-4 mt-2" id="trendingDrinks">
+        <!-- Cards remain static for now -->
+    </div>
+</div>
+
+</div>
+
+<!-- =================================================
+     JAVASCRIPT: COGNITO + DASHBOARD LOGIC
+     ================================================= -->
+<script>
+/* ================== CONFIG ================== */
+const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const REDIRECT_URI = window.location.origin;
+const API_URL = "https://API_ID.execute-api.region.amazonaws.com/STAGE/dashboard";
+
+let salesChart, ordersChart, refreshTimer;
+
+/* ================== AUTH ================== */
+function parseJwt(token) {
+    return JSON.parse(atob(token.split('.')[1]));
+}
+
+function isTokenExpired(token) {
+    const payload = parseJwt(token);
+    return payload.exp * 1000 < Date.now();
+}
+
+function login() {
+    const loginUrl = `https://${COGNITO_DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = loginUrl;
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    clearInterval(refreshTimer);
+    const logoutUrl = `https://${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${REDIRECT_URI}`;
+    window.location.href = logoutUrl;
+}
+
+function handleRedirect() {
+    const hash = window.location.hash.substr(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get("access_token");
+    if (token) {
+        localStorage.setItem("token", token);
+        window.location.hash = "";
+    }
+}
+
+/* ================== DASHBOARD ================== */
+function showDashboard() {
+    const token = localStorage.getItem("token");
+    if (!token || isTokenExpired(token)) {
+        login();
+        return;
+    }
+
+    document.getElementById("sidebar").style.display = "block";
+    document.getElementById("mainContent").style.display = "block";
+
+    loadData();
+    refreshTimer = setInterval(loadData, 10000);
+}
+
+/* ================== DATA FETCH ================== */
+function loadData() {
+    const token = localStorage.getItem("token");
+    if (!token || isTokenExpired(token)) return logout();
+
+    fetch(API_URL, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+        if (res.status === 401) logout();
+        return res.json();
+    })
+    .then(data => {
+        // Populate KPI Cards
+        const kpiRow = document.getElementById("kpiRow");
+        kpiRow.innerHTML = "";
+        data.metrics.forEach(m => {
+            kpiRow.innerHTML += `
+                <div class="col-md-3">
+                    <div class="kpi-card ${m.bgClass}">
+                        <h6>${m.metric}</h6>
+                        <h3>${m.count}</h3>
+                    </div>
+                </div>`;
+        });
+
+        // Sales Chart
+        if (salesChart) salesChart.destroy();
+        salesChart = new Chart(document.getElementById("salesChart"), {
+            type: 'line',
+            data: {
+                labels: data.sales.labels,
+                datasets: [{ label: 'Sales', data: data.sales.values, backgroundColor:'rgba(255,152,0,0.3)', borderColor:'orange', fill:true }]
+            }
+        });
+
+        // Orders Chart
+        if (ordersChart) ordersChart.destroy();
+        ordersChart = new Chart(document.getElementById("ordersChart"), {
+            type: 'bar',
+            data: {
+                labels: data.orders.labels,
+                datasets: [{ label: 'Orders', data: data.orders.values, backgroundColor:'rgba(0,123,255,0.7)' }]
+            }
+        });
+    });
+}
+
+/* ================== INIT ================== */
+handleRedirect();
+showDashboard();
+</script>
+
+</body>
+</html>
+```
+
+# SECTION 2️⃣ Secure & Security ARCHITECTURE Dashboard 🟢 COMPLETE ✅
 ---
