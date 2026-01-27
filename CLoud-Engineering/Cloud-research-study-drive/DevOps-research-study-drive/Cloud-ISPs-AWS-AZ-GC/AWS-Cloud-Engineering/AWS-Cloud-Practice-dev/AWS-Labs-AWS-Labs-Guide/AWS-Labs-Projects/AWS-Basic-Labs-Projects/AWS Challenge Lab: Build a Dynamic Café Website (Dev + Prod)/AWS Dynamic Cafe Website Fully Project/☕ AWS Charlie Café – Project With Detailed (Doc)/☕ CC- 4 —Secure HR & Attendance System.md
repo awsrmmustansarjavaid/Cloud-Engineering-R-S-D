@@ -994,7 +994,7 @@ sudo nano /var/www/html/checkin.html
 
 #### 2️⃣ checkin.html Code
 
-[checkin.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[checkin.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/checkin.html)
 
 ✅ This page allows employees to check in and check out and confirms success/failure messages.
 
@@ -1009,7 +1009,7 @@ sudo nano /var/www/html/employee-portal.html
 
 #### 2️⃣ employee-portal.html Code
 
-[employee-portal.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[employee-portal.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-portal.html)
 
 ✅ Employees can view profile, attendance, leaves, and holidays.
 
@@ -1024,7 +1024,7 @@ sudo nano /var/www/html/admin-dashboard.html
 
 #### 2️⃣ admin-dashboard.html Code
 
-[admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/admin-dashboard.html)
 
 #### 3️⃣ Set permissions:
 
