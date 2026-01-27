@@ -1702,17 +1702,17 @@ All will query RDS and return JSON data to API Gateway.
 #### 1️⃣ — Daily Attendance Lambda
 > **📄 Filename: attendance_daily_summary.py**
 
-[attendance_daily_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[attendance_daily_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/attendance_daily_summary.py)
 
 #### 2️⃣ — Weekly Attendance Lambda
 > **📄 Filename: attendance_weekly_summary.py**
 
-[attendance_weekly_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[attendance_weekly_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/attendance_weekly_summary.py)
 
 #### 3️⃣ — Monthly Attendance Lambda
 > **📄 Filename: attendance_monthly_summary.py**
 
-[attendance_monthly_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[attendance_monthly_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/attendance_monthly_summary.py)
 
 ### 3️⃣ — Lambda Environment Variables
 
