@@ -2229,12 +2229,10 @@ https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
 
 #### Includes:
 
-#### 1️⃣ CSV Export (Backend + Frontend)
+- **▶️ 1️⃣ CSV Export (Backend + Frontend)**
 
 
-#### 2️⃣ Admin vs Staff Roles (Cognito + Lambda + Frontend)
-
-
+- **▶️ 2️⃣ Admin vs Staff Roles (Cognito + Lambda + Frontend)**
 ---
 
 ## PHASE 1️⃣ - CSV Export (Backend + Frontend)
