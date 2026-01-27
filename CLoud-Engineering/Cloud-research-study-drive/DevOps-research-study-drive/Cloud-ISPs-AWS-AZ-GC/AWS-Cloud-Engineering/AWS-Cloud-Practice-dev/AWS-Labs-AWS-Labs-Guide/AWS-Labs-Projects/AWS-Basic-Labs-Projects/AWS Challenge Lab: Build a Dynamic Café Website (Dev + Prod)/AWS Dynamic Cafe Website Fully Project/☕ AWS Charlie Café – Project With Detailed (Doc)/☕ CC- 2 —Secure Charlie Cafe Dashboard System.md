@@ -2273,27 +2273,7 @@ filter_date = params.get("date")
 
 #### If export_csv == True, generate CSV:
 
-```
-import csv
-import io
-
-if export_csv:
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["Customer", "Item", "Quantity", "Table", "Date"])
-    for o in orders:
-        writer.writerow([o["customer_name"], o["item"], o["quantity"], o["table_number"], o["created_at"]])
-    
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "text/csv",
-            "Content-Disposition": "attachment; filename=orders.csv",
-            "Access-Control-Allow-Origin": "*"
-        },
-        "body": output.getvalue()
-    }
-```
+[GetOrderStatusAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 ✔ Now the Lambda supports CSV export.
 
