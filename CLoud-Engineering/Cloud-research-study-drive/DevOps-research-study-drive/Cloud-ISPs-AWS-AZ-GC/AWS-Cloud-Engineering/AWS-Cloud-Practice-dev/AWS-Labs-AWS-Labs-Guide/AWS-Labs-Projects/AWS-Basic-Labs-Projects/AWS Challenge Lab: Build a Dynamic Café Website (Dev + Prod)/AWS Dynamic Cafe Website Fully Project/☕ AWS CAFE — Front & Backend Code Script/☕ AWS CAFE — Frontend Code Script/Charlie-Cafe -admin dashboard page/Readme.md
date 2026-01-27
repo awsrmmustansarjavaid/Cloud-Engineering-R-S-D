@@ -974,3 +974,270 @@ function logout() {
 
 ---
 
+### 4️⃣ ✅ UPDATED dashboard.html (SECURE-READY)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* =================================================
+   GLOBAL STYLES
+   ================================================= */
+body {
+    background-color: #0f0f10;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+}
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+.sidebar a:hover,
+.sidebar a.active {
+    background: #ff9800;
+    color: #000;
+}
+
+/* Main content */
+.main {
+    margin-left: 260px;
+    padding: 25px;
+}
+
+/* Cards */
+.card-dark {
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 20px;
+}
+.kpi-card {
+    border-radius: 20px;
+    padding: 20px;
+    color: white;
+}
+
+/* KPI colors */
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+</style>
+</head>
+
+<body>
+
+<!-- =================================================
+     🔐 SECURE DASHBOARD CONTAINER
+     Everything inside this div will:
+     ✅ stay hidden until Cognito auth succeeds
+     ✅ become visible after protectPage()
+     (controlled by secure-dashboard.js)
+================================================= -->
+<div id="dashboard-container">
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <h4>☕ Charlie Cafe</h4>
+    <p class="text-muted">Dashboard</p>
+
+    <a class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="#"><i class="bi bi-cup-hot"></i> Menu</a>
+    <a href="#"><i class="bi bi-bag-check"></i> Orders</a>
+
+    <a href="analytics.html" class="admin-only">
+        <i class="bi bi-graph-up"></i> Analytics
+    </a>
+
+    <a href="#" class="admin-only">
+        <i class="bi bi-gear"></i> Settings
+    </a>
+
+    <hr>
+
+    <!-- 🔐 SECURE LOGOUT
+         secure-dashboard.js will automatically
+         attach Cognito logout logic -->
+    <a class="logout-btn" style="cursor:pointer">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- ================= MAIN ================= -->
+<div class="main">
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5>Welcome 👋</h5>
+
+    <!-- Notification Bell -->
+    <div class="dropdown">
+        <i class="bi bi-bell fs-4" data-bs-toggle="dropdown"></i>
+        <span id="notificationBadge" class="badge bg-danger">0</span>
+
+        <ul class="dropdown-menu dropdown-menu-end bg-dark">
+            <li class="dropdown-header text-white">Notifications</li>
+            <div id="notificationList"></div>
+        </ul>
+    </div>
+
+    <div>
+        <small class="text-muted">Role:</small>
+        <strong id="roleLabel">Admin</strong>
+    </div>
+</div>
+
+<!-- KPI CARDS -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card bg-green">
+            <h6>Sales</h6>
+            <h3>$1,250</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card bg-purple">
+            <h6>Orders</h6>
+            <h3>86</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card bg-blue">
+            <h6>Drinks</h6>
+            <h3>142</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="kpi-card bg-orange">
+            <h6>Avg</h6>
+            <h3>$14.50</h3>
+        </div>
+    </div>
+</div>
+
+<div class="card-dark">
+    <h5>Dashboard Overview</h5>
+    <p class="text-muted">Analytics & reports coming next</p>
+</div>
+
+</div> <!-- END MAIN -->
+
+</div>
+<!-- 🔐 END SECURE DASHBOARD CONTAINER -->
+
+<!-- ================= WELCOME TOAST ================= -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="welcomeToast" class="toast">
+        <div class="toast-header">
+            <strong class="me-auto">☕ Charlie Cafe</strong>
+            <button class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            Welcome back to the Dashboard!
+        </div>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ================= TOAST LOGIC ================= -->
+<script>
+function showToast(id, key = null) {
+    const toast = document.getElementById(id);
+    if (!toast) return;
+
+    if (key) {
+        const today = new Date().toISOString().split("T")[0];
+        if (localStorage.getItem(key) === today) return;
+        localStorage.setItem(key, today);
+    }
+
+    new bootstrap.Toast(toast).show();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    showToast("welcomeToast", "dashboardWelcome");
+});
+</script>
+
+<!-- ================= ROLE HANDLING ================= -->
+<script>
+localStorage.setItem("userRole", "ADMIN");
+
+if (localStorage.getItem("userRole") === "STAFF") {
+    document.querySelectorAll(".admin-only").forEach(e => e.remove());
+    document.getElementById("roleLabel").innerText = "Staff";
+}
+</script>
+
+<!-- ================= NOTIFICATIONS ================= -->
+<script>
+const notifications = [
+    "☕ New order received",
+    "📊 Sales updated",
+    "⚠️ Low stock alert"
+];
+
+const list = document.getElementById("notificationList");
+const badge = document.getElementById("notificationBadge");
+
+notifications.forEach(n => {
+    const li = document.createElement("li");
+    li.className = "dropdown-item text-white";
+    li.innerText = n;
+    list.appendChild(li);
+});
+
+badge.innerText = notifications.length;
+</script>
+
+<!-- =================================================
+     🔐 CENTRAL AUTH & SECURITY LAYER
+     This ONE file enables:
+     ✅ Page hidden until auth success
+     ✅ auth.js auto-loaded
+     ✅ protectPage()
+     ✅ Secure API calls (authFetch)
+     ✅ Cognito logout
+================================================= -->
+<script src="secure-dashboard.js"></script>
+
+</body>
+</html>
+```
+
+####  ✅ WHAT YOU ACHIEVED (IMPORTANT)
+
+You now have:
+
+✔ Zero auth logic inside dashboard.html
+
+✔ One reusable security file
+
+✔ Production-grade Cognito structure
+
+✔ Future-proof for analytics / orders / reports pages
+
+---
