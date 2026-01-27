@@ -249,7 +249,413 @@ metrics_table.update_item(
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
----
 
 # 🟢 SECTION 5️⃣ COMPLETE & VERIFIED
 ---
+# SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM
+
+## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
+
+### 3️⃣ – EXACT DYNAMODB QUERY CODE (REQUIRED)
+
+> **This is the canonical query function used by Analytics Lambda.**
+
+#### ✅ Python Query Function (COPY AS-IS)
+
+> **Daily / Weekly / Monthly Query (Python)**
+
+```
+import boto3
+from decimal import Decimal
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def query_orders(start_date, end_date):
+    response = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': start_date,
+            ':e': end_date
+        }
+    )
+    return response['Items']
+```
+
+#### ✅ FINAL UPDATED CODE
+
+> **(Same Logic + Comments)**
+
+```
+import boto3
+from decimal import Decimal
+
+# Initialize DynamoDB resource using default AWS credentials and region
+dynamodb = boto3.resource('dynamodb')
+
+# Reference the DynamoDB table that stores cafe orders
+# ⚠️ Replace 'CafeOrders' only if your actual table name is different
+table = dynamodb.Table('CafeOrders')
+
+
+def query_orders(start_date, end_date):
+    """
+    Query orders from DynamoDB between two dates.
+
+    Parameters:
+    - start_date (str): Start date in YYYY-MM-DD format
+    - end_date (str): End date in YYYY-MM-DD format
+
+    Returns:
+    - List of order items from DynamoDB
+    """
+
+    # Perform query operation on DynamoDB
+    # Uses Global Secondary Index (GSI): order_date-index
+    # This index MUST exist on the CafeOrders table
+    response = table.query(
+        IndexName='order_date-index',
+
+        # Fetch only items where order_date is between start_date and end_date
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+
+        # Expression values used in KeyConditionExpression
+        ExpressionAttributeValues={
+            ':s': start_date,   # Start date boundary
+            ':e': end_date      # End date boundary
+        }
+    )
+
+    # Return the list of matching order records
+    return response['Items']
+```
+
+#### 📌 Notes:
+
+- start_date and end_date must be strings
+
+- Format: "YYYY-MM-DD"
+
+- This code assumes GSI already exists
+
+#### 2️⃣ TEST QUERY USING AWS LAMBDA (TEMP TEST)
+
+#### 2️⃣ Paste Test Code
+
+```
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    result = table.query(
+        IndexName='order_date-index',
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': '2026-01-01',
+            ':e': '2026-01-31'
+        }
+    )
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "count": len(result['Items']),
+            "items": result['Items']
+        })
+    }
+```
+
+#### ✅ FINAL UPDATED CODE 
+
+> **(Same Logic + Comments + Env Variables)**
+
+👉 You can copy–paste this directly 
+
+```
+import json
+import boto3
+import os
+
+# ==============================
+# ENVIRONMENT VARIABLES
+# ==============================
+# 🔁 REPLACE in Lambda → Configuration → Environment variables
+# TABLE_NAME        = CafeOrders
+# DATE_INDEX_NAME   = order_date-index
+# DEFAULT_START_DATE = 2026-01-01
+# DEFAULT_END_DATE   = 2026-01-31
+
+TABLE_NAME = os.environ.get('TABLE_NAME', 'CafeOrders')
+DATE_INDEX = os.environ.get('DATE_INDEX_NAME', 'order_date-index')
+START_DATE = os.environ.get('DEFAULT_START_DATE', '2026-01-01')
+END_DATE = os.environ.get('DEFAULT_END_DATE', '2026-01-31')
+
+# ==============================
+# AWS DYNAMODB RESOURCE
+# ==============================
+# Uses IAM role attached to Lambda
+dynamodb = boto3.resource('dynamodb')
+
+# Connect to CafeOrders table
+table = dynamodb.Table(TABLE_NAME)
+
+# ==============================
+# LAMBDA HANDLER
+# ==============================
+
+def lambda_handler(event, context):
+    """
+    This Lambda:
+    - Queries CafeOrders table
+    - Uses order_date GSI
+    - Fetches orders between start & end dates
+    - Returns order count + items
+    """
+
+    # ==============================
+    # OPTIONAL: DATE OVERRIDE FROM QUERY STRING
+    # ==============================
+    # Example:
+    # /analytics?start=2026-01-01&end=2026-01-31
+    params = event.get('queryStringParameters') or {}
+
+    start_date = params.get('start', START_DATE)
+    end_date = params.get('end', END_DATE)
+
+    # ==============================
+    # DYNAMODB QUERY
+    # ==============================
+    result = table.query(
+        IndexName=DATE_INDEX,  # GSI on order_date
+        KeyConditionExpression='order_date BETWEEN :s AND :e',
+        ExpressionAttributeValues={
+            ':s': start_date,
+            ':e': end_date
+        }
+    )
+
+    # ==============================
+    # RESPONSE
+    # ==============================
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps({
+            "count": len(result.get('Items', [])),  # Total orders found
+            "start_date": start_date,
+            "end_date": end_date,
+            "items": result.get('Items', [])
+        })
+    }
+```
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 2️⃣ – ANALYTICS LAMBDA (FULL CODE)
+
+### 1️⃣ Create Cafe Analytics Lambda
+
+### 2️⃣ DEPLOY CODE
+
+**FULL CafeAnalyticsLambda PYTHON CODE (COPY-PASTE)**
+
+```
+import os
+import json
+import boto3
+from datetime import datetime, timedelta
+
+# =======================
+# ENVIRONMENT VARIABLE
+# =======================
+# REPLACE VALUE IN LAMBDA ENV VARIABLES (NOT HERE)
+ORDERS_TABLE_NAME = os.environ.get("ORDERS_TABLE_NAME")
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(ORDERS_TABLE_NAME)
+
+def lambda_handler(event, context):
+
+    period = event.get("queryStringParameters", {}).get("period")
+    today = datetime.utcnow().date()
+
+    if period == "today":
+        start = end = today
+    elif period == "week":
+        start = today - timedelta(days=7)
+        end = today
+    elif period == "month":
+        start = today.replace(day=1)
+        end = today
+    else:
+        return response(400, {"message": "Invalid period"})
+
+    orders = table.query(
+        IndexName="order_date-index",
+        KeyConditionExpression="order_date BETWEEN :s AND :e",
+        ExpressionAttributeValues={
+            ":s": str(start),
+            ":e": str(end)
+        }
+    ).get("Items", [])
+
+    total_sales = sum(float(o.get("total_amount", 0)) for o in orders)
+    total_cost = sum(float(o.get("total_cost", 0)) for o in orders)
+    profit = total_sales - total_cost
+
+    return response(200, {
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "profit": profit,
+        "orders_count": len(orders)
+    })
+
+def response(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps(body)
+    }
+```
+
+#### ✅ FINAL ANALYTICS LAMBDA (WITH COMMENTS ONLY)
+
+🔒 Logic unchanged
+
+🧠 Architecture unchanged
+
+📝 Only comments added
+
+🌱 Environment variable usage clarified
+
+```
+import os
+import json
+import boto3
+from datetime import datetime, timedelta
+
+# ==========================================================
+# ENVIRONMENT VARIABLES
+# ==========================================================
+# ⚠️ DO NOT hardcode table names here
+# You MUST define this key in Lambda → Configuration → Environment variables
+#
+# Key   : ORDERS_TABLE_NAME
+# Value : CafeOrders   (example – replace with your actual table name)
+#
+ORDERS_TABLE_NAME = os.environ.get("ORDERS_TABLE_NAME")
+
+# ==========================================================
+# DYNAMODB CLIENT INITIALIZATION
+# ==========================================================
+# Uses IAM Role attached to Lambda
+# Make sure the role has DynamoDB read permission
+#
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(ORDERS_TABLE_NAME)
+
+# ==========================================================
+# MAIN LAMBDA HANDLER
+# ==========================================================
+def lambda_handler(event, context):
+
+    # ------------------------------------------------------
+    # READ QUERY PARAMETER (?period=today|week|month)
+    # ------------------------------------------------------
+    # This comes from API Gateway request:
+    # /analytics?period=today
+    #
+    period = event.get("queryStringParameters", {}).get("period")
+
+    # ------------------------------------------------------
+    # USE UTC DATE FOR CONSISTENT REPORTING
+    # ------------------------------------------------------
+    today = datetime.utcnow().date()
+
+    # ------------------------------------------------------
+    # DATE RANGE SELECTION BASED ON PERIOD
+    # ------------------------------------------------------
+    if period == "today":
+        start = end = today
+
+    elif period == "week":
+        # Last 7 days including today
+        start = today - timedelta(days=7)
+        end = today
+
+    elif period == "month":
+        # From 1st day of current month to today
+        start = today.replace(day=1)
+        end = today
+
+    else:
+        # Invalid or missing period
+        return response(400, {"message": "Invalid period"})
+
+    # ------------------------------------------------------
+    # QUERY DYNAMODB USING GSI (order_date-index)
+    # ------------------------------------------------------
+    # REQUIREMENTS:
+    # - GSI name must be exactly: order_date-index
+    # - Partition key: order_date (String, YYYY-MM-DD)
+    #
+    orders = table.query(
+        IndexName="order_date-index",
+        KeyConditionExpression="order_date BETWEEN :s AND :e",
+        ExpressionAttributeValues={
+            ":s": str(start),
+            ":e": str(end)
+        }
+    ).get("Items", [])
+
+    # ------------------------------------------------------
+    # CALCULATE TOTAL SALES, COST, AND PROFIT
+    # ------------------------------------------------------
+    # total_amount → selling price (already stored)
+    # total_cost   → cost auto-calculated (Phase 10)
+    #
+    total_sales = sum(float(o.get("total_amount", 0)) for o in orders)
+    total_cost = sum(float(o.get("total_cost", 0)) for o in orders)
+
+    # PROFIT = SALES - COST
+    profit = total_sales - total_cost
+
+    # ------------------------------------------------------
+    # FINAL API RESPONSE
+    # ------------------------------------------------------
+    return response(200, {
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "profit": profit,
+        "orders_count": len(orders)
+    })
+
+# ==========================================================
+# STANDARD API RESPONSE FORMATTER
+# ==========================================================
+def response(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            # Allow frontend (CloudFront / browser) access
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps(body)
+    }
+```
+
+---
+
