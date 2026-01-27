@@ -2955,9 +2955,6 @@ Use Lambda console → Test events → Include requestContext.authorizer.claims.
 
 
 
-
-
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
