@@ -187,13 +187,46 @@ authFetch("https://YOUR_API_ID.execute-api.region.amazonaws.com/prod/dashboard")
    .then(data => console.log(data));
 ```
 
+**✅ API Gateway now rejects unauthenticated requests**
 
+### 🧩 STEP 3 — CloudFront + HTTPS (Optional but Recommended)
 
+#### 1️⃣ Create CloudFront Distribution
 
+Origin: your EC2 or ALB endpoint
 
+Viewer Protocol Policy: Redirect HTTP → HTTPS
 
+Add security headers via Lambda@Edge or AWS WAF
 
-#### ▶️ auth.js template (reusable)
+#### 2️⃣ Disable Directory Listing
+
+EC2: Ensure .htaccess prevents index browsing
+
+Apache: Options -Indexes
+
+#### 3️⃣ Point DNS / Custom Domain
+
+If using a domain: attach ACM certificate for HTTPS
+
+### 🧩 STEP 4 — Roles & Groups (Optional Advanced Security)
+
+Cognito groups: Admin, Staff, Manager
+
+Check user roles inside auth.js:
+
+```
+const groups = parseJwt(token)["cognito:groups"] || [];
+if (groups.includes("Admin")) {
+   console.log("Full access");
+} else if (groups.includes("Staff")) {
+   console.log("Limited access");
+}
+```
+
+- **This allows dynamic page content (e.g., hide analytics from staff)**
+
+### 🧩 STEP 5 — auth.js template (reusable)
 
 ```
 const COGNITO_DOMAIN = "YOUR_COGNITO_DOMAIN.auth.region.amazoncognito.com";
@@ -236,6 +269,22 @@ function securePage() {
 - Include this script in dashboard.html, order-status.html, analytics.html.
 
 - Wrap body content with display:none to hide until auth passes.
+
+### 🧩 STEP 6 — Final auth.js Check
+
+Your auth.js should now include:
+
+Token helpers: parseJwt(), isTokenExpired() ✅
+
+Login/logout via Hosted UI ✅
+
+handleAuthRedirect() to capture JWT ✅
+
+protectPage() to block unauthenticated users ✅
+
+authFetch(url) helper for secure API calls ✅
+
+Optional: check groups for role-based dashboards ✅
 
 ### 2️⃣ Secure Your Admin Pages
 
