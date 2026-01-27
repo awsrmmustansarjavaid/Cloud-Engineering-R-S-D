@@ -822,9 +822,7 @@ sudo nano /var/www/html/analytics.html
 
 ### 2️⃣ analytics.html (FULL CODE)
 
-
-
-
+[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
 
 ### 3️⃣ File PERMISSIONS (MANDATORY)
 
@@ -855,86 +853,9 @@ sudo systemctl restart httpd
 
 > **(PHASE 5 & 6)**
 
-#### How it works
+### 1️⃣ Create Cafe PDF Report Lambda
 
-✔️ Button → API Gateway
-
-✔️ API → Lambda
-
-✔️ Lambda → ReportLab
-
-✔️ PDF saved in S3
-
-✔️ Browser downloads PDF
-
-#### Best for
-
-✔️ Admin
-
-✔️ Monthly reports
-
-✔️ Accounting
-
-✔️ Audit
-
-#### Automation (EventBridge)
-
-✅ Professional
-
-✅ Consistent layout
-
-✅ Can be automated
-
-❌ Slight delay
-
-❌ AWS cost (small)
-
-| Printing Type    | Where it runs | Technology         | Purpose                           |
-| ---------------- | ------------- | ------------------ | --------------------------------- |
-| 🖨 Browser Print | Frontend only | `window.print()`   | Quick, instant print / save PDF   |
-| 📄 Lambda PDF    | Backend       | ReportLab + Lambda | Official, stored, branded reports |
-
-#### 🧠 SIMPLE MENTAL MODEL
-
-```
-STAFF USES → Browser Print
-ADMIN USES → Lambda PDF
-```
-
-#### ⚠️Why?
-
-#### Browser print:
-> **PHASE 7️⃣ **AWS  Charlie Cafe — Secure Admin Order Dashboard**
-
-✔️ Fast
-
-✔️ No backend cost
-
-✔️ No S3
-
-✔️ No permissions
-
-✔️ Good for receipts, daily summaries
-
-#### Lambda PDF:
-
-> **PHASE 5️⃣ & 6️⃣ **☕ AWS CAFE — SALES ANALYTICS & REPORTING SYSTEM**
-
-✔️ Professional layout
-
-✔️ Stored in S3
-
-✔️ Monthly / daily automation
-
-✔️ Logo, tables, profit
-
-✔️ Admin-only (RBAC)
-
-**✅ You are building a REAL PRODUCTION SYSTEM**
-
-### Create Cafe PDF Report Lambda
-
-#### CREATE LAMBDA
+#### 1️⃣ CREATE LAMBDA
 
 ```
 Name: CafePDFReportLambda
@@ -960,8 +881,6 @@ Runtime: Python 3.10
         - **AmazonDynamoDBReadOnlyAccess**
 
 ** ⚠️ if you want to pull real data from DynamoDB**
-
-
 
 ###  3️⃣ DEPLOY EXISTING PDF CODE
 
