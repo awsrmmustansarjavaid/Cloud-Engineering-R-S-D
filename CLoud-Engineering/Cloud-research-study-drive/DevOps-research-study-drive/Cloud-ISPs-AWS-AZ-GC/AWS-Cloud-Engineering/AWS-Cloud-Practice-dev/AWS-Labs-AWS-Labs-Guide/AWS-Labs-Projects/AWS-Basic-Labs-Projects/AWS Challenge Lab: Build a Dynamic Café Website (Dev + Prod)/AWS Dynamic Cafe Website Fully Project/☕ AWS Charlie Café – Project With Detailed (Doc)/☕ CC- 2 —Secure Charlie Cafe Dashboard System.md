@@ -1832,17 +1832,7 @@ sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
 
 #### ⬇️ IMMEDIATELY BELOW IT, PASTE THIS:
 
-```
-<div class="d-flex gap-2 mb-3">
-  <button class="btn btn-outline-dark" onclick="printAllOrders()">
-    🖨️ Print All Orders
-  </button>
-
-  <button class="btn btn-outline-success" onclick="printTodaySummary()">
-    📄 Print Today Summary
-  </button>
-</div>
-```
+[PRINT-ONLY.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 ❌ Do NOT remove anything
 
@@ -1858,37 +1848,7 @@ sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
 
 #### ⬆️ JUST ABOVE IT, PASTE:
 
-```
-<style>
-@media print {
-
-  body {
-    background: #fff !important;
-  }
-
-  button,
-  select,
-  .no-print {
-    display: none !important;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th, td {
-    border: 1px solid #000;
-    padding: 6px;
-    font-size: 12px;
-  }
-
-  h3 {
-    text-align: center;
-  }
-}
-</style>
-```
+[PRINT-ONLY.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 ✔ Ensures clean PDF
 
@@ -1902,44 +1862,7 @@ sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
 
 #### ⬇️ PASTE THIS FULL CODE:
 
-```
-<script>
-function printAllOrders() {
-  window.print();
-}
-
-function printTodaySummary() {
-
-  const rows = document.querySelectorAll("#ordersTable tbody tr");
-  let today = new Date().toISOString().split("T")[0];
-
-  let totalOrders = 0;
-  let totalAmount = 0;
-
-  rows.forEach(row => {
-    const orderDate = row.dataset.date;
-    const amount = parseFloat(row.dataset.total);
-
-    if (orderDate === today) {
-      totalOrders++;
-      totalAmount += amount;
-    }
-  });
-
-  const summaryHTML = `
-    <h3>☕ Cafe Daily Summary</h3>
-    <p><strong>Date:</strong> ${today}</p>
-    <p><strong>Total Orders:</strong> ${totalOrders}</p>
-    <p><strong>Total Sales:</strong> ${totalAmount}</p>
-  `;
-
-  const original = document.body.innerHTML;
-  document.body.innerHTML = summaryHTML;
-  window.print();
-  document.body.innerHTML = original;
-}
-</script>
-```
+[PRINT-ONLY.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 ❌ Do NOT change function names
 
