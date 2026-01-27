@@ -5184,11 +5184,11 @@ if(!userGroups.includes("Admin")){
 ### 1️⃣ Centralize Authentication -  auth.js template (reusable)
 > **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
 
-#### 1️⃣ 📄 /admin/assets/auth.js
+### 1️⃣ 📄 /admin/assets/auth.js
 
 [auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
 
-#### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
+### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
 
 ```
 /* ================= CONFIG ================= */
@@ -5210,7 +5210,7 @@ const REDIRECT_URI = window.location.origin + window.location.pathname; // Usual
 
 - No other changes are required in your existing auth.js. This will fully connect it to your own lab environment.
 
-#### 3️⃣  How to use it in ALL admin pages
+### 3️⃣  How to use it in ALL admin pages
 
 #### 🔐 STEP 1 — Hide page until auth passes
 
