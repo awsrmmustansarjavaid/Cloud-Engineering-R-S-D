@@ -101,6 +101,15 @@
 
 <body>
 
+<!-- =================================================
+     🔐 SECURE ORDER STATUS CONTAINER
+     Everything inside this div will:
+     ✅ stay hidden until Cognito auth succeeds
+     ✅ become visible after protectPage()
+     (controlled by secure-dashboard.js)
+================================================= -->
+<div id="dashboard-container">
+
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-dark">
     <div class="container-fluid">
@@ -113,6 +122,12 @@
     <a href="dashboard.html">🏠 Main Dashboard</a>
     <a href="analytics.html">📈 Analytics</a>
     <a href="order-status.html" class="active">📦 Order Status</a>
+
+    <hr class="text-secondary">
+
+    <!-- 🔐 SECURE LOGOUT
+         secure-dashboard.js attaches Cognito logout -->
+    <a class="logout-btn" style="cursor:pointer">🚪 Logout</a>
 </div>
 
 <!-- ===================== MAIN CONTENT ===================== -->
@@ -144,6 +159,9 @@
         </div>
     </div>
 </div>
+
+</div>
+<!-- 🔐 END SECURE ORDER STATUS CONTAINER -->
 
 <!-- ===================== TOAST NOTIFICATIONS ===================== -->
 
@@ -242,6 +260,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 });
 </script>
+
+<!-- =================================================
+     🔐 CENTRAL AUTH & SECURITY LAYER
+     This ONE file enables:
+     ✅ Page hidden until auth success
+     ✅ auth.js auto-loaded
+     ✅ protectPage()
+     ✅ authFetch()
+     ✅ Cognito logout
+================================================= -->
+<script src="secure-dashboard.js"></script>
 
 </body>
 </html>
