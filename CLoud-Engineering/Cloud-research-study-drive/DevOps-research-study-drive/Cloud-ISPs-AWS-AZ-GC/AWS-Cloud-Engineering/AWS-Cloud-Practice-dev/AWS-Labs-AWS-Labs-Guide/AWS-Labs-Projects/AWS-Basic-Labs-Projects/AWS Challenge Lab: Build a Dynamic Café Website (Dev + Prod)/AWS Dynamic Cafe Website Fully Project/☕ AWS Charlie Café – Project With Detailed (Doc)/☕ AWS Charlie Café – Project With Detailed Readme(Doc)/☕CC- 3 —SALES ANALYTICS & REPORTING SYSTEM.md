@@ -1044,6 +1044,80 @@ By the end of PHASE 9️⃣, you will have:
 
 ❌ NO EventBridge
 
+**✅ PHASE 9 STATUS**
+
+> **🟢 PHASE 9 COMPLETE & VERIFIED**
+---
+## PHASE 🔟  COST AUTO-CALCULATION USING CafeMenu TABLE
+
+> **(MANDATORY BEFORE PROFIT / ANALYTICS / PDF)**
+
+### 🎯 PURPOSE OF THIS PHASE (VERY CLEAR)
+
+After this phase:
+
+✔ Item cost will be fetched automatically
+
+✔ Order Processing Lambda will NOT hardcode cost
+
+✔ Analytics profit will be accurate
+
+✔ Frontend remains UNCHANGED
+
+✔ You can TEST and VERIFY before moving to next phase
+
+### ARCHITECTURE Project Flow
+
+```
+Frontend
+  ↓
+CafeOrderProcessor Lambda
+  ↓
+RDS (MySQL)  ✅ ORDERS STORED HERE
+  ↓
+Order Status Lambda
+  ↓
+DynamoDB (analytics / reporting)
+```
+
+So:
+
+✔ CafeOrderProcessor Lambda is CORRECT
+
+✔ RDS is the source of truth
+
+✔ Cost auto-calculation MUST happen HERE
+
+✔ Later Lambda(s) can read cost from RDS or DynamoDB
+
+You were absolutely correct to question it.
+Now let’s fix PHASE 10 properly for YOUR ARCHITECTURE.
+
+### ARCHITECTURE AFTER PHASE 10
+
+```
+CafeMenu (DynamoDB)  ← item cost
+        ↓
+CafeOrderProcessor Lambda
+        ↓
+orders (RDS MySQL) ← cost saved here
+```
+
+### 📌 PRE-REQUISITES (VERIFY BEFORE START)
+
+Before starting this phase, confirm:
+
+✅ DynamoDB service is already used in your project
+
+✅ Order Processing Lambda already exists
+
+✅ Orders are already saved to CafeOrders table
+
+✅ Each order contains item_name
+
+**⚠️ If any one is missing, STOP and fix first.**
+
+
 
 
 
