@@ -2014,6 +2014,8 @@ analytics_2026-01-01.pdf
 
 #### 1️⃣ – IDENTIFY ORDER STATUS PAGE FILE
 
+**⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps.**
+
 [order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 ### 2️⃣ Restart Apache (MANDATORY)
