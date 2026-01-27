@@ -8,10 +8,6 @@
 
 > **⚠️ This phase is mandatory before Lambda works.**
 
-**Goal of this phase:**
-
-Ensure your existing DynamoDB table structure, index, and query logic are 100% correct and testable before analytics logic is added.
-
 ### 1️⃣ VERIFY EXISTING ORDERS TABLE (REQUIRED STRUCTURE)
 
 #### 1️⃣ Open DynamoDB Console: 
