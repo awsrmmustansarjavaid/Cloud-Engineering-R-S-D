@@ -9,8 +9,15 @@
 
 # SECTION 2️⃣  Previous Versions dashboard.html
 
-### 1️⃣ Frontend Simple Admin Dashboard 
+
+### 1️⃣ Frontend dashboard 
 > **📄 File: dashboard.html**
+
+#### 1️⃣ Create dashboard.html
+
+```
+sudo nano /var/www/html/dashboard.html
+```
 
 #### 2️⃣ Paste Code
 
@@ -326,12 +333,6 @@ sudo systemctl restart httpd
 
 ```
 http:// Your EC2 Public IP/dashboard.html
-```
-
-### 2️⃣ Frontend Admin Order-Status Dashboard
-
-```
-sudo nano /var/www/html/order-status.html
 ```
 
 ---
