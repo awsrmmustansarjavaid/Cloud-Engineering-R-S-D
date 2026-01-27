@@ -141,6 +141,97 @@ DynamoDB cannot query by non-key attributes
 
 ➡️ So we CREATE a key → GSI
 
-#### 2️⃣ Create Global Secondary Index
+### 3️⃣ – EXACT DYNAMODB QUERY CODE (REQUIRED)
+
+HOW QUERY ACTUALLY WORKS (MENTAL MODEL)
+
+Let’s say you query:
+
+```
+start_date = 2026-01-01
+end_date   = 2026-01-31
+```
+
+DynamoDB does:
+
+- Go to GSI order_date-index
+
+- Find partitions between dates
+
+- Sort by order_timestamp
+
+- Return matching items FAST ⚡
+
+Without GSI → impossible.
+
+#### ANALYTICS QUERY CODE (EXPLAINED LINE-BY-LINE)
+
+```
+import boto3
+from decimal import Decimal
+```
+
+👉 boto3 = AWS SDK
+
+👉 Decimal = DynamoDB number safety
+
+```
+dynamodb = boto3.resource('dynamodb')
+```
+
+👉 Creates DynamoDB connection using Lambda IAM role
+
+```
+table = dynamodb.Table('CafeOrders')
+```
+
+👉 Points to EXACT table name
+
+```
+def query_orders(start_date, end_date):
+```
+
+👉 Function accepts:
+
+- "2026-01-01"
+
+- "2026-01-31"
+
+```
+response = table.query(
+```
+
+👉 QUERY, not SCAN (critical)
+
+```
+IndexName='order_date-index',
+```
+
+👉 Uses GSI
+
+👉 Without this → crash
+
+```
+KeyConditionExpression='order_date BETWEEN :s AND :e',
+```
+
+👉 DynamoDB syntax:
+
+- Find all orders where date is between two values
+
+```
+ExpressionAttributeValues={
+    ':s': start_date,
+    ':e': end_date
+}
+```
+
+👉 Injects values safely
+
+```
+return response['Items']
+```
+
+👉 Returns list of orders → Lambda will calculate totals later
 
 
