@@ -1271,7 +1271,256 @@ This is portfolio-ready code 👏
 
 ----
 
-####  4️⃣ ✅ UPDATED order-status.html (SECURE-READY)
+## 🔐 2️⃣ — DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)
+
+### 1️⃣ ✅ Updated order-status.html (Cognito-secured)
+
+Below is your UPDATED order-status.html with:
+
+✅ Page hidden until Cognito auth
+
+✅ protectPage() enforced
+
+✅ authFetch() replacing insecure fetch()
+
+✅ JWT automatically sent to API Gateway
+
+✅ Clean comments (lab / interview ready)
+
+✅ Works behind CloudFront + ALB + HTTP/2
+
+#### Code
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charlie Cafe ☕ | Order Status</title>
+
+    <!-- =================== Bootstrap 5 CSS ==================== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ===================== Google Font ===================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===================== GLOBAL STYLES ===================== */
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            display: none; /* 🔐 Hidden until Cognito auth passes */
+        }
+
+        /* ===================== SIDEBAR ===================== */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #2b160a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 80px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 24px;
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sidebar a:hover {
+            background: #3b1f0e;
+            color: #ff9800;
+        }
+
+        .sidebar a.active {
+            background: #3b1f0e;
+            color: #ff9800;
+            border-left: 4px solid #ff9800;
+        }
+
+        /* ===================== NAVBAR ===================== */
+        .navbar {
+            background-color: #3b1f0e !important;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        /* ===================== MAIN CONTENT ===================== */
+        .main-content {
+            margin-left: 240px;
+            padding-top: 100px;
+        }
+
+        .status-container {
+            background: rgba(30, 30, 30, 0.75);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                padding-top: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 140px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- ===================== SIDEBAR ===================== -->
+<div class="sidebar">
+    <a href="dashboard.html">🏠 Main Dashboard</a>
+    <a href="analytics.html">📈 Analytics</a>
+    <a href="order-status.html" class="active">📦 Order Status</a>
+</div>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-content">
+    <div class="container">
+        <div class="status-container">
+
+            <h2 class="text-center mb-5">📊 Live Order Status</h2>
+
+            <!-- KPI Metrics -->
+            <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+            <!-- Orders Table -->
+            <div class="table-responsive">
+                <table class="table table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Table</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="text-center py-4">
+    © 2026 Charlie Cafe | Fresh Drinks • Made with ❤️
+</footer>
+
+<!-- ===================== BOOTSTRAP JS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- =================================================
+     🔐 AUTHENTICATION LAYER (Cognito)
+     ================================================= -->
+
+<!-- 1️⃣ Central authentication logic -->
+<script src="assets/auth.js"></script>
+
+<script>
+/* =================================================
+   PAGE PROTECTION
+   - Redirects to Cognito Hosted UI if user not logged in
+   - Validates JWT
+   - Shows page only after success
+   ================================================= */
+protectPage();
+
+/* =================================================
+   SECURE DATA FETCH
+   - authFetch() automatically attaches JWT
+   - API Gateway protected by Cognito Authorizer
+   ================================================= */
+authFetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")
+    .then(res => {
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+    })
+    .then(data => {
+
+        // Render KPI metrics
+        data.metrics.forEach(m => {
+            metrics.innerHTML += `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card bg-dark text-center p-3">
+                        <h6 class="text-warning">${m.metric}</h6>
+                        <h3>${m.count}</h3>
+                    </div>
+                </div>`;
+        });
+
+        // Render recent orders
+        data.recent_orders.forEach(o => {
+            orders.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || 'Anonymous'}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || '-'}</td>
+                    <td>${o.created_at}</td>
+                </tr>`;
+        });
+    })
+    .catch(err => {
+        orders.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-danger text-center">
+                    ⚠️ ${err.message}
+                </td>
+            </tr>`;
+    });
+</script>
+
+</body>
+</html>
+```
+
+#### ✅ What This Page Now Demonstrates (Interview-Level)
+
+✔ Zero unauthenticated access
+
+✔ JWT → API Gateway → Lambda (real production flow)
+
+✔ Same auth.js reused (clean architecture)
+
+✔ Ready for Admin / Manager Cognito Groups
+
+✔ CloudFront + ALB compatible
+
+
+###  2️⃣ ✅ UPDATED order-status.html (SECURE-READY - Recommanded)
 
 ✅ Secure container wrapper
 

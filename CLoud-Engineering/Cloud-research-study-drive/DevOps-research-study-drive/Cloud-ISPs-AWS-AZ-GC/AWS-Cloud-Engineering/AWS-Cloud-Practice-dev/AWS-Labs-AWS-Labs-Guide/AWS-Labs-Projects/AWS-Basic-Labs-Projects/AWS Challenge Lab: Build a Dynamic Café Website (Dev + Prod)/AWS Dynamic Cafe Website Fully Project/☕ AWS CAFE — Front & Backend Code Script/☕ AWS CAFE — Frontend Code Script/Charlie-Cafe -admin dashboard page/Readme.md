@@ -973,8 +973,240 @@ function logout() {
 ✔ Enterprise-style dashboard architecture
 
 ---
+## 🔐 4️⃣ — DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)
 
-### 4️⃣ ✅ UPDATED dashboard.html (SECURE-READY)
+
+### 1️⃣ ✅ Updated dashboard.html (with Cognito protection)
+> **Just For case Study)
+
+Below is your UPDATED dashboard.html with:
+
+✅ Page hidden until auth success
+
+✅ auth.js loaded
+
+✅ protectPage() applied
+
+✅ Secure API call placeholder
+
+✅ Cognito-ready logout()
+
+✅ Comments explaining why each part exists
+
+#### Code
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================= ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* =================================================
+   GLOBAL THEME (DARK CAFE STYLE)
+   ================================================= */
+body {
+    background-color: #0f0f10;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+    display: none; /* 🔐 Hidden until Cognito auth passes */
+}
+
+/* =================================================
+   SIDEBAR
+   ================================================= */
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+}
+
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+    background: #ff9800;
+    color: #000;
+}
+
+/* =================================================
+   MAIN CONTENT
+   ================================================= */
+.main {
+    margin-left: 260px;
+    padding: 25px;
+}
+
+/* KPI + cards */
+.kpi-card { border-radius: 20px; padding: 20px; }
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+
+.card-dark {
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- =================================================
+     SIDEBAR
+     ================================================= -->
+<div class="sidebar">
+    <h4>☕ Charlie Cafe</h4>
+    <p class="text-muted">Admin Dashboard</p>
+
+    <a class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="#"><i class="bi bi-cup-hot"></i> Menu</a>
+    <a href="#"><i class="bi bi-bag-check"></i> Orders</a>
+    <a href="#"><i class="bi bi-graph-up"></i> Analytics</a>
+    <a href="#"><i class="bi bi-gear"></i> Settings</a>
+
+    <hr>
+
+    <!-- 🔐 Secure Logout -->
+    <a onclick="logout()" style="cursor:pointer">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- =================================================
+     MAIN CONTENT
+     ================================================= -->
+<div class="main">
+
+<div class="top-bar mb-4">
+    <h5>Welcome, Admin 👋</h5>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="kpi-card bg-green">
+            <h6>Today's Sales</h6>
+            <h3>$1,250</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-purple">
+            <h6>Total Orders</h6>
+            <h3>86</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-blue">
+            <h6>Drinks Sold</h6>
+            <h3>142</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="kpi-card bg-orange">
+            <h6>Avg Order Value</h6>
+            <h3>$14.50</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card-dark">
+            <h5>Sales Overview</h5>
+            <p class="text-muted">(Connected to Analytics API later)</p>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card-dark">
+            <h5>Orders Trend</h5>
+            <p class="text-muted">(Bar chart placeholder)</p>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- =================================================
+     🔐 AUTHENTICATION LAYER (Cognito)
+     ================================================= -->
+
+<!-- 1️⃣ Central auth logic -->
+<script src="assets/auth.js"></script>
+
+<script>
+/* =================================================
+   PAGE PROTECTION
+   - Redirects to Cognito Hosted UI if not logged in
+   - Decodes JWT
+   - Shows page only after validation
+   ================================================= */
+protectPage();
+
+/* =================================================
+   SECURE API CALL EXAMPLE
+   - JWT automatically added by authFetch()
+   - API Gateway must have Cognito Authorizer
+   ================================================= */
+authFetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+        console.log("Secure dashboard data:", data);
+        // Later → update KPIs dynamically
+    })
+    .catch(err => console.error("API error:", err));
+
+/* =================================================
+   LOGOUT
+   - Clears tokens
+   - Redirects to Cognito logout endpoint
+   ================================================= */
+function logout() {
+    cognitoLogout();
+}
+</script>
+
+</body>
+</html>
+```
+
+#### ✅ What You Achieved (Important)
+
+✔ Same auth.js works for CloudFront + ALB + HTTP/2
+
+✔ Dashboard cannot be viewed without Cognito login
+
+✔ JWT automatically sent to API Gateway
+
+✔ Professional real-world architecture
+
+✔ Ready for Admin / Manager role checks next
+
+
+### 2️⃣ ✅ UPDATED dashboard.html (SECURE-READY - Recommanded)
+
 
 ```
 <!DOCTYPE html>
