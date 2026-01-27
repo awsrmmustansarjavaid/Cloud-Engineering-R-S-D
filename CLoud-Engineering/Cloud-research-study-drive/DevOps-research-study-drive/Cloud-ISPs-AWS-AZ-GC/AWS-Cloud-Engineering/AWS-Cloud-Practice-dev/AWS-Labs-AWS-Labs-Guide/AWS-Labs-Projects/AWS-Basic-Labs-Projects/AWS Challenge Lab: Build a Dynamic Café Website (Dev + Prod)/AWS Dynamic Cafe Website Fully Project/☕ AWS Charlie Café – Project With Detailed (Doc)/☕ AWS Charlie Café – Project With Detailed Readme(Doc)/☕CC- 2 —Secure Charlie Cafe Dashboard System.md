@@ -1191,6 +1191,8 @@ Cognito Login → SUCCESS → redirect to order-status.html
 
 ✔ Admin can see orders (RDS / DynamoDB)
 
+---
+
 ### 🟢 STEP 2️⃣ — TEST HOSTED UI LOGIN (VERY IMPORTANT)
 
 > **This confirms Cognito + ALB + Return URL are working.**
