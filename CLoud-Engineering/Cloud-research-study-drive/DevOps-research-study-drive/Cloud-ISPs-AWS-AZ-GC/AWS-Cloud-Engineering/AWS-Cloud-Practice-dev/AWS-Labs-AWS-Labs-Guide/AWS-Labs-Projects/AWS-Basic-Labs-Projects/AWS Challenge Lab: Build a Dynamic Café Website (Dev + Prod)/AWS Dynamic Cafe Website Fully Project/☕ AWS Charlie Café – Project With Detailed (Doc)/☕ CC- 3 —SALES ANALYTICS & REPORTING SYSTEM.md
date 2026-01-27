@@ -1,6 +1,11 @@
 # ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
 > **(Using Existing Order Status System)**
 
+### READ Me About
+
+[☕ CC- 3 —SALES ANALYTICS & REPORTING SYSTEM](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+
+---
 
 # SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM
 
