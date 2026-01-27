@@ -5188,7 +5188,29 @@ if(!userGroups.includes("Admin")){
 
 [auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
 
-#### 2️⃣  How to use it in ALL admin pages
+#### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
+
+```
+/* ================= CONFIG ================= */
+const USER_POOL_ID = "YOUR_COGNITO_USER_POOL_ID";   // Replace with your Cognito User Pool ID
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";             // Replace with your App Client ID (no secret)
+const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.ap-south-1.amazoncognito.com"; // Replace with your Cognito Hosted UI domain
+const REDIRECT_URI = window.location.origin + window.location.pathname; // Usually fine as-is
+```
+
+#### ✅ Notes:
+
+- USER_POOL_ID → from AWS Cognito → User Pool → General settings → Pool ID
+
+- CLIENT_ID → from App client inside your Cognito User Pool → App client ID
+
+- COGNITO_DOMAIN → Cognito Hosted UI domain you set up (e.g., charliecafe-admin.auth.ap-south-1.amazoncognito.com)
+
+- REDIRECT_URI → usually leave as-is, unless you are using a custom domain or CloudFront URL.
+
+- No other changes are required in your existing auth.js. This will fully connect it to your own lab environment.
+
+#### 3️⃣  How to use it in ALL admin pages
 
 #### 🔐 STEP 1 — Hide page until auth passes
 
