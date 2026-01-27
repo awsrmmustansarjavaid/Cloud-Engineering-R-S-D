@@ -2258,4 +2258,501 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ✔ Advanced-ready
 
 
+----
+
+## FULL UPDATED FILE with Stripe Payment UI + JS
+
+✅ Existing PHP order logic
+
+✅ Existing Lambda backend call
+
+✅ Existing receipt, toasts, UI, styling
+
+✅ Existing form submission behavior
+
+### ✅ WHAT WAS ADDED (HIGH LEVEL)
+
+Stripe JS SDK
+
+Payment UI section (card input)
+
+Stripe Elements initialization
+
+Card validation handling
+
+placeOrder() JS function (Stripe payment only)
+
+Payment section appears after order is created
+
+✅ UPDATED order.php (FULL FILE)
+
+⚠️ Replace ONLY your file with this version
+
+🔑 Replace pk_test_xxxxxxxxx with your Stripe TEST publishable key
+
+```
+<?php
+// ===========================================
+// CHARLIE CAFE - PLACE ORDER PAGE (FINAL)
+// ===========================================
+
+$orderSuccess = false;
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+    $prices = [
+        "Coffee" => 3,
+        "Tea" => 2,
+        "Latte" => 4,
+        "Cappuccino" => 4,
+        "Fresh Juice" => 5
+    ];
+
+    $tableNumber = (int)$_POST["table_number"];
+    $customerName = htmlspecialchars($_POST["name"]);
+    $item = $_POST["item"];
+    $quantity = (int)$_POST["quantity"];
+    $total = $prices[$item] * $quantity;
+
+    $payload = json_encode([
+        "table_number"  => $tableNumber,
+        "customer_name" => $customerName,
+        "item"          => $item,
+        "quantity"      => $quantity
+    ]);
+
+    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+    $ch = curl_init($apiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => ["Content-Type: application/json"],
+        CURLOPT_POSTFIELDS => $payload
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    if ($response !== false) {
+        $result = json_decode($response, true);
+        if (isset($result['success']) && $result['success'] === true) {
+            $orderSuccess = true;
+        }
+    }
+
+    $statusUrl = "order-status.php?order_id=$orderId";
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Place Order</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Stripe JS SDK (MANDATORY) -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<style>
+/* Existing styles untouched */
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+    background-size: cover;
+}
+.order-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 35px;
+}
+#card-element {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: #000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height:85vh;">
+<div class="col-md-6">
+<div class="order-card">
+
+<h2 class="text-center">Place Your Order</h2>
+
+<form method="POST">
+    <label>Table Number</label>
+    <input type="number" name="table_number" class="form-control" required>
+
+    <label>Customer Name</label>
+    <input type="text" name="name" class="form-control">
+
+    <label>Select Item</label>
+    <select name="item" class="form-select">
+        <option>Coffee</option>
+        <option>Tea</option>
+        <option>Latte</option>
+        <option>Cappuccino</option>
+        <option>Fresh Juice</option>
+    </select>
+
+    <label>Quantity</label>
+    <input type="number" name="quantity" value="1" class="form-control">
+
+    <button type="submit" class="btn btn-warning w-100 mt-4">☕ Place Order</button>
+</form>
+
+<?php if ($_SERVER["REQUEST_METHOD"] === "POST"): ?>
+
+<!-- ===================== RECEIPT ===================== -->
+<div class="mt-4">
+    <h5>🧾 Order Receipt</h5>
+    <p><strong>Order ID:</strong> <?= $orderId ?></p>
+    <p><strong>Total:</strong> $<?= $total ?></p>
+</div>
+
+<!-- ===================== PAYMENT SECTION (NEW) ===================== -->
+<div id="payment-section" class="mt-4">
+
+    <h4>💳 Pay with Card</h4>
+
+    <!-- Stripe Card Element -->
+    <div id="card-element"></div>
+
+    <!-- Card errors -->
+    <div id="card-errors" class="text-danger mt-2"></div>
+
+    <!-- Payment button -->
+    <button onclick="placeOrder()" class="btn btn-success w-100 mt-3">
+        Pay $<?= $total ?>
+    </button>
+
+</div>
+
+<?php endif; ?>
+
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ===================== STRIPE INITIALIZATION =====================
+
+// Initialize Stripe with TEST publishable key
+const stripe = Stripe("pk_test_xxxxxxxxx");
+
+// Create Stripe Elements instance
+const elements = stripe.elements();
+
+// Create card input element
+const cardElement = elements.create('card', {
+    style: {
+        base: {
+            fontSize: '16px',
+            color: '#ffffff',
+            '::placeholder': { color: '#cccccc' }
+        },
+        invalid: { color: '#ff0000' }
+    }
+});
+
+// Mount card element
+cardElement.mount('#card-element');
+
+// Handle real-time validation errors
+cardElement.on('change', function(event) {
+    document.getElementById('card-errors').textContent =
+        event.error ? event.error.message : '';
+});
+
+// ===================== PLACE ORDER + PAY =====================
+async function placeOrder() {
+
+    try {
+        // Create payment intent (backend)
+        const response = await fetch('/payment/create-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderId: "<?= $orderId ?>",
+                amount: <?= $total * 100 ?>
+            })
+        });
+
+        const data = await response.json();
+
+        // Confirm card payment
+        const result = await stripe.confirmCardPayment(
+            data.clientSecret,
+            { payment_method: { card: cardElement } }
+        );
+
+        if (result.error) {
+            alert("❌ Payment Failed: " + result.error.message);
+        } else {
+            alert("✅ Payment Successful! Order Confirmed.");
+            window.location.href = "<?= $statusUrl ?>";
+        }
+
+    } catch (err) {
+        alert("Payment error occurred.");
+        console.error(err);
+    }
+}
+</script>
+
+</body>
+</html>
+```
+
+### 2nd last version before above version paste in file 
+
+
+```
+<?php
+// ===========================================
+// CHARLIE CAFE - PLACE ORDER PAGE (FINAL)
+// ===========================================
+
+// Flag to show success toast if order submission succeeds
+$orderSuccess = false;
+
+// -------------------------------
+// PROCESS ORDER SUBMISSION
+// -------------------------------
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    // 1️⃣ Generate unique Order ID
+    $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+    // 2️⃣ Define prices for items
+    $prices = [
+        "Coffee" => 3,
+        "Tea" => 2,
+        "Latte" => 4,
+        "Cappuccino" => 4,
+        "Fresh Juice" => 5
+    ];
+
+    // 3️⃣ Get submitted values
+    $tableNumber = (int)$_POST["table_number"];
+    $customerName = htmlspecialchars($_POST["name"]);
+    $item = $_POST["item"];
+    $quantity = (int)$_POST["quantity"];
+
+    // 4️⃣ Calculate total price
+    $total = $prices[$item] * $quantity;
+
+    // 5️⃣ Prepare JSON payload for Lambda API
+    $payload = json_encode([
+        "table_number"  => $tableNumber,
+        "customer_name" => $customerName,
+        "item"          => $item,
+        "quantity"      => $quantity
+    ]);
+
+    // 6️⃣ Lambda API endpoint to create order
+    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+    // 7️⃣ Send order to backend using cURL
+    $ch = curl_init($apiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_HTTPHEADER     => ["Content-Type: application/json"],
+        CURLOPT_POSTFIELDS     => $payload
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    // 8️⃣ If backend confirms, show success toast
+    if ($response !== false) {
+        $result = json_decode($response, true);
+        if (isset($result['success']) && $result['success'] === true) {
+            $orderSuccess = true;
+        }
+    }
+
+    // 9️⃣ Generate order status link
+    $statusUrl = "order-status.php?order_id=$orderId";
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe ☕ | Place Order</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===================== BOOTSTRAP 5 ===================== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ===================== GOOGLE FONT ===================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- ===================== CUSTOM CAFE STYLES ===================== -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+        }
+        .navbar { background-color: #3b1f0e; }
+        .navbar-brand { color: #fff !important; font-weight: 600; }
+        .order-card {
+            background: #fff;
+            border-radius: 22px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            animation: fadeUp 0.9s ease;
+        }
+        label { font-weight: 500; margin-top: 15px; }
+        input, select { border-radius: 10px; padding: 10px; }
+        .btn-order {
+            background-color: #ff9800;
+            color: #000;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 12px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-order:hover { background-color: #e68900; transform: translateY(-2px); }
+        .receipt {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        .status-badge {
+            background: #0d6efd;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        footer { color: #fff; text-align: center; padding: 15px; margin-top: 40px; font-size: 14px; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- ===================== ORDER FORM ===================== -->
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+<div class="col-md-6">
+<div class="order-card">
+
+<h2 class="text-center">Place Your Order</h2>
+<p class="text-center text-muted">Fresh • Hot • Made with Love</p>
+
+<form method="POST">
+    <label>Table Number</label>
+    <input type="number" name="table_number" min="1" class="form-control" required>
+
+    <label>Customer Name</label>
+    <input type="text" name="name" class="form-control" maxlength="50">
+
+    <label>Select Item</label>
+    <select name="item" class="form-select">
+        <option>Coffee</option>
+        <option>Tea</option>
+        <option>Latte</option>
+        <option>Cappuccino</option>
+        <option>Fresh Juice</option>
+    </select>
+
+    <label>Quantity</label>
+    <input type="number" name="quantity" min="1" value="1" class="form-control">
+
+    <button type="submit" class="btn btn-order w-100 mt-4">☕ Place Order</button>
+</form>
+
+<?php if ($_SERVER["REQUEST_METHOD"] === "POST"): ?>
+    <!-- ===================== ORDER RECEIPT ===================== -->
+    <div class="receipt">
+        <h5>🧾 Order Receipt</h5>
+        <p><strong>Order ID:</strong> <?= $orderId ?></p>
+        <p><strong>Status:</strong> <span class="status-badge">RECEIVED</span></p>
+        <hr>
+        <p><strong>Item:</strong> <?= $item ?></p>
+        <p><strong>Quantity:</strong> <?= $quantity ?></p>
+        <p><strong>Total:</strong> $<?= $total ?></p>
+        <hr>
+        <p><strong>Order Status Link:</strong><br>
+            <a href="<?= $statusUrl ?>" target="_blank"><?= $statusUrl ?></a>
+        </p>
+        <button onclick="window.print()" class="btn btn-outline-dark w-100 mt-3">🖨️ Print Receipt</button>
+    </div>
+<?php endif; ?>
+
+</div>
+</div>
+</div>
+
+<!-- ===================== TOASTS ===================== -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="welcomeToast" class="toast">
+        <div class="toast-header">
+            <strong class="me-auto">☕ Charlie Cafe</strong>
+            <button class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">Welcome to the Charlie Cafe order page!</div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Order Placed</strong>
+            <button class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">✅ Your order has been sent to the kitchen!</div>
+    </div>
+</div>
+
+<footer>© 2026 Charlie Cafe | Serverless Orders ☁️</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Show welcome toast
+    new bootstrap.Toast(document.getElementById('welcomeToast'), { delay: 2500 }).show();
+
+    // Show success toast if order was successfully sent
+    <?php if ($orderSuccess): ?>
+        new bootstrap.Toast(document.getElementById('successToast')).show();
+    <?php endif; ?>
+});
+</script>
+
+</body>
+</html>
+```
 
