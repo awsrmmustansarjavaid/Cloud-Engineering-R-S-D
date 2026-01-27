@@ -2220,20 +2220,21 @@ A- dmin dashboard now has employee-wise filtering
 ## ☕ Charlie Café PHASE 9️⃣ — Minor UX / UI Polish
 > **🌐 (Optional but Professional)**
 
-Step 5.1 — Choose Toast Notification Method
-✅ Recommended (No Library)
+### Step 5.1 — Choose Toast Notification Method
 
-Pure HTML + CSS + JavaScript
+#### ✅ Recommended (No Library)
 
-Lightweight
+- Pure HTML + CSS + JavaScript
 
-Works everywhere
+- Lightweight
 
-Perfect for labs & production
+- Works everywhere
+
+- Perfect for labs & production
 
 (We will use this)
 
-Step 5.2 — Add Toast HTML (ONE TIME ONLY)
+### Step 5.2 — Add Toast HTML (ONE TIME ONLY)
 
 Add this once near the end of your HTML body (Admin / Check-in / Checkout pages):
 
@@ -2242,7 +2243,7 @@ Add this once near the end of your HTML body (Admin / Check-in / Checkout pages)
 <div id="toast-container"></div>
 ```
 
-Step 5.3 — Add Toast CSS (GLOBAL)
+### Step 5.3 — Add Toast CSS (GLOBAL)
 
 Add this inside your main CSS file or <style> tag:
 
@@ -2279,7 +2280,7 @@ Add this inside your main CSS file or <style> tag:
 }
 ```
 
-Step 5.4 — Add Toast JavaScript (GLOBAL FUNCTION)
+### Step 5.4 — Add Toast JavaScript (GLOBAL FUNCTION)
 
 Add this once in your main JS file:
 
@@ -2298,20 +2299,20 @@ function showToast(message, type = 'info') {
 }
 ```
 
-Step 5.5 — Replace alert() in Your Code
+### Step 5.5 — Replace alert() in Your Code
 ❌ Old (Bad UX)
 
 ```
 alert("Check-in successful");
 ```
 
-✅ New (Professional UX)
+#### ✅ New (Professional UX)
 
 ```
 showToast("Check-in successful", "success");
 ```
 
-Step 5.6 — Apply to Holiday Admin Page
+### Step 5.6 — Apply to Holiday Admin Page
 Add Success Message
 
 ```
@@ -2337,7 +2338,7 @@ try {
 }
 ```
 
-Step 5.7 — Apply to Check-In / Check-Out Pages
+### Step 5.7 — Apply to Check-In / Check-Out Pages
 Check-In Example
 
 ```
@@ -2358,7 +2359,7 @@ Check-Out Example
 showToast("Checked out successfully", "success");
 ```
 
-Step 5.8 — Add Loading State (Professional Touch)
+#### Step 5.8 — Add Loading State (Professional Touch)
 HTML Button
 
 ```
@@ -2378,7 +2379,7 @@ btn.disabled = false;
 btn.innerText = "Check In";
 ```
 
-Step 5.9 — Improve Error Messages (Human Friendly)
+#### Step 5.9 — Improve Error Messages (Human Friendly)
 
 ❌ Bad:
 
