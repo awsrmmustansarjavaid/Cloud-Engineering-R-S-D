@@ -2,8 +2,7 @@
 
 ### READ Me About
 
-☕ CC- 2 —Secure Charlie Cafe Dashboard System.md
-[order-receipt.php](./order-receipt.php)
+[☕ CC- 2 —Secure Charlie Cafe Dashboard System.md](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 
 ### Goal: Production-ready Admin Dashboard
 
