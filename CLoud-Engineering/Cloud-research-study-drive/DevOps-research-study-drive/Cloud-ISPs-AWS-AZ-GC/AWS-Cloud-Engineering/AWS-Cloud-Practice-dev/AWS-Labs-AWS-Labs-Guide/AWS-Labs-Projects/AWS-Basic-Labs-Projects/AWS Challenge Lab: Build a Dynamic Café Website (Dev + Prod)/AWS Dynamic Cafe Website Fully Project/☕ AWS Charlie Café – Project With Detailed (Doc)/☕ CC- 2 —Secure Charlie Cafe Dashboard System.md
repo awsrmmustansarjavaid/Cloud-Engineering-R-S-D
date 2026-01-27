@@ -1182,42 +1182,6 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 > **⚠️ Note: Yes can change the Cognito Hosted UI design, but with limits.**
 
-### ▶️ What Cognito Hosted UI DOES ALLOW
-
-✔️ Change logo
-
-✔️ Change background color
-
-✔️ Change button color
-
-✔️ Change brand color
-
-✔️ Change favicon
-
-✔️ Use light or dark theme
-
-**👉 This is done via Cognito → App integration → Hosted UI → Customization**
-
-### ▶️ What Cognito Hosted UI DOES NOT ALLOW
-
-❌ Fully redesign layout with Bootstrap
-
-❌ Add custom cards, sections, or animations
-
-❌ Embed Cognito login inside your own page using HTML forms
-
-❌ Add your own JS logic inside the Hosted UI
-
-**👉 Cognito Hosted UI is not a normal HTML page you can edit.**
-
-### ❓ Cognito login form INSIDE your own page
-
-#### ❌ NO (Directly)
-
-**AWS Cognito does not allow username/password submission from your own HTML for security reasons.**
-
-**👉 This is by design.**
-
 ### 1️⃣ The CORRECT & PROFESSIONAL approach (used in real projects)
 
 #### 1️⃣ Option A (RECOMMENDED – what you’re already using)
