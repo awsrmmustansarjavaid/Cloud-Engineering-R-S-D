@@ -81,6 +81,86 @@ One centralized script that any page can include.
 #### ▶️ Benefit:
 You don’t have to rewrite login logic for every page. It makes your architecture professional.
 
+#### ▶️ auth.js depends on:
+
+- Cognito User Pool
+
+- App Client
+
+- Hosted UI
+
+- API Gateway authorizers
+
+- CloudFront + ALB HTTPS + security headers
+
+- Roles and Groups
+
+- Environment variables in auth.js
+
+These configurations ensure that:
+
+- Only authenticated users can access dashboards
+
+- JWT tokens are validated by API Gateway
+
+- Pages remain hidden until auth passes
+
+- Logout works globally
+
+### 🧩 STEP 1 — Cognito User Pool Setup
+
+#### 1️⃣ Create Cognito User Pool
+
+- AWS Console → Cognito → “Manage User Pools” → Create pool
+
+- Name: CharlieCafeAdminPool
+
+#### 2️⃣ Add Attributes
+
+- Required: email
+
+- Optional: name, phone
+
+#### 3️⃣ Enable App Clients
+
+- Create app client without client secret
+
+- App Client Name: AdminWebClient
+
+- Enable Authorization code grant or Implicit grant for SPA
+
+- Allowed OAuth Flows: Implicit grant
+
+- Allowed OAuth Scopes: openid, email, profile
+
+#### 4️⃣ Configure Hosted UI
+
+- Domain name: YOUR_DOMAIN.auth.region.amazoncognito.com
+
+- Callback URL: https://YOUR_DOMAIN/dashboard.html (or your EC2 public IP for testing)
+
+- Sign out URL: same as above
+
+#### 5️⃣ Create Groups (Optional, role-based dashboards)
+
+- Admin → Full access
+
+- Staff → Limited access
+
+- Manager → Read-only analytics
+
+#### 6️⃣ Update auth.js with pool info
+
+```
+const USER_POOL_ID = "YOUR_POOL_ID";
+const CLIENT_ID = "YOUR_APP_CLIENT_ID";
+const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.region.amazoncognito.com";
+```
+
+
+
+
+
 
 #### ▶️ auth.js template (reusable)
 
