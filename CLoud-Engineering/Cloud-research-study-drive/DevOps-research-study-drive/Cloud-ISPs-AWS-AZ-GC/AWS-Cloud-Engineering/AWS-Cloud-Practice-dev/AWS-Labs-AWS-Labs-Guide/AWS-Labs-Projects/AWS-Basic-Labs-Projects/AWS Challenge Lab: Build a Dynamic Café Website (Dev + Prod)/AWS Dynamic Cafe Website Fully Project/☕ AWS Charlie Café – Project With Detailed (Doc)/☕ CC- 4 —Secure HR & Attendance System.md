@@ -1702,162 +1702,17 @@ All will query RDS and return JSON data to API Gateway.
 #### 1️⃣ — Daily Attendance Lambda
 > **📄 Filename: attendance_daily_summary.py**
 
-```
-import json
-import pymysql
-import os
-from datetime import date
-
-# Database configuration (set in Lambda environment variables)
-DB_HOST = os.environ['DB_HOST']
-DB_USER = os.environ['DB_USER']
-DB_PASSWORD = os.environ['DB_PASSWORD']
-DB_NAME = os.environ['DB_NAME']
-
-def lambda_handler(event, context):
-    try:
-        connection = pymysql.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        cursor = connection.cursor(pymysql.cursors.DictCursor)
-        
-        # Get today's date
-        today = date.today().strftime('%Y-%m-%d')
-        
-        # SQL query: daily attendance
-        sql = """
-            SELECT e.employee_id, e.name, a.checkin_time, a.checkout_time
-            FROM attendance a
-            JOIN employees e ON a.employee_id = e.employee_id
-            WHERE a.date = %s
-        """
-        cursor.execute(sql, (today,))
-        result = cursor.fetchall()
-        
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'date': today, 'attendance': result})
-        }
-
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
-        }
-    finally:
-        cursor.close()
-        connection.close()
-```
+[attendance_daily_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 #### 2️⃣ — Weekly Attendance Lambda
 > **📄 Filename: attendance_weekly_summary.py**
 
-```
-import json
-import pymysql
-import os
-from datetime import date, timedelta
-
-DB_HOST = os.environ['DB_HOST']
-DB_USER = os.environ['DB_USER']
-DB_PASSWORD = os.environ['DB_PASSWORD']
-DB_NAME = os.environ['DB_NAME']
-
-def lambda_handler(event, context):
-    try:
-        connection = pymysql.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        cursor = connection.cursor(pymysql.cursors.DictCursor)
-        
-        # Get last 7 days
-        today = date.today()
-        week_ago = today - timedelta(days=6)
-        
-        sql = """
-            SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
-            FROM attendance a
-            JOIN employees e ON a.employee_id = e.employee_id
-            WHERE a.date BETWEEN %s AND %s
-            ORDER BY a.date ASC
-        """
-        cursor.execute(sql, (week_ago, today))
-        result = cursor.fetchall()
-        
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'start_date': str(week_ago), 'end_date': str(today), 'attendance': result})
-        }
-
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
-        }
-    finally:
-        cursor.close()
-        connection.close()
-```
+[attendance_weekly_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 #### 3️⃣ — Monthly Attendance Lambda
 > **📄 Filename: attendance_monthly_summary.py**
 
-```
-import json
-import pymysql
-import os
-from datetime import date
-
-DB_HOST = os.environ['DB_HOST']
-DB_USER = os.environ['DB_USER']
-DB_PASSWORD = os.environ['DB_PASSWORD']
-DB_NAME = os.environ['DB_NAME']
-
-def lambda_handler(event, context):
-    try:
-        connection = pymysql.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        cursor = connection.cursor(pymysql.cursors.DictCursor)
-        
-        # First and last day of current month
-        today = date.today()
-        start_month = today.replace(day=1)
-        end_month = today
-        
-        sql = """
-            SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
-            FROM attendance a
-            JOIN employees e ON a.employee_id = e.employee_id
-            WHERE a.date BETWEEN %s AND %s
-            ORDER BY a.date ASC
-        """
-        cursor.execute(sql, (start_month, end_month))
-        result = cursor.fetchall()
-        
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'start_date': str(start_month), 'end_date': str(end_month), 'attendance': result})
-        }
-
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
-        }
-    finally:
-        cursor.close()
-        connection.close()
-```
+[attendance_monthly_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
 
 ### 3️⃣ — Lambda Environment Variables
 
