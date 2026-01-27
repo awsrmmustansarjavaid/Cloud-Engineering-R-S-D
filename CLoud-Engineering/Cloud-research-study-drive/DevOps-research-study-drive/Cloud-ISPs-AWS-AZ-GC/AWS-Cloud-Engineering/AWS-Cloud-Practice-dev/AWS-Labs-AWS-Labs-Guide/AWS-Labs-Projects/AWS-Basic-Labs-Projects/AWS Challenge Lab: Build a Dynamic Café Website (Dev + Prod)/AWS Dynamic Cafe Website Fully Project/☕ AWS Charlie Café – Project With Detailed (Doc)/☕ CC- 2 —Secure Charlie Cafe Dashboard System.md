@@ -1792,223 +1792,6 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 **✅ PHASE 6 STATUS**
 
 > **🟢 PHASE 6 COMPLETE & VERIFIED**
-
-# SECTION 1️⃣  COMPLETE ✅
----
-
-# SECTION 2️⃣ Charlie Cafe - PRINTING System
-
-## 🔐 PHASE 1️⃣ Charlie Cafe - PRINTING (FRONTEND ONLY)
-
-### 🖨️ Printing System 1 — Browser Print (Frontend-only)
-
-### 1️⃣ — CONFIRM FILE YOU WILL MODIFY (NO JUMP)
-
-#### You must edit this file:
-
-```
-/var/www/html/order-status.html
-```
-
-✔ Same file where orders are shown
-
-✔ Same file used by staff/admin
-
-### 2️⃣ — BACKUP YOUR FILE (MANDATORY)
-
-#### Run:
-
-```
-sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
-```
-
-### 3️⃣ — ADD PRINT BUTTONS (EXACT LOCATION)
-
-#### 🔍 FIND THIS IN YOUR FILE:
-
-```
-<h3>Order Status</h3>
-```
-
-#### ⬇️ IMMEDIATELY BELOW IT, PASTE THIS:
-
-[PRINT-ONLY.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.html)
-
-❌ Do NOT remove anything
-
-❌ Do NOT rename functions
-
-### 4️⃣ — ADD PRINT-ONLY CSS (VERY IMPORTANT)
-
-#### 🔍 FIND:
-
-```
-</head>
-```
-
-#### ⬆️ JUST ABOVE IT, PASTE:
-
-[PRINT-ONLY.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.css)
-
-✔ Ensures clean PDF
-
-✔ Hides buttons automatically
-
-### 5️⃣ — ADD JAVASCRIPT PRINT LOGIC
-
-#### 🔍 FIND THE END OF YOUR <script> TAG
-
-> **🔴 (OR CREATE ONE IF NOT EXISTS)**
-
-#### ⬇️ PASTE THIS FULL CODE:
-
-[PRINT-ONLY.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.js)
-
-❌ Do NOT change function names
-
-❌ Do NOT move code
-
-### 6️⃣ — ENSURE TABLE HAS REQUIRED ATTRIBUTES
-
-#### 🔍 FIND YOUR ORDERS TABLE ROW LOOP
-
-Example:
-
-```
-<tr>
-```
-
-#### 🔁 REPLACE WITH THIS:
-
-```
-<tr data-date="2026-01-17" data-total="15">
-```
-
-#### ⚠️ IMPORTANT
-
-- These values must already exist in JS when rendering rows.
-
-Example in JS:
-
-```
-row.dataset.date = order.order_date;
-row.dataset.total = order.total_amount;
-```
-
-✔ Required for today summary print
-
-### 🧾 ✅ FINAL UPDATED order-status.html (WITH PRINTING + COMMENTS)
-
-#### 📍 Location:
-
-```
-/var/www/html/order-status.html
-```
-
-#### 1️⃣ BACKUP order-status.html
-
-```
-sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
-```
-
-#### ♻️ RESTORE IF NEEDED (OPTIONAL)
-
-```
-sudo cp /var/www/html/order-status-backup.html /var/www/html/order-status.html
-```
-
-#### 2️⃣ Replace your entire file with this
-
-[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
-
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/order-status.html
-```
-
-```
-sudo chmod 644 /var/www/html/order-status.html
-```
-
-#### 5️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-#### 6️⃣ Open page in browser
-
-```
-http://EC2 Public IP/order-status.html
-```
-
-### 7️⃣ — TEST PRINT ALL ORDERS (MANDATORY)
-
-1️⃣ Open browser
-
-2️⃣ Go to Order Status Page
-
-3️⃣ Click 🖨️ Print All Orders
-
-#### EXPECTED RESULT:
-
-✔ Browser print dialog opens
-
-✔ Orders table visible
-
-✔ Buttons hidden
-
-✔ Can save as PDF
-
-### 8️⃣ — TEST TODAY SUMMARY PRINT (MANDATORY)
-
-- **1️⃣ Click 📄 Print Today Summary**
-
-#### EXPECTED RESULT:
-
-✔ Only summary visible
-
-✔ Correct date
-
-✔ Correct totals
-
-✔ Clean PDF layout
-
-**❌ If totals = 0 → your data-date missing**
-
-### 🧪  FINAL CONFIRMATION CHECKLIST
-
-| Item                    | Status |
-| ----------------------- | ------ |
-| No backend used         | ✅      |
-| Print dialog opens      | ✅      |
-| PDF save works          | ✅      |
-| Buttons hidden in print | ✅      |
-| Today summary accurate  | ✅      |
-
-
-### 🟢 PHASE 1️⃣ FINAL STATUS
-
-✅ PHASE 1️⃣ COMPLETE
-
-✅ FULLY TESTED
-
-✅ NO SKIPPED STEPS
-
-✅ SAFE TO MOVE FORWARD
-
-
-**✅ PHASE 1️⃣ STATUS**
-
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
 ## 🔐 PHASE 8️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
@@ -2422,12 +2205,6 @@ https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
 ✅ SUCCESS
 
 
-**✅ PHASE 9 STATUS**
-
-> **🟢 PHASE 9 COMPLETE & VERIFIED**
-
----
-
 ### 🏁 FINAL SUMMARY
 
 | Area             | Status         |
@@ -2442,10 +2219,227 @@ https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
 | Confusion        | ❌ Removed      |
 | Production-ready | ✅ YES          |
 
----
+**✅ PHASE 9 STATUS**
+
+> **🟢 PHASE 9 COMPLETE & VERIFIED**
+
+# SECTION 1️⃣  COMPLETE ✅
 ---
 
+# SECTION 2️⃣ Charlie Cafe - PRINTING System
 
+## 🔐 PHASE 1️⃣ Charlie Cafe - PRINTING (FRONTEND ONLY)
+
+### 🖨️ Printing System 1 — Browser Print (Frontend-only)
+
+### 1️⃣ — CONFIRM FILE YOU WILL MODIFY (NO JUMP)
+
+#### You must edit this file:
+
+```
+/var/www/html/order-status.html
+```
+
+✔ Same file where orders are shown
+
+✔ Same file used by staff/admin
+
+### 2️⃣ — BACKUP YOUR FILE (MANDATORY)
+
+#### Run:
+
+```
+sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+```
+
+### 3️⃣ — ADD PRINT BUTTONS (EXACT LOCATION)
+
+#### 🔍 FIND THIS IN YOUR FILE:
+
+```
+<h3>Order Status</h3>
+```
+
+#### ⬇️ IMMEDIATELY BELOW IT, PASTE THIS:
+
+[PRINT-ONLY.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.html)
+
+❌ Do NOT remove anything
+
+❌ Do NOT rename functions
+
+### 4️⃣ — ADD PRINT-ONLY CSS (VERY IMPORTANT)
+
+#### 🔍 FIND:
+
+```
+</head>
+```
+
+#### ⬆️ JUST ABOVE IT, PASTE:
+
+[PRINT-ONLY.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.css)
+
+✔ Ensures clean PDF
+
+✔ Hides buttons automatically
+
+### 5️⃣ — ADD JAVASCRIPT PRINT LOGIC
+
+#### 🔍 FIND THE END OF YOUR <script> TAG
+
+> **🔴 (OR CREATE ONE IF NOT EXISTS)**
+
+#### ⬇️ PASTE THIS FULL CODE:
+
+[PRINT-ONLY.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.js)
+
+❌ Do NOT change function names
+
+❌ Do NOT move code
+
+### 6️⃣ — ENSURE TABLE HAS REQUIRED ATTRIBUTES
+
+#### 🔍 FIND YOUR ORDERS TABLE ROW LOOP
+
+Example:
+
+```
+<tr>
+```
+
+#### 🔁 REPLACE WITH THIS:
+
+```
+<tr data-date="2026-01-17" data-total="15">
+```
+
+#### ⚠️ IMPORTANT
+
+- These values must already exist in JS when rendering rows.
+
+Example in JS:
+
+```
+row.dataset.date = order.order_date;
+row.dataset.total = order.total_amount;
+```
+
+✔ Required for today summary print
+
+### 🧾 ✅ FINAL UPDATED order-status.html (WITH PRINTING + COMMENTS)
+
+#### 📍 Location:
+
+```
+/var/www/html/order-status.html
+```
+
+#### 1️⃣ BACKUP order-status.html
+
+```
+sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+```
+
+#### ♻️ RESTORE IF NEEDED (OPTIONAL)
+
+```
+sudo cp /var/www/html/order-status-backup.html /var/www/html/order-status.html
+```
+
+#### 2️⃣ Replace your entire file with this
+
+[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 4️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+#### 5️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 6️⃣ Open page in browser
+
+```
+http://EC2 Public IP/order-status.html
+```
+
+### 7️⃣ — TEST PRINT ALL ORDERS (MANDATORY)
+
+1️⃣ Open browser
+
+2️⃣ Go to Order Status Page
+
+3️⃣ Click 🖨️ Print All Orders
+
+#### EXPECTED RESULT:
+
+✔ Browser print dialog opens
+
+✔ Orders table visible
+
+✔ Buttons hidden
+
+✔ Can save as PDF
+
+### 8️⃣ — TEST TODAY SUMMARY PRINT (MANDATORY)
+
+- **1️⃣ Click 📄 Print Today Summary**
+
+#### EXPECTED RESULT:
+
+✔ Only summary visible
+
+✔ Correct date
+
+✔ Correct totals
+
+✔ Clean PDF layout
+
+**❌ If totals = 0 → your data-date missing**
+
+### 🧪  FINAL CONFIRMATION CHECKLIST
+
+| Item                    | Status |
+| ----------------------- | ------ |
+| No backend used         | ✅      |
+| Print dialog opens      | ✅      |
+| PDF save works          | ✅      |
+| Buttons hidden in print | ✅      |
+| Today summary accurate  | ✅      |
+
+
+### 🟢 PHASE 1️⃣ FINAL STATUS
+
+✅ PHASE 1️⃣ COMPLETE
+
+✅ FULLY TESTED
+
+✅ NO SKIPPED STEPS
+
+✅ SAFE TO MOVE FORWARD
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
 
 # SECTION 2️⃣- 🏷️ Order Status – Advanced Features Guide
 
