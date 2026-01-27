@@ -8,12 +8,33 @@
 ---
 # SECTION 1️⃣ Secure Admin Order Dashboard
 
-### 🔐 — PREREQUISITES (CHECK ONLY)
+## 🔐 PHASE  1️⃣ — Create dashboard.html
 
 ✔️ 📄 File: dashboard.html
 
+#### 📍 Location:
+
+> **dashboard.html (Recommanded)**
+
+```
+/var/www/html/dashboard.html
+```
+
+> **order-status.html**
+
+```
+/var/www/html/order-status.html
+```
+
+[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+
 ---
-## 🔐 PHASE 1️⃣ — Set Up Automatic HTTP → HTTPS Redirection
+## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
 
 > **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
