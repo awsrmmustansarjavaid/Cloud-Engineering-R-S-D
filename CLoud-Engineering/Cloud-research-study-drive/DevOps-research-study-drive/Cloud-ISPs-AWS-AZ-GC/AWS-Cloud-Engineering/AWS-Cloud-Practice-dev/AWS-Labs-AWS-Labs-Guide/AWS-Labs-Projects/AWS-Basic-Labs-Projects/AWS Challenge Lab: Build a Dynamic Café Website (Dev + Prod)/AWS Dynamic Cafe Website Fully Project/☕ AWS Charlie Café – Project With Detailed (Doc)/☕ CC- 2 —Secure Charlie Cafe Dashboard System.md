@@ -627,7 +627,6 @@ This is your Return URL
 
 ## 🔐 PHASE 3️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
 
-
 ### ▶️ Part 1️⃣ Cognito Authentication infrastructure 
 
 ### ✅ STEP 1️⃣ — DEFINE YOUR APPLICATION
@@ -639,21 +638,6 @@ This is your Return URL
 ```
 ✅ Single-page application (SPA)
 ```
-
-#### Why?
-
-- Your admin dashboard is HTML + JS
-
-- Runs in browser
-
-- No client secret allowed (correct)
-
-#### ❌ Do NOT choose:
-
-- Traditional web app
-
-- Machine-to-machine
-
 
 #### 2️⃣ Name your application
 
