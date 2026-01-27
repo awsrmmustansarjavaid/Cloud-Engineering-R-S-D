@@ -2273,7 +2273,7 @@ filter_date = params.get("date")
 
 #### If export_csv == True, generate CSV:
 
-[GetOrderStatusAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT%20(single%20order))/order-receipt.php)
+[GetOrderStatusAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/GetOrderStatusAdminLambda.py)
 
 ✔ Now the Lambda supports CSV export.
 
