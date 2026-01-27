@@ -34,7 +34,7 @@ CafeOrders
 
 👉 Do NOT rename the table randomly
 
-#### 3️⃣ Verify Table Keys (CRITICAL)
+### 2️⃣ VERIFY REQUIRED ATTRIBUTES EXIST (DATA CONTRACT)
 
 #### Why this matters
 
@@ -52,7 +52,7 @@ Adding one breaks:
 
 👉 Analytics filtering happens via GSI, not main table.
 
-### STEP 3️⃣ — UNDERSTAND THE “DATA CONTRACT”
+#### UNDERSTAND THE “DATA CONTRACT”
 
 This is the MOST IMPORTANT CONCEPT you were missing.
 
@@ -67,4 +67,80 @@ It means:
 - Lambda does not fix them
 
 - Lambda only reads
+
+#### REQUIRED ATTRIBUTES (NO EXCEPTIONS)
+
+For every COMPLETED order, DynamoDB item must contain:
+
+| Attribute       | Type   | Why                   |
+| --------------- | ------ | --------------------- |
+| order_id        | String | Primary key           |
+| order_date      | String | Used by GSI partition |
+| order_timestamp | Number | Used by GSI sort      |
+| total_amount    | Number | Sales calculation     |
+| total_cost      | Number | Profit calculation    |
+| order_status    | String | Filter COMPLETED      |
+
+**⚠️ Missing even ONE → analytics fails silently or returns empty data.**
+
+#### 2️⃣ Verify Attributes Exist in Real Data
+
+Why this step exists
+
+Most bugs come from:
+
+- order_timestamp saved as string
+
+- total_amount saved as "30" instead of 30
+
+Do this EXACTLY:
+
+- DynamoDB → CafeOrders
+
+- Click Explore table items
+
+- Open at least 3 COMPLETED orders
+
+Manually confirm:
+
+✅ order_date = "2026-01-17"
+
+✅ order_timestamp = Number
+
+✅ total_amount = Number
+
+✅ total_cost = Number
+
+❌ If wrong:
+
+👉 STOP
+
+👉 Fix order creation Lambda first
+
+### 3️⃣ – ADD ADD GLOBAL SECONDARY INDEX (GSI - VERY IMPORTANT)
+
+WHY GSI IS REQUIRED (VERY IMPORTANT)
+
+**❓ Why can’t we just scan the table?**
+
+- Scan is slow
+
+- Scan is expensive
+
+- Scan is forbidden in production analytics
+
+**❓ What problem GSI solves?**
+
+We want:
+
+```
+All orders between date A and date B
+```
+
+DynamoDB cannot query by non-key attributes
+
+➡️ So we CREATE a key → GSI
+
+#### 2️⃣ Create Global Secondary Index
+
 
