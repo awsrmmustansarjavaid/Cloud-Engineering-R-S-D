@@ -832,40 +832,6 @@ Exit SMS sandbox
 
 ### ▶️ Part 2️⃣ Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
 
-### ✅ WHAT YOU HAVE DONE (CONFIRMED)
-
-#### You already have:
-
-✔ Cognito User Pool created
-
-✔ Application (SPA) created
-
-✔ ALB created and HTTPS working
-
-✔ ALB DNS added as Return URL
-
-✔ Password policy configured
-
-✔ Account recovery configured
-
-#### That means:
-
-**👉 Authentication infrastructure is READY**
-
-### 🎯 NOW WHAT IS THE GOAL?
-
-#### For your Café Lab, the remaining goals are:
-
-✔ Admin can log in
-
-✔ Cognito returns a JWT token
-
-✔ Admin dashboard (order-status.html) receives token
-
-✔ API Gateway accepts requests only with valid token
-
-✔ Admin can see orders (RDS / DynamoDB)
-
 ### 🟢 STEP 1️⃣ — CREATE ADMIN USER (MANDATORY)
 
 #### 1️⃣ Where:
@@ -897,24 +863,6 @@ Click Create user
 ✅ Admin account created
 
 ### 🟢 STEP 2️⃣ — TEST HOSTED UI LOGIN (VERY IMPORTANT)
-
-> **This confirms Cognito + ALB + Return URL are working.**
-
-#### Flow summary:
-
-- Admin opens the dashboard via ALB URL
-
-- Browser redirects to Cognito Hosted UI login
-
-- After login, Cognito redirects back to order-status.html
-
-- Access Token is stored in browser
-
-- Token is sent to API Gateway (Cognito Authorizer)
-
-- Dashboard loads securely
-
-> **This approach uses OAuth 2.0 Implicit Flow, which is ideal for plain HTML + JavaScript applications hosted on EC2 / Apache.**
 
 #### 1️⃣ Login Page Configuration Tab:
 
