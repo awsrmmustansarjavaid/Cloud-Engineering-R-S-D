@@ -1844,135 +1844,60 @@ function displaySummary(records) {
 ---
 ## ☕ Charlie Café PHASE 7️⃣ — ADMIN DASHBOARD ENHANCEMENTS
 
-STEP 1 — Database & Backend Preparation
-1️⃣ Verify RDS Tables
+### STEP 1 — Database & Backend Preparation
+
+#### 1️⃣ Verify RDS Tables
 
 You already have:
 
-employees (employee_id, name, job_title)
+- employees (employee_id, name, job_title)
 
-attendance (attendance_id, employee_id, date, checkin_time, checkout_time)
+- attendance (attendance_id, employee_id, date, checkin_time, checkout_time)
 
-leaves (leave_id, employee_id, leave_date, leave_type)
+- leaves (leave_id, employee_id, leave_date, leave_type)
 
-✅ No changes needed here; all data is ready for filtering and summary.
+**✅ No changes needed here; all data is ready for filtering and summary.**
 
-2️⃣ Optional: Add Indexes (Performance)
+#### 2️⃣ Optional: Add Indexes (Performance)
 
 ```
 CREATE INDEX idx_attendance_employee_date ON attendance(employee_id, date);
 CREATE INDEX idx_leaves_employee_date ON leaves(employee_id, leave_date);
 ```
 
-✅ Purpose: Fast filtering by employee and date.
+**✅ Purpose: Fast filtering by employee and date.**
 
-STEP 2 — Lambda Functions for Admin Dashboard Enhancements
+### STEP 2 — Lambda Functions for Admin Dashboard Enhancements
 
 We will create one main Lambda that supports filtering and summary cards.
 
-Filename: admin_dashboard_data.py
+#### Filename: admin_dashboard_data.py
 
-```
-import json
-import pymysql
-import os
-from datetime import date
+[admin_dashboard_data.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/admin_dashboard_data.py)
 
-# RDS connection details from Lambda environment variables
-DB_HOST = os.environ['DB_HOST']
-DB_USER = os.environ['DB_USER']
-DB_PASSWORD = os.environ['DB_PASSWORD']
-DB_NAME = os.environ['DB_NAME']
+#### ✅ This Lambda:
 
-def lambda_handler(event, context):
-    """
-    Returns:
-    - Filtered attendance records (optionally by employee_id)
-    - Summary counts: total present, absent, leaves
-    """
+- Supports optional employee filter
 
-    # Optional query parameter for employee filtering
-    employee_id = event.get('queryStringParameters', {}).get('employee_id')
+- Returns attendance records + summary cards (present / absent / leaves)
 
-    try:
-        connection = pymysql.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        cursor = connection.cursor(pymysql.cursors.DictCursor)
+### STEP 3 — API Gateway Integration
 
-        # 1️⃣ Attendance Records
-        if employee_id:
-            sql_attendance = """
-                SELECT a.date, e.employee_id, e.name, a.checkin_time, a.checkout_time
-                FROM attendance a
-                JOIN employees e ON a.employee_id = e.employee_id
-                WHERE e.employee_id = %s
-                ORDER BY a.date DESC
-            """
-            cursor.execute(sql_attendance, (employee_id,))
-        else:
-            sql_attendance = """
-                SELECT a.date, e.employee_id, e.name, a.checkin_time, a.checkout_time
-                FROM attendance a
-                JOIN employees e ON a.employee_id = e.employee_id
-                ORDER BY a.date DESC
-            """
-            cursor.execute(sql_attendance)
+- Open API Gateway → Existing HR API
 
-        attendance_records = cursor.fetchall()
+- Create Resource: /admin/dashboard
 
-        # 2️⃣ Summary Cards
-        sql_summary = """
-            SELECT 
-                COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL THEN a.employee_id END) AS total_present,
-                COUNT(DISTINCT e.employee_id) - COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL THEN a.employee_id END) AS total_absent,
-                (SELECT COUNT(*) FROM leaves) AS total_leaves
-            FROM employees e
-            LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.date = CURDATE()
-        """
-        cursor.execute(sql_summary)
-        summary = cursor.fetchone()
+- Method: GET → Lambda integration → admin_dashboard_data
 
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'attendance': attendance_records, 'summary': summary})
-        }
+- Enable Cognito Authorizer → Admin-only access
 
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
-        }
-    finally:
-        cursor.close()
-        connection.close()
-```
+- Enable CORS → Allowed origin: your EC2 frontend
 
-✅ This Lambda:
+- Deploy → Stage: prod
 
-Supports optional employee filter
+### STEP 4 — Admin Frontend — HTML Enhancements
 
-Returns attendance records + summary cards (present / absent / leaves)
-
-STEP 3 — API Gateway Integration
-
-Open API Gateway → Existing HR API
-
-Create Resource: /admin/dashboard
-
-Method: GET → Lambda integration → admin_dashboard_data
-
-Enable Cognito Authorizer → Admin-only access
-
-Enable CORS → Allowed origin: your EC2 frontend
-
-Deploy → Stage: prod
-
-STEP 4 — Admin Frontend — HTML Enhancements
-4️⃣1 — Add Filter Dropdown & Summary Cards
+#### 4️⃣1 — Add Filter Dropdown & Summary Cards
 
 ```
 <div class="container my-4">
@@ -2017,7 +1942,7 @@ STEP 4 — Admin Frontend — HTML Enhancements
 </div>
 ```
 
-STEP 5 — Admin Frontend — JS Functions
+### STEP 5 — Admin Frontend — JS Functions
 
 Add these to your shared script (admin.js or auth-api.js):
 
@@ -2097,39 +2022,39 @@ async function initAdminDashboard() {
 initAdminDashboard();
 ```
 
-✅ What this JS does:
+#### ✅ What this JS does:
 
-Populates employee dropdown dynamically
+- Populates employee dropdown dynamically
 
-Fetches attendance + summary cards
+- Fetches attendance + summary cards
 
-Filters by employee
+- Filters by employee
 
-Exports table as CSV
+- Exports table as CSV
 
-STEP 6 — Testing & Verification
+### STEP 6 — Testing & Verification
 
-Login as Admin → Open Dashboard
+- Login as Admin → Open Dashboard
 
-Check Summary Cards → Total Present / Absent / Leaves
+- Check Summary Cards → Total Present / Absent / Leaves
 
-Filter by Employee → Table updates
+- Filter by Employee → Table updates
 
-Export CSV → Open downloaded file, verify data matches table
+- Export CSV → Open downloaded file, verify data matches table
 
-Unauthorized Access Test → Employee account cannot see dashboard or API results
+- Unauthorized Access Test → Employee account cannot see dashboard or API results
 
-🎯 Outcome:
+### 🎯 Outcome:
 
-Admin dashboard now has employee-wise filtering
+A- dmin dashboard now has employee-wise filtering
 
-Export-ready table via CSV
+- Export-ready table via CSV
 
-Summary cards for quick metrics
+- Summary cards for quick metrics
 
-Fully integrated with existing Lambda + RDS
+- Fully integrated with existing Lambda + RDS
 
-Fully job-ready
+- Fully job-ready
 
 
 **✅ PHASE 7️⃣ STATUS**
