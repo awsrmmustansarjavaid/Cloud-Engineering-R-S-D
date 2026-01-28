@@ -294,11 +294,11 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 #### Command to create the js directory
 
 ```
-sudo mkdir -p /var/www/js
+sudo mkdir -p /var/www/html/js
 ```
 
 ```
-sudo nano /var/www/js/auth-api.js
+sudo nano /var/www/html/js/auth-api.js
 ```
 
 [auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth-api.js)
@@ -306,10 +306,10 @@ sudo nano /var/www/js/auth-api.js
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
 
 ```
-sudo chown apache:apache /var/www/js/*
+sudo chown apache:apache /var/www/html/js/*
 ```
 ```
-sudo chmod 644 /var/www/js/*
+sudo chmod 644 /var/www/html/js/*
 ```
 
 ### 2️⃣ Update EC2 PHP App to Use API Gateway
