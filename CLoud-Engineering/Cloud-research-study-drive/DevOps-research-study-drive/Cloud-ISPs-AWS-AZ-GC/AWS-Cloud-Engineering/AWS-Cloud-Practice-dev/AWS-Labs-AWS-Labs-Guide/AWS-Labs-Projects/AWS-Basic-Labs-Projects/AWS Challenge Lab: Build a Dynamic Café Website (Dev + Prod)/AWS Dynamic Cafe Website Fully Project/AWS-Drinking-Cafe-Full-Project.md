@@ -18,7 +18,7 @@
 * SSH client or Cloud9
 
 ---
-# 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS
+## 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS
 
 ## PHASE 1️⃣ — NETWORK & COMPUTE (FOUNDATION)
 
@@ -347,10 +347,10 @@ sudo ./lamp-verify.sh
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 
-# 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS COMPLETE ✅
+## 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS COMPLETE ✅
 ---
 
-# 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS
+## 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS
 
 ## PHASE 1️⃣ — Basic RDS CONFIGURATIONS
 
@@ -679,9 +679,9 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 
-# 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
-# 📢 SECTION 4️⃣ CAFE FRONTEND CONFIGURATIONS
+## 📢 SECTION 4️⃣ CAFE FRONTEND CONFIGURATIONS
 
 ## ☕ AWS CAFE - PHASE 1️⃣ HOME PAGE (index.php)
 > **🌐 Full Responsive Bootstrap Landing Page (index.php)**
@@ -751,7 +751,7 @@ http:// Your EC2 Public IP/dashboard.html
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 
-# 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
 
 ## 📢 ☕ Charlie CAFE - Advance System Development & Deployment 
@@ -769,7 +769,7 @@ http:// Your EC2 Public IP/dashboard.html
 
 ---
 
-# 📢 SECTION 3 — AWS Cafe PRODUCTION
+## 📢 SECTION 3 — AWS Cafe PRODUCTION
 
 ## PHASE 1 — PRODUCTION (us‑west‑2)
 
@@ -785,7 +785,7 @@ http:// Your EC2 Public IP/dashboard.html
 
 ---
 
-# 📢 SECTION 13 — BILLING ALERTS & BUDGETS
+## 📢 SECTION 13 — BILLING ALERTS & BUDGETS
 
 ## 1️⃣ Enable Billing Alerts
 
@@ -825,7 +825,7 @@ Create alarm
 
 ---
 
-# 📢 SECTION 14 — TESTING
+## 📢 SECTION 14 — TESTING
 
 ## API Test
 curl -X POST <api-url> -d '{"customer_name":"CI","item":"Coffee","quantity":1}'
