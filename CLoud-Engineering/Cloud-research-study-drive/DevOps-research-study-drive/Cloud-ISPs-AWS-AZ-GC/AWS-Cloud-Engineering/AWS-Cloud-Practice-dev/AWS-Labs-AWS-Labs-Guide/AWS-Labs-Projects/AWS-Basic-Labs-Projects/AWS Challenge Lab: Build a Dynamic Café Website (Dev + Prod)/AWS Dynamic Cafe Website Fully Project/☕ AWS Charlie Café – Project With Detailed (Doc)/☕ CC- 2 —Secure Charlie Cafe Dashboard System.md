@@ -1402,6 +1402,10 @@ DB_NAME = cafe
 
 - Same 
 
+### 5️⃣ 🔐 Edit VPC
+
+- Same 
+
 
 
 
