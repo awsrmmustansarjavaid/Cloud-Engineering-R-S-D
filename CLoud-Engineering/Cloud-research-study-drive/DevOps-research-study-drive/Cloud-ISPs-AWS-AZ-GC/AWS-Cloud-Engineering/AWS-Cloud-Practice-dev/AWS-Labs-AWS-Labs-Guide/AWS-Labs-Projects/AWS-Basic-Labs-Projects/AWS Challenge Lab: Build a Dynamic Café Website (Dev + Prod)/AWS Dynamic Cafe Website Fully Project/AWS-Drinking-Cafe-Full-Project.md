@@ -432,6 +432,28 @@ mysql --version
 ```
 mysql -h <rds-endpoint> -u cafe_user -p
 ```
+
+or
+
+#### 🛠️ Bash Script: Save RDS Credentials to Secrets Manager
+> **📄 save-rds-secret.sh**
+
+```
+sudo nano save-rds-secret.sh
+```
+
+[RDS Credentials to Secrets Manager ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/save-rds-secret.sh)
+
+#### ▶️ How to Run
+
+```
+sudo chmod +x save-rds-secret.sh
+```
+
+```
+sudo ./save-rds-secret.sh
+```
+
 ---
 
 ### 2️⃣ cafe_db
