@@ -708,13 +708,32 @@ CTRL + X
 #### 4️⃣ Fix File Permissions
 
 ```
-sudo chown apache:apache /var/www/html/dashboard.html
+sudo chown apache:apache /var/www/html/index.php
 ```
 
 ```
-sudo chmod 644 /var/www/html/dashboard.html
+sudo chmod 644 /var/www/html/index.php
 ```
 
+#### ⚠️ Use * to apply it to all files (all extensions) in the directory:
+
+```
+sudo chown apache:apache /var/www/html/*
+```
+```
+sudo chmod 644 /var/www/html/*
+```
+
+#### 👉 If you also want subdirectories included, use:
+
+```
+sudo chown -R apache:apache /var/www/html
+```
+```
+sudo chmod -R 644 /var/www/html
+```
+
+**⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
 
 #### 5️⃣ Restart Apache (MANDATORY)
 
