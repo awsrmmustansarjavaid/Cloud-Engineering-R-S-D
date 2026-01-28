@@ -744,7 +744,7 @@ sudo systemctl restart httpd
 #### 6️⃣ Open page in browser (MANDATORY)
 
 ```
-http:// Your EC2 Public IP/dashboard.html
+http:// Your EC2 Public IP/index.php
 ```
 
 **✅ PHASE 1️⃣ STATUS**
