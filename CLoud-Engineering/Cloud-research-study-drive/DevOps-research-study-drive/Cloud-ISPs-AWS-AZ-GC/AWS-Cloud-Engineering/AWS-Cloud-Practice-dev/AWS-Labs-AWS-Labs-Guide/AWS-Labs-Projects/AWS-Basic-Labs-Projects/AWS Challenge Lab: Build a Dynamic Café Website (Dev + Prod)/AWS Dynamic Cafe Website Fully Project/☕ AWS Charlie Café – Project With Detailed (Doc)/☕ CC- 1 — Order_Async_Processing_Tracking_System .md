@@ -1398,7 +1398,7 @@ Click **Add**
 #### Test Event Name:
 
 ```
-GetOrderStatusLambda
+Test-GetOrderStatusLambda
 ```
 
 #### Test event:
