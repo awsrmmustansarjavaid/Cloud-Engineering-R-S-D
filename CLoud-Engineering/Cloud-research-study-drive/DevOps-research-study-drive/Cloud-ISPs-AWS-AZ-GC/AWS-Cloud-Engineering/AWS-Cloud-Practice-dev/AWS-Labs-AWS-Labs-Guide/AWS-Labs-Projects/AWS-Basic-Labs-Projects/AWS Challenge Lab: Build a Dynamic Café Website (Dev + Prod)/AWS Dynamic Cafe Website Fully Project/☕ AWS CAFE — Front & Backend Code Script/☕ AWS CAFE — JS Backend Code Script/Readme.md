@@ -1238,7 +1238,7 @@ const AUTH_API = (() => {
     // CONFIGURATION
     // -------------------------------
     const config = {
-        apiGatewayBaseUrl: "https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev",
+        apiGatewayBaseUrl: "https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev/orders",
         paymentEndpoint: "/payment/create-intent",
         ordersEndpoint: "/orders",           // <- Added for orders.php
         orderStatusEndpoint: "/order-status", 
