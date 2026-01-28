@@ -560,6 +560,24 @@ For example !
 ```
 ---
 
+### Method 1️⃣ Cafe Order API + RDS Tests
+
+```
+sudo nano api-gw-rds-secret-test.sh
+```
+
+[Cafe Order API + RDS Tests](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/api-gw-rds-secret-test.sh)
+
+#### ▶️ How to Run
+
+```
+sudo chmod +x api-gw-rds-secret-test.sh
+```
+
+```
+sudo ./api-gw-rds-secret-test.sh
+```
+
 ### Method 2️⃣ Cafe Order API + RDS Tests
 
 ### 1️⃣ Test API Gateway
