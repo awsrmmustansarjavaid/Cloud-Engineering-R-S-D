@@ -1965,6 +1965,32 @@ ORD-20260114-8392
 
 - same steps 
 
+#### 5️⃣ Lambda Environment Variables
+
+- AWS Console → Lambda → CreateOrderLambda
+
+- Go to Configuration tab
+
+- Click Environment variables
+
+- Click Edit
+
+- Add EXACT variables
+
+| Key       | Value                             |
+| --------- | --------------------------------- |
+| `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
+| `DB_USER` | `admin`                           |
+| `DB_PASS` | `your-db-password`                |
+| `DB_NAME` | `charlie_cafe`                    |
+
+
+⚠️ NO quotes
+
+⚠️ NO spaces
+
+- Click Save
+
 ### 🧪 STEP 3 — TEST ORDER CREATION
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
