@@ -1115,7 +1115,7 @@ const AUTH_API = (() => {
     // ================================
     // Centralize all API endpoints for PHP pages and front-end calls
     const apiGateway = {
-        baseUrl: "https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev",
+        baseUrl: "https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev/orders",
 
         // Orders API (used by orders.php)
         ordersEndpoint: "/orders",
