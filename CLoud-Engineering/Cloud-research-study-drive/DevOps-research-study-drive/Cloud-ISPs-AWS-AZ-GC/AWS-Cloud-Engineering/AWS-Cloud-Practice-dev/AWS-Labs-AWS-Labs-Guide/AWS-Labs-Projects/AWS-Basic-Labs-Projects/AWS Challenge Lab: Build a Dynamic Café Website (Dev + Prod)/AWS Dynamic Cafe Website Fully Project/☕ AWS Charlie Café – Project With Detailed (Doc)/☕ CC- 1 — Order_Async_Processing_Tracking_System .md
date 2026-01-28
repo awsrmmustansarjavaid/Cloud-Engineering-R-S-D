@@ -301,10 +301,10 @@ sudo mkdir -p /var/www/html/js
 ```
 
 ```
-sudo nano /var/www/html/js/auth-api.js
+sudo nano /var/www/html/js/central-auth-api.js
 ```
 
-[auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth-api.js)
+[central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
 
@@ -318,7 +318,7 @@ sudo chmod 644 /var/www/html/js/*
 #### Double-check file path
 
 ```
-ls -lh /var/www/html/js/auth-api.js
+ls -lh /var/www/html/js/central-auth-api.js
 ```
 
 ### 2️⃣ Update EC2 PHP App to Use API Gateway
