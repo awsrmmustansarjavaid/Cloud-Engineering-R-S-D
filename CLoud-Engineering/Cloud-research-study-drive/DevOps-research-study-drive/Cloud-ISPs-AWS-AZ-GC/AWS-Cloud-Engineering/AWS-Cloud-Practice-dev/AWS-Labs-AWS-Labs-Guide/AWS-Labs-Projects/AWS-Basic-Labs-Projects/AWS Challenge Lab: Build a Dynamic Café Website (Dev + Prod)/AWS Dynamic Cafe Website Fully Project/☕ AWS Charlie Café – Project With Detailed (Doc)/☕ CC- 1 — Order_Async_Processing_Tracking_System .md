@@ -1951,7 +1951,7 @@ ORD-20260114-8392
 
 #### 1️⃣ Open Lambda
 
-Function: CreateOrderLambda
+- Function: CreateOrderLambda
 
 #### 2️⃣ Replace Code (100% COPY)
 
@@ -1959,7 +1959,11 @@ Function: CreateOrderLambda
 
 #### 3️⃣ Deploy Lambda
 
-Click Deploy
+- Click Deploy
+
+#### 4️⃣ Attach Lambda Layer
+
+- same steps 
 
 ### 🧪 STEP 3 — TEST ORDER CREATION
 
