@@ -37,7 +37,7 @@
 
 ### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)
 
-[PyMySQL Lambda Layer](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/upload-pymysql-layer.sh)
+[PyMySQL Lambda Layer](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/upload-pymysql-layer.sh)
 
 ### Method 2️⃣ - PyMySQL Lambda Layer (1-to-1)
 
