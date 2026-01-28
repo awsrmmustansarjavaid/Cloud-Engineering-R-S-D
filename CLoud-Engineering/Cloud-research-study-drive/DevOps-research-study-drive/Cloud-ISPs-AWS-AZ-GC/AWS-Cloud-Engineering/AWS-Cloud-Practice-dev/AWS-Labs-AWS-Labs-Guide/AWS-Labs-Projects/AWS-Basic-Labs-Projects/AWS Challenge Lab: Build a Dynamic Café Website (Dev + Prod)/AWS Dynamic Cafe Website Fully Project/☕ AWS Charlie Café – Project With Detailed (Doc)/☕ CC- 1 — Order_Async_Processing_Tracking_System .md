@@ -1854,12 +1854,11 @@ https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status
 
 This file is frontend-only and SAFE
 
-#### ☕ FINAL order-status.php with print button (CAFE STYLED - Recommanded)
+#### ☕ FINAL order-receipt.php with print button (CAFE STYLED - Recommanded)
 
 ```
-sudo nano /var/www/html/orders.php
+sudo nano /var/www/html/order-receipt.php
 ```
-
 
 [order-receipt.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
 
@@ -1868,10 +1867,10 @@ sudo nano /var/www/html/orders.php
 ✅ 2.1 Fix File Permissions
 
 ```
-sudo chown apache:apache /var/www/html/orders.php
+sudo chown apache:apache /var/www/html/order-receipt.php
 ```
 ```
-sudo chmod 644 /var/www/html/orders.php
+sudo chmod 644 /var/www/html/order-receipt.php
 ```
 
 ### 3️⃣ Restart Apache (MANDATORY)
