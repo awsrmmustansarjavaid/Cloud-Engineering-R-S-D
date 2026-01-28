@@ -435,23 +435,24 @@ mysql -h <rds-endpoint> -u cafe_user -p
 
 or
 
-#### 🛠️ Bash Script: Save RDS Credentials to Secrets Manager
-> **📄 save-rds-secret.sh**
+#### 🛠️ BASH SCRIPT (Safe RDS Connection)
+> **📄 connect-rds.sh**
+
 
 ```
-sudo nano save-rds-secret.sh
+sudo nano connect-rds.sh
 ```
 
-[RDS Credentials to Secrets Manager ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/save-rds-secret.sh)
+[RDS Credentials to Secrets Manager ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/connect-rds.sh)
 
 #### ▶️ How to Run
 
 ```
-sudo chmod +x save-rds-secret.sh
+sudo chmod +x connect-rds.sh
 ```
 
 ```
-sudo ./save-rds-secret.sh
+sudo ./connect-rds.sh
 ```
 
 ---
