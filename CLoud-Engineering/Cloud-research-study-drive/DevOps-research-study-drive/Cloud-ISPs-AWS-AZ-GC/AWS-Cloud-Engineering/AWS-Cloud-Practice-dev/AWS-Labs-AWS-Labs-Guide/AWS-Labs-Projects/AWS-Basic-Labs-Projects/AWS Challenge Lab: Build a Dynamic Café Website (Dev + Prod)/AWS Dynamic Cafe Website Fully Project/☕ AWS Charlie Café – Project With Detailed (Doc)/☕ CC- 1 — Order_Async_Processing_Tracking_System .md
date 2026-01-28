@@ -2042,17 +2042,25 @@ ORD-20260114-8392
 
 ### 🌐 STEP 5 — CREATE New Resources API GATEWAY FOR WORKER
 
-#### Resources Endpoint 
+#### Resources
 
 ```
-POST /order-update
+/order-update
 ```
+
+- API Method: POST
 
 - Integration: CafeOrderWorkerLambda
 
 - Enable CORS
 
 - Deploy stage: prod
+
+#### Endpoint 
+
+```
+POST /order-update
+```
 
 ### 🧪 STEP 6 — TEST STATUS FLOW (MANDATORY)
 
