@@ -1357,7 +1357,7 @@ Make sure Worker Lambda Role has:
 
 ####  1️⃣ Open Lambda Function
 
-* Lambda → Functions → `CafeOrderProcessor`
+* Lambda → Functions → `GetOrderStatusLambda`
 
 #### 2️⃣ Add Layer
 
