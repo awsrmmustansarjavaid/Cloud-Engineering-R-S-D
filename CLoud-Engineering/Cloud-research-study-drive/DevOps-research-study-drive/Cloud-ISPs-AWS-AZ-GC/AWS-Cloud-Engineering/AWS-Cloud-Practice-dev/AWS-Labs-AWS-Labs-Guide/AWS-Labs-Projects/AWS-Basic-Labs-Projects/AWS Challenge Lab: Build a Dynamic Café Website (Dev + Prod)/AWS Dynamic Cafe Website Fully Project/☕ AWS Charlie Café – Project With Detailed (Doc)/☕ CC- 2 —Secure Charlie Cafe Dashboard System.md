@@ -1382,12 +1382,29 @@ API_URL = ".../admin/order-status"
 
 - **Permissions:** Create new role with basic Lambda permissions
 
-### ✅ FINAL LAMBDA CODE (Python 3.12)
+### 2️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
 
 > 🔁 This is a drop-in replacement
 > Nothing else needs to change
 
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
+
+### 3️⃣ 🔐 Add Environment Variables
+
+```
+DB_HOST = <your-rds-endpoint>
+DB_USER = admin
+DB_PASS = <your-db-password>
+DB_NAME = cafe
+```
+
+### 4️⃣ 🔐 Attach Lambda Layer
+
+- Same 
+
+
+
+
 
 #### ✅ Result:
 
@@ -1398,14 +1415,7 @@ API_URL = ".../admin/order-status"
 ✅ returns filtered orders
 
 
-### 3️⃣ 🔐 Add Environment Variables
 
-```
-DB_HOST = <your-rds-endpoint>
-DB_USER = admin
-DB_PASS = <your-db-password>
-DB_NAME = cafe
-```
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
