@@ -1149,13 +1149,13 @@ sudo systemctl restart httpd
 - 2️⃣ Open:
 
 ```
-https://ALB-DNS/order-status.html
+https://ALB-DNS/dashboard.html
 ```
 
 #### Example: 
 
 ```
-http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/order-status.html
+http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/dashboard.html
 ```
 
 - 3️⃣ You should be redirected to:
@@ -1318,14 +1318,14 @@ GET /order-status
 
 - **Click Actions → Deploy API**
 
-- **Stage: prod (or admin if you created a new stage)**
+- **Stage: status (or admin if you created a new stage)**
 
 - **Save Invoke URL**
 
 #### 📌 Copy new endpoint API URL:
 
 ```
-https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
 ```
 > **OR**
 
@@ -1338,7 +1338,7 @@ https://xxx.execute-api.region.amazonaws.com/admin/order-status
 #### 🔁 Update frontend:
 
 ```
-API_URL = ".../prod/order-status"
+API_URL = ".../status/order-status"
 ```
 
 > **OR**
