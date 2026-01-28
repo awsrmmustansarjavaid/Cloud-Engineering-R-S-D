@@ -329,8 +329,19 @@ ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 
 ### 2️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
 
+```
+sudo nano lamp-verify.sh
+```
 
 [Development and Delopment LAMP Server ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/lamp-verify.sh)
+
+```
+sudo chmod +x lamp-verify.sh
+```
+
+```
+sudo ./lamp-verify.sh
+```
 
 **✅ PHASE 2️⃣ STATUS**
 
