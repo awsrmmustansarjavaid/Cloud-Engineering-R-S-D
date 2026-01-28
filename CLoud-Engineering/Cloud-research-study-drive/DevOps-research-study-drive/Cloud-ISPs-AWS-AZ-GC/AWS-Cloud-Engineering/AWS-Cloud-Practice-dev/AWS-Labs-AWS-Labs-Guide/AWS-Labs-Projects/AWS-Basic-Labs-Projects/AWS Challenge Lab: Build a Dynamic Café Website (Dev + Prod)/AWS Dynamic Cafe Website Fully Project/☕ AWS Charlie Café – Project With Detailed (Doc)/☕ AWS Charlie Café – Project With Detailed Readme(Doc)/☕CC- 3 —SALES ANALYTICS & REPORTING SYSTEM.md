@@ -2473,9 +2473,81 @@ const PDF_API = "https://abc123.execute-api.us-east-1.amazonaws.com/prod/report/
 # SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM COMPLETE & VERIFIED ✅
 ---
 
-# SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
+## 1️⃣ ☕ Charlie Café – Cach Payment System 
 
-# SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
+### 🎯 FINAL BEHAVIOR (CONFIRMED)
+
+#### 1️⃣ Customer side
+
+- Customer places order
+
+- Customer sees two payment choices:
+
+  - 💳 Card Payment (Stripe – existing)
+
+  - ☕ Pay Now (Cash at Counter)
+
+- If customer clicks Pay Now (Cash):
+
+  - Card payment UI is disabled
+
+  - Order status becomes AWAITING_CASH_PAYMENT
+
+  - Customer is redirected to order status page
+
+#### 2️⃣ Admin side
+
+- Admin dashboard shows:
+
+  - Orders waiting for cash
+
+- Admin clicks Mark as Paid
+
+- Order status updates to PAID
+
+✔ This matches real cafés
+
+✔ This teaches state machines
+
+✔ This keeps Stripe intact
+
+✔ This is interview-ready architecture
+
+### 🧠 ORDER STATUS FLOW (IMPORTANT)
+
+```
+CREATED
+   ↓
+AWAITING_CASH_PAYMENT   ← (Pay Now - Cash)
+   ↓
+PAID                   ← (Admin action)
+
+OR
+
+CREATED
+   ↓
+PAID                   ← (Stripe Card Payment)
+```
+
+### 🧠 WHY THIS DESIGN IS EXCELLENT (IMPORTANT)
+
+✔ Real café workflow
+
+✔ Clean separation of concerns
+
+✔ No Stripe dependency for lab
+
+✔ Demonstrates async payments
+
+✔ Interview-grade system design
+
+✔ Scales to QR ordering easily
+
+
+## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
+
+
+## 🟦 PHASE 1️⃣ — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
 > **(Using Existing Place Order Flow)**
 
 ### Tech Stack (Your Existing Lab):
