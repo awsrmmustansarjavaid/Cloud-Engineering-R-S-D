@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <!-- ===================== META ===================== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===================== TITLE ===================== -->
+    <title>Charlie Cafe ☕ | Order Status</title>
+
+    <!-- ===================== BOOTSTRAP ===================== -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ===================== GOOGLE FONT ===================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===================== GLOBAL STYLES ===================== */
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+        }
+
+        /* ===================== SIDEBAR ===================== */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #2b160a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 80px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 24px;
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #3b1f0e;
+            color: #ff9800;
+        }
+
+        .sidebar a.active {
+            background: #3b1f0e;
+            color: #ff9800;
+            border-left: 4px solid #ff9800;
+        }
+
+        /* ===================== NAVBAR ===================== */
+        .navbar {
+            background-color: #3b1f0e !important;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        /* ===================== MAIN CONTENT ===================== */
+        .main-content {
+            margin-left: 240px;
+            padding-top: 100px;
+        }
+
+        .status-container {
+            background: rgba(30, 30, 30, 0.75);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* ===================== RESPONSIVE ===================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 140px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =================================================
+     🔐 SECURE ORDER STATUS CONTAINER
+     Everything inside this div will:
+     ✅ stay hidden until Cognito auth succeeds
+     ✅ become visible after protectPage()
+     (controlled by secure-dashboard.js)
+================================================= -->
+<div id="dashboard-container">
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- ===================== SIDEBAR ===================== -->
+<div class="sidebar">
+    <a href="dashboard.html">🏠 Main Dashboard</a>
+    <a href="analytics.html">📈 Analytics</a>
+    <a href="order-status.html" class="active">📦 Order Status</a>
+
+    <hr class="text-secondary">
+
+    <!-- 🔐 SECURE LOGOUT
+         secure-dashboard.js attaches Cognito logout -->
+    <a class="logout-btn" style="cursor:pointer">🚪 Logout</a>
+</div>
+
+<!-- ===================== MAIN CONTENT ===================== -->
+<div class="main-content">
+    <div class="container">
+        <div class="status-container">
+
+            <h2 class="text-center mb-5">📊 Live Order Status</h2>
+
+            <!-- ===================== METRICS ===================== -->
+            <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+            <!-- ===================== ORDERS TABLE ===================== -->
+            <div class="table-responsive">
+                <table class="table table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Table</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- 🔐 END SECURE ORDER STATUS CONTAINER -->
+
+<!-- ===================== TOAST NOTIFICATIONS ===================== -->
+
+<!-- Welcome Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="welcomeToast" class="toast">
+        <div class="toast-header">
+            <strong class="me-auto">☕ Charlie Cafe</strong>
+            <button class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            Welcome to the Order Status Dashboard!
+        </div>
+    </div>
+</div>
+
+<!-- Data Loaded Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="dataToast" class="toast">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Data Loaded</strong>
+            <button class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            ✅ Orders & metrics updated successfully!
+        </div>
+    </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="text-center py-4">
+    © 2026 Charlie Cafe | Fresh Drinks • Made with ❤️
+</footer>
+
+<!-- ===================== BOOTSTRAP JS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ===================== DATA FETCH + TOAST LOGIC ===================== -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* -------- Show welcome toast when page opens -------- */
+    const welcomeToast = new bootstrap.Toast(
+        document.getElementById("welcomeToast"),
+        { delay: 2500 }
+    );
+    welcomeToast.show();
+
+    /* -------- Fetch order status from backend API -------- */
+    fetch("https://API_ID.execute-api.region.amazonaws.com/status/order-status")
+        .then(res => {
+            if (!res.ok) throw new Error("API Error");
+            return res.json();
+        })
+        .then(data => {
+
+            /* -------- Render metrics cards -------- */
+            const metricsDiv = document.getElementById("metrics");
+            metricsDiv.innerHTML = "";
+
+            data.metrics.forEach(m => {
+                metricsDiv.innerHTML += `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card bg-dark text-center p-3">
+                            <h6 class="text-warning">${m.metric}</h6>
+                            <h3>${m.count}</h3>
+                        </div>
+                    </div>`;
+            });
+
+            /* -------- Render recent orders table -------- */
+            const ordersBody = document.getElementById("orders");
+            ordersBody.innerHTML = "";
+
+            data.recent_orders.forEach(o => {
+                ordersBody.innerHTML += `
+                    <tr>
+                        <td>${o.customer_name || 'Anonymous'}</td>
+                        <td>${o.item}</td>
+                        <td>${o.quantity}</td>
+                        <td>${o.table_number || '-'}</td>
+                        <td>${o.created_at}</td>
+                    </tr>`;
+            });
+
+            /* -------- Show success toast after data load -------- */
+            new bootstrap.Toast(document.getElementById("dataToast")).show();
+        })
+        .catch(err => {
+            document.getElementById("orders").innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-danger">
+                        ⚠️ ${err.message}
+                    </td>
+                </tr>`;
+        });
+});
+</script>
+
+<!-- =================================================
+     🔐 CENTRAL AUTH & SECURITY LAYER
+     This ONE file enables:
+     ✅ Page hidden until auth success
+     ✅ auth.js auto-loaded
+     ✅ protectPage()
+     ✅ authFetch()
+     ✅ Cognito logout
+================================================= -->
+<script src="secure-dashboard.js"></script>
+
+</body>
+</html>
