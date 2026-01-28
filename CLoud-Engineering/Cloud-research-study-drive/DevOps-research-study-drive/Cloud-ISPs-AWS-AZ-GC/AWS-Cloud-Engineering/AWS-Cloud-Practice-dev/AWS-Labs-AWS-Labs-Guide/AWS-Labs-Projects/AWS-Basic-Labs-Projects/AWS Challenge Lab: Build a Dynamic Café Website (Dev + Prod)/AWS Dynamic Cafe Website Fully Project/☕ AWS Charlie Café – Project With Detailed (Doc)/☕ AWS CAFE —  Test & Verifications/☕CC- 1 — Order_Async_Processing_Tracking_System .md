@@ -64,7 +64,7 @@
 sudo nano api-gw-rds-secret-test.sh
 ```
 
-[Cafe Order API + RDS Tests](../AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/api-gw-rds-secret-test.sh)
+[Cafe Order API + RDS Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/api-gw-rds-secret-test.sh)
 
 #### ▶️ How to Run
 
