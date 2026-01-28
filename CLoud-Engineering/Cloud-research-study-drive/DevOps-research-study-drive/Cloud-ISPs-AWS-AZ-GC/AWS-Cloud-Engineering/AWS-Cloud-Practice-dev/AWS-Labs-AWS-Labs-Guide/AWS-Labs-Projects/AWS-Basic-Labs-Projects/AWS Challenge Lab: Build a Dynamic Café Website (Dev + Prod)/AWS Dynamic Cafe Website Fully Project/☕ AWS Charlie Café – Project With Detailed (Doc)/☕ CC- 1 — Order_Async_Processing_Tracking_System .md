@@ -9,6 +9,9 @@
 
 **Approach:** AWS Console First • No Skipped Steps • Exam + Real-World Safe
 
+### READ Me About
+
+[☕ CC- 1 — Order Async Processing & Tracking System](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 ---
 
 # SECTION 1️⃣ Cafe Order Processor
