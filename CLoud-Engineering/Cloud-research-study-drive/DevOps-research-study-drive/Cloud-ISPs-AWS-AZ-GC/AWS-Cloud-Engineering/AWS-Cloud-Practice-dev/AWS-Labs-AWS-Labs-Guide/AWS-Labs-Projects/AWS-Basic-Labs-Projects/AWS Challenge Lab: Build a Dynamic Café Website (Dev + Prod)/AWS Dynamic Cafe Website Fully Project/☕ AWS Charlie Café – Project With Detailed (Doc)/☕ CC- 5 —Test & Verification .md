@@ -1957,7 +1957,59 @@ Use this EXACT JSON:
 
 ✔ If this works → continue
 
-#### ✅ TEST 2 Place order from frontend.
+#### ✅ TEST 2 Test from FRONTEND (REAL USER FLOW)
+
+- Open frontend
+
+```
+http://54.147.142.110/orders.php
+```
+
+#### Fill form
+
+- Table Number: 1
+
+- Name: Charlie
+
+- Item: Coffee
+
+- Quantity: 3
+
+#### Click Place Order
+
+#### ✅ Expected behavior:
+
+- Order placed
+
+- Receipt shows Order ID
+
+- Payment section loads
+
+- After payment → redirect to:
+
+```
+/order-status.php?order_id=ORD-XXXX
+```
+
+### 🚨 Common Failures & Fixes
+
+#### ❌ Invalid order reference
+
+Cause: order_id not passed in URL
+Fix: Make sure Lambda returns track_url AND frontend redirects to it
+
+#### ❌ Lambda test works, API Gateway fails
+
+Cause: Bad integration request mapping
+Fix: Ensure API Gateway passes raw body to Lambda
+
+#### ❌ Frontend works but no redirect
+
+Cause: JS not reading Lambda response
+Fix: Ensure frontend uses:
+```
+window.location.href = response.track_url;
+```
 
 #### Expected response:
 
@@ -1972,12 +2024,42 @@ Use this EXACT JSON:
 
 #### ✅ TEST 3 Test API Gateway (Lambda + API)
 
-- Copy API Gateway URL
+#### Copy API Gateway URL
 
 ```
 https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev/orders
 ```
 
+#### Run from EC2 / Local terminal
+
+```
+curl -X POST \
+  https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+        "table_number":1,
+        "customer_name":"Test User",
+        "item":"Coffee",
+        "quantity":3
+      }'
+```
+
+#### ✅ Expected Response:
+
+```
+{
+  "order_id": "ORD-20260114-8392",
+  "status": "RECEIVED",
+  "total": 9.0,
+  "track_url": "/order-status.php?order_id=ORD-20260114-8392"
+}
+```
+
+✔ If this fails → API Gateway mapping issue
+
+✔ If this works → continue
+
+#### ✅ TEST 3 — 
 
 
 
