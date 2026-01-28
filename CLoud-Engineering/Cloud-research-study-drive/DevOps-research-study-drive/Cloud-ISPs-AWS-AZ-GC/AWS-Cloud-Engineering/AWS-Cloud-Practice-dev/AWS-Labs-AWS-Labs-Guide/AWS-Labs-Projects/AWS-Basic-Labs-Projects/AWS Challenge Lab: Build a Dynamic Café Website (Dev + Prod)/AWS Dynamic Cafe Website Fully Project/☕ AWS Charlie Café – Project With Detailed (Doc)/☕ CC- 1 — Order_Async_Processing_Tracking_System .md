@@ -1395,6 +1395,12 @@ Click **Add**
 
 ### 5️⃣ Test Lambda
 
+#### Test Event Name:
+
+```
+GetOrderStatusLambda
+```
+
 #### Test event:
 
 ```
