@@ -1406,9 +1406,29 @@ DB_NAME = cafe
 
 - Same 
 
+### 6️⃣ 🔐 Test
 
+- Name:
 
+```
+Test_OrderStatusLambda
+```
 
+```
+{}
+```
+#### Expected Result
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization",
+    "Access-Control-Allow-Methods": "GET"
+  },
+```
 
 #### ✅ Result:
 
