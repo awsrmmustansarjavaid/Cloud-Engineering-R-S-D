@@ -754,39 +754,19 @@ http:// Your EC2 Public IP/dashboard.html
 # 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
 
-# 📢 SECTION 5️⃣ — ☕ AWS CAFE — Order_Async_Processing_Tracking_System 
+## 📢 ☕ Charlie CAFE - Advance System Development & Deployment 
+
+1️⃣ [☕ AWS CAFE — Order_Async_Processing_Tracking_System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%201%20—%20Order_Async_Processing_Tracking_System%20.md)
 
 
-[☕ AWS CAFE — Order_Async_Processing_Tracking_System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%201%20—%20Order_Async_Processing_Tracking_System%20.md)
+2️⃣ [AWS ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 
+3️⃣ [☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
 
-# 📢 SECTION 5️⃣ — ☕ AWS CAFE — Order_Async_Processing_Tracking_System COMPLETE ✅
----
+4️⃣ [☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
 
-# 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System
+5️⃣ [☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%204%20—Secure%20HR%20%26%20Attendance%20System.md)
 
-[AWS ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
-
-# 📢 SECTION 6️⃣ — AWS ☕ Charlie Cafe — Secure Admin Order Dashboard COMPLETE ✅
----
-
-# 📢 SECTION 7️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
-
-[☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
-
-# 📢 SECTION 7️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM ✅
----
-# 📢 SECTION 8️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM
-
-[☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
-
-# 📢 SECTION 8️⃣ — ☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM ✅
----
-# 📢 SECTION 9️⃣ — ☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System
-
-[☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%204%20—Secure%20HR%20%26%20Attendance%20System.md)
-
-# 📢 SECTION 9️⃣ — ☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System ✅
 ---
 
 # 📢 SECTION 3 — AWS Cafe PRODUCTION
