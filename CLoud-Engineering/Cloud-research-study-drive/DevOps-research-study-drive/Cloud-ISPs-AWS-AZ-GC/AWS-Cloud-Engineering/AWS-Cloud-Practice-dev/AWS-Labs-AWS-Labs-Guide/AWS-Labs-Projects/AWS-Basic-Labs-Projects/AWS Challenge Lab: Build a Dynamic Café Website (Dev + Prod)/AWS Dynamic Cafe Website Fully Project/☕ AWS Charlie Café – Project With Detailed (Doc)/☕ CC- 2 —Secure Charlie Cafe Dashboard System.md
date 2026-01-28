@@ -598,7 +598,9 @@ Amazon Cognito → User pools
 
 **⚠️ This is the step everyone misses**
 
-### 🔐 NOW — THIS IS WHERE “STEP 3 — SECURITY” REALLY LIVES
+### ✅ STEP 3️⃣ PASSWORD POLICY 
+
+> **🔐 NOW — THIS IS WHERE “STEP 3 — SECURITY” REALLY LIVES**
 
 **You are now INSIDE the User Pool, not the app wizard.**
 
