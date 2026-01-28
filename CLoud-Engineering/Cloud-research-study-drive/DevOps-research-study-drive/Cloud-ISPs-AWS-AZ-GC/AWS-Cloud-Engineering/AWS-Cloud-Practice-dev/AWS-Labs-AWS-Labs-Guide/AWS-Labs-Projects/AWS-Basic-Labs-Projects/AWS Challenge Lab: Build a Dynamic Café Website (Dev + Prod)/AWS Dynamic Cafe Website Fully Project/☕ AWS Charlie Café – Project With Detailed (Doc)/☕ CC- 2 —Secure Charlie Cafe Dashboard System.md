@@ -1448,7 +1448,7 @@ Test_OrderStatusLambda
 #### 1️⃣ ❌ Without token
 
 ```
-curl https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
 ```
 
 #### ✅ Expected:
@@ -1467,7 +1467,7 @@ curl https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
 
 ```
 curl -H "Authorization: Bearer <access_token>" \
-https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
 ```
 
 #### ✅ Expected:
@@ -1480,7 +1480,7 @@ JSON response with metrics + recent orders
 
 ```
 curl -H "Authorization: Bearer <access_token>" \
-"https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=2026-01-17"
+"https://API_ID.execute-api.REGION.amazonaws.com/status/order-status?date=2026-01-17"
 ```
 
 #### ✅ Expected: 
