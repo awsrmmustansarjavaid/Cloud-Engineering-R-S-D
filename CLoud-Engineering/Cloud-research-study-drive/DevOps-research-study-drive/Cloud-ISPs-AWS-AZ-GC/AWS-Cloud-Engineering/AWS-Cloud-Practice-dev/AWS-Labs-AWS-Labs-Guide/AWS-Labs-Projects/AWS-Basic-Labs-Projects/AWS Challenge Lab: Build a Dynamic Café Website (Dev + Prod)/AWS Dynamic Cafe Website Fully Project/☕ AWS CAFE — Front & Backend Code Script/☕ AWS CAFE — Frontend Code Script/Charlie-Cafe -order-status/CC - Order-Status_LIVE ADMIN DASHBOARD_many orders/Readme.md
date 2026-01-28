@@ -2147,8 +2147,9 @@ This is exactly how real production admin panels are built.
 
 ---
 
-last old 
+last old 28-1-2026
 
+```
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
@@ -2425,3 +2426,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+```
