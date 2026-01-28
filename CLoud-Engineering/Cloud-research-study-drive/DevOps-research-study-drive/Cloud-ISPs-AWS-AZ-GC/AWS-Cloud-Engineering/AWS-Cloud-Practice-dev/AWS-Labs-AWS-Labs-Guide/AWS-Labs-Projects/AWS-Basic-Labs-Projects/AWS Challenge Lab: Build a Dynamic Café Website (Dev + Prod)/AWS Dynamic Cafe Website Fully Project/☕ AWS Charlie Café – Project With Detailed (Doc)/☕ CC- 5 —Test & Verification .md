@@ -1924,7 +1924,40 @@ STEP 4️⃣ Click Print Receipt
 
 ### 🧪 STEP 3 — TEST ORDER CREATION
 
-Place order from frontend.
+
+
+#### ✅ TEST 1 — Test Lambda DIRECTLY (mandatory first)
+
+- AWS Console → Lambda → CreateOrderLambda
+
+- Click Test → Create new test event
+
+- test event name: CreateOrderLambda
+
+Use this EXACT JSON:
+
+```
+{
+  "body": "{\"table_number\":1,\"customer_name\":\"Test User\",\"item\":\"Coffee\",\"quantity\":3}"
+}
+```
+
+- Click Test
+
+#### ✅ Expected Lambda Response:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"order_id\":\"ORD-20260114-8392\",\"status\":\"RECEIVED\",\"total\":9.0,\"track_url\":\"/order-status.php?order_id=ORD-20260114-8392\"}"
+}
+```
+
+✔ If this fails → STOP (Lambda bug)
+
+✔ If this works → continue
+
+#### ✅ TEST 2 Place order from frontend.
 
 #### Expected response:
 
@@ -1936,6 +1969,18 @@ Place order from frontend.
   "track_url": "/order-status.php?order_id=..."
 }
 ```
+
+#### ✅ TEST 3 Test API Gateway (Lambda + API)
+
+- Copy API Gateway URL
+
+```
+https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev/orders
+```
+
+
+
+
 
 **✅ PHASE 3️⃣ STATUS**
 
