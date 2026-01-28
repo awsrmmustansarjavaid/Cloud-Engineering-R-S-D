@@ -529,7 +529,7 @@ Click Create item again:
 
 ---
 
-#### 4️⃣ Create Third Item (Cappuccino)
+#### 4️⃣ Create 4th Item (Cappuccino)
 
 ```
 {
@@ -546,7 +546,7 @@ Click Create item again:
 
 ---
 
-#### 5️⃣ Create Third Item (Fresh Juice)
+#### 5️⃣ Create 5th Item (Fresh Juice)
 
 ```
 {
@@ -614,7 +614,7 @@ Click Create item again:
 
 - ✅ Click Create item
 
-#### 4️⃣ Create First Item (Cappuccino)
+#### 4️⃣ Create 4th Item (Cappuccino)
 
 1. Partition key:
 
@@ -630,7 +630,7 @@ Click Create item again:
 
 - ✅ Click Create item
 
-#### 5️⃣ Create First Item (Fresh Juice)
+#### 5️⃣ Create 5th Item (Fresh Juice)
 
 1. Partition key:
 
