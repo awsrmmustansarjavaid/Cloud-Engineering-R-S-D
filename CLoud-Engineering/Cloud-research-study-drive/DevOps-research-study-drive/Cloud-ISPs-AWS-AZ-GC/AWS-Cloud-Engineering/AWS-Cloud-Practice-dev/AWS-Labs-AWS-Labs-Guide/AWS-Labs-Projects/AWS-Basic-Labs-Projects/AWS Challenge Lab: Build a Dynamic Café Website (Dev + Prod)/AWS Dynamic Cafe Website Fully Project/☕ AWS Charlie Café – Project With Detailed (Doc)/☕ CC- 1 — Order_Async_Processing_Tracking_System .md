@@ -2040,7 +2040,7 @@ ORD-20260114-8392
 
 [CafeOrderWorkerLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda.py)
 
-### 🌐 STEP 5 — CREATE API GATEWAY FOR WORKER
+### 🌐 STEP 5 — CREATE New Resources API GATEWAY FOR WORKER
 
 #### Endpoint
 
