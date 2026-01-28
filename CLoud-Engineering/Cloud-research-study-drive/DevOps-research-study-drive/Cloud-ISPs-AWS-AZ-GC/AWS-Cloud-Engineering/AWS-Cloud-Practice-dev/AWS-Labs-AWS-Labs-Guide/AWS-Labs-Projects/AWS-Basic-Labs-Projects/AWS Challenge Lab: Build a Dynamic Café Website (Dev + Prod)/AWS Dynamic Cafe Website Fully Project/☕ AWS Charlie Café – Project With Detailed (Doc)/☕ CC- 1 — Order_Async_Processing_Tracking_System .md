@@ -1305,7 +1305,7 @@ metrics_table.update_item(
 
 #### Below is the FINAL, READY-TO-DEPLOY Worker Lambda code with:
 
-[CafeOrderMetrics.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderMetrics.py)
+[CafeOrderWorker.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorker.py)
 
 **Click Deploy**
 
