@@ -312,6 +312,12 @@ sudo chown apache:apache /var/www/html/js/*
 sudo chmod 644 /var/www/html/js/*
 ```
 
+#### Double-check file path
+
+```
+ls -lh /var/www/html/js/auth-api.js
+```
+
 ### 2️⃣ Update EC2 PHP App to Use API Gateway
 
 ```
