@@ -2042,7 +2042,7 @@ ORD-20260114-8392
 
 ### 🌐 STEP 5 — CREATE New Resources API GATEWAY FOR WORKER
 
-#### Endpoint
+#### Resources Endpoint 
 
 ```
 POST /order-update
