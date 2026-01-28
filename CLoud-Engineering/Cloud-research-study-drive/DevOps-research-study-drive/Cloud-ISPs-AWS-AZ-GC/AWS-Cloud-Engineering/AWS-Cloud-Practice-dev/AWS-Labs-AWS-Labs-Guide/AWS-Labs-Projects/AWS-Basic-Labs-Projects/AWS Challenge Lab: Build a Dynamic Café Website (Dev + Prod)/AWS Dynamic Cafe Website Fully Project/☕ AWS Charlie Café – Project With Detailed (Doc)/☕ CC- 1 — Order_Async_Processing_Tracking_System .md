@@ -2054,6 +2054,8 @@ ORD-20260114-8392
 
 - Enable CORS
 
+- Check Box : POST
+
 - Deploy stage: prod
 
 #### Endpoint 
