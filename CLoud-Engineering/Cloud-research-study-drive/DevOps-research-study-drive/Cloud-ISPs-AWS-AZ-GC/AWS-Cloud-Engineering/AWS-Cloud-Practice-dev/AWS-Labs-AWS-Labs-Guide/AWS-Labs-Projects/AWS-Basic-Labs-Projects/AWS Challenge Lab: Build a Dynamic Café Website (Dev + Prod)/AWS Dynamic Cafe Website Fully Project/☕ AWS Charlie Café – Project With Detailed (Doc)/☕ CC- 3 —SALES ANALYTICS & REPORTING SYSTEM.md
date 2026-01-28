@@ -4086,7 +4086,18 @@ cron(0/10 * * * ? *)
 # SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM COMPLETE & VERIFIED ✅
 ---
 
-# SECTION 2️⃣ ☕ Charlie Café – Online Payment Integration
+# SECTION 2️⃣ ☕ Charlie Café – Order Payment System
+
+
+## 1️⃣ ☕ Charlie Café – Cach Payment System 
+
+
+
+
+
+
+## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
+
 
 ## 🟦 PHASE 1️⃣ — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
 
