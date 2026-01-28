@@ -2038,7 +2038,7 @@ ORD-20260114-8392
 
 ### 2️⃣ Lambda Code (STRICT COPY)
 
-[CafeOrderWorkerLambda.py](/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda.py)
+[CafeOrderWorkerLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda.py)
 
 ### 🌐 STEP 5 — CREATE API GATEWAY FOR WORKER
 
