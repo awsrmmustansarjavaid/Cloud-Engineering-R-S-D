@@ -289,6 +289,17 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 
 ## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
 
+### 1️⃣ Create the shared auth-api.js file
+
+```
+sudo nano js/auth-api.js
+```
+
+[auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+
+
+
 ### 1️⃣ Update EC2 PHP App to Use API Gateway
 
 ```
