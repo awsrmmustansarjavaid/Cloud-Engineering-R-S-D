@@ -295,12 +295,9 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 sudo nano js/auth-api.js
 ```
 
-[auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+[auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth-api.js)
 
-
-
-
-### 1️⃣ Update EC2 PHP App to Use API Gateway
+### 2️⃣ Update EC2 PHP App to Use API Gateway
 
 ```
 sudo nano /var/www/html/orders.php
