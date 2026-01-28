@@ -23,6 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $quantity = (int)$_POST["quantity"];
     $total = $prices[$item] * $quantity;
 
+    // -----------------------------
+    // Prepare payload for API call
+    // -----------------------------
     $payload = json_encode([
         "table_number"  => $tableNumber,
         "customer_name" => $customerName,
@@ -30,7 +33,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "quantity"      => $quantity
     ]);
 
-    $apiUrl = "https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders";
+    // -----------------------------
+    // Using central API endpoint
+    // -----------------------------
+    $apiUrl = "https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev/orders"; // <- centralized orders API
 
     $ch = curl_init($apiUrl);
     curl_setopt_array($ch, [
@@ -70,29 +76,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <!-- Stripe JS SDK (MANDATORY) -->
 <script src="https://js.stripe.com/v3/"></script>
 
+<!-- Centralized API -->
+<script src="/js/auth-api.js"></script>
+
 <style>
-/* Existing styles untouched */
-body {
-    font-family: 'Poppins', sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
-                url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
-    background-size: cover;
-}
-.order-card {
-    background: #fff;
-    border-radius: 22px;
-    padding: 35px;
-}
-#card-element {
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background: #000;
-}
+/* styles unchanged */
+body { font-family: 'Poppins', sans-serif; min-height: 100vh; background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4"); background-size: cover; }
+.order-card { background: #fff; border-radius: 22px; padding: 35px; }
+#card-element { padding: 12px; border-radius: 10px; border: 1px solid #ccc; background: #000; }
 </style>
 </head>
-
 <body>
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height:85vh;">
@@ -132,22 +125,14 @@ body {
     <p><strong>Total:</strong> $<?= $total ?></p>
 </div>
 
-<!-- ===================== PAYMENT SECTION (NEW) ===================== -->
+<!-- ===================== PAYMENT ===================== -->
 <div id="payment-section" class="mt-4">
-
     <h4>💳 Pay with Card</h4>
-
-    <!-- Stripe Card Element -->
     <div id="card-element"></div>
-
-    <!-- Card errors -->
     <div id="card-errors" class="text-danger mt-2"></div>
-
-    <!-- Payment button -->
-    <button onclick="placeOrder()" class="btn btn-success w-100 mt-3">
+    <button onclick="payOrder()" class="btn btn-success w-100 mt-3">
         Pay $<?= $total ?>
     </button>
-
 </div>
 
 <?php endif; ?>
@@ -159,60 +144,22 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// ===================== STRIPE INITIALIZATION =====================
-
-// Initialize Stripe with TEST publishable key
+// ===================== STRIPE INIT =====================
 const stripe = Stripe("pk_test_xxxxxxxxx");
-
-// Create Stripe Elements instance
 const elements = stripe.elements();
-
-// Create card input element
-const cardElement = elements.create('card', {
-    style: {
-        base: {
-            fontSize: '16px',
-            color: '#ffffff',
-            '::placeholder': { color: '#cccccc' }
-        },
-        invalid: { color: '#ff0000' }
-    }
-});
-
-// Mount card element
+const cardElement = elements.create('card', { style: { base: { fontSize: '16px', color: '#ffffff', '::placeholder': { color: '#cccccc' } }, invalid: { color: '#ff0000' } } });
 cardElement.mount('#card-element');
-
-// Handle real-time validation errors
-cardElement.on('change', function(event) {
-    document.getElementById('card-errors').textContent =
-        event.error ? event.error.message : '';
-});
+cardElement.on('change', event => { document.getElementById('card-errors').textContent = event.error ? event.error.message : ''; });
 
 // ===================== PLACE ORDER + PAY =====================
-async function placeOrder() {
-
+async function payOrder() {
     try {
-        // Create payment intent (backend)
-        const response = await fetch('/payment/create-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                orderId: "<?= $orderId ?>",
-                amount: <?= $total * 100 ?>
-            })
-        });
+        // Use centralized API
+        const paymentData = await AUTH_API.createPaymentIntent("<?= $orderId ?>", <?= $total * 100 ?>);
+        const result = await stripe.confirmCardPayment(paymentData.clientSecret, { payment_method: { card: cardElement } });
 
-        const data = await response.json();
-
-        // Confirm card payment
-        const result = await stripe.confirmCardPayment(
-            data.clientSecret,
-            { payment_method: { card: cardElement } }
-        );
-
-        if (result.error) {
-            alert("❌ Payment Failed: " + result.error.message);
-        } else {
+        if (result.error) alert("❌ Payment Failed: " + result.error.message);
+        else {
             alert("✅ Payment Successful! Order Confirmed.");
             window.location.href = "<?= $statusUrl ?>";
         }
