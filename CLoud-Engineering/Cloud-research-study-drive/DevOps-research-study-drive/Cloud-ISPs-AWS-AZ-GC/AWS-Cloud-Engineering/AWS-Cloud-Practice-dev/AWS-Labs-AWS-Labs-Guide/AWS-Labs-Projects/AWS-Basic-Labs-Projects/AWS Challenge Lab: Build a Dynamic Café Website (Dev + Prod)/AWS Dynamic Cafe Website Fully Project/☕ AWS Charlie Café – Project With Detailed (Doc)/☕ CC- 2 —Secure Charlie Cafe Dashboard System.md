@@ -66,7 +66,7 @@ sudo systemctl enable httpd
 #### Open browser:
 
 ```
-http://54.183.22.10/order-status.html
+http://54.183.22.10/dashboard.html
 ```
 
 ✅ If page opens → PERFECT
@@ -97,7 +97,7 @@ Now you FINALLY have a valid Return URL.
 #### Use:
 
 ```
-http://54.183.22.10/order-status.html
+http://54.183.22.10/dashboard.html
 ```
 
 **⚠️ BUT Cognito REQUIRES HTTPS**
@@ -158,7 +158,7 @@ HTTPS 443  0.0.0.0/0
 | **Protocol**             | HTTP                                       | Matches your web server on EC2 (use HTTPS only if EC2 already has SSL) |
 | **Port**                 | 80                                         | Default HTTP port your web server listens on             |
 | **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
-| **Health check path**    | / (or /order-status.html)                  | Path ALB uses to check if instance is healthy            |
+| **Health check path**    | / (or /dashboard.html)                  | Path ALB uses to check if instance is healthy            |
 
 #### STEP 5️⃣ — Add Listener to ALB 
 
@@ -194,7 +194,7 @@ https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
 Open:
 
 ```
-https://ALB-DNS/order-status.html
+https://ALB-DNS/dashboard.html
 ```
 
 ✅ Works → DONE
@@ -293,7 +293,7 @@ xxxxx.cloudfront.net
 #### 2️⃣ Default Root Object (Optional but Recommended)
 
 ```
-order-status.html
+dashboard.html
 ```
 
 **⚠️ Do NOT add /order-status.html to Origin Path**
@@ -304,14 +304,14 @@ order-status.html
 | Configuration Item   | Value                             |
 | -------------------- | --------------------------------- |
 | Origin Path          | ❌ Empty                           |
-| Default Root Object  | ✅ `order-status.html`             |
+| Default Root Object  | ✅ `dashboard.html`             |
 | File location on EC2 | `/var/www/html/order-status.html` |
 
 
 This ensures:
 
 ```
-CloudFront → ALB → EC2 Apache → order-status.html
+CloudFront → ALB → EC2 Apache → dashboard.html
 ```
 
 #### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
@@ -333,7 +333,7 @@ CloudFront → Distributions → Your Distribution
 invalidation path:
 
 ```
-/order-status.html
+/dashboard.html
 ```
 
 #### 5️⃣ Click Create invalidation
@@ -361,7 +361,7 @@ After status = Completed:
 3️⃣ Open:
 
 ```
-https://xxxxx.cloudfront.net/order-status.html
+https://xxxxx.cloudfront.net/dashboard.html
 ```
 
 You should see latest code.
@@ -371,7 +371,7 @@ You should see latest code.
 ❌ Invalidating:
 
 ```
-order-status.html
+dashboard.html
 ```
 
 (missing leading /)
@@ -444,7 +444,7 @@ Cafe homepage loads (if root object not set)
 Open:
 
 ```
-https://xxxxx.cloudfront.net/order-status.html
+https://xxxxx.cloudfront.net/dashboard.html
 ```
 
 #### Expected:
@@ -462,7 +462,7 @@ If CloudFront fails:
 Test ALB directly:
 
 ```
-http://ALB-DNS-NAME/order-status.html
+http://ALB-DNS-NAME/dashboard.html
 ```
 
 #### Ensure:
@@ -487,7 +487,7 @@ This is your Return URL
 | ---------- | ------------------------------ |
 | Host page  | EC2 Apache                     |
 | HTTPS      | ALB                            |
-| Return URL | ALB DNS + `/order-status.html` |
+| Return URL | ALB DNS + `/dashboard.html` |
 | CloudFront | Later (optional)               |
 
 **✅ PHASE 1️⃣ STATUS**
@@ -572,7 +572,7 @@ d2og2zrs47voou.cloudfront.net
 #### For Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/order-status.html
+https://d2og2zrs47voou.cloudfront.net/dashboard.html
 ```
 
 #### Now click the button at bottom-right:
@@ -853,7 +853,7 @@ https://YOUR_COGNITO_DOMAIN/login
 ?client_id=CLIENT_ID
 &response_type=token
 &scope=openid+email+profile
-&redirect_uri=https://ALB-DNS/order-status.html
+&redirect_uri=https://cloudfront/dashboard.html
 ```
 
 #### Example:
@@ -879,7 +879,7 @@ https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
 After login, browser redirects to:
 
 ```
-https://cloudfront/order-status.html#id_token=xxxxx&access_token=xxxxx
+https://cloudfront/dashboard.html#id_token=xxxxx&access_token=xxxxx
 ```
 
 🎉 THIS MEANS SUCCESS
@@ -909,13 +909,13 @@ You said:
 So your real URL is something like:
 
 ```
-http://<cloudfront>/order-status.html
+http://<cloudfront>/dashboard.html
 ```
 
 Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/order-status.html
+https://d2og2zrs47voou.cloudfront.net/dashboard.html
 ```
 
 #### 1️⃣ Path (new UI):
@@ -935,7 +935,7 @@ Cognito
 #### Add EXACTLY:
 
 ```
-http://<cloudfront>/order-status.html
+http://<cloudfront>/dashboard.html
 ```
 
 ✔ Must match character by character
@@ -947,7 +947,7 @@ http://<cloudfront>/order-status.html
 #### Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/order-status.html
+https://d2og2zrs47voou.cloudfront.net/dashboard.html
 ```
 
 #### 3️⃣ Sign-out URLs (recommended)
@@ -955,7 +955,7 @@ https://d2og2zrs47voou.cloudfront.net/order-status.html
 #### Add the same:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/order-status.html
+https://d2og2zrs47voou.cloudfront.net/dashboard.html
 ```
 
 > **Cognito is strict: must be HTTPS + exact path, no trailing slash.**
@@ -1093,12 +1093,12 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 Once the above is confirmed:
 
 ```
-https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/order-status.html
+https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/dashboard.html
 ```
 
 - Expected: Cognito login page shows
 
-- Login → redirect → CloudFront /order-status.html
+- Login → redirect → CloudFront /dashboard.html
 
 **✔️ If this works → frontend code will work too.**
 
