@@ -554,7 +554,7 @@ AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_KEY"
 AWS_DEFAULT_REGION="us-east-1"
 
 # S3 bucket and path
-S3_BUCKET="mn-cafe-s3-bucket"
+S3_BUCKET="charlie-cafe-s3-bucket"
 S3_KEY="layers/pymysql-layer.zip"
 
 # Local layer folder
