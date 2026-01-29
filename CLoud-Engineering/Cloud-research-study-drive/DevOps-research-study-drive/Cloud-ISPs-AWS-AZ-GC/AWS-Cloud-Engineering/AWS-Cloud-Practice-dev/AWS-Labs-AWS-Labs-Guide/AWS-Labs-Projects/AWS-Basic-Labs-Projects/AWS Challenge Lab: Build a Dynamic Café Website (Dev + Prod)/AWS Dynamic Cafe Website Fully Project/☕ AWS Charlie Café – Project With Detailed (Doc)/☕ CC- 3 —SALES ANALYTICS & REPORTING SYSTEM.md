@@ -4278,7 +4278,7 @@ Your existing API (important)
 
 Type: REST API
 
-🔹 Step 3.2 — Create Resource
+#### 🔹 Step 3.2 — Create Resource
 
 ```
 /orders
@@ -4297,7 +4297,7 @@ Resource Path: /cash-payment
 
 Click Create Resource
 
-🔹 Step 3.3 — Create POST Method
+#### 🔹 Step 3.3 — Create POST Method
 
 Select /orders/cash-payment
 
@@ -4311,7 +4311,7 @@ Lambda Function: CashPaymentLambda
 
 Click Save
 
-🔹 Step 3.4 — Enable CORS (DO NOT SKIP)
+#### 🔹 Step 3.4 — Enable CORS (DO NOT SKIP)
 
 Select /orders/cash-payment
 
@@ -4321,7 +4321,7 @@ Accept defaults
 
 Click Enable CORS and replace existing
 
-🔹 Step 3.5 — Deploy API
+#### 🔹 Step 3.5 — Deploy API
 
 Click Actions
 
@@ -4361,7 +4361,7 @@ fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment"
 
 ### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
 
-✅ Test 1 — Manual API Test
+#### ✅ Test 1 — Manual API Test
 
 Use Postman / curl:
 
@@ -4372,7 +4372,7 @@ POST /orders/cash-payment
 }
 ```
 
-Expected:
+#### Expected:
 
 ```
 {
@@ -4380,7 +4380,7 @@ Expected:
 }
 ```
 
-✅ Test 2 — DynamoDB Check
+#### ✅ Test 2 — DynamoDB Check
 
 Open DynamoDB item:
 
@@ -4389,7 +4389,7 @@ payment_method = CASH
 payment_status = PENDING
 ```
 
-✅ Test 3 — UI Test
+#### ✅ Test 3 — UI Test
 
 Place order
 
