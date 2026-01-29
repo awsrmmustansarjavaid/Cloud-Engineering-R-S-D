@@ -4270,13 +4270,13 @@ def lambda_handler(event, context):
 
 #### 🔹 Step 3.1 — Open API Gateway
 
-AWS Console → API Gateway
+- AWS Console → API Gateway
 
-Choose:
+- Choose:
 
-Your existing API (important)
+  - Your existing API (important)
 
-Type: REST API
+  - Type: REST API
 
 #### 🔹 Step 3.2 — Create Resource
 
@@ -4285,51 +4285,51 @@ Type: REST API
    └── /cash-payment
 ```
 
-Steps:
+#### Steps:
 
-Select /orders
+- Select /orders
 
-Click Create Resource
+- Click Create Resource
 
-Resource Name: cash-payment
+- Resource Name: cash-payment
 
-Resource Path: /cash-payment
+- Resource Path: /cash-payment
 
-Click Create Resource
+- Click Create Resource
 
 #### 🔹 Step 3.3 — Create POST Method
 
-Select /orders/cash-payment
+- Select /orders/cash-payment
 
-Click Create Method
+- Click Create Method
 
-Choose POST
+- Choose POST
 
-Integration type: Lambda Function
+- Integration type: Lambda Function
 
-Lambda Function: CashPaymentLambda
+- Lambda Function: CashPaymentLambda
 
-Click Save
+- Click Save
 
 #### 🔹 Step 3.4 — Enable CORS (DO NOT SKIP)
 
-Select /orders/cash-payment
+- Select /orders/cash-payment
 
-Click Enable CORS
+- Click Enable CORS
 
-Accept defaults
+- Accept defaults
 
-Click Enable CORS and replace existing
+- Click Enable CORS and replace existing
 
 #### 🔹 Step 3.5 — Deploy API
 
-Click Actions
+- Click Actions
 
-Deploy API
+- Deploy API
 
-Stage: dev
+- Stage: dev
 
-Click Deploy
+- Click Deploy
 
 Your endpoint becomes:
 
@@ -4391,25 +4391,26 @@ payment_status = PENDING
 
 #### ✅ Test 3 — UI Test
 
-Place order
+- Place order
 
-Click Pay Now (Cash)
+- Click Pay Now (Cash)
 
-Card UI disappears
+- Card UI disappears
 
-Redirect works
+- Redirect works
 
-Order shows pending payment
+- Order shows pending payment
 
 
 ## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
 
-🟦 STEP 1 — CREATE ADMIN LAMBDA
-🔹 1.1 Open AWS Lambda
+### 🟦 STEP 1 — CREATE ADMIN LAMBDA
+
+#### 🔹 1.1 Open AWS Lambda
 
 AWS Console → Lambda → Create function
 
-🔹 1.2 Function Settings
+#### 🔹 1.2 Function Settings
 
 Function name: AdminMarkPaidLambda
 
@@ -4420,9 +4421,9 @@ Execution role: Use existing role
 
 Click Create function
 
-🟦 STEP 2 — IAM PERMISSIONS (CRITICAL)
+### 🟦 STEP 2 — IAM PERMISSIONS (CRITICAL)
 
-Open:
+#### Open:
 
 ```
 AdminMarkPaidLambda
@@ -4431,7 +4432,7 @@ AdminMarkPaidLambda
 → Role
 ```
 
-Ensure this permission exists:
+#### Ensure this permission exists:
 
 ```
 {
@@ -4445,9 +4446,9 @@ Ensure this permission exists:
 
 **⚠️ If missing → Admin cannot mark paid.**
 
-🟦 STEP 3 — ADMIN LAMBDA CODE (WITH COMMENTS)
+### 🟦 STEP 3 — ADMIN LAMBDA CODE (WITH COMMENTS)
 
-Replace entire Lambda code with this:
+#### Replace entire Lambda code with this:
 
 ```
 # ===========================================
@@ -4520,13 +4521,14 @@ def lambda_handler(event, context):
         }
 ```
 
-🟦 STEP 4 — CREATE ADMIN API ENDPOINT
-🔹 4.1 Open API Gateway
+### 🟦 STEP 4 — CREATE ADMIN API ENDPOINT
+
+#### 🔹 4.1 Open API Gateway
 
 AWS Console → API Gateway
 Select your existing REST API
 
-🔹 4.2 Create Resource
+#### 🔹 4.2 Create Resource
 
 ```
 /admin
@@ -4543,7 +4545,7 @@ Resource name: admin
 
 Create sub-resource → mark-paid
 
-🔹 4.3 Create POST Method
+#### 🔹 4.3 Create POST Method
 
 Select /admin/mark-paid
 
@@ -4555,7 +4557,7 @@ Lambda name: AdminMarkPaidLambda
 
 Save
 
-🔹 4.4 Enable CORS (MANDATORY)
+#### 🔹 4.4 Enable CORS (MANDATORY)
 
 Select /admin/mark-paid
 
@@ -4565,7 +4567,7 @@ Accept defaults
 
 Save
 
-🔹 4.5 Deploy API
+#### 🔹 4.5 Deploy API
 
 Actions → Deploy API
 
@@ -4579,9 +4581,9 @@ Deploy
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 ```
 
-🟦 STEP 5 — ADMIN TEST (IMPORTANT)
+### 🟦 STEP 5 — ADMIN TEST (IMPORTANT)
 
-Use Postman / curl:
+#### Use Postman / curl:
 
 ```
 POST /admin/mark-paid
@@ -4590,7 +4592,7 @@ POST /admin/mark-paid
 }
 ```
 
-Expected DynamoDB:
+#### Expected DynamoDB:
 
 ```
 payment_status = PAID
@@ -4601,7 +4603,7 @@ payment_status = PAID
 
 ## ☕ CHARLIE CAFÉ PHASE 3️⃣ Order status page understands CARD vs CASH
 
-🧠 WHAT THIS PAGE MUST DO
+### 🧠 WHAT THIS PAGE MUST DO
 
 Based on DB values:
 
@@ -4611,7 +4613,7 @@ Based on DB values:
 | CASH + PENDING | “Pay at counter”   |
 | CASH + PAID    | “Cash received”    |
 
-🟦 STEP 6 — ORDER STATUS API MUST RETURN FIELDS
+### 🟦 STEP 6 — ORDER STATUS API MUST RETURN FIELDS
 
 Your existing Order Status API must return:
 
@@ -4623,10 +4625,11 @@ Your existing Order Status API must return:
 }
 ```
 
-⚠️ If missing, update backend first.
+**⚠️ If missing, update backend first.**
 
-🟦 STEP 7 — UPDATE order-status.php
-✅ FULL UPDATED FILE (WITH COMMENTS)
+### 🟦 STEP 7 — UPDATE order-status.php
+
+#### ✅ FULL UPDATED FILE (WITH COMMENTS)
 
 ```
 <?php
@@ -4703,20 +4706,24 @@ $data = json_decode($response, true);
 </html>
 ```
 
-🟦 STEP 8 — FINAL TEST SCENARIOS (DO ALL)
-🧪 Scenario A — Card
+### 🟦 STEP 8 — FINAL TEST SCENARIOS (DO ALL)
+
+#### 🧪 Scenario A — Card
 
 ✔ Order → Card payment
+
 ✔ Status shows Paid via Card
 
-🧪 Scenario B — Cash Pending
+#### 🧪 Scenario B — Cash Pending
 
 ✔ Order → Pay Now (Cash)
+
 ✔ Status shows Pay at Counter
 
-🧪 Scenario C — Cash Paid
+#### 🧪 Scenario C — Cash Paid
 
 ✔ Admin → Mark Paid
+
 ✔ Refresh status → Cash received
 
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
