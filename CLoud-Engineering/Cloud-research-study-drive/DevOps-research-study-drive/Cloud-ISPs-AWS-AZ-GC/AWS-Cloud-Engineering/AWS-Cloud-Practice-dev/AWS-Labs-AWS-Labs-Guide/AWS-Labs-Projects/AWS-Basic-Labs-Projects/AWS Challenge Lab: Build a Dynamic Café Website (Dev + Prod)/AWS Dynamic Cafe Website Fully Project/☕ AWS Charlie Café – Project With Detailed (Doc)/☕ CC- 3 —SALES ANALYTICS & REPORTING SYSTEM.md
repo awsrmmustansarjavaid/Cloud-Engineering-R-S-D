@@ -4641,8 +4641,8 @@ Your existing Order Status API must return:
 ```
 <?php
 // ===========================================
-// CHARLIE CAFE - ORDER STATUS PAGE
-// Cash-aware payment logic
+// CHARLIE CAFE - PAYMENT STATUS PAGE
+// Shows CARD / CASH payment result ONLY
 // ===========================================
 
 // API endpoint to fetch order status
@@ -4667,7 +4667,7 @@ $data = json_decode($response, true);
 <!DOCTYPE html>
 <html>
 <head>
-<title>Order Status</title>
+<title>Payment Status</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -4676,7 +4676,7 @@ $data = json_decode($response, true);
 <div class="container mt-5">
 <div class="card p-4">
 
-<h3>📦 Order Status</h3>
+<h3>💳 Payment Status</h3>
 
 <p><strong>Order ID:</strong> <?= $orderId ?></p>
 
