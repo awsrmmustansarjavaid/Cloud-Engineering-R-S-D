@@ -4806,6 +4806,17 @@ Below is a clean, correct version aligned with your flow.
 
 [payment-status.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## ☕ CHARLIE CAFÉ PHASE 5️⃣ 🔁 admin-orders.php
+
+### admin-orders.php
+
+[payment-status.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+
 
 
 **✅ PHASE 4️⃣ STATUS**

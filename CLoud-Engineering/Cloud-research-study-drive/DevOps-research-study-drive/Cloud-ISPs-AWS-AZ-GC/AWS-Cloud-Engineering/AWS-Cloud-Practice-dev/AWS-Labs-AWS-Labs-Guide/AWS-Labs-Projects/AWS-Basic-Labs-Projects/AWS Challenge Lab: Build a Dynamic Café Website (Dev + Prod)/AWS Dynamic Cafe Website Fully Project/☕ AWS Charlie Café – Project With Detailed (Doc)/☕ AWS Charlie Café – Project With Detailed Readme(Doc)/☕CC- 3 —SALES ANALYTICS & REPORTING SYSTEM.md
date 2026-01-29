@@ -2838,6 +2838,70 @@ order-status.php
 (print / kitchen / tracking)
 ```
 
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## ☕ CHARLIE CAFÉ PHASE 5️⃣ 🔁 admin-orders.php
+
+### 📊 Admin “Mark as Paid” button
+
+👉 You do NOT add the “Admin – Mark as Paid” button in order.php or payment-status.php. That button belongs to a separate Admin page, not a customer page.
+
+Why it should NOT be on order.php or payment-status.php
+order.php
+
+Customer-facing
+
+Used to place order + choose payment
+
+Customers must never see admin controls
+❌ Security risk
+❌ Logic mixing
+
+payment-status.php
+
+Still customer-facing
+
+Read-only status page
+
+Shows:
+
+“Pay at counter”
+
+“Paid”
+
+“Waiting”
+❌ Customers must NOT mark themselves as paid
+
+So we keep these pages clean and safe.
+
+✅ Correct & professional placement
+📊 Admin “Mark as Paid” button goes here:
+👉 admin-orders.php (NEW or existing admin page)
+
+This page is:
+
+Admin-only (protected later with Cognito / auth)
+
+Shows all orders
+
+Used by cashier or staff
+
+Recommended Admin Flow (LAB-Perfect)
+
+```
+Customer
+ └─ order.php
+     └─ payment-status.php (cash pending)
+
+Admin / Cashier
+ └─ admin-orders.php
+     └─ [Mark as Paid] button
+         └─ Lambda → update payment_status = PAID
+```
+
+
 
 
 
@@ -2846,7 +2910,6 @@ order-status.php
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-
 ## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
 
 ### 🧠 PART 1 — HOW REDIRECT ACTUALLY WORKS (VERY SIMPLE)
