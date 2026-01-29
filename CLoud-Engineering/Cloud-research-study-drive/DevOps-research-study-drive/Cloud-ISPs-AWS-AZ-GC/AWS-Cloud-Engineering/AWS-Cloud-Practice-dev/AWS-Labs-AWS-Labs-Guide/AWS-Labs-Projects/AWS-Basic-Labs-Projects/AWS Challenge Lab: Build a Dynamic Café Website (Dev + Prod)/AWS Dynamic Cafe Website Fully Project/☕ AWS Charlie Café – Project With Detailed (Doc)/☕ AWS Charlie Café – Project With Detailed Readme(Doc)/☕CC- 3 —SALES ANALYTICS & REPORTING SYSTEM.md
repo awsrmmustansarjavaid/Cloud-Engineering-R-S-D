@@ -2746,7 +2746,22 @@ Choose <strong>ONE</strong> payment method only.
 </p>
 ```
 
+### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
 
+Scenario 1 – Card
+
+✔ Place order
+✔ Pay with card
+✔ Status → PAID
+
+Scenario 2 – Cash
+
+✔ Place order
+✔ Click Pay Now (Cash)
+✔ Card UI disappears
+✔ Status → AWAITING PAYMENT
+✔ Admin → Mark Paid
+✔ Status → PAID
 
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
 
