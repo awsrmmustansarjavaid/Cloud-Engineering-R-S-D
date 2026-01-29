@@ -4093,15 +4093,6 @@ cron(0/10 * * * ? *)
 
 ### 1️⃣ DynamoDB / RDS (Order Table)
 
-#### Add 2 columns / attributes:
-
-| Field          | Example            |
-| -------------- | ------------------ |
-| payment_method | `CARD` / `CASH`    |
-| payment_status | `PENDING` / `PAID` |
-
-> **Your existing table is fine — just extend it**
-
 🟦 STEP 1 — UPDATE DATABASE (VERY IMPORTANT)
 1️⃣ If you are using DynamoDB
 🔹 Step 1.1 — Open DynamoDB
@@ -4122,6 +4113,8 @@ Partition Key: order_id (String)
 
 👉 DynamoDB is schema-less, so you do NOT manually add columns.
 
+#### Add 2 columns / attributes:
+
 You will simply start writing these attributes:
 
 | Attribute Name | Value          |
@@ -4129,7 +4122,10 @@ You will simply start writing these attributes:
 | payment_method | CASH / CARD    |
 | payment_status | PENDING / PAID |
 
+> **Your existing table is fine — just extend it**
+
 ✅ Nothing else to configure here
+
 ✅ DynamoDB auto-creates attributes
 
 1️⃣ If you are using RDS (MySQL)
