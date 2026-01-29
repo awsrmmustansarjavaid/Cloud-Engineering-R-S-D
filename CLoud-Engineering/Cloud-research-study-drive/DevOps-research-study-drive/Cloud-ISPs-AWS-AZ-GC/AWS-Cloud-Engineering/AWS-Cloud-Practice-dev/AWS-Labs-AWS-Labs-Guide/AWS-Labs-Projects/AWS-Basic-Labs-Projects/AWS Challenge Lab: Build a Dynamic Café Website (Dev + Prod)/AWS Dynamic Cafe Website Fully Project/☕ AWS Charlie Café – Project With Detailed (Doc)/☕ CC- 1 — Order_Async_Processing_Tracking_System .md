@@ -2988,7 +2988,256 @@ Below is a clean, correct version aligned with your flow.
 
 [payment-status.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
-### 2️⃣ admin-orders.php
+### 2️⃣ Backend Configuration
+
+### 1️⃣ CREATE ADMIN LAMBDA
+
+#### Step 1.1 – Open AWS Lambda Console
+
+Go to AWS Console → Lambda → Create function
+
+Function name: AdminMarkPaidLambda
+
+Runtime: Python 3.10
+
+Permissions: Choose existing role or create new role with DynamoDB access
+
+#### Step 1.2 – Attach IAM Policy
+
+Lambda needs UpdateItem permission for your table.
+
+Policy JSON example:
+
+```
+{
+  "Effect": "Allow",
+  "Action": [
+    "dynamodb:UpdateItem",
+    "dynamodb:GetItem",
+    "dynamodb:Query"
+  ],
+  "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
+}
+```
+
+Attach this policy to the Lambda’s role.
+
+Step 1.3 – Add Lambda Code
+
+Replace entire code with:
+
+```
+# ===========================================
+# AdminMarkPaidLambda
+# Purpose:
+# - Admin marks CASH orders as PAID
+# ===========================================
+
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    """
+    Expects POST JSON:
+    { "order_id": "ORD-123456" }
+    """
+
+    try:
+        # Parse request body
+        body = json.loads(event['body'])
+        order_id = body['order_id']
+
+        # Update order status
+        table.update_item(
+            Key={'order_id': order_id},
+            UpdateExpression="SET payment_status = :ps",
+            ExpressionAttributeValues={':ps': 'PAID'}
+        )
+
+        return {
+            "statusCode": 200,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({
+                "success": True,
+                "message": "Order marked as PAID"
+            })
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"success": False, "error": str(e)})
+        }
+```
+
+2️⃣ CREATE API GATEWAY ENDPOINT
+Step 2.1 – Open API Gateway Console
+
+AWS Console → API Gateway → Choose your existing REST API (or create a new one)
+
+Step 2.2 – Add Resource /admin/mark-paid
+
+Select your API → Actions → Create Resource
+
+Resource Name: admin → Create Sub-resource mark-paid
+
+This creates endpoint /admin/mark-paid
+
+Step 2.3 – Add POST Method
+
+Select /admin/mark-paid → Create Method → POST
+
+Integration type → Lambda Function
+
+Lambda → AdminMarkPaidLambda → Save
+
+Enable CORS: Actions → Enable CORS → Accept defaults → Save
+
+Step 2.4 – Deploy API
+
+Actions → Deploy API
+
+Stage → dev
+
+Note the endpoint URL:
+
+```
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
+```
+
+3️⃣ CREATE ADMIN FRONT-END PAGE
+Step 3.1 – admin-orders.php
+
+This page is for admin only, shows all orders, and provides the “Mark as Paid” button for pending CASH orders.
+
+```
+<?php
+// ===============================
+// CHARLIE CAFE - ADMIN ORDERS PAGE
+// ===============================
+
+// Fetch all orders from API
+$apiUrl = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/orders";
+
+$ch = curl_init($apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
+
+$orders = json_decode($response, true);
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Orders</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-dark text-white">
+<div class="container mt-5">
+
+<h3>📊 Admin Orders</h3>
+
+<table class="table table-dark table-bordered">
+<thead>
+<tr>
+    <th>Order ID</th>
+    <th>Table</th>
+    <th>Item</th>
+    <th>Payment</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+</thead>
+<tbody>
+<?php foreach ($orders as $order): ?>
+<tr>
+    <td><?= $order['order_id'] ?></td>
+    <td><?= $order['table_number'] ?></td>
+    <td><?= $order['item'] ?></td>
+    <td><?= $order['payment_method'] ?></td>
+    <td><?= $order['payment_status'] ?></td>
+    <td>
+        <?php if ($order['payment_method'] === 'CASH' && $order['payment_status'] === 'PENDING'): ?>
+            <button class="btn btn-success btn-sm"
+                onclick="markPaid('<?= $order['order_id'] ?>')">
+                ✅ Mark as Paid
+            </button>
+        <?php else: ?>
+            —
+        <?php endif; ?>
+    </td>
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+
+</div>
+
+<script>
+function markPaid(orderId) {
+    fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Payment marked as PAID");
+            location.reload();
+        } else {
+            alert("Failed: " + data.error);
+        }
+    });
+}
+</script>
+
+</body>
+</html>
+```
+
+4️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
+
+Add a button to print / track order after payment is confirmed:
+
+```
+<?php if ($data['payment_status'] === 'PAID'): ?>
+    <a href="print-order.php?order_id=<?= $orderId ?>"
+       class="btn btn-primary mt-3">
+       🖨 Print Order / View Receipt
+    </a>
+<?php endif; ?>
+```
+
+5️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
+
+Replace button logic with:
+
+```
+<?php if ($data['payment_status'] === 'PAID'): ?>
+<script>
+    setTimeout(() => {
+        window.location.href = "print-order.php?order_id=<?= $orderId ?>";
+    }, 2000); // Redirect 2 seconds after payment confirmed
+</script>
+<?php endif; ?>
+```
+
+6️⃣ TEST SCENARIOS (DO ALL STEPS)
+
+Customer places CASH order → order.php → payment-status.php shows Pay at Counter
+
+Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
+
+Customer refreshes payment-status.php → status changes Cash payment received
+
+Optional: Auto-redirect → print-order.php to print receipt
 
 
 
