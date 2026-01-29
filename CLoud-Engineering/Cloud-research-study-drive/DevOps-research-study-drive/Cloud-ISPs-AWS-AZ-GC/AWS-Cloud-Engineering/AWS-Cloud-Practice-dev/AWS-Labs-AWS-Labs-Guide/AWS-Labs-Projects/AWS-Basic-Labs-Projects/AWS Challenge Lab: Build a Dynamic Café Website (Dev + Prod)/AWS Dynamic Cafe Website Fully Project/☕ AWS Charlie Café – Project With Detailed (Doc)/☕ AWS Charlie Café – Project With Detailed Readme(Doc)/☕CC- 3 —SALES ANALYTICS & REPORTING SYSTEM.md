@@ -2768,6 +2768,86 @@ Scenario 2 – Cash
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
+
+### 🧠 WHY YOU ARE FEELING CONFUSED (VERY NORMAL)
+
+Right now you have two different concepts mixed under the same name:
+
+| Page name                     | Actual responsibility                |
+| ----------------------------- | ------------------------------------ |
+| `order-status.php` (existing) | Kitchen / preparation / ready status |
+| (new page you built)          | Payment result (card or cash)        |
+
+
+Those are two different stages in the order lifecycle.
+
+So your instinct is 100% right.
+
+### 🧱 CORRECT PAGE RESPONSIBILITY SPLIT (RECOMMENDED)
+
+### ✅ Page 1 — payment-status.php
+
+#### Purpose:
+👉 Shown immediately after payment decision
+
+#### Handles:
+
+- Card payment success
+
+- Cash pending
+
+- Cash paid
+
+Nothing else.
+
+### ✅ Page 2 — order-status.php
+
+#### Purpose:
+👉 Shown after payment is completed
+
+#### Handles:
+
+- Preparing
+
+- Ready
+
+- Served
+
+Nothing about payment.
+
+#### This separation:
+
+✔ Avoids confusion
+
+✔ Scales well
+
+✔ Matches real apps
+
+✔ Prevents future bugs
+
+### 🔄 FINAL USER FLOW (VERY CLEAR)
+
+```
+order.php
+   ↓
+(payment decision)
+   ↓
+payment-status.php
+   ↓
+(after PAID)
+   ↓
+order-status.php   ← kitchen / live tracking
+```
+
+
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
 
 ## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
 
