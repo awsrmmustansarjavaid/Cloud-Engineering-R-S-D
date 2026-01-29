@@ -2831,13 +2831,11 @@ Nothing about payment.
 ```
 order.php
    ↓
-(payment decision)
-   ↓
 payment-status.php
+   ↓ (after PAID)
+order-status.php
    ↓
-(after PAID)
-   ↓
-order-status.php   ← kitchen / live tracking
+(print / kitchen / tracking)
 ```
 
 

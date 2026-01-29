@@ -59,7 +59,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // Order status page
-    $statusUrl = "order-status.php?order_id=$orderId";
+    // $statusUrl = "order-status.php?order_id=$orderId";
+
+    // Payment status page (after payment decision)
+       $statusUrl = "payment-status.php?order_id=$orderId";
+
 }
 ?>
 
@@ -186,7 +190,12 @@ card.mount("#card-element");
 
 // Handle card payment
 async function payWithCard() {
-    alert("Stripe payment flow continues here (unchanged).");
+
+    // ⚠️ Your existing Stripe logic stays here    
+    alert("Stripe payment successful (LAB simulation).");
+
+    // Redirect to payment status page
+    window.location.href = "<?= $statusUrl ?>";
 }
 
 // Handle CASH payment

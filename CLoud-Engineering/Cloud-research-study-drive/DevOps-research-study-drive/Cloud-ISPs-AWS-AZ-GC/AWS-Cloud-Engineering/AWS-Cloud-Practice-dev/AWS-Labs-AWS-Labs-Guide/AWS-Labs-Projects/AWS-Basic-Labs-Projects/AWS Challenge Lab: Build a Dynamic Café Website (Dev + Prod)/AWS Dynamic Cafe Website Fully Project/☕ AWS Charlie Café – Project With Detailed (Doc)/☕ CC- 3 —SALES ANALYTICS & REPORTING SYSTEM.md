@@ -4738,67 +4738,73 @@ $data = json_decode($response, true);
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 
-## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
+## ☕ CHARLIE CAFÉ PHASE 4️⃣ 🔁 REDIRECTING TO payment-status.php
 
-🟦 STEP 1 — REDIRECT FROM order.php (CARD + CASH)
-💳 Card payment (Stripe)
+### 🟦 STEP 1 — REDIRECT FROM order.php (CARD + CASH)
 
-Inside payWithCard():
+#### 🔁 1️⃣ Change destination page (VERY IMPORTANT)
+
+🔴 CURRENT (near the top)
 
 ```
-if (result.paymentIntent.status === "succeeded") {
+// Order status page
+$statusUrl = "order-status.php?order_id=$orderId";
+```
 
-    // Redirect to order status page
-    window.location.href = "order-status.php?order_id=<?= $orderId ?>&print=1";
+✅ CHANGE TO
+
+```
+// Payment status page (after payment decision)
+$statusUrl = "payment-status.php?order_id=$orderId";
+```
+
+That’s it.
+Nothing else touched here.
+
+#### 💳 2️⃣ CARD PAYMENT REDIRECT (ADD ONLY)
+
+🔴 CURRENT
+
+```
+async function payWithCard() {
+    alert("Stripe payment flow continues here (unchanged).");
 }
 ```
 
-☕ Cash payment
-
-Inside payWithCash():
+✅ UPDATED (redirect added, flow unchanged)
 
 ```
-if (result.success) {
+async function payWithCard() {
 
-    // Redirect to order status page
-    window.location.href = "order-status.php?order_id=<?= $orderId ?>&print=1";
+    // ⚠️ Your existing Stripe logic stays here
+    alert("Stripe payment successful (LAB simulation).");
+
+    // Redirect to payment status page
+    window.location.href = "<?= $statusUrl ?>";
 }
 ```
 
-📌 print=1 is a flag we’ll use next.
+✔ No Stripe logic removed
+✔ Just a redirect after success
 
-🟦 STEP 2 — UPDATE order-status.php (AUTO PRINT)
+#### ☕ 3️⃣ CASH PAYMENT (ALREADY CORRECT ✅)
 
-Add ONLY these parts.
-
-1️⃣ Read the print flag (PHP)
-
-At the top:
+You already did this perfectly 👌
+This line is already correct:
 
 ```
-$autoPrint = isset($_GET['print']) && $_GET['print'] == 1;
+window.location.href = "<?= $statusUrl ?>";
 ```
 
-2️⃣ Trigger print (HTML + JS)
+Since $statusUrl now points to payment-status.php, cash flow is done.
 
-Add before </body>:
+### ✅ PART 2: FINAL payment-status.php (CLEAN + PRINT REDIRECT)
 
-```
-<?php if ($autoPrint): ?>
-<script>
-    // Wait for page to load, then open print dialog
-    window.onload = function () {
-        window.print();
-    };
-</script>
-<?php endif; ?>
-```
+Below is a clean, correct version aligned with your flow.
 
+#### 📄 payment-status.php
 
-
-
-
-
+[payment-status.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
 
 
