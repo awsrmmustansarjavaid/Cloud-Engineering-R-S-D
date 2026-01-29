@@ -4401,6 +4401,10 @@ payment_status = PENDING
 
 - Order shows pending payment
 
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
 
 ## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
 
@@ -4408,18 +4412,18 @@ payment_status = PENDING
 
 #### 🔹 1.1 Open AWS Lambda
 
-AWS Console → Lambda → Create function
+- AWS Console → Lambda → Create function
 
 #### 🔹 1.2 Function Settings
 
-Function name: AdminMarkPaidLambda
+- Function name: AdminMarkPaidLambda
 
-Runtime: Python 3.10
+- Runtime: Python 3.10
 
-Execution role: Use existing role
+- Execution role: Use existing role
 (Must allow DynamoDB UpdateItem)
 
-Click Create function
+- Click Create function
 
 ### 🟦 STEP 2 — IAM PERMISSIONS (CRITICAL)
 
@@ -4525,8 +4529,9 @@ def lambda_handler(event, context):
 
 #### 🔹 4.1 Open API Gateway
 
-AWS Console → API Gateway
-Select your existing REST API
+- AWS Console → API Gateway
+
+- Select your existing REST API
 
 #### 🔹 4.2 Create Resource
 
@@ -4535,45 +4540,45 @@ Select your existing REST API
    └── /mark-paid
 ```
 
-Steps:
+#### Steps:
 
-Select /
+- Select /
 
-Create Resource
+- Create Resource
 
-Resource name: admin
+- Resource name: admin
 
-Create sub-resource → mark-paid
+- Create sub-resource → mark-paid
 
 #### 🔹 4.3 Create POST Method
 
-Select /admin/mark-paid
+- Select /admin/mark-paid
 
-Create Method → POST
+- Create Method → POST
 
-Integration type: Lambda
+- Integration type: Lambda
 
-Lambda name: AdminMarkPaidLambda
+- Lambda name: AdminMarkPaidLambda
 
-Save
+- Save
 
 #### 🔹 4.4 Enable CORS (MANDATORY)
 
-Select /admin/mark-paid
+- Select /admin/mark-paid
 
-Click Enable CORS
+- Click Enable CORS
 
-Accept defaults
+- Accept defaults
 
-Save
+- Save
 
 #### 🔹 4.5 Deploy API
 
-Actions → Deploy API
+- Actions → Deploy API
 
-Stage: dev
+- Stage: dev
 
-Deploy
+- Deploy
 
 📌 Endpoint URL:
 
@@ -4600,7 +4605,10 @@ payment_status = PAID
 
 **✅ Admin feature COMPLETE**
 
+**✅ PHASE 2️⃣ STATUS**
 
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
 ## ☕ CHARLIE CAFÉ PHASE 3️⃣ Order status page understands CARD vs CASH
 
 ### 🧠 WHAT THIS PAGE MUST DO
@@ -4726,6 +4734,25 @@ $data = json_decode($response, true);
 
 ✔ Refresh status → Cash received
 
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+
+## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
+
+
+
+
+
+
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
 
 

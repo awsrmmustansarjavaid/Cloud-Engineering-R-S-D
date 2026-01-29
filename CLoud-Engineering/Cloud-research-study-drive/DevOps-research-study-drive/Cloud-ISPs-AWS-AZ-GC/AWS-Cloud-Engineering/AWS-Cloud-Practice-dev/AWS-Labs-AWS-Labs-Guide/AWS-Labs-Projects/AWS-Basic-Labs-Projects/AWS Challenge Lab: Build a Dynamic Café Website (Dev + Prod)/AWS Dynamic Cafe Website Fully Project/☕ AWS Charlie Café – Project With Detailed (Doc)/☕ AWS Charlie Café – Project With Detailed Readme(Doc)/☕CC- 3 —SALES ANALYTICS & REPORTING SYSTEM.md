@@ -2763,6 +2763,71 @@ Scenario 2 – Cash
 ✔ Admin → Mark Paid
 ✔ Status → PAID
 
+
+## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
+
+🧠 PART 1 — HOW REDIRECT ACTUALLY WORKS (VERY SIMPLE)
+
+There are only two valid ways to redirect a user in your case:
+
+✅ WAY 1 — JavaScript Redirect (BEST FOR PAYMENT)
+
+Used after Stripe or Cash API success
+
+```
+window.location.href = "order-status.php?order_id=ORD-123";
+```
+
+📌 This is what you must use after payment approval, because:
+
+Payment happens in JavaScript
+
+PHP has already finished executing
+
+Headers can’t be changed anymore
+
+👉 This is the correct method for your case
+
+❌ WAY 2 — PHP header() (NOT usable here)
+
+```
+header("Location: order-status.php");
+```
+
+❌ This will NOT work after Stripe/cash click
+❌ PHP already rendered the page
+
+🧠 PART 2 — YOUR EXACT REQUIREMENT
+
+“After payment approved I want:
+
+order-status page open
+
+printing page also open”
+
+This is 100% doable, and this is how cafés do it.
+
+✅ CORRECT UX PATTERN (IMPORTANT)
+
+You DO NOT redirect to two pages.
+
+Instead:
+
+👉 order-status.php opens
+👉 order-status.php triggers print automatically
+
+This avoids popup blockers and chaos.
+
+🧩 FINAL FLOW (VERY CLEAR)
+
+```
+Payment Success
+     ↓
+Redirect to order-status.php
+     ↓
+order-status.php auto-opens print page
+```
+
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
 
 
