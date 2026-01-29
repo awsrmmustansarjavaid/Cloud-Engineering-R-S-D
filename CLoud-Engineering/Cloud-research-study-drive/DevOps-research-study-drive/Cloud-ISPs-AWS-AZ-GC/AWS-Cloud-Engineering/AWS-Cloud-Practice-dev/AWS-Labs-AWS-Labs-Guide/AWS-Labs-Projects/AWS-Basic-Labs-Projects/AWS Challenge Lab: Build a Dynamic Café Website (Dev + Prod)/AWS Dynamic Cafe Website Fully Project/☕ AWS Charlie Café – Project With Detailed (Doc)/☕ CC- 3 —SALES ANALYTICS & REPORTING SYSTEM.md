@@ -4092,8 +4092,7 @@ cron(0/10 * * * ? *)
 ## 1️⃣ ☕ Charlie Café – Cach Payment System 
 
 ### 1️⃣ DynamoDB / RDS (Order Table)
-
-### 🟦 STEP 1 — UPDATE DATABASE (VERY IMPORTANT)
+> **UPDATE DATABASE (VERY IMPORTANT)**
 
 #### 1️⃣ If you are using DynamoDB
 
@@ -4140,8 +4139,206 @@ ADD payment_method VARCHAR(10),
 ADD payment_status VARCHAR(10);
 ```
 
+### 2️⃣ CREATE LAMBDA FUNCTION
 
-### 2️⃣ API Gateway – NEW ENDPOINT (CASH)
+#### 🔹 Step 2.1 — Open Lambda
+
+- AWS Console → Lambda → Create function
+
+#### Settings:
+
+- Function name: CashPaymentLambda
+
+- Runtime: Python 3.10
+
+- Execution role: Use existing role
+(Must allow DynamoDB access)
+
+- Click Create function
+
+#### 🔹 Step 2.2 — IAM PERMISSIONS (CRITICAL)
+
+#### Open:
+
+```
+CashPaymentLambda → Configuration → Permissions → Role
+```
+
+Attach this policy (or ensure it exists):
+
+```
+{
+  "Effect": "Allow",
+  "Action": [
+    "dynamodb:UpdateItem"
+  ],
+  "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
+}
+```
+
+**⚠️ If this is missing → Lambda WILL FAIL.**
+
+#### 🔹 Step 2.3 — ADD LAMBDA CODE (WITH COMMENTS)
+
+#### Replace entire code with this:
+
+```
+# ===========================================
+# CashPaymentLambda
+# Purpose:
+# - Called when customer selects CASH payment
+# - Does NOT mark payment as PAID
+# - Admin will mark PAID later
+# ===========================================
+
+import json
+import boto3
+
+# Create DynamoDB resource
+dynamodb = boto3.resource('dynamodb')
+
+# Reference your orders table
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    """
+    Expected Input (from API Gateway):
+    {
+        "order_id": "ORD-123456"
+    }
+    """
+
+    try:
+        # -------------------------------
+        # Parse request body
+        # -------------------------------
+        body = json.loads(event['body'])
+        order_id = body['order_id']
+
+        # -------------------------------
+        # Update order to CASH + PENDING
+        # -------------------------------
+        table.update_item(
+            Key={
+                'order_id': order_id
+            },
+            UpdateExpression="""
+                SET payment_method = :pm,
+                    payment_status = :ps
+            """,
+            ExpressionAttributeValues={
+                ':pm': 'CASH',
+                ':ps': 'PENDING'
+            }
+        )
+
+        # -------------------------------
+        # Success response
+        # -------------------------------
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "success": True,
+                "message": "Order marked for cash payment"
+            })
+        }
+
+    except Exception as e:
+        # -------------------------------
+        # Error handling
+        # -------------------------------
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "success": False,
+                "error": str(e)
+            })
+        }
+```
+
+- Click Deploy
+
+
+
+### 3️⃣ API Gateway – NEW ENDPOINT (CASH)
+
+#### 🔹 Step 3.1 — Open API Gateway
+
+AWS Console → API Gateway
+
+Choose:
+
+Your existing API (important)
+
+Type: REST API
+
+🔹 Step 3.2 — Create Resource
+
+```
+/orders
+   └── /cash-payment
+```
+
+Steps:
+
+Select /orders
+
+Click Create Resource
+
+Resource Name: cash-payment
+
+Resource Path: /cash-payment
+
+Click Create Resource
+
+🔹 Step 3.3 — Create POST Method
+
+Select /orders/cash-payment
+
+Click Create Method
+
+Choose POST
+
+Integration type: Lambda Function
+
+Lambda Function: CashPaymentLambda
+
+Click Save
+
+🔹 Step 3.4 — Enable CORS (DO NOT SKIP)
+
+Select /orders/cash-payment
+
+Click Enable CORS
+
+Accept defaults
+
+Click Enable CORS and replace existing
+
+🔹 Step 3.5 — Deploy API
+
+Click Actions
+
+Deploy API
+
+Stage: dev
+
+Click Deploy
+
+Your endpoint becomes:
+
+```
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment
+```
+
+
+
 
 ```
 POST /orders/cash-payment
@@ -4156,6 +4353,25 @@ POST /orders/cash-payment
   - payment_method = CASH
 
   - payment_status = PENDING
+
+### 4️⃣ — FRONTEND CALL (ALREADY MATCHES)
+
+Your frontend correctly calls:
+
+```
+fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        order_id: "ORD-XXXX"
+    })
+});
+```
+
+✅ This is correct
+
+✅ No change needed
+
 
 ### 3️⃣ Lambda – CashPaymentLambda (Python)
 
