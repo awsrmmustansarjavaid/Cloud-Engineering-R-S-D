@@ -4102,6 +4102,48 @@ cron(0/10 * * * ? *)
 
 > **Your existing table is fine — just extend it**
 
+🟦 STEP 1 — UPDATE DATABASE (VERY IMPORTANT)
+1️⃣ If you are using DynamoDB
+🔹 Step 1.1 — Open DynamoDB
+
+AWS Console → DynamoDB → Tables → CafeOrders
+
+🔹 Step 1.2 — Confirm Primary Key
+
+Your table must have:
+
+```
+Partition Key: order_id (String)
+```
+
+⚠️ If not, STOP — this lab assumes order_id is the key.
+
+🔹 Step 1.3 — Add Attributes (NO MIGRATION NEEDED)
+
+👉 DynamoDB is schema-less, so you do NOT manually add columns.
+
+You will simply start writing these attributes:
+
+| Attribute Name | Value          |
+| -------------- | -------------- |
+| payment_method | CASH / CARD    |
+| payment_status | PENDING / PAID |
+
+✅ Nothing else to configure here
+✅ DynamoDB auto-creates attributes
+
+1️⃣ If you are using RDS (MySQL)
+
+Run this ONCE:
+
+```
+ALTER TABLE cafe_orders
+ADD payment_method VARCHAR(10),
+ADD payment_status VARCHAR(10);
+```
+
+
+
 ### 2️⃣ API Gateway – NEW ENDPOINT (CASH)
 
 ```
