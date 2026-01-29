@@ -4402,13 +4402,327 @@ Redirect works
 Order shows pending payment
 
 
+## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
+
+🟦 STEP 1 — CREATE ADMIN LAMBDA
+🔹 1.1 Open AWS Lambda
+
+AWS Console → Lambda → Create function
+
+🔹 1.2 Function Settings
+
+Function name: AdminMarkPaidLambda
+
+Runtime: Python 3.10
+
+Execution role: Use existing role
+(Must allow DynamoDB UpdateItem)
+
+Click Create function
+
+🟦 STEP 2 — IAM PERMISSIONS (CRITICAL)
+
+Open:
+
+```
+AdminMarkPaidLambda
+→ Configuration
+→ Permissions
+→ Role
+```
+
+Ensure this permission exists:
+
+```
+{
+  "Effect": "Allow",
+  "Action": [
+    "dynamodb:UpdateItem"
+  ],
+  "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
+}
+```
+
+**⚠️ If missing → Admin cannot mark paid.**
+
+🟦 STEP 3 — ADMIN LAMBDA CODE (WITH COMMENTS)
+
+Replace entire Lambda code with this:
+
+```
+# ===========================================
+# AdminMarkPaidLambda
+# Purpose:
+# - Used by ADMIN only
+# - Marks CASH orders as PAID
+# ===========================================
+
+import json
+import boto3
+
+# Connect to DynamoDB
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    """
+    Expected request body:
+    {
+        "order_id": "ORD-123456"
+    }
+    """
+
+    try:
+        # -----------------------------
+        # Parse incoming request
+        # -----------------------------
+        body = json.loads(event['body'])
+        order_id = body['order_id']
+
+        # -----------------------------
+        # Update payment status to PAID
+        # -----------------------------
+        table.update_item(
+            Key={'order_id': order_id},
+            UpdateExpression="SET payment_status = :ps",
+            ExpressionAttributeValues={
+                ':ps': 'PAID'
+            }
+        )
+
+        # -----------------------------
+        # Success response
+        # -----------------------------
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "success": True,
+                "message": "Order marked as PAID"
+            })
+        }
+
+    except Exception as e:
+        # -----------------------------
+        # Error handling
+        # -----------------------------
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "success": False,
+                "error": str(e)
+            })
+        }
+```
+
+🟦 STEP 4 — CREATE ADMIN API ENDPOINT
+🔹 4.1 Open API Gateway
+
+AWS Console → API Gateway
+Select your existing REST API
+
+🔹 4.2 Create Resource
+
+```
+/admin
+   └── /mark-paid
+```
+
+Steps:
+
+Select /
+
+Create Resource
+
+Resource name: admin
+
+Create sub-resource → mark-paid
+
+🔹 4.3 Create POST Method
+
+Select /admin/mark-paid
+
+Create Method → POST
+
+Integration type: Lambda
+
+Lambda name: AdminMarkPaidLambda
+
+Save
+
+🔹 4.4 Enable CORS (MANDATORY)
+
+Select /admin/mark-paid
+
+Click Enable CORS
+
+Accept defaults
+
+Save
+
+🔹 4.5 Deploy API
+
+Actions → Deploy API
+
+Stage: dev
+
+Deploy
+
+📌 Endpoint URL:
+
+```
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
+```
+
+🟦 STEP 5 — ADMIN TEST (IMPORTANT)
+
+Use Postman / curl:
+
+```
+POST /admin/mark-paid
+{
+  "order_id": "ORD-123"
+}
+```
+
+Expected DynamoDB:
+
+```
+payment_status = PAID
+```
+
+**✅ Admin feature COMPLETE**
 
 
+## ☕ CHARLIE CAFÉ PHASE 3️⃣ Order status page understands CARD vs CASH
+
+🧠 WHAT THIS PAGE MUST DO
+
+Based on DB values:
+
+| Condition      | Show               |
+| -------------- | ------------------ |
+| CARD + PAID    | “Payment received” |
+| CASH + PENDING | “Pay at counter”   |
+| CASH + PAID    | “Cash received”    |
+
+🟦 STEP 6 — ORDER STATUS API MUST RETURN FIELDS
+
+Your existing Order Status API must return:
+
+```
+{
+  "order_id": "ORD-123",
+  "payment_method": "CASH",
+  "payment_status": "PENDING"
+}
+```
+
+⚠️ If missing, update backend first.
+
+🟦 STEP 7 — UPDATE order-status.php
+✅ FULL UPDATED FILE (WITH COMMENTS)
+
+```
+<?php
+// ===========================================
+// CHARLIE CAFE - ORDER STATUS PAGE
+// Cash-aware payment logic
+// ===========================================
+
+// API endpoint to fetch order status
+$apiBaseUrl = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/order-status";
+
+// Validate order ID
+if (!isset($_GET['order_id'])) {
+    die("Invalid Order ID");
+}
+
+$orderId = $_GET['order_id'];
+
+// Call backend API
+$ch = curl_init($apiBaseUrl . "?order_id=" . urlencode($orderId));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Order Status</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-dark text-white">
+
+<div class="container mt-5">
+<div class="card p-4">
+
+<h3>📦 Order Status</h3>
+
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+
+<?php if ($data['payment_method'] === 'CARD'): ?>
+
+    <div class="alert alert-success">
+        ✅ Payment received via CARD
+    </div>
+
+<?php elseif ($data['payment_method'] === 'CASH' && $data['payment_status'] === 'PENDING'): ?>
+
+    <div class="alert alert-warning">
+        ☕ Please pay at the counter
+    </div>
+
+<?php elseif ($data['payment_method'] === 'CASH' && $data['payment_status'] === 'PAID'): ?>
+
+    <div class="alert alert-success">
+        ✅ Cash payment received
+    </div>
+
+<?php else: ?>
+
+    <div class="alert alert-secondary">
+        ⏳ Order created, waiting for payment
+    </div>
+
+<?php endif; ?>
+
+</div>
+</div>
+
+</body>
+</html>
+```
+
+🟦 STEP 8 — FINAL TEST SCENARIOS (DO ALL)
+🧪 Scenario A — Card
+
+✔ Order → Card payment
+✔ Status shows Paid via Card
+
+🧪 Scenario B — Cash Pending
+
+✔ Order → Pay Now (Cash)
+✔ Status shows Pay at Counter
+
+🧪 Scenario C — Cash Paid
+
+✔ Admin → Mark Paid
+✔ Refresh status → Cash received
 
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
 
 
-## 🟦 PHASE 1️⃣ — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
+## ☕ CHARLIE CAFÉ PHASE 1️⃣ — STRIPE ACCOUNT (ABSOLUTELY BEGINNER SAFE)
 
 ### 1️⃣ — Create Stripe Account
 
