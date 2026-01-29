@@ -2848,47 +2848,52 @@ order-status.php
 
 👉 You do NOT add the “Admin – Mark as Paid” button in order.php or payment-status.php. That button belongs to a separate Admin page, not a customer page.
 
-Why it should NOT be on order.php or payment-status.php
+### Why it should NOT be on order.php or payment-status.php
 order.php
 
-Customer-facing
+- Customer-facing
 
-Used to place order + choose payment
+- Used to place order + choose payment
 
-Customers must never see admin controls
-❌ Security risk
-❌ Logic mixing
+- Customers must never see admin controls
 
-payment-status.php
+  ❌ Security risk
 
-Still customer-facing
+  ❌ Logic mixing
 
-Read-only status page
+#### payment-status.php
 
-Shows:
+- Still customer-facing
 
-“Pay at counter”
+- Read-only status page
 
-“Paid”
+- Shows:
 
-“Waiting”
-❌ Customers must NOT mark themselves as paid
+  - “Pay at counter”
+
+  - “Paid”
+
+  - “Waiting”
+
+    ❌ Customers must NOT mark themselves as paid
 
 So we keep these pages clean and safe.
 
-✅ Correct & professional placement
-📊 Admin “Mark as Paid” button goes here:
+### ✅ Correct & professional placement
+
+#### 📊 Admin “Mark as Paid” button goes here:
+
 👉 admin-orders.php (NEW or existing admin page)
 
 This page is:
 
-Admin-only (protected later with Cognito / auth)
+- Admin-only (protected later with Cognito / auth)
 
-Shows all orders
+- Shows all orders
 
-Used by cashier or staff
+- Used by cashier or staff
 
-Recommended Admin Flow (LAB-Perfect)
+#### Recommended Admin Flow (LAB-Perfect)
 
 ```
 Customer
@@ -2901,7 +2906,23 @@ Admin / Cashier
          └─ Lambda → update payment_status = PAID
 ```
 
+### Result
 
+- Customer refreshes payment-status.php → sees PAID
+
+- Admin sees Print button
+
+- Printing uses print-order.php
+
+### ✅ You now have a REAL café workflow
+
+- Customer ≠ Cashier
+
+- Cash verified manually
+
+- Status syncs across pages
+
+- No hacks, no shortcuts
 
 
 
