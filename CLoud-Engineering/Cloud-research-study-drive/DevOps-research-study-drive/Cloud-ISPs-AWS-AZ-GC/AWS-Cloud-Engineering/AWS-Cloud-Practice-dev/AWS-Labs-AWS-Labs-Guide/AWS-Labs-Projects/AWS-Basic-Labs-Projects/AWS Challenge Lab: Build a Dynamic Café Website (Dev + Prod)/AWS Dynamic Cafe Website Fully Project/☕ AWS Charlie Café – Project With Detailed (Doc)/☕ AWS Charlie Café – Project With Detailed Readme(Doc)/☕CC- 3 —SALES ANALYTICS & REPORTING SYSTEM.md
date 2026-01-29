@@ -2543,6 +2543,44 @@ PAID                   ← (Stripe Card Payment)
 
 ✔ Scales to QR ordering easily
 
+☕ CHARLIE CAFÉ – CASH PAYMENT FLOW (LAB GUIDE)
+
+This guide covers ONLY CASH PAYMENT, end-to-end.
+
+🧠 FINAL GOAL (KEEP THIS IN MIND)
+
+When customer clicks “Pay Now (Cash)”:
+
+Frontend sends order_id
+
+API Gateway receives request
+
+Lambda updates order:
+
+payment_method = CASH
+
+payment_status = PENDING
+
+Admin later marks order as PAID
+
+🧱 STEP 0 — PRE-REQUISITES (DO NOT SKIP)
+
+You already have:
+
+✅ Orders table (DynamoDB or RDS)
+
+✅ Order creation API
+
+✅ order_id stored in DB
+
+✅ API Gateway working
+
+✅ Lambda execution role exists
+
+If any one of these is missing, stop and fix it first.
+
+
+
 ### 4️⃣ Admin Lambda – Mark Paid (Already Similar to Yours)
 
 ```
