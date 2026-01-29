@@ -4634,7 +4634,7 @@ Your existing Order Status API must return:
 
 **⚠️ If missing, update backend first.**
 
-### 🟦 STEP 7 — UPDATE order-status.php
+### 🟦 STEP 7 — UPDATE payment-status.php
 
 #### ✅ FULL UPDATED FILE (WITH COMMENTS)
 
