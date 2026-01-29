@@ -4093,25 +4093,27 @@ cron(0/10 * * * ? *)
 
 ### 1️⃣ DynamoDB / RDS (Order Table)
 
-🟦 STEP 1 — UPDATE DATABASE (VERY IMPORTANT)
-1️⃣ If you are using DynamoDB
-🔹 Step 1.1 — Open DynamoDB
+### 🟦 STEP 1 — UPDATE DATABASE (VERY IMPORTANT)
 
-AWS Console → DynamoDB → Tables → CafeOrders
+#### 1️⃣ If you are using DynamoDB
 
-🔹 Step 1.2 — Confirm Primary Key
+#### 🔹 Step 1.1 — Open DynamoDB
 
-Your table must have:
+- AWS Console → DynamoDB → Tables → CafeOrders
+
+#### 🔹 Step 1.2 — Confirm Primary Key
+
+- Your table must have:
 
 ```
 Partition Key: order_id (String)
 ```
 
-⚠️ If not, STOP — this lab assumes order_id is the key.
+**⚠️ If not, STOP — this lab assumes order_id is the key.**
 
-🔹 Step 1.3 — Add Attributes (NO MIGRATION NEEDED)
+#### 🔹 Step 1.3 — Add Attributes (NO MIGRATION NEEDED)
 
-👉 DynamoDB is schema-less, so you do NOT manually add columns.
+**👉 DynamoDB is schema-less, so you do NOT manually add columns.**
 
 #### Add 2 columns / attributes:
 
@@ -4128,16 +4130,15 @@ You will simply start writing these attributes:
 
 ✅ DynamoDB auto-creates attributes
 
-1️⃣ If you are using RDS (MySQL)
+#### 2️⃣ If you are using RDS (MySQL)
 
-Run this ONCE:
+#### Run this ONCE:
 
 ```
 ALTER TABLE cafe_orders
 ADD payment_method VARCHAR(10),
 ADD payment_status VARCHAR(10);
 ```
-
 
 
 ### 2️⃣ API Gateway – NEW ENDPOINT (CASH)
