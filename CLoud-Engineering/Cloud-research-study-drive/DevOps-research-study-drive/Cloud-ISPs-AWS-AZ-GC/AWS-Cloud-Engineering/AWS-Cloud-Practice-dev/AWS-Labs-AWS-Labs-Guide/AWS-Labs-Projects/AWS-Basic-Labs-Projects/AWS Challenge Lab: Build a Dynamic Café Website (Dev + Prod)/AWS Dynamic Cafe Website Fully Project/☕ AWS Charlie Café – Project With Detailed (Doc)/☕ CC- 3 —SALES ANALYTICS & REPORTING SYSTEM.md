@@ -4163,11 +4163,11 @@ def lambda_handler(event, context):
     }
 ```
 
-#### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+### 4️⃣ 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
 [orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
-### 🧪 TEST SCENARIOS (DO THESE)
+### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
 Scenario 1 – Card
 
 ✔ Place order
