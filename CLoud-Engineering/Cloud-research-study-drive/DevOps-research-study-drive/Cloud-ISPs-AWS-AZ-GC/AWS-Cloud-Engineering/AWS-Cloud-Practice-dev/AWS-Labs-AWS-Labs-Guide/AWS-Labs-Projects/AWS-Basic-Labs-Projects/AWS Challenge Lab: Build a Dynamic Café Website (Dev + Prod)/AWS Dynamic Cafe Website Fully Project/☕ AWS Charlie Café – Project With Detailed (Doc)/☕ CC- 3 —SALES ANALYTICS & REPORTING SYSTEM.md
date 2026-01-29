@@ -4337,11 +4337,6 @@ Your endpoint becomes:
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment
 ```
 
-
-
-
-
-
 ### 4️⃣ — FRONTEND CALL (ALREADY MATCHES)
 
 Your frontend correctly calls:
