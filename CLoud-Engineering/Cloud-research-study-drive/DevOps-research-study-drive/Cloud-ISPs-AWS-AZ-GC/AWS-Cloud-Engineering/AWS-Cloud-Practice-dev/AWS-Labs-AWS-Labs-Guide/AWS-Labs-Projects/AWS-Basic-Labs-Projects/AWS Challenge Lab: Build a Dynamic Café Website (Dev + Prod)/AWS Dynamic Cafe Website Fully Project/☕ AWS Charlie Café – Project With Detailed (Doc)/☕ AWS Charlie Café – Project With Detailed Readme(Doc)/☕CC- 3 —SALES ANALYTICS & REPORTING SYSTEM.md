@@ -2580,6 +2580,67 @@ You already have:
 If any one of these is missing, stop and fix it first.
 
 
+### 3️⃣ API Gateway – NEW ENDPOINT (CASH)
+
+```
+POST /orders/cash-payment
+```
+
+#### Purpose
+
+- Called when customer clicks Pay Now (Cash)
+
+- Marks order as:
+
+  - payment_method = CASH
+
+  - payment_status = PENDING
+
+
+### 3️⃣ Lambda – CashPaymentLambda (Python)
+
+```
+# ===========================================
+# CashPaymentLambda
+# ===========================================
+
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    """
+    Triggered when customer selects CASH payment.
+    This does NOT mark order as PAID.
+    Admin will do that later.
+    """
+
+    body = json.loads(event['body'])
+    order_id = body['order_id']
+
+    # Update order to waiting-for-cash
+    table.update_item(
+        Key={'order_id': order_id},
+        UpdateExpression="""
+            SET payment_method = :pm,
+                payment_status = :ps
+        """,
+        ExpressionAttributeValues={
+            ':pm': 'CASH',
+            ':ps': 'PENDING'
+        }
+    )
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "success": True,
+            "message": "Order marked as cash payment"
+        })
+    }
+```
 
 ### 4️⃣ Admin Lambda – Mark Paid (Already Similar to Yours)
 
