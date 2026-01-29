@@ -4088,8 +4088,7 @@ cron(0/10 * * * ? *)
 
 # SECTION 2️⃣ ☕ Charlie Café – Order Payment System
 
-
-## 1️⃣ ☕ Charlie Café – Cach Payment System 
+## ☕ CHARLIE CAFÉ PHASE 1️⃣ Cach Payment System 
 
 ### 1️⃣ DynamoDB / RDS (Order Table)
 > **UPDATE DATABASE (VERY IMPORTANT)**
@@ -4740,6 +4739,60 @@ $data = json_decode($response, true);
 ---
 
 ## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
+
+🟦 STEP 1 — REDIRECT FROM order.php (CARD + CASH)
+💳 Card payment (Stripe)
+
+Inside payWithCard():
+
+```
+if (result.paymentIntent.status === "succeeded") {
+
+    // Redirect to order status page
+    window.location.href = "order-status.php?order_id=<?= $orderId ?>&print=1";
+}
+```
+
+☕ Cash payment
+
+Inside payWithCash():
+
+```
+if (result.success) {
+
+    // Redirect to order status page
+    window.location.href = "order-status.php?order_id=<?= $orderId ?>&print=1";
+}
+```
+
+📌 print=1 is a flag we’ll use next.
+
+🟦 STEP 2 — UPDATE order-status.php (AUTO PRINT)
+
+Add ONLY these parts.
+
+1️⃣ Read the print flag (PHP)
+
+At the top:
+
+```
+$autoPrint = isset($_GET['print']) && $_GET['print'] == 1;
+```
+
+2️⃣ Trigger print (HTML + JS)
+
+Add before </body>:
+
+```
+<?php if ($autoPrint): ?>
+<script>
+    // Wait for page to load, then open print dialog
+    window.onload = function () {
+        window.print();
+    };
+</script>
+<?php endif; ?>
+```
 
 
 

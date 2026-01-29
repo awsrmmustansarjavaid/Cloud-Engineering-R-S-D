@@ -2579,6 +2579,7 @@ You already have:
 
 If any one of these is missing, stop and fix it first.
 
+## ☕ CHARLIE CAFÉ PHASE 1️⃣ Cach Payment System 
 
 ### 3️⃣ API Gateway – NEW ENDPOINT (CASH)
 
@@ -2763,14 +2764,18 @@ Scenario 2 – Cash
 ✔ Admin → Mark Paid
 ✔ Status → PAID
 
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
 
 ## ☕ CHARLIE CAFÉ PHASE 4️⃣ Redirect
 
-🧠 PART 1 — HOW REDIRECT ACTUALLY WORKS (VERY SIMPLE)
+### 🧠 PART 1 — HOW REDIRECT ACTUALLY WORKS (VERY SIMPLE)
 
 There are only two valid ways to redirect a user in your case:
 
-✅ WAY 1 — JavaScript Redirect (BEST FOR PAYMENT)
+### ✅ WAY 1 — JavaScript Redirect (BEST FOR PAYMENT)
 
 Used after Stripe or Cash API success
 
@@ -2778,47 +2783,49 @@ Used after Stripe or Cash API success
 window.location.href = "order-status.php?order_id=ORD-123";
 ```
 
-📌 This is what you must use after payment approval, because:
+### 📌 This is what you must use after payment approval, because:
 
-Payment happens in JavaScript
+- Payment happens in JavaScript
 
-PHP has already finished executing
+- PHP has already finished executing
 
-Headers can’t be changed anymore
+- Headers can’t be changed anymore
 
-👉 This is the correct method for your case
+**👉 This is the correct method for your case**
 
-❌ WAY 2 — PHP header() (NOT usable here)
+### ❌ WAY 2 — PHP header() (NOT usable here)
 
 ```
 header("Location: order-status.php");
 ```
 
 ❌ This will NOT work after Stripe/cash click
+
 ❌ PHP already rendered the page
 
-🧠 PART 2 — YOUR EXACT REQUIREMENT
+### 🧠 PART 2 — YOUR EXACT REQUIREMENT
 
 “After payment approved I want:
 
-order-status page open
+- order-status page open
 
-printing page also open”
+- printing page also open”
 
 This is 100% doable, and this is how cafés do it.
 
-✅ CORRECT UX PATTERN (IMPORTANT)
+### ✅ CORRECT UX PATTERN (IMPORTANT)
 
 You DO NOT redirect to two pages.
 
 Instead:
 
 👉 order-status.php opens
+
 👉 order-status.php triggers print automatically
 
 This avoids popup blockers and chaos.
 
-🧩 FINAL FLOW (VERY CLEAR)
+### 🧩 FINAL FLOW (VERY CLEAR)
 
 ```
 Payment Success
@@ -2827,6 +2834,65 @@ Redirect to order-status.php
      ↓
 order-status.php auto-opens print page
 ```
+
+### 🧾 WHAT WILL PRINT?
+
+By default:
+
+- Order ID
+
+- Payment message
+
+- Status
+
+You can style print-only receipt later.
+
+### 🧪 HOW THIS BEHAVES (IMPORTANT)
+
+#### Case 1 — Card Payment
+
+✔ Pay → Redirect
+
+✔ Order status page opens
+
+✔ Print dialog opens automatically
+
+#### Case 2 — Cash Payment
+
+✔ Click Cash
+
+✔ Redirect
+
+✔ Status page shows “Pay at counter”
+
+✔ Print dialog opens
+
+#### Case 3 — Admin marks paid later
+
+✔ Customer refreshes
+
+✔ No auto-print (unless print=1)
+
+### ⚠️ WHY THIS IS THE RIGHT WAY
+
+❌ Redirecting to 2 pages = browser blocks
+
+❌ Opening new tabs = popup issues
+
+✅ Single redirect
+
+✅ Controlled printing
+
+✅ Clean UX
+
+✅ Mobile-safe
+
+### 🧠 FINAL RULE (REMEMBER THIS)
+
+> **Redirect ONCE → Print INSIDE destination page**
+
+
+
 
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
 
