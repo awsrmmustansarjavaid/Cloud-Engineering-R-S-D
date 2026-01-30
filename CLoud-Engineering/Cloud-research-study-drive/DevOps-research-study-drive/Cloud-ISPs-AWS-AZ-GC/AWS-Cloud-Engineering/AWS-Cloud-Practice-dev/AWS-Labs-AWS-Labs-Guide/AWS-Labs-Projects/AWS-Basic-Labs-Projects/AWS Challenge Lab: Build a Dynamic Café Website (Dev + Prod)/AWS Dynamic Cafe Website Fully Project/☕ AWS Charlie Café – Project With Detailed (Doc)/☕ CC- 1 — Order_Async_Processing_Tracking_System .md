@@ -2702,41 +2702,36 @@ This creates endpoint /admin/mark-paid
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 ```
 
-#### Step 2.1 – Open API Gateway Console
-
-
-
-#### Step 2.2 – Add Resource /admin/mark-paid
-
-
-
-#### Step 2.3 – Add POST Method
-
-- Select /admin/mark-paid → Create Method → POST
-
-- Integration type → Lambda Function
-
-- Lambda → AdminMarkPaidLambda → Save
-
-- Enable CORS: Actions → Enable CORS → Accept defaults → Save
-
-#### Step 2.4 – Deploy API
-
-- Actions → Deploy API
-
-- Stage → dev
-
-Note the endpoint URL:
-
-```
-POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
-```
-
 ### 🟦 STEP 5 — admin-orders.php
 
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
 
+### 4️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
 
+Add a button to print / track order after payment is confirmed:
+
+```
+<?php if ($data['payment_status'] === 'PAID'): ?>
+    <a href="print-order.php?order_id=<?= $orderId ?>"
+       class="btn btn-primary mt-3">
+       🖨 Print Order / View Receipt
+    </a>
+<?php endif; ?>
+```
+
+### 5️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
+
+Replace button logic with:
+
+```
+<?php if ($data['payment_status'] === 'PAID'): ?>
+<script>
+    setTimeout(() => {
+        window.location.href = "print-order.php?order_id=<?= $orderId ?>";
+    }, 2000); // Redirect 2 seconds after payment confirmed
+</script>
+<?php endif; ?>
+```
 
 
 ### 🟦 STEP 6 — ADMIN TEST (IMPORTANT)
@@ -2895,136 +2890,11 @@ Below is a clean, correct version aligned with your flow.
 ## ☕ CHARLIE CAFÉ PHASE 5️⃣ 🔁 admin-orders.php
 
 
-### 2️⃣ Backend Configuration
-
-
-
-
-
-### 2️⃣ CREATE API GATEWAY ENDPOINT
-
-
-
 ### 3️⃣ CREATE ADMIN FRONT-END PAGE
 
-#### Step 3.1 – admin-orders.php
 
-This page is for admin only, shows all orders, and provides the “Mark as Paid” button for pending CASH orders.
 
-```
-<?php
-// ===============================
-// CHARLIE CAFE - ADMIN ORDERS PAGE
-// ===============================
 
-// Fetch all orders from API
-$apiUrl = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/orders";
-
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
-
-$orders = json_decode($response, true);
-?>
-
-<!DOCTYPE html>
-<html>
-<head>
-<title>Admin Orders</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body class="bg-dark text-white">
-<div class="container mt-5">
-
-<h3>📊 Admin Orders</h3>
-
-<table class="table table-dark table-bordered">
-<thead>
-<tr>
-    <th>Order ID</th>
-    <th>Table</th>
-    <th>Item</th>
-    <th>Payment</th>
-    <th>Status</th>
-    <th>Action</th>
-</tr>
-</thead>
-<tbody>
-<?php foreach ($orders as $order): ?>
-<tr>
-    <td><?= $order['order_id'] ?></td>
-    <td><?= $order['table_number'] ?></td>
-    <td><?= $order['item'] ?></td>
-    <td><?= $order['payment_method'] ?></td>
-    <td><?= $order['payment_status'] ?></td>
-    <td>
-        <?php if ($order['payment_method'] === 'CASH' && $order['payment_status'] === 'PENDING'): ?>
-            <button class="btn btn-success btn-sm"
-                onclick="markPaid('<?= $order['order_id'] ?>')">
-                ✅ Mark as Paid
-            </button>
-        <?php else: ?>
-            —
-        <?php endif; ?>
-    </td>
-</tr>
-<?php endforeach; ?>
-</tbody>
-</table>
-
-</div>
-
-<script>
-function markPaid(orderId) {
-    fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order_id: orderId })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Payment marked as PAID");
-            location.reload();
-        } else {
-            alert("Failed: " + data.error);
-        }
-    });
-}
-</script>
-
-</body>
-</html>
-```
-
-### 4️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
-
-Add a button to print / track order after payment is confirmed:
-
-```
-<?php if ($data['payment_status'] === 'PAID'): ?>
-    <a href="print-order.php?order_id=<?= $orderId ?>"
-       class="btn btn-primary mt-3">
-       🖨 Print Order / View Receipt
-    </a>
-<?php endif; ?>
-```
-
-### 5️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
-
-Replace button logic with:
-
-```
-<?php if ($data['payment_status'] === 'PAID'): ?>
-<script>
-    setTimeout(() => {
-        window.location.href = "print-order.php?order_id=<?= $orderId ?>";
-    }, 2000); // Redirect 2 seconds after payment confirmed
-</script>
-<?php endif; ?>
-```
 
 ### 6️⃣ TEST SCENARIOS (DO ALL STEPS)
 
