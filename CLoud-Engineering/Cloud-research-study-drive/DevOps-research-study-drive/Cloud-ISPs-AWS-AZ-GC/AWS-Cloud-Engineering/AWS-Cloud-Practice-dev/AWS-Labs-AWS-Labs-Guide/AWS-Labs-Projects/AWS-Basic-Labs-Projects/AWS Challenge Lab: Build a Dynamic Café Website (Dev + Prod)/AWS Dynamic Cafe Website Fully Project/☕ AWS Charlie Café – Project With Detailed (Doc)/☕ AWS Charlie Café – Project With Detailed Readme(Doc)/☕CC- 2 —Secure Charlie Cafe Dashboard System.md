@@ -1361,6 +1361,16 @@ if export_csv:
 
 #### ✅ FINAL LAMBDA CODE — order_status_lambda.py
 
+This Lambda supports BOTH:
+
+🖥 Normal JSON response (for order-status.html)
+
+⬇ CSV export (when ?export=true)
+
+No pandas. No layers. Just standard Python csv (best for labs + Free Tier).
+
+#### LAMBDA CODE
+
 Runtime: Python 3.9
 Trigger: API Gateway (GET /order-status)
 Auth: Cognito Authorizer (JWT)
