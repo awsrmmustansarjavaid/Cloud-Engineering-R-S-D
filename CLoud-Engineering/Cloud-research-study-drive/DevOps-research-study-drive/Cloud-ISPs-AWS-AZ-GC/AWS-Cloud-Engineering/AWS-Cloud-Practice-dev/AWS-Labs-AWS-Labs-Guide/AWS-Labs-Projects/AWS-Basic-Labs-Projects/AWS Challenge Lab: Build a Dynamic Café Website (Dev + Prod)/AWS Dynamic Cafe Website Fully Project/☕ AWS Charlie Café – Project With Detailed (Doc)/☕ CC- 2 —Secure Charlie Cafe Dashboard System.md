@@ -2202,7 +2202,7 @@ Staff group     → Lambda restricted
 
 [central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
-### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
+### 2️⃣  🔧 central-auth-api.js Minimal Configuration Replacement
 
 ```
 /* ================= CONFIG ================= */
