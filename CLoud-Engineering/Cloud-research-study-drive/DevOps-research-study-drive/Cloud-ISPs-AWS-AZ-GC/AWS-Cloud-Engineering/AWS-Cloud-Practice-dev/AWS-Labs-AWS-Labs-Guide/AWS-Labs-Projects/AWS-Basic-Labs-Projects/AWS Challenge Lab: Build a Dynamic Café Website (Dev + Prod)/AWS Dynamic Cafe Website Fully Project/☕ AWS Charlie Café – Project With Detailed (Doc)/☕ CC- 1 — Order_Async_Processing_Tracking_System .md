@@ -2916,14 +2916,14 @@ $data = json_decode($response, true);
 
 #### 🔁 1️⃣ Change destination page (VERY IMPORTANT)
 
-🔴 CURRENT (near the top)
+#### 🔴 CURRENT (near the top)
 
 ```
 // Order status page
 $statusUrl = "order-status.php?order_id=$orderId";
 ```
 
-✅ CHANGE TO
+#### ✅ CHANGE TO
 
 ```
 // Payment status page (after payment decision)
@@ -2935,7 +2935,7 @@ Nothing else touched here.
 
 #### 💳 2️⃣ CARD PAYMENT REDIRECT (ADD ONLY)
 
-🔴 CURRENT
+#### 🔴 CURRENT
 
 ```
 async function payWithCard() {
@@ -2943,7 +2943,7 @@ async function payWithCard() {
 }
 ```
 
-✅ UPDATED (redirect added, flow unchanged)
+#### ✅ UPDATED (redirect added, flow unchanged)
 
 ```
 async function payWithCard() {
@@ -2957,6 +2957,7 @@ async function payWithCard() {
 ```
 
 ✔ No Stripe logic removed
+
 ✔ Just a redirect after success
 
 #### ☕ 3️⃣ CASH PAYMENT (ALREADY CORRECT ✅)
@@ -2994,19 +2995,19 @@ Below is a clean, correct version aligned with your flow.
 
 #### Step 1.1 – Open AWS Lambda Console
 
-Go to AWS Console → Lambda → Create function
+- Go to AWS Console → Lambda → Create function
 
-Function name: AdminMarkPaidLambda
+- Function name: AdminMarkPaidLambda
 
-Runtime: Python 3.10
+- Runtime: Python 3.10
 
-Permissions: Choose existing role or create new role with DynamoDB access
+- Permissions: Choose existing role or create new role with DynamoDB access
 
 #### Step 1.2 – Attach IAM Policy
 
 Lambda needs UpdateItem permission for your table.
 
-Policy JSON example:
+#### Policy JSON example:
 
 ```
 {
@@ -3020,9 +3021,9 @@ Policy JSON example:
 }
 ```
 
-Attach this policy to the Lambda’s role.
+- Attach this policy to the Lambda’s role.
 
-Step 1.3 – Add Lambda Code
+#### Step 1.3 – Add Lambda Code
 
 Replace entire code with:
 
@@ -3074,34 +3075,35 @@ def lambda_handler(event, context):
         }
 ```
 
-2️⃣ CREATE API GATEWAY ENDPOINT
-Step 2.1 – Open API Gateway Console
+### 2️⃣ CREATE API GATEWAY ENDPOINT
 
-AWS Console → API Gateway → Choose your existing REST API (or create a new one)
+#### Step 2.1 – Open API Gateway Console
 
-Step 2.2 – Add Resource /admin/mark-paid
+- AWS Console → API Gateway → Choose your existing REST API (or create a new one)
 
-Select your API → Actions → Create Resource
+#### Step 2.2 – Add Resource /admin/mark-paid
 
-Resource Name: admin → Create Sub-resource mark-paid
+- Select your API → Actions → Create Resource
+
+- Resource Name: admin → Create Sub-resource mark-paid
 
 This creates endpoint /admin/mark-paid
 
-Step 2.3 – Add POST Method
+#### Step 2.3 – Add POST Method
 
-Select /admin/mark-paid → Create Method → POST
+- Select /admin/mark-paid → Create Method → POST
 
-Integration type → Lambda Function
+- Integration type → Lambda Function
 
-Lambda → AdminMarkPaidLambda → Save
+- Lambda → AdminMarkPaidLambda → Save
 
-Enable CORS: Actions → Enable CORS → Accept defaults → Save
+- Enable CORS: Actions → Enable CORS → Accept defaults → Save
 
-Step 2.4 – Deploy API
+#### Step 2.4 – Deploy API
 
-Actions → Deploy API
+- Actions → Deploy API
 
-Stage → dev
+- Stage → dev
 
 Note the endpoint URL:
 
@@ -3109,8 +3111,9 @@ Note the endpoint URL:
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 ```
 
-3️⃣ CREATE ADMIN FRONT-END PAGE
-Step 3.1 – admin-orders.php
+### 3️⃣ CREATE ADMIN FRONT-END PAGE
+
+#### Step 3.1 – admin-orders.php
 
 This page is for admin only, shows all orders, and provides the “Mark as Paid” button for pending CASH orders.
 
@@ -3202,7 +3205,7 @@ function markPaid(orderId) {
 </html>
 ```
 
-4️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
+### 4️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
 
 Add a button to print / track order after payment is confirmed:
 
@@ -3215,7 +3218,7 @@ Add a button to print / track order after payment is confirmed:
 <?php endif; ?>
 ```
 
-5️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
+### 5️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
 
 Replace button logic with:
 
@@ -3229,15 +3232,15 @@ Replace button logic with:
 <?php endif; ?>
 ```
 
-6️⃣ TEST SCENARIOS (DO ALL STEPS)
+### 6️⃣ TEST SCENARIOS (DO ALL STEPS)
 
-Customer places CASH order → order.php → payment-status.php shows Pay at Counter
+- Customer places CASH order → order.php → payment-status.php shows Pay at Counter
 
-Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
+- Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
 
-Customer refreshes payment-status.php → status changes Cash payment received
+- Customer refreshes payment-status.php → status changes Cash payment received
 
-Optional: Auto-redirect → print-order.php to print receipt
+- Optional: Auto-redirect → print-order.php to print receipt
 
 **✅ PHASE 5️⃣ STATUS**
 
