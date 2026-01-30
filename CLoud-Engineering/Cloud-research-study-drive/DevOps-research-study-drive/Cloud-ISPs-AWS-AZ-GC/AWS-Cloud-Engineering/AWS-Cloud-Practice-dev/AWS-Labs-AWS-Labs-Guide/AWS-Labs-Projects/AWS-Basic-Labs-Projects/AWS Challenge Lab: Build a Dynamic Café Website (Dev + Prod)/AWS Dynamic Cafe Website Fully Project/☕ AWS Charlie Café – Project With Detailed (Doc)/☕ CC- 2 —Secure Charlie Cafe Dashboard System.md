@@ -1461,7 +1461,15 @@ curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
 
 - Login via Cognito Hosted UI
 
-- Get access_token
+- Get a JWT access token
+
+- Call API Gateway with
+
+```
+Authorization: Bearer <access_token>
+```
+
+- ✅ Receive JSON response
 
 - Make GET request with header:
 
