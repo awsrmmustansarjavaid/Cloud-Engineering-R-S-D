@@ -2594,9 +2594,13 @@ payment_status = PENDING
 - Execution role: Use existing role
 (Must allow DynamoDB UpdateItem)
 
+- Permissions: Choose existing role or create new role with DynamoDB access
+
 - Click Create function
 
 ### 🟦 STEP 2 — IAM PERMISSIONS (CRITICAL)
+
+Lambda needs UpdateItem permission for your table.
 
 #### Open:
 
@@ -2613,15 +2617,21 @@ AdminMarkPaidLambda
 {
   "Effect": "Allow",
   "Action": [
-    "dynamodb:UpdateItem"
+    "dynamodb:UpdateItem",
+    "dynamodb:GetItem",
+    "dynamodb:Query"
   ],
   "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
 }
 ```
 
+- Attach this policy to the Lambda’s role.
+
 **⚠️ If missing → Admin cannot mark paid.**
 
 ### 🟦 STEP 3 — ADMIN LAMBDA CODE (WITH COMMENTS)
+
+
 
 #### Replace entire Lambda code with this:
 
@@ -2688,7 +2698,14 @@ AdminMarkPaidLambda
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 ```
 
-### 🟦 STEP 5 — ADMIN TEST (IMPORTANT)
+### 🟦 STEP 5 — admin-orders.php
+
+[admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+
+
+
+
+### 🟦 STEP 6 — ADMIN TEST (IMPORTANT)
 
 #### Use Postman / curl:
 
@@ -2843,43 +2860,14 @@ Below is a clean, correct version aligned with your flow.
 ---
 ## ☕ CHARLIE CAFÉ PHASE 5️⃣ 🔁 admin-orders.php
 
-### 1️⃣ admin-orders.php
 
-[admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
 
 ### 2️⃣ Backend Configuration
 
 ### 1️⃣ CREATE ADMIN LAMBDA
 
-#### Step 1.1 – Open AWS Lambda Console
 
-- Go to AWS Console → Lambda → Create function
 
-- Function name: AdminMarkPaidLambda
-
-- Runtime: Python 3.10
-
-- Permissions: Choose existing role or create new role with DynamoDB access
-
-#### Step 1.2 – Attach IAM Policy
-
-Lambda needs UpdateItem permission for your table.
-
-#### Policy JSON example:
-
-```
-{
-  "Effect": "Allow",
-  "Action": [
-    "dynamodb:UpdateItem",
-    "dynamodb:GetItem",
-    "dynamodb:Query"
-  ],
-  "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
-}
-```
-
-- Attach this policy to the Lambda’s role.
 
 #### Step 1.3 – Add Lambda Code
 
