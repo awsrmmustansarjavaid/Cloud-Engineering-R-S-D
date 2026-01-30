@@ -2736,6 +2736,14 @@ Replace button logic with:
 
 ### 🟦 STEP 6 — ADMIN TEST (IMPORTANT)
 
+- Customer places CASH order → order.php → payment-status.php shows Pay at Counter
+
+- Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
+
+- Customer refreshes payment-status.php → status changes Cash payment received
+
+- Optional: Auto-redirect → print-order.php to print receipt
+
 #### Use Postman / curl:
 
 ```
@@ -2887,29 +2895,7 @@ Below is a clean, correct version aligned with your flow.
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ CHARLIE CAFÉ PHASE 5️⃣ 🔁 admin-orders.php
 
-
-### 3️⃣ CREATE ADMIN FRONT-END PAGE
-
-
-
-
-
-### 6️⃣ TEST SCENARIOS (DO ALL STEPS)
-
-- Customer places CASH order → order.php → payment-status.php shows Pay at Counter
-
-- Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
-
-- Customer refreshes payment-status.php → status changes Cash payment received
-
-- Optional: Auto-redirect → print-order.php to print receipt
-
-**✅ PHASE 5️⃣ STATUS**
-
-> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
----
 ## 2️⃣ ☕ Charlie Café – Online Payment Integration + STRIPE
 
 
