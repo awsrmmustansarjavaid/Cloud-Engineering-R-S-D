@@ -2461,7 +2461,7 @@ For EVERY protected route (orders, metrics, export):
 
 This applies to EVERY Lambda that serves protected data.
 
-### 4️⃣ — Extract User Groups from JWT (CORE LOGIC)
+#### Step 4️⃣ — Extract User Groups from JWT (CORE LOGIC)
 
 #### ✅ Lambda Template (COPY AS-IS)
 
@@ -2494,6 +2494,48 @@ def lambda_handler(event, context):
     # -----------------------------
     # (Handled below per feature)
 ```
+#### 🧠 Why this matters
+
+Even if someone manually opens admin-dashboard.html, backend will BLOCK them.
+
+### 4️⃣ — ROLE-BASED PERMISSIONS (BACKEND)
+
+#### Step 5️⃣ — Protect CSV Export (Admins Only)
+
+```
+# Example flag from query or path
+export_csv = event.get("queryStringParameters", {}).get("export")
+
+# Admin-only action
+if export_csv and role != "Admin":
+    return {
+        "statusCode": 403,
+        "body": json.dumps({"message": "Admins only"})
+    }
+```
+
+#### Step 6️⃣ — Protect Metrics Endpoint
+
+```
+# Metrics endpoint logic
+if role != "Admin":
+    return {
+        "statusCode": 403,
+        "body": json.dumps({"message": "Admins only"})
+    }
+
+# Fetch metrics safely here
+```
+
+#### Step 7️⃣ — Orders Endpoint (Admin + Staff)
+
+```
+# Orders are allowed for both roles
+# No restriction needed
+fetch_orders()
+```
+
+
 
 ### 🔹 Lambda – Role-Based Permissions
 
