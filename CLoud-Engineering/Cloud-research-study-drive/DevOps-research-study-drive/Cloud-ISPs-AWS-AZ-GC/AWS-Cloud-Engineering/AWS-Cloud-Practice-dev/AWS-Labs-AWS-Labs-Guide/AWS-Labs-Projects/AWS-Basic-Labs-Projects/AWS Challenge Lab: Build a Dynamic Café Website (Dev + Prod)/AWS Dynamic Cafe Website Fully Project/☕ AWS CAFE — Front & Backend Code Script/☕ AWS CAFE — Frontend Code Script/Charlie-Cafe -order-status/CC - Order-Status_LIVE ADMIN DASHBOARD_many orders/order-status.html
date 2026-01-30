@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Charlie Cafe ☕ | Order Status</title>
 
-    <!-- BOOTSTRAP -->
+    <!-- ================= BOOTSTRAP ================= -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- GOOGLE FONT -->
+    <!-- ================= GOOGLE FONT ================= -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
@@ -74,12 +74,14 @@
 
 <div id="dashboard-container">
 
+<!-- ================= NAVBAR ================= -->
 <nav class="navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
     </div>
 </nav>
 
+<!-- ================= SIDEBAR ================= -->
 <div class="sidebar">
     <a href="dashboard.html">🏠 Main Dashboard</a>
     <a href="analytics.html">📈 Analytics</a>
@@ -88,14 +90,24 @@
     <a class="logout-btn" style="cursor:pointer">🚪 Logout</a>
 </div>
 
+<!-- ================= MAIN CONTENT ================= -->
 <div class="main-content">
     <div class="container">
         <div class="status-container">
 
-            <h2 class="text-center mb-5">📊 Live Order Status</h2>
+            <h2 class="text-center mb-4">📊 Live Order Status</h2>
 
+            <!-- ================= CSV EXPORT BUTTON ================= -->
+            <div class="d-flex justify-content-end mb-4">
+                <button class="btn btn-success" onclick="exportCSV()">
+                    ⬇ Export CSV
+                </button>
+            </div>
+
+            <!-- ================= METRICS ================= -->
             <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
 
+            <!-- ================= ORDERS TABLE ================= -->
             <div class="table-responsive">
                 <table class="table table-hover text-white">
                     <thead>
@@ -117,29 +129,35 @@
 
 </div>
 
-<!-- BOOTSTRAP JS -->
+<!-- ================= BOOTSTRAP JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- 🔐 CENTRAL AUTH (REQUIRED) -->
+<!-- ================= CENTRAL AUTH (REQUIRED) ================= -->
 <script src="/js/central-auth-api.js"></script>
 
 <script>
-/* ================= PROTECT PAGE ================= */
+/* =========================================================
+   PROTECT PAGE — redirect to login if not authenticated
+   ========================================================= */
 CHARLIE.auth.protectPage();
 
-/* ================= LOGOUT ================= */
+/* =========================================================
+   LOGOUT HANDLER
+   ========================================================= */
 document.querySelector(".logout-btn").onclick = () => {
     CHARLIE.auth.logout();
 };
 
-/* ================= FETCH DATA ================= */
+/* =========================================================
+   FETCH DASHBOARD DATA (METRICS + ORDERS)
+   ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
 
     CHARLIE.authFetch(
         `${CHARLIE.CONFIG.API_BASE}/order-status`
     )
     .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) throw new Error("Failed to fetch order status");
         return res.json();
     })
     .then(data => {
@@ -150,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         metricsDiv.innerHTML = "";
         ordersBody.innerHTML = "";
 
+        // Render metrics cards
         data.metrics.forEach(m => {
             metricsDiv.innerHTML += `
                 <div class="col-6 col-md-3">
@@ -160,6 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>`;
         });
 
+        // Render recent orders
         data.recent_orders.forEach(o => {
             ordersBody.innerHTML += `
                 <tr>
@@ -180,6 +200,41 @@ document.addEventListener("DOMContentLoaded", () => {
             </tr>`;
     });
 });
+
+/* =========================================================
+   CSV EXPORT FUNCTION (ADMIN ONLY)
+   ========================================================= */
+function exportCSV() {
+
+    // Build API URL with export flag
+    const url = `${CHARLIE.CONFIG.API_BASE}/order-status?export=true`;
+
+    // Use authenticated fetch (adds Bearer token automatically)
+    CHARLIE.authFetch(url)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("CSV export failed");
+            }
+            return res.blob(); // CSV file comes as a blob
+        })
+        .then(blob => {
+            // Create temporary download link
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "orders.csv";
+
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup
+            document.body.removeChild(link);
+        })
+        .catch(err => {
+            alert("❌ " + err.message);
+            console.error(err);
+        });
+}
 </script>
 
 </body>

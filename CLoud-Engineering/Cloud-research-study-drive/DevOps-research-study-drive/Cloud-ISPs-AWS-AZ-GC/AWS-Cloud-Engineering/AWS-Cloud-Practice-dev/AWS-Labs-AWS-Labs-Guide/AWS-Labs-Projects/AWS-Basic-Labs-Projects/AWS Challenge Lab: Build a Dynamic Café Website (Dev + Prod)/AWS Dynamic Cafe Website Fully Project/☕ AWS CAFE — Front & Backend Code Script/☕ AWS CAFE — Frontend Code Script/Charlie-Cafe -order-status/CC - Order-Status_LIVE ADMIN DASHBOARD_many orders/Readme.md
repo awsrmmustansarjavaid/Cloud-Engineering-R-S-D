@@ -2427,3 +2427,200 @@ document.addEventListener("DOMContentLoaded", () => {
 </body>
 </html>
 ```
+
+
+
+last updated
+
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charlie Cafe ☕ | Order Status</title>
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+        }
+
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #2b160a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 80px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 24px;
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sidebar a.active {
+            background: #3b1f0e;
+            color: #ff9800;
+            border-left: 4px solid #ff9800;
+        }
+
+        .navbar {
+            background-color: #3b1f0e !important;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding-top: 100px;
+        }
+
+        .status-container {
+            background: rgba(30, 30, 30, 0.75);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1100px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body style="display:none">
+
+<div id="dashboard-container">
+
+<nav class="navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<div class="sidebar">
+    <a href="dashboard.html">🏠 Main Dashboard</a>
+    <a href="analytics.html">📈 Analytics</a>
+    <a href="order-status.html" class="active">📦 Order Status</a>
+    <hr class="text-secondary">
+    <a class="logout-btn" style="cursor:pointer">🚪 Logout</a>
+</div>
+
+<div class="main-content">
+    <div class="container">
+        <div class="status-container">
+
+            <h2 class="text-center mb-5">📊 Live Order Status</h2>
+
+            <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+            <div class="table-responsive">
+                <table class="table table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Table</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- BOOTSTRAP JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 🔐 CENTRAL AUTH (REQUIRED) -->
+<script src="/js/central-auth-api.js"></script>
+
+<script>
+/* ================= PROTECT PAGE ================= */
+CHARLIE.auth.protectPage();
+
+/* ================= LOGOUT ================= */
+document.querySelector(".logout-btn").onclick = () => {
+    CHARLIE.auth.logout();
+};
+
+/* ================= FETCH DATA ================= */
+document.addEventListener("DOMContentLoaded", () => {
+
+    CHARLIE.authFetch(
+        `${CHARLIE.CONFIG.API_BASE}/order-status`
+    )
+    .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch");
+        return res.json();
+    })
+    .then(data => {
+
+        const metricsDiv = document.getElementById("metrics");
+        const ordersBody = document.getElementById("orders");
+
+        metricsDiv.innerHTML = "";
+        ordersBody.innerHTML = "";
+
+        data.metrics.forEach(m => {
+            metricsDiv.innerHTML += `
+                <div class="col-6 col-md-3">
+                    <div class="card bg-dark text-center p-3">
+                        <h6 class="text-warning">${m.metric}</h6>
+                        <h3>${m.count}</h3>
+                    </div>
+                </div>`;
+        });
+
+        data.recent_orders.forEach(o => {
+            ordersBody.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || "Anonymous"}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || "-"}</td>
+                    <td>${o.created_at}</td>
+                </tr>`;
+        });
+    })
+    .catch(err => {
+        document.getElementById("orders").innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger">
+                    ⚠️ ${err.message}
+                </td>
+            </tr>`;
+    });
+});
+</script>
+
+</body>
+</html>
+```
+
+---
+
