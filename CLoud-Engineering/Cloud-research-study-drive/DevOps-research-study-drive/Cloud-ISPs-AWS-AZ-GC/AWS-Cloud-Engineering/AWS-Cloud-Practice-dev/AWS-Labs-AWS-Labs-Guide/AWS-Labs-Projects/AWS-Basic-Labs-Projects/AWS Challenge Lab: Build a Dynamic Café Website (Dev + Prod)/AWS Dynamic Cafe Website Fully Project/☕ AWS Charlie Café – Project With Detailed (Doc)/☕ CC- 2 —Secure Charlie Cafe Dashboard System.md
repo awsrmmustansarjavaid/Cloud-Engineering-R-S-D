@@ -1883,7 +1883,12 @@ Under OAuth flows:
 
 ### 🌐 5️⃣ — CONFIGURE HOSTED UI (FOR LOGIN TEST)
 
-- Cognito → App integration → Domain
+- Go to:
+
+```
+AWS Console → Cognito → User Pools → YOUR POOL
+→ App integration → Domain
+```
 
 - Verify domain exists like:
 
@@ -1891,7 +1896,11 @@ Under OAuth flows:
 https://cafe-auth.auth.ap-south-1.amazoncognito.com
 ```
 
-**✔️ Copy this domain — you will use it.**
+✅ If domain exists → good
+
+❌ If not → create it (Amazon Cognito domain is fine)
+
+📌 **✔️ Copy this domain — you will use it.**
 
 ### 🔑 6️⃣ — GET JWT TOKEN (MANDATORY TEST)
 
