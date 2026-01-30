@@ -2390,49 +2390,109 @@ orders.csv
 
 ### 2️⃣ ADMIN VS STAFF ROLES
 
-### 🎯 Goal
 
-| Role            | Pages Allowed                                                   | Permissions                     |
-| --------------- | --------------------------------------------------------------- | ------------------------------- |
-| **Admin**       | `admin-dashboard.html`, `order-status.html`, future admin pages | Metrics ✅ Orders ✅ CSV Export ✅ |
-| **Staff**       | `order-status.html` only                                        | Orders ✅ Metrics ❌ CSV ❌        |
-| **Anyone else** | Nothing                                                         | ❌                               |
+### 1️⃣ AWS COGNITO (ROLE SOURCE OF TRUTH)
 
-> **⚠️ Important rule (SECURITY LAW)**
+#### Step 1️⃣ — Create Groups (ONE TIME ONLY)
 
-> Frontend hiding is NOT security, Backend MUST enforce roles
-> We will do both.
+- 📍 AWS Console → Cognito → User Pools → YourPool
 
-### 🔹 AWS Cognito Steps
+- Click Groups
 
-#### Step 1 — Create Groups
+- Click Create group
+
+#### Create Group #1
 
 ```
-Cognito → User Pool → Groups → Create Group
+Group name: Admin
+Description: Full access users
 ```
 
-- Group 1: Admin
-
-- Group 2: Staff
-
-#### Step 2 — Assign Users to Groups
+#### Create Group #2
 
 ```
-Users → select user → Add to group → Admin/Staff
+Group name: Staff
+Description: Order-only users
 ```
 
-#### Step 3 — Update Lambda for Role Check
+✅ Done.
+
+These names are case-sensitive → Admin, Staff
+
+#### Step 2️⃣ — Assign Users to Groups
+
+- 📍 Cognito → Users
+
+- Select a user
+
+- Click Add to group
+
+- Choose:
+
+  - Admin → for admin users
+
+  - Staff → for employees
+
+#### 🧠 Cognito will now automatically inject this into JWT:
 
 ```
-# After JWT validation
-user_groups = user.get("cognito:groups", [])
+cognito:groups = ["Admin"]
+```
 
-if "Admin" in user_groups:
-    role = "Admin"
-elif "Staff" in user_groups:
-    role = "Staff"
-else:
-    return {"statusCode": 403, "body": "Access denied"}
+### 2️⃣ API GATEWAY AUTHORIZATION (MANDATORY)
+
+#### Step 3️⃣ — Ensure Cognito Authorizer is Attached
+
+- 📍 API Gateway → Your API
+
+For EVERY protected route (orders, metrics, export):
+
+- Click route (GET /orders, GET /metrics, etc.)
+
+- Authorization → Cognito User Pool
+
+- Choose your user pool
+
+- Save & deploy
+
+**⚠️ If you skip this → Lambda receives unauthenticated users ❌**
+
+### 3️⃣ — LAMBDA ROLE EXTRACTION (BACKEND SECURITY)
+
+This applies to EVERY Lambda that serves protected data.
+
+### 4️⃣ — Extract User Groups from JWT (CORE LOGIC)
+
+#### ✅ Lambda Template (COPY AS-IS)
+
+```
+import json
+
+def lambda_handler(event, context):
+    # -----------------------------
+    # 1️⃣ Extract JWT claims
+    # -----------------------------
+    claims = event["requestContext"]["authorizer"]["claims"]
+
+    # Cognito groups (Admin / Staff)
+    user_groups = claims.get("cognito:groups", [])
+
+    # Normalize role
+    if "Admin" in user_groups:
+        role = "Admin"
+    elif "Staff" in user_groups:
+        role = "Staff"
+    else:
+        # User has no role → blocked
+        return {
+            "statusCode": 403,
+            "body": json.dumps({"message": "Access denied"})
+        }
+
+    # -----------------------------
+    # 2️⃣ Continue based on role
+    # -----------------------------
+    # (Handled below per feature)
 ```
 
 ### 🔹 Lambda – Role-Based Permissions
