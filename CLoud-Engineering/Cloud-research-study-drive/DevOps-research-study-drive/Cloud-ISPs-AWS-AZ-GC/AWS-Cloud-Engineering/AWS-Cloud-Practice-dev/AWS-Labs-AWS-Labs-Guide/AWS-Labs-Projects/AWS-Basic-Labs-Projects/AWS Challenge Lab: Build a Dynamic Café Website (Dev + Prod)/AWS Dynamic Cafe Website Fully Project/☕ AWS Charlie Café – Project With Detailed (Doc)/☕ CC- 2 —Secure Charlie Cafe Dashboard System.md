@@ -2438,37 +2438,77 @@ You now have enterprise-grade frontend security:
 
 ## PHASE 1️⃣ - CSV Export (Backend + Frontend)
 
-### 1️⃣ CSV EXPORT (Backend + Frontend)
+### 1️⃣ CSV EXPORT Backend (Lambda)
 
-
-
-### 🔹 Backend Steps (Lambda)
-
-#### Step 1 — Open your Lambda
+#### 1️⃣ — Open your Lambda
 
 - **AWS Console → Lambda → GetOrderStatusAdminLambda**
-
-
 
 [GetOrderStatusAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/GetOrderStatusAdminLambda.py)
 
 ✔ Now the Lambda supports CSV export.
 
-### 🔹 Frontend Steps
+### 2️⃣ CSV EXPORT Frontend
 
-#### Step 1 — Add Export Button
-
-
+#### 1️⃣ — Add Export Button
 
 [order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 
 ✔ Users can now download CSV of filtered or all orders.
 
+### 3️⃣ API GATEWAY CONFIGURATION (NO SKIP)
 
-**✅ PHASE 1 STATUS**
+#### 1️⃣ Resource
 
-> **🟢 PHASE 1 COMPLETE & VERIFIED**
+```
+GET /order-status
+```
+
+#### 2️⃣ Integration
+
+- Type: Lambda Proxy Integration
+
+- Lambda: order_status_lambda
+
+#### 3️⃣ Cognito Authorizer
+
+- Attach CognitoAuthorizer
+
+- Token source: Authorization
+
+#### 4️⃣ Enable CORS
+
+- Access-Control-Allow-Origin: *
+
+- Access-Control-Allow-Headers: Authorization,Content-Type
+
+### ✅ HOW FRONTEND CALLS THIS (CONFIRMED)
+
+#### 1️⃣ Normal dashboard
+
+```
+GET /order-status
+Authorization: Bearer <JWT>
+```
+
+#### 2️⃣ CSV Export
+
+```
+GET /order-status?export=true
+Authorization: Bearer <JWT>
+```
+
+#### ✅ Browser automatically downloads:
+
+```
+orders.csv
+```
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
 ## PHASE 2️⃣ - Admin vs Staff Roles (Cognito + Lambda + Frontend)
