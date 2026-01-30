@@ -1303,6 +1303,45 @@ orders = cursor.fetchall()
 ---
 # SECTION 2️⃣- 🏷️ Order Status – Advanced Features Guide
 
+## PHASE 1️⃣ - CSV Export (Backend + Frontend)
+
+### 1️⃣ CSV EXPORT (Backend + Frontend)
+
+### 🔹 Frontend Steps
+
+#### Inside dashboard HTML:
+
+```
+<button class="btn btn-success mt-3" onclick="exportCSV()">Export CSV</button>
+```
+
+#### Step 2 — Add JS function
+
+```
+function exportCSV(){
+  let url = API_URL + "?export=true";
+  const date = filterDate.value;
+  if(date) url += "&date=" + date;
+
+  const token = localStorage.getItem("token");
+  fetch(url, {
+    headers:{ Authorization: "Bearer " + token }
+  })
+  .then(res => res.blob())
+  .then(blob => {
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = "orders.csv";
+    link.click();
+  });
+}
+```
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
 
 
 

@@ -2482,33 +2482,7 @@ filter_date = params.get("date")
 
 #### Step 1 — Add Export Button
 
-#### Inside dashboard HTML:
 
-```
-<button class="btn btn-success mt-3" onclick="exportCSV()">Export CSV</button>
-```
-
-#### Step 2 — Add JS function
-
-```
-function exportCSV(){
-  let url = API_URL + "?export=true";
-  const date = filterDate.value;
-  if(date) url += "&date=" + date;
-
-  const token = localStorage.getItem("token");
-  fetch(url, {
-    headers:{ Authorization: "Bearer " + token }
-  })
-  .then(res => res.blob())
-  .then(blob => {
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = "orders.csv";
-    link.click();
-  });
-}
-```
 
 [order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
