@@ -2195,12 +2195,12 @@ Staff group     → Lambda restricted
 ---
 ## 🔐 PHASE 7️⃣ Secure & Security ARCHITECTURE Dashboard — Secure Admin Pages
 
-### 1️⃣ Centralize Authentication -  auth.js template (reusable)
-> **🧠 OPTION 1 (RECOMMENDED): auth.js (All logic in one file)**
+### 1️⃣ Centralize Authentication -  central-auth-api.js template (reusable)
+> **🧠 OPTION 1 (RECOMMENDED): central-auth-api.js (All logic in one file)**
 
-### 1️⃣ 📄 /admin/assets/auth.js
+### 1️⃣ 📄 /admin/assets/central-auth-api.js
 
-[auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/auth.js)
+[central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
 ### 2️⃣  🔧 Auth.js Minimal Configuration Replacement
 
@@ -2211,132 +2211,6 @@ const CLIENT_ID = "YOUR_APP_CLIENT_ID";             // Replace with your App Cli
 const COGNITO_DOMAIN = "YOUR_DOMAIN.auth.ap-south-1.amazoncognito.com"; // Replace with your Cognito Hosted UI domain
 const REDIRECT_URI = window.location.origin + window.location.pathname; // Usually fine as-is
 ```
-
-#### ✅ Notes:
-
-- USER_POOL_ID → from AWS Cognito → User Pool → General settings → Pool ID
-
-- CLIENT_ID → from App client inside your Cognito User Pool → App client ID
-
-- COGNITO_DOMAIN → Cognito Hosted UI domain you set up (e.g., charliecafe-admin.auth.ap-south-1.amazoncognito.com)
-
-- REDIRECT_URI → usually leave as-is, unless you are using a custom domain or CloudFront URL.
-
-- No other changes are required in your existing auth.js. This will fully connect it to your own lab environment.
-
-### 3️⃣  How to use it in ALL admin pages
-
-#### 🔐 STEP 1 — Hide page until auth passes
-
-At top of every admin HTML file:
-
-```
-<body style="display:none">
-```
-
-#### 🔐 STEP 2 — Load auth.js
-
-Before your page’s own JS:
-
-```
-<script src="assets/auth.js"></script>
-```
-
-#### 🔐 STEP 3 — Protect page
-
-At the bottom:
-
-```
-<script>
-protectPage();
-</script>
-```
-
-**✅ That’s it. Page is secured.**
-
-#### 🧪 Example: order-status.html
-
-```
-<body style="display:none">
-
-<script src="assets/auth.js"></script>
-
-<script>
-protectPage();
-
-authFetch(API_URL)
-    .then(res => res.json())
-    .then(data => console.log(data));
-</script>
-```
-
-#### 🧪 Example: analytics.html
-
-```
-<body style="display:none">
-
-<script src="assets/auth.js"></script>
-
-<script>
-protectPage();
-
-authFetch("https://api.example.com/admin/analytics")
-    .then(res => res.json())
-    .then(data => console.log(data));
-</script>
-```
-
-### 🔒 EXTRA SECURITY (OPTIONAL BUT IMPRESSIVE)
-
-#### 🔐 1. Protect APIs (MANDATORY)
-
-- API Gateway → Cognito Authorizer
-
-- Reject requests without valid JWT
-
-#### 🔐 2. Cognito Groups
-
-- Admin
-
-- Staff
-
-- Manager
-
-Then in auth.js: 
-
-```
-parseJwt(token)["cognito:groups"]
-```
-
-#### 🔐 3. CloudFront
-
-- HTTPS only
-
-- Disable directory listing
-
-- Add security headers
-
-
-### 2️⃣ SECURE DASHBOARD AUTH MODULE (Cognito Protection - secure-dashboard.js)
-> **DEPLOY FINAL FRONTEND Cognito Protection (WRITE ONCE ✅)**
-
-### 🧩 STEP 1 — Create secure-dashboard.js
-
-Create a new file:
-
-```
-secure-dashboard.js
-```
-
-**📌 This file becomes the security engine for all dashboards.**
-
-
-### 🧩 STEP 2 — Add Full Secure Dashboard Module Code
-> **📄 /admin/assets/secure-dashboard.js**
-
-[secure-dashboard.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/secure-dashboard.js)
-
-
 ### 🧩 STEP 3 — Update Dashboard HTML (Minimal Change)
 
 #### ⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps of phase 1.
