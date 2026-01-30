@@ -2535,6 +2535,145 @@ if role != "Admin":
 fetch_orders()
 ```
 
+#### ✅ Backend Security Matrix
+
+| Endpoint      | Admin | Staff |
+| ------------- | ----- | ----- |
+| `/orders`     | ✅     | ✅     |
+| `/metrics`    | ✅     | ❌     |
+| `/export-csv` | ✅     | ❌     |
+
+
+### 5️⃣ — FRONTEND AUTH FOUNDATION (REUSABLE)
+
+This file will be reused across all pages.
+
+#### Step 8️⃣ — Create central-auth.js (IMPORTANT)
+
+- 📍 Place this in /js/central-auth.js
+
+```
+// ===============================
+// CENTRAL AUTH FILE (REUSABLE)
+// ===============================
+
+// Decode JWT payload
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+}
+
+// Get logged-in user role
+function getUserRole() {
+    const token = localStorage.getItem("idToken");
+    if (!token) return null;
+
+    const payload = parseJwt(token);
+    return payload["cognito:groups"] || [];
+}
+
+// Page-level access control
+function requireRole(requiredRole) {
+    const groups = getUserRole();
+
+    if (!groups || !groups.includes(requiredRole)) {
+        alert("Access denied");
+        window.location.href = "login.html";
+    }
+}
+```
+
+#### 🧠 This is your future-proof system
+
+You’ll reuse it for every page later.
+
+### 6️⃣ — ADMIN DASHBOARD (ADMIN ONLY)
+
+#### Step 9️⃣ — Protect admin-dashboard.html
+
+```
+<script src="js/central-auth.js"></script>
+
+<script>
+    // 🚨 Block non-admin users
+    requireRole("Admin");
+</script>
+```
+
+#### Step 🔟 — Hide UI for Non-Admins (Extra Safety)
+
+```
+const userGroups = getUserRole();
+
+if (!userGroups.includes("Admin")) {
+    document.getElementById("exportCSVButton").style.display = "none";
+    document.getElementById("metricsSection").style.display = "none";
+}
+```
+
+⚠️ UI hiding = UX only, not security
+Backend already blocks access.
+
+### 7️⃣ — STAFF PAGE (ORDER STATUS)
+
+#### Step 1️⃣1️⃣ — Protect order-status.html
+
+```
+<script src="js/central-auth.js"></script>
+
+<script>
+    // Allow Admin or Staff
+    const groups = getUserRole();
+    if (!groups.includes("Admin") && !groups.includes("Staff")) {
+        alert("Access denied");
+        window.location.href = "login.html";
+    }
+</script>
+```
+
+#### Step 1️⃣2️⃣ — Hide Admin Features for Staff
+
+```
+const groups = getUserRole();
+
+if (!groups.includes("Admin")) {
+    document.getElementById("exportCSVButton").style.display = "none";
+    document.getElementById("metricsSection").style.display = "none";
+}
+```
+
+### 8️⃣ — VERIFY EVERYTHING (DO NOT SKIP)
+
+#### ✅ Test Case 1 — Admin User
+
+✔ Can open admin-dashboard.html
+
+✔ Can see metrics
+
+✔ Can export CSV
+
+✔ Can open order-status.html
+
+#### ✅ Test Case 2 — Staff User
+
+✔ Can open order-status.html
+
+❌ Cannot open admin-dashboard.html
+
+❌ Cannot access /metrics API
+
+❌ CSV export returns 403
+
+❌ Test Case 3 — Manual URL Hack
+
+#### Staff opens:
+
+```
+/export-csv
+```
+
+**👉 403 Forbidden (Backend stops it)**
 
 
 ### 🔹 Lambda – Role-Based Permissions
