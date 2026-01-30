@@ -2385,15 +2385,23 @@ orders.csv
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 2️⃣ - Admin vs Staff Roles (Cognito + Lambda + Frontend)
+## PHASE 2️⃣ - Admin vs Staff Roles 
+> **(Cognito + API Gateway + Lambda + Frontend)**
 
 ### 2️⃣ ADMIN VS STAFF ROLES
 
 ### 🎯 Goal
 
-- **Admin → Full access (metrics + orders + export)**
+| Role            | Pages Allowed                                                   | Permissions                     |
+| --------------- | --------------------------------------------------------------- | ------------------------------- |
+| **Admin**       | `admin-dashboard.html`, `order-status.html`, future admin pages | Metrics ✅ Orders ✅ CSV Export ✅ |
+| **Staff**       | `order-status.html` only                                        | Orders ✅ Metrics ❌ CSV ❌        |
+| **Anyone else** | Nothing                                                         | ❌                               |
 
-- **Staff → Limited access (orders only, no export, no metrics)**
+> **⚠️ Important rule (SECURITY LAW)**
+
+> Frontend hiding is NOT security, Backend MUST enforce roles
+> We will do both.
 
 ### 🔹 AWS Cognito Steps
 
