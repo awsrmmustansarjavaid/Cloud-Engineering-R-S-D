@@ -1919,9 +1919,12 @@ https://YOUR_DOMAIN/login
 #### Example:
 
 ```
-https://cafe-auth.auth.ap-south-1.amazoncognito.com/login?response_type=token&client_id=abc123&redirect_uri=https://jwt.io
+https://cafe-auth.auth.ap-south-1.amazoncognito.com/login
+?response_type=token
+&client_id=abc123
+&scope=email+openid
+&redirect_uri=https://jwt.io
 ```
-
 #### 2️⃣ Login with Admin user
 
 You will be redirected to jwt.io
