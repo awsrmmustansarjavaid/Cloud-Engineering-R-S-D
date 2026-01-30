@@ -1909,10 +1909,11 @@ https://cafe-auth.auth.ap-south-1.amazoncognito.com
 #### Paste this (replace values):
 
 ```
-https://YOUR_DOMAIN/login?
-response_type=token&
-client_id=YOUR_CLIENT_ID&
-redirect_uri=https://jwt.io
+https://YOUR_DOMAIN/login
+?response_type=token
+&client_id=YOUR_CLIENT_ID
+&scope=email+openid
+&redirect_uri=https://jwt.io
 ```
 
 #### Example:
