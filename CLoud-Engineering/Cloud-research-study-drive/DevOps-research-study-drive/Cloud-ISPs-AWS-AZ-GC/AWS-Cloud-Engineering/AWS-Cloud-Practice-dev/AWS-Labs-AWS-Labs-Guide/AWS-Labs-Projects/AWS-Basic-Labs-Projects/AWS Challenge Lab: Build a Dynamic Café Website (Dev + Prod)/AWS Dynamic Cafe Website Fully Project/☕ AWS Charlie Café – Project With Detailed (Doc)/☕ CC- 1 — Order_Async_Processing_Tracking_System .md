@@ -2579,7 +2579,7 @@ payment_status = PENDING
 
 ## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
 
-### 🟦 STEP 1 — CREATE ADMIN LAMBDA
+### 1️⃣ — CREATE ADMIN LAMBDA
 
 #### 🔹 1.1 Open AWS Lambda
 
@@ -2598,7 +2598,7 @@ payment_status = PENDING
 
 - Click Create function
 
-### 🟦 STEP 2 — IAM PERMISSIONS (CRITICAL)
+### 2️⃣ — IAM PERMISSIONS (CRITICAL)
 
 Lambda needs UpdateItem permission for your table.
 
@@ -2629,15 +2629,13 @@ AdminMarkPaidLambda
 
 **⚠️ If missing → Admin cannot mark paid.**
 
-### 🟦 STEP 3 — ADMIN LAMBDA CODE (WITH COMMENTS)
-
-
+### 3️⃣ — ADMIN LAMBDA CODE (WITH COMMENTS)
 
 #### Replace entire Lambda code with this:
 
 [AdminMarkPaidLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminMarkPaidLambda.py)
 
-### 🟦 STEP 4 — CREATE ADMIN API ENDPOINT
+### 4️⃣ — CREATE ADMIN API ENDPOINT
 
 #### 🔹 4.1 Open API Gateway
 
@@ -2702,11 +2700,11 @@ This creates endpoint /admin/mark-paid
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 ```
 
-### 🟦 STEP 5 — admin-orders.php
+### 5️⃣ — admin-orders.php
 
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
 
-### 4️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
+### 6️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
 
 Add a button to print / track order after payment is confirmed:
 
@@ -2719,7 +2717,7 @@ Add a button to print / track order after payment is confirmed:
 <?php endif; ?>
 ```
 
-### 5️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
+### 7️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
 
 Replace button logic with:
 
@@ -2734,7 +2732,7 @@ Replace button logic with:
 ```
 
 
-### 🟦 STEP 6 — ADMIN TEST (IMPORTANT)
+### 8️⃣ — ADMIN TEST (IMPORTANT)
 
 - Customer places CASH order → order.php → payment-status.php shows Pay at Counter
 
