@@ -1307,6 +1307,62 @@ orders = cursor.fetchall()
 
 ### 1️⃣ CSV EXPORT (Backend + Frontend)
 
+#### 🎯 Goal: Allow admin to export all order data or filtered by date to a CSV file.
+
+### 🔹 Backend Steps (Lambda)
+
+#### Step 2 — Install CSV library (Python)
+
+#### If using Python:
+
+```
+# Use Lambda Layer for pandas or csv
+```
+
+#### Step 3 — Modify Lambda to add CSV output
+
+#### Add query parameter:
+
+```
+params = event.get("queryStringParameters") or {}
+export_csv = params.get("export") == "true"
+```
+
+#### Fetch orders (with date filter if needed):
+
+```
+filter_date = params.get("date")
+# Apply filter logic as shown in Task 3
+```
+
+#### If export_csv == True, generate CSV:
+
+```
+import csv
+import io
+
+if export_csv:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Customer", "Item", "Quantity", "Table", "Date"])
+    for o in orders:
+        writer.writerow([o["customer_name"], o["item"], o["quantity"], o["table_number"], o["created_at"]])
+    
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "text/csv",
+            "Content-Disposition": "attachment; filename=orders.csv",
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": output.getvalue()
+    }
+```
+
+
+
+
+
 ### 🔹 Frontend Steps
 
 #### Inside dashboard HTML:

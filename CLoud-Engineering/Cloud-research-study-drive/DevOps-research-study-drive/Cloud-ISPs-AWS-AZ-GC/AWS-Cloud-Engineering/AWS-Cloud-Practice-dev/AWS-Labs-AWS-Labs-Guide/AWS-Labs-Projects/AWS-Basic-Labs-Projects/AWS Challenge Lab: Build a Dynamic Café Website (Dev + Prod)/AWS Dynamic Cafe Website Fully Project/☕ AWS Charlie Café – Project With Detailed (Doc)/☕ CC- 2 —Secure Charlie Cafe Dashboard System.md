@@ -2440,7 +2440,7 @@ You now have enterprise-grade frontend security:
 
 ### 1️⃣ CSV EXPORT (Backend + Frontend)
 
-#### 🎯 Goal: Allow admin to export all order data or filtered by date to a CSV file.
+
 
 ### 🔹 Backend Steps (Lambda)
 
@@ -2448,31 +2448,7 @@ You now have enterprise-grade frontend security:
 
 - **AWS Console → Lambda → GetOrderStatusAdminLambda**
 
-#### Step 2 — Install CSV library (Python)
 
-#### If using Python:
-
-```
-# Use Lambda Layer for pandas or csv
-```
-
-#### Step 3 — Modify Lambda to add CSV output
-
-#### Add query parameter:
-
-```
-params = event.get("queryStringParameters") or {}
-export_csv = params.get("export") == "true"
-```
-
-#### Fetch orders (with date filter if needed):
-
-```
-filter_date = params.get("date")
-# Apply filter logic as shown in Task 3
-```
-
-#### If export_csv == True, generate CSV:
 
 [GetOrderStatusAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/GetOrderStatusAdminLambda.py)
 
