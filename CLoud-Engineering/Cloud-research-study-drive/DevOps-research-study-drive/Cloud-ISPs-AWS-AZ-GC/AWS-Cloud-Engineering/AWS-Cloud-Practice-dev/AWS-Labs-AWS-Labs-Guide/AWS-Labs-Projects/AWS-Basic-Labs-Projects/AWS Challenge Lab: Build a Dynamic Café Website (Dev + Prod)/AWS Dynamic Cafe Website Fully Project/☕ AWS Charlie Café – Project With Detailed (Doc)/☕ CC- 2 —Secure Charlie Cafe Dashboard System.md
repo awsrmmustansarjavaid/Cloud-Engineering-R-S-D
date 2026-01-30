@@ -1471,17 +1471,152 @@ Authorization: Bearer <access_token>
 
 - ✅ Receive JSON response
 
+#### 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
+
+#### STEP 1️⃣ Open Cognito Hosted UI Login
+
+- Go to AWS Console → Cognito → User Pools → Your pool
+
+- Click App integration → App client settings
+
+#### You will see:
+
+- Domain
+
+- Client ID
+
+- Callback URL
+
+- Allowed OAuth flows
+
+#### STEP 2️⃣ Construct the LOGIN URL
+
+Open browser and paste (replace values):
+
+```
+https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=token
+&scope=email+openid
+&redirect_uri=https://example.com
+```
+
+#### 📌 Example:
+
+```
+https://charlie-cafe.auth.us-east-1.amazoncognito.com/login
+?client_id=4abc123xyz
+&response_type=token
+&scope=email+openid
+&redirect_uri=https://example.com
+```
+
+- 👉 Press Enter
+
+#### STEP 3️⃣ Login Screen Appears
+
+- Enter username & password
+
+- Click Sign in
+
+If login is successful → browser redirects to:
+
+```
+https://example.com/#access_token=eyJraWQiOiJr...
+```
+
+#### STEP 4️⃣ COPY THE ACCESS TOKEN
+
+From the URL bar, copy ONLY this part:
+
+```
+access_token=eyJraWQiOiJr...
+```
+
+#### ⚠️ Do NOT copy:
+
+- id_token
+
+- expires_in
+
+- token_type
+
+👉 You need access_token
+
+#### STEP 5️⃣ Use Token in API Call (Browser DevTools)
+
+Open Chrome DevTools → Console
+
+Paste:
+
+```
+fetch("https://API_ID.execute-api.REGION.amazonaws.com/status/order-status", {
+  headers: {
+    "Authorization": "Bearer YOUR_ACCESS_TOKEN"
+  }
+})
+.then(res => res.json())
+.then(data => console.log(data));
+```
+
+#### ✅ EXPECTED RESULT
+
+```
+{
+  "orders": [...],
+  "metrics": {...}
+}
+```
+
+🎉 DONE — frontend token works.
+
+#### 🧪 METHOD 2 — curl (CLI / AWS TESTING)
+
+Use this after you already have the token.
+
+#### STEP 1️⃣ Open Terminal / CMD
+
+#### STEP 2️⃣ Run curl Command
+
 - Make GET request with header:
 
 ```
-curl -H "Authorization: Bearer <access_token>" \
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
 https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
 ```
 
-#### ✅ Expected:
+#### 📌 Example:
+
+```
+curl -H "Authorization: Bearer eyJraWQiOiJr..." \
+https://abcd123.execute-api.us-east-1.amazonaws.com/status/order-status
+```
+
+#### ✅ EXPECTED RESPONSES
 
 ```
 JSON response with metrics + recent orders
+```
+
+#### ✅ SUCCESS (200)
+
+```
+{
+  "orders": [...],
+  "metrics": {...}
+}
+```
+
+#### ❌ NO TOKEN
+
+```
+{"message":"Unauthorized"}
+```
+
+#### ❌ INVALID TOKEN
+
+```
+401 Unauthorized
 ```
 
 #### 3️⃣ Date Filter Test
