@@ -305,7 +305,7 @@ dashboard.html
 | -------------------- | --------------------------------- |
 | Origin Path          | ❌ Empty                           |
 | Default Root Object  | ✅ `dashboard.html`             |
-| File location on EC2 | `/var/www/html/order-status.html` |
+| File location on EC2 | `/var/www/html/dashboard.html` |
 
 
 This ensures:
