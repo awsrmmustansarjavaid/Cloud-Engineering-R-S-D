@@ -1929,7 +1929,25 @@ https://cafe-auth.auth.ap-south-1.amazoncognito.com/login
 
 You will be redirected to jwt.io
 
+- Login with Admin user
+
+- After success → browser redirects to jwt.io
+
+The URL bar will look like this:
+
+```
+https://jwt.io/#access_token=eyJraWQiOiJr...
+&id_token=eyJraWQiOiJr...
+&expires_in=3600
+```
+
 #### 3️⃣ COPY ID TOKEN (IMPORTANT)
+
+👉 Copy access_token ONLY
+
+❌ Do NOT use id_token
+
+❌ Do NOT copy the whole URL
 
 It looks like: 
 
@@ -1943,23 +1961,68 @@ eyJraWQiOiJLT...
 
 ### 🧪 7️⃣ — VERIFY TOKEN CONTENT (NO SKIP)
 
-- On jwt.io
+What you SHOULD verify on jwt.io
 
-- Paste ID token
+- Paste the access_token into jwt.io
 
-#### Verify payload contains:
+You should see payload like:
 
 ```
 {
-  "email": "...",
-  "cognito:groups": ["Admin"],
-  "iss": "https://cognito-idp..."
+  "iss": "https://cognito-idp.ap-south-1.amazonaws.com/...",
+  "client_id": "abc123",
+  "scope": "email openid",
+  "token_use": "access"
 }
 ```
 
-✔ If cognito:groups exists → continue
+✅ token_use = access → CORRECT
 
-❌ If missing → user NOT in group → FIX STEP 3
+❌ If token_use = id → wrong token
+
+#### ⚠️ About cognito:groups
+
+Important clarity:
+
+- cognito:groups usually appears in id_token
+
+- API Gateway does NOT require it
+
+- For your current lab → ignore groups
+
+Groups matter later for:
+
+- Admin-only Lambdas
+
+- Role-based access
+
+Not for basic auth testing.
+
+#### ✅ FINAL STEP — CALL API GATEWAY (THIS IS THE GOAL)
+
+Now run:
+
+```
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
+
+#### ✅ EXPECTED RESULTS
+
+#### ✅ Success
+
+```
+{
+  "orders": [...],
+  "metrics": {...}
+}
+```
+
+#### ❌ Missing / wrong token
+
+```
+401 Unauthorized
+```
 
 #### 🚪 8️⃣ — CREATE API GATEWAY COGNITO AUTHORIZER
 > **If you did not create then follow this step... otherwisse leave it**
