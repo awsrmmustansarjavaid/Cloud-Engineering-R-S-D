@@ -1031,3 +1031,58 @@ def lambda_handler(event, context):
             })
         }
 ```
+
+#### Step 1.3 – Add Lambda Code
+
+Replace entire code with:
+
+```
+# ===========================================
+# AdminMarkPaidLambda
+# Purpose:
+# - Admin marks CASH orders as PAID
+# ===========================================
+
+import json
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+def lambda_handler(event, context):
+    """
+    Expects POST JSON:
+    { "order_id": "ORD-123456" }
+    """
+
+    try:
+        # Parse request body
+        body = json.loads(event['body'])
+        order_id = body['order_id']
+
+        # Update order status
+        table.update_item(
+            Key={'order_id': order_id},
+            UpdateExpression="SET payment_status = :ps",
+            ExpressionAttributeValues={':ps': 'PAID'}
+        )
+
+        return {
+            "statusCode": 200,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({
+                "success": True,
+                "message": "Order marked as PAID"
+            })
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"success": False, "error": str(e)})
+        }
+```
+
+---
+

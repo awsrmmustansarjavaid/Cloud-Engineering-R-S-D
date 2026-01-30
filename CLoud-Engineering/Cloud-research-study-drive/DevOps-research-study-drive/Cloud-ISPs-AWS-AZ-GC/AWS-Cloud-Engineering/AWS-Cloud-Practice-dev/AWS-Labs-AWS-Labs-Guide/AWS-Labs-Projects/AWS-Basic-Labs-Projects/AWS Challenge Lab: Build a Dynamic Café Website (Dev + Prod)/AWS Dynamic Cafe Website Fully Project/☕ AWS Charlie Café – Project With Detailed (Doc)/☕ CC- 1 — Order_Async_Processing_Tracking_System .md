@@ -2641,11 +2641,11 @@ AdminMarkPaidLambda
 
 #### 🔹 4.1 Open API Gateway
 
-- AWS Console → API Gateway
-
-- Select your existing REST API
+- AWS Console → API Gateway → Choose your existing REST API (or create a new one)
 
 #### 🔹 4.2 Create Resource
+
+- Select your API → Actions → Create Resource
 
 ```
 /admin
@@ -2661,6 +2661,10 @@ AdminMarkPaidLambda
 - Resource name: admin
 
 - Create sub-resource → mark-paid
+
+> **Resource Name: admin → Create Sub-resource mark-paid**
+
+This creates endpoint /admin/mark-paid
 
 #### 🔹 4.3 Create POST Method
 
@@ -2693,6 +2697,36 @@ AdminMarkPaidLambda
 - Deploy
 
 📌 Endpoint URL:
+
+```
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
+```
+
+#### Step 2.1 – Open API Gateway Console
+
+
+
+#### Step 2.2 – Add Resource /admin/mark-paid
+
+
+
+#### Step 2.3 – Add POST Method
+
+- Select /admin/mark-paid → Create Method → POST
+
+- Integration type → Lambda Function
+
+- Lambda → AdminMarkPaidLambda → Save
+
+- Enable CORS: Actions → Enable CORS → Accept defaults → Save
+
+#### Step 2.4 – Deploy API
+
+- Actions → Deploy API
+
+- Stage → dev
+
+Note the endpoint URL:
 
 ```
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
@@ -2861,101 +2895,15 @@ Below is a clean, correct version aligned with your flow.
 ## ☕ CHARLIE CAFÉ PHASE 5️⃣ 🔁 admin-orders.php
 
 
-
 ### 2️⃣ Backend Configuration
 
-### 1️⃣ CREATE ADMIN LAMBDA
 
 
 
-
-#### Step 1.3 – Add Lambda Code
-
-Replace entire code with:
-
-```
-# ===========================================
-# AdminMarkPaidLambda
-# Purpose:
-# - Admin marks CASH orders as PAID
-# ===========================================
-
-import json
-import boto3
-
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('CafeOrders')
-
-def lambda_handler(event, context):
-    """
-    Expects POST JSON:
-    { "order_id": "ORD-123456" }
-    """
-
-    try:
-        # Parse request body
-        body = json.loads(event['body'])
-        order_id = body['order_id']
-
-        # Update order status
-        table.update_item(
-            Key={'order_id': order_id},
-            UpdateExpression="SET payment_status = :ps",
-            ExpressionAttributeValues={':ps': 'PAID'}
-        )
-
-        return {
-            "statusCode": 200,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({
-                "success": True,
-                "message": "Order marked as PAID"
-            })
-        }
-
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"success": False, "error": str(e)})
-        }
-```
 
 ### 2️⃣ CREATE API GATEWAY ENDPOINT
 
-#### Step 2.1 – Open API Gateway Console
 
-- AWS Console → API Gateway → Choose your existing REST API (or create a new one)
-
-#### Step 2.2 – Add Resource /admin/mark-paid
-
-- Select your API → Actions → Create Resource
-
-- Resource Name: admin → Create Sub-resource mark-paid
-
-This creates endpoint /admin/mark-paid
-
-#### Step 2.3 – Add POST Method
-
-- Select /admin/mark-paid → Create Method → POST
-
-- Integration type → Lambda Function
-
-- Lambda → AdminMarkPaidLambda → Save
-
-- Enable CORS: Actions → Enable CORS → Accept defaults → Save
-
-#### Step 2.4 – Deploy API
-
-- Actions → Deploy API
-
-- Stage → dev
-
-Note the endpoint URL:
-
-```
-POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
-```
 
 ### 3️⃣ CREATE ADMIN FRONT-END PAGE
 
