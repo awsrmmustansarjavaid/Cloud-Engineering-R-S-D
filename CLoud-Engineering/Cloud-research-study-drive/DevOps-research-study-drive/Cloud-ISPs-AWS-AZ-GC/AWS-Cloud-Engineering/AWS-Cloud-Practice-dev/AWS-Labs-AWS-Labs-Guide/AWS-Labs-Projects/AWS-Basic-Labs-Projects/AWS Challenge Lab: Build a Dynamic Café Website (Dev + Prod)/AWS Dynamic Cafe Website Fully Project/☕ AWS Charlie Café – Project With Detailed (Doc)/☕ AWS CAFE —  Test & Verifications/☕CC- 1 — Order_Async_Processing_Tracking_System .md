@@ -1553,7 +1553,7 @@ curl -X POST \
 
 ✔ If this works → continue
 
-### 🧑‍💻 STEP 4 — CREATE WORKER (KITCHEN) LAMBDA
+### 🧪 STEP 6 — TEST STATUS FLOW (MANDATORY)
 
 #### Test 1: RECEIVED → PREPARING
 
