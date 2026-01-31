@@ -353,7 +353,7 @@ CafeDevWebServer
 ### 2️⃣ Charile Cafe Mega USER DATA
 > **📍 File Location: charlie-cafe-mega-setup.sh**
 
-[Charile Cafe Mega Bash-Script](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Charile%20Cafe%20Mega%20Bash-Script/charlie-cafe-mega-setup.sh)
+[Charile Cafe Mega Bash-Script](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Charile%20Cafe%20Mega%20Bash-Script/charlie-cafe-mega-setup.sh)
 
 
 
