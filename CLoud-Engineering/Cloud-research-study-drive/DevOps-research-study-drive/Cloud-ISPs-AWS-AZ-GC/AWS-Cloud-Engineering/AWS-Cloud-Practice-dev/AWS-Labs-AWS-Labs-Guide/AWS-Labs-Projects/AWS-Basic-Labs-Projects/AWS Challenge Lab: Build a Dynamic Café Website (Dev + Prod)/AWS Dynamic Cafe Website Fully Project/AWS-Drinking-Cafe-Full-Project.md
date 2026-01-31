@@ -556,6 +556,10 @@ INSERT INTO orders (table_number, customer_name, item, quantity) VALUES
 ### 7️⃣ Verify:
 
 ```
+DESCRIBE orders;
+```
+
+```
 SELECT * FROM orders;
 ```
 
