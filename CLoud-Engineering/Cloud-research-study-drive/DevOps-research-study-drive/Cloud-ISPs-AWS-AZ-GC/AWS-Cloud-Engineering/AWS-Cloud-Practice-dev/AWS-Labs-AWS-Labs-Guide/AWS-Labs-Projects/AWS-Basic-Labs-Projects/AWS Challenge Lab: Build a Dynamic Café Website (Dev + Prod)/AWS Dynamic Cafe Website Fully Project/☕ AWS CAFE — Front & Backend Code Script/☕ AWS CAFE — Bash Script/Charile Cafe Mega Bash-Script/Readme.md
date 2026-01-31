@@ -23,6 +23,17 @@
 
 Has clear comments so future-you won’t get lost
 
+### 🧠 WHAT THIS SCRIPT SAVES YOU
+
+| Task         | Manual Time | Now   |
+| ------------ | ----------- | ----- |
+| EC2 setup    | 30 min      | 2 min |
+| DB creation  | 20 min      | auto  |
+| Lambda layer | 15 min      | auto  |
+| JS config    | error-prone | safe  |
+| Permissions  | forgotten   | fixed |
+
+
 **Below is a PRODUCTION-QUALITY MEGA SCRIPT 🧠🔥**
 
 You can save this as:
