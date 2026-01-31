@@ -348,12 +348,12 @@ CafeDevWebServer
 ### 1️⃣ LAMP Server USER DATA
 > **📍 File Location: AWS-LAMP Server-Bash-Script.md**
 
-[AWS-LAMP Server Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
+[AWS-LAMP Server Bash-Script](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/☕%20AWS%20CAFE%20—%20EC2%20Lamp%20Server%20Script.sh)
 
 ### 2️⃣ Charile Cafe Mega USER DATA
 > **📍 File Location: AWS-LAMP Server-Bash-Script.md**
 
-[Charile Cafe Mega Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
+[Charile Cafe Mega Bash-Script](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Charile%20Cafe%20Mega%20Bash-Script/charlie-cafe-mega-setup.sh)
 
 
 
