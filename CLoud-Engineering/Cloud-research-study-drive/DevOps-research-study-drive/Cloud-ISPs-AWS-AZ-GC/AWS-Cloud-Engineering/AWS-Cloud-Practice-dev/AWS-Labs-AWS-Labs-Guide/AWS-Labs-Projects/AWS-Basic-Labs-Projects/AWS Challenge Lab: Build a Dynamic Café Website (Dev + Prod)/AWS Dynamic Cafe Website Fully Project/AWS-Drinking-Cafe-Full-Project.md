@@ -292,7 +292,38 @@ CloudWatchLogsFullAccess
 
 **✔️ Click Create policy**
 
+#### 7️⃣ Create IAM Policy FOR CashPaymentLambda
+> **⚠️ If this is missing → Lambda WILL FAIL.**
 
+- **Custom Policy name:** 
+
+```
+CashPaymentLambda
+```
+
+Attach this policy (or ensure it exists):
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": "arn:aws:dynamodb:us-east-1:9180599465397:table/CafeOrders"
+    }
+  ]
+}
+```
+
+**✔️ Click Create policy**
 
 - **✔️ Click Create IAM ROLE**
 

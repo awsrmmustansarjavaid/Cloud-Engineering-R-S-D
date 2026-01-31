@@ -2559,39 +2559,7 @@ DESCRIBE orders;
 
 - Click Create function
 
-#### 🔹 Step 2.2 — IAM PERMISSIONS (CRITICAL)
-
-#### Open:
-
-```
-CashPaymentLambda → Configuration → Permissions → Role
-```
-
-Attach this policy (or ensure it exists):
-
-```
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:GetItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Query",
-        "dynamodb:Scan"
-      ],
-      "Resource": "arn:aws:dynamodb:us-east-1:9180599465397:table/CafeOrders"
-    }
-  ]
-}
-```
-
-**⚠️ If this is missing → Lambda WILL FAIL.**
-
-#### 🔹 Step 2.3 — ADD LAMBDA CODE (WITH COMMENTS)
+#### 🔹 Step 2.2 — ADD LAMBDA CODE (WITH COMMENTS)
 
 #### Replace entire code with this:
 
