@@ -2483,6 +2483,12 @@ You will simply start writing these attributes:
 
 > **Your existing table is fine — just extend it**
 
+- Click Explore table items (or Items tab) → Create item.
+
+- Use JSON view for ease.
+
+
+
 ✅ Nothing else to configure here
 
 ✅ DynamoDB auto-creates attributes
