@@ -1979,12 +1979,20 @@ POST /admin/mark-paid
 payment_status = PAID
 ```
 
-
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ CHARLIE CAFÉ PHASE 3️⃣ Order status page understands CARD vs CASH
+
+
+
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+
 # 🟢 SECTION 6️⃣ COMPLETE & VERIFIED
 
 ---
