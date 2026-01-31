@@ -1750,4 +1750,61 @@ order-status.php?order_id=ORD-XXXX
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 
-----
+# 🟢 SECTION 5️⃣ COMPLETE & VERIFIED
+---
+# SECTION 6️⃣ ☕ Charlie Café – Order Payment System
+
+## ☕ CHARLIE CAFÉ PHASE 1️⃣ Cach Payment System 
+
+### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
+
+#### ✅ Test 1 — Manual API Test
+
+Use Postman / curl:
+
+```
+POST /orders/cash-payment
+{
+  "order_id": "ORD-123"
+}
+```
+
+#### Expected:
+
+```
+{
+  "success": true
+}
+```
+
+#### ✅ Test 2 — DynamoDB Check
+
+Open DynamoDB item:
+
+```
+payment_method = CASH
+payment_status = PENDING
+```
+
+#### ✅ Test 3 — UI Test
+
+- Place order
+
+- Click Pay Now (Cash)
+
+- Card UI disappears
+
+- Redirect works
+
+- Order shows pending payment
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+
+
+# 🟢 SECTION 6️⃣ COMPLETE & VERIFIED
+
+---

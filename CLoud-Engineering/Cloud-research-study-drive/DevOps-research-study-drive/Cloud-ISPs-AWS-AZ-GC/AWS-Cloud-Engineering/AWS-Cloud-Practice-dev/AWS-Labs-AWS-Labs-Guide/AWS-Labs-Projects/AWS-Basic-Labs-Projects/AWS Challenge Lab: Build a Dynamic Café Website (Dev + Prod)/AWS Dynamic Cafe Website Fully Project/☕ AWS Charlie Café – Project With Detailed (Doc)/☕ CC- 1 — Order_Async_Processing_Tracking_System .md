@@ -2662,47 +2662,6 @@ fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment"
 
 [orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
-### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
-
-#### ✅ Test 1 — Manual API Test
-
-Use Postman / curl:
-
-```
-POST /orders/cash-payment
-{
-  "order_id": "ORD-123"
-}
-```
-
-#### Expected:
-
-```
-{
-  "success": true
-}
-```
-
-#### ✅ Test 2 — DynamoDB Check
-
-Open DynamoDB item:
-
-```
-payment_method = CASH
-payment_status = PENDING
-```
-
-#### ✅ Test 3 — UI Test
-
-- Place order
-
-- Click Pay Now (Cash)
-
-- Card UI disappears
-
-- Redirect works
-
-- Order shows pending payment
 
 **✅ PHASE 1️⃣ STATUS**
 
