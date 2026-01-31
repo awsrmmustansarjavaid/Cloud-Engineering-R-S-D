@@ -292,7 +292,7 @@ CloudWatchLogsFullAccess
 
 **✔️ Click Create policy**
 
-#### 7️⃣ Create IAM Policy FOR CashPaymentLambda
+#### 7️⃣ Create IAM Policy FOR CashPaymentLambda & AdminMarkPaidLambda
 > **⚠️ If this is missing → Lambda WILL FAIL.**
 
 - **Custom Policy name:** 
