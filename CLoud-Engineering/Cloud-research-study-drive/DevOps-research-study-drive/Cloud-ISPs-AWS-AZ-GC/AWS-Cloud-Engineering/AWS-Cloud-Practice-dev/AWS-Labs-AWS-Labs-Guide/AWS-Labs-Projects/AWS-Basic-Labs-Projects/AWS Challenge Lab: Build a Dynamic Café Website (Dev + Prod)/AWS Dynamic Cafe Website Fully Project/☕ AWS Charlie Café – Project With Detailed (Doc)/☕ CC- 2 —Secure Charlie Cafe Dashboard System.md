@@ -2546,47 +2546,9 @@ fetch_orders()
 
 ### 5️⃣ — FRONTEND AUTH FOUNDATION (REUSABLE)
 
-This file will be reused across all pages.
 
-#### Step 8️⃣ — Create central-auth.js (IMPORTANT)
 
-- 📍 Place this in /js/central-auth.js
 
-```
-// ===============================
-// CENTRAL AUTH FILE (REUSABLE)
-// ===============================
-
-// Decode JWT payload
-function parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-}
-
-// Get logged-in user role
-function getUserRole() {
-    const token = localStorage.getItem("idToken");
-    if (!token) return null;
-
-    const payload = parseJwt(token);
-    return payload["cognito:groups"] || [];
-}
-
-// Page-level access control
-function requireRole(requiredRole) {
-    const groups = getUserRole();
-
-    if (!groups || !groups.includes(requiredRole)) {
-        alert("Access denied");
-        window.location.href = "login.html";
-    }
-}
-```
-
-#### 🧠 This is your future-proof system
-
-You’ll reuse it for every page later.
 
 ### 6️⃣ — ADMIN DASHBOARD (ADMIN ONLY)
 

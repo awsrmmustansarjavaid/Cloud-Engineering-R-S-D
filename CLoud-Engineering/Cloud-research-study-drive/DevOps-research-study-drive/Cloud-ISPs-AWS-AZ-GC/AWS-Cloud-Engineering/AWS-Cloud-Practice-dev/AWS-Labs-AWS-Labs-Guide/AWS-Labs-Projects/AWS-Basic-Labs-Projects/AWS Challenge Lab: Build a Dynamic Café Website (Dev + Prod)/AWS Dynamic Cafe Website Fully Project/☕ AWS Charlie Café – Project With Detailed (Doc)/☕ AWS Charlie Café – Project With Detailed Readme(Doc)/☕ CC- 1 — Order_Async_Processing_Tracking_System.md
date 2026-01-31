@@ -3,6 +3,54 @@
 
 # ☕ Charlie Café SECTION 1️⃣ Cafe Order Processor 
 
+## PHASE 5️⃣ — Frontend Development Code
+
+##  Modify orders.php (Automation)
+
+* Remove direct DB insert
+* Send POST JSON to API Gateway
+
+## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
+
+### 1️⃣ Create the shared central-auth.js (IMPORTANT)
+
+
+```
+// ===============================
+// CENTRAL AUTH FILE (REUSABLE)
+// ===============================
+
+// Decode JWT payload
+function parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+}
+
+// Get logged-in user role
+function getUserRole() {
+    const token = localStorage.getItem("idToken");
+    if (!token) return null;
+
+    const payload = parseJwt(token);
+    return payload["cognito:groups"] || [];
+}
+
+// Page-level access control
+function requireRole(requiredRole) {
+    const groups = getUserRole();
+
+    if (!groups || !groups.includes(requiredRole)) {
+        alert("Access denied");
+        window.location.href = "login.html";
+    }
+}
+```
+
+#### 🧠 This is your future-proof system
+
+You’ll reuse it for every page later.
+
 
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED

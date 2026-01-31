@@ -292,7 +292,11 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 
 ## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
 
-### 1️⃣ Create the shared auth-api.js file
+### 1️⃣ Create the shared central-auth.js (IMPORTANT)
+> **This file will be reused across all pages.**
+
+
+- 📍 Place this in /js/central-auth.js
 
 #### Command to create the js directory
 
