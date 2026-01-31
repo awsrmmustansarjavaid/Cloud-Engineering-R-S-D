@@ -2853,26 +2853,6 @@ sudo nano payment-status.php
 sudo systemctl restart httpd
 ```
 
-### 🟦 STEP 8 — FINAL TEST SCENARIOS (DO ALL)
-
-#### 🧪 Scenario A — Card
-
-✔ Order → Card payment
-
-✔ Status shows Paid via Card
-
-#### 🧪 Scenario B — Cash Pending
-
-✔ Order → Pay Now (Cash)
-
-✔ Status shows Pay at Counter
-
-#### 🧪 Scenario C — Cash Paid
-
-✔ Admin → Mark Paid
-
-✔ Refresh status → Cash received
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**

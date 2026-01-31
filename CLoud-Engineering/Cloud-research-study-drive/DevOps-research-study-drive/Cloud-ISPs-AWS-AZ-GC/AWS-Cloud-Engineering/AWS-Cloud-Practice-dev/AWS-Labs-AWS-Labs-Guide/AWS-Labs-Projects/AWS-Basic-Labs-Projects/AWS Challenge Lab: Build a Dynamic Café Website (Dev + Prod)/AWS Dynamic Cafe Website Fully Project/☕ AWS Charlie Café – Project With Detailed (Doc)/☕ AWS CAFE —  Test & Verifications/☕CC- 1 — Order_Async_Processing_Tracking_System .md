@@ -1985,12 +1985,39 @@ payment_status = PAID
 ---
 ## ☕ CHARLIE CAFÉ PHASE 3️⃣ Order status page understands CARD vs CASH
 
+### 🟦 STEP 8 — FINAL TEST SCENARIOS (DO ALL)
 
+#### 🧪 Scenario A — Card
 
+✔ Order → Card payment
+
+✔ Status shows Paid via Card
+
+#### 🧪 Scenario B — Cash Pending
+
+✔ Order → Pay Now (Cash)
+
+✔ Status shows Pay at Counter
+
+#### 🧪 Scenario C — Cash Paid
+
+✔ Admin → Mark Paid
+
+✔ Refresh status → Cash received
 
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## ☕ CHARLIE CAFÉ PHASE 4️⃣ 🔁 REDIRECTING TO payment-status.php
+
+
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 
 # 🟢 SECTION 6️⃣ COMPLETE & VERIFIED
