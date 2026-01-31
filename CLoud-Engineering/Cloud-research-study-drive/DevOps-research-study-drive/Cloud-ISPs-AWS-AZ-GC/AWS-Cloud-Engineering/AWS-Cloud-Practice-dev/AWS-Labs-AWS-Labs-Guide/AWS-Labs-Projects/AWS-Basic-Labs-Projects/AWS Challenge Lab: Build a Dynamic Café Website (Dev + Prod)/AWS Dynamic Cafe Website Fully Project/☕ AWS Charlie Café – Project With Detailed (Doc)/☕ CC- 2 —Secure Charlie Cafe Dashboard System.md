@@ -2230,24 +2230,6 @@ sudo nano /var/www/html/dashboard.html
 
 [dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
 
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/dashboard.html
-```
-
-```
-sudo chmod 644 /var/www/html/dashboard.html
-```
-
-
 #### 5️⃣ Restart Apache (MANDATORY)
 
 ```
