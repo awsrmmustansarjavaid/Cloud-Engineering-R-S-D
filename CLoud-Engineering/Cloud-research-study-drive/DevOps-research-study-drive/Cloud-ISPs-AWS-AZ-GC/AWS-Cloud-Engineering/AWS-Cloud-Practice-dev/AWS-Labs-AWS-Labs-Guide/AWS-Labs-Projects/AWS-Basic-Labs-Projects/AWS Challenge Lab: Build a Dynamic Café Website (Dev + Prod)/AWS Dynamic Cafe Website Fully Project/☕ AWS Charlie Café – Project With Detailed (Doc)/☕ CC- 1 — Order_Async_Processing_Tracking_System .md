@@ -1583,6 +1583,12 @@ curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
 https://API_ID.execute-api.region.amazonaws.com/status/order-status
 ```
 
+#### Example;
+
+```
+https://a1053skr51.execute-api.us-east-1.amazonaws.com/status/order-status
+```
+
 ✔ JSON visible
 
 **✅ PHASE 5️⃣ STATUS**
