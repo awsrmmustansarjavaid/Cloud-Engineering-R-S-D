@@ -2487,7 +2487,7 @@ You will simply start writing these attributes:
 
 - Use JSON view for ease.
 
-Basic test item (CASH payment – PENDING)
+#### Basic test item (CASH payment – PENDING)
 
 ```
 {
@@ -2502,7 +2502,7 @@ Basic test item (CASH payment – PENDING)
 }
 ```
 
-Another test item (CARD payment – PAID)
+#### Another test item (CARD payment – PAID)
 
 ```
 {
