@@ -2541,7 +2541,6 @@ use cafe_db;
 DESCRIBE orders;
 ```
 
-
 ### 2️⃣ CREATE LAMBDA FUNCTION
 
 #### 🔹 Step 2.1 — Open Lambda
@@ -2566,7 +2565,6 @@ DESCRIBE orders;
 [CashPaymentLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CashPaymentLambda.py)
 
 - Click Deploy
-
 
 
 ### 3️⃣ API Gateway – NEW ENDPOINT (CASH)
