@@ -2519,35 +2519,67 @@ You will simply start writing these attributes:
 
 ```
 {
-  "order_id": { "S": "TEST-ORD-20260131-0001" },
-  "table_number": { "N": "3" },
-  "item": { "S": "Latte" },
-  "quantity": { "N": "1" },
-  "total_amount": { "N": "4.00" },
-  "status": { "S": "RECEIVED" },
+  "order_id": { "S": "ORD-TEST-001" },
+  "table_number": { "N": "5" },
+  "item": { "S": "Coffee" },
+  "quantity": { "N": "2" },
+  "total_amount": { "N": "6" },
+
   "payment_method": { "S": "CASH" },
-  "payment_status": { "S": "PENDING" }
+  "payment_status": { "S": "PENDING" },
+
+  "status": { "S": "RECEIVED" },
+  "created_at": { "S": "2026-01-14T10:30:00Z" }
 }
 ```
+
 
 #### Another test item (CARD payment – PAID)
 
 ```
 {
-  "order_id": { "S": "TEST-ORD-20260131-0002" },
-  "table_number": { "N": "7" },
-  "item": { "S": "Fresh Juice" },
+  "order_id": { "S": "ORD-TEST-002" },
+  "table_number": { "N": "5" },
+  "item": { "S": "Coffee" },
   "quantity": { "N": "2" },
-  "total_amount": { "N": "10.00" },
-  "status": { "S": "PREPARING" },
+  "total_amount": { "N": "6" },
+
   "payment_method": { "S": "CARD" },
-  "payment_status": { "S": "PAID" }
+  "payment_status": { "S": "PENDING" },
+
+  "status": { "S": "RECEIVED" },
+  "created_at": { "S": "2026-01-14T10:30:00Z" }
 }
 ```
+
+#### You just:
+
+- Added payment_method
+
+- Added payment_status
+
+- WITHOUT changing schema
+
+- WITHOUT migrations
+
+- WITHOUT breaking anything
+
+#### 🔎 VERIFY STEP 1.3 WORKED
+
+Click the item → you should see:
+
+```
+payment_method: CASH
+payment_status: PENDING
+```
+
+✅ That’s it
 
 ✅ Nothing else to configure here
 
 ✅ DynamoDB auto-creates attributes
+
+❌ No further DB action needed
 
 #### 2️⃣ If you are using RDS (MySQL)
 

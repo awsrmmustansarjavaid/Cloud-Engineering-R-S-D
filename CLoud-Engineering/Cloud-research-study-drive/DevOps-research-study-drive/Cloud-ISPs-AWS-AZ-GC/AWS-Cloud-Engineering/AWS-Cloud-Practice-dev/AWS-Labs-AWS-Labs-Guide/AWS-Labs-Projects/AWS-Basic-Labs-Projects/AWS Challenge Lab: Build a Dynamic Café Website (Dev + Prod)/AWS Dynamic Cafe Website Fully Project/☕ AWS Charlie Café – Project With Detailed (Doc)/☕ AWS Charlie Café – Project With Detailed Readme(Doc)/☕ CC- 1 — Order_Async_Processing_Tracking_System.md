@@ -53,6 +53,8 @@ You’ll reuse it for every page later.
 
 
 
+
+
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
 # SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
