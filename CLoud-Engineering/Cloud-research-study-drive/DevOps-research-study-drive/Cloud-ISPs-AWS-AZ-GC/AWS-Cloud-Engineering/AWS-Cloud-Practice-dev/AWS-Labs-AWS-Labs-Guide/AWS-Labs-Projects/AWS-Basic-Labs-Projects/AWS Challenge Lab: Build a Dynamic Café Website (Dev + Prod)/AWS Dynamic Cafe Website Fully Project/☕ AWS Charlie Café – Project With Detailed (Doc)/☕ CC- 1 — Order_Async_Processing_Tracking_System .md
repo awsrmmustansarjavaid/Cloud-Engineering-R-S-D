@@ -2469,27 +2469,18 @@ order-receipt.php
 
 - AWS Console → DynamoDB → Tables → CafeOrders
 
-- Table Name :
+- Fill EXACTLY like this
 
-```
-CafeOrders
-```
+| Field         | Value        |
+| ------------- | ------------ |
+| Table name    | `CafeOrders` |
+| Partition key | `order_id`   |
+| Type          | `String`     |
+| Sort key      | ❌ NONE       |
+| Table class   | Standard     |
+| Capacity mode | On-demand    |
+| Encryption    | Default      |
 
-- Partition key:
-
-```
-order_id
-```
-
-- Type: String
-
-- **❌ (No sort key needed, as per task—keeps it simple for lookups by order_id.)**
-
-- Table class: Standard (default)
-
-- Capacity mode: On-demand (recommended for variable traffic; pay per request).
-
-- Encryption: AWS owned key (default, free).
 
 - Click Create table.
 
