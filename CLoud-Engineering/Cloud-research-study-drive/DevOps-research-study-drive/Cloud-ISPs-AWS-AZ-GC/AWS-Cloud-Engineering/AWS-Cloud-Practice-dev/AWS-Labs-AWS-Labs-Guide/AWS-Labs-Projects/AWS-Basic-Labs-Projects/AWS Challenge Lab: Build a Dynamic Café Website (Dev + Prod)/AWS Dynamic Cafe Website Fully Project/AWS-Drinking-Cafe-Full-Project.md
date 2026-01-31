@@ -343,10 +343,19 @@ CafeDevWebServer
   * SSH (22) → Your IP
   * HTTP (80) → 0.0.0.0/0*
 
-#### ✅ EC2 LAMP Server USER DATA
+### 7️⃣ EC2 USER DATA
+
+### 1️⃣ LAMP Server USER DATA
 > **📍 File Location: AWS-LAMP Server-Bash-Script.md**
 
-[AWS-LAMP Server-Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
+[AWS-LAMP Server Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
+
+### 2️⃣ Charile Cafe Mega USER DATA
+> **📍 File Location: AWS-LAMP Server-Bash-Script.md**
+
+[Charile Cafe Mega Bash-Script](https://github.com/awsrmmustansarjavaid/Cloud-Engineering-R-S-D/blob/main/CLoud-Engineering/Cloud-research-study-drive/DevOps-research-study-drive/Cloud-ISPs-AWS-AZ-GC/AWS-Cloud-Engineering/AWS-Cloud-Practice-dev/AWS-Labs-Bash-Script/AWS-LAMP%20Server-Bash-Script.md)
+
+
 
 
 **✅ PHASE 1️⃣ STATUS**
