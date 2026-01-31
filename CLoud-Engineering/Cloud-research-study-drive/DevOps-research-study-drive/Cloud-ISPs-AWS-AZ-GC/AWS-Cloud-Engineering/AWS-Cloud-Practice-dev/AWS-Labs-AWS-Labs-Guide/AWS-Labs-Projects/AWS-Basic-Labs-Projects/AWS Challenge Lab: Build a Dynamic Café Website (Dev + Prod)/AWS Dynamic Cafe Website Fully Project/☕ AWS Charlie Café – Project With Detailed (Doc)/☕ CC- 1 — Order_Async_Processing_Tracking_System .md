@@ -2531,6 +2531,17 @@ ADD payment_method VARCHAR(10),
 ADD payment_status VARCHAR(10);
 ```
 
+#### verify
+
+```
+use cafe_db;
+```
+
+```
+DESCRIBE orders;
+```
+
+
 ### 2️⃣ CREATE LAMBDA FUNCTION
 
 #### 🔹 Step 2.1 — Open Lambda
