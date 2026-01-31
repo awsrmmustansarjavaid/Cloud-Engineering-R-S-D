@@ -2718,7 +2718,10 @@ AdminMarkPaidLambda
 
 - Attach this policy to the Lambda’s role.
 
-**⚠️ If missing → Admin cannot mark paid.**
+- **⚠️ If missing → Admin cannot mark paid.**
+
+- **⚠️ 2️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
+
 
 ### 3️⃣ — ADMIN LAMBDA CODE (WITH COMMENTS)
 
