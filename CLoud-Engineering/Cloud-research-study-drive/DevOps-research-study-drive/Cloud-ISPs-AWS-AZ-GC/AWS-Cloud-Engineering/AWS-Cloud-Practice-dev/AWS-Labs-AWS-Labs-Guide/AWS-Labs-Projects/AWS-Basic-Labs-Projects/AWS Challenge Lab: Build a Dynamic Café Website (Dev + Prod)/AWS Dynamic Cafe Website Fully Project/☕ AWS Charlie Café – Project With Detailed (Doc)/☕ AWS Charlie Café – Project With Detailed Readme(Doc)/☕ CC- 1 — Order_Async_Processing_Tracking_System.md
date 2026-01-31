@@ -964,6 +964,34 @@ Choose <strong>ONE</strong> payment method only.
 </p>
 ```
 
+### 6️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
+
+Add a button to print / track order after payment is confirmed:
+
+```
+<?php if ($data['payment_status'] === 'PAID'): ?>
+    <a href="print-order.php?order_id=<?= $orderId ?>"
+       class="btn btn-primary mt-3">
+       🖨 Print Order / View Receipt
+    </a>
+<?php endif; ?>
+```
+
+### 7️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
+
+Replace button logic with:
+
+```
+<?php if ($data['payment_status'] === 'PAID'): ?>
+<script>
+    setTimeout(() => {
+        window.location.href = "print-order.php?order_id=<?= $orderId ?>";
+    }, 2000); // Redirect 2 seconds after payment confirmed
+</script>
+<?php endif; ?>
+```
+
+
 ### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
 
 Scenario 1 – Card

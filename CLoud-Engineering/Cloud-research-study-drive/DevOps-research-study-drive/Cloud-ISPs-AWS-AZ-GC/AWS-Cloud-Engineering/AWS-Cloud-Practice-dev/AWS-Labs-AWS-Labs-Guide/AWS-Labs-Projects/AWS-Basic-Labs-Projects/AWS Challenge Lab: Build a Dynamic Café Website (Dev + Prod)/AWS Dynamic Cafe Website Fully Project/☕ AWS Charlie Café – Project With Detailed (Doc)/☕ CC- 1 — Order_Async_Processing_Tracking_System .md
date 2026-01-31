@@ -2798,32 +2798,7 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
 
-### 6️⃣ UPDATE payment-status.php FOR CUSTOMER REDIRECT
 
-Add a button to print / track order after payment is confirmed:
-
-```
-<?php if ($data['payment_status'] === 'PAID'): ?>
-    <a href="print-order.php?order_id=<?= $orderId ?>"
-       class="btn btn-primary mt-3">
-       🖨 Print Order / View Receipt
-    </a>
-<?php endif; ?>
-```
-
-### 7️⃣ OPTIONAL AUTO-REDIRECT TO PRINT PAGE
-
-Replace button logic with:
-
-```
-<?php if ($data['payment_status'] === 'PAID'): ?>
-<script>
-    setTimeout(() => {
-        window.location.href = "print-order.php?order_id=<?= $orderId ?>";
-    }, 2000); // Redirect 2 seconds after payment confirmed
-</script>
-<?php endif; ?>
-```
 
 
 ### 8️⃣ — ADMIN TEST (IMPORTANT)
