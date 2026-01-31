@@ -2448,7 +2448,15 @@ order_id
 
 - **❌ (No sort key needed, as per task—keeps it simple for lookups by order_id.)**
 
+- Table class: Standard (default)
 
+- Capacity mode: On-demand (recommended for variable traffic; pay per request).
+
+- Encryption: AWS owned key (default, free).
+
+- Click Create table.
+
+**🕐 Wait 1-2 minutes until status shows Active.**
 
 #### 🔹 Step 1.2 — Confirm Primary Key
 
