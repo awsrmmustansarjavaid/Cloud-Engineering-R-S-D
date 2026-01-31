@@ -11,8 +11,8 @@
 // ===================================================
 
 // Your API Gateway endpoints (replace xxxx with your real API ID)
-$ordersApi    = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/orders";
-$markPaidApi  = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid";
+$ordersApi    = "https://a1053skr51.execute-api.us-east-1.amazonaws.com/dev/orders";
+$markPaidApi  = "https://a1053skr51.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid";
 
 // Fetch all orders using cURL
 $ch = curl_init($ordersApi);
