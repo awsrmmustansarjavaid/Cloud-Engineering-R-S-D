@@ -1,5 +1,12 @@
 <?php
-// ================= CONFIG =================
+// =======================================================
+// CHARLIE CAFE — ORDER RECEIPT (LIVE STATUS + BILLING)
+// STEP 8 IMPLEMENTATION
+// =======================================================
+
+// 🔴 IMPORTANT: Replace YOUR_API_ID with real API Gateway ID
+// Example:
+// https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/prod/order-status
 $apiBaseUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
 
 // ================= VALIDATE INPUT =================
@@ -9,7 +16,9 @@ if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
 
 $orderId = $_GET['order_id'];
 
-// ================= FETCH ORDER =================
+// ================= FETCH ORDER FROM BACKEND =================
+// Calls:
+// GET /order-status?order_id=ORD-XXXX
 function fetchOrder($apiBaseUrl, $orderId) {
     $url = $apiBaseUrl . "?order_id=" . urlencode($orderId);
     $ch = curl_init($url);
@@ -74,6 +83,7 @@ body {
 
     <hr>
 
+    <!-- ORDER META -->
     <p><strong>Order ID:</strong> <?= htmlspecialchars($order['order_id']) ?></p>
     <p><strong>Customer:</strong> <?= htmlspecialchars($order['customer_name']) ?></p>
     <p><strong>Table:</strong> <?= htmlspecialchars($order['table_number']) ?></p>
@@ -81,18 +91,20 @@ body {
 
     <hr>
 
+    <!-- ORDER ITEMS -->
     <p><strong>Item:</strong> <?= htmlspecialchars($order['item']) ?></p>
     <p><strong>Quantity:</strong> <?= htmlspecialchars($order['quantity']) ?></p>
 
     <hr>
 
+    <!-- LIVE STATUS BADGE -->
     <?php
     $status = $order['status'];
     $badge = "secondary";
-    if ($status === "RECEIVED") $badge = "info";
-    if ($status === "PREPARING") $badge = "warning";
-    if ($status === "READY") $badge = "primary";
-    if ($status === "COMPLETED") $badge = "success";
+    if ($status === "RECEIVED")   $badge = "info";
+    if ($status === "PREPARING")  $badge = "warning";
+    if ($status === "READY")      $badge = "primary";
+    if ($status === "COMPLETED")  $badge = "success";
     ?>
 
     <p>
@@ -104,16 +116,18 @@ body {
 
     <hr>
 
+    <!-- BILLING (STEP 8 REQUIREMENT) -->
     <p class="fw-bold">
         Total Amount: $<?= number_format($order['total_amount'], 2) ?>
     </p>
 
-    <!-- QR CODE -->
+    <!-- QR CODE FOR LIVE TRACKING -->
     <div id="qrBox" class="text-center my-3">
         <div id="qrcode"></div>
         <small class="text-muted">Scan to track order</small>
     </div>
 
+    <!-- PRINT -->
     <div class="d-grid gap-2 mt-3">
         <button onclick="window.print()" class="btn btn-dark">
             🖨️ Print Receipt
@@ -130,7 +144,8 @@ new QRCode(document.getElementById("qrcode"), {
     height: 120
 });
 
-// ================= AUTO REFRESH (10s) =================
+// ================= AUTO STATUS REFRESH (10s) =================
+// Reloads page to fetch latest order status from backend
 setInterval(() => {
     fetch(window.location.href, { cache: "no-store" })
         .then(res => res.text())
