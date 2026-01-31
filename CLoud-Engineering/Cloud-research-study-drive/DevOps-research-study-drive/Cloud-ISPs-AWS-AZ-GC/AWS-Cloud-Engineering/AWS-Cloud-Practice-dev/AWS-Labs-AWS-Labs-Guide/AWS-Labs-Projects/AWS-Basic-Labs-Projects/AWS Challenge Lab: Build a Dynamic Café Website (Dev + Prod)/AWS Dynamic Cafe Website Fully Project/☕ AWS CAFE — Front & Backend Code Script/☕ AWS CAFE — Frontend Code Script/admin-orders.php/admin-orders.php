@@ -1,183 +1,230 @@
 <?php
 // ===================================================
-// CHARLIE CAFE ☕ - ADMIN ORDERS DASHBOARD
-// Cashier "Mark as Paid" Panel
+// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (Updated)
+// Cashier "Mark as Paid" Panel for CASH orders
+// ===================================================
+// Features:
+//   - Fetches all orders from API Gateway → AdminGetOrders Lambda (GET /admin/orders)
+//   - Displays order list with payment method & status
+//   - Cashier can mark CASH + PENDING orders as PAID (calls POST /admin/mark-paid → AdminMarkPaidLambda)
+//   - Auto-refreshes every 30s (safe for lab/demo; consider WebSocket/polling in production)
 // ===================================================
 
-// Admin Orders API (GET all orders)
-$ordersApi = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/orders";
+// Your API Gateway endpoints (replace xxxx with your real API ID)
+$ordersApi    = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/orders";
+$markPaidApi  = "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid";
 
-// Fetch all orders
+// Fetch all orders using cURL
 $ch = curl_init($ordersApi);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT        => 10,          // Prevent long hangs
+    CURLOPT_FOLLOWLOCATION => true
+]);
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
 curl_close($ch);
 
-// Decode response safely
-$orders = json_decode($response, true) ?? [];
+// Decode JSON safely – fallback to empty array if anything fails
+$orders = [];
+if ($response !== false && $httpCode === 200) {
+    $decoded = json_decode($response, true);
+    if (is_array($decoded)) {
+        $orders = $decoded;
+    }
+} else {
+    // Optional: log error (in production use error_log or monitoring)
+    $fetchError = $curlError ?: "HTTP $httpCode - API returned invalid response";
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Charlie Café ☕ | Orders Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Bootstrap 5 -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-
-<style>
-/* ===== SAME CAFE THEME (UNCHANGED) ===== */
-:root {
-    --cafe-bg:#1a110b;--cafe-surface:#2c1b12;--cafe-card:#3a251c;
-    --cafe-cream:#f5e9d4;--cafe-text:#e8d9c0;--cafe-accent:#c97b44;
-    --cafe-accent-dark:#a15f32;--cafe-success:#6b9e78;
-    --cafe-pending:#d9a66d;--cafe-shadow:0 12px 40px rgba(0,0,0,0.55);
-}
-body{
-    font-family:'Poppins',sans-serif;color:var(--cafe-text);
-    min-height:100vh;background:var(--cafe-bg)
-    url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920')
-    center/cover fixed no-repeat;
-}
-body::before{
-    content:"";position:fixed;inset:0;
-    background:rgba(26,17,11,.68);
-    backdrop-filter:blur(3.5px);z-index:-1;
-}
-.container{max-width:1400px;padding:3rem 1rem;}
-h3{font-family:'Playfair Display',serif;color:var(--cafe-cream);}
-.dashboard-card{
-    background:rgba(58,37,28,.82);
-    border-radius:24px;padding:2.2rem;
-    box-shadow:var(--cafe-shadow);
-}
-.badge-paid{background:var(--cafe-success);}
-.badge-pending{background:var(--cafe-pending);color:#1a110b;}
-.badge-card{background:#6b829e;}
-.btn-paid{
-    background:linear-gradient(135deg,var(--cafe-accent),var(--cafe-accent-dark));
-    border:none;border-radius:50px;color:#fff;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Charlie Café ☕ | Orders Dashboard</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cafe-bg:#1a110b; --cafe-surface:#2c1b12; --cafe-card:#3a251c;
+            --cafe-cream:#f5e9d4; --cafe-text:#e8d9c0; --cafe-accent:#c97b44;
+            --cafe-accent-dark:#a15f32; --cafe-success:#6b9e78;
+            --cafe-pending:#d9a66d; --cafe-shadow:0 12px 40px rgba(0,0,0,0.55);
+        }
+        body {
+            font-family:'Poppins',sans-serif; color:var(--cafe-text);
+            min-height:100vh; background:var(--cafe-bg)
+            url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920')
+            center/cover fixed no-repeat;
+        }
+        body::before {
+            content:""; position:fixed; inset:0;
+            background:rgba(26,17,11,.68); backdrop-filter:blur(3.5px); z-index:-1;
+        }
+        .container { max-width:1400px; padding:3rem 1rem; }
+        h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
+        .dashboard-card {
+            background:rgba(58,37,28,.82); border-radius:24px; padding:2.2rem;
+            box-shadow:var(--cafe-shadow);
+        }
+        .badge-paid { background:var(--cafe-success); color:#fff; }
+        .badge-pending { background:var(--cafe-pending); color:#1a110b; }
+        .badge-card { background:#6b829e; color:#fff; }
+        .btn-paid {
+            background:linear-gradient(135deg,var(--cafe-accent),var(--cafe-accent-dark));
+            border:none; border-radius:50px; color:#fff;
+        }
+        .btn-paid:disabled { opacity:0.6; cursor:not-allowed; }
+    </style>
 </head>
-
 <body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>☕ Charlie Café – Orders Dashboard</h3>
+            <span class="text-muted">Cashier Panel • Auto-refresh every 30s</span>
+        </div>
 
-<div class="container">
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>☕ Charlie Café – Orders Dashboard</h3>
-        <span class="text-muted">Cashier Panel</span>
-    </div>
+        <?php if (isset($fetchError)): ?>
+            <div class="alert alert-warning text-center">
+                ⚠️ <?= htmlspecialchars($fetchError) ?> — Please check API or try refreshing.
+            </div>
+        <?php endif; ?>
 
-    <!-- MAIN CARD -->
-    <div class="dashboard-card">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle text-white">
-                <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Table</th>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-
-                <?php if (empty($orders)): ?>
-                    <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
-                            No orders yet ☕
-                        </td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php foreach ($orders as $order): ?>
-                <tr>
-                    <td><?= htmlspecialchars($order['order_id']) ?></td>
-                    <td><?= (int)$order['table_number'] ?></td>
-                    <td><?= htmlspecialchars($order['item']) ?></td>
-                    <td><?= (int)$order['quantity'] ?></td>
-
-                    <!-- Payment Method -->
-                    <td>
-                        <?php if ($order['payment_method'] === 'CARD'): ?>
-                            <span class="badge badge-card">CARD</span>
+        <!-- MAIN CARD -->
+        <div class="dashboard-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Table</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($orders)): ?>
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    No orders found yet ☕<br>
+                                    <small>(New orders appear automatically)</small>
+                                </td>
+                            </tr>
                         <?php else: ?>
-                            <span class="badge bg-secondary">CASH</span>
+                            <?php foreach ($orders as $order): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($order['order_id'] ?? '—') ?></td>
+                                    <td><?= (int)($order['table_number'] ?? 0) ?></td>
+                                    <td><?= htmlspecialchars($order['item'] ?? '—') ?></td>
+                                    <td><?= (int)($order['quantity'] ?? 0) ?></td>
+                                    
+                                    <!-- Payment Method -->
+                                    <td>
+                                        <?php 
+                                        $method = $order['payment_method'] ?? 'UNKNOWN';
+                                        if ($method === 'CARD'): ?>
+                                            <span class="badge badge-card">CARD</span>
+                                        <?php elseif ($method === 'CASH'): ?>
+                                            <span class="badge bg-secondary">CASH</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-dark"><?= htmlspecialchars($method) ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <!-- Payment Status -->
+                                    <td>
+                                        <?php 
+                                        $status = $order['payment_status'] ?? 'UNKNOWN';
+                                        if ($status === 'PAID'): ?>
+                                            <span class="badge badge-paid">PAID</span>
+                                        <?php else: ?>
+                                            <span class="badge badge-pending">PENDING</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <!-- ACTION COLUMN -->
+                                    <td>
+                                        <?php if ($method === 'CASH' && $status === 'PENDING'): ?>
+                                            <button class="btn btn-paid btn-sm mark-paid-btn"
+                                                data-order-id="<?= htmlspecialchars($order['order_id']) ?>"
+                                                onclick="markAsPaid(this)">
+                                                ✅ Mark Paid
+                                            </button>
+                                        <?php elseif ($status === 'PAID'): ?>
+                                            <a href="print-order.php?order_id=<?= urlencode($order['order_id'] ?? '') ?>"
+                                               class="btn btn-outline-light btn-sm">
+                                                🖨 Print
+                                            </a>
+                                        <?php else: ?>
+                                            —
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         <?php endif; ?>
-                    </td>
-
-                    <!-- Payment Status -->
-                    <td>
-                        <?php if ($order['payment_status'] === 'PAID'): ?>
-                            <span class="badge badge-paid">PAID</span>
-                        <?php else: ?>
-                            <span class="badge badge-pending">PENDING</span>
-                        <?php endif; ?>
-                    </td>
-
-                    <!-- ACTION COLUMN -->
-                    <td>
-                        <?php if ($order['payment_method'] === 'CASH' && $order['payment_status'] === 'PENDING'): ?>
-                            <!-- Cashier confirms cash payment -->
-                            <button class="btn btn-paid btn-sm"
-                                onclick="markAsPaid('<?= $order['order_id'] ?>')">
-                                ✅ Mark Paid
-                            </button>
-
-                        <?php elseif ($order['payment_status'] === 'PAID'): ?>
-                            <!-- Optional: print receipt after payment -->
-                            <a href="print-order.php?order_id=<?= $order['order_id'] ?>"
-                               class="btn btn-outline-light btn-sm">
-                                🖨 Print
-                            </a>
-                        <?php else: ?>
-                            —
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ===================== JS ===================== -->
-<script>
-// Cashier confirms CASH payment
-function markAsPaid(orderId) {
-    if (!confirm("Confirm CASH payment for order " + orderId + "?")) return;
+    <!-- ===================== JAVASCRIPT ===================== -->
+    <script>
+        // Mark CASH order as PAID – calls AdminMarkPaidLambda via API Gateway
+        async function markAsPaid(button) {
+            const orderId = button.getAttribute('data-order-id');
+            if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
 
-    fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order_id: orderId })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("☕ Payment marked as PAID");
-            location.reload(); // refresh dashboard
-        } else {
-            alert("❌ Failed to update payment");
+            // Disable button & show loading
+            button.disabled = true;
+            button.textContent = "Processing...";
+
+            try {
+                const response = await fetch(
+                    "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ order_id: orderId })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert("☕ Payment marked as PAID successfully!");
+                    location.reload(); // Refresh to show updated status
+                } else {
+                    alert("❌ Failed: " + (data.error || data.message || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Mark paid error:", err);
+                alert("Server error – please try again or check connection.");
+            } finally {
+                button.disabled = false;
+                button.textContent = "✅ Mark Paid";
+            }
         }
-    })
-    .catch(() => alert("Server error"));
-}
 
-// Auto-refresh dashboard every 30 seconds (LAB SAFE)
-setInterval(() => location.reload(), 30000);
-</script>
-
+        // Auto-refresh dashboard every 30 seconds (demo/lab safe)
+        // In production: consider EventBridge + WebSocket or shorter polling
+        setInterval(() => location.reload(), 30000);
+    </script>
 </body>
 </html>

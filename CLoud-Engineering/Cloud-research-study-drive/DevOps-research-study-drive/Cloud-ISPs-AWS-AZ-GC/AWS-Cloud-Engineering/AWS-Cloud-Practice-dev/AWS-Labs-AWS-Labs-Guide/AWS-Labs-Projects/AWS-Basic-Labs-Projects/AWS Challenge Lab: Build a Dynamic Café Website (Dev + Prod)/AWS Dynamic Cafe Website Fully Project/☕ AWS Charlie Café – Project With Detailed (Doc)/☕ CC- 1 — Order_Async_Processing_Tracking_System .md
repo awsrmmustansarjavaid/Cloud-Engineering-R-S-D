@@ -2798,9 +2798,6 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
 
-
-
-
 ### 8️⃣ — ADMIN TEST (IMPORTANT)
 
 - Customer places CASH order → order.php → payment-status.php shows Pay at Counter
