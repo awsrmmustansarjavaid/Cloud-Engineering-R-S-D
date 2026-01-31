@@ -1798,6 +1798,91 @@ payment_status = PENDING
 
 - Order shows pending payment
 
+#### ✅ Test 4 — Test Event JSON (for Lambda Console)
+
+- Go to your Lambda → Test tab
+
+- Click Create new event (or Configure test event)
+
+- Event name: e.g. TestCashPayment
+
+- Template: Choose API Gateway AWS Proxy if available (recommended), or just paste custom JSON below
+
+- Paste one of these into the editor:
+
+Basic successful test (most common)
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-1234\"}",
+  "httpMethod": "POST",
+  "path": "/orders/cash-payment",
+  "requestContext": {
+    "stage": "dev",
+    "requestId": "test-1234-abcd"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "isBase64Encoded": false
+}
+```
+
+#### Minimal version 
+> **(just the required body – works if your integration is proxy)**
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-5678\"}"
+}
+```
+
+#### With more realistic API Gateway fields
+> **(best match for proxy integration)**
+
+```
+{
+  "resource": "/orders/cash-payment",
+  "path": "/orders/cash-payment",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Accept": "*/*"
+  },
+  "multiValueHeaders": {
+    "Content-Type": ["application/json"]
+  },
+  "queryStringParameters": null,
+  "multiValueQueryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "t89kib",
+    "resourcePath": "/orders/cash-payment",
+    "httpMethod": "POST",
+    "stage": "dev",
+    "requestId": "test-request-id-001",
+    "identity": {},
+    "path": "/dev/orders/cash-payment"
+  },
+  "body": "{\"order_id\": \"ORD-20260131-9999\"}",
+  "isBase64Encoded": false
+}
+```
+
+#### ✅ Expected success (200):
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"success\": true, \"message\": \"Order marked for cash payment\"}"
+}
+```
+
+
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
