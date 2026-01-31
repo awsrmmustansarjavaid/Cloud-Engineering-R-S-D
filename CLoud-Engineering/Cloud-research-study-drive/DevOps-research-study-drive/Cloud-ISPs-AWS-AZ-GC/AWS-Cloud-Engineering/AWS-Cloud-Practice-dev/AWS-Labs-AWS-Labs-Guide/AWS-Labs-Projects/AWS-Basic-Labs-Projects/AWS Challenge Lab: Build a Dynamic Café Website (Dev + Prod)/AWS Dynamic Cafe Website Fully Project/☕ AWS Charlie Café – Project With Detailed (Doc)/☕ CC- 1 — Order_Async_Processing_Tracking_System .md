@@ -2571,11 +2571,21 @@ Attach this policy (or ensure it exists):
 
 ```
 {
-  "Effect": "Allow",
-  "Action": [
-    "dynamodb:UpdateItem"
-  ],
-  "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": "arn:aws:dynamodb:us-east-1:9180599465397:table/CafeOrders"
+    }
+  ]
 }
 ```
 
