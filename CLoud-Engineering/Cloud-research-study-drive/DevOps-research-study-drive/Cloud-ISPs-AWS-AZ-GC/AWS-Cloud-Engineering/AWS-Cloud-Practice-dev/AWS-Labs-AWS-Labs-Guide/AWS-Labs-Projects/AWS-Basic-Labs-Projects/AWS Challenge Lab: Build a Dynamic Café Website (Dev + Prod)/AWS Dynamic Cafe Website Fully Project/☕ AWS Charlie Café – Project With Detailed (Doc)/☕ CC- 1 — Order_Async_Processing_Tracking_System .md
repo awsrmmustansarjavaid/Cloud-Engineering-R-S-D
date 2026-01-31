@@ -2796,7 +2796,15 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 
 ### 5️⃣ — admin-orders.php
 
+```
+sudo nano admin-orders.php
+```
+
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+
+```
+sudo systemctl restart httpd
+```
 
 
 **✅ Admin feature COMPLETE**
@@ -2835,7 +2843,15 @@ Your existing Order Status API must return:
 
 #### ✅ FULL UPDATED FILE (WITH COMMENTS)
 
+```
+sudo nano payment-status.php
+```
+
 [payment-status.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+```
+sudo systemctl restart httpd
+```
 
 ### 🟦 STEP 8 — FINAL TEST SCENARIOS (DO ALL)
 
