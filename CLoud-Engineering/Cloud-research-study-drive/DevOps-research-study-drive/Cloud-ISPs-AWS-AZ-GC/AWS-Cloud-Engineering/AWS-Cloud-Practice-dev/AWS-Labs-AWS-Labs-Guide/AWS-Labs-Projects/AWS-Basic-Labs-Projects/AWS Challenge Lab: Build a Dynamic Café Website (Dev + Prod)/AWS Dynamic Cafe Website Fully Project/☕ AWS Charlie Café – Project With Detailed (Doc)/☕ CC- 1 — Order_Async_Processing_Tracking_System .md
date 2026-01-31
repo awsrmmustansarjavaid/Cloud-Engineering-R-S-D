@@ -2183,7 +2183,7 @@ FROM orders
 WHERE order_id=%s
 ```
 #### ✅ FINAL — Order Status Lambda
-> **
+
 ```
 import json
 import os
