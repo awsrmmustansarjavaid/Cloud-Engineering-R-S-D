@@ -1888,8 +1888,79 @@ Basic successful test (most common)
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 
+## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
+
+### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
+
+#### ✅ Test 1 — Manual Lambda Test
+
+- Go to your Lambda function → Test tab
+
+- Create new event (or edit existing)
+
+- Paste the JSON above
+
+- Give it a name like TestMarkPaid
+
+- Click Test
+
+#### Test Event JSON (for Lambda Console)
+Copy-paste this exact JSON into the Test tab in your Lambda function:
+
+```
+{
+  "body": "{\"order_id\": \"ORD-1738333333-456\"}",
+  "httpMethod": "POST",
+  "path": "/orders/cash-payment",
+  "resource": "/orders/cash-payment",
+  "requestContext": {
+    "resourceId": "abc123",
+    "resourcePath": "/orders/cash-payment",
+    "httpMethod": "POST",
+    "stage": "dev",
+    "requestId": "test-request-id-1234",
+    "identity": {
+      "sourceIp": "127.0.0.1"
+    }
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "isBase64Encoded": false
+}
+```
+
+#### Expected successful output (if order exists in DynamoDB):
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"success\": true, \"message\": \"Order marked as PAID\"}"
+}
+```
+
+#### Minimal Test Event (if you just want to simulate body)
+This also works fine for your code:
+
+```
+{
+  "body": "{\"order_id\": \"ORD-999999999-999\"}"
+}
+```
 
 
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
 # 🟢 SECTION 6️⃣ COMPLETE & VERIFIED
 
 ---
