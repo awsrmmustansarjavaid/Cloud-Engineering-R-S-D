@@ -28,7 +28,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
-            scroll-behavior: smooth; /* Smooth scrolling UX */
+            scroll-behavior: smooth;
         }
 
         /* ===============================
@@ -42,6 +42,21 @@
             font-weight: 600;
             letter-spacing: 0.5px;
             color: #fff !important;
+        }
+
+        /* Dashboard Login Button */
+        .btn-dashboard {
+            background-color: #ff9800;
+            color: #000;
+            font-weight: 600;
+            border-radius: 25px;
+            padding: 6px 18px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-dashboard:hover {
+            background-color: #e68900;
+            transform: translateY(-1px);
         }
 
         /* ===============================
@@ -159,7 +174,23 @@
 =============================== -->
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
+
+        <!-- Cafe Brand -->
         <a class="navbar-brand" href="#">☕ Charlie Cafe</a>
+
+        <!-- RIGHT SIDE LOGIN BUTTON -->
+        <!-- 
+            NOTE:
+            - This is ONLY a frontend redirect
+            - Later you can change href to your real dashboard URL
+            - Example: dashboard.html / admin/dashboard.html
+        -->
+        <div class="ms-auto">
+            <a href="dashboard.html" class="btn btn-dashboard">
+                Login to Dashboard
+            </a>
+        </div>
+
     </div>
 </nav>
 
@@ -212,11 +243,10 @@
         <!-- Fresh Juice -->
         <div class="col-md-4">
             <div class="card menu-card">
-                <img
-                    src="https://images.unsplash.com/photo-1600271886742-f049cd451bba"
-                    alt="Fresh Juice"
-                    loading="lazy"
-                    referrerpolicy="no-referrer">
+                <img src="https://images.unsplash.com/photo-1600271886742-f049cd451bba"
+                     alt="Fresh Juice"
+                     loading="lazy"
+                     referrerpolicy="no-referrer">
                 <div class="card-body text-center">
                     <h5>Fresh Juice</h5>
                     <p>Orange, Mango, Apple, Mixed Fruits</p>
@@ -248,7 +278,7 @@
 </footer>
 
 <!-- ===============================
-     TOAST NOTIFICATION (Example)
+     TOAST NOTIFICATION
 =============================== -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="welcomeToast" class="toast" role="alert">
@@ -270,9 +300,10 @@
        TOAST AUTO SHOW
     =============================== */
     document.addEventListener("DOMContentLoaded", () => {
-        const toast = new bootstrap.Toast(document.getElementById('welcomeToast'), {
-            delay: 3000
-        });
+        const toast = new bootstrap.Toast(
+            document.getElementById('welcomeToast'),
+            { delay: 3000 }
+        );
         toast.show();
     });
 </script>
