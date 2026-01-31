@@ -1799,11 +1799,33 @@ Click Save
 
 Click Deploy
 
-### 🧪 STEP 5 — TEST LAMBDA (MANDATORY)
+### 🧪 STEP 5 — Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
+### 🧪 STEP 6 — TEST LAMBDA (MANDATORY)
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
-### 🌐 STEP 6 — CREATE API GATEWAY (READ-ONLY)
+### 🌐 STEP 7 — CREATE API GATEWAY (READ-ONLY)
 
 #### 1️⃣ Open API Gateway
 
@@ -1855,11 +1877,11 @@ prod
 https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status
 ```
 
-### 🧪 STEP 7 — TEST API (CRITICAL)
+### 🧪 STEP 8 — TEST API (CRITICAL)
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
-### 🧑‍💻 STEP 8 — CREATE order-status.php
+### 🧑‍💻 STEP 9 — CREATE order-status.php
 
 This file is frontend-only and SAFE
 
@@ -1898,7 +1920,7 @@ $apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-st
 
 **🔁 Replace with your real API Gateway URL**
 
-### 🧪 STEP 9 — END-TO-END TEST
+### 🧪 STEP 10 — END-TO-END TEST
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
