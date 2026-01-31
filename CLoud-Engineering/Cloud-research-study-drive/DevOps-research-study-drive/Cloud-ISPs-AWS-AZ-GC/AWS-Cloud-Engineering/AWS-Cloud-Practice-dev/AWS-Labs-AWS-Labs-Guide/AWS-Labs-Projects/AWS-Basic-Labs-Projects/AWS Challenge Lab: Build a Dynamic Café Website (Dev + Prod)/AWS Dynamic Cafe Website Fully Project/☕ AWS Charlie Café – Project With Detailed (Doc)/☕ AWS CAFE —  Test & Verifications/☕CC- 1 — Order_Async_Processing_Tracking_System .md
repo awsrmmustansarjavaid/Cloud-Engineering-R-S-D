@@ -1892,6 +1892,14 @@ Basic successful test (most common)
 
 ### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
 
+- Customer places CASH order → order.php → payment-status.php shows Pay at Counter
+
+- Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
+
+- Customer refreshes payment-status.php → status changes Cash payment received
+
+- Optional: Auto-redirect → print-order.php to print receipt
+
 #### ✅ Test 1 — Manual Lambda Test
 
 - Go to your Lambda function → Test tab
@@ -1954,6 +1962,21 @@ This also works fine for your code:
   },
   "body": "{\"success\": true, \"message\": \"Order marked as PAID\"}"
 }
+```
+
+#### ✅ Test 2 — Use Postman / curl:
+
+```
+POST /admin/mark-paid
+{
+  "order_id": "ORD-123"
+}
+```
+
+#### Expected DynamoDB:
+
+```
+payment_status = PAID
 ```
 
 

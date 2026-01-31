@@ -2798,30 +2798,6 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
 
-### 8️⃣ — ADMIN TEST (IMPORTANT)
-
-- Customer places CASH order → order.php → payment-status.php shows Pay at Counter
-
-- Admin clicks “Mark as Paid” → DynamoDB updates payment_status = PAID
-
-- Customer refreshes payment-status.php → status changes Cash payment received
-
-- Optional: Auto-redirect → print-order.php to print receipt
-
-#### Use Postman / curl:
-
-```
-POST /admin/mark-paid
-{
-  "order_id": "ORD-123"
-}
-```
-
-#### Expected DynamoDB:
-
-```
-payment_status = PAID
-```
 
 **✅ Admin feature COMPLETE**
 
