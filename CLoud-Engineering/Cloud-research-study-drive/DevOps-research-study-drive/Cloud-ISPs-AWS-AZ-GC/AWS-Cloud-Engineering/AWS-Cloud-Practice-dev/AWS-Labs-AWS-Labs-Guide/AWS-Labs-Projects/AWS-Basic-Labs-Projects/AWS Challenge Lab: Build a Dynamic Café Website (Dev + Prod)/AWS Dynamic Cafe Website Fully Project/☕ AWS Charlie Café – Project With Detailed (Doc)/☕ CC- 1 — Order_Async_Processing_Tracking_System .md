@@ -2526,7 +2526,7 @@ You will simply start writing these attributes:
 #### Run this ONCE:
 
 ```
-ALTER TABLE cafe_orders
+ALTER TABLE orders
 ADD payment_method VARCHAR(10),
 ADD payment_status VARCHAR(10);
 ```
