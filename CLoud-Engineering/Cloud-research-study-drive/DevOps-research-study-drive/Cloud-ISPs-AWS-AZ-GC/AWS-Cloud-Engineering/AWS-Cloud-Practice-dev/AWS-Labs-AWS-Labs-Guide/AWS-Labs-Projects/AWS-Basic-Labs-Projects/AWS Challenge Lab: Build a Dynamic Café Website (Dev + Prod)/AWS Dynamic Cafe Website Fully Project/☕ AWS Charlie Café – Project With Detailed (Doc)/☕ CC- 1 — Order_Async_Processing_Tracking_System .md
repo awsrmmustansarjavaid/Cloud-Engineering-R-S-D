@@ -1829,7 +1829,12 @@ Click Deploy
 
 #### 1️⃣ Open API Gateway
 
-Create → REST API → New API
+- Exisiting REST API 
+
+or 
+
+- Create → REST API → New API
+
 
 ##### Name:
 
