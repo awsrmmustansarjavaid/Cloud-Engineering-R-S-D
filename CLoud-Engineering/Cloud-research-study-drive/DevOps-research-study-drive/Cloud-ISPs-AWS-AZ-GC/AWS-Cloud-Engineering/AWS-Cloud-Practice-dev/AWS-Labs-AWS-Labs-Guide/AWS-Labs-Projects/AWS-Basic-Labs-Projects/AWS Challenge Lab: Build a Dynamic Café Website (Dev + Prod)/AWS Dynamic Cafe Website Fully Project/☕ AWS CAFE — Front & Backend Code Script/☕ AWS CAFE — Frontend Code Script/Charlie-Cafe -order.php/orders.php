@@ -67,7 +67,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $orderSuccess = true; // Show receipt & payment options
         }
     }
-    
+
+    // ===========================================   
+    // Change destination page    
+    // ===========================================
+
+    // Order status page
+    // $statusUrl = "order-status.php?order_id=$orderId";
+
+
     // URL for payment status page (after user chooses payment method)
     $statusUrl = "payment-status.php?order_id=$orderId";
 }
@@ -203,6 +211,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         });
         card.mount("#card-element");
+
+    // ===========================================   
+    // CARD PAYMENT REDIRECT    
+    // ===========================================
 
         // Handle card payment (currently simulated)
         async function payWithCard() {
