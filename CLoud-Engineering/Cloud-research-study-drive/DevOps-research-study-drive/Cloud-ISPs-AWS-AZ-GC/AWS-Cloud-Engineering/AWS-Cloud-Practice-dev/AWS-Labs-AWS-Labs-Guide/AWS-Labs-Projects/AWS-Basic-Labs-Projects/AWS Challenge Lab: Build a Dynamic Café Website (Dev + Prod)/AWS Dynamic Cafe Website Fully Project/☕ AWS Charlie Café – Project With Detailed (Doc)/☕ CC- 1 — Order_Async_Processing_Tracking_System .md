@@ -2076,6 +2076,54 @@ ORD-20260114-8392
 
 [CafeOrderWorkerLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda.py)
 
+#### 3️⃣ Lambda Environment Variables
+
+- AWS Console → Lambda → CreateOrderLambda
+
+- Go to Configuration tab
+
+- Click Environment variables
+
+- Click Edit
+
+- Add EXACT variables
+
+| Key       | Value                             |
+| --------- | --------------------------------- |
+| `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
+| `DB_USER` | `cafe_user`                           |
+| `DB_PASS` | `your-db-password`                |
+| `DB_NAME` | `cafe_db`                    |
+
+
+⚠️ NO quotes
+
+⚠️ NO spaces
+
+- Click Save
+
+#### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
 ### 🌐 STEP 5 — CREATE New Resources API GATEWAY FOR WORKER
 
 #### Resources
