@@ -2881,6 +2881,8 @@ $statusUrl = "payment-status.php?order_id=$orderId";
 That’s it.
 Nothing else touched here.
 
+- **⚠️ 1️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
+
 #### 💳 2️⃣ CARD PAYMENT REDIRECT (ADD ONLY)
 
 #### 🔴 CURRENT
@@ -2908,6 +2910,8 @@ async function payWithCard() {
 
 ✔ Just a redirect after success
 
+- **⚠️ 2️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
+
 #### ☕ 3️⃣ CASH PAYMENT (ALREADY CORRECT ✅)
 
 You already did this perfectly 👌
@@ -2918,6 +2922,8 @@ window.location.href = "<?= $statusUrl ?>";
 ```
 
 Since $statusUrl now points to payment-status.php, cash flow is done.
+
+- **⚠️ 3️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
 
 ### ✅ PART 2: FINAL payment-status.php (CLEAN + PRINT REDIRECT)
 
