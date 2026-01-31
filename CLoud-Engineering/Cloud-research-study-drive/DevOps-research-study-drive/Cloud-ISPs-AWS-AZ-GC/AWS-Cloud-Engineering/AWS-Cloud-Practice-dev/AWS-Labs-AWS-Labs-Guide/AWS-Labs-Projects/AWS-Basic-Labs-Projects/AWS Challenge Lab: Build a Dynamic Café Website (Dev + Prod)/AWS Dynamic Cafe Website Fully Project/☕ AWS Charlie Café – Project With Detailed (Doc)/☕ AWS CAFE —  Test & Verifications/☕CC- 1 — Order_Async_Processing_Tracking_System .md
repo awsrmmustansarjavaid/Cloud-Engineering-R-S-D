@@ -1933,6 +1933,17 @@ Copy-paste this exact JSON into the Test tab in your Lambda function:
 }
 ```
 
+#### Minimal Test Event (if you just want to simulate body)
+> **(Shorter version — good for quick tests)**
+
+This also works fine for your code:
+
+```
+{
+  "body": "{\"order_id\": \"ORD-999999999-999\"}"
+}
+```
+
 #### Expected successful output (if order exists in DynamoDB):
 
 ```
@@ -1942,15 +1953,6 @@ Copy-paste this exact JSON into the Test tab in your Lambda function:
     "Access-Control-Allow-Origin": "*"
   },
   "body": "{\"success\": true, \"message\": \"Order marked as PAID\"}"
-}
-```
-
-#### Minimal Test Event (if you just want to simulate body)
-This also works fine for your code:
-
-```
-{
-  "body": "{\"order_id\": \"ORD-999999999-999\"}"
 }
 ```
 
