@@ -2487,7 +2487,35 @@ You will simply start writing these attributes:
 
 - Use JSON view for ease.
 
+Basic test item (CASH payment – PENDING)
 
+```
+{
+  "order_id": { "S": "TEST-ORD-20260131-0001" },
+  "table_number": { "N": "3" },
+  "item": { "S": "Latte" },
+  "quantity": { "N": "1" },
+  "total_amount": { "N": "4.00" },
+  "status": { "S": "RECEIVED" },
+  "payment_method": { "S": "CASH" },
+  "payment_status": { "S": "PENDING" }
+}
+```
+
+Another test item (CARD payment – PAID)
+
+```
+{
+  "order_id": { "S": "TEST-ORD-20260131-0002" },
+  "table_number": { "N": "7" },
+  "item": { "S": "Fresh Juice" },
+  "quantity": { "N": "2" },
+  "total_amount": { "N": "10.00" },
+  "status": { "S": "PREPARING" },
+  "payment_method": { "S": "CARD" },
+  "payment_status": { "S": "PAID" }
+}
+```
 
 ✅ Nothing else to configure here
 
