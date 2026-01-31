@@ -1420,8 +1420,6 @@ STEP 4️⃣ Click Print Receipt
 
 ### 🧪 STEP 3 — TEST ORDER CREATION
 
-
-
 #### ✅ TEST 1 — Test Lambda DIRECTLY (mandatory first)
 
 - AWS Console → Lambda → CreateOrderLambda
@@ -1554,6 +1552,105 @@ curl -X POST \
 ✔ If this fails → API Gateway mapping issue
 
 ✔ If this works → continue
+
+### 🧑‍💻 STEP 4 — CREATE WORKER (KITCHEN) LAMBDA
+
+#### Test 1: RECEIVED → PREPARING
+
+- Name: Test_RECEIVED-PREPARING
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"PREPARING\"}",
+  "httpMethod": "POST",
+  "path": "/order-update",
+  "isBase64Encoded": false
+}
+```
+
+#### Expected Result:
+
+```
+✅ should succeed
+```
+
+#### Test 2: PREPARING → READY
+
+- Name: Test_PREPARING-READY
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"COMPLETED\"}",
+  "httpMethod": "POST",
+  "path": "/order-update",
+  "isBase64Encoded": false
+}
+```
+
+#### Expected Result:
+
+```
+✅ should succeed after Test 1
+```
+
+#### Test 3: READY → COMPLETED
+
+- Name: Test_READY-COMPLETED
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"COMPLETED\"}",
+  "httpMethod": "POST",
+  "path": "/order-update",
+  "isBase64Encoded": false
+}
+```
+
+#### Expected Result:
+
+```
+✅ should succeed
+```
+
+#### Test 4: Negative Test: Invalid Transition
+
+> **⚠️ e.g. try to go back to PREPARING after COMPLETED**
+
+- Name: Test_Negative-Invalid
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"PREPARING\"}",
+  "httpMethod": "POST",
+  "path": "/order-update",
+  "isBase64Encoded": false
+}
+```
+
+#### Expected Result:
+
+```
+✅ should 400 – "Invalid status transition"
+```
+
+#### Test 5: Negative Test: Non-existent order
+
+- Name: Test_Negative-Non-existent
+
+```
+{
+  "body": "{\"order_id\": \"ORD-FAKE-9999\", \"status\": \"PREPARING\"}",
+  "httpMethod": "POST",
+  "path": "/order-update",
+  "isBase64Encoded": false
+}
+```
+
+#### Expected Result:
+
+```
+✅ should 404 – "Order not found"
+```
 
 
 **✅ PHASE 3️⃣ STATUS**
