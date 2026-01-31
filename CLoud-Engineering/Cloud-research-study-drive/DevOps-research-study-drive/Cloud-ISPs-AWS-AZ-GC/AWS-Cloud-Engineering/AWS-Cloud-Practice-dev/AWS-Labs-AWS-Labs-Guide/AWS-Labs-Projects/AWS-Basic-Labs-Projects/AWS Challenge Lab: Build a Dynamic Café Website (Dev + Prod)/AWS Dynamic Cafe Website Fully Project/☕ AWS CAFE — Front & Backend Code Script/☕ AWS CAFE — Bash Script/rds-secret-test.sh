@@ -18,9 +18,9 @@ echo
 FAIL_COUNT=0
 
 # ── CHANGE ONLY THESE TWO VALUES! ────────────────────────────────────────
-SECRET_NAME="/cafe/prod/database/credentials"          # ← Your secret name or ARN
+SECRET_NAME="CafeDevDBSM"          # ← Your secret name or ARN
 # Examples: "prod-db-secret", "my-rds-credentials", or full ARN
-RDS_DB="cafe_orders"                                   # ← Database name to connect to (optional)
+RDS_DB="cafe_db"                                   # ← Database name to connect to (optional)
 
 PORT="3306"   # almost always 3306 for MySQL/MariaDB/Aurora
 
