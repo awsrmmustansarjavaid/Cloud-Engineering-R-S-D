@@ -19,7 +19,7 @@ const CHARLIE = (() => {
         COGNITO_DOMAIN: "us-east-1wxssmoiqi.auth.us-east-1.amazoncognito.com",
 
         // -------- API Gateway --------
-        API_BASE: "https://bs0vgnth0f.execute-api.us-east-1.amazonaws.com/dev",
+        API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
 
         // -------- CloudFront --------
         CLOUDFRONT_BASE: "https://d3lnkgtsj0uwlu.cloudfront.net"
@@ -90,7 +90,6 @@ const CHARLIE = (() => {
                 return;
             }
 
-            // Page is safe
             document.body.style.display = "block";
         }
     };
@@ -123,9 +122,9 @@ const CHARLIE = (() => {
 
     const api = {
 
-        // ---------- ORDERS ----------
+        // ---------- PLACE ORDER ----------
         placeOrder(payload) {
-            return fetch(`${CONFIG.API_BASE}/orders`, {
+            return fetch(`${CONFIG.API_BASE}/dev/orders`, {  // ← add /dev/ (or your current stage)
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -135,19 +134,27 @@ const CHARLIE = (() => {
         // ---------- ORDER STATUS ----------
         getOrderStatus(orderId) {
             return fetch(
-                `${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`
+                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
             ).then(res => res.json());
         },
 
-        // ---------- WORKER / ADMIN ----------
-        updateOrder(payload) {
-            return authFetch(`${CONFIG.API_BASE}/order-update`, {
+        // ---------- CASH PAYMENT ----------
+        // ✅ NEW: Centralized cash payment endpoint
+        cashPayment(orderId) {
+            return fetch(`${CONFIG.API_BASE}/dev/orders/cash-payment`, {  // ← assuming this is also under /dev/
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ order_id: orderId })
+            }).then(res => res.json());
+        },
+
+        // ---------- ADMIN ----------
+        updateOrder(payload) {
+            return authFetch(`${CONFIG.API_BASE}/dev/order-update`, {  // ← add stage here too
                 body: JSON.stringify(payload)
             }).then(res => res.json());
         }
     };
-
     /* =====================================================
        6️⃣ CLOUDFRONT ASSETS
     ===================================================== */
