@@ -2298,6 +2298,18 @@ GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?or
 
 ### 🧩 STEP 1 — DATABASE (VERIFY ONLY)
 
+#### 1️⃣ Open RDS → Query Editor (or MySQL client)
+
+#### 2️⃣ Run:
+
+```
+use cafe_db;
+```
+
+```
+DESCRIBE orders;
+```
+
 ❌ Do NOT drop or modify existing columns
 
 ✅ Only verify these exist
