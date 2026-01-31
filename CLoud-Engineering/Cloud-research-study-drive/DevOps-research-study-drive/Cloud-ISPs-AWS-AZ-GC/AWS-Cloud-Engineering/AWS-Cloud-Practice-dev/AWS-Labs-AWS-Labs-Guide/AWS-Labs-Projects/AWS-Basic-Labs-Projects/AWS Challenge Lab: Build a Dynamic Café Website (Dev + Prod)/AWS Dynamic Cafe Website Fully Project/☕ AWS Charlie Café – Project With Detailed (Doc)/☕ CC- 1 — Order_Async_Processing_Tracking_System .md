@@ -2124,6 +2124,10 @@ ORD-20260114-8392
 
 **⏳ Wait until Lambda status = Active**
 
+#### 5️⃣ Attach Lambda Layer
+
+- same steps 
+
 ### 🌐 STEP 5 — CREATE New Resources API GATEWAY FOR WORKER
 
 #### Resources
