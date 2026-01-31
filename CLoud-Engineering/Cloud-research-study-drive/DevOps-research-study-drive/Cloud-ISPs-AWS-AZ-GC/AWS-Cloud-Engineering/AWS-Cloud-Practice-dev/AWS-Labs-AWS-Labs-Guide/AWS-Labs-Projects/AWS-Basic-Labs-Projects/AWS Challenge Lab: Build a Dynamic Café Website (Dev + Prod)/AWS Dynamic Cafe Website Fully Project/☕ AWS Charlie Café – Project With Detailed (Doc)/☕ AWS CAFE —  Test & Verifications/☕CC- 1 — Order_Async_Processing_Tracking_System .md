@@ -1652,6 +1652,47 @@ curl -X POST \
 ✅ should 404 – "Order not found"
 ```
 
+### 🧑‍💻 STEP 9 — 🧪 FINAL TEST
+
+#### 1️⃣ Test directly in browser
+
+```
+https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=ORD-XXXX
+```
+
+#### 2️⃣ Expected JSON
+
+```
+{
+  "order": {
+    "order_id": "ORD-20260114-8392",
+    "table_number": 3,
+    "customer_name": "Alex",
+    "item": "Coffee",
+    "quantity": 2,
+    "total_amount": "10.00",
+    "status": "PREPARING",
+    "created_at": "2026-01-14 10:21:33"
+  }
+}
+```
+
+
+1️⃣ Place order
+
+2️⃣ Backend returns order_id
+
+3️⃣ Open:
+
+```
+order-receipt.php?order_id=ORD-XXXX
+```
+
+4️⃣ Status updates automatically
+
+5️⃣ Scan QR → same page
+
+6️⃣ Print → receipt only
 
 **✅ PHASE 3️⃣ STATUS**
 
