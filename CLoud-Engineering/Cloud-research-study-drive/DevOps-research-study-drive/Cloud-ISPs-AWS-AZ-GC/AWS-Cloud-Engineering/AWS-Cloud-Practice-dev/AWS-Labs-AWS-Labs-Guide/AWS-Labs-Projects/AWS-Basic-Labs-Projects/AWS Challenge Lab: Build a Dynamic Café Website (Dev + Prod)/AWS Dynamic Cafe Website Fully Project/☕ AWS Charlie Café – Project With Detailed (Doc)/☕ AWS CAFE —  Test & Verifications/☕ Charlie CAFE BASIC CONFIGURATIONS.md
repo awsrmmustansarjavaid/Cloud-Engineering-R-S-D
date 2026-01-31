@@ -404,6 +404,26 @@ EC2-Cafe-Secrets-Role
 ---
 ## PHASE 3️⃣ — VERIFY CAFE DATABASE CONFIGURATIONS
 
+### Method 1️⃣ Bash Scripting Cafe  RDS Tests
+
+```
+sudo nano rds-secret-test.sh
+```
+
+[Cafe RDS Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/rds-secret-test.sh)
+
+#### ▶️ How to Run
+
+```
+sudo chmod +x rds-secret-test.sh
+```
+
+```
+sudo ./rds-secret-test.sh
+```
+
+### Method 2️⃣ Cafe  RDS Tests
+
 #### 1️⃣ Verify Database
 
 ```
