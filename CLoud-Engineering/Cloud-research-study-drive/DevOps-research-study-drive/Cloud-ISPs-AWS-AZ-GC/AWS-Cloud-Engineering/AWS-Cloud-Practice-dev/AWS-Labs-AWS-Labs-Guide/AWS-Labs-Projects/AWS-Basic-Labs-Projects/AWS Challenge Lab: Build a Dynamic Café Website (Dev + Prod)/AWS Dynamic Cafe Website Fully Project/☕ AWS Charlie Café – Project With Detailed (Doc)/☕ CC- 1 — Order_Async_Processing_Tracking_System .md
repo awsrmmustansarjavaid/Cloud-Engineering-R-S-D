@@ -2563,7 +2563,7 @@ DESCRIBE orders;
 
 #### Replace entire code with this:
 
-[CashPaymentLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+[CashPaymentLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CashPaymentLambda.py)
 
 - Click Deploy
 
