@@ -2173,11 +2173,86 @@ POST /order-update
 
 #### Replace SELECT query:
 
+> **🔁 Replace ONLY the SQL + response logic**
+
+> **(keep env vars, VPC, API Gateway exactly as-is)**
+
 ```
 SELECT order_id, table_number, item, quantity, total_amount, status, created_at
 FROM orders
 WHERE order_id=%s
 ```
+#### ✅ FINAL — Order Status Lambda
+> **
+```
+import json
+import os
+import pymysql
+
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASS"],
+        database=os.environ["DB_NAME"],
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+def lambda_handler(event, context):
+    params = event.get("queryStringParameters") or {}
+    order_id = params.get("order_id")
+
+    if not order_id:
+        return {
+            "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": "order_id required"})
+        }
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                order_id,
+                table_number,
+                customer_name,
+                item,
+                quantity,
+                total_amount,
+                status,
+                created_at
+            FROM orders
+            WHERE order_id = %s
+        """, (order_id,))
+
+        order = cursor.fetchone()
+
+        if not order:
+            return {
+                "statusCode": 404,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Order not found"})
+            }
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({
+                "order": order
+            }, default=str)
+        }
+
+    finally:
+        cursor.close()
+        conn.close()
+```
+
+[CafeOrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda.py)
 
 ### 🧑‍💻 STEP 8 — order-receipt.php
 
