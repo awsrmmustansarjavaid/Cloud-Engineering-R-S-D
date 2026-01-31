@@ -1829,10 +1829,6 @@ Click Deploy
 
 #### 1️⃣ Open API Gateway
 
-- Exisiting REST API 
-
-or 
-
 - Create → REST API → New API
 
 
@@ -1946,6 +1942,10 @@ Connect to your cafe database.
 #### Run exactly this SQL:
 
 ```
+use cafe_db;
+```
+
+```
 ALTER TABLE orders
 ADD COLUMN order_id VARCHAR(50),
 ADD COLUMN status VARCHAR(20) DEFAULT 'RECEIVED',
@@ -2016,9 +2016,9 @@ ORD-20260114-8392
 | Key       | Value                             |
 | --------- | --------------------------------- |
 | `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
-| `DB_USER` | `admin`                           |
+| `DB_USER` | `cafe_user`                           |
 | `DB_PASS` | `your-db-password`                |
-| `DB_NAME` | `charlie_cafe`                    |
+| `DB_NAME` | `cafe_db`                    |
 
 
 ⚠️ NO quotes
