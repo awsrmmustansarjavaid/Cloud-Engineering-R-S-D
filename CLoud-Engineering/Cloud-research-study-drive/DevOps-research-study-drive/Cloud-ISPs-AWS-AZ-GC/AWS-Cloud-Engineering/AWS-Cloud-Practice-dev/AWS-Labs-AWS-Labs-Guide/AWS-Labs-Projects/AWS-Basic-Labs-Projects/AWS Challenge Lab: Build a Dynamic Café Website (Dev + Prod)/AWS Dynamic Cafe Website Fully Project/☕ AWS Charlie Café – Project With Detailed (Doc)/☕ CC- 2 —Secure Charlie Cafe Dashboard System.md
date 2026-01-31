@@ -2546,10 +2546,6 @@ fetch_orders()
 
 ### 5️⃣ — FRONTEND AUTH FOUNDATION (REUSABLE)
 
-
-
-
-
 ### 6️⃣ — ADMIN DASHBOARD (ADMIN ONLY)
 
 #### Step 9️⃣ — Protect admin-dashboard.html
