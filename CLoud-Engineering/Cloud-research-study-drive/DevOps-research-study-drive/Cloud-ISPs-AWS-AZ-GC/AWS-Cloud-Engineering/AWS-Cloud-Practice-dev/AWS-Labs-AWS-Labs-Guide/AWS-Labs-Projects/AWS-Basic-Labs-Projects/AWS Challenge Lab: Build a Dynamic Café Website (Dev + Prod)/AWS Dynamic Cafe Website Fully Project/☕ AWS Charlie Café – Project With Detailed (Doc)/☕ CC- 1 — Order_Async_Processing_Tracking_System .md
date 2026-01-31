@@ -2389,6 +2389,10 @@ echo "<a class='btn btn-success mt-2'
 
 ✔ This only adds a link
 
+**⚠️ STEP 3 is ALREADY implemented in your order.php.You do NOT need structural changes.**
+
+[order.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
 ### 🧩 STEP 4 — CREATE CUSTOMER TRACKING PAGE
 
 #### File name (NEW)
