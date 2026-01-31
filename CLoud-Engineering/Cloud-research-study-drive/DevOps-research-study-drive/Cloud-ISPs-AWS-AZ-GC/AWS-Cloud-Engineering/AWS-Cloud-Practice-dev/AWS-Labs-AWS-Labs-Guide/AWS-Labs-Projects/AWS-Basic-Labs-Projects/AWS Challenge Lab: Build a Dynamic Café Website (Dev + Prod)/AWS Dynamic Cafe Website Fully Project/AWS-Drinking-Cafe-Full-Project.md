@@ -330,14 +330,18 @@ Attach this policy (or ensure it exists):
 
 ### 6️⃣ EC2 Instance (Amazon Linux 2023)
 
+ * EC2 Name : 
+``` 
+CafeDevWebServer
+```
+
 * AMI: Amazon Linux 2023
 * Type: `t2.micro`
 * VPC/Subnet: Dev VPC + Public subnet
 * Security Group:
 
   * SSH (22) → Your IP
-  * HTTP (80) → 0.0.0.0/0
-* Name tag: `CafeDevWebServer`
+  * HTTP (80) → 0.0.0.0/0*
 
 #### ✅ EC2 LAMP Server USER DATA
 > **📍 File Location: AWS-LAMP Server-Bash-Script.md**
