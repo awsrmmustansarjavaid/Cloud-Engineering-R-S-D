@@ -2864,68 +2864,8 @@ sudo systemctl restart httpd
 
 #### 🔁 1️⃣ Change destination page (VERY IMPORTANT)
 
-#### 🔴 CURRENT (near the top)
 
-```
-// Order status page
-$statusUrl = "order-status.php?order_id=$orderId";
-```
-
-#### ✅ CHANGE TO
-
-```
-// Payment status page (after payment decision)
-$statusUrl = "payment-status.php?order_id=$orderId";
-```
-
-That’s it.
-Nothing else touched here.
-
-- **⚠️ 1️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
-
-#### 💳 2️⃣ CARD PAYMENT REDIRECT (ADD ONLY)
-
-#### 🔴 CURRENT
-
-```
-async function payWithCard() {
-    alert("Stripe payment flow continues here (unchanged).");
-}
-```
-
-#### ✅ UPDATED (redirect added, flow unchanged)
-
-```
-async function payWithCard() {
-
-    // ⚠️ Your existing Stripe logic stays here
-    alert("Stripe payment successful (LAB simulation).");
-
-    // Redirect to payment status page
-    window.location.href = "<?= $statusUrl ?>";
-}
-```
-
-✔ No Stripe logic removed
-
-✔ Just a redirect after success
-
-- **⚠️ 2️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
-
-#### ☕ 3️⃣ CASH PAYMENT (ALREADY CORRECT ✅)
-
-You already did this perfectly 👌
-This line is already correct:
-
-```
-window.location.href = "<?= $statusUrl ?>";
-```
-
-Since $statusUrl now points to payment-status.php, cash flow is done.
-
-- **⚠️ 3️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
-
-### ✅ PART 2: FINAL payment-status.php (CLEAN + PRINT REDIRECT)
+### ✅ FINAL payment-status.php (CLEAN + PRINT REDIRECT)
 
 Below is a clean, correct version aligned with your flow.
 
