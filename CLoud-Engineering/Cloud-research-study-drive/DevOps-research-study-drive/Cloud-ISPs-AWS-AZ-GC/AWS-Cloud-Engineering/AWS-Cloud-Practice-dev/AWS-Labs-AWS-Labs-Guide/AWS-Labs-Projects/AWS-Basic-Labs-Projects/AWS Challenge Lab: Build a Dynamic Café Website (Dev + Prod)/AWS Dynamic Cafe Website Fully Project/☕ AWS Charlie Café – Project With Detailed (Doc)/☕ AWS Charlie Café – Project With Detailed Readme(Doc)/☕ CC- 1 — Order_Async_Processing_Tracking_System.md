@@ -1040,6 +1040,88 @@ Replace button logic with:
 </script>
 <?php endif; ?>
 ```
+#### 🔹 Step 1.3 — Add Attributes (NO MIGRATION NEEDED)
+
+**👉 DynamoDB is schema-less, so you do NOT manually add columns.**
+
+#### Add 2 columns / attributes:
+
+You will simply start writing these attributes:
+
+| Attribute Name | Value          |
+| -------------- | -------------- |
+| payment_method | CASH / CARD    |
+| payment_status | PENDING / PAID |
+
+> **Your existing table is fine — just extend it**
+
+- Click Explore table items (or Items tab) → Create item.
+
+- Use JSON view for ease.
+
+#### You just:
+
+- Added payment_method
+
+- Added payment_status
+
+- WITHOUT changing schema
+
+- WITHOUT migrations
+
+- WITHOUT breaking anything
+
+#### 🧠 WHY THIS WORKS (IMPORTANT)
+
+- DynamoDB stores each item as a JSON object
+
+- Different orders can have:
+
+  - more attributes
+
+  - fewer attributes
+
+  - different shapes
+
+This is by design
+
+#### 🧪 WHAT HAPPENS NEXT (MENTAL MODEL)
+
+When customer places order:
+
+```
+{
+  "order_id": "ORD-123",
+  "payment_method": "CASH",
+  "payment_status": "PENDING"
+}
+```
+
+When customer pays cash:
+
+```
+{
+  "order_id": "ORD-123",
+  "payment_method": "CASH",
+  "payment_status": "PAID"
+}
+```
+
+👉 Same item
+
+👉 Same table
+
+👉 Just updated attributes
+
+### ❌ COMMON WRONG ASSUMPTIONS (YOU DID NOTHING WRONG)
+
+| Thought                    | Reality |
+| -------------------------- | ------- |
+| “I must add columns”       | ❌ No    |
+| “I need migration”         | ❌ No    |
+| “I must alter table”       | ❌ No    |
+| “This step changes schema” | ❌ No    |
+
 
 
 ### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
@@ -1062,6 +1144,10 @@ Scenario 2 – Cash
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+
+
 ---
 ## ☕ CHARLIE CAFÉ PHASE 4️⃣ 🔁 REDIRECTING TO payment-status.php
 

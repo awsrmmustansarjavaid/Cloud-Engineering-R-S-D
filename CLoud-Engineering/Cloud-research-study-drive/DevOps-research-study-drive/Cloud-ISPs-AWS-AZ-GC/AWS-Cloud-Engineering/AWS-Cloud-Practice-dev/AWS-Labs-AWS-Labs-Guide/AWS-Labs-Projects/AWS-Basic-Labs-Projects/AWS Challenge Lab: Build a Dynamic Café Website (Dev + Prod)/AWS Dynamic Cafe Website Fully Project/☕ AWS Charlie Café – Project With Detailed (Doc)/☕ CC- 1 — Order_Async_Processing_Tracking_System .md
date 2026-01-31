@@ -2498,23 +2498,6 @@ Partition Key: order_id (String)
 
 #### 🔹 Step 1.3 — Add Attributes (NO MIGRATION NEEDED)
 
-**👉 DynamoDB is schema-less, so you do NOT manually add columns.**
-
-#### Add 2 columns / attributes:
-
-You will simply start writing these attributes:
-
-| Attribute Name | Value          |
-| -------------- | -------------- |
-| payment_method | CASH / CARD    |
-| payment_status | PENDING / PAID |
-
-> **Your existing table is fine — just extend it**
-
-- Click Explore table items (or Items tab) → Create item.
-
-- Use JSON view for ease.
-
 #### Basic test item (CASH payment – PENDING)
 
 ```
@@ -2533,7 +2516,6 @@ You will simply start writing these attributes:
 }
 ```
 
-
 #### Another test item (CARD payment – PAID)
 
 ```
@@ -2551,19 +2533,6 @@ You will simply start writing these attributes:
   "created_at": { "S": "2026-01-14T10:30:00Z" }
 }
 ```
-
-#### You just:
-
-- Added payment_method
-
-- Added payment_status
-
-- WITHOUT changing schema
-
-- WITHOUT migrations
-
-- WITHOUT breaking anything
-
 #### 🔎 VERIFY STEP 1.3 WORKED
 
 Click the item → you should see:
