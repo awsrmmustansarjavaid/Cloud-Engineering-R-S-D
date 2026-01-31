@@ -2428,9 +2428,27 @@ order-receipt.php
 
 #### 1️⃣ If you are using DynamoDB
 
-#### 🔹 Step 1.1 — Open DynamoDB
+#### 🔹 Step 1.1 — Create the CafeOrders Table
 
 - AWS Console → DynamoDB → Tables → CafeOrders
+
+- Table Name :
+
+```
+CafeOrders
+```
+
+- Partition key:
+
+```
+order_id
+```
+
+- Type: String
+
+- **❌ (No sort key needed, as per task—keeps it simple for lookups by order_id.)**
+
+
 
 #### 🔹 Step 1.2 — Confirm Primary Key
 
