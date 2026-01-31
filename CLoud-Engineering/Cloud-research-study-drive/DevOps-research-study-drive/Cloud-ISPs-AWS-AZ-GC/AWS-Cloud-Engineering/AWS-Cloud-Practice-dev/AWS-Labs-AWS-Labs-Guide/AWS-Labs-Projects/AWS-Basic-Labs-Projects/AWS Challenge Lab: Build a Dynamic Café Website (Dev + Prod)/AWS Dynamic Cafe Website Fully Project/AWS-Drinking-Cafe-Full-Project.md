@@ -317,7 +317,7 @@ Attach this policy (or ensure it exists):
         "dynamodb:Query",
         "dynamodb:Scan"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:9180599465397:table/CafeOrders"
+      "Resource": "arn:aws:dynamodb:us-east-1:aaaaaa55564333:table/CafeOrders"
     }
   ]
 }
