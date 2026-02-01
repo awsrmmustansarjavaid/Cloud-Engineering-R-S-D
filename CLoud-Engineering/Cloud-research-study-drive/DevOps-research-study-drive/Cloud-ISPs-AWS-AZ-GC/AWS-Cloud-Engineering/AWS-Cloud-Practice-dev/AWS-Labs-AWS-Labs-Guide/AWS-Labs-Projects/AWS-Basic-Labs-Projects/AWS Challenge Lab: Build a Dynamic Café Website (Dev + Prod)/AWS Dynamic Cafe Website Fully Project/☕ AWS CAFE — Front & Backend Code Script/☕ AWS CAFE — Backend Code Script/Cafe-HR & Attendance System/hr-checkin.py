@@ -3,7 +3,6 @@ import os
 import pymysql
 from datetime import date, datetime
 
-# Database connection
 connection = pymysql.connect(
     host=os.environ['DB_HOST'],
     user=os.environ['DB_USER'],
@@ -14,14 +13,26 @@ connection = pymysql.connect(
 
 def lambda_handler(event, context):
     try:
-        # Extract Cognito user ID from JWT
-        cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+        # -------------------------------
+        # AUTHORIZATION — ROLE CHECK
+        # -------------------------------
+        claims = event["requestContext"]["authorizer"]["claims"]
+        groups = claims.get("cognito:groups", [])
 
+        if isinstance(groups, str):
+            groups = [groups]
+
+        if "Employee" not in groups:
+            return response(403, "Forbidden")
+
+        # -------------------------------
+        # BUSINESS LOGIC (UNCHANGED)
+        # -------------------------------
+        cognito_user_id = claims["sub"]
         today = date.today()
         now = datetime.now().time()
 
         with connection.cursor() as cursor:
-            # Get employee ID
             cursor.execute(
                 "SELECT employee_id FROM employees WHERE cognito_user_id=%s",
                 (cognito_user_id,)
@@ -31,13 +42,10 @@ def lambda_handler(event, context):
             if not employee:
                 return response(404, "Employee not found")
 
-            employee_id = employee['employee_id']
-
-            # Insert attendance
             cursor.execute("""
                 INSERT INTO attendance (employee_id, attendance_date, checkin_time)
                 VALUES (%s, %s, %s)
-            """, (employee_id, today, now))
+            """, (employee["employee_id"], today, now))
 
             connection.commit()
 
@@ -53,7 +61,9 @@ def response(status, message):
     return {
         "statusCode": status,
         "headers": {
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Authorization,Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
         },
         "body": json.dumps({"message": message})
     }

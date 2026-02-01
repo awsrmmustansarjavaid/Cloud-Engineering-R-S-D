@@ -13,7 +13,22 @@ connection = pymysql.connect(
 
 def lambda_handler(event, context):
     try:
-        cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+        # -------------------------------
+        # AUTHORIZATION — ROLE CHECK
+        # -------------------------------
+        claims = event["requestContext"]["authorizer"]["claims"]
+        groups = claims.get("cognito:groups", [])
+
+        if isinstance(groups, str):
+            groups = [groups]
+
+        if "Employee" not in groups:
+            return response(403, "Forbidden")
+
+        # -------------------------------
+        # BUSINESS LOGIC (UNCHANGED)
+        # -------------------------------
+        cognito_user_id = claims["sub"]
         today = date.today()
         now = datetime.now().time()
 
@@ -40,7 +55,9 @@ def response(status, message):
     return {
         "statusCode": status,
         "headers": {
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Authorization,Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
         },
         "body": json.dumps({"message": message})
     }
