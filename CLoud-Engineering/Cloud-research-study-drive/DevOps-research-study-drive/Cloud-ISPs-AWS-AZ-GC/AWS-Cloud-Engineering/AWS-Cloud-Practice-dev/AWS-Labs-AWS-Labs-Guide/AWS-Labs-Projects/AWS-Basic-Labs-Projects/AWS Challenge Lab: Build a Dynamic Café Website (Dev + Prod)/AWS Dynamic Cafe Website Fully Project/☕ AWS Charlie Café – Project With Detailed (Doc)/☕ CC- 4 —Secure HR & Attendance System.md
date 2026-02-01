@@ -1403,6 +1403,35 @@ sudo nano /var/www/html/hr-attendance.html
 
 [hr-attendance.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/hr-attendance.html)
 
+### 2️⃣ BACKEND — HR ATTENDANCE DASHBOARD
+
+#### 1️⃣ DynamoDB Table (Attendance)
+
+- Create table:
+
+| Setting       | Value                       |
+| ------------- | --------------------------- |
+| Table name    | `CafeAttendance`            |
+| Partition key | `employee_id` (String)      |
+| Sort key      | `date` (String, YYYY-MM-DD) |
+
+📌 This allows:
+
+- One record per day
+
+- Easy query by date
+
+📌 Format you will store:
+
+- Other attributes:
+
+    - check_in
+
+    - check_out
+
+    - role
+
+
 
 ### 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
 
