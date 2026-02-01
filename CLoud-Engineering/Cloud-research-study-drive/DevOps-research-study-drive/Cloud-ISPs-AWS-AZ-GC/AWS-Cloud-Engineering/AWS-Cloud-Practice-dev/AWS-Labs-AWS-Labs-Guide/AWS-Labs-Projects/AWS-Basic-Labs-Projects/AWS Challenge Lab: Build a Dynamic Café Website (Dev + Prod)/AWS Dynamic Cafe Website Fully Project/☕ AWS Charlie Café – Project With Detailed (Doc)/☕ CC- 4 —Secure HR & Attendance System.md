@@ -392,9 +392,9 @@ HR Secure Attendance & Employee Management API
 
 - /checkout
 
-- /employee/profile
+- /employee-profile
 
-- /attendance/history
+- /attendance-history
 
 - /leaves-holidays
 
