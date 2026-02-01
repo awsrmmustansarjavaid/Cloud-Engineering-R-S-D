@@ -711,7 +711,7 @@ sudo chmod 755 js/central-auth-api.js
 
 ### 3️⃣ BACKEND CONFIGURATION
 
-#### ✅ FINAL PRODUCTION-SAFE COMMON LAMBDA TEMPLATE
+#### 1️⃣ FINAL PRODUCTION-SAFE COMMON LAMBDA TEMPLATE
 > **👉 USE THIS IN ALL 5 HR LAMBDAS**
 
 ```
@@ -775,6 +775,44 @@ def lambda_handler(event, context):
 ```
 
 **⚠️ All these 5 HR Lambda Updated.. Skip this step**
+
+#### 2️⃣ 🧩 HOW TO APPLY THIS TO EACH LAMBDA (NO CONFUSION)
+
+#### 1️⃣ Check-In Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# INSERT attendance record
+```
+
+#### 2️⃣ Check-Out Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# UPDATE checkout_time
+```
+
+#### 3️⃣ Attendance History Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# SELECT attendance rows
+# return list → auto JSON-safe
+```
+
+#### 4️⃣ Leaves & Holidays Lambda
+
+```
+ALLOWED_ROLE = "Employee"
+# SELECT leaves + holidays
+```
+
+#### 5️⃣ Admin Employees Lambda
+
+```
+ALLOWED_ROLE = "Admin"
+# SELECT all employees
+```
 
 
 #### 3️⃣ — PERFORMANCE & SAFETY SETTINGS
