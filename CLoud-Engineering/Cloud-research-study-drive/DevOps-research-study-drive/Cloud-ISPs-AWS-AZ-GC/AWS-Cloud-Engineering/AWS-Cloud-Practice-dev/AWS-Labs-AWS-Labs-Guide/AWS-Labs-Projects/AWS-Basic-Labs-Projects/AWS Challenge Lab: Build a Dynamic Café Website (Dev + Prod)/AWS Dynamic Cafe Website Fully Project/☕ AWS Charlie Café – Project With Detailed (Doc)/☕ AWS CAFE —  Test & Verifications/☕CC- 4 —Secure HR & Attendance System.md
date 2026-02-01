@@ -834,10 +834,334 @@ You now have:
 ---
 ## ☕ Charlie Café PHASE 6️⃣ — ADMIN ATTENDANCE ANALYTICS
 
+### 1️⃣ . Lambda Test
 
+- Open each Lambda in AWS Console
 
+- Click Test → Use Empty JSON {}
+
+- Check JSON output → Should return today/weekly/monthly attendance
+
+### 2️⃣ . API Gateway Test
+
+- Open API Gateway Console → Resource → GET /admin/attendance/daily
+
+- Click Test → Should return JSON array of attendance
+
+- Repeat for weekly & monthly
+
+### 3️⃣ . Admin Frontend Test
+
+- Login as Admin → Open Dashboard
+
+- Click Daily / Weekly / Monthly buttons
+
+- Check that table populates correctly
+
+- Verify that non-admin users cannot see these buttons or API data
+
+**✅ After this, Admin Attendance Analytics will be fully functional — daily, weekly, monthly summaries with frontend display.**
 
 **✅ PHASE 6️⃣ STATUS**
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 7️⃣ — ADMIN DASHBOARD ENHANCEMENTS
+
+- Login as Admin → Open Dashboard
+
+- Check Summary Cards → Total Present / Absent / Leaves
+
+- Filter by Employee → Table updates
+
+- Export CSV → Open downloaded file, verify data matches table
+
+- Unauthorized Access Test → Employee account cannot see dashboard or API results
+
+### 🎯 Outcome:
+
+A- dmin dashboard now has employee-wise filtering
+
+- Export-ready table via CSV
+
+- Summary cards for quick metrics
+
+- Fully integrated with existing Lambda + RDS
+
+- Fully job-ready
+
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 8️⃣ — Update Cafe Security Configuration
+
+### 4️⃣ — Verification Steps
+
+- EC2 Verification
+
+    - Try connecting via SSH from your IP → should work.
+
+    - Access frontend in browser → should work.
+
+- Lambda Verification
+
+    - Test Lambda function in AWS console.
+
+    - Ensure it can connect to RDS (e.g., query SELECT 1).
+
+- RDS Verification
+
+    - Check Connectivity & Security → VPC security groups.
+
+    - Optional: Test from another EC2 → should fail if SG is correct.
+
+### 5️⃣ — Documentation for Audit
+
+- Create a security document (Markdown or Excel) listing:
+
+    - All SG names
+
+    - Inbound/outbound rules
+
+    - Purpose for each rule
+
+#### Example Markdown snippet:
+
+```
+# Security Group Documentation
+
+## EC2 Frontend SG
+- Port 22 (SSH) → Your IP
+- Port 80 (HTTP) → 0.0.0.0/0
+- Port 443 (HTTPS) → 0.0.0.0/0
+
+## Lambda SG
+- Outbound → RDS SG: 3306/TCP
+
+## RDS SG
+- Inbound → Lambda SG: 3306/TCP
+```
+
+#### ✅ Result:
+
+- Your environment is now locked down.
+
+- Only Lambda can access the database.
+
+- Frontend EC2 is secure for admin & public traffic.
+
+
+**✅ PHASE 8️⃣ STATUS**
+
+> **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 🔟 — Update CafePDFReportLambda for HR & Attendance
+
+### 2️⃣ Step 2️⃣ – Verify & Test Your HR Lambdas with PDF
+
+#### 1️⃣ A) Quick Unit Test (Lambda Console)
+
+- Go to AWS Lambda → CafePDFReportLambda → Test
+
+#### 2️⃣ Sample test event:
+
+#### 1️⃣ attendance test event
+
+```
+{
+  "queryStringParameters": {
+    "page": "attendance"
+  }
+}
+```
+#### Expected Result:
+- Lambda generates Employee Attendance PDF using RDS attendance + employees table
+
+#### PDF includes:
+
+    - Title: 📋 Employee Attendance Report
+
+    - Generated date
+
+    - Table with attendance records:
+```
+Employee | Job Title | Date       | Check-In | Check-Out
+Alice    | Barista   | 2026-01-19 | 09:00    | 17:00
+Bob      | Manager   | 2026-01-19 | 08:50    | 16:50
+...      | ...       | ...        | ...      | ...
+```
+- Sorted by attendance_date DESC (most recent first)
+
+#### PDF is:
+
+    - Stored in S3 bucket: attendance_report_<today>.pdf
+
+    - Returned in Lambda response body
+
+**✅ StatusCode 200, PDF content returned**
+
+#### 2️⃣ analytics test event
+
+```
+{
+  "queryStringParameters": {
+    "page": "analytics"
+  }
+}
+```
+
+#### Expected Result:
+
+- Lambda generates a PDF for Cafe Sales Analytics
+
+#### PDF includes:
+
+    - Title: 📊 Cafe Sales Analytics Report
+
+    - Generated date (today)
+
+    - Table with:
+
+```
+Metric       | Amount
+Total Sales  | 12000
+Total Cost   | 8000
+Profit       | 4000
+```
+
+#### PDF is:
+
+    - Stored in S3 bucket: analytics_report_<today>.pdf
+
+    - Returned in Lambda response body (as Base64-ish content, decoded in console)
+
+**✅ Success: StatusCode 200, PDF content returned**
+
+#### 3️⃣ order-status test event
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+#### Expected Result:
+
+- Lambda generates Order Status PDF using DynamoDB ORDERS_TABLE_NAME
+
+- PDF includes:
+
+    - Title: 📝 Cafe Order Status Report
+
+    - Generated date
+
+    - Table with order details:
+```
+Order ID | Item | Qty | Cost | Price | Profit
+```
+
+#### Each row shows:
+
+    - order_id
+
+    - item_name
+
+    - quantity
+
+    - item_cost
+
+    - item_price
+
+    - calculated profit
+
+#### PDF is:
+
+    - Stored in S3 bucket: order-status_report_<today>.pdf
+
+    - Returned in Lambda response body
+
+**✅ Success: StatusCode 200, PDF content returned**
+
+#### 4️⃣ Notes for All Tests
+
+- If S3 bucket is missing, Lambda will throw a NoSuchBucket error
+
+- If RDS is inaccessible, the "attendance" test will fail
+
+- The PDF content returned in Lambda console is not human-readable (binary-ish), but downloading from S3 will give a normal PDF
+
+- All tests should return HTTP statusCode 200 if everything is correct
+
+##### ✅ In short:
+| Page Type      | PDF Contents                                     | S3 File Name                    | StatusCode |
+| -------------- | ------------------------------------------------ | ------------------------------- | ---------- |
+| `analytics`    | Cafe sales metrics table                         | analytics_report_<today>.pdf    | 200        |
+| `order-status` | Order table from DynamoDB                        | order-status_report_<today>.pdf | 200        |
+| `attendance`   | Attendance table from RDS (employees+attendance) | attendance_report_<today>.pdf   | 200        |
+
+**✅ This is enough — Lambda will handle the correct report.**
+
+#### 2️⃣ B) Test Individual HR Lambda Functions
+
+- hr-checkin → Invoke test with Cognito JWT in event
+
+- hr-checkout → Invoke test after check-in
+
+- hr-employee-profile → Should return employee info
+
+- hr-attendance-history → Should return attendance records
+
+- hr-leaves-holidays → Should return leaves + holidays
+
+#### Tips:
+
+Use Lambda console → Test events → Include requestContext.authorizer.claims.sub as a dummy Cognito user ID
+
+#### Example:
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+- Check logs in CloudWatch → Lambda → Logs if errors occur.
+
+#### 3️⃣ C) Verify PDF Integration
+
+- After generating some attendance records:
+
+    - hr-checkin and hr-checkout must have created today’s attendance
+
+- Invoke CafePDFReportLambda with page=attendance
+
+- Download PDF from S3 bucket → Verify:
+
+    - Employee name
+
+    - Job title
+
+    - Check-in time
+
+    - Check-out time
+
+### ✅ After this step:
+
+- Your HR & Attendance system is fully integrated with PDF generation
+
+- No need for a new PDF Lambda
+
+- All Lambda functions are ready for API Gateway integration
+
+**✅ PHASE 🔟 STATUS**
+
+> **🟢 PHASE 🔟 COMPLETE & VERIFIED**
 ---
