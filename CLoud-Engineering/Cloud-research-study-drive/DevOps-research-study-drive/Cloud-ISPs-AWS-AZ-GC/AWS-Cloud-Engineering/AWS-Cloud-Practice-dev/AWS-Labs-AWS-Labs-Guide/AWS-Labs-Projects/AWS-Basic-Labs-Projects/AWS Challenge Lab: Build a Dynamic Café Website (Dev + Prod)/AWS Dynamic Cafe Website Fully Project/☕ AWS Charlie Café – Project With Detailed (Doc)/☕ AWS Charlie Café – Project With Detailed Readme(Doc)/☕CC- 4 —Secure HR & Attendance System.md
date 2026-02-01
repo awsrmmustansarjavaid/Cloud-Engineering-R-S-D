@@ -70,6 +70,23 @@
 
 ## PHASE 2️⃣ Architecture Overview   
 
+### 8️⃣ Confirm Lambda DB Access (Important Minor Step)
+
+- Check Lambda Environment Variables
+
+- Open Lambda → Any existing café Lambda
+
+#### Ensure ALL exist:
+
+| Variable | Example                        |
+| -------- | ------------------------------ |
+| DB_HOST  | cafedb.xxxxx.rds.amazonaws.com |
+| DB_NAME  | cafedb                         |
+| DB_USER  | admin                          |
+| DB_PASS  | ********                       |
+
+> **If missing → Add them, save, deploy.**
+
 ### 1️⃣ Frontend Layer
 
 - Hosted on **EC2 Apache Web Server**

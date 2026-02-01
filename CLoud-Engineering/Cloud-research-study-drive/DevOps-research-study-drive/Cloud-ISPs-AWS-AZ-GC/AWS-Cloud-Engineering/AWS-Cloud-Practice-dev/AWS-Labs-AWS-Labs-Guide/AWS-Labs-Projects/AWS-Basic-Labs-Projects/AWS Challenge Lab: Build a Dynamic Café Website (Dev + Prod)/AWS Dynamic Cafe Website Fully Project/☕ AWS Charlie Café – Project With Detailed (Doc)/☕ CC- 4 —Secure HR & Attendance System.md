@@ -176,24 +176,7 @@ sudo chmod +x setup_cafe_hr_attendance.sh
 sudo ./setup_cafe_hr_attendance.sh
 ```
 
-### 8️⃣ Confirm Lambda DB Access (Important Minor Step)
-
-- Check Lambda Environment Variables
-
-- Open Lambda → Any existing café Lambda
-
-#### Ensure ALL exist:
-
-| Variable | Example                        |
-| -------- | ------------------------------ |
-| DB_HOST  | cafedb.xxxxx.rds.amazonaws.com |
-| DB_NAME  | cafedb                         |
-| DB_USER  | admin                          |
-| DB_PASS  | ********                       |
-
-> **If missing → Add them, save, deploy.**
-
-### 9️⃣ Final End  – What You Have Now
+### 🌐 Final End  – What You Have Now
 
 ✅ Database schema ready
 
