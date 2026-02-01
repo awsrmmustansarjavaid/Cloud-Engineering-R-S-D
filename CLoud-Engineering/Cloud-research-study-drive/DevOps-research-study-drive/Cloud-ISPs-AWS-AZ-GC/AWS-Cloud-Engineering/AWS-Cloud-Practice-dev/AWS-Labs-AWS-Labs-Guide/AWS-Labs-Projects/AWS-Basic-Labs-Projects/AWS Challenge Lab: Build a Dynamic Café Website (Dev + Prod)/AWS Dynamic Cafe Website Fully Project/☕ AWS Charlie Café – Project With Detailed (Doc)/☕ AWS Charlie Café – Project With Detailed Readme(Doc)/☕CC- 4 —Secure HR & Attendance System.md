@@ -1823,6 +1823,15 @@ We will cover everything in this exact order:
 
 7️⃣ How your existing check-in / check-out page should be updated (minimal & safe)
 
+| Page                    | Who uses it | What it does                      |
+| ----------------------- | ----------- | --------------------------------- |
+| Check-In / Check-Out    | Employee    | Mark attendance                   |
+| HR Attendance Dashboard | Admin / HR  | View attendance, reports, filters |
+
+👉 Employees NEVER see the HR dashboard
+
+👉 Admins NEVER use check-in manually
+
 ### 🧠 PART 1 — BIG PICTURE (UNDERSTAND FIRST)
 
 #### What we are building
@@ -1848,6 +1857,31 @@ An HR Attendance Dashboard page that:
     - Lambda
 
     - DynamoDB (attendance table)
+
+```
+Employee
+  │
+  ├─ checkin.html
+  │     └── POST /hr/attendance (Employee role)
+  │
+Admin (HR)
+  │
+  ├─ hr-dashboard.html
+  │     ├── GET /hr/attendance (Admin role)
+  │     ├── filter by date / employee
+  │
+Cognito
+  ├── Login
+  ├── Logout
+  ├── Groups: Admin, Employee
+```
+
+✅ One Cognito
+
+✅ One central-auth-api.js
+
+✅ Multiple pages, same auth logic
+
 
 ### 🧠 PART 2 — BACKEND (WHAT MUST EXIST)
 
