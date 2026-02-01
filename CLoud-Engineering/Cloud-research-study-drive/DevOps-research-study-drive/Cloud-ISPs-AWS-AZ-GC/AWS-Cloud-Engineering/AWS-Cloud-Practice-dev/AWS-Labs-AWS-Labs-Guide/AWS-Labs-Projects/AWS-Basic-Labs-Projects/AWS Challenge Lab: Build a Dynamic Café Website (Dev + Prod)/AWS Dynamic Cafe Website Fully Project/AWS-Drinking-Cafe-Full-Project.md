@@ -300,7 +300,7 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 
 ✔ Can be attached to Lambda execution roles
 
-#### 2️⃣ IAM Policies Method - 2 
+#### 2️⃣ IAM Policies Method - 2 1-2-1 Each Single IAM Policies
 
 #### 1️⃣ Create IAM Policy for  PRODUCER LAMBDA
 > **Your API Lambda must be allowed to send messages.**
