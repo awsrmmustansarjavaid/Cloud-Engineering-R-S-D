@@ -1257,3 +1257,116 @@ const CHARLIE = (() => {
 
 ---
 
+### ✅ UPDATED central-auth-api.js
+> **Update Version: 1.5**
+
+### ✅ Updated api section with HR endpoints
+
+```
+/* =====================================================
+   5️⃣ API GATEWAY ENDPOINTS
+   - Orders + HR APIs
+===================================================== */
+const api = {
+
+    // -------- Existing Orders APIs --------
+    placeOrder(payload) {
+        return fetch(`${CONFIG.API_BASE}/dev/orders`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    },
+
+    getOrderStatus(orderId) {
+        return fetch(
+            `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
+        ).then(res => res.json());
+    },
+
+    cashPayment(orderId) {
+        return fetch(`${CONFIG.API_BASE}/dev/orders/cash-payment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order_id: orderId })
+        }).then(res => res.json());
+    },
+
+    updateOrder(payload) {
+        return authFetch(`${CONFIG.API_BASE}/dev/order-update`, {
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    },
+
+    // -------- NEW HR APIs --------
+    // Get all employees (admin only)
+    getAllEmployees() {
+        // Use authFetch to include access token
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/employees`).then(res => res.json());
+    },
+
+    // Get specific employee by ID
+    getEmployee(employeeId) {
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/employee?employee_id=${encodeURIComponent(employeeId)}`)
+            .then(res => res.json());
+    },
+
+    // Add new employee (admin only)
+    addEmployee(payload) {
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/employee/add`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    },
+
+    // Update employee details
+    updateEmployee(payload) {
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/employee/update`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    },
+
+    // Delete employee (admin only)
+    deleteEmployee(employeeId) {
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/employee/delete`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
+        }).then(res => res.json());
+    },
+
+    // Record attendance
+    recordAttendance(payload) {
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    },
+
+    // Get attendance of employee
+    getAttendance(employeeId) {
+        return authFetch(`${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`)
+            .then(res => res.json());
+    }
+};
+```
+
+### ✅ How to integrate in central-auth-api.js
+
+- Replace the existing const api = { ... } block with the updated one above.
+
+- Everything else (auth, protectPage, logout) remains unchanged.
+
+- Use the HR APIs anywhere in your pages via:
+
+```
+// Example: fetch all employees
+CHARLIE.api.getAllEmployees().then(data => console.log(data));
+
+// Example: record attendance
+CHARLIE.api.recordAttendance({ employee_id: "123", check_in: "08:00" })
+    .then(res => console.log(res));
+```
+
+
+
