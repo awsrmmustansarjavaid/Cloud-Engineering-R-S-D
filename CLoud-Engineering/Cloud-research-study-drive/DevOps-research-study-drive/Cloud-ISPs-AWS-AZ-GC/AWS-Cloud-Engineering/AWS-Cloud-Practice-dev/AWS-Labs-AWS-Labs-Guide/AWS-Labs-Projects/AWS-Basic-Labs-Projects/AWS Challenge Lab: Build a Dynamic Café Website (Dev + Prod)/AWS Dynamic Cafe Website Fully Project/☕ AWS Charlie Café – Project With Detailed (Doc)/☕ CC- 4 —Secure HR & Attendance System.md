@@ -49,9 +49,11 @@ mysql -h <RDS-ENDPOINT> -u <DB-USER> -p cafedb
 
 - Query Editor → Connect to cafedb
 
-### 2️⃣ Create employees Table
+### 2️⃣ Method - 1 HR & Attendance System Create Tables
 
 > **This table links Cognito users with café employees.**
+
+#### 1️⃣ Create employees Table
 
 ```
 CREATE TABLE employees (
@@ -75,7 +77,7 @@ CREATE TABLE employees (
 
 - created_at → audit trail
 
-### 3️⃣ Create attendance Table
+#### 2️⃣ Create attendance Table
 
 ```
 CREATE TABLE attendance (
@@ -100,7 +102,9 @@ checkin_time and checkout_time separated
 
 Foreign key ensures valid employee
 
-### 4️⃣ Create leaves Table
+#### 3️⃣ Create leaves Table
+
+
 
 ```
 CREATE TABLE leaves (
@@ -113,7 +117,7 @@ CREATE TABLE leaves (
 );
 ```
 
-### 5️⃣ Create holidays Table
+#### 4️⃣ Create holidays Table
 
 ```
 CREATE TABLE holidays (
@@ -123,8 +127,7 @@ CREATE TABLE holidays (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
-
-### 6️⃣ Insert Test Data (Required for Frontend Testing)
+### 3️⃣ Insert Test Data (Required for Frontend Testing)
 
 #### 1️⃣ Insert Holidays
 
@@ -146,22 +149,7 @@ VALUES
 ('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
 ```
 
-### 7️⃣ Verify Tables
-
-```
-SHOW TABLES;
-```
-
-#### Expected output:
-
-```
-employees
-attendance
-leaves
-holidays
-```
-
-### 8️⃣ HR & Attendance System Bash Script 
+### 4️⃣ Method - 2 HR & Attendance System Create Tables Bash Script 
 
 #### 1️⃣ Create File
 
@@ -183,6 +171,21 @@ sudo chmod +x setup_cafe_hr_attendance.sh
 
 ```
 sudo ./setup_cafe_hr_attendance.sh
+```
+
+### 5️⃣ Verify Tables
+
+```
+SHOW TABLES;
+```
+
+#### Expected output:
+
+```
+employees
+attendance
+leaves
+holidays
 ```
 
 ### 8️⃣ Confirm Lambda DB Access (Important Minor Step)
