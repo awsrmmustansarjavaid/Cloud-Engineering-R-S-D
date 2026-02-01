@@ -579,56 +579,75 @@ sudo chmod 644 *.html
 
 #### 1️⃣ Cognito keeps user session
 
-When user logs in:
+When a user logs in via Cognito:
 
-- ID Token
+- Cognito automatically stores 3 important tokens in browser (local/session storage):
 
-- Access Token
+    - ID Token
 
-- Refresh Token
+    - Access Token
 
-are stored by Cognito SDK in browser (local/session storage)
+    - Refresh Token
 
-#### 2️⃣ This line logs the user out
+- These tokens allow Cognito SDK to know if a user is logged in.
+
+#### 2️⃣ Logging Out the User
+
+To log the user out, you call:
 
 ```
 user.signOut();
 ```
 
-#### What happens:
+#### What happens internally
 
-- Tokens are removed
+- Tokens are removed from storage (ID, Access, Refresh).
 
-- Session invalidated
+- Session is invalidated on the client side.
 
-- getCurrentUser() returns null
+- userPool.getCurrentUser() now returns null (because the session is gone).
+
+✅ This is why the user cannot access protected pages anymore.
 
 #### 3️⃣ Protecting Pages (IMPORTANT)
 
-On every protected page, you already do:
+On every page you want only logged-in users to see, you need this check at the top:
 
 ```
 const user = userPool.getCurrentUser();
 if (!user) {
-    window.location.href = "login.html";
+    window.location.href = "login.html"; // Redirect to login if not logged in
 }
 ```
 
 **👉 This prevents access after logout.**
 
+#### Why this is important:
+
+- After logout, userPool.getCurrentUser() returns null.
+
+- User automatically gets redirected to login (or another page).
+
+This ensures security: no one can access protected pages after logout.
+
 #### 4️⃣ Redirect After Logout
 
+After logging out, you often want to send the user somewhere:
+
 ```
-window.location.href = "index.html";
+user.signOut(); 
+window.location.href = "index.html"; // Example: redirect to homepage
 ```
 
 You can redirect to:
 
-- Login page
+- Could be login page (login.html)
 
-- Landing page
+- Could be landing page (index.html)
 
-- Café homepage
+- Could be home of your app
+
+**8This is purely optional, but good UX.**
 
 **✅ PHASE 4️⃣ STATUS**
 
