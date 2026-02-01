@@ -845,6 +845,142 @@ const CHARLIE = (() => {
 ### ✅ UPDATED central-auth-api.js
 > **Update Version: 1.4**
 
+#### ✅ What is already present in your code
+
+#### 1️⃣ Cognito Login
+
+- auth.login() handles redirecting the user to Cognito login page.
+
+- Accepts optional redirectUrl.
+
+- #### ✅ Works fine.
+
+#### 2️⃣ Cognito Logout
+
+- auth.logout() exists and:
+
+    - Removes access_token from localStorage.
+
+    - Redirects user to Cognito logout page using logout_uri.
+
+- #### ✅ This is correct and works.
+
+#### 3️⃣ Token Handling
+
+- getToken(), parseJwt(), isTokenExpired() exist.
+
+- Tokens are stored in localStorage and checked for expiration.
+
+- #### ✅ Works properly.
+
+#### 4️⃣ Redirect Handling After Login
+
+- auth.handleRedirect() parses the URL hash after Cognito login.
+
+- Stores access_token in localStorage.
+
+- #### ✅ Works fine.
+
+#### 5️⃣ Page Protection
+
+- auth.protectPage():
+
+    - Calls handleRedirect() to process token.
+
+    - Checks token existence and expiration.
+
+    - Redirects to login if invalid.
+
+    - Displays page if token is valid.
+
+- #### ✅ Works perfectly for “protected pages”.
+
+#### 6️⃣ Role-Based Access
+
+- getUserRoles(), isAdmin(), isEmployee(), enforceAdminAccess(), enforceEmployeeAccess() exist.
+
+- #### ✅ Handles restricting pages by roles.
+
+-  Calls auth.logout() if unauthorized.
+
+- #### ✅ Correct.
+
+#### 7️⃣ Authenticated API Calls
+
+- authFetch() adds token to Authorization header.
+
+- Calls auth.logout() if token invalid.
+
+- #### ✅ Correct.
+
+### ⚠️ What’s missing / you may need to add
+
+#### 1️⃣ Logout Button Event Handler
+
+- Your JS handles logout functionally, but no actual button is wired to call auth.logout().
+
+- You need to add this in your page:
+
+```
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    CHARLIE.auth.logout("index.html"); // or "login.html" after logout
+});
+```
+
+- And in HTML:
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+#### 2️⃣ Protect All Pages
+
+- You have auth.protectPage(), but it’s not automatically called anywhere.
+
+- On every protected page, at the top of your JS:
+
+```
+document.addEventListener("DOMContentLoaded", () => {
+    CHARLIE.auth.protectPage();
+});
+```
+
+#### 3️⃣ Optional: Show/hide page elements after login
+
+- document.body.style.display = "block"; is already in protectPage().
+
+- ✅ That’s fine; nothing to change.
+
+#### 4️⃣ Optional: Better Logout UX
+
+- Right now auth.logout() goes to Cognito logout and then redirects.
+
+- If you want immediate local logout and redirect, you could optionally:
+
+```
+auth.logoutImmediate = (redirectUrl = "index.html") => {
+    localStorage.removeItem("access_token");
+    window.location.href = redirectUrl;
+};
+```
+
+- Not necessary, but sometimes improves UX.
+
+✅ Summary
+
+| Feature                 | Status in your code | Action needed                                     |
+| ----------------------- | ------------------- | ------------------------------------------------- |
+| Login via Cognito       | ✅ Yes               | None                                              |
+| Logout via Cognito      | ✅ Yes               | Just add button event handler                     |
+| Token storage & parsing | ✅ Yes               | None                                              |
+| Page protection         | ✅ Yes               | Must call `protectPage()` on every protected page |
+| Role-based access       | ✅ Yes               | None                                              |
+| Authenticated fetch     | ✅ Yes               | None                                              |
+| Logout button in HTML   | ❌ No                | Add `<button id="logoutBtn">Logout</button>`      |
+| Call logout button      | ❌ No                | Add JS event listener                             |
+
+#### ✅ Updated Code
+
 ```
 /* =========================================================
    CHARLIE CAFE — CENTRAL AUTH + API CONFIG (UPDATED)
@@ -1083,3 +1219,39 @@ const CHARLIE = (() => {
 
 })();
 ```
+
+### ✅ What’s new/updated
+
+#### 1️⃣ Logout button integration
+
+- Call CHARLIE.auth.setupLogoutButton(); in your page JS after page loads.
+
+- Default button ID: logoutBtn
+
+- Default redirect after logout: index.html
+
+#### 2️⃣ Page protection
+
+- protectPage() should be called on every protected page to check token and show content.
+
+#### 3️⃣ Full comments
+
+- Every section explains what it does for beginners.
+
+#### Example usage in a page (dashboard.html)
+
+```
+<body style="display:none">
+    <button id="logoutBtn">Logout</button>
+
+    <script src="js/central-auth-api.js"></script>
+    <script>
+        // Protect page and show content only if logged in
+        CHARLIE.auth.protectPage();
+
+        // Setup logout button
+        CHARLIE.auth.setupLogoutButton("logoutBtn", "index.html");
+    </script>
+</body>
+```
+
