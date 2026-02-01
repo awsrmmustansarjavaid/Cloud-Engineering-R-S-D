@@ -4,9 +4,6 @@ import pymysql
 from decimal import Decimal
 import datetime
 
-# ------------------------
-# DATABASE CONNECTION
-# ------------------------
 connection = pymysql.connect(
     host=os.environ['DB_HOST'],
     user=os.environ['DB_USER'],
@@ -15,25 +12,27 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
-# ------------------------
-# JSON SERIALIZER
-# ------------------------
 def json_serializer(obj):
-    """
-    Handles Decimal, date, datetime for JSON serialization
-    """
     if isinstance(obj, Decimal):
         return float(obj)
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
-    return str(obj)  # fallback for other types
+    return str(obj)
 
-# ------------------------
-# LAMBDA HANDLER
-# ------------------------
 def lambda_handler(event, context):
-    # Get logged-in Cognito user ID
-    cognito_user_id = event['requestContext']['authorizer']['claims']['sub']
+    # -------------------------------
+    # AUTHORIZATION — ROLE CHECK
+    # -------------------------------
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if isinstance(groups, str):
+        groups = [groups]
+
+    if "Employee" not in groups:
+        return forbidden()
+
+    cognito_user_id = claims["sub"]
 
     with connection.cursor() as cursor:
         cursor.execute("""
@@ -43,9 +42,20 @@ def lambda_handler(event, context):
         """, (cognito_user_id,))
         employee = cursor.fetchone()
 
-    # Return JSON response safely
     return {
         "statusCode": 200,
-        "headers": {"Access-Control-Allow-Origin": "*"},
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Authorization,Content-Type"
+        },
         "body": json.dumps(employee, default=json_serializer)
+    }
+
+def forbidden():
+    return {
+        "statusCode": 403,
+        "headers": {
+            "Access-Control-Allow-Origin": "*"
+        },
+        "body": json.dumps({"message": "Forbidden"})
     }
