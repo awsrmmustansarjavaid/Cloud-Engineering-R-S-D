@@ -461,6 +461,32 @@ http://<EC2-Public-IP>/admin-dashboard.html
 SELECT * FROM attendance ORDER BY attendance_date DESC;
 ```
 
+### 3️⃣ HOW TO TEST LOGOUT (VERIFICATION — VERY IMPORTANT)
+
+> **Do this test for both roles:**
+
+#### Test Steps
+
+1️⃣ Login as Admin or Employee
+
+2️⃣ Open dashboard
+
+3️⃣ Click Logout
+
+4️⃣ Redirect happens
+
+5️⃣ Press Browser Back Button
+
+#### Expected Result
+
+❌ Page does NOT load
+
+✅ Redirects again
+
+✅ Session fully destroyed
+
+**👉 This confirms Cognito is correctly integrated**
+
 **✅ PHASE 4️⃣ STATUS**
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
