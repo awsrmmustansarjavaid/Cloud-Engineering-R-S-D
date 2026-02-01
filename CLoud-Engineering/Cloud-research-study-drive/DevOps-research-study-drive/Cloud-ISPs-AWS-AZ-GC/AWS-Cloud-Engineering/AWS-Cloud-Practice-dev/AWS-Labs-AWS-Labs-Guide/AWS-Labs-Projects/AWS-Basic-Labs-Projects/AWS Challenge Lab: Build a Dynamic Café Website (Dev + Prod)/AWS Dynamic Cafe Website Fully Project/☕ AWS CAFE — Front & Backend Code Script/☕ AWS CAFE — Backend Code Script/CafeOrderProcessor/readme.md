@@ -15,6 +15,7 @@
 > **PHASE 6️⃣ — Backend Development Code**
 
 > **1️⃣ Lambda Payload Code (INSERT INTO MariaDB)**
+> **Update Version: 1.0**
 
 
 ```
@@ -143,6 +144,8 @@ Receives an API Gateway request with JSON body:
 > **1️⃣ Lambda Payload Code (INSERT INTO MariaDB)**
 
 > **📄 File Name: CafeOrderProcessor(1st-V-1stTime_create_code).py**
+
+> **Update Version: 1.1**
 
 
 ```

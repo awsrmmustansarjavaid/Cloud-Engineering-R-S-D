@@ -42,6 +42,7 @@ any admin page
 ❌ NO AWS SDK in browser
 
 ### ✅ central-auth-api.js (FINAL – COPY 100%)
+> **Update Version: 1.0**
 
 ```
 /* =========================================================
@@ -241,6 +242,7 @@ CHARLIE.api.placeOrder(orderPayload);
 ```
 
 ### 🔹 order-status.html
+> **Update Version: 1.1**
 
 ```
 CHARLIE.api.getOrderStatus(orderId);
@@ -422,8 +424,7 @@ const CHARLIE = (() => {
 ```
 
 ### ✅ UPDATED central-auth-api.js
-
-> **Before HR system's Phase 5**
+> **Update Version: 1.2**
 
 
 ```
