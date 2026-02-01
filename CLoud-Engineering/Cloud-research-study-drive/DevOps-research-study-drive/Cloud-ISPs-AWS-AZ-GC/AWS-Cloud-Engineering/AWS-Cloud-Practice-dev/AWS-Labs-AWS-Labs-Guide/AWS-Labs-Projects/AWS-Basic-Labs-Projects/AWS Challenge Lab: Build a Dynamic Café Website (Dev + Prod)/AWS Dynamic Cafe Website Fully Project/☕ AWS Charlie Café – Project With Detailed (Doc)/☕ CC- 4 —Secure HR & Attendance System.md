@@ -646,6 +646,84 @@ You can redirect to:
 [central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
 
+### 2️⃣ FRONTEND CONFIGURATION
+
+#### 1️⃣ File placement (ONLY ONE JS FILE NOW)
+
+```
+/var/www/html
+├── admin-dashboard.html
+├── employee-portal.html
+└── js/
+    └── central-auth-api.js
+```
+
+#### 2️⃣ Permissions:
+
+```
+sudo chown www-data:www-data js/central-auth-api.js
+```
+```
+sudo chmod 755 js/central-auth-api.js
+```
+
+#### 3️⃣ ADMIN PAGE USAGE (FINAL)
+
+```
+<script src="js/central-auth-api.js"></script>
+<script>
+    CHARLIE.auth.protectPage();
+    CHARLIE.enforceAdminAccess();
+
+    async function loadEmployees() {
+        const data = await CHARLIE.secureFetch(
+            CHARLIE.apiBase + "/admin/employees"
+        );
+        console.log(data);
+    }
+
+    loadEmployees();
+</script>
+
+<div id="admin-section" style="display:none;">
+    <button>Manage Employees</button>
+</div>
+```
+
+#### 4️⃣ EMPLOYEE PAGE USAGE (FINAL)
+
+```
+<script src="js/central-auth-api.js"></script>
+<script>
+    CHARLIE.auth.protectPage();
+    CHARLIE.enforceEmployeeAccess();
+
+    async function loadProfile() {
+        const data = await CHARLIE.secureFetch(
+            CHARLIE.apiBase + "/employee/profile"
+        );
+        console.log(data);
+    }
+
+    loadProfile();
+</script>
+```
+
+### 3️⃣ BACKEND CONFIGURATION
+
+Your Lambda Cognito group enforcement is 100% aligned with this frontend.
+
+- Frontend checks = UX
+
+- Backend checks = SECURITY
+
+✔️ No security gap
+
+✔️ No duplication
+
+✔️ Production-safe
+
+
 
 
 #### 3️⃣ — PERFORMANCE & SAFETY SETTINGS
