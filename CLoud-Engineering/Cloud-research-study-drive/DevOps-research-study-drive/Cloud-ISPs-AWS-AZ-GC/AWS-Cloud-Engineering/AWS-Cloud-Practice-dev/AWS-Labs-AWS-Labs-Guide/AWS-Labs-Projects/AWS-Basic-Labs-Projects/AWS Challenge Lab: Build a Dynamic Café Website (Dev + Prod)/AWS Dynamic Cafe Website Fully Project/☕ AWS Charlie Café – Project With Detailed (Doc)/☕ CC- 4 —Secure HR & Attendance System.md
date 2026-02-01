@@ -171,7 +171,7 @@ sudo nano setup_cafe_hr_attendance.sh
 
 #### 2️⃣ Bash Script 
 
-[setup_cafe_hr_attendance.sh](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/setup_cafe_hr_attendance.sh)
+[setup_cafe_hr_attendance.sh](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/setup_cafe_hr_attendance/setup_cafe_hr_attendance.sh)
 
 #### 3️⃣ Make the Script Executable
 
