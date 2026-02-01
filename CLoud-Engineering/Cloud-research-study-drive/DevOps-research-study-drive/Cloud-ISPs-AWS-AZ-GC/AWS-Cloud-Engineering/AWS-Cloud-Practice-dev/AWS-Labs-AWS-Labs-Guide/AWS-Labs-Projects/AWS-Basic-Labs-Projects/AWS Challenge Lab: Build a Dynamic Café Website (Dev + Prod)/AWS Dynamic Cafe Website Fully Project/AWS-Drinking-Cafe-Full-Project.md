@@ -89,7 +89,7 @@ EC2-Cafe-Secrets-Role
 - **IAM Role Name:**
 
 ```
-CafeAPILambdaRole
+charlie-cafe-iam-Role
 ```
 
 - **Description:**
