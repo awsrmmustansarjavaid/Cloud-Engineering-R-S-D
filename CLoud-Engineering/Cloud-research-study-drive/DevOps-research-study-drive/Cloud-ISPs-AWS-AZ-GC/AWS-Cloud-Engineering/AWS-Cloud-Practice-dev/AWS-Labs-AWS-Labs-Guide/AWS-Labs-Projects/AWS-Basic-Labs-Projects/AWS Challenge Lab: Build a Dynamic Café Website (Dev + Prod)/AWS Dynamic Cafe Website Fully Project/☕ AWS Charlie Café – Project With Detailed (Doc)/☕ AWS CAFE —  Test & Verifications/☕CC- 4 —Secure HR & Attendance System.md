@@ -1165,3 +1165,246 @@ Use Lambda console → Test events → Include requestContext.authorizer.claims.
 
 > **🟢 PHASE 🔟 COMPLETE & VERIFIED**
 ---
+## PHASE 1️⃣1️⃣ — ☕ Charlie Café – Lambda Verification & Testing
+
+#### We are testing all 5 HR Lambdas:
+
+- hr-checkin
+
+- hr-checkout
+
+- hr-employee-profile
+
+- hr-attendance-history
+
+- hr-leaves-holidays
+
+### ⚡ Pre-requisite
+
+- You have test employee in RDS (employees table)
+
+- You have Cognito user ID for test (can use any existing Cognito user in your pool)
+
+- You have DB credentials in Lambda env variables
+
+- You can open Lambda console
+
+### 1️⃣ Testing hr-checkin
+
+#### Step 1: Open Lambda
+
+- AWS Console → Lambda → hr-checkin → Test tab
+
+#### Step 2: Create Test Event
+
+- Click Configure test event
+
+- Event template: API Gateway AWS Proxy
+
+- Event name: test-checkin
+
+- Replace body with minimal event (simulated API Gateway + Cognito JWT):
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+> **Note: Replace "TEMP-COGNITO-ID" with actual Cognito sub from your test user.**
+
+#### Step 3: Run Test
+
+- Click Test
+
+- Check Execution result
+
+#### ✅ Expected:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-in successful\"}"
+}
+```
+
+#### Step 4: Verify DB
+
+```
+SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
+```
+
+- You should see today’s check-in timestamp
+
+- If IntegrityError occurs → already checked-in → remove row and retest
+
+### 2️⃣ Testing hr-checkout
+
+#### Step 1: Open Lambda → hr-checkout → Test tab
+
+#### Step 2: Create Test Event
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3: Run Test
+
+- Click Test
+
+- Check Execution result
+
+#### ✅ Expected:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-out successful\"}"
+}
+```
+
+#### Step 4: Verify DB
+
+```
+SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
+```
+
+- Check that checkout_time is filled
+
+- If no check-in exists → error 400 as expected
+
+### 3️⃣ Testing hr-employee-profile
+
+#### Step 1: Open Lambda → hr-employee-profile → Test tab
+
+#### Step 2: Test Event
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3: Run Test
+
+#### ✅ Expected result:
+
+```
+{
+  "name": "Alice",
+  "job_title": "Barista",
+  "salary": 40000,
+  "start_date": "2025-12-01"
+}
+```
+
+- Verify matches RDS record
+
+### 4️⃣ Testing hr-attendance-history
+
+#### Step 1: Open Lambda → hr-attendance-history → Test tab
+
+#### Step 2: Test Event
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3: Run Test
+
+#### ✅ Expected result:
+
+```
+[
+  {
+    "attendance_date": "2026-01-19",
+    "checkin_time": "09:00:00",
+    "checkout_time": "17:00:00"
+  },
+  ...
+]
+```
+
+- Cross-check with attendance table
+
+- Ensure dates & times match
+
+### 5️⃣ Testing hr-leaves-holidays
+
+#### Step 1: Open Lambda → hr-leaves-holidays → Test tab
+
+#### Step 2: Test Event
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "TEMP-COGNITO-ID"
+      }
+    }
+  }
+}
+```
+
+#### Step 3: Run Test
+
+#### ✅ Expected result:
+
+```
+{
+  "leaves": [
+    {"leave_date": "2026-01-15", "leave_type": "Sick Leave"}
+  ],
+  "holidays": [
+    {"holiday_date": "2026-01-01", "description": "New Year"}
+  ]
+}
+```
+
+- Cross-check leaves table and holidays table
+
+### ⚠ Notes & Common Issues
+
+| Problem                    | Fix                                                             |
+| -------------------------- | --------------------------------------------------------------- |
+| `Employee not found`       | Check `cognito_user_id` matches RDS `employees.cognito_user_id` |
+| `Access denied to DB`      | Check Lambda SG & env vars, ensure RDS allows Lambda SG         |
+| `Already checked in today` | Delete today's attendance row, then retest                      |
+| `Cannot connect to DB`     | Check Lambda VPC & subnets allow access to RDS                  |
+
+
+**✅ Now all 5 Lambdas are tested & verified**
+
+**✅ PHASE 1️⃣1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣1️⃣ COMPLETE & VERIFIED**
+---
