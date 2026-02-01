@@ -647,7 +647,29 @@ You can redirect to:
 
 - Could be home of your app
 
-**8This is purely optional, but good UX.**
+**This is purely optional, but good UX.**
+
+#### 5️⃣ Optional: Logout Button Integration
+
+Example logout button in HTML:
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+#### JavaScript:
+
+```
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    const user = userPool.getCurrentUser();
+    if (user) {
+        user.signOut();
+        window.location.href = "index.html"; // Redirect after logout
+    }
+});
+```
+
+**✅ Simple, clean, and works with Cognito.**
 
 **✅ PHASE 4️⃣ STATUS**
 
