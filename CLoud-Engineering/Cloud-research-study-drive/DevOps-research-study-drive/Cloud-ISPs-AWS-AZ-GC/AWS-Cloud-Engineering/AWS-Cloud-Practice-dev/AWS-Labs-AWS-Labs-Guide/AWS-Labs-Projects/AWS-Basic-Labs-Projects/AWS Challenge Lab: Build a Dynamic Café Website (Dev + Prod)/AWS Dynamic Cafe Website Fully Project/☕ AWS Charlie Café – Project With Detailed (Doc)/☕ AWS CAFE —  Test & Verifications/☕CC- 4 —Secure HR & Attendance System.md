@@ -439,8 +439,27 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 ---
 ## ☕ Charlie Café PHASE 4️⃣ — Frontend Pages for HR System
 
+### 1️⃣ Open browser:
 
+```
+http://<EC2-Public-IP>/checkin.html
+http://<EC2-Public-IP>/employee-portal.html
+http://<EC2-Public-IP>/admin-dashboard.html
+```
 
+#### Enter:
+
+    - Valid employee ID → Check-In → ✅ success
+
+    - Same ID again → backend should block duplicate
+
+    - Check-Out after check-in → ✅ success
+
+### 2️ Verify in RDS:
+
+```
+SELECT * FROM attendance ORDER BY attendance_date DESC;
+```
 
 **✅ PHASE 4️⃣ STATUS**
 

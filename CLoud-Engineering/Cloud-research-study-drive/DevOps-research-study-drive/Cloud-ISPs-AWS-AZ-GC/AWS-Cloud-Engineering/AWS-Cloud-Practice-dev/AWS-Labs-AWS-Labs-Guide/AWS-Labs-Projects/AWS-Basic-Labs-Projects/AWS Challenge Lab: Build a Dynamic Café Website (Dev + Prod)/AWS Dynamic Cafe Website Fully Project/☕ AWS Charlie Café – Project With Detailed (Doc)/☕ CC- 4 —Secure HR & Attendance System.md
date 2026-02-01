@@ -573,27 +573,7 @@ sudo chown apache:apache *.html
 sudo chmod 644 *.html
 ```
 
-#### 4️⃣ Open browser:
 
-```
-http://<EC2-Public-IP>/checkin.html
-http://<EC2-Public-IP>/employee-portal.html
-http://<EC2-Public-IP>/admin-dashboard.html
-```
-
-#### 5️⃣ Enter:
-
-    - Valid employee ID → Check-In → ✅ success
-
-    - Same ID again → backend should block duplicate
-
-    - Check-Out after check-in → ✅ success
-
-#### 6️⃣ Verify in RDS:
-
-```
-SELECT * FROM attendance ORDER BY attendance_date DESC;
-```
 
 ### 4️⃣ — HOW LOGOUT INTEGRATES WITH COGNITO (STEP-BY-STEP)
 
