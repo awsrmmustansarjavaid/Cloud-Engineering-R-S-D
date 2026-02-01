@@ -5,9 +5,9 @@
 
 # ☕ Charlie Café SECTION 2️⃣ - Attendance System
 
-## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
+## ☕ Charlie Café PHASE 1️⃣ — Database Layer (RDS) Configuration
 
-### 6️⃣ Lambda Testing & Verification
+### 1️⃣ Lambda Testing & Verification
 
 #### 1️⃣ Test Environment Variables
 
@@ -107,7 +107,51 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 - checkout_time should be NULL
 
-### 3️⃣ Test hr-checkout Lambda
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
+
+### 1️⃣ Lambda Testing & Verification
+
+#### 1️⃣ Test Environment Variables
+
+- Lambda → Configuration → Environment variables
+
+- Ensure:
+
+```
+DB_HOST, DB_NAME, DB_USER, DB_PASS
+```
+
+- Double-check spelling and values (typos will break RDS connection).
+
+#### 2️⃣ — VPC Settings
+
+- Lambda → Configuration → VPC
+
+- Must be in the same VPC as RDS
+
+- Use private subnets that can reach RDS
+
+- Security group: allows outbound TCP 3306 to RDS
+
+#### 3️⃣ — Install PyMySQL Layer (if missing)
+
+- If your Lambda environment doesn’t have pymysql, create a Lambda Layer:
+
+- Create a folder python/lib/python3.12/site-packages/
+
+- pip install pymysql -t python/lib/python3.12/site-packages/
+
+- Zip and upload as Layer
+
+- Attach Layer to all HR Lambdas
+
+### 2️⃣ Test hr-checkout Lambda
 
 #### Step 1 — Open Lambda Console
 
