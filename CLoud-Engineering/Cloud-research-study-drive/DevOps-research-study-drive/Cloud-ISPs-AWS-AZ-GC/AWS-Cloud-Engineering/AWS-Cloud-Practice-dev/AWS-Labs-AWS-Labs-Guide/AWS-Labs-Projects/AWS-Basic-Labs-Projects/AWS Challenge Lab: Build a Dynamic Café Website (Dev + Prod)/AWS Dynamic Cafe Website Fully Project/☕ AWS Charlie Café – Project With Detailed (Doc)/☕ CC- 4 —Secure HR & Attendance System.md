@@ -556,7 +556,7 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 #### Verify in RDS: 
 - checkout_time populated for today
 
-#### 8.3 Test /employee/profile (GET)
+#### 8.3 Test /employee-profile (GET)
 
 - URL: /employee-profile
 
@@ -573,7 +573,7 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 }
 ```
 
-#### 8.4 Test /attendance/history (GET)
+#### 8.4 Test /attendance-history (GET)
 
 - URL: /attendance-history
 
