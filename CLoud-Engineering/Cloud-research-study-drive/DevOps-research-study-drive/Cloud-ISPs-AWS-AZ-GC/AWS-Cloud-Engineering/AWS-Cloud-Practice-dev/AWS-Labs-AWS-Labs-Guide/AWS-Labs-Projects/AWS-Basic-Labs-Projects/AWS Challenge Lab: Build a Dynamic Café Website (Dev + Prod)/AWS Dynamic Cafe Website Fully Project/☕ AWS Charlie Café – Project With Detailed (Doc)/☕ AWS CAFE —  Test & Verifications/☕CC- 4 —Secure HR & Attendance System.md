@@ -491,3 +491,172 @@ SELECT * FROM attendance ORDER BY attendance_date DESC;
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ Charlie Café PHASE 5️⃣ Secure Frontend & API Integration with Production Hardening
+
+### 1️⃣ Frontend  - auth-api.js
+
+#### VERIFY FILE LOCATIONS (LINUX)
+
+```
+cd /var/www/html
+```
+```
+ls -R js
+```
+
+#### You should see:
+
+```
+js/
+ ├── config.js
+ └── auth-api.js
+```
+
+If yes → ✅ continue
+
+If not → stop and fix paths
+
+### 🧪 TEST 1️⃣ — Browser Console
+
+1️⃣ Open DevTools → Console
+
+2️⃣ You should NOT see:
+
+```
+CONFIG is not defined
+```
+
+### 🧪 TEST 2️⃣ — Employee Normal Flow
+
+1️⃣ Login as Employee
+
+2️⃣ Open employee portal
+
+3️⃣ Profile loads
+
+4️⃣ Attendance loads
+
+5️⃣ Admin buttons NOT visible
+
+✅ PASS
+
+### 🧪 TEST 3️⃣ — Employee Tries Admin URL
+
+1️⃣ Login as Employee
+
+2️⃣ Open admin-dashboard.html manually
+
+❌ Access denied
+
+✅ Redirect to login
+
+### 🧪 TEST 4️⃣ — Admin Normal Flow
+
+1️⃣ Login as Admin
+
+2️⃣ Open admin dashboard
+
+3️⃣ Admin buttons visible
+
+4️⃣ Employee list loads
+
+✅ PASS
+
+### 🧪 TEST 5️⃣ — JWT Verification
+
+1️⃣ Open DevTools → Network
+
+2️⃣ Click any API call
+
+3️⃣ Check Headers
+
+#### You MUST see:
+
+```
+Authorization: eyJraWQiOiJ...
+```
+
+✅ Token attached
+
+✅ Cognito authorizer working
+
+### 🧪 TEST 6️⃣ — API Protection
+
+1️⃣ Copy API URL
+
+2️⃣ Open in browser without token
+
+❌ 401 / 403 error
+
+✅ Secure
+
+### 🧪 TEST 7️⃣ — Authentication
+
+- Token expires → auto logout
+
+- Logout destroys session
+
+- Back button blocked
+
+### 🧪 TEST 8️⃣  Authorization
+
+Admin cannot be Employee
+
+Employee cannot be Admin
+
+Backend blocks unauthorized API calls
+
+### 🧪 TEST 9️⃣ UX
+
+Loader visible
+
+Errors friendly
+
+No raw error messages
+
+### 🧪 TEST 🔟 Observability
+
+CloudWatch logs visible
+
+Errors traceable
+
+Requests traceable
+
+### 🧪 TEST 1️⃣1️⃣ Token Expiry
+
+Wait 1 hour OR invalidate session
+
+API call triggers auto logout
+
+Redirects to login
+
+
+### 🏁 CONGRATULATIONS
+
+You now have:
+
+✔ Real AWS architecture
+
+✔ Secure Cognito auth
+
+✔ Role-based UI
+
+✔ Hardened APIs
+
+✔ Production-level frontend
+
+✔ Job-ready project
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 6️⃣ — ADMIN ATTENDANCE ANALYTICS
+
+
+
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
