@@ -1260,7 +1260,7 @@ const CHARLIE = (() => {
 ### ✅ UPDATED central-auth-api.js
 > **Update Version: 1.5**
 
-### ✅ Updated api section with HR endpoints
+### ✅ Updated REST API section with HR endpoints
 
 ```
 /* =====================================================
