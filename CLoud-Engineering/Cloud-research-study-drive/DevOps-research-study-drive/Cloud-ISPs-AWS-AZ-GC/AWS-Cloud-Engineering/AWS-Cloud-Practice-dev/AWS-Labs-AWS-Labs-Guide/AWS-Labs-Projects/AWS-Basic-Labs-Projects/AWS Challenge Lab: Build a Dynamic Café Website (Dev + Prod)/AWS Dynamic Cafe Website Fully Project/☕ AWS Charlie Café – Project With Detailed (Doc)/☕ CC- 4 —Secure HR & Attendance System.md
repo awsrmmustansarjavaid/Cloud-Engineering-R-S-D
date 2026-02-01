@@ -372,10 +372,10 @@ HR Secure Attendance & Employee Management API
 
 | Resource           | Path                  | Lambda Function         |
 | ------------------ | --------------------- | ----------------------- |
-| Check-In           | `/checkin`            | `hr-checkin`            |
-| Check-Out          | `/checkout`           | `hr-checkout`           |
-| Employee Profile   | `/employee/profile`   | `hr-employee-profile`   |
-| Attendance History | `/attendance/history` | `hr-attendance-history` |
+| checkin           | `/checkin`            | `hr-checkin`            |
+| checkout         | `/checkout`           | `hr-checkout`           |
+| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
+| Attendance History | `/attendance-history` | `hr-attendance-history` |
 | Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
 
 #### Step 1 — Add /checkin
