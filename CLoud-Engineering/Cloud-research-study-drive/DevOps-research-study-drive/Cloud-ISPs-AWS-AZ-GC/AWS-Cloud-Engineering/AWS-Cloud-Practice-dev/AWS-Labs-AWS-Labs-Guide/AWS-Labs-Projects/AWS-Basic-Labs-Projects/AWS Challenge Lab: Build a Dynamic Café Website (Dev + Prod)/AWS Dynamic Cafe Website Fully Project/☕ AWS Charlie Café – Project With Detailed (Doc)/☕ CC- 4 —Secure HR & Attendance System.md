@@ -711,17 +711,68 @@ sudo chmod 755 js/central-auth-api.js
 
 ### 3️⃣ BACKEND CONFIGURATION
 
-Your Lambda Cognito group enforcement is 100% aligned with this frontend.
+#### ✅ FINAL PRODUCTION-SAFE COMMON LAMBDA TEMPLATE
+> **👉 USE THIS IN ALL 5 HR LAMBDAS**
 
-- Frontend checks = UX
+```
+import json
+import logging
+from datetime import date, datetime
 
-- Backend checks = SECURITY
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-✔️ No security gap
+# ---------- JSON SAFE ENCODER ----------
+def json_safe(obj):
+    if isinstance(obj, (date, datetime)):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
 
-✔️ No duplication
+def response(status, body):
+    return {
+        "statusCode": status,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Authorization,Content-Type",
+            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        },
+        "body": json.dumps(body, default=json_safe)
+    }
 
-✔️ Production-safe
+def lambda_handler(event, context):
+    logger.info("Request received")
+    logger.info(event)
+
+    # -------------------------------
+    # AUTHORIZATION (Cognito Authorizer)
+    # -------------------------------
+    try:
+        claims = event["requestContext"]["authorizer"]["claims"]
+    except KeyError:
+        return response(401, {"message": "Unauthorized"})
+
+    groups = claims.get("cognito:groups", [])
+
+    # Normalize groups (string → list)
+    if isinstance(groups, str):
+        groups = [groups]
+
+    # -------------------------------
+    # ROLE CHECK (CHANGE PER FUNCTION)
+    # -------------------------------
+    ALLOWED_ROLE = "Employee"  # CHANGE PER LAMBDA
+
+    if ALLOWED_ROLE not in groups:
+        return response(403, {"message": "Forbidden"})
+
+    # -------------------------------
+    # BUSINESS LOGIC (PER LAMBDA)
+    # -------------------------------
+    # Write your DB / logic here
+
+    return response(200, {"message": "Success"})
+```
 
 
 
