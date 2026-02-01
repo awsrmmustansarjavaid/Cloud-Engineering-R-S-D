@@ -529,6 +529,27 @@ Attach this policy (or ensure it exists):
 
 **✔️ Click Create policy**
 
+#### 8️⃣ Create IAM Policy FOR HR System
+> **If you already have a Lambda role that accesses RDS + CloudWatch, reuse it. If not, follow every step below.**
+
+- Trusted entity type: AWS service
+
+- Service: Lambda
+
+- Click Next
+
+#### Step 3️⃣: Attach Permissions
+
+- Attach exactly these policies:
+
+    - AWSLambdaBasicExecutionRole
+
+    - AmazonRDSDataFullAccess (or your custom RDS policy)
+
+- Click Next
+
+**✔️ Click Create policy**
+
 - **✔️ Click Create IAM ROLE**
 
 ### 6️⃣ EC2 Instance (Amazon Linux 2023)

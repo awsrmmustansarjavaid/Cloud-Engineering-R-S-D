@@ -223,46 +223,7 @@ holidays
 
 ## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
-### 1️⃣ IAM Role for HR Lambdas (ONE TIME ONLY)
-
-If you already have a Lambda role that accesses RDS + CloudWatch, reuse it.
-If not, follow every step below.
-
-#### Step 1️⃣: Open IAM
-
-- AWS Console → IAM
-
-- Roles → Create role
-
-#### Step 2️⃣: Select Trusted Entity
-
-- Trusted entity type: AWS service
-
-- Service: Lambda
-
-- Click Next
-
-#### Step 3️⃣: Attach Permissions
-
-- Attach exactly these policies:
-
-    - AWSLambdaBasicExecutionRole
-
-    - AmazonRDSDataFullAccess (or your custom RDS policy)
-
-- Click Next
-
-#### Step 4️⃣: Role Name
-
-#### Role name:
-
-```
-cafe-hr-lambda-role
-```
-
-- Create role
-
-### 2️⃣ Create Lambda: hr-checkin
+### 1️⃣ Create Lambda: hr-checkin
 
 #### Step 1️⃣: Open Lambda
 
@@ -335,7 +296,7 @@ cafe-hr-lambda-role
 
 - Click Deploy
 
-### 3️⃣ Create Lambda: hr-checkout
+### 2️⃣ Create Lambda: hr-checkout
 > **Repeat Steps Exactly Like hr-checkin**
 
 #### Only change:
@@ -352,7 +313,7 @@ hr-checkout
 
 - Deploy.
 
-### 4️⃣ Create Lambda: hr-employee-profile
+### 3️⃣ Create Lambda: hr-employee-profile
 
 #### 1️⃣ Function name
 
@@ -366,7 +327,7 @@ hr-employee-profile
 
 - Deploy.
 
-### 5️⃣ Create Lambda: hr-attendance-history
+### 4️⃣ Create Lambda: hr-attendance-history
 
 #### 1️⃣ Function name
 
@@ -380,7 +341,7 @@ hr-attendance-history
 
 - Deploy.
 
-6️⃣ Create Lambda: hr-leaves-holidays
+### 5️⃣ Create Lambda: hr-leaves-holidays
 
 #### 1️⃣ Function name
 
@@ -394,7 +355,7 @@ hr-leaves-holidays
 
 - Deploy.
 
-### 7️⃣ Lambda Testing & Verification
+### 6️⃣ Lambda Testing & Verification
 
 #### 1️⃣ Test Environment Variables
 
