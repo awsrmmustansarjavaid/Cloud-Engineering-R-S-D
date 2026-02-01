@@ -378,10 +378,8 @@ You can paste this directly into IAM → Policies → Create policy → JSON
   "Version": "2012-10-17",
   "Statement": [
 
-    /* ============================
-       🔹 LAMBDA BASIC EXECUTION
-       ============================ */
     {
+      "Sid": "LambdaBasicExecutionLogs",
       "Effect": "Allow",
       "Action": [
         "logs:CreateLogGroup",
@@ -391,10 +389,8 @@ You can paste this directly into IAM → Policies → Create policy → JSON
       "Resource": "*"
     },
 
-    /* ============================
-       🔹 LAMBDA VPC ACCESS
-       ============================ */
     {
+      "Sid": "LambdaVPCAccess",
       "Effect": "Allow",
       "Action": [
         "ec2:CreateNetworkInterface",
@@ -406,19 +402,15 @@ You can paste this directly into IAM → Policies → Create policy → JSON
       "Resource": "*"
     },
 
-    /* ============================
-       🔹 DYNAMODB FULL ACCESS
-       ============================ */
     {
+      "Sid": "DynamoDBFullAccess",
       "Effect": "Allow",
       "Action": "dynamodb:*",
       "Resource": "*"
     },
 
-    /* ============================
-       🔹 RDS DATA API FULL ACCESS
-       ============================ */
     {
+      "Sid": "RDSDataAPIFullAccess",
       "Effect": "Allow",
       "Action": [
         "rds-data:ExecuteStatement",
@@ -430,27 +422,25 @@ You can paste this directly into IAM → Policies → Create policy → JSON
       "Resource": "*"
     },
 
-    /* ============================
-       🔹 CUSTOM LAMBDA LOGS (RESTRICTED)
-       ============================ */
     {
+      "Sid": "CustomLambdaLogGroupCreate",
       "Effect": "Allow",
       "Action": "logs:CreateLogGroup",
-      "Resource": "arn:aws:logs:us-east-1:Your AWS ACCOUNT ID :*"
+      "Resource": "arn:aws:logs:us-east-1:"Your AWS ACCOUNT ID ":*"
     },
+
     {
+      "Sid": "CustomLambdaLogStreamAccess",
       "Effect": "Allow",
       "Action": [
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "arn:aws:logs:us-east-1:Your AWS ACCOUNT ID :log-group:/aws/lambda/cloudfront-cache-invalidator:*"
+      "Resource": "arn:aws:logs:us-east-1:"Your AWS ACCOUNT ID ":log-group:/aws/lambda/cloudfront-cache-invalidator:*"
     },
 
-    /* ============================
-       🔹 CAFE MENU TABLE ACCESS
-       ============================ */
     {
+      "Sid": "CafeMenuTableAccess",
       "Effect": "Allow",
       "Action": [
         "dynamodb:GetItem",
@@ -458,13 +448,11 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "dynamodb:PutItem",
         "dynamodb:UpdateItem"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:Your AWS ACCOUNT ID :table/CafeMenu"
+      "Resource": "arn:aws:dynamodb:us-east-1:"Your AWS ACCOUNT ID ":table/CafeMenu"
     },
 
-    /* ============================
-       🔹 CAFE ORDERS TABLE ACCESS
-       ============================ */
     {
+      "Sid": "CafeOrdersTableAccess",
       "Effect": "Allow",
       "Action": [
         "dynamodb:PutItem",
@@ -474,13 +462,11 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "dynamodb:Query",
         "dynamodb:Scan"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:Your AWS ACCOUNT ID :table/CafeOrders"
+      "Resource": "arn:aws:dynamodb:us-east-1:"Your AWS ACCOUNT ID ":table/CafeOrders"
     },
 
-    /* ============================
-       🔹 SQS – CAFE ORDERS QUEUE
-       ============================ */
     {
+      "Sid": "CafeOrdersQueueAccess",
       "Effect": "Allow",
       "Action": [
         "sqs:SendMessage",
@@ -488,13 +474,11 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes"
       ],
-      "Resource": "arn:aws:sqs:us-east-1:Your AWS ACCOUNT ID :CafeOrdersQueue"
+      "Resource": "arn:aws:sqs:us-east-1:"Your AWS ACCOUNT ID ":CafeOrdersQueue"
     },
 
-    /* ============================
-       🔹 SECRETS MANAGER (CAFE)
-       ============================ */
     {
+      "Sid": "CafeSecretsManagerAccess",
       "Effect": "Allow",
       "Action": [
         "secretsmanager:GetSecretValue",
@@ -506,11 +490,8 @@ You can paste this directly into IAM → Policies → Create policy → JSON
       ]
     },
 
-    /* ============================
-       🔹 S3 APP BUCKET ACCESS
-       ============================ */
     {
-      "Sid": "AllowS3AccessToAppBucket",
+      "Sid": "CafeS3AppBucketAccess",
       "Effect": "Allow",
       "Action": [
         "s3:GetObject",
