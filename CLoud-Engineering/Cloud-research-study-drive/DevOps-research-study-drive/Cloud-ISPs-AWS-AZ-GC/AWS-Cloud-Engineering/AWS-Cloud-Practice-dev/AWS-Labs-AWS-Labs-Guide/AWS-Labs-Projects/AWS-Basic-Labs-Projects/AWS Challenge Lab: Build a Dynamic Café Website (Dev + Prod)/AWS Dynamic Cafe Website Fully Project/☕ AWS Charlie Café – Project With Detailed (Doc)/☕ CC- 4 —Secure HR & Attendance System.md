@@ -774,7 +774,7 @@ def lambda_handler(event, context):
     return response(200, {"message": "Success"})
 ```
 
-
+**⚠️ All these 5 HR Lambda Updated.. Skip this step**
 
 
 #### 3️⃣ — PERFORMANCE & SAFETY SETTINGS
