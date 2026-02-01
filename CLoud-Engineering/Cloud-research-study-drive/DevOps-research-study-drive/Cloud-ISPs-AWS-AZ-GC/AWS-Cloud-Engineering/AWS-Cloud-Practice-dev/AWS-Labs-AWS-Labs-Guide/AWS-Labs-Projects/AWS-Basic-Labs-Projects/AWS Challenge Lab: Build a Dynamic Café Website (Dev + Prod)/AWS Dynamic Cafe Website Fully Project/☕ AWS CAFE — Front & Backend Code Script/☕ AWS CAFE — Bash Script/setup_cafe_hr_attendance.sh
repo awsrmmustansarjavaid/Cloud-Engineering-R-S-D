@@ -5,7 +5,7 @@ echo "☕ Starting Cafe RDS Schema Setup (Employees + Attendance)..."
 
 # ================= CONFIG =================
 AWS_REGION="us-east-1"
-SECRET_ARN="arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSM-NSiXdV" # ← CHANGE TO YOUR REAL SECRET ARN
+SECRET_ID="CafeDevDBSM"
 DB_NAME="cafe_db"   # ← change to "cafedb" if that's your actual database name
 
 # ================= FETCH SECRET FROM SECRETS MANAGER =================
