@@ -1,34 +1,34 @@
 /* =========================================================
-   CHARLIE CAFE — CENTRAL AUTH + API CONFIG
+   CHARLIE CAFE — CENTRAL AUTH + API CONFIG (UPDATED)
    Single source of truth for ALL frontend pages
-   SAFE FOR BROWSER USE
+   Includes logout button handling, page protection, and role checks
 ========================================================= */
 
 const CHARLIE = (() => {
 
     /* =====================================================
-       1️⃣ GLOBAL CONFIG (UNCHANGED)
+       1️⃣ GLOBAL CONFIG
+       - Cognito, API Gateway, CloudFront
     ===================================================== */
-
     const CONFIG = {
         REGION: "us-east-1",
 
-        // -------- Cognito --------
+        // Cognito User Pool
         USER_POOL_ID: "us-east-1_1wxssmoiqi",
         CLIENT_ID: "3a4uchovr497k8v3gl52e2j5d8",
         COGNITO_DOMAIN: "us-east-1wxssmoiqi.auth.us-east-1.amazoncognito.com",
 
-        // -------- API Gateway --------
+        // API Gateway
         API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
 
-        // -------- CloudFront --------
+        // CloudFront
         CLOUDFRONT_BASE: "https://d3lnkgtsj0uwlu.cloudfront.net"
     };
 
     /* =====================================================
-       2️⃣ TOKEN HELPERS (UNCHANGED)
+       2️⃣ TOKEN HELPERS
+       - Parse JWT, check expiration, get token from storage
     ===================================================== */
-
     function parseJwt(token) {
         return JSON.parse(atob(token.split(".")[1]));
     }
@@ -42,11 +42,12 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       3️⃣ COGNITO AUTH (UNCHANGED)
+       3️⃣ COGNITO AUTH
+       - Login, Logout, Redirect handling, Page protection
     ===================================================== */
-
     const auth = {
 
+        // 🔹 Login redirect to Cognito
         login(redirectUrl = window.location.href) {
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/login` +
@@ -58,9 +59,12 @@ const CHARLIE = (() => {
             window.location.href = url;
         },
 
+        // 🔹 Logout user
         logout(redirectUrl = window.location.origin) {
+            // Remove token from localStorage
             localStorage.removeItem("access_token");
 
+            // Redirect to Cognito logout endpoint (optional redirect after logout)
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/logout` +
                 `?client_id=${CONFIG.CLIENT_ID}` +
@@ -69,6 +73,7 @@ const CHARLIE = (() => {
             window.location.href = url;
         },
 
+        // 🔹 Handle redirect after Cognito login
         handleRedirect() {
             if (!window.location.hash) return;
 
@@ -76,33 +81,45 @@ const CHARLIE = (() => {
             const token = params.get("access_token");
 
             if (token) {
-                localStorage.setItem("access_token", token);
-                window.location.hash = "";
+                localStorage.setItem("access_token", token); // Save token
+                window.location.hash = ""; // Clean URL
             }
         },
 
+        // 🔹 Protect page for logged-in users
         protectPage() {
             this.handleRedirect();
 
             const token = getToken();
             if (!token || isTokenExpired(token)) {
-                this.login();
+                this.login(); // Redirect to login if no valid token
                 return;
             }
 
+            // Show page content only if authenticated
             document.body.style.display = "block";
+        },
+
+        // 🔹 Logout button integration
+        setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "index.html") {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+
+            btn.addEventListener("click", () => {
+                this.logout(redirectUrl); // Call logout function
+            });
         }
     };
 
     /* =====================================================
-       4️⃣ AUTHENTICATED FETCH (UNCHANGED)
+       4️⃣ AUTHENTICATED FETCH
+       - Include token in headers for API calls
     ===================================================== */
-
     async function authFetch(url, options = {}) {
         const token = getToken();
 
         if (!token || isTokenExpired(token)) {
-            auth.logout();
+            auth.logout(); // Auto logout if token expired
             return;
         }
 
@@ -117,18 +134,15 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       🆕 4️⃣A SECURE FETCH (PHASE 5)
-       Alias for Phase-5 naming
+       4️⃣A SECURE FETCH (Alias for Phase-5)
     ===================================================== */
-
     async function secureFetch(url, options = {}) {
         return authFetch(url, options).then(res => res.json());
     }
 
     /* =====================================================
-       🆕 4️⃣B ROLE & ACCESS CONTROL (PHASE 5)
+       4️⃣B ROLE & ACCESS CONTROL
     ===================================================== */
-
     function getUserRoles() {
         const token = getToken();
         if (!token) return [];
@@ -149,7 +163,6 @@ const CHARLIE = (() => {
             alert("Admin access only");
             auth.logout();
         }
-
         const adminSection = document.getElementById("admin-section");
         if (adminSection) adminSection.style.display = "block";
     }
@@ -162,9 +175,8 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       5️⃣ API GATEWAY ENDPOINTS (UNCHANGED)
+       5️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
-
     const api = {
 
         placeOrder(payload) {
@@ -197,9 +209,8 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       6️⃣ CLOUDFRONT ASSETS (UNCHANGED)
+       6️⃣ CLOUDFRONT ASSETS
     ===================================================== */
-
     const assets = {
         url(path) {
             return `${CONFIG.CLOUDFRONT_BASE}/${path}`;
@@ -207,17 +218,15 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       EXPORT (PHASE-5 EXTENDED)
+       7️⃣ EXPORT
+       - Expose all functions and config for pages
     ===================================================== */
-
     return {
         CONFIG,
-        apiBase: CONFIG.API_BASE,   // ✅ Phase-5 requirement
+        apiBase: CONFIG.API_BASE,
         auth,
         api,
         assets,
-
-        // Phase-5 exports
         secureFetch,
         enforceAdminAccess,
         enforceEmployeeAccess,
