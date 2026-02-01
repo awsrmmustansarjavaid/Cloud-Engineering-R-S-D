@@ -7,7 +7,7 @@
 const CHARLIE = (() => {
 
     /* =====================================================
-       1️⃣ GLOBAL CONFIG
+       1️⃣ GLOBAL CONFIG (UNCHANGED)
     ===================================================== */
 
     const CONFIG = {
@@ -26,7 +26,7 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       2️⃣ TOKEN HELPERS
+       2️⃣ TOKEN HELPERS (UNCHANGED)
     ===================================================== */
 
     function parseJwt(token) {
@@ -42,7 +42,7 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       3️⃣ COGNITO AUTH (Hosted UI)
+       3️⃣ COGNITO AUTH (UNCHANGED)
     ===================================================== */
 
     const auth = {
@@ -95,7 +95,7 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       4️⃣ AUTHENTICATED FETCH
+       4️⃣ AUTHENTICATED FETCH (UNCHANGED)
     ===================================================== */
 
     async function authFetch(url, options = {}) {
@@ -117,46 +117,87 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       5️⃣ API GATEWAY ENDPOINTS
+       🆕 4️⃣A SECURE FETCH (PHASE 5)
+       Alias for Phase-5 naming
+    ===================================================== */
+
+    async function secureFetch(url, options = {}) {
+        return authFetch(url, options).then(res => res.json());
+    }
+
+    /* =====================================================
+       🆕 4️⃣B ROLE & ACCESS CONTROL (PHASE 5)
+    ===================================================== */
+
+    function getUserRoles() {
+        const token = getToken();
+        if (!token) return [];
+        const payload = parseJwt(token);
+        return payload["cognito:groups"] || [];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("Admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("Employee");
+    }
+
+    function enforceAdminAccess() {
+        if (!isAdmin()) {
+            alert("Admin access only");
+            auth.logout();
+        }
+
+        const adminSection = document.getElementById("admin-section");
+        if (adminSection) adminSection.style.display = "block";
+    }
+
+    function enforceEmployeeAccess() {
+        if (!isEmployee()) {
+            alert("Employee access only");
+            auth.logout();
+        }
+    }
+
+    /* =====================================================
+       5️⃣ API GATEWAY ENDPOINTS (UNCHANGED)
     ===================================================== */
 
     const api = {
 
-        // ---------- PLACE ORDER ----------
         placeOrder(payload) {
-            return fetch(`${CONFIG.API_BASE}/dev/orders`, {  // ← add /dev/ (or your current stage)
+            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(res => res.json());
         },
 
-        // ---------- ORDER STATUS ----------
         getOrderStatus(orderId) {
             return fetch(
                 `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
             ).then(res => res.json());
         },
 
-        // ---------- CASH PAYMENT ----------
-        // ✅ NEW: Centralized cash payment endpoint
         cashPayment(orderId) {
-            return fetch(`${CONFIG.API_BASE}/dev/orders/cash-payment`, {  // ← assuming this is also under /dev/
+            return fetch(`${CONFIG.API_BASE}/dev/orders/cash-payment`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ order_id: orderId })
             }).then(res => res.json());
         },
 
-        // ---------- ADMIN ----------
         updateOrder(payload) {
-            return authFetch(`${CONFIG.API_BASE}/dev/order-update`, {  // ← add stage here too
+            return authFetch(`${CONFIG.API_BASE}/dev/order-update`, {
                 body: JSON.stringify(payload)
             }).then(res => res.json());
         }
     };
+
     /* =====================================================
-       6️⃣ CLOUDFRONT ASSETS
+       6️⃣ CLOUDFRONT ASSETS (UNCHANGED)
     ===================================================== */
 
     const assets = {
@@ -166,14 +207,21 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       EXPORT
+       EXPORT (PHASE-5 EXTENDED)
     ===================================================== */
 
     return {
         CONFIG,
+        apiBase: CONFIG.API_BASE,   // ✅ Phase-5 requirement
         auth,
         api,
-        assets
+        assets,
+
+        // Phase-5 exports
+        secureFetch,
+        enforceAdminAccess,
+        enforceEmployeeAccess,
+        getUserRoles
     };
 
 })();
