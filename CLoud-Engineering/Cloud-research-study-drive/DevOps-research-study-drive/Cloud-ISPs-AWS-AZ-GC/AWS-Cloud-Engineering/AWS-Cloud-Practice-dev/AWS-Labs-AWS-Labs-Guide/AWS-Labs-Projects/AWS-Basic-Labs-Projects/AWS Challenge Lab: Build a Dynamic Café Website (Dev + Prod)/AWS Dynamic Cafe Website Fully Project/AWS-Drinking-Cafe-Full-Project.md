@@ -100,8 +100,6 @@ Allow Lambda to read menu items from DynamoDB
 
 - **IAM Role for Charlie Cafe Policies**
 
-
-
 #### 1️⃣ IAM Policies Method -1 ✅ Mega Custom IAM Policy
 
 **👉 Paste into IAM → Policies → Create policy → JSON**
