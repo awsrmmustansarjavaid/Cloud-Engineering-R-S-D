@@ -424,9 +424,9 @@ HR Secure Attendance & Employee Management API
 
     - /checkout → hr-checkout
 
-    - /employee/profile → hr-employee-profile
+    - /employee-profile → hr-employee-profile
 
-    - /attendance/history → hr-attendance-history
+    - /attendance-history → hr-attendance-history
 
     - /leaves-holidays → hr-leaves-holidays
 
