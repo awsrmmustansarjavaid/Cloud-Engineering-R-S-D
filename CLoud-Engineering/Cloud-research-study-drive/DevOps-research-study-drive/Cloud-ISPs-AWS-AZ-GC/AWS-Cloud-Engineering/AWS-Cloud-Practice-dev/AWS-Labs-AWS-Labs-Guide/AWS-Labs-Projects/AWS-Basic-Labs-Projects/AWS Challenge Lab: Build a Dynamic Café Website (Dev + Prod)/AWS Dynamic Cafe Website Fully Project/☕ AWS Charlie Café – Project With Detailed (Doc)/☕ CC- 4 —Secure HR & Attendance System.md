@@ -558,7 +558,7 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 
 #### 8.3 Test /employee/profile (GET)
 
-- URL: /employee/profile
+- URL: /employee-profile
 
 - Method: GET
 
@@ -575,7 +575,7 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
 
 #### 8.4 Test /attendance/history (GET)
 
-- URL: /attendance/history
+- URL: /attendance-history
 
 - Headers: Authorization: <Cognito JWT>
 
