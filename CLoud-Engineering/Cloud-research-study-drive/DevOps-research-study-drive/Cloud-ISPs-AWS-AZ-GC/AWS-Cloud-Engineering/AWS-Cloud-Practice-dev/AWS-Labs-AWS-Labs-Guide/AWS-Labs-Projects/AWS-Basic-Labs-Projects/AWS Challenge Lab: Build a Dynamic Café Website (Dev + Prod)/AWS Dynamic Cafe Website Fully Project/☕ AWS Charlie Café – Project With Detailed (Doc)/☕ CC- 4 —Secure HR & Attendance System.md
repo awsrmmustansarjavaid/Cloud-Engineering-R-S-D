@@ -779,21 +779,141 @@ def lambda_handler(event, context):
 #### 2️⃣ 🧩 HOW TO APPLY THIS TO EACH LAMBDA (NO CONFUSION)
 > **This step (ALLOWED_ROLE = Employee/Admin) is part of Cognito role-based access control (RBAC).**
 
-#### 1️⃣ Check-In Lambda
+#### 1️⃣ Create Cognito User Pool
+
+#### Step 1: Open Cognito
+
+- AWS Console → Cognito
+
+- Click Create user pool
+
+#### Step 2: Basic setup
+
+- User pool name:
+
+```
+HR-User-Pool
+```
+
+- Sign-in options:          ✔ Email
+
+- Password policy:          Default (OK)
+
+#### Step 3: Attributes
+
+- Required attributes:      ✔ email
+
+#### Step 4: App Client
+
+- App client name:
+
+```
+hr-web-client
+```
+
+**❌ Disable client secret (IMPORTANT for frontend)**
+
+- Create the pool ✅
+
+#### 2️⃣ Create Cognito Groups (ROLES)
+
+#### Step 1: Go to your User Pool
+
+- User Pool → Groups
+
+#### Step 2: Create Groups
+
+- Create two groups:
+
+- Group 1 Name: Employee
+
+- Group 2 Name: Admin
+
+**👉 These group names are your roles**
+
+#### 3️⃣ Create Test Users
+
+#### Step 1: Users → Create user
+
+- Create Employee user
+
+    - Email: employee@test.com
+
+    - Add to group: Employee
+
+- Create Admin user
+
+    - Email: admin@test.com
+
+    - Add to group: Admin
+
+- Set permanent passwords.
+
+#### 4️⃣ Attach Cognito Authorizer to API Gateway
+
+#### Step 1: API Gateway
+
+- Open your HR API
+
+- Go to Authorizers
+
+- Create Authorizer
+
+#### Step 2: Configure
+
+- Type: Cognito
+
+- User Pool: HR-User-Pool
+
+- Token source:
+
+```
+Authorization
+```
+
+- Save.
+
+#### Step 3: Attach Authorizer to Routes
+
+- For each HR route:
+
+- Method → Method Request
+
+- Authorization → Cognito Authorizer
+
+- Save & Redeploy API
+
+#### 5️⃣ Add ROLE CHECK
+
+Now comes your ALLOWED_ROLE logic.
+
+#### 🔹 Common Role Check Snippet (SAFE & CLEAN)
+
+Add this after extracting Cognito claims
+(does NOT break your existing logic)
+
+```
+def check_role(event, allowed_role):
+    claims = event['requestContext']['authorizer']['claims']
+    groups = claims.get('cognito:groups', '')
+    return allowed_role in groups
+```
+
+#### 6️⃣ Check-In Lambda
 
 ```
 ALLOWED_ROLE = "Employee"
 # INSERT attendance record
 ```
 
-#### 2️⃣ Check-Out Lambda
+#### 7️⃣ Check-Out Lambda
 
 ```
 ALLOWED_ROLE = "Employee"
 # UPDATE checkout_time
 ```
 
-#### 3️⃣ Attendance History Lambda
+#### 8️⃣ Attendance History Lambda
 
 ```
 ALLOWED_ROLE = "Employee"
@@ -801,46 +921,46 @@ ALLOWED_ROLE = "Employee"
 # return list → auto JSON-safe
 ```
 
-#### 4️⃣ Leaves & Holidays Lambda
+#### 9️⃣ Leaves & Holidays Lambda
 
 ```
 ALLOWED_ROLE = "Employee"
 # SELECT leaves + holidays
 ```
 
-#### 5️⃣ Admin Employees Lambda
+#### 🔟 Admin Employees Lambda
 
 ```
 ALLOWED_ROLE = "Admin"
 # SELECT all employees
 ```
 
-#### 🔧 REQUIRED API GATEWAY CONFIG
+### 4️⃣ REQUIRED API GATEWAY CONFIG
 
-✅ Authorizer
+#### ✅ Authorizer
 
-Type: Cognito User Pool
+- Type: Cognito User Pool
 
-Token Source: Authorization
+- Token Source: Authorization
 
-Identity validation: Bearer .*
+- Identity validation: Bearer .*
 
-✅ Method Request (ALL methods)
+#### ✅ Method Request (ALL methods)
 
-Authorization: Cognito Authorizer
+- Authorization: Cognito Authorizer
 
-API Key: false
+- API Key: false
 
-✅ Enable CORS (ALL resources)
+#### ✅ Enable CORS (ALL resources)
 
-Allow:
+- Allow:
 
 ```
 Authorization
 Content-Type
 ```
 
-🔐 SECURITY MODEL
+#### 🔐 SECURITY MODEL
 > **(YOU DID THIS RIGHT)**
 
 | Layer       | Responsibility   |
