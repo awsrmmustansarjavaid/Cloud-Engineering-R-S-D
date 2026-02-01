@@ -406,7 +406,7 @@ HR Secure Attendance & Employee Management API
 
     - Select POST for /checkin and /checkout
 
-    - Select GET for /employee/profile, /attendance/history, /leaves-holidays
+    - Select GET for /employee-profile, /attendance-history, /leaves-holidays
 
 ### 4️⃣ Integrate Lambda Function
 
