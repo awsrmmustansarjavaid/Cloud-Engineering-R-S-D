@@ -80,9 +80,7 @@ COLLATE utf8mb4_unicode_ci;
 echo "📋 Creating HR & Attendance tables..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
--- =====================================================
--- Employees table (Cognito linked)
--- =====================================================
+-- Employees table
 CREATE TABLE IF NOT EXISTS employees (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
     cognito_user_id VARCHAR(100) NOT NULL,
@@ -94,9 +92,7 @@ CREATE TABLE IF NOT EXISTS employees (
     UNIQUE KEY uk_cognito_user (cognito_user_id)
 ) ENGINE=InnoDB;
 
--- =====================================================
 -- Attendance table
--- =====================================================
 CREATE TABLE IF NOT EXISTS attendance (
     attendance_id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT NOT NULL,
@@ -110,9 +106,7 @@ CREATE TABLE IF NOT EXISTS attendance (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- =====================================================
 -- Leaves table
--- =====================================================
 CREATE TABLE IF NOT EXISTS leaves (
     leave_id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT NOT NULL,
@@ -125,9 +119,7 @@ CREATE TABLE IF NOT EXISTS leaves (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- =====================================================
--- Holidays table (global)
--- =====================================================
+-- Holidays table
 CREATE TABLE IF NOT EXISTS holidays (
     holiday_id INT AUTO_INCREMENT PRIMARY KEY,
     holiday_date DATE NOT NULL UNIQUE,
@@ -137,18 +129,24 @@ CREATE TABLE IF NOT EXISTS holidays (
 EOF
 
 # =========================================================
-# ADD INDEXES FOR ATTENDANCE (FASTER QUERIES)
+# ADD INDEXES FOR ATTENDANCE TABLE (MYSQL 5.7 SAFE)
 # =========================================================
-echo "📈 Adding indexes to attendance table (if not exist)..."
+echo "📈 Adding indexes to attendance table (idempotent)..."
 
+# Check if index exists before creating
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
--- Index on attendance_date
-ALTER TABLE attendance
-    ADD INDEX IF NOT EXISTS idx_attendance_date (attendance_date);
+SET @idx1 := (SELECT COUNT(1) FROM INFORMATION_SCHEMA.STATISTICS 
+              WHERE table_schema=DATABASE() AND table_name='attendance' AND index_name='idx_attendance_date');
+SET @idx2 := (SELECT COUNT(1) FROM INFORMATION_SCHEMA.STATISTICS 
+              WHERE table_schema=DATABASE() AND table_name='attendance' AND index_name='idx_attendance_employee');
 
--- Index on employee_id
-ALTER TABLE attendance
-    ADD INDEX IF NOT EXISTS idx_attendance_employee (employee_id);
+-- Add index on attendance_date if missing
+SET @sql := IF(@idx1=0,'ALTER TABLE attendance ADD INDEX idx_attendance_date (attendance_date)','SELECT "Index idx_attendance_date already exists"');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Add index on employee_id if missing
+SET @sql := IF(@idx2=0,'ALTER TABLE attendance ADD INDEX idx_attendance_employee (employee_id)','SELECT "Index idx_attendance_employee already exists"');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 EOF
 
 # =========================================================
@@ -157,12 +155,10 @@ EOF
 echo "🌱 Inserting test data (idempotent)..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
--- Holidays
 INSERT IGNORE INTO holidays (holiday_date, description) VALUES
     ('2026-01-01', 'New Year'),
     ('2026-03-23', 'Pakistan Day');
 
--- Temporary test employee
 INSERT IGNORE INTO employees
     (cognito_user_id, name, job_title, salary, start_date)
 VALUES
@@ -170,17 +166,15 @@ VALUES
 EOF
 
 # =========================================================
-# VERIFICATION TESTS (FINAL)
+# VERIFICATION TESTS
 # =========================================================
 echo ""
 echo "🔍 VERIFICATION RESULTS"
 echo "------------------------------------------"
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
--- Show all tables
 SHOW TABLES;
 
--- Row counts
 SELECT 'employees'  AS table_name, COUNT(*) AS row_count FROM employees
 UNION ALL
 SELECT 'attendance', COUNT(*) FROM attendance
@@ -189,12 +183,11 @@ SELECT 'leaves',     COUNT(*) FROM leaves
 UNION ALL
 SELECT 'holidays',   COUNT(*) FROM holidays;
 
--- Sample employee record
 SELECT employee_id, name, job_title, cognito_user_id
 FROM employees
 LIMIT 3;
 
--- Verify indexes on attendance table
+-- Verify indexes
 SHOW INDEX FROM attendance;
 
 SELECT 'HR & Attendance schema + indexes verified successfully ✅' AS status;
