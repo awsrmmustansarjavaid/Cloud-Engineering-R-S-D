@@ -1807,6 +1807,21 @@ This is exactly how real AWS + frontend projects are reviewed in interviews.
 
 ## ☕ Charlie Café PHASE 8️⃣ — HR Attendance Dashboard
 
+We will cover everything in this exact order:
+
+1️⃣ First, clear the confusion
+
+2️⃣ Architecture (how all pages + Cognito + APIs connect)
+
+3️⃣ Difference between Check-In/Check-Out page vs HR Dashboard
+
+4️⃣ Backend (API Gateway + Lambda) – step by step
+
+5️⃣ Frontend HR Dashboard page – full code with comments
+
+6️⃣ How Cognito Logout button works on ALL pages (important)
+
+7️⃣ How your existing check-in / check-out page should be updated (minimal & safe)
 
 ### 🧠 PART 1 — BIG PICTURE (UNDERSTAND FIRST)
 
