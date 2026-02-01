@@ -1389,7 +1389,30 @@ initAdminDashboard();
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 8️⃣ — Update Cafe Security Configuration
+## ☕ Charlie Café PHASE 8️⃣ — HR Attendance Dashboard
+
+### 1️⃣ — FRONTEND HR ATTENDANCE DASHBOARD
+
+🔹 STEP 1 — Create Folder & File
+
+📁 Create file:
+
+```
+hr-attendance.html
+```
+
+🔹 STEP 2 — Basic HTML Skeleton (VERY IMPORTANT)
+
+
+
+
+
+
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 9️⃣ — Update Cafe Security Configuration
 
 ### 1️⃣ — EC2 Frontend Security Group
 
@@ -1485,11 +1508,11 @@ initAdminDashboard();
 
 - No need to modify if DB is only accessed by Lambda.
 
-**✅ PHASE 8️⃣ STATUS**
+**✅ PHASE 9️⃣ STATUS**
 
-> **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 9️⃣ — Minor UX / UI Polish
+## ☕ Charlie Café PHASE 🔟 — Minor UX / UI Polish
 > **🌐 (Optional but Professional)**
 
 ### Step 5.1 — Choose Toast Notification Method
@@ -1673,11 +1696,11 @@ catch {
 }
 ```
 
-**✅ PHASE 9️⃣ STATUS**
+**✅ PHASE 🔟 STATUS**
 
-> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 🔟 COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 🔟 — Update CafePDFReportLambda for HR & Attendance
+## ☕ Charlie Café PHASE 1️⃣1️⃣ — Update CafePDFReportLambda for HR & Attendance
 
 ### 📃 Research and Development (Just for CaseStudy)
 
@@ -2011,7 +2034,7 @@ Fully commented code
 
 - No other code changes, still handles analytics and order-status
 
-**✅ PHASE 🔟 STATUS**
+**✅ PHASE 1️⃣1️⃣ STATUS**
 
-> **🟢 PHASE 🔟 COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣1️⃣ COMPLETE & VERIFIED**
 ---

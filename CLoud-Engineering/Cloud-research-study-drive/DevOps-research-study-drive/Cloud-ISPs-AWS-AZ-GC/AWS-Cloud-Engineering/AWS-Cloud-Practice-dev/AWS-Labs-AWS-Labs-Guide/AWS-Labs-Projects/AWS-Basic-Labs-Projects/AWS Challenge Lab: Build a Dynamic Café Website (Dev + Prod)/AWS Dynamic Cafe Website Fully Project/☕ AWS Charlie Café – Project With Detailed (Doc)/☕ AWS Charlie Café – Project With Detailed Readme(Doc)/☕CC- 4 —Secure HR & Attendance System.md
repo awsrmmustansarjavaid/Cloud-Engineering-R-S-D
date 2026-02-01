@@ -640,7 +640,7 @@ function logout() {
 
 ✔ Secure & Cognito-approved
 
-> **🟢 PHASE 3️⃣  R & D COMPLETE**
+> **🟢 PHASE 3️⃣  COMPLETE**
 ---
 ## ☕ Charlie Café PHASE 5️⃣ Secure Frontend & API Integration with Production Hardening
 > **Frontend & Backend Security, API Integration, and Role-Based UI (Production Ready)**
@@ -1803,3 +1803,62 @@ This is exactly how real AWS + frontend projects are reviewed in interviews.
 
 
 > **🟢 PHASE 9️⃣ COMPLETE**
+---
+
+## ☕ Charlie Café PHASE 8️⃣ — HR Attendance Dashboard
+
+
+### 🧠 PART 1 — BIG PICTURE (UNDERSTAND FIRST)
+
+#### What we are building
+
+An HR Attendance Dashboard page that:
+
+- Is protected by Cognito
+
+- Only Employee / Admin can access
+
+- Allows:
+
+    - ✅ Employee → Check-In / Check-Out
+
+    - ✅ Admin → View attendance
+
+- Uses:
+
+    - central-auth-api.js (already built)
+
+    - API Gateway
+
+    - Lambda
+
+    - DynamoDB (attendance table)
+
+### 🧠 PART 2 — BACKEND (WHAT MUST EXIST)
+
+You already have most of this, but I’ll explain how frontend connects.
+
+#### ✅ Required Backend APIs (API Gateway)
+
+| Purpose        | Method | Endpoint                              |
+| -------------- | ------ | ------------------------------------- |
+| Check-In       | POST   | `/dev/hr/attendance`                  |
+| Check-Out      | POST   | `/dev/hr/attendance`                  |
+| Get Attendance | GET    | `/dev/hr/attendance?employee_id=E123` |
+
+#### 👉 These are already referenced in your central-auth-api.js:
+
+```
+CHARLIE.api.recordAttendance()
+CHARLIE.api.getAttendance()
+```
+So NO backend change is required now ✅
+We will only consume them from frontend.
+
+
+
+
+
+
+> **🟢 PHASE 8️⃣ COMPLETE**
+---
