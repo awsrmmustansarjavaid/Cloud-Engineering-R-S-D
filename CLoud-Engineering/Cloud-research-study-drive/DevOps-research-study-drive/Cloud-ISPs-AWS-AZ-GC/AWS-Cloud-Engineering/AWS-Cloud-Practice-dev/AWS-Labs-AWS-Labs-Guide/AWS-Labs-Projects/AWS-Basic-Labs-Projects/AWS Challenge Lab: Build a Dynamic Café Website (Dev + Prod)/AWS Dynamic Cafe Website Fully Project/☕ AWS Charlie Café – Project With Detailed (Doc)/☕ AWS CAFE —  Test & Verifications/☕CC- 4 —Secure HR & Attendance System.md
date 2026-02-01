@@ -119,6 +119,20 @@ Example:
 }
 ```
 
+#### without cognito 
+
+```
+{
+  "statusCode": 403,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+  },
+  "body": "{\"message\": \"Forbidden\"}"
+}
+```
+
 #### Step 4 — Verify in RDS
 
 ```
@@ -172,6 +186,20 @@ SELECT * FROM attendance WHERE employee_id = 1;
 }
 ```
 
+#### without cognito 
+
+```
+{
+  "statusCode": 403,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization,Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+  },
+  "body": "{\"message\": \"Forbidden\"}"
+}
+```
+
 #### Step 4 — Verify in RDS
 
 ```
@@ -209,6 +237,18 @@ SELECT * FROM attendance WHERE employee_id = 1;
 }
 ```
 
+#### without cognito 
+
+```
+{
+  "statusCode": 403,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"message\": \"Forbidden\"}"
+}
+```
+
 > **Confirms Lambda can read employees table from RDS**
 
 ### 5️⃣ Test hr-attendance-history Lambda
@@ -240,6 +280,18 @@ SELECT * FROM attendance WHERE employee_id = 1;
 }
 ```
 
+#### without cognito 
+
+```
+{
+  "statusCode": 403,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"message\": \"Forbidden\"}"
+}
+```
+
 > **Confirms RDS attendance table integration**
 
 ### 6️⃣ Test hr-leaves-holidays Lambda
@@ -268,6 +320,18 @@ SELECT * FROM attendance WHERE employee_id = 1;
 {
   "statusCode": 200,
   "body": "{\"leaves\": [{\"leave_date\": \"2026-01-15\", \"leave_type\": \"Sick Leave\"}], \"holidays\": [{\"holiday_date\": \"2026-01-01\", \"description\": \"New Year\"}]}"
+}
+```
+
+#### without cognito 
+
+```
+{
+  "statusCode": 403,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"message\": \"Forbidden\"}"
 }
 ```
 
