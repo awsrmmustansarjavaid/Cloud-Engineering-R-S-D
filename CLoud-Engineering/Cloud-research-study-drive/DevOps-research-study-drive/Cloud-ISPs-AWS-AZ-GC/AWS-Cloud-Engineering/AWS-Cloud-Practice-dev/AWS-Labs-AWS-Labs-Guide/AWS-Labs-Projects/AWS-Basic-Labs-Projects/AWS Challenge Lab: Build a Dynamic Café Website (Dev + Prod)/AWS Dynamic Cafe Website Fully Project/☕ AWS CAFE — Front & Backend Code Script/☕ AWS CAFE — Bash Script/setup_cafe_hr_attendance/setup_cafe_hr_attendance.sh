@@ -137,6 +137,21 @@ CREATE TABLE IF NOT EXISTS holidays (
 EOF
 
 # =========================================================
+# ADD INDEXES FOR ATTENDANCE (FASTER QUERIES)
+# =========================================================
+echo "📈 Adding indexes to attendance table (if not exist)..."
+
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
+-- Index on attendance_date
+ALTER TABLE attendance
+    ADD INDEX IF NOT EXISTS idx_attendance_date (attendance_date);
+
+-- Index on employee_id
+ALTER TABLE attendance
+    ADD INDEX IF NOT EXISTS idx_attendance_employee (employee_id);
+EOF
+
+# =========================================================
 # INSERT TEST / SEED DATA (IDEMPOTENT)
 # =========================================================
 echo "🌱 Inserting test data (idempotent)..."
@@ -165,7 +180,7 @@ mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 -- Show all tables
 SHOW TABLES;
 
--- Row counts (SAFE alias name)
+-- Row counts
 SELECT 'employees'  AS table_name, COUNT(*) AS row_count FROM employees
 UNION ALL
 SELECT 'attendance', COUNT(*) FROM attendance
@@ -179,7 +194,10 @@ SELECT employee_id, name, job_title, cognito_user_id
 FROM employees
 LIMIT 3;
 
-SELECT 'HR & Attendance schema verified successfully ✅' AS status;
+-- Verify indexes on attendance table
+SHOW INDEX FROM attendance;
+
+SELECT 'HR & Attendance schema + indexes verified successfully ✅' AS status;
 EOF
 
 echo ""
