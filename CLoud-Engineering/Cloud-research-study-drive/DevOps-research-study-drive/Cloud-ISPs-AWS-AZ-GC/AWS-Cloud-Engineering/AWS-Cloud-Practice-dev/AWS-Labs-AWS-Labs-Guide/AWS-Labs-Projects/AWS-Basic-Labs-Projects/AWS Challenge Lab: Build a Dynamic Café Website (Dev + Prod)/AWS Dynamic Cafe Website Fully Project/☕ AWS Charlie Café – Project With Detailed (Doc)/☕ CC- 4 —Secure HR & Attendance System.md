@@ -271,7 +271,7 @@ cafe-hr-lambda-role
 | ------- | ----------------- |
 | DB_HOST | your-rds-endpoint |
 | DB_NAME | cafedb            |
-| DB_USER | your-db-user      |
+| DB_USER | cafe_user     |
 | DB_PASS | your-db-password  |
 
 - Click Save
