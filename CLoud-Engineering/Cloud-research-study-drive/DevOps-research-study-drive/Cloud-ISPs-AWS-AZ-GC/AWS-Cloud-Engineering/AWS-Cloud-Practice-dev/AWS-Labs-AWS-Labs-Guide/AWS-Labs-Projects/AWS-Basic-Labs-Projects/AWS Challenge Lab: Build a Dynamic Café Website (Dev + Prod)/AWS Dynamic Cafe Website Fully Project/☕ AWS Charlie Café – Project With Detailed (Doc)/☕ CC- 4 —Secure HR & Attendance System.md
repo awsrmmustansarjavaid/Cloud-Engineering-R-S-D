@@ -491,7 +491,7 @@ HR Secure Attendance & Employee Management API
 #### Copy the Invoke URL. Example:
 
 ```
-https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/dev
 ```
 
 ### 8️⃣ Test Each API Endpoint
@@ -505,7 +505,7 @@ https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod
     - URL:
 
 ```
-https://<API-ID>.execute-api.<region>.amazonaws.com/prod/checkin
+https://<API-ID>.execute-api.<region>.amazonaws.com/dev/checkin
 ```
 
     - Method: POST
