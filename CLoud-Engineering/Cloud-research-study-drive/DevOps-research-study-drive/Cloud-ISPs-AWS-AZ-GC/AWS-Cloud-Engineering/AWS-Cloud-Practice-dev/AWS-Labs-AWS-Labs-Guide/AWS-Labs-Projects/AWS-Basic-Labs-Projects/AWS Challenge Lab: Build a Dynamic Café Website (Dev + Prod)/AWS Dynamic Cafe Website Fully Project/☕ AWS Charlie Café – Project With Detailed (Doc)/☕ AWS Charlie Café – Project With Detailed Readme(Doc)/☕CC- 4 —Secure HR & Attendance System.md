@@ -1856,7 +1856,233 @@ So NO backend change is required now ✅
 We will only consume them from frontend.
 
 
+### 🧠 PART 3 — FRONTEND HR ATTENDANCE DASHBOARD (FULL STEPS)
 
+#### 🔹 STEP 1 — Create Folder & File
+
+#### 📁 Create file:
+
+```
+hr-attendance.html
+```
+
+#### 🔹 STEP 2 — Basic HTML Skeleton (VERY IMPORTANT)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HR Attendance Dashboard</title>
+</head>
+
+<!-- IMPORTANT:
+     Body is hidden by default
+     It will show ONLY after Cognito auth passes
+-->
+<body style="display:none">
+
+    <h1>HR Attendance Dashboard</h1>
+
+    <!-- Logout Button (WORKS ON ALL PAGES) -->
+    <button id="logoutBtn">Logout</button>
+
+    <hr>
+
+    <!-- Attendance Section -->
+    <h2>Employee Attendance</h2>
+
+    <button id="checkInBtn">Check In</button>
+    <button id="checkOutBtn">Check Out</button>
+
+    <p id="status"></p>
+
+    <hr>
+
+    <!-- Admin Attendance View -->
+    <div id="admin-section" style="display:none">
+        <h2>Admin: Attendance Records</h2>
+
+        <input id="employeeIdInput" placeholder="Employee ID">
+        <button id="loadAttendanceBtn">Load Attendance</button>
+
+        <pre id="attendanceResult"></pre>
+    </div>
+
+    <!-- CENTRAL AUTH FILE -->
+    <script src="js/central-auth-api.js"></script>
+
+    <!-- PAGE SCRIPT -->
+    <script src="js/hr-attendance.js"></script>
+
+</body>
+</html>
+```
+
+✅ Nothing fancy
+
+✅ Clean
+
+✅ Safe
+
+#### 🔹 STEP 3 — Create Page JS File
+
+#### 📁 Create:
+
+```
+js/hr-attendance.js
+```
+
+#### 🔹 STEP 4 — Protect the Page (MOST IMPORTANT)
+
+```
+// STEP 1: Protect page using Cognito
+CHARLIE.auth.protectPage();
+
+// STEP 2: Setup logout button (works globally)
+CHARLIE.auth.setupLogoutButton("logoutBtn", "index.html");
+
+// STEP 3: Show admin section if Admin
+if (CHARLIE.isAdmin()) {
+    document.getElementById("admin-section").style.display = "block";
+}
+```
+
+#### 👉 What happens here:
+
+- If user NOT logged in → redirected to Cognito login
+
+- If token expired → auto login
+
+- If logged in → page becomes visible
+
+- Logout button is wired automatically
+
+#### 🔹 STEP 5 — Check-In Logic (Employee)
+
+```
+document.getElementById("checkInBtn").addEventListener("click", async () => {
+
+    try {
+        const result = await CHARLIE.api.recordAttendance({
+            action: "CHECK_IN",
+            time: new Date().toISOString()
+        });
+
+        document.getElementById("status").innerText =
+            "✅ Checked in successfully";
+
+    } catch (err) {
+        document.getElementById("status").innerText =
+            "❌ Check-in failed";
+    }
+});
+```
+
+#### 🔐 Protected by:
+
+- Cognito token
+
+- requireEmployee() inside central-auth-api.js
+
+#### 🔹 STEP 6 — Check-Out Logic
+
+```
+document.getElementById("checkOutBtn").addEventListener("click", async () => {
+
+    try {
+        const result = await CHARLIE.api.recordAttendance({
+            action: "CHECK_OUT",
+            time: new Date().toISOString()
+        });
+
+        document.getElementById("status").innerText =
+            "✅ Checked out successfully";
+
+    } catch (err) {
+        document.getElementById("status").innerText =
+            "❌ Check-out failed";
+    }
+});
+```
+
+#### 🔹 STEP 7 — Admin: View Attendance Records
+
+```
+document.getElementById("loadAttendanceBtn").addEventListener("click", async () => {
+
+    const employeeId =
+        document.getElementById("employeeIdInput").value;
+
+    if (!employeeId) {
+        alert("Enter Employee ID");
+        return;
+    }
+
+    try {
+        const data =
+            await CHARLIE.api.getAttendance(employeeId);
+
+        document.getElementById("attendanceResult")
+            .innerText = JSON.stringify(data, null, 2);
+
+    } catch (err) {
+        alert("Failed to load attendance");
+    }
+});
+```
+
+#### 🔐 Only Admin can see this section.
+
+### 🧠 PART 4 — HOW LOGOUT WORKS ON ALL PAGES (IMPORTANT)
+
+#### 🔹 ONE RULE (THIS IS THE SECRET)
+
+> **Every page loads central-auth-api.js**
+
+That’s it.
+
+- No duplication.
+
+- No confusion.
+
+#### 🔹 Logout Button Flow (Internally)
+
+#### When user clicks Logout:
+
+```
+CHARLIE.auth.logout();
+```
+
+### What happens step by step:
+
+1️⃣ access_token removed from localStorage
+
+2️⃣ Browser redirected to Cognito logout endpoint
+
+3️⃣ Cognito clears session
+
+4️⃣ User redirected back to your site
+
+5️⃣ Any protected page → immediately redirected to login
+
+#### 🔹 Why Logout Works Everywhere
+
+Because:
+
+#### Every page calls:
+
+```
+CHARLIE.auth.protectPage();
+```
+
+After logout:
+
+```
+getToken() → null
+```
+
+➡️ User is kicked out automatically.
 
 
 

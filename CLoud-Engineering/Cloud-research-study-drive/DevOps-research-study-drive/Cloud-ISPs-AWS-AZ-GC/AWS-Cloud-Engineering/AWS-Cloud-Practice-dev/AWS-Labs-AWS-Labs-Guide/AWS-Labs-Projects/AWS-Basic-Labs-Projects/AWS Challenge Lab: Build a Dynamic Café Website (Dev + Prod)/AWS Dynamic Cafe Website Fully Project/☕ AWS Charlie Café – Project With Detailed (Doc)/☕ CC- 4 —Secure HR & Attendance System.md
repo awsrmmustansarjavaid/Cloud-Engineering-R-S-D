@@ -1393,19 +1393,49 @@ initAdminDashboard();
 
 ### 1️⃣ — FRONTEND HR ATTENDANCE DASHBOARD
 
-🔹 STEP 1 — Create Folder & File
+#### 🔹 STEP 1 — Create Folder & File
 
-📁 Create file:
+#### 📁 Create file:
 
 ```
-hr-attendance.html
+sudo nano /var/www/html/hr-attendance.html
 ```
 
-🔹 STEP 2 — Basic HTML Skeleton (VERY IMPORTANT)
+[hr-attendance.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/hr-attendance.html)
 
 
+### 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
 
+You do NOT repeat logout logic.
 
+#### ✅ Why it works everywhere:
+
+#### Every page includes:
+
+```
+<script src="js/central-auth-api.js"></script>
+```
+
+#### And runs:
+
+```
+CHARLIE.auth.protectPage();
+CHARLIE.auth.setupLogoutButton("logoutBtn");
+```
+
+#### 🔁 Logout flow:
+
+1️⃣ User clicks Logout
+
+2️⃣ Token removed from localStorage
+
+3️⃣ Cognito session destroyed
+
+4️⃣ User redirected
+
+5️⃣ Any protected page → auto login redirect
+
+#### 💥 Works globally. No duplication.
 
 
 **✅ PHASE 7️⃣ STATUS**
