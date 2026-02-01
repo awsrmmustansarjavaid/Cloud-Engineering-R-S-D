@@ -777,6 +777,27 @@ def lambda_handler(event, context):
 **⚠️ All these 5 HR Lambda Updated.. Skip this step**
 
 #### 2️⃣ 🧩 HOW TO APPLY THIS TO EACH LAMBDA (NO CONFUSION)
+> **This step (ALLOWED_ROLE = Employee/Admin) is part of Cognito role-based access control (RBAC).**
+
+So the correct order is:
+
+✅ Correct Lab Order (Very Important)
+
+✅ Create all HR Lambda functions (you already did)
+
+✅ Make sure Lambdas work logically (they do)
+
+🔐 Configure Cognito User Pool
+
+🔐 Create Cognito Groups (Employee / Admin)
+
+🔐 Attach Cognito Authorizer to API Gateway
+
+🧩 THEN add ALLOWED_ROLE checks inside Lambdas
+
+- **👉 If you add role checks before Cognito, everything will fail again with 403 and confusion.**
+
+- **👉 So: DO NOT add this yet. Add it after Cognito is working**
 
 #### 1️⃣ Check-In Lambda
 
