@@ -814,6 +814,47 @@ ALLOWED_ROLE = "Admin"
 # SELECT all employees
 ```
 
+#### 🔧 REQUIRED API GATEWAY CONFIG
+
+✅ Authorizer
+
+Type: Cognito User Pool
+
+Token Source: Authorization
+
+Identity validation: Bearer .*
+
+✅ Method Request (ALL methods)
+
+Authorization: Cognito Authorizer
+
+API Key: false
+
+✅ Enable CORS (ALL resources)
+
+Allow:
+
+```
+Authorization
+Content-Type
+```
+
+🔐 SECURITY MODEL
+> **(YOU DID THIS RIGHT)**
+
+| Layer       | Responsibility   |
+| ----------- | ---------------- |
+| Frontend    | UX + redirect    |
+| Backend     | REAL security    |
+| Cognito     | Identity         |
+| API Gateway | Token validation |
+
+
+✔️ No frontend trust
+
+✔️ No role bypass
+
+✔️ Production-grade
 
 #### 3️⃣ — PERFORMANCE & SAFETY SETTINGS
 
