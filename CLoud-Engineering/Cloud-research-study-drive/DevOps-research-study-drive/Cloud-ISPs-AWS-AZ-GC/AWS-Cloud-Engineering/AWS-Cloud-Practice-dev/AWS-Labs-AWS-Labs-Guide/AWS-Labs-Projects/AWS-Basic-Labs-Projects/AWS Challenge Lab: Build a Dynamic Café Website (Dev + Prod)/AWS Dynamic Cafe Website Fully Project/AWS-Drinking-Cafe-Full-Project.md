@@ -328,6 +328,7 @@ Attach this policy (or ensure it exists):
 - **✔️ Click Create IAM ROLE**
 
 ### ✅ Mega Custom IAM Policy
+**👉 Paste into IAM → Policies → Create policy → JSON**
 
 - Policy Name: charlie-cafe-iam-policy
 
