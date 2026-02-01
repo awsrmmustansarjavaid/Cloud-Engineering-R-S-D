@@ -176,21 +176,6 @@ sudo chmod +x setup_cafe_hr_attendance.sh
 sudo ./setup_cafe_hr_attendance.sh
 ```
 
-### 5️⃣ Verify Tables
-
-```
-SHOW TABLES;
-```
-
-#### Expected output:
-
-```
-employees
-attendance
-leaves
-holidays
-```
-
 ### 8️⃣ Confirm Lambda DB Access (Important Minor Step)
 
 - Check Lambda Environment Variables

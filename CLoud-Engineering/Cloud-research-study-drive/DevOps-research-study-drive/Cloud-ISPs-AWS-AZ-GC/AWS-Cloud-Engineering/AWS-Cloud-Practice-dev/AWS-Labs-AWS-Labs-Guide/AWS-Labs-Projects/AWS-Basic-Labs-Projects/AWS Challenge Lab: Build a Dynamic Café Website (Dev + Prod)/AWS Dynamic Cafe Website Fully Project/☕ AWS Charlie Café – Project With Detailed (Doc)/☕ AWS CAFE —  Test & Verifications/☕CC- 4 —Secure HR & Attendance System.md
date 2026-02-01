@@ -7,7 +7,22 @@
 
 ## ☕ Charlie Café PHASE 1️⃣ — Database Layer (RDS) Configuration
 
-### 1️⃣ Lambda Testing & Verification
+### 1️⃣ Verify Cafe_DB Tables
+
+```
+SHOW TABLES;
+```
+
+#### Expected output:
+
+```
+employees
+attendance
+leaves
+holidays
+```
+
+### 2️⃣ Lambda Testing & Verification
 
 #### 1️⃣ Test Environment Variables
 
