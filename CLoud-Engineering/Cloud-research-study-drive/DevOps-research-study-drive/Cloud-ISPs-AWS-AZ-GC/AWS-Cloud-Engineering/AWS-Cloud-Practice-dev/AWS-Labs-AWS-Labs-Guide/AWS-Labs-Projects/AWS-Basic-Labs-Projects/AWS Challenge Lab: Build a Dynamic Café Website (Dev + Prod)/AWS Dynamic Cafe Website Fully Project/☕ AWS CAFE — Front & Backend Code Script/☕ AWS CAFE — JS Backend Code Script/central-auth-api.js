@@ -8,8 +8,9 @@
    ✔ Role-Based Access (Admin / Employee)
    ✔ Secure API Gateway Calls
    ✔ Orders + HR REST APIs
-   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6) — MERGED SINGLE LAMBDA
+   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6)
    ✔ ADMIN DASHBOARD ENHANCEMENTS (PHASE 7)
+   ✔ AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED) ✅ NEW
 ========================================================= */
 
 const CHARLIE = (() => {
@@ -157,6 +158,29 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
+       🔐 AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
+       -----------------------------------------------------
+       • Runs once per app
+       • Checks token every 30 seconds
+       • Logs out if expired or tampered
+    ===================================================== */
+    function startAutoLogoutWatcher() {
+        setInterval(() => {
+            const token = getToken();
+            if (!token) return;
+
+            try {
+                if (isTokenExpired(token)) {
+                    alert("🔐 Session expired");
+                    auth.logout();
+                }
+            } catch {
+                auth.logout();
+            }
+        }, 30000);
+    }
+
+    /* =====================================================
        6️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
     const api = {
@@ -205,7 +229,7 @@ const CHARLIE = (() => {
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
         },
 
-        /* 📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6) */
+        /* 📊 ADMIN ATTENDANCE ANALYTICS */
         adminAttendance: {
             getDailySummary() {
                 requireAdmin();
@@ -221,7 +245,7 @@ const CHARLIE = (() => {
             }
         },
 
-        /* 📈 ADMIN DASHBOARD (PHASE 7) */
+        /* 📈 ADMIN DASHBOARD */
         adminDashboard: {
             fetchData(employeeId = "") {
                 requireAdmin();
@@ -246,15 +270,16 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       8️⃣ PAGE INITIALIZER
+       8️⃣ PAGE INITIALIZER (AUTO + LOGOUT)
     ===================================================== */
     function initProtectedPage() {
         auth.protectPage();
         auth.setupLogoutButton();
+        startAutoLogoutWatcher(); // ✅ START AUTO LOGOUT
     }
 
     /* =====================================================
-       9️⃣ EXPORT (PUBLIC API) ✅ FIXED & COMPLETE
+       9️⃣ EXPORT (PUBLIC API)
     ===================================================== */
     return {
         CONFIG,
@@ -267,8 +292,8 @@ const CHARLIE = (() => {
         getUserRoles,
         isAdmin,
         isEmployee,
-        requireAdmin,      // ✅ now exported
-        requireEmployee    // ✅ now exported
+        requireAdmin,
+        requireEmployee
     };
 
 })();
