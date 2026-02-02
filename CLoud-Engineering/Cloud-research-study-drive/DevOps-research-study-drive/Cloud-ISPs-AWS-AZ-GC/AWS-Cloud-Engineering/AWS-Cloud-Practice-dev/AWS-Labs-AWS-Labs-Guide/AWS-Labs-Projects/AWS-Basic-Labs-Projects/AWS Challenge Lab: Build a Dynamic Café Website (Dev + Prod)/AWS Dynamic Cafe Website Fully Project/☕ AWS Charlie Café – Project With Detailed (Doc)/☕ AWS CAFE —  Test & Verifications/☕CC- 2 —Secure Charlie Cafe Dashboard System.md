@@ -224,3 +224,71 @@ https://cloudfront/cafe-admin-dashboard.html#id_token=xxxxx&access_token=xxxxx
 
 🎉 THIS MEANS SUCCESS
 
+#### 3️⃣ Test the Login URL Directly
+
+Once the above is confirmed:
+
+```
+https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+```
+
+- Expected: Cognito login page shows
+
+- Login → redirect → CloudFront /cafe-admin-dashboard.html
+
+**✔️ If this works → frontend code will work too.**
+
+#### ✅ Must Know Before Next Step
+
+- OAuth Scopes: openid, email, profile
+
+- OAuth Grant Type: Implicit grant enabled
+
+- Auth flows: Only 4 boxes checked ✅
+
+- Client secret: Disabled ✅
+
+- Callback + sign-out URLs: Exact CloudFront URL ✅
+
+#### 9️⃣ 🧪 HOW TO TEST
+
+- 1️⃣ Open Incognito window
+
+- 2️⃣ Open:
+
+```
+https://ALB-DNS/cafe-admin-dashboard.html
+```
+
+#### Example: 
+
+```
+http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/cafe-admin-dashboard.html
+```
+
+- 3️⃣ You should be redirected to:
+
+```
+https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
+```
+
+- 4️⃣ Login with:
+
+  - Username: 	cafeadmin
+
+  - Password: (your permanent password)
+
+- 5️⃣ After login:
+
+  - ✅ Redirects back
+
+  - ✅ Dashboard appears
+
+  - ✅ No HTTP 400
+
+**👍 This is production-style SPA + Cognito + API Gateway security.**
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---

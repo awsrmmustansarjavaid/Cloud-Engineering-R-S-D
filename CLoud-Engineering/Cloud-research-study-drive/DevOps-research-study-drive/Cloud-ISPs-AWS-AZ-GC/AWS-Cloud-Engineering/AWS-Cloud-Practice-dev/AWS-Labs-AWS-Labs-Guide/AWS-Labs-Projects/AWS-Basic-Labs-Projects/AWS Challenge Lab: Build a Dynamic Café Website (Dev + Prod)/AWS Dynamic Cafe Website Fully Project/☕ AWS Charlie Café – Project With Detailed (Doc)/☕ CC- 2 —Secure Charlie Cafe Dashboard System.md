@@ -680,8 +680,7 @@ Click Create user
 
 ✅ Admin account created
 
-
-#### 5️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+#### 4️⃣ Callback / Return URL (MOST IMPORTANT STEP)
 
 > **the ❌ HTTP ERROR 400**
 
@@ -779,7 +778,6 @@ Because you are using:
 response_type=token
 ```
 
-
 #### 2️⃣ OpenID Connect scopes Settings 
 
 ✔ OpenID
@@ -876,7 +874,6 @@ us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com
 
 **⚠️ Simple words: Do NOT add https:// inside the variable (your code already adds it)**
 
-
 #### Example:
 
 ```
@@ -885,38 +882,11 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 
 **📌 Copy ONLY this part (no https, no /login)**
 
-#### 3️⃣ Test the Login URL Directly
-
-Once the above is confirmed:
-
-```
-https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
-```
-
-- Expected: Cognito login page shows
-
-- Login → redirect → CloudFront /cafe-admin-dashboard.html
-
-**✔️ If this works → frontend code will work too.**
-
-#### ✅ Must Know Before Next Step
-
-- OAuth Scopes: openid, email, profile
-
-- OAuth Grant Type: Implicit grant enabled
-
-- Auth flows: Only 4 boxes checked ✅
-
-- Client secret: Disabled ✅
-
-- Callback + sign-out URLs: Exact CloudFront URL ✅
-
 #### 6️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
 
 #### 1️⃣ cafe-admin-dashboard.html File (Recommanded)
 
 [cafe-admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
-
 
 #### 1️⃣ Edit file on EC2:
 
@@ -932,44 +902,6 @@ sudo nano /var/www/html/order-status.html
 ```
 sudo systemctl restart httpd
 ```
-
-#### 9️⃣ 🧪 HOW TO TEST
-
-- 1️⃣ Open Incognito window
-
-- 2️⃣ Open:
-
-```
-https://ALB-DNS/cafe-admin-dashboard.html
-```
-
-#### Example: 
-
-```
-http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/cafe-admin-dashboard.html
-```
-
-- 3️⃣ You should be redirected to:
-
-```
-https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
-```
-
-- 4️⃣ Login with:
-
-  - Username: 	cafeadmin
-
-  - Password: (your permanent password)
-
-- 5️⃣ After login:
-
-  - ✅ Redirects back
-
-  - ✅ Dashboard appears
-
-  - ✅ No HTTP 400
-
-**👍 This is production-style SPA + Cognito + API Gateway security.**
 
 ## Task 2️⃣ - Cognito Hosted UI Customize Design
 
