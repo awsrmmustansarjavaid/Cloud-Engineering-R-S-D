@@ -4,6 +4,11 @@
 
 [☕ CC- 2 —Secure Charlie Cafe Dashboard System](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 
+### ☕ AWS Charlie Café – Test & Verifications
+
+[Secure Charlie Cafe Dashboard System](./☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕CC-%204%20—Secure%20HR%20%26%20Attendance%20System.md)
+
+
 ---
 # SECTION 1️⃣ Secure Admin Order Dashboard
 
@@ -11,100 +16,7 @@
 
 > **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
-### 1️⃣  — USE EC2 PUBLIC IP (BEST FOR LAB)
-
-> **This is 100% acceptable for labs and Cognito testing**
-
-#### STEP 1️⃣ — CONFIRM EC2 IS PUBLIC
-
-#### 1️⃣ Go to:
-
-```
-EC2 → Instances
-```
-
-#### 2️⃣ Select your instance
-
-#### 3️⃣ Copy:
-
-```
-Public IPv4 address
-```
-
-Example:
-
-```
-54.183.22.10
-```
-
-#### ⚠️ If you do NOT see a public IP:
-
-- Instance must be in a public subnet
-
-- Must have Internet Gateway
-
-#### STEP 2️⃣ — CONFIRM APACHE IS RUNNING
-
-#### SSH into EC2:
-
-```
-sudo systemctl status httpd
-```
-
-#### If not running:
-
-```
-sudo systemctl start httpd
-```
-
-```
-sudo systemctl enable httpd
-```
-
-#### STEP 3️⃣ — TEST PAGE DIRECTLY
-
-#### Open browser:
-
-```
-http://54.183.22.10/cafe-admin-dashboard.html
-```
-
-✅ If page opens → PERFECT
-
-❌ If not → check Security Group
-
-
-#### STEP 4️⃣ — FIX SECURITY GROUP (VERY IMPORTANT)
-
-#### 1️⃣ Go to:
-
-```
-EC2 → Security Groups → Your SG
-```
-
-#### 2️⃣ Inbound rules:
-
-```
-HTTP   TCP   80   0.0.0.0/0
-```
-
-Save
-
-#### STEP 5️⃣ — USE THIS AS RETURN URL IN COGNITO
-
-Now you FINALLY have a valid Return URL.
-
-#### Use:
-
-```
-http://54.183.22.10/cafe-admin-dashboard.html
-```
-
-**⚠️ BUT Cognito REQUIRES HTTPS**
-
-> **So for Cognito we must do ONE SMALL CHANGE**
-
-### 2️⃣  — HTTPS REQUIREMENT (CRITICAL)
+### 1️⃣  — HTTPS REQUIREMENT (CRITICAL)
 
 **⚠️ Cognito does NOT allow HTTP except localhost.**
 
@@ -112,7 +24,7 @@ So we must add HTTPS.
 
 You have TWO EASY OPTIONS
 
-### 2️⃣  — USE ALB
+### 1️⃣  — USE ALB
 
 > **This is the simplest HTTPS solution.**
 
@@ -189,18 +101,7 @@ Example:
 https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
 ```
 
-#### STEP 7️⃣  — TEST PAGE
-
-Open:
-
-```
-https://ALB-DNS/cafe-admin-dashboard.html
-```
-
-✅ Works → DONE
-
-
-### 3️⃣ — CLOUD FRONT
+### 2️⃣ — CLOUD FRONT
 
 #### 🧱 STEP 1️⃣ — CloudFront Origin (ALB)
 
@@ -422,73 +323,12 @@ Deployed
 
 **⚠️ If status is In Progress, wait 5–10 minutes.**
 
-#### 2️⃣ Basic Connectivity Test
-
-Open in browser:
-
-```
-https://xxxxx.cloudfront.net/
-```
-
-#### Expected result:
-
-```
-order-status.html loads
-OR
-
-Cafe homepage loads (if root object not set)
-```
-
-#### 3️⃣ Direct File Test
-
-Open:
-
-```
-https://xxxxx.cloudfront.net/cafe-admin-dashboard.html
-```
-
-#### Expected:
-
-```
-Page loads successfully
-
-No 403 / 504 / timeout errors
-```
-
-#### 4️⃣ Backend Health Verification
-
-If CloudFront fails:
-
-Test ALB directly:
-
-```
-http://ALB-DNS-NAME/cafe-admin-dashboard.html
-```
-
-#### Ensure:
-
-- ALB target group = Healthy
-
-- EC2 Apache is running
-
-- Security Groups allow ALB → EC2 (port 80)
-
 ### 6️⃣ — USE THIS IN COGNITO
 
 ```
 d2og2zrs47voou.cloudfront.net
 ```
-
-This is your Return URL
-
-#### ✅ FINAL RECOMMENDED PATH
-
-| Step       | Do this                        |
-| ---------- | ------------------------------ |
-| Host page  | EC2 Apache                     |
-| HTTPS      | ALB                            |
-| Return URL | ALB DNS + `/cafe-admin-dashboard.html` |
-| CloudFront | Later (optional)               |
+**This is your Return URL**
 
 **✅ PHASE 1️⃣ STATUS**
 
