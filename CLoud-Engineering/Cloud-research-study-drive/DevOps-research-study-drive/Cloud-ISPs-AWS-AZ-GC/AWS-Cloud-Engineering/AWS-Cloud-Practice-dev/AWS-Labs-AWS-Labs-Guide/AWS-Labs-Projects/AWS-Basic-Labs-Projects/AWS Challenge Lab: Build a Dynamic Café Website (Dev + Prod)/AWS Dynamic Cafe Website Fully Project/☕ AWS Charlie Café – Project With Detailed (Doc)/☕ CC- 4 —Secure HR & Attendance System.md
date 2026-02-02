@@ -1184,7 +1184,7 @@ We will create one main Lambda that supports filtering and summary cards.
 
 #### Filename: admin_dashboard_data.py
 
-[admin_dashboard_data.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/admin_dashboard_data.py)
+[admin_dashboard_data.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/admin_dashboard_data.py)
 
 #### ✅ This Lambda:
 
