@@ -1517,30 +1517,32 @@ Example item inserted later:
 
 -  Required group: Admin
 
+### 3️⃣ 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
 
-
-
-
-
-
-### 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
-
-You do NOT repeat logout logic.
-
-#### ✅ Why it works everywhere:
-
-#### Every page includes:
+#### Step 1 — Add central auth
 
 ```
 <script src="js/central-auth-api.js"></script>
 ```
 
-#### And runs:
+#### Step 2 — Protect page
 
 ```
 CHARLIE.auth.protectPage();
-CHARLIE.auth.setupLogoutButton("logoutBtn");
 ```
+
+#### Step 3 — Replace fetch with secureFetch
+
+```
+CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
+    method: "POST",
+    body: JSON.stringify({ employee_id: employeeId })
+});
+```
+
+👉 UI stays same
+
+👉 Security added
 
 #### 🔁 Logout flow:
 
@@ -1555,6 +1557,8 @@ CHARLIE.auth.setupLogoutButton("logoutBtn");
 5️⃣ Any protected page → auto login redirect
 
 #### 💥 Works globally. No duplication.
+
+
 
 
 **✅ PHASE 7️⃣ STATUS**

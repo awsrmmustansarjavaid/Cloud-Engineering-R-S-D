@@ -2151,6 +2151,61 @@ Check-out:   17:11
 Role:        Employee
 ```
 
+### 3️⃣ 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
+
+#### 🔑 Key concept:
+
+Logout logic is CENTRALIZED
+
+```
+CHARLIE.auth.setupLogoutButton();
+```
+
+This means:
+
+- Every page uses the same logout logic
+
+- Token is removed
+
+- Cognito session ends
+
+- Redirect happens
+
+- Protected pages auto-block access
+
+#### 👉 No duplicate logout code anywhere
+
+You do NOT repeat logout logic.
+
+### ✅ Why it works everywhere:
+
+#### Every page includes:
+
+```
+<script src="js/central-auth-api.js"></script>
+```
+
+#### And runs:
+
+```
+CHARLIE.auth.protectPage();
+CHARLIE.auth.setupLogoutButton("logoutBtn");
+```
+
+### ✅ YOUR EXISTING CHECK-IN / CHECK-OUT PAGE (IMPORTANT)
+
+#### ❌ Current issue:
+
+- Uses direct fetch
+
+- No Cognito protection
+
+- No logout
+
+- Anyone can call API
+
+#### ✅ Minimal safe fixes (DO NOT rewrite UI)
+
 
 
 > **🟢 PHASE 8️⃣ COMPLETE**
