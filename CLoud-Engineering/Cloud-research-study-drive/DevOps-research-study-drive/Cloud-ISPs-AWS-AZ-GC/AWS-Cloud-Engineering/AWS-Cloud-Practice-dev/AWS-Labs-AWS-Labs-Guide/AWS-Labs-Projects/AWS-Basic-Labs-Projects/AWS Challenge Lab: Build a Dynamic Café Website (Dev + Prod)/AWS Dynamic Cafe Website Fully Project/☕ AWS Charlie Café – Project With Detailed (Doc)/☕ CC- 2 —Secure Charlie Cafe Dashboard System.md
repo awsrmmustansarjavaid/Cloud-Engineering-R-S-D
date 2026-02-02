@@ -66,7 +66,7 @@ sudo systemctl enable httpd
 #### Open browser:
 
 ```
-http://54.183.22.10/dashboard.html
+http://54.183.22.10/cafe-admin-dashboard.html
 ```
 
 ✅ If page opens → PERFECT
@@ -97,7 +97,7 @@ Now you FINALLY have a valid Return URL.
 #### Use:
 
 ```
-http://54.183.22.10/dashboard.html
+http://54.183.22.10/cafe-admin-dashboard.html
 ```
 
 **⚠️ BUT Cognito REQUIRES HTTPS**
@@ -158,7 +158,7 @@ HTTPS 443  0.0.0.0/0
 | **Protocol**             | HTTP                                       | Matches your web server on EC2 (use HTTPS only if EC2 already has SSL) |
 | **Port**                 | 80                                         | Default HTTP port your web server listens on             |
 | **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
-| **Health check path**    | / (or /dashboard.html)                  | Path ALB uses to check if instance is healthy            |
+| **Health check path**    | / (or /cafe-admin-dashboard.html)                  | Path ALB uses to check if instance is healthy            |
 
 #### STEP 5️⃣ — Add Listener to ALB 
 
@@ -194,7 +194,7 @@ https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
 Open:
 
 ```
-https://ALB-DNS/dashboard.html
+https://ALB-DNS/cafe-admin-dashboard.html
 ```
 
 ✅ Works → DONE
@@ -293,7 +293,7 @@ xxxxx.cloudfront.net
 #### 2️⃣ Default Root Object (Optional but Recommended)
 
 ```
-dashboard.html
+cafe-admin-dashboard.html
 ```
 
 **⚠️ Do NOT add /order-status.html to Origin Path**
@@ -304,14 +304,14 @@ dashboard.html
 | Configuration Item   | Value                             |
 | -------------------- | --------------------------------- |
 | Origin Path          | ❌ Empty                           |
-| Default Root Object  | ✅ `dashboard.html`             |
-| File location on EC2 | `/var/www/html/dashboard.html` |
+| Default Root Object  | ✅ `cafe-admin-dashboard.html`             |
+| File location on EC2 | `/var/www/html/cafe-admin-dashboard.html` |
 
 
 This ensures:
 
 ```
-CloudFront → ALB → EC2 Apache → dashboard.html
+CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
 ```
 
 #### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
@@ -333,7 +333,7 @@ CloudFront → Distributions → Your Distribution
 invalidation path:
 
 ```
-/dashboard.html
+/cafe-admin-dashboard.html
 ```
 
 #### 5️⃣ Click Create invalidation
@@ -361,7 +361,7 @@ After status = Completed:
 3️⃣ Open:
 
 ```
-https://xxxxx.cloudfront.net/dashboard.html
+https://xxxxx.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 You should see latest code.
@@ -371,7 +371,7 @@ You should see latest code.
 ❌ Invalidating:
 
 ```
-dashboard.html
+cafe-admin-dashboard.html
 ```
 
 (missing leading /)
@@ -444,7 +444,7 @@ Cafe homepage loads (if root object not set)
 Open:
 
 ```
-https://xxxxx.cloudfront.net/dashboard.html
+https://xxxxx.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 #### Expected:
@@ -462,7 +462,7 @@ If CloudFront fails:
 Test ALB directly:
 
 ```
-http://ALB-DNS-NAME/dashboard.html
+http://ALB-DNS-NAME/cafe-admin-dashboard.html
 ```
 
 #### Ensure:
@@ -487,7 +487,7 @@ This is your Return URL
 | ---------- | ------------------------------ |
 | Host page  | EC2 Apache                     |
 | HTTPS      | ALB                            |
-| Return URL | ALB DNS + `/dashboard.html` |
+| Return URL | ALB DNS + `/cafe-admin-dashboard.html` |
 | CloudFront | Later (optional)               |
 
 **✅ PHASE 1️⃣ STATUS**
@@ -572,7 +572,7 @@ d2og2zrs47voou.cloudfront.net
 #### For Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/dashboard.html
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 #### Now click the button at bottom-right:
@@ -855,7 +855,7 @@ https://YOUR_COGNITO_DOMAIN/login
 ?client_id=CLIENT_ID
 &response_type=token
 &scope=openid+email+profile
-&redirect_uri=https://cloudfront/dashboard.html
+&redirect_uri=https://cloudfront/cafe-admin-dashboard.html
 ```
 
 #### Example:
@@ -881,7 +881,7 @@ https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
 After login, browser redirects to:
 
 ```
-https://cloudfront/dashboard.html#id_token=xxxxx&access_token=xxxxx
+https://cloudfront/cafe-admin-dashboard.html#id_token=xxxxx&access_token=xxxxx
 ```
 
 🎉 THIS MEANS SUCCESS
@@ -911,13 +911,13 @@ You said:
 So your real URL is something like:
 
 ```
-http://<cloudfront>/dashboard.html
+http://<cloudfront>/cafe-admin-dashboard.html
 ```
 
 Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/dashboard.html
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 #### 1️⃣ Path (new UI):
@@ -937,7 +937,7 @@ Cognito
 #### Add EXACTLY:
 
 ```
-http://<cloudfront>/dashboard.html
+http://<cloudfront>/cafe-admin-dashboard.html
 ```
 
 ✔ Must match character by character
@@ -949,7 +949,7 @@ http://<cloudfront>/dashboard.html
 #### Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/dashboard.html
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 #### 3️⃣ Sign-out URLs (recommended)
@@ -957,7 +957,7 @@ https://d2og2zrs47voou.cloudfront.net/dashboard.html
 #### Add the same:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/dashboard.html
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 > **Cognito is strict: must be HTTPS + exact path, no trailing slash.**
@@ -1095,12 +1095,12 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 Once the above is confirmed:
 
 ```
-https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/dashboard.html
+https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=token&client_id=393ld7o96bt7qlv0shp124osh5&scope=openid+email+profile&redirect_uri=https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 - Expected: Cognito login page shows
 
-- Login → redirect → CloudFront /dashboard.html
+- Login → redirect → CloudFront /cafe-admin-dashboard.html
 
 **✔️ If this works → frontend code will work too.**
 
@@ -1118,13 +1118,9 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login?response_type=
 
 #### 6️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
 
-#### 1️⃣ dashboard.html File (Recommanded)
+#### 1️⃣ cafe-admin-dashboard.html File (Recommanded)
 
-```
-sudo nano /var/www/html/dashboard.html
-```
-
-[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
+[cafe-admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
 
 
 #### 1️⃣ Edit file on EC2:
@@ -1149,13 +1145,13 @@ sudo systemctl restart httpd
 - 2️⃣ Open:
 
 ```
-https://ALB-DNS/dashboard.html
+https://ALB-DNS/cafe-admin-dashboard.html
 ```
 
 #### Example: 
 
 ```
-http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/dashboard.html
+http://charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com/cafe-admin-dashboard.html
 ```
 
 - 3️⃣ You should be redirected to:
