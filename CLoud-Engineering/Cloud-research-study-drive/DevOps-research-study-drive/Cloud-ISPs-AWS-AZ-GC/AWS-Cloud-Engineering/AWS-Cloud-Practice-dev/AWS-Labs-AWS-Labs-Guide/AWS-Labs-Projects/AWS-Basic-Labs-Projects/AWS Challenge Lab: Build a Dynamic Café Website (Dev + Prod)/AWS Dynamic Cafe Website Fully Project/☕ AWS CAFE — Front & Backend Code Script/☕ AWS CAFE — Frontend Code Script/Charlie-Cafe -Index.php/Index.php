@@ -2,12 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <!-- 
-        SECURITY NOTE:
-        - Always define charset & viewport
-        - Prevents encoding issues and layout bugs
-    -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Charlie Cafe ☕ | Fresh Drinks & Coffee</title>
@@ -18,22 +12,19 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Google Font (Modern + Professional) -->
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        /* ===============================
-           GLOBAL STYLES
-        =============================== */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
             scroll-behavior: smooth;
         }
 
-        /* ===============================
-           NAVBAR
-        =============================== */
         .navbar {
             background-color: #3b1f0e;
         }
@@ -44,10 +35,10 @@
             color: #fff !important;
         }
 
-        /* Dashboard Login Button */
+        /* Strong Login Button */
         .btn-dashboard {
-            background-color: #ff9800;
-            color: #000;
+            background-color: #ff5722; /* stronger orange/red */
+            color: #fff;
             font-weight: 600;
             border-radius: 25px;
             padding: 6px 18px;
@@ -55,13 +46,11 @@
         }
 
         .btn-dashboard:hover {
-            background-color: #e68900;
+            background-color: #e64a19;
             transform: translateY(-1px);
         }
 
-        /* ===============================
-           HERO SECTION
-        =============================== */
+        /* Hero */
         .hero {
             background:
                 linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
@@ -73,11 +62,10 @@
             align-items: center;
             color: #fff;
             animation: fadeIn 1.2s ease-in-out;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
         }
 
-        /* ===============================
-           PREMIUM MENU CARDS
-        =============================== */
+        /* Menu Cards */
         .menu-card {
             border: none;
             border-radius: 18px;
@@ -107,9 +95,27 @@
             color: #555;
         }
 
-        /* ===============================
-           ORDER SECTION
-        =============================== */
+        /* Order Buttons */
+        .btn-order {
+            background-color: #ff9800;
+            color: #000;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-order:hover {
+            background-color: #e68900;
+            transform: translateY(-2px);
+        }
+
+        /* Transparent effect for all buttons */
+        .btn {
+            opacity: 0.95;
+        }
+
+        /* Order Section */
         .order-section {
             background:
                 linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)),
@@ -125,26 +131,7 @@
             color: #fff;
         }
 
-        /* ===============================
-           BUTTONS
-        =============================== */
-        .btn-order {
-            background-color: #ff9800;
-            color: #000;
-            font-weight: 600;
-            border-radius: 30px;
-            padding: 12px 30px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-order:hover {
-            background-color: #e68900;
-            transform: translateY(-2px);
-        }
-
-        /* ===============================
-           FOOTER
-        =============================== */
+        /* Footer */
         footer {
             background-color: #3b1f0e;
             color: #fff;
@@ -152,9 +139,6 @@
             font-size: 0.9rem;
         }
 
-        /* ===============================
-           ANIMATIONS
-        =============================== */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -169,117 +153,80 @@
 
 <body>
 
-<!-- ===============================
-     NAVBAR
-=============================== -->
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
+        <a class="navbar-brand" href="#"><i class="bi bi-cup-fill"></i> Charlie Cafe</a>
 
-        <!-- Cafe Brand -->
-        <a class="navbar-brand" href="#">☕ Charlie Cafe</a>
-
-        <!-- RIGHT SIDE LOGIN BUTTON -->
-        <!-- 
-            NOTE:
-            - This is ONLY a frontend redirect
-            - Later you can change href to your real dashboard URL
-            - Example: dashboard.html / admin/dashboard.html
-        -->
         <div class="ms-auto">
             <a href="dashboard.html" class="btn btn-dashboard">
-                Login to Dashboard
+                <i class="bi bi-box-arrow-in-right"></i> Login
             </a>
         </div>
-
     </div>
 </nav>
 
-<!-- ===============================
-     HERO SECTION
-=============================== -->
-<section class="hero">
-    <div class="container text-center">
-        <h1 class="display-5 fw-bold">Fresh Drinks & Perfect Coffee</h1>
+<section class="hero text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold"><i class="bi bi-mug-hot-fill"></i> Fresh Drinks & Perfect Coffee</h1>
         <p class="lead">Coffee • Tea • Fresh Fruit Juices</p>
-
-        <!-- SECURITY NOTE:
-             Use server-side auth on orders.php
-             Frontend links are NOT security
-        -->
-        <a href="orders.php" class="btn btn-order mt-3">Order Now</a>
+        <a href="orders.php" class="btn btn-order mt-3">
+            <i class="bi bi-cart-fill"></i> Order Now
+        </a>
     </div>
 </section>
 
-<!-- ===============================
-     MENU SECTION
-=============================== -->
 <section class="container py-5">
     <h2 class="text-center fw-bold mb-5">Our Special Menu</h2>
 
     <div class="row g-4">
-
-        <!-- Coffee -->
         <div class="col-md-4">
-            <div class="card menu-card">
+            <div class="card menu-card text-center">
                 <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348" alt="Coffee" loading="lazy">
-                <div class="card-body text-center">
-                    <h5>Coffee</h5>
+                <div class="card-body">
+                    <h5><i class="bi bi-mug-hot"></i> Coffee</h5>
                     <p>Espresso, Cappuccino, Latte, Americano</p>
                 </div>
             </div>
         </div>
 
-        <!-- Tea -->
         <div class="col-md-4">
-            <div class="card menu-card">
+            <div class="card menu-card text-center">
                 <img src="https://images.unsplash.com/photo-1544787219-7f47ccb76574" alt="Tea" loading="lazy">
-                <div class="card-body text-center">
-                    <h5>Tea</h5>
+                <div class="card-body">
+                    <h5><i class="bi bi-tea-fill"></i> Tea</h5>
                     <p>Green Tea, Black Tea, Masala Chai</p>
                 </div>
             </div>
         </div>
 
-        <!-- Fresh Juice -->
         <div class="col-md-4">
-            <div class="card menu-card">
-                <img src="https://images.unsplash.com/photo-1600271886742-f049cd451bba"
-                     alt="Fresh Juice"
-                     loading="lazy"
-                     referrerpolicy="no-referrer">
-                <div class="card-body text-center">
-                    <h5>Fresh Juice</h5>
+            <div class="card menu-card text-center">
+                <img src="https://images.unsplash.com/photo-1600271886742-f049cd451bba" alt="Fresh Juice" loading="lazy" referrerpolicy="no-referrer">
+                <div class="card-body">
+                    <h5><i class="bi bi-cup-straw"></i> Fresh Juice</h5>
                     <p>Orange, Mango, Apple, Mixed Fruits</p>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
-<!-- ===============================
-     ORDER CTA SECTION
-=============================== -->
 <section class="container my-5">
     <div class="order-section text-center">
         <div class="order-box">
-            <h2 class="fw-bold">Order Your Favorite Drink ☕🥤</h2>
+            <h2 class="fw-bold"><i class="bi bi-mug-hot-fill"></i> Order Your Favorite Drink</h2>
             <p class="mt-3">Fast • Fresh • Delicious</p>
-            <a href="orders.php" class="btn btn-order mt-4">Go to Order Page</a>
+            <a href="orders.php" class="btn btn-order mt-4">
+                <i class="bi bi-cart-fill"></i> Go to Order Page
+            </a>
         </div>
     </div>
 </section>
 
-<!-- ===============================
-     FOOTER
-=============================== -->
 <footer class="text-center">
     <p class="mb-0">© 2026 Charlie Cafe | Fresh Drinks Everyday</p>
 </footer>
 
-<!-- ===============================
-     TOAST NOTIFICATION
-=============================== -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="welcomeToast" class="toast" role="alert">
         <div class="toast-header">
@@ -292,13 +239,8 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    /* ===============================
-       TOAST AUTO SHOW
-    =============================== */
     document.addEventListener("DOMContentLoaded", () => {
         const toast = new bootstrap.Toast(
             document.getElementById('welcomeToast'),
