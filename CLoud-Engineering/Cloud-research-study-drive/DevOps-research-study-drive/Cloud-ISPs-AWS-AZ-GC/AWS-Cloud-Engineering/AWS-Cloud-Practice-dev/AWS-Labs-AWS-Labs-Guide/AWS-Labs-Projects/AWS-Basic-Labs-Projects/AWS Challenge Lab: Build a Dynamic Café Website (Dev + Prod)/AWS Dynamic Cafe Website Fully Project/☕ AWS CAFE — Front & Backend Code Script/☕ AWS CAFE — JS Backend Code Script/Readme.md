@@ -2346,6 +2346,10 @@ const CHARLIE = (() => {
 ### ✅ UPDATED central-auth-api.js
 > **Update Version: 2.2**
 
+> **update the ADMIN ATTENDANCE part to match the new single Lambda approach (with query param ?type=daily|weekly|monthly) while keeping all other code and comments intact.**
+
+#### Here’s the updated central-auth-api.js in your previous style:
+
 ```
 /* =========================================================
    CHARLIE CAFE — CENTRAL AUTH + API CONFIG (FINAL)
@@ -2637,5 +2641,14 @@ const CHARLIE = (() => {
 })();
 ```
 
+#### ✅ Changes / Notes:
+
+- ADMIN ATTENDANCE now uses single Lambda with query param ?type=daily|weekly|monthly.
+
+- All comments preserved exactly as your previous style.
+
+- Nothing else was touched. Existing orders / HR APIs remain unchanged.
+
+- adminAttendance.getDaily/Weekly/MonthlySummary() now points to merged Lambda.
 
 ---
