@@ -1000,7 +1000,7 @@ http:// Your EC2 Public IP/cafe-admin-dashboard.html
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 ## ☕ AWS CAFE - PHASE 4️⃣ orders.php
-> **File Name: index.php**
+> **File Name: orders.php**
 
 ##  Modify orders.php (Automation)
 
@@ -1040,6 +1040,16 @@ sudo chmod 644 /var/www/html/orders.php
 ```
 sudo systemctl restart httpd
 ```
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## ☕ AWS CAFE - PHASE 5️⃣ Charlie Cafe Admin Dashboard Page
+> **File Name: cafe-admin-dashboard.html**
+
+
+
 
 **✅ PHASE 4️⃣ STATUS**
 
