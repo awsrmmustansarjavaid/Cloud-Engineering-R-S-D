@@ -1915,6 +1915,55 @@ function displaySummary(records) {
 
 [central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
+---
+
+### ✅ BIG DECISION (CONFIRMED)
+
+✔ YES — merging all 3 Lambdas into ONE is 100% possible
+✔ This is actually BETTER (less confusion, fewer bugs)
+
+We will create:
+
+- ONE Lambda
+
+- ONE API resource
+
+- ONE JS integration
+
+- Role-based Admin protection
+
+### 🧱 FINAL ARCHITECTURE (VERY SIMPLE)
+
+```
+Frontend (Admin Dashboard)
+        ↓
+central-auth-api.js (secureFetch + auth)
+        ↓
+API Gateway
+/admin/attendance?type=daily|weekly|monthly
+        ↓
+ONE Lambda: attendance_summary.py
+        ↓
+RDS (attendance + employees)
+```
+
+### 1️⃣ — CREATE ONE LAMBDA ONLY
+
+#### 🧠 HOW THIS LAMBDA WILL WORK
+
+It will read:
+
+```
+?type=daily
+?type=weekly
+?type=monthly
+```
+
+**and run the correct SQL.**
+
+
+
+
 
 > **🟢 PHASE 6️⃣ COMPLETE**
 ---

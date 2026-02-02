@@ -8,7 +8,7 @@
    ✔ Role-Based Access (Admin / Employee)
    ✔ Secure API Gateway Calls
    ✔ Orders + HR REST APIs
-   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6)
+   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6) — MERGED SINGLE LAMBDA
 ========================================================= */
 
 const CHARLIE = (() => {
@@ -25,7 +25,7 @@ const CHARLIE = (() => {
         COGNITO_DOMAIN: "us-east-1wxssmoiqi.auth.us-east-1.amazoncognito.com",
 
         // API Gateway
-        API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
+        API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com/prod",
 
         // CloudFront (Static Assets)
         CLOUDFRONT_BASE: "https://d3lnkgtsj0uwlu.cloudfront.net"
@@ -225,23 +225,29 @@ const CHARLIE = (() => {
         },
 
         /* =================================================
-           📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6)
+           📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6) — SINGLE LAMBDA
+           --------------------------------------------------
+           Now using ONE Lambda with query param:
+           /admin/attendance?type=daily|weekly|monthly
         ================================================= */
         adminAttendance: {
 
+            /* Daily summary */
             getDailySummary() {
                 requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/prod/admin/attendance/daily`);
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
             },
 
+            /* Weekly summary */
             getWeeklySummary() {
                 requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/prod/admin/attendance/weekly`);
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
             },
 
+            /* Monthly summary */
             getMonthlySummary() {
                 requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/prod/admin/attendance/monthly`);
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
             }
         }
     };
@@ -264,7 +270,7 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       9️⃣ EXPORT (PUBLIC API) ✅ FIXED
+       9️⃣ EXPORT (PUBLIC API)
     ===================================================== */
     return {
         CONFIG,

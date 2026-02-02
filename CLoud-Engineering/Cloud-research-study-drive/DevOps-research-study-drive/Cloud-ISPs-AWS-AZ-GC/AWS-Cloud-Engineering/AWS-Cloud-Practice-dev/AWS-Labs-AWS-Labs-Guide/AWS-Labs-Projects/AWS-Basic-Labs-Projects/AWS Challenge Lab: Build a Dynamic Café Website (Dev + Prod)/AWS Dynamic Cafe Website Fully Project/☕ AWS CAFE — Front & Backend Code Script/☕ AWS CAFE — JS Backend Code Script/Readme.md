@@ -2340,3 +2340,302 @@ const CHARLIE = (() => {
 
 })();
 ```
+
+---
+
+### ✅ UPDATED central-auth-api.js
+> **Update Version: 2.2**
+
+```
+/* =========================================================
+   CHARLIE CAFE — CENTRAL AUTH + API CONFIG (FINAL)
+   ---------------------------------------------------------
+   ✔ Cognito Hosted UI Login / Logout
+   ✔ Token Handling (Access Token)
+   ✔ Page Protection (Auto Redirect)
+   ✔ Logout Button (Centralized)
+   ✔ Role-Based Access (Admin / Employee)
+   ✔ Secure API Gateway Calls
+   ✔ Orders + HR REST APIs
+   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6) — MERGED SINGLE LAMBDA
+========================================================= */
+
+const CHARLIE = (() => {
+
+    /* =====================================================
+       1️⃣ GLOBAL CONFIG
+    ===================================================== */
+    const CONFIG = {
+        REGION: "us-east-1",
+
+        // Cognito User Pool
+        USER_POOL_ID: "us-east-1_1wxssmoiqi",
+        CLIENT_ID: "3a4uchovr497k8v3gl52e2j5d8",
+        COGNITO_DOMAIN: "us-east-1wxssmoiqi.auth.us-east-1.amazoncognito.com",
+
+        // API Gateway
+        API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com/prod",
+
+        // CloudFront (Static Assets)
+        CLOUDFRONT_BASE: "https://d3lnkgtsj0uwlu.cloudfront.net"
+    };
+
+    /* =====================================================
+       2️⃣ TOKEN HELPERS
+    ===================================================== */
+    function parseJwt(token) {
+        return JSON.parse(atob(token.split(".")[1]));
+    }
+
+    function isTokenExpired(token) {
+        return parseJwt(token).exp * 1000 < Date.now();
+    }
+
+    function getToken() {
+        return localStorage.getItem("access_token");
+    }
+
+    /* =====================================================
+       3️⃣ AUTH MODULE (LOGIN / LOGOUT / PROTECT)
+    ===================================================== */
+    const auth = {
+
+        /* 🔐 Login using Cognito Hosted UI */
+        login(redirectUrl = window.location.href) {
+            const url =
+                `https://${CONFIG.COGNITO_DOMAIN}/login` +
+                `?response_type=token` +
+                `&client_id=${CONFIG.CLIENT_ID}` +
+                `&scope=openid+email+profile` +
+                `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+
+            window.location.href = url;
+        },
+
+        /* 🔓 Logout from Cognito + browser */
+        logout(redirectUrl = window.location.origin) {
+            localStorage.removeItem("access_token");
+
+            const url =
+                `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+                `?client_id=${CONFIG.CLIENT_ID}` +
+                `&logout_uri=${encodeURIComponent(redirectUrl)}`;
+
+            window.location.href = url;
+        },
+
+        /* 🔄 Capture token after login redirect */
+        handleRedirect() {
+            if (!window.location.hash) return;
+
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const token = params.get("access_token");
+
+            if (token) {
+                localStorage.setItem("access_token", token);
+                window.location.hash = ""; // clean URL
+            }
+        },
+
+        /* 🚧 Protect page (auth required) */
+        protectPage() {
+            this.handleRedirect();
+
+            const token = getToken();
+            if (!token || isTokenExpired(token)) {
+                this.login();
+                return;
+            }
+
+            // Show page only after authentication
+            document.body.style.display = "block";
+        },
+
+        /* 🔘 Attach logout button */
+        setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "index.html") {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+
+            btn.addEventListener("click", () => {
+                this.logout(redirectUrl);
+            });
+        }
+    };
+
+    /* =====================================================
+       4️⃣ SECURE FETCH (JWT AUTO ATTACH)
+    ===================================================== */
+    async function authFetch(url, options = {}) {
+        const token = getToken();
+
+        if (!token || isTokenExpired(token)) {
+            auth.logout();
+            return;
+        }
+
+        return fetch(url, {
+            ...options,
+            headers: {
+                ...(options.headers || {}),
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        });
+    }
+
+    async function secureFetch(url, options = {}) {
+        return authFetch(url, options).then(res => res.json());
+    }
+
+    /* =====================================================
+       5️⃣ ROLE & ACCESS CONTROL
+    ===================================================== */
+    function getUserRoles() {
+        const token = getToken();
+        if (!token) return [];
+        const payload = parseJwt(token);
+        return payload["cognito:groups"] || [];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("Admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("Employee");
+    }
+
+    function requireAdmin() {
+        if (!isAdmin()) {
+            alert("❌ Admin access only");
+            auth.logout();
+            throw new Error("Admin access required");
+        }
+    }
+
+    function requireEmployee() {
+        if (!isEmployee() && !isAdmin()) {
+            alert("❌ Employee access only");
+            auth.logout();
+            throw new Error("Employee access required");
+        }
+    }
+
+    /* =====================================================
+       6️⃣ API GATEWAY ENDPOINTS
+    ===================================================== */
+    const api = {
+
+        /* 🛒 ORDERS */
+
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        getOrderStatus(orderId) {
+            return fetch(
+                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
+            ).then(res => res.json());
+        },
+
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
+
+        recordAttendance(payload) {
+            requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        getAttendance(employeeId) {
+            requireEmployee();
+            return secureFetch(
+                `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+            );
+        },
+
+        /* 👨‍💼 HR — ADMIN ONLY */
+
+        getAllEmployees() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+        },
+
+        /* =================================================
+           📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6) — SINGLE LAMBDA
+           --------------------------------------------------
+           Now using ONE Lambda with query param:
+           /admin/attendance?type=daily|weekly|monthly
+        ================================================= */
+        adminAttendance: {
+
+            /* Daily summary */
+            getDailySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
+            },
+
+            /* Weekly summary */
+            getWeeklySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
+            },
+
+            /* Monthly summary */
+            getMonthlySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
+            }
+        }
+    };
+
+    /* =====================================================
+       7️⃣ CLOUDFRONT ASSETS
+    ===================================================== */
+    const assets = {
+        url(path) {
+            return `${CONFIG.CLOUDFRONT_BASE}/${path}`;
+        }
+    };
+
+    /* =====================================================
+       8️⃣ PAGE INITIALIZER (ONE LINE PER PAGE)
+    ===================================================== */
+    function initProtectedPage() {
+        auth.protectPage();
+        auth.setupLogoutButton();
+    }
+
+    /* =====================================================
+       9️⃣ EXPORT (PUBLIC API)
+    ===================================================== */
+    return {
+        CONFIG,
+        apiBase: CONFIG.API_BASE,
+        auth,
+        api,
+        assets,
+        secureFetch,
+        initProtectedPage,
+        getUserRoles,
+        isAdmin,
+        isEmployee
+    };
+
+})();
+```
+
+
+---

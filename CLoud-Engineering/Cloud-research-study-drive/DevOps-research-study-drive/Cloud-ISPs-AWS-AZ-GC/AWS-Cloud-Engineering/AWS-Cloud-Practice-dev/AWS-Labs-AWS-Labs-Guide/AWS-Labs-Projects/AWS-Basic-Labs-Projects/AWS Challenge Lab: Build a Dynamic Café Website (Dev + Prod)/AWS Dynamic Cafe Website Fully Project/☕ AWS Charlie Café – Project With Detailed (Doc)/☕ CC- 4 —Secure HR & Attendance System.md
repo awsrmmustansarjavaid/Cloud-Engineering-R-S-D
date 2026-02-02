@@ -1046,6 +1046,92 @@ Content-Type
 ---
 ## ☕ Charlie Café PHASE 6️⃣ — ADMIN ATTENDANCE ANALYTICS
 
+### 1️⃣ — DATABASE (NO CHANGE, JUST VERIFY)
+
+Run this ONCE in RDS:
+
+```
+CREATE INDEX idx_attendance_date ON attendance(date);
+CREATE INDEX idx_attendance_employee ON attendance(employee_id);
+```
+
+**✅ Done. Move on.**
+
+### 1️⃣ — CREATE ONE LAMBDA ONLY
+
+#### 1️⃣ 📄 Lambda Name : attendance_summary
+
+[attendance_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/attendance_summary.py)
+
+#### 1️⃣ ✅ Lambda Environment Variables
+
+| Key         | Value             |
+| ----------- | ----------------- |
+| DB_HOST     | your-rds-endpoint |
+| DB_USER     | rds-username      |
+| DB_PASSWORD | rds-password      |
+| DB_NAME     | cafedb            |
+
+### 🟢 STEP 3 — API GATEWAY (ONE RESOURCE ONLY)
+
+1️⃣ Open API Gateway → Existing API
+
+2️⃣ Create Resource
+
+```
+/admin
+   └── /attendance
+```
+
+3️⃣ Create Method
+
+```
+GET
+```
+
+4️⃣ Integration
+
+Type: Lambda
+
+Lambda: attendance_summary
+
+Enable Lambda Proxy
+
+5️⃣ Enable Cognito Authorizer
+
+✔ REQUIRED
+✔ Admin only
+
+6️⃣ Deploy
+
+Stage: prod
+
+✅ FINAL API ENDPOINT
+
+```
+GET /admin/attendance?type=daily
+GET /admin/attendance?type=weekly
+GET /admin/attendance?type=monthly
+```
+
+🟢 STEP 4 — UPDATE central-auth-api.js
+
+You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
+
+📄 central-auth-api.js (UPDATED + SAFE)
+
+[central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
+
+
+
+
+
+
+
+
+```
+sudo nano /var/www/html/attendance_summary
+```
 
 
 
