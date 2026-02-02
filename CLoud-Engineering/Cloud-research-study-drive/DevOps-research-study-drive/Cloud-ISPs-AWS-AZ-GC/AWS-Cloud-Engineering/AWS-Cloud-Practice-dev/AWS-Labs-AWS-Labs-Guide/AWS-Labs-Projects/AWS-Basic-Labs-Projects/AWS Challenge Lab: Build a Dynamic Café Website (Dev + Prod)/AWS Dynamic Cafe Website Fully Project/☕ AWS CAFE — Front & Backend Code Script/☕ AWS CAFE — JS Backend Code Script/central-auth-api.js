@@ -160,6 +160,7 @@ const CHARLIE = (() => {
        6️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
     const api = {
+
         /* 🛒 ORDERS */
         placeOrder(payload) {
             return fetch(`${CONFIG.API_BASE}/dev/orders`, {
@@ -204,12 +205,7 @@ const CHARLIE = (() => {
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
         },
 
-        /* =================================================
-           📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6) — SINGLE LAMBDA
-           --------------------------------------------------
-           Now using ONE Lambda with query param:
-           /admin/attendance?type=daily|weekly|monthly
-        ================================================= */
+        /* 📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6) */
         adminAttendance: {
             getDailySummary() {
                 requireAdmin();
@@ -225,23 +221,15 @@ const CHARLIE = (() => {
             }
         },
 
-        /* =================================================
-           📈 ADMIN DASHBOARD ENHANCEMENTS (PHASE 7)
-           --------------------------------------------------
-           Supports summary cards, employee filter, table, CSV export
-        ================================================= */
+        /* 📈 ADMIN DASHBOARD (PHASE 7) */
         adminDashboard: {
-
-            /* Fetch dashboard data (optionally filter by employee) */
-            async fetchData(employeeId = "") {
+            fetchData(employeeId = "") {
                 requireAdmin();
                 let url = `${CONFIG.API_BASE}/admin/dashboard`;
                 if (employeeId) url += `?employee_id=${employeeId}`;
                 return secureFetch(url);
             },
-
-            /* Fetch employee list for filter dropdown */
-            async fetchEmployees() {
+            fetchEmployees() {
                 requireAdmin();
                 return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
             }
@@ -258,7 +246,7 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       8️⃣ PAGE INITIALIZER (ONE LINE PER PAGE)
+       8️⃣ PAGE INITIALIZER
     ===================================================== */
     function initProtectedPage() {
         auth.protectPage();
@@ -266,7 +254,7 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       9️⃣ EXPORT (PUBLIC API)
+       9️⃣ EXPORT (PUBLIC API) ✅ FIXED & COMPLETE
     ===================================================== */
     return {
         CONFIG,
@@ -278,7 +266,9 @@ const CHARLIE = (() => {
         initProtectedPage,
         getUserRoles,
         isAdmin,
-        isEmployee
+        isEmployee,
+        requireAdmin,      // ✅ now exported
+        requireEmployee    // ✅ now exported
     };
 
 })();
