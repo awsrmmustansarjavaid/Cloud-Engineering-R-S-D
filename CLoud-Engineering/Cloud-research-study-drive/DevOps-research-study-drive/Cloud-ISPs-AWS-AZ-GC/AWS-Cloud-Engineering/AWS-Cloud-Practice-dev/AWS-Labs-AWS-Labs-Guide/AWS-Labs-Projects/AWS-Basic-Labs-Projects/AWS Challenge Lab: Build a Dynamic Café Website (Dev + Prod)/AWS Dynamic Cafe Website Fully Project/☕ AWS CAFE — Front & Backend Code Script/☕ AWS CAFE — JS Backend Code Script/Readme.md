@@ -3186,6 +3186,34 @@ const CHARLIE = (() => {
 ### ✅ UPDATED central-auth-api.js
 > **Update Version: 2.4**
 
+#### ✅ FILE 2: central-auth-api.js (UPDATED – ONLY REQUIRED CHANGE)
+
+#### 🔧 What I added (VERY IMPORTANT)
+
+Your unified dashboard uses this API, but it was missing:
+
+```
+getDashboardMetrics(filter)
+```
+
+So I added it cleanly and safely.
+
+#### 🔁 ADD THIS INSIDE api OBJECT (nothing else changes)
+
+```
+/* =================================================
+   📊 ORDERS DASHBOARD METRICS
+   SOURCE: dashboard.html
+================================================= */
+getDashboardMetrics(filter = "today") {
+    return secureFetch(
+        `${CONFIG.API_BASE}/admin/dashboard/metrics?filter=${filter}`
+    );
+},
+```
+
+**📍 Place it here inside const api = {} (top or bottom is fine).**
+
 Here’s the updated central-auth-api.js with everything kept, comments intact, your export section preserved, and one important fix:
 
 👉 I have now ALSO exported requireAdmin and requireEmployee so you can safely use them in admin / HR dashboard pages if needed.
@@ -3468,3 +3496,7 @@ const CHARLIE = (() => {
 
 })();
 ```
+
+---
+
+
