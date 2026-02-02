@@ -2666,3 +2666,92 @@ https://xxxxx.execute-api.region.amazonaws.com/admin/order-status
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 # SECTION 3️⃣  COMPLETE ✅
 ---
+
+# SECTION 4️⃣ Cognito + FrontEnd Advance Features
+
+### ✅ What you already have (important)
+
+In central-auth-api.js you already implemented working Cognito logout:
+
+```
+logout(redirectUrl = window.location.origin) {
+    localStorage.removeItem("access_token");
+    const url =
+        `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+        `?client_id=${CONFIG.CLIENT_ID}` +
+        `&logout_uri=${encodeURIComponent(redirectUrl)}`;
+    window.location.href = url;
+}
+```
+
+#### ✅ This:
+
+- Clears token
+
+- Calls Cognito Hosted UI logout
+
+- Redirects safely
+
+So logic is correct and production-ready 👍
+
+### ❌ What was missing in admin-dashboard.html
+
+You have the button:
+
+```
+<button class="btn btn-warning btn-sm w-100" id="logoutBtn">🔒 Logout</button>
+```
+
+But ❌ you never attached it to Cognito logout.
+
+### ✅ THE FIX (this is all you need)
+
+### 1️⃣ Keep the button 
+
+```
+<button class="btn btn-warning btn-sm w-100" id="logoutBtn">🔒 Logout</button>
+```
+
+### 2️⃣ Add this JS AFTER central-auth-api.js
+
+Replace this part in admin-dashboard.html:
+
+```
+CHARLIE.auth.protectPage();          // login required
+CHARLIE.auth.setupLogoutButton();    // logout button
+```
+
+#### ✅ This line is the key
+
+It binds the button to Cognito sign-out.
+
+### 3️⃣ (Optional but recommended) Explicit redirect
+
+If you want logout → index.html instead of homepage:
+
+```
+CHARLIE.auth.setupLogoutButton("logoutBtn", "index.html");
+```
+
+### 🔁 What happens now (working flow)
+
+- User clicks Logout
+
+- access_token removed from localStorage
+
+- Browser redirects to:
+
+```
+https://<your-cognito-domain>/logout
+```
+
+- Cognito session is destroyed
+
+- User redirected to index.html
+
+- Protected pages → auto redirect to login again
+
+✅ 100% correct Cognito behavior
+
+---
+
