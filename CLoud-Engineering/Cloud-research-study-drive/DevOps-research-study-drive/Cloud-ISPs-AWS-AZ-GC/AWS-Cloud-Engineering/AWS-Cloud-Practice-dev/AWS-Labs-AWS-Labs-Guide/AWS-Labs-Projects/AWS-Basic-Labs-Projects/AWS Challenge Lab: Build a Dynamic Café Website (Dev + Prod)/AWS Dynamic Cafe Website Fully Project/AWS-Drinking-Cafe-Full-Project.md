@@ -548,6 +548,14 @@ Attach this policy (or ensure it exists):
 
 **✔️ Click Create policy**
 
+#### 9️⃣ Create IAM Policy  HR ATTENDANCE DASHBOARD
+
+- Lambda role permissions:
+
+  - AmazonDynamoDBFullAccess
+
+  - CloudWatchLogsFullAccess
+
 - **✔️ Click Create IAM ROLE**
 
 ### 6️⃣ EC2 Instance (Amazon Linux 2023)
