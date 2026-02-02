@@ -1499,7 +1499,25 @@ Example item inserted later:
 
 📍 Purpose: HR/Admin can view attendance records
 
-[GetAttendanceAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+[GetAttendanceAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/Charile%20Cafe%20-%20Attendance%20System/GetAttendanceAdminLambda.py)
+
+#### 3️⃣ API Gateway
+
+- Create REST API resource:
+
+```
+/dev/hr/attendance
+```
+
+- Method: GET
+
+-  Attach Lambda: GetAttendanceAdminLambda
+
+-  Authorizer: Cognito User Pool
+
+-  Required group: Admin
+
+
 
 
 
