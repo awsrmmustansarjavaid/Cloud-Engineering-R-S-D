@@ -2348,6 +2348,100 @@ const CHARLIE = (() => {
 
 > **update the ADMIN ATTENDANCE part to match the new single Lambda approach (with query param ?type=daily|weekly|monthly) while keeping all other code and comments intact.**
 
+#### 📄 central-auth-api.js (UPDATED + SAFE)
+
+```
+const CHARLIE = (() => {
+
+  /* ================= CONFIG ================= */
+  const CONFIG = {
+    API_BASE: "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod",
+    ADMIN_ROLE: "Admin"
+  };
+
+  /* ================= AUTH ================= */
+  const auth = {
+    protectPage() {
+      const token = localStorage.getItem("idToken");
+      if (!token) {
+        window.location.href = "login.html";
+      }
+    },
+
+    setupLogoutButton() {
+      const btn = document.getElementById("logoutBtn");
+      if (!btn) return;
+
+      btn.addEventListener("click", () => {
+        localStorage.clear();
+        window.location.href = "index.html";
+      });
+    }
+  };
+
+  /* ================= ROLES ================= */
+  function getUserRoles() {
+    const token = localStorage.getItem("idToken");
+    if (!token) return [];
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload["cognito:groups"] || [];
+  }
+
+  function isAdmin() {
+    return getUserRoles().includes(CONFIG.ADMIN_ROLE);
+  }
+
+  /* ================= SECURE FETCH ================= */
+  async function secureFetch(url, options = {}) {
+    const token = localStorage.getItem("idToken");
+    if (!token) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    options.headers = {
+      ...(options.headers || {}),
+      "Authorization": token,
+      "Content-Type": "application/json"
+    };
+
+    const res = await fetch(url, options);
+
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    return res.json();
+  }
+
+  /* ================= ADMIN ATTENDANCE ================= */
+  async function loadAttendanceSummary(type) {
+    if (!isAdmin()) {
+      alert("Admin access only");
+      return;
+    }
+
+    return secureFetch(
+      `${CONFIG.API_BASE}/admin/attendance?type=${type}`
+    );
+  }
+
+  /* ================= EXPORT ================= */
+  return {
+    CONFIG,
+    apiBase: CONFIG.API_BASE,
+    auth,
+    secureFetch,
+    loadAttendanceSummary,
+    getUserRoles,
+    isAdmin
+  };
+
+})();
+```
+
 #### Here’s the updated central-auth-api.js in your previous style:
 
 ```
