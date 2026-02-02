@@ -394,6 +394,10 @@ def lambda_handler(event, context):
 ### ✅ admin_dashboard_data.py
 > **Update Version 1.1**
 
+Phase 6 you merged the 3 attendance Lambdas into a single Lambda with query param type=daily|weekly|monthly, it’s best to update admin_dashboard_data.py to be consistent with that logic and make it more robust for Phase 7 dashboard needs.
+
+Here’s a fully commented, updated version for your dashboard Lambda:
+
 ```
 import json
 import pymysql
@@ -513,3 +517,25 @@ def lambda_handler(event, context):
         if connection:
             connection.close()
 ```
+
+### ✅ Key Modifications After Phase 6 Merge:
+
+- Single Lambda now matches the Phase 6 merged attendance approach.
+
+- Optional employee filter maintained.
+
+- Summary query updated:
+
+    - Uses CURDATE() for “today” summary.
+
+    - Counts present / absent correctly.
+
+    - Leaves filtered for today only.
+
+    - CORS headers added for frontend requests.
+
+    - Fully commented for easy maintenance.
+
+- Compatible with your updated central-auth-api.js Phase 7 integration (CHARLIE.api.adminDashboard.fetchData()).
+
+---
