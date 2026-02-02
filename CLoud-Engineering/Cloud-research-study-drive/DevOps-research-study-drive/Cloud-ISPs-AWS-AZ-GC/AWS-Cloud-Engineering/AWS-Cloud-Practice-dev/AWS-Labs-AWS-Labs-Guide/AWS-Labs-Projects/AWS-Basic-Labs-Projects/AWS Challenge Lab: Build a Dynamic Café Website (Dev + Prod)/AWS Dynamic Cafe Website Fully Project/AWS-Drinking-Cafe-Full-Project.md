@@ -124,6 +124,8 @@ Allow Lambda to read menu items from DynamoDB
 
 - AmazonRDSDataFullAccess
 
+- CloudWatchLogsFullAccess
+
 #### 2️⃣ Custom Policies (ALL merged)
 
 - AWSLambdaBasicExecution (custom logs scope)
@@ -154,13 +156,9 @@ You can paste this directly into IAM → Policies → Create policy → JSON
   "Statement": [
 
     {
-      "Sid": "LambdaBasicExecutionLogs",
+      "Sid": "CloudWatchLogsFullAccess",
       "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
+      "Action": "logs:*",
       "Resource": "*"
     },
 
@@ -195,23 +193,6 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "rds-data:RollbackTransaction"
       ],
       "Resource": "*"
-    },
-
-    {
-      "Sid": "CustomLambdaLogGroupCreate",
-      "Effect": "Allow",
-      "Action": "logs:CreateLogGroup",
-      "Resource": "arn:aws:logs:us-east-1:"Your AWS ACCOUNT ID ":*"
-    },
-
-    {
-      "Sid": "CustomLambdaLogStreamAccess",
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:us-east-1:"Your AWS ACCOUNT ID ":log-group:/aws/lambda/cloudfront-cache-invalidator:*"
     },
 
     {
