@@ -1678,5 +1678,365 @@ CHARLIE.api.recordAttendance({
 
 ---
 
+### ✅ UPDATED central-auth-api.js
+> **Update Version: 2**
 
+✅ NO logic removed
 
+✅ New initProtectedPage() added
+
+✅ Beginner-friendly comments everywhere
+
+✅ No skipped or jumped steps
+
+✅ Safe for ALL pages (Admin / Employee / HR / Orders)
+
+You can copy–paste this file as-is.
+
+```
+/* =========================================================
+   CHARLIE CAFE — CENTRAL AUTH + API CONFIG (FINAL)
+   ---------------------------------------------------------
+   ✔ Cognito Hosted UI Login / Logout
+   ✔ Token Handling (Access Token)
+   ✔ Page Protection (Auto Redirect)
+   ✔ Logout Button (Centralized)
+   ✔ Role-Based Access (Admin / Employee)
+   ✔ Secure API Gateway Calls
+   ✔ Orders + HR REST APIs
+========================================================= */
+
+const CHARLIE = (() => {
+
+    /* =====================================================
+       1️⃣ GLOBAL CONFIG (CHANGE ONLY IF REQUIRED)
+    ===================================================== */
+    const CONFIG = {
+        REGION: "us-east-1",
+
+        // Cognito User Pool
+        USER_POOL_ID: "us-east-1_1wxssmoiqi",
+        CLIENT_ID: "3a4uchovr497k8v3gl52e2j5d8",
+        COGNITO_DOMAIN: "us-east-1wxssmoiqi.auth.us-east-1.amazoncognito.com",
+
+        // API Gateway Base URL
+        API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
+
+        // CloudFront (Static Assets)
+        CLOUDFRONT_BASE: "https://d3lnkgtsj0uwlu.cloudfront.net"
+    };
+
+    /* =====================================================
+       2️⃣ TOKEN HELPERS
+       - Decode JWT
+       - Check expiry
+       - Get token from browser
+    ===================================================== */
+    function parseJwt(token) {
+        return JSON.parse(atob(token.split(".")[1]));
+    }
+
+    function isTokenExpired(token) {
+        return parseJwt(token).exp * 1000 < Date.now();
+    }
+
+    function getToken() {
+        return localStorage.getItem("access_token");
+    }
+
+    /* =====================================================
+       3️⃣ AUTH MODULE (LOGIN / LOGOUT / PROTECT PAGE)
+    ===================================================== */
+    const auth = {
+
+        /* 🔐 Redirect user to Cognito Login */
+        login(redirectUrl = window.location.href) {
+            const url =
+                `https://${CONFIG.COGNITO_DOMAIN}/login` +
+                `?response_type=token` +
+                `&client_id=${CONFIG.CLIENT_ID}` +
+                `&scope=openid+email+profile` +
+                `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+
+            window.location.href = url;
+        },
+
+        /* 🔓 Logout user from Cognito + browser */
+        logout(redirectUrl = window.location.origin) {
+            localStorage.removeItem("access_token");
+
+            const url =
+                `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+                `?client_id=${CONFIG.CLIENT_ID}` +
+                `&logout_uri=${encodeURIComponent(redirectUrl)}`;
+
+            window.location.href = url;
+        },
+
+        /* 🔄 Handle Cognito redirect after login */
+        handleRedirect() {
+            if (!window.location.hash) return;
+
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const token = params.get("access_token");
+
+            if (token) {
+                localStorage.setItem("access_token", token);
+                window.location.hash = ""; // Clean URL
+            }
+        },
+
+        /* 🚧 Protect page (LOGIN REQUIRED) */
+        protectPage() {
+            this.handleRedirect();
+
+            const token = getToken();
+            if (!token || isTokenExpired(token)) {
+                this.login();
+                return;
+            }
+
+            // Show page only after auth success
+            document.body.style.display = "block";
+        },
+
+        /* 🔘 Attach logout button */
+        setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "index.html") {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+
+            btn.addEventListener("click", () => {
+                this.logout(redirectUrl);
+            });
+        }
+    };
+
+    /* =====================================================
+       4️⃣ SECURE FETCH (AUTO TOKEN ATTACH)
+    ===================================================== */
+    async function authFetch(url, options = {}) {
+        const token = getToken();
+
+        if (!token || isTokenExpired(token)) {
+            auth.logout();
+            return;
+        }
+
+        return fetch(url, {
+            ...options,
+            headers: {
+                ...(options.headers || {}),
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        });
+    }
+
+    async function secureFetch(url, options = {}) {
+        return authFetch(url, options).then(res => res.json());
+    }
+
+    /* =====================================================
+       5️⃣ ROLE & ACCESS CONTROL
+    ===================================================== */
+    function getUserRoles() {
+        const token = getToken();
+        if (!token) return [];
+        const payload = parseJwt(token);
+        return payload["cognito:groups"] || [];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("Admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("Employee");
+    }
+
+    function requireAdmin() {
+        if (!isAdmin()) {
+            alert("❌ Admin access only");
+            auth.logout();
+            throw new Error("Admin access required");
+        }
+    }
+
+    function requireEmployee() {
+        if (!isEmployee() && !isAdmin()) {
+            alert("❌ Employee access only");
+            auth.logout();
+            throw new Error("Employee access required");
+        }
+    }
+
+    /* =====================================================
+       6️⃣ API GATEWAY ENDPOINTS (ORDERS + HR)
+    ===================================================== */
+    const api = {
+
+        /* 🛒 ORDERS (PUBLIC / MIXED) */
+
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        getOrderStatus(orderId) {
+            return fetch(
+                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
+            ).then(res => res.json());
+        },
+
+        cashPayment(orderId) {
+            return fetch(`${CONFIG.API_BASE}/dev/orders/cash-payment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ order_id: orderId })
+            }).then(res => res.json());
+        },
+
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        /* 👨‍💼 HR — ADMIN ONLY */
+
+        getAllEmployees() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+        },
+
+        addEmployee(payload) {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employee/add`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        updateEmployee(payload) {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employee/update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        deleteEmployee(employeeId) {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employee/delete`, {
+                method: "POST",
+                body: JSON.stringify({ employee_id: employeeId })
+            });
+        },
+
+        /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
+
+        recordAttendance(payload) {
+            requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        getAttendance(employeeId) {
+            requireEmployee();
+            return secureFetch(
+                `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+            );
+        }
+    };
+
+    /* =====================================================
+       7️⃣ GLOBAL PAGE INITIALIZER (NO CONFUSION ⭐)
+       - Protect page
+       - Attach logout button
+       - ONE LINE PER PAGE
+    ===================================================== */
+    function initProtectedPage(options = {}) {
+        const {
+            requireAuth = true,
+            enableLogout = true,
+            logoutButtonId = "logoutBtn"
+        } = options;
+
+        if (requireAuth) {
+            auth.protectPage();
+        }
+
+        if (enableLogout) {
+            auth.setupLogoutButton(logoutButtonId);
+        }
+    }
+
+    /* =====================================================
+       8️⃣ CLOUDFRONT ASSETS
+    ===================================================== */
+    const assets = {
+        url(path) {
+            return `${CONFIG.CLOUDFRONT_BASE}/${path}`;
+        }
+    };
+
+    /* =====================================================
+       9️⃣ EXPORT (PUBLIC API)
+    ===================================================== */
+    return {
+        CONFIG,
+        apiBase: CONFIG.API_BASE,
+        auth,
+        api,
+        assets,
+        secureFetch,
+        initProtectedPage,
+        getUserRoles,
+        isAdmin,
+        isEmployee
+    };
+
+})();
+```
+
+#### ✅ HOW TO USE THIS (NO CONFUSION)
+
+#### 🔹 Any protected page (Admin / HR / Employee):
+
+```
+<button id="logoutBtn">Logout</button>
+
+<script src="js/central-auth-api.js"></script>
+<script>
+  CHARLIE.initProtectedPage();
+</script>
+```
+
+#### 🔹 API call example:
+
+```
+CHARLIE.api.recordAttendance({
+  employee_id: "E101"
+});
+```
+
+#### 🏆 RESULT
+
+✔ One JS file
+
+✔ Zero duplication
+
+✔ Global logout
+
+✔ Secure APIs
+
+✔ Beginner-safe
+
+✔ Production-ready
+---
