@@ -5,14 +5,8 @@
     <title>Charlie Café | Admin Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- ================= Bootstrap CSS ================= -->
+    <!-- ================= Bootstrap ================= -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- ================= Cognito SDK ================= -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazon-cognito-identity-js/6.2.1/amazon-cognito-identity.min.js"></script>
-
-    <!-- ================= jsPDF ================= -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- ================= Café Theme ================= -->
     <style>
@@ -25,210 +19,201 @@
             background-size: cover;
             background-attachment: fixed;
             font-family: "Segoe UI", sans-serif;
-            display: flex;
-            transition: background 0.3s;
+            display: none; /* 🔐 hidden until auth success */
         }
 
         body.light-mode {
             background: #f4efe9;
         }
 
-        /* ===== Sidebar ===== */
         #sidebar {
             width: 230px;
             background-color: #2b1b12;
             color: #fff;
-            flex-shrink: 0;
             padding: 20px;
         }
 
         #sidebar h3 {
-            font-family: Georgia, serif;
             color: #f5c16c;
             text-align: center;
         }
 
         #sidebar .nav-link {
-            color: #f1f1f1;
+            color: #fff;
             margin-bottom: 6px;
-            border-radius: 6px;
         }
 
-        #sidebar .nav-link:hover {
-            background-color: #3d261a;
-            color: #f5c16c;
-        }
-
-        /* ===== Content ===== */
         #content {
             flex-grow: 1;
             padding: 30px;
         }
 
         .content-card {
-            background-color: rgba(255,255,255,0.97);
-            border-radius: 15px;
+            background: #fff;
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 8px 22px rgba(0,0,0,0.45);
-        }
-
-        table th {
-            background-color: #2b1b12;
-            color: #fff;
-        }
-
-        .status-badge {
-            font-size: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            #sidebar {
-                width: 100%;
-            }
         }
     </style>
 </head>
 
-<body>
+<body class="d-flex">
 
-<!-- ================= Sidebar (ADMIN ONLY) ================= -->
+<!-- ================= SIDEBAR ================= -->
 <nav id="sidebar">
     <h3>☕ Charlie Café</h3>
     <hr>
 
-    <ul class="nav nav-pills flex-column mb-3">
+    <ul class="nav flex-column">
         <li><a class="nav-link active" href="#">Dashboard</a></li>
-        <li><a class="nav-link" href="#">Attendance</a></li>
         <li><a class="nav-link" href="#">Employees</a></li>
-        <li><a class="nav-link" href="#">Leaves</a></li>
-        <li><a class="nav-link" href="#">Reports</a></li>
+        <li><a class="nav-link" href="#">Attendance</a></li>
     </ul>
 
     <hr>
 
-    <!-- Admin Controls -->
-    <div class="d-grid gap-2">
-        <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">🌗 Toggle Theme</button>
-        <button class="btn btn-outline-light btn-sm" onclick="downloadPDF()">📄 Download Report</button>
-        <button class="btn btn-warning btn-sm" onclick="logout()">🔒 Logout</button>
-    </div>
+    <button class="btn btn-warning btn-sm w-100" id="logoutBtn">🔒 Logout</button>
 </nav>
 
-<!-- ================= Main Content ================= -->
-<div id="content">
+<!-- ================= MAIN CONTENT ================= -->
+<div id="content" class="w-100">
 
     <div class="content-card">
+
         <h2>Admin Dashboard</h2>
-        <p class="text-muted">HR & Attendance Management</p>
+        <p class="text-muted">Attendance Analytics</p>
 
-        <!-- Status Badge -->
-        <span id="today-status" class="badge bg-secondary status-badge">
-            Loading today status...
-        </span>
+        <!-- ===== Summary Cards ===== -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-success text-white p-3">
+                    <h6>Total Present</h6>
+                    <h3 id="card-present">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white p-3">
+                    <h6>Total Absent</h6>
+                    <h3 id="card-absent">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark p-3">
+                    <h6>Total Leaves</h6>
+                    <h3 id="card-leaves">0</h3>
+                </div>
+            </div>
+        </div>
 
-        <hr>
+        <!-- ===== Controls ===== -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select id="employeeFilter" class="form-select">
+                    <option value="">All Employees</option>
+                </select>
+            </div>
 
-        <!-- Attendance Table -->
-        <div class="table-responsive mt-3">
-            <table class="table table-striped table-bordered" id="attendance-table">
+            <div class="col-md-8 text-end">
+                <button class="btn btn-outline-primary" onclick="loadSummary('daily')">Daily</button>
+                <button class="btn btn-outline-primary" onclick="loadSummary('weekly')">Weekly</button>
+                <button class="btn btn-outline-primary" onclick="loadSummary('monthly')">Monthly</button>
+            </div>
+        </div>
+
+        <!-- ===== Attendance Table ===== -->
+        <div class="table-responsive">
+            <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Employee ID</th>
+                        <th>Employee</th>
                         <th>Date</th>
                         <th>Check-In</th>
                         <th>Check-Out</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="attendance-body"></tbody>
             </table>
         </div>
-    </div>
 
+        <button class="btn btn-primary mt-3" onclick="exportCSV()">Export CSV</button>
+
+    </div>
 </div>
 
-<!-- ================= JavaScript ================= -->
+<!-- ================= CENTRAL AUTH ================= -->
+<script src="js/central-auth-api.js"></script>
+
 <script>
-    /* ===== Cognito Config ===== */
-    const poolData = {
-        UserPoolId: 'us-east-1_XXXXXX',
-        ClientId: 'XXXXXXXXXXXX'
-    };
-    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-    const apiBase = 'https://<API-ID>.execute-api.us-east-1.amazonaws.com/dev';
+/* =====================================================
+   🔐 AUTH & ROLE ENFORCEMENT
+===================================================== */
+CHARLIE.auth.protectPage();          // login required
+CHARLIE.auth.setupLogoutButton();    // logout button
+if (!CHARLIE.isAdmin()) {
+    alert("Admin access only");
+    CHARLIE.auth.logout();
+}
 
-    async function getJWT() {
-        const user = userPool.getCurrentUser();
-        return new Promise((resolve, reject) => {
-            if (!user) reject("Not logged in");
-            user.getSession((err, session) => {
-                if (err) reject(err);
-                resolve(session.getIdToken().getJwtToken());
-            });
-        });
-    }
+/* =====================================================
+   📊 LOAD ATTENDANCE SUMMARY (Phase 6 Lambda)
+===================================================== */
+async function loadSummary(type) {
+    const data = await CHARLIE.secureFetch(
+        `${CHARLIE.apiBase}/admin/attendance?type=${type}`
+    );
 
-    /* ===== Load Attendance (Admin View) ===== */
-    async function loadAttendance() {
-        const token = await getJWT();
-        const res = await fetch(`${apiBase}/attendance/all`, {
-            headers: { Authorization: token }
-        });
-        const records = await res.json();
+    document.getElementById("card-present").textContent = data.summary.total_present;
+    document.getElementById("card-absent").textContent = data.summary.total_absent;
+    document.getElementById("card-leaves").textContent = data.summary.total_leaves;
 
-        const tbody = document.querySelector("#attendance-table tbody");
-        tbody.innerHTML = "";
+    renderTable(data.attendance);
+}
 
-        const today = new Date().toISOString().slice(0,10);
-        let countToday = 0;
+/* =====================================================
+   📋 RENDER TABLE
+===================================================== */
+function renderTable(rows) {
+    const tbody = document.getElementById("attendance-body");
+    tbody.innerHTML = "";
 
-        records.forEach(r => {
-            if (r.attendance_date === today) countToday++;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${r.employee_id}</td>
-                    <td>${r.attendance_date}</td>
-                    <td>${r.checkin_time || "-"}</td>
-                    <td>${r.checkout_time || "-"}</td>
-                </tr>
-            `;
-        });
+    rows.forEach(r => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${r.name}</td>
+                <td>${r.date}</td>
+                <td>${r.checkin_time || "-"}</td>
+                <td>${r.checkout_time || "-"}</td>
+            </tr>
+        `;
+    });
+}
 
-        updateTodayStatus(countToday);
-    }
+/* =====================================================
+   👥 LOAD EMPLOYEES (FILTER)
+===================================================== */
+async function loadEmployees() {
+    const employees = await CHARLIE.api.getAllEmployees();
+    const select = document.getElementById("employeeFilter");
 
-    function updateTodayStatus(count) {
-        const badge = document.getElementById("today-status");
-        badge.textContent = `${count} employees checked in today`;
-        badge.className = "badge bg-success status-badge";
-    }
+    employees.forEach(e => {
+        const opt = document.createElement("option");
+        opt.value = e.employee_id;
+        opt.textContent = e.name;
+        select.appendChild(opt);
+    });
+}
 
-    /* ===== PDF Export ===== */
-    function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("Charlie Café – Attendance Report", 10, 10);
-        doc.text(document.getElementById("attendance-table").innerText, 10, 20);
-        doc.save("attendance-report.pdf");
-    }
+/* =====================================================
+   📤 EXPORT CSV
+===================================================== */
+function exportCSV() {
+    alert("CSV export logic can be plugged here");
+}
 
-    /* ===== Theme Toggle ===== */
-    function toggleTheme() {
-        document.body.classList.toggle("light-mode");
-    }
-
-    /* ===== Logout ===== */
-    function logout() {
-        const user = userPool.getCurrentUser();
-        if (user) user.signOut();
-        alert("Logged out successfully");
-        window.location.href = "index.html";
-    }
-
-    /* ===== Initial Load ===== */
-    loadAttendance();
+/* =====================================================
+   🚀 INIT
+===================================================== */
+loadEmployees();
+loadSummary("daily");
 </script>
 
 </body>
