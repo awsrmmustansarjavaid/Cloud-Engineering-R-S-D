@@ -1057,13 +1057,13 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 **✅ Done. Move on.**
 
-### 1️⃣ — CREATE ONE LAMBDA ONLY
+### 2️⃣ — CREATE ONE LAMBDA ONLY
 
 #### 1️⃣ 📄 Lambda Name : attendance_summary
 
 [attendance_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/attendance_summary.py)
 
-#### 1️⃣ ✅ Lambda Environment Variables
+#### 2️⃣ ✅ Lambda Environment Variables
 
 | Key         | Value             |
 | ----------- | ----------------- |
@@ -1072,7 +1072,7 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 | DB_PASSWORD | rds-password      |
 | DB_NAME     | cafedb            |
 
-### 🟢 STEP 3 — API GATEWAY (ONE RESOURCE ONLY)
+### 3️⃣ — API GATEWAY (ONE RESOURCE ONLY)
 
 1️⃣ Open API Gateway → Existing API
 
@@ -1114,7 +1114,7 @@ GET /admin/attendance?type=weekly
 GET /admin/attendance?type=monthly
 ```
 
-🟢 STEP 4 — UPDATE central-auth-api.js
+### 4️⃣ — UPDATE central-auth-api.js
 
 You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 
@@ -1122,9 +1122,9 @@ You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 
 [central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
-🟢 STEP 5 — ADMIN DASHBOARD (FRONTEND)
+### 5️⃣ — ADMIN DASHBOARD (FRONTEND)
 
-HTML Buttons (NO CHANGE)
+#### 1️⃣ HTML Buttons (NO CHANGE)
 
 ```
 <button onclick="load('daily')">Daily</button>
@@ -1134,7 +1134,7 @@ HTML Buttons (NO CHANGE)
 <div id="summary-result"></div>
 ```
 
-JS Usage
+#### 2️⃣ JS Usage
 
 ```
 <script src="js/central-auth-api.js"></script>
