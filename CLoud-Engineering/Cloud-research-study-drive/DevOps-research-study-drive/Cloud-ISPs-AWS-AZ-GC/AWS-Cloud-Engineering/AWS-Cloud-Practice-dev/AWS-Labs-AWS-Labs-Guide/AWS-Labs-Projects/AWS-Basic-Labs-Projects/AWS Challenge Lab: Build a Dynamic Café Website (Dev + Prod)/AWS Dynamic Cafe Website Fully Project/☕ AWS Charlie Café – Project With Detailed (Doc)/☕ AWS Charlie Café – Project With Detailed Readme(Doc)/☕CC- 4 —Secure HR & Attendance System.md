@@ -2206,6 +2206,276 @@ CHARLIE.auth.setupLogoutButton("logoutBtn");
 
 #### ✅ Minimal safe fixes (DO NOT rewrite UI)
 
+### 🧠 FIRST: WHAT YOU ALREADY HAVE (IMPORTANT)
+
+You already have this file:
+
+```
+js/central-auth-api.js
+```
+
+Inside it, you already have:
+
+- CHARLIE.auth.login()
+
+- CHARLIE.auth.logout()
+
+- CHARLIE.auth.protectPage()
+
+- CHARLIE.auth.setupLogoutButton()
+
+👉 This file is the brain
+
+👉 Every page will use this brain
+
+👉 Pages themselves stay simple
+
+### 🧩 STEP 0 — UNDERSTAND THE RULE (VERY IMPORTANT)
+
+> **❗ Logout works on ALL pages only because ALL pages use the SAME auth file**
+
+- If one page does NOT load central-auth-api.js
+→ logout will NOT work on that page.
+
+### ✅ STEP 1 — ADD CENTRAL AUTH FILE (MANDATORY)
+
+#### What you do
+
+Open ANY page (check-in, dashboard, HR page, admin page)
+
+#### At the BOTTOM of <body>, add:
+
+```
+<script src="js/central-auth-api.js"></script>
+```
+
+#### What this does (simple words)
+
+- Loads Cognito logic
+
+- Loads logout logic
+
+- Loads token logic
+
+**🧠 Without this → page is blind**
+
+### ✅ STEP 2 — PROTECT THE PAGE (MANDATORY)
+
+Immediately AFTER loading the script, add:
+
+```
+<script>
+  CHARLIE.auth.protectPage();
+</script>
+```
+
+#### What happens internally (step by step)
+
+1️⃣ Browser opens page
+
+2️⃣ central-auth-api.js loads
+
+3️⃣ protectPage() runs
+
+4️⃣ It checks:
+
+Is token present?
+
+Is token expired?
+
+| Situation       | What happens               |
+| --------------- | -------------------------- |
+| User logged in  | Page shows                 |
+| User logged out | Redirects to Cognito login |
+| Token expired   | Redirects to Cognito login |
+
+**👉 This is why logout works everywhere**
+
+### ✅ STEP 3 — ADD LOGOUT BUTTON (UI)
+
+On the page where you want logout (navbar, dashboard, etc):
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+That’s it.
+No logic here.
+No Cognito code here.
+
+### ✅ STEP 4 — CONNECT LOGOUT BUTTON TO CENTRAL LOGIC
+
+Below protectPage() add:
+
+```
+<script>
+  CHARLIE.auth.setupLogoutButton();
+</script>
+```
+
+#### What this does internally
+
+Finds button with id logoutBtn
+
+Attaches click event
+
+On click → calls CHARLIE.auth.logout()
+
+👉 You did NOT write logout logic
+
+👉 You reused central logic
+
+### 🔁 STEP 5 — WHAT HAPPENS WHEN USER CLICKS LOGOUT
+
+This is the exact internal flow:
+
+1️⃣ User clicks Logout button
+
+⬇
+
+2️⃣ This function runs (already in your file):
+
+```
+CHARLIE.auth.logout()
+```
+
+⬇
+
+3️⃣ Logout function does TWO things:
+
+A. Local logout
+
+Removes access_token from localStorage
+
+B. Cognito logout
+
+Redirects to:
+
+```
+https://<cognito-domain>/logout
+```
+
+⬇
+
+4️⃣ Cognito destroys session
+
+User is logged out from Cognito itself
+
+⬇
+
+5️⃣ User redirected back (index.html or login.html)
+
+### 🔐 STEP 6 — WHY LOGOUT AFFECTS ALL PAGES (KEY POINT)
+
+After logout:
+
+access_token = ❌ NOT EXISTS
+
+Now user tries to open ANY protected page:
+
+```
+CHARLIE.auth.protectPage();
+```
+
+What protectPage() sees:
+
+```
+if (!token || token expired) {
+    login();
+}
+```
+
+⬇
+
+RESULT:
+
+➡ Redirect to login
+➡ Page NEVER loads
+
+👉 This is how logout works globally
+
+👉 No extra code needed on other pages
+
+### 🔄 STEP 7 — WHY YOU MUST USE secureFetch
+
+❌ Old way (unsafe)
+
+```
+fetch("/attendance/checkin")
+```
+
+This:
+
+Does NOT send token
+
+Does NOT check login
+
+Can be called by anyone
+
+✅ New way (safe)
+
+```
+CHARLIE.secureFetch("/dev/hr/attendance", {...})
+```
+
+What happens internally:
+
+1️⃣ Gets token
+2️⃣ Checks expiration
+3️⃣ Adds token to header
+4️⃣ If invalid → logout automatically
+
+👉 Logout protection extends to API calls too
+
+📌 COMPLETE PAGE TEMPLATE (COPY THIS MENTALLY)
+
+Every protected page must follow this order:
+
+1️⃣ Load central auth
+2️⃣ Protect page
+3️⃣ Setup logout button
+4️⃣ Page-specific logic
+
+Example:
+
+```
+<script src="js/central-auth-api.js"></script>
+
+<script>
+  CHARLIE.auth.protectPage();
+  CHARLIE.auth.setupLogoutButton();
+</script>
+```
+
+### 🧠 FINAL MENTAL MODEL (VERY IMPORTANT)
+
+central-auth-api.js = security brain
+
+Pages = dumb UI
+
+Logout = one place only
+
+Protection = automatic
+
+No duplicate code
+
+No confusion later
+
+#### 🔁 Logout flow:
+
+1️⃣ User clicks Logout
+
+2️⃣ Token removed from localStorage
+
+3️⃣ Cognito session destroyed
+
+4️⃣ User redirected
+
+5️⃣ Any protected page → auto login redirect
+
+#### 💥 Works globally. No duplication.
+
+
 ### ✅ FINAL SUMMARY (READ THIS TWICE)
 
 ✅ HR Dashboard = new page

@@ -1521,17 +1521,43 @@ Example item inserted later:
 
 #### Step 1 — Add central auth
 
+- Open ANY page (check-in, dashboard, HR page, admin page)
+
+- At the BOTTOM of <body>, add:
+
 ```
 <script src="js/central-auth-api.js"></script>
 ```
 
 #### Step 2 — Protect page
 
+- Immediately AFTER loading the script, add:
+
 ```
-CHARLIE.auth.protectPage();
+<script>
+  CHARLIE.auth.protectPage();
+</script>
 ```
 
-#### Step 3 — Replace fetch with secureFetch
+#### Step 3 — ADD LOGOUT BUTTON (UI)
+
+- On the page where you want logout (navbar, dashboard, etc):
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+#### Step 4 — CONNECT LOGOUT BUTTON TO CENTRAL LOGIC
+
+Below protectPage() add:
+
+```
+<script>
+  CHARLIE.auth.setupLogoutButton();
+</script>
+```
+
+#### Step 5 — Replace fetch with secureFetch
 
 ```
 CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
@@ -1544,26 +1570,10 @@ CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
 
 👉 Security added
 
-#### 🔁 Logout flow:
 
-1️⃣ User clicks Logout
+**✅ PHASE 8️⃣ STATUS**
 
-2️⃣ Token removed from localStorage
-
-3️⃣ Cognito session destroyed
-
-4️⃣ User redirected
-
-5️⃣ Any protected page → auto login redirect
-
-#### 💥 Works globally. No duplication.
-
-
-
-
-**✅ PHASE 7️⃣ STATUS**
-
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
 ---
 ## ☕ Charlie Café PHASE 9️⃣ — Update Cafe Security Configuration
 
