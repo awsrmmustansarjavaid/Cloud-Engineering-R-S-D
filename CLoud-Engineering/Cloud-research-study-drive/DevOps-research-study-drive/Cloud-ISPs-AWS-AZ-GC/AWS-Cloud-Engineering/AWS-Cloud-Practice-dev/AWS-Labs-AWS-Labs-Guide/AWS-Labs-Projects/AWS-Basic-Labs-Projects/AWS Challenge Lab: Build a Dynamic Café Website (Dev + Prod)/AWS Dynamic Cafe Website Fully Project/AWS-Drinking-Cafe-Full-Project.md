@@ -1142,9 +1142,18 @@ sudo systemctl restart httpd
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ AWS CAFE - PHASE 7️⃣ order-status.php
-> **File Name: order-status.php **
+## ☕ AWS CAFE - PHASE 7️⃣ admin-orders.php
+> **File Name: admin-orders.php **
 
+```
+sudo nano admin-orders.php
+```
+
+[admin-orders.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+
+```
+sudo systemctl restart httpd
+```
 
 
 **✅ PHASE 7️⃣ STATUS**

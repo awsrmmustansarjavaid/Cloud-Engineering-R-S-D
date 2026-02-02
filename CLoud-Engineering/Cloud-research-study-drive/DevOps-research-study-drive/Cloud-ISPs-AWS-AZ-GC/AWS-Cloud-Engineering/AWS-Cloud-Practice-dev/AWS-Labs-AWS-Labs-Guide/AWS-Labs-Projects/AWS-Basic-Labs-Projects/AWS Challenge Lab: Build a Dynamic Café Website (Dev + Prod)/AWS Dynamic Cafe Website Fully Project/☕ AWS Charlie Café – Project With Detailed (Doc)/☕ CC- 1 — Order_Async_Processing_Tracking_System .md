@@ -2665,16 +2665,13 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 
 ### 5️⃣ — admin-orders.php
 
-```
-sudo nano admin-orders.php
-```
-
 [admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+
+**🔁 Replace with your real API Gateway URL**
 
 ```
 sudo systemctl restart httpd
 ```
-
 
 **✅ Admin feature COMPLETE**
 
