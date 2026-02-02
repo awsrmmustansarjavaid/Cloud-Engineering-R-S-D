@@ -1145,7 +1145,7 @@ Set the following for all three Lambdas:
 </div>
 ```
 
-#### 2️⃣ — Shared Script Functions (auth-api.js or separate admin.js)
+#### 2️⃣ — Shared Script Functions (central-auth-api.js)
 
 ```
 // Load Daily Attendance
@@ -1193,6 +1193,8 @@ function displaySummary(records) {
 **⚠️  Skip it... because already added in central-auth-api.js**
 
 [central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
+
+
 
 
 
