@@ -246,6 +246,9 @@ document.getElementById("loadAttendanceBtn")
 </body>
 </html>
 ```
+### FRONTEND — HR ATTENDANCE DASHBOARD (NEW PAGE)
+
+> **📄 File: hr-attendance-dashboard.html**
 
 > **Update Version: 1.1**
 
