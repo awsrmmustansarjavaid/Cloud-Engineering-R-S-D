@@ -2237,6 +2237,53 @@ Inside it, you already have:
 - If one page does NOT load central-auth-api.js
 → logout will NOT work on that page.
 
+### 🟢 OPTION 1 (RECOMMENDED)
+
+**👉 Keep EVERYTHING inside central-auth-api.js**
+
+This is what large production apps do.
+
+#### 🧠 HOW THIS OPTION WORKS (CONCEPT)
+
+Instead of doing this on every page:
+
+```
+CHARLIE.auth.protectPage();
+CHARLIE.auth.setupLogoutButton();
+```
+
+You create ONE function inside central-auth-api.js like:
+
+```
+CHARLIE.initProtectedPage();
+```
+
+**And then every page only calls ONE LINE.**
+
+#### 🧠 WHAT HAPPENS INTERNALLY (VERY IMPORTANT)
+
+When page loads:
+
+1️⃣ central-auth-api.js loads
+
+2️⃣ initProtectedPage() runs
+
+3️⃣ Token validated
+
+4️⃣ Page allowed or redirected
+
+When logout clicked:
+
+1️⃣ Token removed
+
+2️⃣ Cognito session destroyed
+
+3️⃣ Redirect happens
+
+4️⃣ Any protected page → blocked
+
+### 🟢 OPTION 2
+
 ### ✅ STEP 1 — ADD CENTRAL AUTH FILE (MANDATORY)
 
 #### What you do

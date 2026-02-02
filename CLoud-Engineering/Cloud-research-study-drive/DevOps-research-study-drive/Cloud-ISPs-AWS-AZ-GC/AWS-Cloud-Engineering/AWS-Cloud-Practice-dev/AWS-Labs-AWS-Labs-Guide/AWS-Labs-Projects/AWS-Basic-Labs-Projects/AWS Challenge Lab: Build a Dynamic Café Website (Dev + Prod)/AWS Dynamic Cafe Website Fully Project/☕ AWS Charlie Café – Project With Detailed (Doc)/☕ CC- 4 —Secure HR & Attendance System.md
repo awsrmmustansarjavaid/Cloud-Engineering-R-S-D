@@ -1519,6 +1519,97 @@ Example item inserted later:
 
 ### 3️⃣ 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
 
+### 🟢 OPTION 1 (RECOMMENDED)
+
+**👉 Keep EVERYTHING inside central-auth-api.js**
+
+This is what large production apps do.
+
+#### 🔹 STEP 1 — ADD A NEW INIT FUNCTION (CENTRALIZED)
+
+Open central-auth-api.js
+
+Add this near the bottom, before return {}:
+
+```
+/* =====================================================
+   GLOBAL PAGE INITIALIZER (ONE-LINE SETUP)
+===================================================== */
+function initProtectedPage(options = {}) {
+    const {
+        requireAuth = true,
+        enableLogout = true,
+        logoutButtonId = "logoutBtn"
+    } = options;
+
+    // Step 1: Protect page (login required)
+    if (requireAuth) {
+        auth.protectPage();
+    }
+
+    // Step 2: Setup logout button
+    if (enableLogout) {
+        auth.setupLogoutButton(logoutButtonId);
+    }
+}
+```
+
+#### 🔹 STEP 2 — EXPORT IT
+
+Inside return {} add:
+
+```
+initProtectedPage
+```
+
+Now this function becomes usable on ALL pages.
+
+#### 🔹 STEP 3 — USE IT ON ANY PAGE (VERY SIMPLE)
+
+Now your pages become EXTREMELY CLEAN:
+
+```
+<script src="js/central-auth-api.js"></script>
+
+<script>
+  CHARLIE.initProtectedPage();
+</script>
+```
+
+That’s it.
+No Cognito logic.
+No duplication.
+No confusion.
+
+#### 🔹 STEP 4 — LOGOUT BUTTON (UI ONLY)
+
+Wherever you want logout:
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+No JS code here.
+Everything handled centrally.
+
+#### 🔹 STEP 5 — API CALLS (SECURE)
+
+Replace ALL fetch calls with:
+
+```
+CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
+    method: "POST",
+    body: JSON.stringify({ employee_id: employeeId })
+});
+```
+
+Security, token, expiration, auto-logout — all handled centrally.
+
+
+
+
+### 🟢 OPTION 2
+
 #### Step 1 — Add central auth
 
 - Open ANY page (check-in, dashboard, HR page, admin page)
@@ -1569,6 +1660,7 @@ CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
 👉 UI stays same
 
 👉 Security added
+
 
 
 **✅ PHASE 8️⃣ STATUS**
