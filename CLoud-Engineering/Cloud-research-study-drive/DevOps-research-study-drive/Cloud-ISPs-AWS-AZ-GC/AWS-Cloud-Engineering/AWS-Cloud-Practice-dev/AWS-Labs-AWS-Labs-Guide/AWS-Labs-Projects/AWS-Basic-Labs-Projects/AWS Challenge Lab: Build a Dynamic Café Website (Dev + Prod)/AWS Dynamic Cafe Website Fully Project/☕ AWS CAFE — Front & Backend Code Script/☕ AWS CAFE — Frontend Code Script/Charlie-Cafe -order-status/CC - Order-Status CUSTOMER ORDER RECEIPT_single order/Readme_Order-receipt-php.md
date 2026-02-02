@@ -1176,39 +1176,6 @@ body {
     color: #fff;
 }
 
-/* ================= SIDEBAR ================= */
-.sidebar {
-    width: 220px;
-    height: 100vh;
-    background: #2b160a;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding-top: 80px;
-    z-index: 1000;
-}
-.sidebar a {
-    display: flex;
-    align-items: center;
-    padding: 12px 20px;
-    color: #ddd;
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.2s;
-}
-.sidebar a i {
-    margin-right: 10px;
-    color: #ff9800;
-}
-.sidebar a:hover, .sidebar a.active {
-    background: #3b1f0e;
-    color: #fff;
-    border-left: 4px solid #ff9800;
-}
-.sidebar a.logout-btn i {
-    color: #ff4d4d;
-}
-
 /* ================= NAVBAR ================= */
 .navbar {
     background-color: rgba(59, 31, 14, 0.9) !important;
@@ -1219,11 +1186,16 @@ body {
 .navbar .navbar-brand {
     font-weight: bold;
     color: #ff9800 !important;
+    display: flex;
+    align-items: center;
+}
+.navbar .navbar-brand i {
+    margin-right: 10px;
+    font-size: 1.5rem;
 }
 
 /* ================= MAIN CONTENT ================= */
 .main-content {
-    margin-left: 220px;
     padding-top: 100px;
     padding-bottom: 50px;
 }
@@ -1251,24 +1223,25 @@ body {
     margin-right: 8px;
 }
 
-/* ================= TABLE ================= */
-.table th, .table td {
-    vertical-align: middle;
-}
-.table-hover tbody tr:hover {
-    background-color: rgba(255, 152, 0, 0.2);
-}
-
 /* ================= STATUS BADGE ================= */
 .status-badge {
     font-size: 14px;
     padding: 6px 12px;
 }
 
+/* ================= QR CODE BOX ================= */
+#qrBox {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width:768px){
-    .main-content { margin-left: 0; padding-top: 120px; }
-    .sidebar { width: 100%; height: auto; position: relative; padding-top: 20px; }
+    .main-content { padding-top: 120px; }
 }
 </style>
 </head>
@@ -1278,18 +1251,11 @@ body {
 <!-- ================= NAVBAR ================= -->
 <nav class="navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
+        <a class="navbar-brand" href="index.php">
+            <i class="bi bi-cup-straw-fill"></i> Charlie Cafe
+        </a>
     </div>
 </nav>
-
-<!-- ================= SIDEBAR ================= -->
-<div class="sidebar">
-    <a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Main Dashboard</a>
-    <a href="analytics.html"><i class="bi bi-graph-up-arrow"></i> Analytics</a>
-    <a href="order-receipt.php?order_id=<?= $orderId ?>" class="active"><i class="bi bi-cup-fill"></i> Receipt</a>
-    <hr class="text-secondary">
-    <a class="logout-btn" style="cursor:pointer"><i class="bi bi-door-open-fill"></i> Logout</a>
-</div>
 
 <!-- ================= MAIN CONTENT ================= -->
 <div class="main-content">
@@ -1331,9 +1297,9 @@ body {
             <p class="fw-bold"><i class="bi bi-currency-dollar"></i> Total Amount: $<?= number_format($order['total_amount'], 2) ?></p>
 
             <!-- ================= QR CODE ================= -->
-            <div id="qrBox" class="text-center my-3">
+            <div id="qrBox" class="my-3">
                 <div id="qrcode"></div>
-                <small class="text-muted">Scan to track order</small>
+                <small class="text-muted mt-2">Scan to track order</small>
             </div>
 
             <!-- ================= BUTTONS ================= -->
@@ -1352,31 +1318,28 @@ body {
 
 <!-- ================= CENTRAL AUTH ================= -->
 <script src="/js/central-auth-api.js"></script>
+
 <script>
 /* =========================================================
    PROTECT PAGE — redirect to login if not authenticated
-   ========================================================= */
-CHARLIE.auth.protectPage();
+========================================================= */
+CHARLIE.auth.protectPage().then(() => {
+    // Show body after auth passed
+    document.body.style.display = "block";
 
-/* =========================================================
-   LOGOUT HANDLER
-   ========================================================= */
-document.querySelector(".logout-btn").onclick = () => {
-    CHARLIE.auth.logout();
-};
-
-/* =========================================================
-   QR CODE GENERATION
-   ========================================================= */
-new QRCode(document.getElementById("qrcode"), {
-    text: window.location.href,
-    width: 120,
-    height: 120
+    /* =========================================================
+       QR CODE GENERATION
+    ========================================================= */
+    new QRCode(document.getElementById("qrcode"), {
+        text: window.location.href,
+        width: 140,
+        height: 140
+    });
 });
 
 /* =========================================================
    AUTO REFRESH (10s)
-   ========================================================= */
+========================================================= */
 setInterval(() => {
     fetch(window.location.href, { cache: "no-store" })
         .then(res => res.text())
