@@ -1996,6 +1996,141 @@ async function initAdminDashboard() {
 initAdminDashboard();
 ```
 
+since you merged Phase 6 three Lambdas into one, Phase 7 needs a tiny adjustment to make sure the dashboard summary cards & attendance table can handle the single Lambda approach (query param approach is fine).
+
+Everything else in Phase 7 can stay the same; you just need to make sure:
+
+API URLs match the new single Lambda pattern for attendance analytics.
+
+secureFetch is used from central-auth-api.js (which now has merged Lambda support).
+
+Optional: requireAdmin() checks for admin access before fetching dashboard data.
+
+Here’s the updated Phase 7 JS functions — written in the same style and comments as your central-auth-api.js:
+
+```
+/* =========================================================
+   CHARLIE CAFE — ADMIN DASHBOARD ENHANCEMENTS (PHASE 7)
+   ---------------------------------------------------------
+   ✔ Employee Filter Dropdown
+   ✔ Summary Cards (Present / Absent / Leaves)
+   ✔ Attendance Table
+   ✔ Export CSV
+   ✔ Admin Access Required
+========================================================= */
+
+/* -----------------------------
+   Load Employee Filter Options
+------------------------------ */
+async function loadEmployeeFilter() {
+    // Ensure only Admin can see dashboard
+    if (!CHARLIE.isAdmin()) {
+        alert("❌ Admin access only");
+        return;
+    }
+
+    // Fetch all employees from API
+    const employees = await CHARLIE.secureFetch(CHARLIE.apiBase + "/admin/employees");
+    const select = document.getElementById("employeeFilter");
+
+    // Populate dropdown
+    employees.forEach(emp => {
+        const option = document.createElement("option");
+        option.value = emp.employee_id;
+        option.text = emp.name;
+        select.add(option);
+    });
+}
+
+/* -----------------------------
+   Load Dashboard Data
+------------------------------ */
+async function loadDashboardData() {
+    if (!CHARLIE.isAdmin()) {
+        alert("❌ Admin access only");
+        return;
+    }
+
+    const empId = document.getElementById("employeeFilter").value;
+    let url = CHARLIE.apiBase + "/admin/dashboard";
+    if (empId) url += "?employee_id=" + empId;
+
+    // Fetch dashboard data from Lambda
+    const data = await CHARLIE.secureFetch(url);
+
+    // Update summary cards
+    document.getElementById("card-present").innerText = data.summary.total_present;
+    document.getElementById("card-absent").innerText = data.summary.total_absent;
+    document.getElementById("card-leaves").innerText = data.summary.total_leaves;
+
+    // Populate attendance table
+    const container = document.getElementById("dashboard-table-container");
+    let html = `<table class="table table-striped table-bordered">
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                    </tr>`;
+    data.attendance.forEach(r => {
+        html += `<tr>
+                    <td>${r.employee_id}</td>
+                    <td>${r.name}</td>
+                    <td>${r.date}</td>
+                    <td>${r.checkin_time}</td>
+                    <td>${r.checkout_time}</td>
+                 </tr>`;
+    });
+    html += `</table>`;
+    container.innerHTML = html;
+}
+
+/* -----------------------------
+   Export CSV Function
+------------------------------ */
+function exportCSV() {
+    const table = document.querySelector("#dashboard-table-container table");
+    if (!table) return;
+
+    let csv = [];
+    for (let row of table.rows) {
+        let cols = Array.from(row.cells).map(cell => `"${cell.innerText}"`);
+        csv.push(cols.join(","));
+    }
+
+    const csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
+    const encodedUri = encodeURI(csvContent);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "attendance_dashboard.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+/* -----------------------------
+   Initialize Admin Dashboard
+------------------------------ */
+async function initAdminDashboard() {
+    await loadEmployeeFilter();
+    await loadDashboardData();
+}
+
+// Auto-initialize dashboard on page load
+initAdminDashboard();
+```
+
+### ✅ Key Modifications for Phase 7 after Phase 6 merge:
+
+- No separate /daily, /weekly, /monthly URLs are needed in Phase 7 because this dashboard Lambda already handles summaries and filtering.
+
+- All fetches use CHARLIE.secureFetch — aligns with merged Phase 6 authentication & token handling.
+
+- Added admin access checks using CHARLIE.isAdmin() before fetching data.
+
+- Comments match the style from your central-auth-api.js.
 
 ---
 
