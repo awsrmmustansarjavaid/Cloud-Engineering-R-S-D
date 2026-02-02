@@ -454,8 +454,6 @@ CafeDevWebServer
 [Charile Cafe Mega Bash-Script](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Charile%20Cafe%20Mega%20Bash-Script/charlie-cafe-mega-setup.sh)
 
 
-
-
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
@@ -914,6 +912,53 @@ http:// Your EC2 Public IP/index.php
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+## ☕ AWS CAFE - PHASE 2️⃣ Charlie Cafe Admin Dashboard Page
+> **File Name: cafe-admin-dashboard.html**
+### 1️⃣ Create index.php
+
+```
+sudo nano /var/www/html/cafe-admin-dashboard.html
+```
+
+### 2️⃣ Paste this clean landing page code:
+
+[cafe-admin-dashboard.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 4️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/cafe-admin-dashboard.html
+```
+
+```
+sudo chmod 644 /var/www/html/cafe-admin-dashboard.html
+```
+
+#### 5️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 6️⃣ Open page in browser (MANDATORY)
+
+```
+http:// Your EC2 Public IP/cafe-admin-dashboard.html
+```
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
 
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
