@@ -10,7 +10,7 @@
 
 ---
 
-# ☕ Charlie Café SECTION 2️⃣ - Attendance System
+# ☕ Charlie Café SECTION 1️⃣ - Attendance System
 
 ## ☕ Charlie Café PHASE 1️⃣ — Database Layer (RDS) Configuration
 
