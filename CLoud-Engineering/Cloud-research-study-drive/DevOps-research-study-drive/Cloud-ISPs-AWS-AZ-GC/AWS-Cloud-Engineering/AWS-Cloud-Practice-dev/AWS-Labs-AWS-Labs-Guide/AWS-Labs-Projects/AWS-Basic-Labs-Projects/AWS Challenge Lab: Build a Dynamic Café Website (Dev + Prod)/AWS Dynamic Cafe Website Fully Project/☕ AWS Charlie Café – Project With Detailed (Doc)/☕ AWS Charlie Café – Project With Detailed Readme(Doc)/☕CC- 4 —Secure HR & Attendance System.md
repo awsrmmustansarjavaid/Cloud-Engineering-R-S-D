@@ -2133,6 +2133,24 @@ getToken() → null
 
 ➡️ User is kicked out automatically.
 
+### 🗄️ STEP 3.1 — CREATE DYNAMODB TABLE: CafeAttendance
+
+(ABSOLUTELY NO SKIP VERSION)
+
+#### 🧠 FIRST: What this table is for (very important)
+
+This table will store ONE attendance record per employee per day.
+
+Example record:
+
+```
+Employee ID: 101
+Date:        2026-02-01
+Check-in:    09:03
+Check-out:   17:11
+Role:        Employee
+```
+
 
 
 > **🟢 PHASE 8️⃣ COMPLETE**

@@ -896,9 +896,61 @@ A- dmin dashboard now has employee-wise filtering
 ---
 ## ☕ Charlie Café PHASE 8️⃣ — HR Attendance Dashboard
 
+### ✅ Test 1 — VERIFY TABLE STRUCTURE (VERY IMPORTANT)
 
+- Click your table CafeAttendance
 
+- Go to Overview tab
 
+- Confirm you see:
+
+| Field         | Value                |
+| ------------- | -------------------- |
+| Partition key | employee_id (String) |
+| Sort key      | date (String)        |
+| Status        | Active               |
+
+#### If this matches → ✅ 100% correct
+
+#### ✅ OPTIONAL: TEST MANUAL ITEM (ONLY TO UNDERSTAND)
+
+- Click Explore table items
+
+- Click Create item
+
+- Switch to JSON view
+
+#### Paste:
+
+```
+{
+  "employee_id": "101",
+  "date": "2026-02-01",
+  "check_in": "09:00",
+  "check_out": "17:00",
+  "role": "Employee"
+}
+```
+
+- Click Create item
+
+This confirms table works.
+
+#### 🔁 FINAL CHECKPOINT
+
+Before moving forward, answer YES to all:
+
+✅ Table name is CafeAttendance
+
+✅ Partition key = employee_id (String)
+
+✅ Sort key = date (String)
+
+✅ Region = us-east-1
+
+✅ Table status = Active
+
+If ANY answer is NO, STOP and fix it.
 
 
 

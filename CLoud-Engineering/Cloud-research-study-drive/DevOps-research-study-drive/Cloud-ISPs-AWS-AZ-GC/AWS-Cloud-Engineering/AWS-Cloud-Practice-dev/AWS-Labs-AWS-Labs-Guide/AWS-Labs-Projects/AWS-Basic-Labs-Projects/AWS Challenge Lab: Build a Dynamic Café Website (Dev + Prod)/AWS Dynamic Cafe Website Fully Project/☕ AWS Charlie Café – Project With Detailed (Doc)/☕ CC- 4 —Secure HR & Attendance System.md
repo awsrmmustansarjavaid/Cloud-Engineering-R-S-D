@@ -1431,6 +1431,72 @@ sudo nano /var/www/html/hr-attendance.html
 
     - role
 
+#### TABLE SETTINGS
+
+#### Capacity mode
+
+- Select: On-demand (recommended)
+
+👉 No billing surprises
+
+👉 Best for learning & small projects
+
+#### Table class
+
+- Leave default (Standard)
+
+#### Encryption
+
+- Leave default (AWS owned key)
+
+#### Tags
+
+- Optional → Skip for now
+
+#### CLICK “CREATE TABLE”
+
+- Scroll down
+
+- Click Create table
+
+**⏳ Wait ~10–20 seconds**
+
+Status will change from Creating → Active
+
+#### ✅ Table is now created
+
+#### ✅ DO NOT CREATE “OTHER ATTRIBUTES” MANUALLY ❗❗❗
+
+This is where beginners get confused.
+
+#### ❌ You do NOT add:
+
+- check_in
+
+- check_out
+
+- role
+
+inside table settings.
+
+#### ✅ DynamoDB is schema-less
+
+Attributes are added automatically when Lambda inserts data.
+
+Example item inserted later:
+
+```
+{
+  "employee_id": "101",
+  "date": "2026-02-01",
+  "check_in": "09:03",
+  "check_out": "17:11",
+  "role": "Employee"
+}
+```
+
+
+
 
 
 ### 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
