@@ -1552,64 +1552,9 @@ https://a1053skr51.execute-api.us-east-1.amazonaws.com/status/order-status
 ---
 ## PHASE 6️⃣ — FRONTEND ORDER STATUS PAGE
 
-### 1️⃣ Create File
-
-```
-sudo nano /var/www/html/order-status.html
-```
-
-### 1️⃣ CODE
-
-#### 🚨 IMPORTANT:
-
-#### Replace this line ONLY:
-
-```
-fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
-```
-
-#### With your real API:
-
-```
-fetch("https://abcd1234.execute-api.us-east-1.amazonaws.com/admin/order-status")
-```
-
-#### 1️⃣ Simple order-status.html 
-
 [order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
-#### 2️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-### 2️⃣ SECURITY & PERMISSIONS
-
-✅ 2.1 Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/order-status.html
-```
-```
-sudo chmod 644 /var/www/html/order-status.html
-```
-
-### 3️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-### 4️⃣ Open page in browser
-
-✔ Orders visible
-
-✔ Counts visible
-
-✔ Date/time visible
-
+**⚠️ Just Updated REST API endpoint's URL in code with yours**
 
 **✅ PHASE 6️⃣ STATUS**
 
