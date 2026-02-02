@@ -33,11 +33,9 @@ body {
   position: fixed;
   width: 100%;
   z-index: 1000;
-  /* Add shadow for better UX */
   box-shadow: 0 3px 10px rgba(0,0,0,0.5);
 }
 
-/* Navbar brand icon + style */
 .navbar-brand i {
   margin-right: 8px;
 }
@@ -54,7 +52,7 @@ body {
 }
 
 .sidebar a {
-  display: flex; /* Align icon + text */
+  display: flex;
   align-items: center;
   gap: 10px;
   padding: 14px 24px;
@@ -110,9 +108,9 @@ h3 {
   border: none;
 }
 
-/* Download PDF Button with icon + strong color */
+/* Download PDF Button */
 .btn-success {
-  background: linear-gradient(45deg, #ff5722, #ff9800); /* stronger orange */
+  background: linear-gradient(45deg, #ff5722, #ff9800); /* strong color */
   border: none;
   position: absolute;
   top: 20px;
@@ -158,12 +156,13 @@ h3 {
 
 <body>
 
+<!-- ===================== DASHBOARD CONTAINER ===================== -->
 <div id="dashboard-container">
 
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-dark">
   <div class="container-fluid">
-    <!-- Added cafe icon to brand -->
+    <!-- Added cafe icon -->
     <a class="navbar-brand" href="index.html"><i class="bi bi-cup-fill"></i> Charlie Cafe</a>
   </div>
 </nav>
@@ -176,8 +175,8 @@ h3 {
 
   <hr class="text-secondary">
 
-  <!-- Logout button -->
-  <a class="logout-btn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
+  <!-- Cognito Logout Button -->
+  <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
 </div>
 
 <!-- ===================== MAIN CONTENT ===================== -->
@@ -210,10 +209,11 @@ h3 {
     <canvas id="chart" class="mt-4" height="120"></canvas>
 
     <!-- ===================== PDF ===================== -->
-    <button class="btn btn-success" onclick="downloadPDF()"><i class="bi bi-file-earmark-pdf-fill"></i> Download PDF</button>
+    <button class="btn btn-success" onclick="downloadPDF()">
+      <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
+    </button>
   </div>
 </div>
-
 </div>
 
 <!-- ===================== TOASTS ===================== -->
@@ -241,8 +241,22 @@ h3 {
   </div>
 </div>
 
-<!-- ===================== SCRIPTS ===================== -->
+<!-- ===================== CENTRAL AUTH JS ===================== -->
+<!-- This file handles Cognito login, logout, token storage, and page protection -->
+<script src="central-auth-api.js"></script>
+
 <script>
+/* ===================== PAGE PROTECTION ===================== */
+document.addEventListener("DOMContentLoaded", async () => {
+  // Protect page: redirect to login if no valid token
+  await protectPage();
+
+  // Attach logout to button
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    cognitoLogout(); // From central-auth-api.js
+  });
+});
+
 /* ===================== API CONFIG ===================== */
 const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod";
 const ANALYTICS_API = `${API_BASE_URL}/analytics`;
@@ -306,7 +320,6 @@ function downloadPDF() {
 
 <!-- ===================== BOOTSTRAP JS ===================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="secure-dashboard.js"></script>
 
 </body>
 </html>
