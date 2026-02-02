@@ -2624,3 +2624,565 @@ document.addEventListener("DOMContentLoaded", () => {
 
 ---
 
+### Updated Order-Status.html
+
+> **Update Version : 5.0**
+
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charlie Cafe ☕ | Order Status</title>
+
+    <!-- ================= BOOTSTRAP ================= -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ================= GOOGLE FONT ================= -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+        }
+
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #2b160a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 80px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 24px;
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sidebar a.active {
+            background: #3b1f0e;
+            color: #ff9800;
+            border-left: 4px solid #ff9800;
+        }
+
+        .navbar {
+            background-color: #3b1f0e !important;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding-top: 100px;
+        }
+
+        .status-container {
+            background: rgba(30, 30, 30, 0.75);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1100px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body style="display:none">
+
+<div id="dashboard-container">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <a href="dashboard.html">🏠 Main Dashboard</a>
+    <a href="analytics.html">📈 Analytics</a>
+    <a href="order-status.html" class="active">📦 Order Status</a>
+    <hr class="text-secondary">
+    <a class="logout-btn" style="cursor:pointer">🚪 Logout</a>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main-content">
+    <div class="container">
+        <div class="status-container">
+
+            <h2 class="text-center mb-4">📊 Live Order Status</h2>
+
+            <!-- ================= CSV EXPORT BUTTON ================= -->
+            <div class="d-flex justify-content-end mb-4">
+                <button class="btn btn-success" onclick="exportCSV()">
+                    ⬇ Export CSV
+                </button>
+            </div>
+
+            <!-- ================= METRICS ================= -->
+            <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+            <!-- ================= ORDERS TABLE ================= -->
+            <div class="table-responsive">
+                <table class="table table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Table</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- ================= BOOTSTRAP JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ================= CENTRAL AUTH (REQUIRED) ================= -->
+<script src="/js/central-auth-api.js"></script>
+
+<script>
+/* =========================================================
+   PROTECT PAGE — redirect to login if not authenticated
+   ========================================================= */
+CHARLIE.auth.protectPage();
+
+/* =========================================================
+   LOGOUT HANDLER
+   ========================================================= */
+document.querySelector(".logout-btn").onclick = () => {
+    CHARLIE.auth.logout();
+};
+
+/* =========================================================
+   FETCH DASHBOARD DATA (METRICS + ORDERS)
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+
+    CHARLIE.authFetch(
+        `${CHARLIE.CONFIG.API_BASE}/order-status`
+    )
+    .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch order status");
+        return res.json();
+    })
+    .then(data => {
+
+        const metricsDiv = document.getElementById("metrics");
+        const ordersBody = document.getElementById("orders");
+
+        metricsDiv.innerHTML = "";
+        ordersBody.innerHTML = "";
+
+        // Render metrics cards
+        data.metrics.forEach(m => {
+            metricsDiv.innerHTML += `
+                <div class="col-6 col-md-3">
+                    <div class="card bg-dark text-center p-3">
+                        <h6 class="text-warning">${m.metric}</h6>
+                        <h3>${m.count}</h3>
+                    </div>
+                </div>`;
+        });
+
+        // Render recent orders
+        data.recent_orders.forEach(o => {
+            ordersBody.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || "Anonymous"}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || "-"}</td>
+                    <td>${o.created_at}</td>
+                </tr>`;
+        });
+    })
+    .catch(err => {
+        document.getElementById("orders").innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger">
+                    ⚠️ ${err.message}
+                </td>
+            </tr>`;
+    });
+});
+
+/* =========================================================
+   CSV EXPORT FUNCTION (ADMIN ONLY)
+   ========================================================= */
+function exportCSV() {
+
+    // Build API URL with export flag
+    const url = `${CHARLIE.CONFIG.API_BASE}/order-status?export=true`;
+
+    // Use authenticated fetch (adds Bearer token automatically)
+    CHARLIE.authFetch(url)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("CSV export failed");
+            }
+            return res.blob(); // CSV file comes as a blob
+        })
+        .then(blob => {
+            // Create temporary download link
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "orders.csv";
+
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup
+            document.body.removeChild(link);
+        })
+        .catch(err => {
+            alert("❌ " + err.message);
+            console.error(err);
+        });
+}
+</script>
+
+</body>
+</html>
+```
+
+----
+### Updated Order-Status.html
+
+> **Update Version: 5.1**
+
+Bootstrap fully responsive, background cafe image
+
+Cafe-related icons everywhere (metrics, buttons, sidebar, live order status)
+
+Transparent buttons with matching cafe icons
+
+Sidebar icons updated to match cafe theme
+
+Clear comments throughout for easy modification
+
+```
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charlie Cafe ☕ | Order Status</title>
+
+<!-- ================= BOOTSTRAP ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================= GOOGLE FONT ================= -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- ================= BOOTSTRAP ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* ================= BODY + BACKGROUND ================= */
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)),
+                url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #fff;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: #2b160a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 80px;
+    z-index: 1000;
+}
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    color: #ddd;
+    text-decoration: none;
+    font-weight: 500;
+}
+.sidebar a i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+    color: #ff9800;
+}
+.sidebar a.active {
+    background: #3b1f0e;
+    color: #fff;
+    border-left: 4px solid #ff9800;
+}
+.sidebar a.logout-btn i {
+    color: #ff4d4d;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+    background-color: rgba(59, 31, 14, 0.9) !important;
+    position: fixed;
+    width: 100%;
+    z-index: 1100;
+}
+.navbar .navbar-brand {
+    font-weight: bold;
+    color: #ff9800 !important;
+}
+
+/* ================= MAIN CONTENT ================= */
+.main-content {
+    margin-left: 240px;
+    padding-top: 100px;
+    padding-bottom: 50px;
+}
+
+/* ================= STATUS CONTAINER ================= */
+.status-container {
+    background: rgba(30, 30, 30, 0.85);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* ================= METRICS CARDS ================= */
+.card-metric {
+    background: rgba(59, 31, 14, 0.85);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+.card-metric:hover {
+    transform: scale(1.05);
+}
+.card-metric h6 {
+    color: #ff9800;
+}
+
+/* ================= BUTTONS ================= */
+.btn-transparent {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #ff9800;
+    color: #ff9800;
+    display: flex;
+    align-items: center;
+}
+.btn-transparent i {
+    margin-right: 8px;
+}
+
+/* ================= TABLE ================= */
+.table th, .table td {
+    vertical-align: middle;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 152, 0, 0.2);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:768px){
+    .main-content { margin-left: 0; padding-top: 120px; }
+    .sidebar { width: 100%; height: auto; position: relative; padding-top: 20px;}
+}
+</style>
+</head>
+
+<body style="display:none">
+
+<div id="dashboard-container">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
+    </div>
+</nav>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <a href="dashboard.html"><i class="bi bi-house-door-fill"></i> Main Dashboard</a>
+    <a href="analytics.html"><i class="bi bi-graph-up-arrow"></i> Analytics</a>
+    <a href="order-status.html" class="active"><i class="bi bi-cup-fill"></i> Live Orders</a>
+    <hr class="text-secondary">
+    <a class="logout-btn" style="cursor:pointer"><i class="bi bi-door-open-fill"></i> Logout</a>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main-content">
+    <div class="container">
+        <div class="status-container">
+
+            <h2 class="text-center mb-4"><i class="bi bi-cup-straw"></i> Live Order Status</h2>
+
+            <!-- ================= CSV EXPORT BUTTON ================= -->
+            <div class="d-flex justify-content-end mb-4">
+                <button class="btn btn-transparent" onclick="exportCSV()">
+                    <i class="bi bi-download"></i> Export CSV
+                </button>
+            </div>
+
+            <!-- ================= METRICS ================= -->
+            <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+            <!-- ================= ORDERS TABLE ================= -->
+            <div class="table-responsive">
+                <table class="table table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Table</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- ================= BOOTSTRAP JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ================= CENTRAL AUTH (REQUIRED) ================= -->
+<script src="/js/central-auth-api.js"></script>
+
+<script>
+/* =========================================================
+   PROTECT PAGE — redirect to login if not authenticated
+   ========================================================= */
+CHARLIE.auth.protectPage();
+
+/* =========================================================
+   LOGOUT HANDLER
+   ========================================================= */
+document.querySelector(".logout-btn").onclick = () => {
+    CHARLIE.auth.logout();
+};
+
+/* =========================================================
+   FETCH DASHBOARD DATA (METRICS + ORDERS)
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+
+    CHARLIE.authFetch(`${CHARLIE.CONFIG.API_BASE}/order-status`)
+    .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch order status");
+        return res.json();
+    })
+    .then(data => {
+
+        const metricsDiv = document.getElementById("metrics");
+        const ordersBody = document.getElementById("orders");
+
+        metricsDiv.innerHTML = "";
+        ordersBody.innerHTML = "";
+
+        // Render metrics cards with cafe icon
+        data.metrics.forEach(m => {
+            metricsDiv.innerHTML += `
+                <div class="col-6 col-md-3">
+                    <div class="card-metric">
+                        <i class="bi bi-cup-straw-fill fs-3 mb-2"></i>
+                        <h6>${m.metric}</h6>
+                        <h3>${m.count}</h3>
+                    </div>
+                </div>`;
+        });
+
+        // Render recent orders
+        data.recent_orders.forEach(o => {
+            ordersBody.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || "Anonymous"}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || "-"}</td>
+                    <td>${o.created_at}</td>
+                </tr>`;
+        });
+    })
+    .catch(err => {
+        document.getElementById("orders").innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger">
+                    ⚠️ ${err.message}
+                </td>
+            </tr>`;
+    });
+});
+
+/* =========================================================
+   CSV EXPORT FUNCTION (ADMIN ONLY)
+   ========================================================= */
+function exportCSV() {
+    const url = `${CHARLIE.CONFIG.API_BASE}/order-status?export=true`;
+    CHARLIE.authFetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error("CSV export failed");
+            return res.blob();
+        })
+        .then(blob => {
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "orders.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        })
+        .catch(err => {
+            alert("❌ " + err.message);
+            console.error(err);
+        });
+}
+</script>
+
+</body>
+</html>
+```
+---
+
+
+
+
