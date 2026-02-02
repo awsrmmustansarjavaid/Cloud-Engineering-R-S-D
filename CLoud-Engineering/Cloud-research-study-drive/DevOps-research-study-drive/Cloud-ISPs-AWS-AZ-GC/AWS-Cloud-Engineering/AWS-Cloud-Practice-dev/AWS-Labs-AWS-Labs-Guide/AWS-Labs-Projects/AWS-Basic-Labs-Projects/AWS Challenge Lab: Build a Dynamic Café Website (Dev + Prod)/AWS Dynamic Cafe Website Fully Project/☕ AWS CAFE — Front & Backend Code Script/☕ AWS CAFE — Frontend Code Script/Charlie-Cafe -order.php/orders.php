@@ -145,7 +145,7 @@ body {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="trackorder.php">Track Order</a></li>
+                <li class="nav-item"><a class="nav-link" href="order-status.php">Track Order</a></li>
                 <li class="nav-item"><a class="nav-link" href="cafe-admin-dashboard.html">Price List</a></li>
             </ul>
         </div>
