@@ -1142,7 +1142,15 @@ sudo systemctl restart httpd
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ AWS CAFE - PHASE 7️⃣ order-status.php
+> **File Name: order-status.php **
 
+
+
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+---
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
 
