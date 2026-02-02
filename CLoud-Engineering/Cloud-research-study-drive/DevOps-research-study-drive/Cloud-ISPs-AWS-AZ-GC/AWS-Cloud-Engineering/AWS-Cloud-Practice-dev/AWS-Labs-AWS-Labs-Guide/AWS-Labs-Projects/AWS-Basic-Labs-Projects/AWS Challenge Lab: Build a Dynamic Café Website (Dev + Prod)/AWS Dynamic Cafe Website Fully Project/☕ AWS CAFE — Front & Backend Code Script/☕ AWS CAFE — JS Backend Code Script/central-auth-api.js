@@ -9,6 +9,7 @@
    ✔ Secure API Gateway Calls
    ✔ Orders + HR REST APIs
    ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6) — MERGED SINGLE LAMBDA
+   ✔ ADMIN DASHBOARD ENHANCEMENTS (PHASE 7)
 ========================================================= */
 
 const CHARLIE = (() => {
@@ -50,8 +51,6 @@ const CHARLIE = (() => {
        3️⃣ AUTH MODULE (LOGIN / LOGOUT / PROTECT)
     ===================================================== */
     const auth = {
-
-        /* 🔐 Login using Cognito Hosted UI */
         login(redirectUrl = window.location.href) {
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/login` +
@@ -59,54 +58,41 @@ const CHARLIE = (() => {
                 `&client_id=${CONFIG.CLIENT_ID}` +
                 `&scope=openid+email+profile` +
                 `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
-
             window.location.href = url;
         },
 
-        /* 🔓 Logout from Cognito + browser */
         logout(redirectUrl = window.location.origin) {
             localStorage.removeItem("access_token");
-
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/logout` +
                 `?client_id=${CONFIG.CLIENT_ID}` +
                 `&logout_uri=${encodeURIComponent(redirectUrl)}`;
-
             window.location.href = url;
         },
 
-        /* 🔄 Capture token after login redirect */
         handleRedirect() {
             if (!window.location.hash) return;
-
             const params = new URLSearchParams(window.location.hash.substring(1));
             const token = params.get("access_token");
-
             if (token) {
                 localStorage.setItem("access_token", token);
-                window.location.hash = ""; // clean URL
+                window.location.hash = "";
             }
         },
 
-        /* 🚧 Protect page (auth required) */
         protectPage() {
             this.handleRedirect();
-
             const token = getToken();
             if (!token || isTokenExpired(token)) {
                 this.login();
                 return;
             }
-
-            // Show page only after authentication
             document.body.style.display = "block";
         },
 
-        /* 🔘 Attach logout button */
         setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "index.html") {
             const btn = document.getElementById(buttonId);
             if (!btn) return;
-
             btn.addEventListener("click", () => {
                 this.logout(redirectUrl);
             });
@@ -118,12 +104,10 @@ const CHARLIE = (() => {
     ===================================================== */
     async function authFetch(url, options = {}) {
         const token = getToken();
-
         if (!token || isTokenExpired(token)) {
             auth.logout();
             return;
         }
-
         return fetch(url, {
             ...options,
             headers: {
@@ -176,9 +160,7 @@ const CHARLIE = (() => {
        6️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
     const api = {
-
         /* 🛒 ORDERS */
-
         placeOrder(payload) {
             return fetch(`${CONFIG.API_BASE}/dev/orders`, {
                 method: "POST",
@@ -201,7 +183,6 @@ const CHARLIE = (() => {
         },
 
         /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
-
         recordAttendance(payload) {
             requireEmployee();
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
@@ -218,7 +199,6 @@ const CHARLIE = (() => {
         },
 
         /* 👨‍💼 HR — ADMIN ONLY */
-
         getAllEmployees() {
             requireAdmin();
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
@@ -231,23 +211,39 @@ const CHARLIE = (() => {
            /admin/attendance?type=daily|weekly|monthly
         ================================================= */
         adminAttendance: {
-
-            /* Daily summary */
             getDailySummary() {
                 requireAdmin();
                 return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
             },
-
-            /* Weekly summary */
             getWeeklySummary() {
                 requireAdmin();
                 return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
             },
-
-            /* Monthly summary */
             getMonthlySummary() {
                 requireAdmin();
                 return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
+            }
+        },
+
+        /* =================================================
+           📈 ADMIN DASHBOARD ENHANCEMENTS (PHASE 7)
+           --------------------------------------------------
+           Supports summary cards, employee filter, table, CSV export
+        ================================================= */
+        adminDashboard: {
+
+            /* Fetch dashboard data (optionally filter by employee) */
+            async fetchData(employeeId = "") {
+                requireAdmin();
+                let url = `${CONFIG.API_BASE}/admin/dashboard`;
+                if (employeeId) url += `?employee_id=${employeeId}`;
+                return secureFetch(url);
+            },
+
+            /* Fetch employee list for filter dropdown */
+            async fetchEmployees() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
             }
         }
     };
@@ -286,3 +282,4 @@ const CHARLIE = (() => {
     };
 
 })();
+

@@ -1149,20 +1149,6 @@ You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 </script>
 ```
 
-
-
-
-
-
-```
-sudo nano /var/www/html/attendance_summary
-```
-
-
-
-
-
-
 **✅ PHASE 6️⃣ STATUS**
 
 > **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
@@ -1267,85 +1253,14 @@ We will create one main Lambda that supports filtering and summary cards.
 </div>
 ```
 
-### STEP 5 — Admin Frontend — JS Functions
 
-Add these to your shared script (admin.js or auth-api.js):
+### STEP 5 — UPDATE central-auth-api.js
 
-```
-// Load Employee Filter Options
-async function loadEmployeeFilter() {
-    const employees = await secureFetch(apiBase + "/admin/employees");
-    const select = document.getElementById("employeeFilter");
-    employees.forEach(emp => {
-        const option = document.createElement("option");
-        option.value = emp.employee_id;
-        option.text = emp.name;
-        select.add(option);
-    });
-}
+You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 
-// Load Dashboard Data
-async function loadDashboardData() {
-    const empId = document.getElementById("employeeFilter").value;
-    let url = apiBase + "/admin/dashboard";
-    if (empId) url += "?employee_id=" + empId;
+📄 central-auth-api.js (UPDATED + SAFE)
 
-    const data = await secureFetch(url);
-
-    // Populate summary cards
-    document.getElementById("card-present").innerText = data.summary.total_present;
-    document.getElementById("card-absent").innerText = data.summary.total_absent;
-    document.getElementById("card-leaves").innerText = data.summary.total_leaves;
-
-    // Populate attendance table
-    const container = document.getElementById("dashboard-table-container");
-    let html = `<table class="table table-striped table-bordered">
-                    <tr>
-                        <th>Employee ID</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Check-In</th>
-                        <th>Check-Out</th>
-                    </tr>`;
-    data.attendance.forEach(r => {
-        html += `<tr>
-                    <td>${r.employee_id}</td>
-                    <td>${r.name}</td>
-                    <td>${r.date}</td>
-                    <td>${r.checkin_time}</td>
-                    <td>${r.checkout_time}</td>
-                 </tr>`;
-    });
-    html += `</table>`;
-    container.innerHTML = html;
-}
-
-// Export CSV Function
-function exportCSV() {
-    const table = document.querySelector("#dashboard-table-container table");
-    let csv = [];
-    for (let row of table.rows) {
-        let cols = Array.from(row.cells).map(cell => '"' + cell.innerText + '"');
-        csv.push(cols.join(","));
-    }
-    const csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "attendance_dashboard.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Initialize dashboard
-async function initAdminDashboard() {
-    await loadEmployeeFilter();
-    await loadDashboardData();
-}
-
-initAdminDashboard();
-```
+[central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
 #### ✅ What this JS does:
 
