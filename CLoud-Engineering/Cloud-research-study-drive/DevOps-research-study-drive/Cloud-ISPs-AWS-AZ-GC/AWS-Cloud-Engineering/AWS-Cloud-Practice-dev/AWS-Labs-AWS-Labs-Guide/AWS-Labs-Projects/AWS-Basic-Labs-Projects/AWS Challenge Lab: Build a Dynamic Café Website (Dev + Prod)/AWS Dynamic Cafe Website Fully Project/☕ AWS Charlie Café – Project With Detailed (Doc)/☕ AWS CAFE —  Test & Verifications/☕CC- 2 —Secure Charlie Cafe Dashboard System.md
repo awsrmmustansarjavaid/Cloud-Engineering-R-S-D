@@ -175,5 +175,52 @@ http://ALB-DNS-NAME/cafe-admin-dashboard.html
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 3️⃣ — Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
+> **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
+### 🟢 STEP 2️⃣ — TEST HOSTED UI LOGIN (VERY IMPORTANT)
+
+#### 1️⃣ Login Page Configuration Tab:
+
+```
+Cognito → User pools → Your user pool → App clients → Your App → Login pages  
+```
+
+#### 2️⃣ Construct LOGIN URL:
+
+```
+https://YOUR_COGNITO_DOMAIN/login
+?client_id=CLIENT_ID
+&response_type=token
+&scope=openid+email+profile
+&redirect_uri=https://cloudfront/cafe-admin-dashboard.html
+```
+
+#### Example:
+
+```
+https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
+```
+
+#### 3️⃣ Test
+
+- Open it in browser.
+
+#### 4️⃣ Login with:
+
+- Username: admin
+
+- Temporary password
+
+- Set new password
+
+#### ✅ EXPECTED RESULT
+
+After login, browser redirects to:
+
+```
+https://cloudfront/cafe-admin-dashboard.html#id_token=xxxxx&access_token=xxxxx
+```
+
+🎉 THIS MEANS SUCCESS
 
