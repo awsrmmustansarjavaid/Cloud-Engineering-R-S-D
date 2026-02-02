@@ -1122,7 +1122,32 @@ You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 
 [central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
+🟢 STEP 5 — ADMIN DASHBOARD (FRONTEND)
 
+HTML Buttons (NO CHANGE)
+
+```
+<button onclick="load('daily')">Daily</button>
+<button onclick="load('weekly')">Weekly</button>
+<button onclick="load('monthly')">Monthly</button>
+
+<div id="summary-result"></div>
+```
+
+JS Usage
+
+```
+<script src="js/central-auth-api.js"></script>
+<script>
+  CHARLIE.auth.protectPage();
+  CHARLIE.auth.setupLogoutButton();
+
+  async function load(type) {
+    const data = await CHARLIE.loadAttendanceSummary(type);
+    displaySummary(data.attendance);
+  }
+</script>
+```
 
 
 
