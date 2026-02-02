@@ -1495,6 +1495,12 @@ Example item inserted later:
 }
 ```
 
+#### 2️⃣ Lambda: GetAttendanceAdminLambda
+
+📍 Purpose: HR/Admin can view attendance records
+
+[GetAttendanceAdminLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
 
 
 
