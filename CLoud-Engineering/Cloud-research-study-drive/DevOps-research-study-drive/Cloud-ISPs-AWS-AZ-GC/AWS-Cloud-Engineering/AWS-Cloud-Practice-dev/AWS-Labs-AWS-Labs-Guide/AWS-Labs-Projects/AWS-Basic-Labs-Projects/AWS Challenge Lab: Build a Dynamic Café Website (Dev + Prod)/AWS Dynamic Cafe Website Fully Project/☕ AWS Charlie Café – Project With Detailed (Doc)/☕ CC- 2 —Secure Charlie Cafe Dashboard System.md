@@ -2765,4 +2765,124 @@ https://<your-cognito-domain>/logout
 
 
 ---
+### 3️⃣ AUTO LOGOUT ON TOKEN EXPIRY (IMPORTANT)
 
+Add this ONCE in admin-dashboard.js:
+
+```
+// ⏱ Auto logout every 30 seconds if token expired
+setInterval(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        if (payload.exp * 1000 < Date.now()) {
+            alert("🔐 Session expired");
+            CHARLIE.auth.logout();
+        }
+    } catch {
+        CHARLIE.auth.logout();
+    }
+}, 30000);
+```
+
+### 4️⃣ ORDERS + CSV EXPORT
+
+```
+async function loadOrders() {
+    const data = await CHARLIE.api.adminDashboard.fetchData();
+    renderOrdersTable(data.orders || []);
+}
+
+function renderOrdersTable(orders) {
+    let html = `<table class="table table-dark">
+        <tr><th>ID</th><th>Status</th><th>Total</th></tr>`;
+
+    orders.forEach(o => {
+        html += `<tr>
+            <td>${o.order_id}</td>
+            <td>${o.status}</td>
+            <td>${o.total}</td>
+        </tr>`;
+    });
+
+    html += `</table>`;
+    document.getElementById("ordersTable").innerHTML = html;
+}
+
+function exportOrdersCSV() {
+    const rows = document.querySelectorAll("#ordersTable tr");
+    let csv = [];
+
+    rows.forEach(row => {
+        const cols = row.querySelectorAll("td, th");
+        csv.push([...cols].map(c => `"${c.innerText}"`).join(","));
+    });
+
+    const blob = new Blob([csv.join("\n")], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "orders.csv";
+    a.click();
+}
+```
+
+### 5️⃣ HR — EMPLOYEE LIST (ADMIN)
+
+```
+async function loadEmployees() {
+    const employees = await CHARLIE.api.getAllEmployees();
+    let html = "<ul class='list-group'>";
+
+    employees.forEach(e => {
+        html += `<li class="list-group-item bg-dark text-light">
+            ${e.name} (${e.role})
+        </li>`;
+    });
+
+    html += "</ul>";
+    document.getElementById("employeeList").innerHTML = html;
+}
+```
+
+### 6️⃣ STAFF — OWN ATTENDANCE
+
+```
+async function loadMyAttendance() {
+    const user = CHARLIE.getUserRoles(); // or sub from token
+    const data = await CHARLIE.api.getAttendance("me");
+
+    let html = "<ul>";
+    data.forEach(a => {
+        html += `<li>${a.date} — ${a.check_in} → ${a.check_out}</li>`;
+    });
+    html += "</ul>";
+
+    document.getElementById("myAttendance").innerHTML = html;
+}
+```
+
+### 7️⃣ ANALYTICS + CHARTS (ADMIN ONLY)
+
+```
+async function loadAnalytics() {
+    CHARLIE.requireAdmin();
+
+    const data = await CHARLIE.api.adminAttendance.getMonthlySummary();
+
+    const ctx = document.getElementById("attendanceChart");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: "Attendance",
+                data: data.values
+            }]
+        }
+    });
+}
+```
+
+---
