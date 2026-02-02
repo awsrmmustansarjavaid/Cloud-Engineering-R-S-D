@@ -4175,3 +4175,39 @@ async function payWithCash() {
 </body>
 </html>
 ```
+
+### ✅ What’s New / Upgraded
+
+#### Navbar added
+
+- Left: Logo (☕ Charlie Cafe)
+
+- Right: Home / Track Order / Price List (redirects to admin dashboard)
+
+- Fully responsive
+
+#### Background image + responsive design
+
+- Add your images/cafe-background.jpg in project folder
+
+- Covers full viewport
+
+- Works on mobile
+
+#### Form icons
+
+- Added Bootstrap Icons for table, person, item, quantity
+
+- Makes UI visually appealing
+
+#### Bootstrap + Responsive
+
+- Everything now uses Bootstrap grid & utilities
+
+- Card and container adapt to mobile
+
+#### Comments
+
+- Clear inline comments for navbar, form, payment, receipt
+
+---
