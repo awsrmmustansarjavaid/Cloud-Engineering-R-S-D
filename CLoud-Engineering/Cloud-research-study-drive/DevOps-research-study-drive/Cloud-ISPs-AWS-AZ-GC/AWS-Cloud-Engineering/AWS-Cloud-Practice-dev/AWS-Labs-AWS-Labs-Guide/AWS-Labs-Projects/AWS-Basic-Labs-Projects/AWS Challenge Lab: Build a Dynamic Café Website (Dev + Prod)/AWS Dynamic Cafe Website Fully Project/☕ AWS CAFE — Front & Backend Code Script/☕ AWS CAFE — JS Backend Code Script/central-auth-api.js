@@ -8,12 +8,13 @@
    ✔ Role-Based Access (Admin / Employee)
    ✔ Secure API Gateway Calls
    ✔ Orders + HR REST APIs
+   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6)
 ========================================================= */
 
 const CHARLIE = (() => {
 
     /* =====================================================
-       1️⃣ GLOBAL CONFIG (CHANGE ONLY IF REQUIRED)
+       1️⃣ GLOBAL CONFIG
     ===================================================== */
     const CONFIG = {
         REGION: "us-east-1",
@@ -23,7 +24,7 @@ const CHARLIE = (() => {
         CLIENT_ID: "3a4uchovr497k8v3gl52e2j5d8",
         COGNITO_DOMAIN: "us-east-1wxssmoiqi.auth.us-east-1.amazoncognito.com",
 
-        // API Gateway Base URL
+        // API Gateway
         API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
 
         // CloudFront (Static Assets)
@@ -32,9 +33,6 @@ const CHARLIE = (() => {
 
     /* =====================================================
        2️⃣ TOKEN HELPERS
-       - Decode JWT
-       - Check expiry
-       - Get token from browser
     ===================================================== */
     function parseJwt(token) {
         return JSON.parse(atob(token.split(".")[1]));
@@ -49,11 +47,11 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       3️⃣ AUTH MODULE (LOGIN / LOGOUT / PROTECT PAGE)
+       3️⃣ AUTH MODULE (LOGIN / LOGOUT / PROTECT)
     ===================================================== */
     const auth = {
 
-        /* 🔐 Redirect user to Cognito Login */
+        /* 🔐 Login using Cognito Hosted UI */
         login(redirectUrl = window.location.href) {
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/login` +
@@ -65,7 +63,7 @@ const CHARLIE = (() => {
             window.location.href = url;
         },
 
-        /* 🔓 Logout user from Cognito + browser */
+        /* 🔓 Logout from Cognito + browser */
         logout(redirectUrl = window.location.origin) {
             localStorage.removeItem("access_token");
 
@@ -77,7 +75,7 @@ const CHARLIE = (() => {
             window.location.href = url;
         },
 
-        /* 🔄 Handle Cognito redirect after login */
+        /* 🔄 Capture token after login redirect */
         handleRedirect() {
             if (!window.location.hash) return;
 
@@ -86,11 +84,11 @@ const CHARLIE = (() => {
 
             if (token) {
                 localStorage.setItem("access_token", token);
-                window.location.hash = ""; // Clean URL
+                window.location.hash = ""; // clean URL
             }
         },
 
-        /* 🚧 Protect page (LOGIN REQUIRED) */
+        /* 🚧 Protect page (auth required) */
         protectPage() {
             this.handleRedirect();
 
@@ -100,7 +98,7 @@ const CHARLIE = (() => {
                 return;
             }
 
-            // Show page only after auth success
+            // Show page only after authentication
             document.body.style.display = "block";
         },
 
@@ -116,7 +114,7 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       4️⃣ SECURE FETCH (AUTO TOKEN ATTACH)
+       4️⃣ SECURE FETCH (JWT AUTO ATTACH)
     ===================================================== */
     async function authFetch(url, options = {}) {
         const token = getToken();
@@ -175,11 +173,11 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       6️⃣ API GATEWAY ENDPOINTS (ORDERS + HR)
+       6️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
     const api = {
 
-        /* 🛒 ORDERS (PUBLIC / MIXED) */
+        /* 🛒 ORDERS */
 
         placeOrder(payload) {
             return fetch(`${CONFIG.API_BASE}/dev/orders`, {
@@ -195,49 +193,10 @@ const CHARLIE = (() => {
             ).then(res => res.json());
         },
 
-        cashPayment(orderId) {
-            return fetch(`${CONFIG.API_BASE}/dev/orders/cash-payment`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ order_id: orderId })
-            }).then(res => res.json());
-        },
-
         updateOrder(payload) {
             return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
                 method: "POST",
                 body: JSON.stringify(payload)
-            });
-        },
-
-        /* 👨‍💼 HR — ADMIN ONLY */
-
-        getAllEmployees() {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
-        },
-
-        addEmployee(payload) {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employee/add`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-        },
-
-        updateEmployee(payload) {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employee/update`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-        },
-
-        deleteEmployee(employeeId) {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employee/delete`, {
-                method: "POST",
-                body: JSON.stringify({ employee_id: employeeId })
             });
         },
 
@@ -256,33 +215,39 @@ const CHARLIE = (() => {
             return secureFetch(
                 `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
             );
+        },
+
+        /* 👨‍💼 HR — ADMIN ONLY */
+
+        getAllEmployees() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+        },
+
+        /* =================================================
+           📊 ADMIN ATTENDANCE ANALYTICS (PHASE 6)
+        ================================================= */
+        adminAttendance: {
+
+            getDailySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/prod/admin/attendance/daily`);
+            },
+
+            getWeeklySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/prod/admin/attendance/weekly`);
+            },
+
+            getMonthlySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/prod/admin/attendance/monthly`);
+            }
         }
     };
 
     /* =====================================================
-       7️⃣ GLOBAL PAGE INITIALIZER (NO CONFUSION ⭐)
-       - Protect page
-       - Attach logout button
-       - ONE LINE PER PAGE
-    ===================================================== */
-    function initProtectedPage(options = {}) {
-        const {
-            requireAuth = true,
-            enableLogout = true,
-            logoutButtonId = "logoutBtn"
-        } = options;
-
-        if (requireAuth) {
-            auth.protectPage();
-        }
-
-        if (enableLogout) {
-            auth.setupLogoutButton(logoutButtonId);
-        }
-    }
-
-    /* =====================================================
-       8️⃣ CLOUDFRONT ASSETS
+       7️⃣ CLOUDFRONT ASSETS
     ===================================================== */
     const assets = {
         url(path) {
@@ -291,7 +256,15 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       9️⃣ EXPORT (PUBLIC API)
+       8️⃣ PAGE INITIALIZER (ONE LINE PER PAGE)
+    ===================================================== */
+    function initProtectedPage() {
+        auth.protectPage();
+        auth.setupLogoutButton();
+    }
+
+    /* =====================================================
+       9️⃣ EXPORT (PUBLIC API) ✅ FIXED
     ===================================================== */
     return {
         CONFIG,
