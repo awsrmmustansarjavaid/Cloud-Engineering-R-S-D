@@ -107,8 +107,6 @@ Foreign key ensures valid employee
 
 #### 3️⃣ Create leaves Table
 
-
-
 ```
 CREATE TABLE leaves (
     leave_id INT AUTO_INCREMENT PRIMARY KEY,
