@@ -292,41 +292,7 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 
 ## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
 
-### 1️⃣ FRONTEND AUTH FOUNDATION (REUSABLE)
-
-#### 1️⃣ Create the shared central-auth.js (IMPORTANT)
-> **This file will be reused across all pages.**
-
-- 📍 Place this in /js/central-auth.js
-
-#### Command to create the js directory
-
-```
-sudo mkdir -p /var/www/html/js
-```
-
-```
-sudo nano /var/www/html/js/central-auth-api.js
-```
-
-[central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
-
-#### ⚠️ Use * to apply it to all files (all extensions) in the directory:
-
-```
-sudo chown apache:apache /var/www/html/js/*
-```
-```
-sudo chmod 644 /var/www/html/js/*
-```
-
-#### Double-check file path
-
-```
-ls -lh /var/www/html/js/central-auth-api.js
-```
-
-### 2️⃣ FRONTEND Web Pages
+### 1️⃣ FRONTEND Web Pages
 
 #### 1️⃣ Create orders.php
 
