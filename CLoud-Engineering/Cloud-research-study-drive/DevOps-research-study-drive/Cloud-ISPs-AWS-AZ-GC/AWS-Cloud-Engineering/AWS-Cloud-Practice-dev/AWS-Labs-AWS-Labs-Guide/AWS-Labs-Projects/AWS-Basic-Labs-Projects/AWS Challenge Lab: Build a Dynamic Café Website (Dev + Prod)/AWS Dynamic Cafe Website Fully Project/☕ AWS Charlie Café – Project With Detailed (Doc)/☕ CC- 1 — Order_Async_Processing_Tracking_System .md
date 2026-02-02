@@ -2709,11 +2709,9 @@ Your existing Order Status API must return:
 
 #### ✅ FULL UPDATED FILE (WITH COMMENTS)
 
-```
-sudo nano payment-status.php
-```
-
 [payment-status.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+**🔁 Replace with your real API Gateway URL**
 
 ```
 sudo systemctl restart httpd
@@ -2729,7 +2727,6 @@ sudo systemctl restart httpd
 ### 🟦 STEP 1 — REDIRECT FROM order.php (CARD + CASH)
 
 #### 🔁 1️⃣ Change destination page (VERY IMPORTANT)
-
 
 ### ✅ FINAL payment-status.php (CLEAN + PRINT REDIRECT)
 

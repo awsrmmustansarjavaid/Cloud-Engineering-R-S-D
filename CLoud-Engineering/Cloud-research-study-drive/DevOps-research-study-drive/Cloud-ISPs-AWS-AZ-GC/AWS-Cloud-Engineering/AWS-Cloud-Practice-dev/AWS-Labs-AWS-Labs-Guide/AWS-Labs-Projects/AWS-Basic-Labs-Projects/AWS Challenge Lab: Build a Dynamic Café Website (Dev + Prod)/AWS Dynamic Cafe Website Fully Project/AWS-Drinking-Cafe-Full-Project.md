@@ -1155,11 +1155,30 @@ sudo nano admin-orders.php
 sudo systemctl restart httpd
 ```
 
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+---
+## ☕ AWS CAFE - PHASE 7️⃣ payment-status.php
+
+```
+sudo nano payment-status.php
+```
+
+[payment-status.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+```
+sudo systemctl restart httpd
+```
 
 **✅ PHASE 7️⃣ STATUS**
 
 > **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 ---
+
+
+
+
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
 
