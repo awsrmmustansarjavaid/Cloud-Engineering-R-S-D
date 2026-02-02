@@ -2706,13 +2706,13 @@ But ❌ you never attached it to Cognito logout.
 
 ### ✅ THE FIX (this is all you need)
 
-### 1️⃣ Keep the button 
+### 1️⃣ Keep the button (Already Added)
 
 ```
 <button class="btn btn-warning btn-sm w-100" id="logoutBtn">🔒 Logout</button>
 ```
 
-### 2️⃣ Add this JS AFTER central-auth-api.js
+### 2️⃣ Add this JS AFTER central-auth-api.js (Already Added)
 
 Replace this part in admin-dashboard.html:
 
@@ -2725,7 +2725,7 @@ CHARLIE.auth.setupLogoutButton();    // logout button
 
 It binds the button to Cognito sign-out.
 
-### 3️⃣ (Optional but recommended) Explicit redirect
+### 3️⃣ (Optional but recommended) Explicit redirect (Already Added)
 
 If you want logout → index.html instead of homepage:
 
