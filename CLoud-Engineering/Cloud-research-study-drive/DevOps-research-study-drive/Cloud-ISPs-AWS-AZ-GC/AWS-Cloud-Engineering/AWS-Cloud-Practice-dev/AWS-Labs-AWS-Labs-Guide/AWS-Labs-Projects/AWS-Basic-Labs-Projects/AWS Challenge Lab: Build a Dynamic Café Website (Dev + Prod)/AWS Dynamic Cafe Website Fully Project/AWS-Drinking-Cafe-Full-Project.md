@@ -845,7 +845,7 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 ---`
 ## 📢 SECTION 4️⃣ CAFE FRONTEND CONFIGURATIONS
 
-## ☕ AWS CAFE - PHASE 1️⃣ HOME PAGE (index.php)
+## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND AUTH FOUNDATION (REUSABLE)
 
 #### 1️⃣ Create the shared central-auth.js (IMPORTANT)
 > **This file will be reused across all pages.**
@@ -884,8 +884,8 @@ ls -lh /var/www/html/js/central-auth-api.js
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND AUTH FOUNDATION (REUSABLE)
-
+## ☕ AWS CAFE - PHASE 2️⃣ HOME PAGE (index.php)
+> **File Name: index.php**
 
 
 ### 1️⃣ Create index.php
@@ -949,12 +949,12 @@ sudo systemctl restart httpd
 http:// Your EC2 Public IP/index.php
 ```
 
-**✅ PHASE 1️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
 
-## ☕ AWS CAFE - PHASE 2️⃣ Charlie Cafe Admin Dashboard Page
+## ☕ AWS CAFE - PHASE 3️⃣ Charlie Cafe Admin Dashboard Page
 > **File Name: cafe-admin-dashboard.html**
 ### 1️⃣ Create index.php
 
@@ -995,9 +995,55 @@ sudo systemctl restart httpd
 http:// Your EC2 Public IP/cafe-admin-dashboard.html
 ```
 
-**✅ PHASE 1️⃣ STATUS**
+**✅ PHASE 3️⃣ STATUS**
 
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## ☕ AWS CAFE - PHASE 4️⃣ orders.php
+> **File Name: index.php**
+
+##  Modify orders.php (Automation)
+
+* Remove direct DB insert
+* Send POST JSON to API Gateway
+
+## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
+
+### 1️⃣ Create orders.php
+
+```
+sudo nano /var/www/html/orders.php
+```
+#### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+
+[orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 4️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/orders.php
+```
+
+```
+sudo chmod 644 /var/www/html/orders.php
+```
+
+### 3️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅

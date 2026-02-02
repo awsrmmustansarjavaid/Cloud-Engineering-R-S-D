@@ -285,59 +285,11 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
 
 ## PHASE 5️⃣ — Frontend Development Code
 
-##  Modify orders.php (Automation)
-
-* Remove direct DB insert
-* Send POST JSON to API Gateway
-
-## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
-
-### 1️⃣ FRONTEND Web Pages
-
-#### 1️⃣ Create orders.php
-
-```
-sudo nano /var/www/html/orders.php
-```
-#### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
 [orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
 
-#### 2️⃣ ADMIN DASHBOARD (ADMIN ONLY)
-> **📄 File: dashboard.html**
-
-#### 1️⃣ Create dashboard.html
-
-```
-sudo nano /var/www/html/dashboard.html
-```
-
-#### 2️⃣ Paste Code
-
-[dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-admin%20dashboard%20page/dashboard.html)
-
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/dashboard.html
-```
-
-```
-sudo chmod 644 /var/www/html/dashboard.html
-```
-
-### 3️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
+**⚠️ Just Update REST API Endpoint's URL with yours**
 
 **✅ PHASE 5️⃣ STATUS**
 
