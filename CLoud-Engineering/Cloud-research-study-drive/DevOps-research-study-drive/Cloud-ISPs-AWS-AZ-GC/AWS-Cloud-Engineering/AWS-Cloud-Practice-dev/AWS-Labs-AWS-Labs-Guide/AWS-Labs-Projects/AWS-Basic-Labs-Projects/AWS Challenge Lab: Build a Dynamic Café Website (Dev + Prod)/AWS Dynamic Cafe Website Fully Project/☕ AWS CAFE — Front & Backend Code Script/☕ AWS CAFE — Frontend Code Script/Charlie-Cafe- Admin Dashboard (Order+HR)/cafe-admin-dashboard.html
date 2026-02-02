@@ -17,15 +17,14 @@
      - HR Dashboard styles → admin-dashboard.html
 ===================================================== -->
 <style>
-/* ===== COMMON ===== */
 body {
     background-color: #0f0f10;
     color: #fff;
     font-family: 'Segoe UI', sans-serif;
-    display: none; /* 🔐 hidden until auth */
+    display: none; /* 🔐 hidden until Cognito auth passes */
 }
 
-/* ===== SIDEBAR (MERGED & UNIFIED) ===== */
+/* ===== SIDEBAR (MERGED) ===== */
 .sidebar {
     width: 250px;
     background: #151515;
@@ -54,7 +53,7 @@ body {
     padding: 25px;
 }
 
-/* ===== KPI CARDS (FROM ORDER DASHBOARD) ===== */
+/* ===== KPI CARDS (FROM dashboard.html) ===== */
 .kpi-card {
     border-radius: 20px;
     padding: 20px;
@@ -65,7 +64,7 @@ body {
 .bg-blue { background: #3498db; }
 .bg-orange { background: #e67e22; }
 
-/* ===== TABLE CONTAINER ===== */
+/* ===== TABLE ===== */
 .table-container {
     margin-top: 30px;
     background: #1c1c1e;
@@ -73,7 +72,7 @@ body {
     padding: 20px;
 }
 
-/* ===== SECTIONS ===== */
+/* ===== SECTION TOGGLING ===== */
 .section { display: none; }
 .section.active { display: block; }
 </style>
@@ -82,25 +81,29 @@ body {
 <body>
 
 <!-- =====================================================
-     SIDEBAR (MERGED)
-     - Navigation controls which section is visible
+     SIDEBAR
+     SOURCE: MERGED (dashboard.html + admin-dashboard.html)
 ===================================================== -->
 <div class="sidebar">
     <h4>☕ Charlie Café</h4>
     <p class="text-muted">Admin Dashboard</p>
 
-    <!-- From dashboard.html -->
-    <a class="active" onclick="showSection('orders')">
+    <!-- Orders Dashboard -->
+    <a class="active" onclick="showSection(event,'orders')">
         <i class="bi bi-bag-check"></i> Orders
     </a>
 
-    <!-- From admin-dashboard.html -->
-    <a onclick="showSection('hr')">
+    <!-- HR Dashboard -->
+    <a onclick="showSection(event,'hr')">
         <i class="bi bi-people"></i> HR / Attendance
     </a>
 
     <hr>
-    <a id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</a>
+
+    <!-- 🔐 WORKING Cognito Logout -->
+    <a id="logoutBtn">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
 </div>
 
 <!-- =====================================================
@@ -109,7 +112,7 @@ body {
 <div class="main">
 
 <!-- =====================================================
-     🛒 ORDERS DASHBOARD SECTION
+     🛒 ORDERS DASHBOARD
      SOURCE: dashboard.html
 ===================================================== -->
 <div id="orders" class="section active">
@@ -140,11 +143,10 @@ body {
             <tbody id="ordersTable"></tbody>
         </table>
     </div>
-
 </div>
 
 <!-- =====================================================
-     👥 HR / ATTENDANCE DASHBOARD SECTION
+     👥 HR / ATTENDANCE DASHBOARD
      SOURCE: admin-dashboard.html
 ===================================================== -->
 <div id="hr" class="section">
@@ -156,19 +158,19 @@ body {
         <div class="col-md-4">
             <div class="card bg-success text-white p-3">
                 <h6>Total Present</h6>
-                <h3 id="card-present">0</h3>
+                <h3 id="cardPresent">0</h3>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card bg-danger text-white p-3">
                 <h6>Total Absent</h6>
-                <h3 id="card-absent">0</h3>
+                <h3 id="cardAbsent">0</h3>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card bg-warning text-dark p-3">
                 <h6>Total Leaves</h6>
-                <h3 id="card-leaves">0</h3>
+                <h3 id="cardLeaves">0</h3>
             </div>
         </div>
     </div>
@@ -190,34 +192,34 @@ body {
                 <th>Check-Out</th>
             </tr>
         </thead>
-        <tbody id="attendance-body"></tbody>
+        <tbody id="attendanceBody"></tbody>
     </table>
-
 </div>
 
 </div>
 
 <!-- =====================================================
-     CENTRAL AUTH & API (MANDATORY)
+     CENTRAL AUTH (MANDATORY)
 ===================================================== -->
 <script src="js/central-auth-api.js"></script>
 
 <script>
 /* =====================================================
-   🔐 AUTH GUARD (COMMON)
+   🔐 AUTH GUARD + LOGOUT (Cognito)
 ===================================================== */
-CHARLIE.auth.protectPage();
-CHARLIE.auth.setupLogoutButton();
+CHARLIE.auth.protectPage();                 // login required
+CHARLIE.auth.setupLogoutButton("logoutBtn","index.html"); // ✔ WORKING SIGN-OUT
 document.body.style.display = "block";
 
 /* =====================================================
-   🧭 SECTION NAVIGATION
+   🧭 SECTION SWITCHING
 ===================================================== */
-function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    event.target.classList.add('active');
+function showSection(e, id) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+    e.currentTarget.classList.add("active");
 }
 
 /* =====================================================
@@ -227,21 +229,24 @@ function showSection(id) {
 async function loadOrdersDashboard() {
     const data = await CHARLIE.api.getDashboardMetrics("today");
 
-    sales.innerText = `$${data.sales}`;
-    ordersCount.innerText = data.orders;
-    drinksCount.innerText = data.drinks;
-    avgPrice.innerText = `$${data.avg}`;
+    document.getElementById("sales").innerText = `$${data.sales}`;
+    document.getElementById("ordersCount").innerText = data.orders;
+    document.getElementById("drinksCount").innerText = data.drinks;
+    document.getElementById("avgPrice").innerText = `$${data.avg}`;
 
-    ordersTable.innerHTML = "";
+    const table = document.getElementById("ordersTable");
+    table.innerHTML = "";
+
     data.latest_orders.forEach(o => {
-        ordersTable.innerHTML += `
+        table.innerHTML += `
             <tr>
                 <td>${o.customer_name || "Anonymous"}</td>
                 <td>${o.item}</td>
                 <td>${o.quantity}</td>
                 <td>${o.table_number || "-"}</td>
                 <td>${o.date}</td>
-            </tr>`;
+            </tr>
+        `;
     });
 }
 
@@ -250,23 +255,24 @@ async function loadOrdersDashboard() {
    SOURCE: admin-dashboard.html
 ===================================================== */
 async function loadSummary(type) {
-    const data = await CHARLIE.secureFetch(
-        `${CHARLIE.apiBase}/admin/attendance?type=${type}`
-    );
+    const data = await CHARLIE.api.adminAttendance[`get${type.charAt(0).toUpperCase()+type.slice(1)}Summary`]();
 
-    card-present.textContent = data.summary.total_present;
-    card-absent.textContent = data.summary.total_absent;
-    card-leaves.textContent = data.summary.total_leaves;
+    document.getElementById("cardPresent").innerText = data.summary.total_present;
+    document.getElementById("cardAbsent").innerText = data.summary.total_absent;
+    document.getElementById("cardLeaves").innerText = data.summary.total_leaves;
 
-    attendance-body.innerHTML = "";
+    const tbody = document.getElementById("attendanceBody");
+    tbody.innerHTML = "";
+
     data.attendance.forEach(r => {
-        attendance-body.innerHTML += `
+        tbody.innerHTML += `
             <tr>
                 <td>${r.name}</td>
                 <td>${r.date}</td>
                 <td>${r.checkin_time || "-"}</td>
                 <td>${r.checkout_time || "-"}</td>
-            </tr>`;
+            </tr>
+        `;
     });
 }
 
