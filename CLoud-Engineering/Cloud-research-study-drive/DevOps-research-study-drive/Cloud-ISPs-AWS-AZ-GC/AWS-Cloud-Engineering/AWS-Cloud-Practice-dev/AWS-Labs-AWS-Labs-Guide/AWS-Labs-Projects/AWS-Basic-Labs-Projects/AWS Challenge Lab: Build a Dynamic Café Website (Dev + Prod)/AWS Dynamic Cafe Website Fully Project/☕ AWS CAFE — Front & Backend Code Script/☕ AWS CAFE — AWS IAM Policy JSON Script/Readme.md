@@ -339,6 +339,15 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 
 ---
 
+### ✅ Updated charlie-cafe-iam-policy
+
+> **Update Version 1.2**
+
+
+
+```
+
+```
 
 
 
