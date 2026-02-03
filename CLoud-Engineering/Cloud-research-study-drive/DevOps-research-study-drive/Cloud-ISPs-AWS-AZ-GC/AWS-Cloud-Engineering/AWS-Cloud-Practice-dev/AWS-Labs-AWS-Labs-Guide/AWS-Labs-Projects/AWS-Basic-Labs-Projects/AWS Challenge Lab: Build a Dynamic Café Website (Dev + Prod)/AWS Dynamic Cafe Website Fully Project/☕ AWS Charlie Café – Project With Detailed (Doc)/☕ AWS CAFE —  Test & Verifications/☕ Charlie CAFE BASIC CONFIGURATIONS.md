@@ -586,15 +586,9 @@ Perfect, this is a serious lab-grade requirement, so I’ll give you a clean, sa
 
 ✔ CSV export (machine-readable summary)
 
-✔ PDF report (human-readable audit report)
-
-✔ PDF report (human-readable audit report)
-
-✔ Auto-skips PDF if tool missing
-
 ✔ Fully commented
 
-✔ Uploads TXT + CSV + PDF to S3
+✔ Uploads TXT + CSV to S3
 
 ### 📄 File Name: charlie_cafe_lab_verify.sh
 
@@ -606,25 +600,17 @@ Perfect, this is a serious lab-grade requirement, so I’ll give you a clean, sa
 
 #### S3 folder: Charlie Cafe Test and Verification/
 
-### 1️⃣ NEW DEPENDENCY (only for PDF)
-
-```
-sudo dnf install -y pandoc
-```
-
-**⚠️ (If you don’t install it, PDF step will auto-skip)**
-
-### 2️⃣ Create a file
+### 1️⃣ Create a file
 
 ```
 sudo nano charlie_cafe_lab_test_verify.sh
 ```
 
-### 3️⃣ Paset Script
+### 2️⃣ Paset Script
 
 [Charlie Cafe Lab Basic Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_lab_test_verify.sh)
 
-### 4️⃣ How to Run
+### 3️⃣ How to Run
 
 ```
 sudo chmod +x charlie_cafe_lab_test_verify.sh
