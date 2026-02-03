@@ -347,7 +347,46 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 
 - IAM Role for Lambda (ONE role only)
 
-#### Trust policy
+####  🔍 WHAT YOU ASKED TO ADD (Cognito Authorizer policy)
+
+New policy permissions:
+
+```
+logs:CreateLogGroup
+logs:CreateLogStream
+logs:PutLogEvents
+```
+
+#### Reality check: You already have this and MORE via:
+
+```
+{
+  "Sid": "CloudWatchLogsFullAccess",
+  "Effect": "Allow",
+  "Action": "logs:*",
+  "Resource": "*"
+}
+```
+
+➡️ logs:* fully includes:
+
+CreateLogGroup ✅
+
+CreateLogStream ✅
+
+PutLogEvents ✅
+
+So:
+
+✅ Cognito Authorizer Lambda already works
+
+✅ No new permission is required
+
+❌ Adding a duplicate statement would be redundant (but not useful)
+
+#### 🔐 TRUST POLICY (IMPORTANT SEPARATION)
+
+The trust policy you shared:
 
 ```
 {
@@ -382,9 +421,20 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 ```
 
 👉 No role-per-user
+
 👉 No role-per-group
 
-#### ✅ Updated charlie-cafe-iam-policy.md
+#### ⚠️ This does NOT go inside the mega policy
+
+- Trust policy → attached to IAM ROLE
+
+- Permissions policy → attached to ROLE or POLICY
+
+**You already handled this correctly earlier 👍**
+
+#### ✅ FINAL Updated charlie-cafe-iam-policy.md
+
+**⚠️ Reminder: replace "Your AWS ACCOUNT ID" with your real account ID when pasting into AWS.**
 
 ```
 {
@@ -395,17 +445,6 @@ You can paste this directly into IAM → Policies → Create policy → JSON
       "Sid": "CloudWatchLogsFullAccess",
       "Effect": "Allow",
       "Action": "logs:*",
-      "Resource": "*"
-    },
-
-    {
-      "Sid": "LambdaBasicExecutionLogsExplicit",
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
       "Resource": "*"
     },
 
@@ -451,7 +490,7 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "dynamodb:PutItem",
         "dynamodb:UpdateItem"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:910599465397:table/CafeMenu"
+      "Resource": "arn:aws:dynamodb:us-east-1:Your AWS ACCOUNT ID:table/CafeMenu"
     },
 
     {
@@ -465,7 +504,7 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "dynamodb:Query",
         "dynamodb:Scan"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:910599465397:table/CafeOrders"
+      "Resource": "arn:aws:dynamodb:us-east-1:Your AWS ACCOUNT ID:table/CafeOrders"
     },
 
     {
@@ -477,7 +516,7 @@ You can paste this directly into IAM → Policies → Create policy → JSON
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes"
       ],
-      "Resource": "arn:aws:sqs:us-east-1:910599465397:CafeOrdersQueue"
+      "Resource": "arn:aws:sqs:us-east-1:Your AWS ACCOUNT ID:CafeOrdersQueue"
     },
 
     {
@@ -511,6 +550,21 @@ You can paste this directly into IAM → Policies → Create policy → JSON
   ]
 }
 ```
+
+#### 🧠 FINAL CLARITY (VERY IMPORTANT)
+
+✅ Cognito Authorizer Lambda already supported
+
+✅ Logs permissions already exceed requirements
+
+✅ Trust policy stays separate
+
+✅ Mega policy remains clean & valid
+
+✅ No risk introduced
+
+---
+
 
 
 
