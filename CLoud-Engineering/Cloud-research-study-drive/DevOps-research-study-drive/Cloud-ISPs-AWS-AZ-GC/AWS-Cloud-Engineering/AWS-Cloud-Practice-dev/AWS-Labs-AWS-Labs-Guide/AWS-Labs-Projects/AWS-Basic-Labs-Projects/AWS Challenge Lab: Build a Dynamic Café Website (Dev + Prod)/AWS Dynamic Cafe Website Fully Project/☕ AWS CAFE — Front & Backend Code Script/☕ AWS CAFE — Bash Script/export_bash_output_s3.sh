@@ -2,34 +2,71 @@
 # =============================================================
 # Exporting Bash Script Output to S3
 #
-# This script runs any specified bash script, captures its
-# output (stdout + stderr), saves it to a text file, converts
-# it to CSV and PDF, and uploads all three to an S3 bucket.
+# DESCRIPTION:
+# This script runs any specified Bash script, captures its output,
+# and exports the results to AWS S3 in CSV and PDF formats.
+# Adds timestamp to files, ensures Pandoc is installed, creates
+# a folder in S3, and uploads the output files.
 #
-# Requirements:
-# - AWS CLI configured (Access Key + Secret Key)
-# - pandoc (installed automatically if missing)
+# SAFE: Read-only, does not modify the target script.
 # =============================================================
 
 set -euo pipefail
 
 # ===============================
-# ASK USER INPUTS
+# USER CONFIGURATION (REPLACE)
 # ===============================
-read -p "Enter the full path of the bash script to run: " SCRIPT_PATH
-if [[ ! -f "$SCRIPT_PATH" ]]; then
-  echo "❌ File not found: $SCRIPT_PATH"
+
+# Replace with your AWS credentials
+AWS_ACCESS_KEY_ID="YOUR_AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY="YOUR_AWS_SECRET_ACCESS_KEY"
+AWS_REGION="us-east-1"
+
+# Replace with your S3 bucket name
+S3_BUCKET="charlie-cafe-s3-bucket"
+S3_PREFIX="Charlie Cafe Test and Verification"
+
+# ===============================
+# SPECIFY THE BASH SCRIPT TO RUN
+# ===============================
+# Only one path should be active at a time
+
+# Example 1: Script in same folder as exporter
+#TARGET_BASH_SCRIPT="./connect_rds.sh"
+
+# Example 2: Script one folder above exporter
+#TARGET_BASH_SCRIPT="../connect_rds.sh"
+
+# Example 3: Script in subfolder relative to exporter
+#TARGET_BASH_SCRIPT="./subfolder/connect_rds.sh"
+
+# Example 4: Absolute path anywhere
+#TARGET_BASH_SCRIPT="/var/www/html/bash_script/connect_rds.sh"
+
+# Example 5: Script in home directory
+#TARGET_BASH_SCRIPT="$HOME/connect_rds.sh"
+
+# Example 6: Script in /tmp folder
+#TARGET_BASH_SCRIPT="/tmp/connect_rds.sh"
+
+# ✅ Uncomment the one you want to run:
+TARGET_BASH_SCRIPT="./charlie_cafe_lab_test_verify.sh"
+
+# ===============================
+# CHECK TARGET SCRIPT EXISTS
+# ===============================
+if [ ! -f "$TARGET_BASH_SCRIPT" ]; then
+  echo "❌ Target bash script not found: $TARGET_BASH_SCRIPT"
   exit 1
 fi
 
-read -p "Enter AWS Access Key ID: " AWS_ACCESS_KEY_ID
-read -p "Enter AWS Secret Access Key: " AWS_SECRET_ACCESS_KEY
-read -p "Enter AWS Region (default: us-east-1): " AWS_REGION
-AWS_REGION=${AWS_REGION:-us-east-1}
-
-read -p "Enter S3 Bucket name: " S3_BUCKET
-read -p "Enter S3 folder/prefix (default: Bash Script Output): " S3_PREFIX
-S3_PREFIX=${S3_PREFIX:-Bash Script Output}
+# ===============================
+# TIMESTAMP & FILE NAMES
+# ===============================
+TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')
+OUTPUT_TEXT="Basic_Script_Output_${TIMESTAMP}.txt"
+OUTPUT_CSV="Basic_Script_Output_${TIMESTAMP}.csv"
+OUTPUT_PDF="Basic_Script_Output_${TIMESTAMP}.pdf"
 
 # ===============================
 # EXPORT AWS CREDENTIALS
@@ -39,61 +76,61 @@ export AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION="$AWS_REGION"
 
 # ===============================
-# TIMESTAMP & OUTPUT FILES
-# ===============================
-TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')
-BASENAME=$(basename "$SCRIPT_PATH" .sh)
-TXT_FILE="${BASENAME}_Output_${TIMESTAMP}.txt"
-CSV_FILE="${BASENAME}_Output_${TIMESTAMP}.csv"
-PDF_FILE="${BASENAME}_Output_${TIMESTAMP}.pdf"
-
-# ===============================
-# CHECK PANDOC AND INSTALL IF NEEDED
+# CHECK & INSTALL PANDOC
 # ===============================
 if ! command -v pandoc >/dev/null 2>&1; then
-    echo "⚠️ pandoc not found. Installing..."
-    sudo yum install -y pandoc || { echo "❌ Failed to install pandoc"; exit 1; }
-    ok="✅"
-    echo "$ok pandoc installed"
+    echo "📦 Pandoc not found. Installing..."
+    if ! rpm -q epel-release >/dev/null 2>&1; then
+        echo "   → Installing epel-release..."
+        sudo amazon-linux-extras install epel -y || sudo yum install epel-release -y
+    fi
+    sudo yum install pandoc -y || {
+        echo "❌ Pandoc installation failed. Please install manually."
+        exit 1
+    }
+    echo "✅ Pandoc installed successfully"
 fi
 
 # ===============================
-# RUN THE SCRIPT AND CAPTURE OUTPUT
+# RUN TARGET BASH SCRIPT
 # ===============================
-echo "🔹 Running script: $SCRIPT_PATH"
+echo "🧪 Running target bash script: $TARGET_BASH_SCRIPT"
 echo "-------------------------------------------------------------"
-bash "$SCRIPT_PATH" >"$TXT_FILE" 2>&1
-echo "✅ Script output saved to $TXT_FILE"
+
+# Capture output into text file
+bash "$TARGET_BASH_SCRIPT" 2>&1 | tee "$OUTPUT_TEXT"
 
 # ===============================
-# CONVERT TXT TO CSV (simple)
+# CONVERT TEXT TO CSV
 # ===============================
-# Each line becomes a CSV row (text only)
-awk '{gsub(/"/,"\"\""); print "\"" $0 "\"" }' "$TXT_FILE" >"$CSV_FILE"
-echo "✅ Converted output to CSV: $CSV_FILE"
+echo "🔄 Converting output to CSV..."
+awk '{gsub(/"/,"\"\""); print "\"" $0 "\""}' "$OUTPUT_TEXT" > "$OUTPUT_CSV"
+echo "✅ CSV created: $OUTPUT_CSV"
 
 # ===============================
-# CONVERT TXT TO PDF USING PANDOC
+# CONVERT TEXT TO PDF
 # ===============================
-pandoc "$TXT_FILE" -o "$PDF_FILE" --pdf-engine=xelatex || { echo "❌ PDF conversion failed"; exit 1; }
-echo "✅ Converted output to PDF: $PDF_FILE"
+echo "🔄 Converting output to PDF using Pandoc..."
+pandoc "$OUTPUT_TEXT" -o "$OUTPUT_PDF"
+echo "✅ PDF created: $OUTPUT_PDF"
 
 # ===============================
 # UPLOAD FILES TO S3
 # ===============================
-echo "☁️ Uploading files to S3..."
-aws s3 cp "$TXT_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$TXT_FILE"
-aws s3 cp "$CSV_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$CSV_FILE"
-aws s3 cp "$PDF_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$PDF_FILE"
-echo "✅ Files uploaded to S3:"
-echo "   - s3://$S3_BUCKET/$S3_PREFIX/$TXT_FILE"
-echo "   - s3://$S3_BUCKET/$S3_PREFIX/$CSV_FILE"
-echo "   - s3://$S3_BUCKET/$S3_PREFIX/$PDF_FILE"
+echo "☁️ Uploading files to S3 bucket: $S3_BUCKET"
+aws s3 cp "$OUTPUT_TEXT" "s3://$S3_BUCKET/$S3_PREFIX/$OUTPUT_TEXT"
+aws s3 cp "$OUTPUT_CSV"  "s3://$S3_BUCKET/$S3_PREFIX/$OUTPUT_CSV"
+aws s3 cp "$OUTPUT_PDF"  "s3://$S3_BUCKET/$S3_PREFIX/$OUTPUT_PDF"
+
+echo "✅ Files uploaded to S3 successfully:"
+echo "   • s3://$S3_BUCKET/$S3_PREFIX/$OUTPUT_TEXT"
+echo "   • s3://$S3_BUCKET/$S3_PREFIX/$OUTPUT_CSV"
+echo "   • s3://$S3_BUCKET/$S3_PREFIX/$OUTPUT_PDF"
 
 # ===============================
-# FINAL STATUS
+# FINAL MESSAGE
 # ===============================
 echo "============================================================="
-echo "🎉 Bash script output export completed successfully!"
-echo "All files are available in S3 with timestamp $TIMESTAMP"
+echo "🎉 Bash script output successfully exported to S3"
+echo "Files include timestamp: $TIMESTAMP"
 echo "============================================================="
