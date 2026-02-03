@@ -891,7 +891,7 @@ or Identity Pool
 For now → Lambda-based authorization is perfect
 ---
 
-### 5️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+### 2️⃣ Callback / Return URL (MOST IMPORTANT STEP)
 
 > **the ❌ HTTP ERROR 400**
 
@@ -925,7 +925,7 @@ Example:
 https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
-#### 1️⃣ Path (new UI):
+### 🟢 STEP 1️⃣ Path (new UI):
 
 ```
 Cognito
@@ -937,7 +937,7 @@ Cognito
 → Edit
 ```
 
-#### 2️⃣ Callback URLs (VERY IMPORTANT)
+### 🟢 STEP 2️⃣ Callback URLs (VERY IMPORTANT)
 
 #### Add EXACTLY:
 
@@ -957,7 +957,7 @@ http://<cloudfront>/cafe-admin-dashboard.html
 https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
-#### 3️⃣ Sign-out URLs (recommended)
+### 🟢 STEP 3️⃣ Sign-out URLs (recommended)
 
 #### Add the same:
 
@@ -971,7 +971,7 @@ https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 
 **⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
-#### 4️⃣ ✅ OAuth Settings 
+### 🟢 STEP 4️⃣ ✅ OAuth Settings 
 
 Make sure these are enabled:
 
@@ -1056,11 +1056,13 @@ In App Client settings:
 
 **⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
-#### 5️⃣ Where to COPY your Cognito Domain (exact path)
+---
+
+### 3️⃣ Where to COPY your Cognito Domain (exact path)
 
 You asked this directly, so here is the exact path 👇
 
-#### 1️⃣ AWS Console path:
+### 🟢 STEP 1️⃣ AWS Console path:
 
 ```
 Cognito
@@ -1070,7 +1072,7 @@ Cognito
 → Domain
 ```
 
-#### 2️⃣ You will see something like:
+### 🟢 STEP 2️⃣ You will see something like:
 
 ```
 Domain:
@@ -1093,13 +1095,13 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 
 **📌 Copy ONLY this part (no https, no /login)**
 
-#### 6️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
+### 4️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
 
-#### 1️⃣ cafe-admin-dashboard.html File (Recommanded)
+### 🟢 STEP 1️⃣ cafe-admin-dashboard.html File (Recommanded)
 
 [cafe-admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
 
-#### 1️⃣ Edit file on EC2:
+### 🟢 STEP 2️⃣ Edit file on EC2:
 
 ```
 sudo nano /var/www/html/order-status.html
@@ -1108,7 +1110,7 @@ sudo nano /var/www/html/order-status.html
 [order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 
-#### 8️⃣ Restart Apache (MANDATORY)
+### 🟢 STEP 3️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
