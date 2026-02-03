@@ -947,7 +947,17 @@ This is 🔥 gold for authorization.
 
 > **✅ This authorizer will validate JWTs automatically.**
 
+- Attach this authorizer to your routes:
 
+/admin/*
+
+/employee/*
+
+or /api/*
+
+**✔ Now API Gateway blocks unauthenticated users**
+
+### 1️⃣ Create Cognito Authorizer
 
 
 
