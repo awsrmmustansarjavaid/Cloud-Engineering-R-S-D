@@ -337,9 +337,9 @@ d2og2zrs47voou.cloudfront.net
 ## 🔐 PHASE 2️⃣ — Cognito Authentication infrastructure 
 > **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
-### ✅ STEP 1️⃣ — DEFINE YOUR APPLICATION
+### 1️⃣ Basic Cognito Configuration — DEFINE YOUR APPLICATION
 
-#### 1️⃣ Application type
+#### ✅ STEP 1️⃣ Application type
 
 > **👉 SELECT THIS (CORRECT FOR YOUR PROJECT)**
 
@@ -347,7 +347,7 @@ d2og2zrs47voou.cloudfront.net
 ✅ Single-page application (SPA)
 ```
 
-#### 2️⃣ Name your application
+#### ✅ STEP 2️⃣ Name your application
 
 Example:
 
@@ -357,7 +357,7 @@ CharlieCafeAdminSPA
 
 **❕ (Name doesn’t matter technically)**
 
-#### 2️⃣ — CONFIGURE OPTIONS (VERY IMPORTANT)
+#### ✅ STEP 3️⃣ — CONFIGURE OPTIONS (VERY IMPORTANT)
 
 #### 1️⃣ Options for sign-in identifiers
 
@@ -421,7 +421,7 @@ https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 🟠 Create user directory
 ```
 
-### ✅ STEP 2️⃣ — OPEN THE ACTUAL USER POOL (THIS IS THE MISSING STEP)
+### 2️⃣ — OPEN THE ACTUAL USER POOL (THIS IS THE MISSING STEP)
 
 > **📢 After creation completes:**
 
@@ -438,13 +438,13 @@ Amazon Cognito → User pools
 
 **⚠️ This is the step everyone misses**
 
-### ✅ STEP 3️⃣ PASSWORD POLICY 
+### 3️⃣ PASSWORD POLICY 
 
 > **🔐 NOW — THIS IS WHERE “STEP 3 — SECURITY” REALLY LIVES**
 
 **You are now INSIDE the User Pool, not the app wizard.**
 
-#### 1️⃣  PASSWORD POLICY 
+#### ✅ STEP 1️⃣  PASSWORD POLICY 
 
 #### Path:
 
@@ -472,7 +472,7 @@ Password policy
 
 **✔ Password policy = OK**
 
-#### 2️⃣ Multi-factor authentication (MFA)
+#### ✅ STEP 2️⃣ Multi-factor authentication (MFA)
 
 #### 1️⃣ Path:
 
@@ -490,7 +490,7 @@ User pool → Authentication → Sign-in experience → Account recovery
 
 Click Save changes
 
-#### 2️⃣ ACCOUNT RECOVERY 
+#### ✅ STEP 3️⃣ ACCOUNT RECOVERY 
 
 #### 1️⃣ Path:
 
@@ -521,104 +521,6 @@ Click Save changes
 | Account recovery | ⚠ Fix to Email only |
 
 **✔ Now your account recovery matches the lab**
-
-### ❗  PASSWORD IS “INACTIVE” + SNS ERROR (Optional)
-
-> **This is a REAL AWS SERVICE ISSUE, not a mistake.**
-
-#### 🚨 ERROR YOU GOT
-
-```
-[UserError] Failed to get SNS sandbox status for account
-```
-
-### ❓ Why this happens
-
-#### Cognito depends on Amazon SNS for:
-
-- SMS
-
-- MFA
-
-- Some passwordless / choice-based sign-in features
-
-#### Your AWS account:
-
-❌ SNS sandbox not initialized
-
-❌ SMS not approved
-
-❌ Region mismatch possible
-
-**🔐 So AWS disables choice-based sign-in → password**
-
-
-### 🔴 IMPORTANT CLARIFICATION
-
-> **❗ You do NOT need “Options for choice-based sign-in” for your project**
-
-#### Your lab uses:
-
-```
-Username + Password
-Hosted UI
-OAuth tokens
-```
-
-#### NOT:
-
-- Passwordless
-
-- Passkeys
-
-- SMS login
-
-**🔐 So this section is NOT REQUIRED**
-
-### ✅ WHAT YOU SHOULD DO (CORRECT ACTION)
-
-### 🔹 OPTION 1 — IGNORE IT (RECOMMENDED)
-
-#### ✔ Leave:
-
-```
-Options for choice-based sign-in
-Passwordless status: Inactive
-```
-
-**👉 Your Cognito login WILL STILL WORK**
-
-#### This setting does NOT affect:
-
-- Hosted UI login
-
-- Username/password
-
-- Token generation
-
-- API Gateway authorizer
-
-### 🔹 OPTION 2 — FIX SNS (ONLY IF YOU WANT)
-
-> **This is advanced and NOT needed for your lab, but for completeness:**
-
-#### 1️⃣ Go to:
-
-```
-Amazon SNS → Text messaging (SMS)
-```
-
-#### 2️⃣ Request:
-
-```
-Exit SMS sandbox
-```
-
-#### 3️⃣ Add billing details
-
-#### 4️⃣ Wait for AWS approval (hours/days)
-
-**⚠️ Not recommended for labs**
 
 ### ✅ FINAL VERDICT (IMPORTANT)
 

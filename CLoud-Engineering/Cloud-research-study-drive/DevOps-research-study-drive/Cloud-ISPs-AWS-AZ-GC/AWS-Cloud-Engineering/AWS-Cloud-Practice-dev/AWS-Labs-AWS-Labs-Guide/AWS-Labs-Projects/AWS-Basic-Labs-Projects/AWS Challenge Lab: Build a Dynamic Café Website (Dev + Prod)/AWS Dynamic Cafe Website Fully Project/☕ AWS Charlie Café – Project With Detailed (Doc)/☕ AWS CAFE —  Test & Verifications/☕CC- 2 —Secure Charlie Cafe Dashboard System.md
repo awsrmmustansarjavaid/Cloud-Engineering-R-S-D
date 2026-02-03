@@ -292,6 +292,104 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 **👍 This is production-style SPA + Cognito + API Gateway security.**
 
+### ❗  PASSWORD IS “INACTIVE” + SNS ERROR (Optional)
+
+> **This is a REAL AWS SERVICE ISSUE, not a mistake.**
+
+#### 🚨 ERROR YOU GOT
+
+```
+[UserError] Failed to get SNS sandbox status for account
+```
+
+### ❓ Why this happens
+
+#### Cognito depends on Amazon SNS for:
+
+- SMS
+
+- MFA
+
+- Some passwordless / choice-based sign-in features
+
+#### Your AWS account:
+
+❌ SNS sandbox not initialized
+
+❌ SMS not approved
+
+❌ Region mismatch possible
+
+**🔐 So AWS disables choice-based sign-in → password**
+
+
+### 🔴 IMPORTANT CLARIFICATION
+
+> **❗ You do NOT need “Options for choice-based sign-in” for your project**
+
+#### Your lab uses:
+
+```
+Username + Password
+Hosted UI
+OAuth tokens
+```
+
+#### NOT:
+
+- Passwordless
+
+- Passkeys
+
+- SMS login
+
+**🔐 So this section is NOT REQUIRED**
+
+### ✅ WHAT YOU SHOULD DO (CORRECT ACTION)
+
+### 🔹 OPTION 1 — IGNORE IT (RECOMMENDED)
+
+#### ✔ Leave:
+
+```
+Options for choice-based sign-in
+Passwordless status: Inactive
+```
+
+**👉 Your Cognito login WILL STILL WORK**
+
+#### This setting does NOT affect:
+
+- Hosted UI login
+
+- Username/password
+
+- Token generation
+
+- API Gateway authorizer
+
+### 🔹 OPTION 2 — FIX SNS (ONLY IF YOU WANT)
+
+> **This is advanced and NOT needed for your lab, but for completeness:**
+
+#### 1️⃣ Go to:
+
+```
+Amazon SNS → Text messaging (SMS)
+```
+
+#### 2️⃣ Request:
+
+```
+Exit SMS sandbox
+```
+
+#### 3️⃣ Add billing details
+
+#### 4️⃣ Wait for AWS approval (hours/days)
+
+**⚠️ Not recommended for labs**
+
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
