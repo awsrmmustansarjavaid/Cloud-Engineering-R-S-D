@@ -477,7 +477,7 @@ Password policy
 #### 1️⃣ Path:
 
 ```
-User pool → Sign-in experience → Account recovery
+User pool → Authentication → Sign-in experience → Account recovery
 ```
 
 #### 2️⃣ Select:
