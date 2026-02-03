@@ -2012,9 +2012,6 @@ payment_status = PAID
 ## ☕ CHARLIE CAFÉ PHASE 4️⃣ 🔁 REDIRECTING TO payment-status.php
 
 
-
-
-
 **✅ PHASE 4️⃣ STATUS**
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
