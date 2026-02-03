@@ -404,6 +404,21 @@ EC2-Cafe-Secrets-Role
 ---
 ## PHASE 3️⃣ — VERIFY CAFE DATABASE CONFIGURATIONS
 
+🔐 Reads DB creds from AWS Secrets Manager
+
+🔌 Connects to RDS MySQL
+
+✅ Verifies database
+
+✅ Verifies all tables
+
+✅ Verifies columns
+
+✅ Verifies indexes
+
+✅ Verifies sample data
+
+📊 Gives clear pass/fail output
 
 ```
 sudo nano verify_cafe_rds_schema.sh
