@@ -443,3 +443,76 @@ CHARLIE.auth.login(
 **Once you fix this → login will work instantly**
 
 ----
+### Cognito Errors 2 - access token
+
+### ✅ Step 1: Use Hosted UI login (already in your JS)
+
+- You do not manually get the token — your central-auth-api.js already handles it:
+
+```
+auth.login(); // redirects user to Cognito Hosted UI
+```
+
+- After login, Cognito redirects back to your CloudFront page (your cafe-admin-dashboard.html)
+
+- The access token is automatically in the URL hash: #access_token=...
+
+- Your JS handleRedirect() extracts it and stores it in localStorage.
+
+> **No need to manually copy token from jwt.io — that’s only for debugging.**
+
+### ✅ Step 2: Ensure your Cognito App Client settings are correct
+
+- Allowed Callback URLs → must include:
+
+```
+https://d159bqc5pw64hn.cloudfront.net/cafe-admin-dashboard.html
+```
+
+- Allowed Logout URLs → include your CloudFront origin (e.g., home page)
+
+- OAuth Flows → enable:
+
+  - Implicit grant → Access token and ID token (this is what your JS uses)
+
+- Scopes → enable at least: openid email profile
+
+> **These are already required for your central-auth-api.js.**
+
+### ✅ Step 3: Testing it the fast way
+
+- Open your CloudFront page:
+
+```
+https://d159bqc5pw64hn.cloudfront.net/cafe-admin-dashboard.html
+```
+
+- Click “Login” (your login() function triggers Hosted UI)
+
+- Login as Admin/Employee
+
+- If successful, page reloads and your JS automatically stores access_token
+
+You can check in browser DevTools → Application → Local Storage → access_token
+
+> **If it’s there, your token is valid and API calls will work. No need to manually paste anything.**
+
+### ✅ Step 4: Avoid token expiration issues
+
+- Your startAutoLogoutWatcher() already logs out users automatically after 30 sec check.
+
+- No manual token refresh needed for now, just re-login when expired.
+
+### 💡 Shortcut for you:
+
+Do not manually touch token.
+
+- Just make sure your Cognito App Client settings (callback URL, implicit grant, scopes) are correct.
+
+- Let your central-auth-api.js handle everything automatically.
+
+> **This is the industry standard / production-ready approach.**
+
+---
+
+
