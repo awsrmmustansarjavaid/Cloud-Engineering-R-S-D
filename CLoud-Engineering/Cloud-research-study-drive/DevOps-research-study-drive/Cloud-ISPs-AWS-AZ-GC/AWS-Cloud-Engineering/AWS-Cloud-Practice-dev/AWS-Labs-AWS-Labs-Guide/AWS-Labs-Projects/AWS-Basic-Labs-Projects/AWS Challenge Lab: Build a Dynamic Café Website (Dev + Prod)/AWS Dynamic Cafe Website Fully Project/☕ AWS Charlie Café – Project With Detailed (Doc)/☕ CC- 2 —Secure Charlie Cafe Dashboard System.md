@@ -522,7 +522,138 @@ Click Save changes
 
 **✔ Now your account recovery matches the lab**
 
-### 4️⃣ 
+### 4️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+
+### 🟢 STEP 1️⃣ Path (new UI):
+
+```
+Cognito
+→ User pools
+→ Your user pool
+→ App integration
+→ App clients
+→ Click your App Client
+→ Edit
+```
+
+### 🟢 STEP 2️⃣ Callback URLs (VERY IMPORTANT)
+
+#### Add EXACTLY:
+
+```
+http://<cloudfront>/cafe-admin-dashboard.html
+```
+
+✔ Must match character by character
+
+✔ http vs https must match
+
+✔ trailing slash matters
+
+#### Example:
+
+```
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+```
+
+### 🟢 STEP 3️⃣ Sign-out URLs (recommended)
+
+#### Add the same:
+
+```
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+```
+
+> **Cognito is strict: must be HTTPS + exact path, no trailing slash.**
+
+**👉 Save changes**
+
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
+
+### 🟢 STEP 4️⃣ ✅ OAuth Settings 
+
+Make sure these are enabled:
+
+#### 1️⃣ OAuth 2.0 grant types Settings 
+
+✔ Implicit grant (Recommanded)
+
+OR 
+
+✔ Authorization code grant (optional)
+
+Because you are using:
+
+```
+response_type=token
+```
+
+#### 2️⃣ OpenID Connect scopes Settings 
+
+✔ OpenID
+
+✔ Email
+
+✔ Profile
+
+**If missing → Invalid request.**
+
+**👉 Save changes**
+
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
+
+> **✅ This is correct for login with response_type=token.**
+
+**Tip:** Only select these 3 scopes for now: openid, email, profile — leave phone optional if not needed.
+
+#### 3️⃣ Check App Client Auth Flows (REFRESH_TOKEN_AUTH)
+
+#### Path in AWS Console :
+
+- AWS Console → Cognito → User Pools → select your pool
+
+- App clients (left menu) → click Show details for your App Client
+
+- Scroll to Authentication flows section
+
+#### You should see exactly these 4 checked boxes:
+
+✔ Choice-based sign-in → ALLOW_USER_AUTH
+
+✔ Sign in with username and password → ALLOW_USER_PASSWORD_AUTH
+
+✔ Sign in with secure remote password (SRP) → ALLOW_USER_SRP_AUTH
+
+✔ Get new user tokens from existing authenticated sessions → ALLOW_REFRESH_TOKEN_AUTH
+
+✅ These 4 are correct. No other boxes should be checked.
+
+💡 This is exactly what Cognito needs to allow your front-end response_type=token flow.
+
+**👉 Save changes**
+
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
+
+#### 4️⃣ Check App Client settings
+
+- AWS Console → Cognito → User Pools → App clients → click Show details
+
+- Ensure Client secret is Disabled ✅
+
+In App Client settings:
+
+| Setting       | Value             |
+| ------------- | ----------------- |
+| App type      | **Public client** |
+| Client secret | ❌ Disabled        |
+
+**If client secret is enabled → Invalid request**
+
+> **If the secret is enabled, the browser flow cannot work and will throw “Invalid request”.**
+
+**👉 Save changes**
+
+**⏳ Wait 30–60 seconds (Cognito propagation delay)**
 
 ### 5️⃣ Where to COPY your Cognito Domain (exact path)
 
