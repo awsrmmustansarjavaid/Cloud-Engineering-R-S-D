@@ -199,7 +199,11 @@ https://YOUR_COGNITO_DOMAIN/login
 #### Example:
 
 ```
-https://charlie-cafe-admin.auth.us-east-1.amazoncognito.com/login
+https://us-east-1hdcwdjqvz.auth.us-east-1.amazoncognito.com/login
+?response_type=token
+&client_id=3hcigucn7fmd11gvo9uuqud6fi
+&scope=openid+email+profile
+&redirect_uri=https://d159bqc5pw64hn.cloudfront.net/cafe-admin-dashboard.html
 ```
 
 #### 3️⃣ Test
