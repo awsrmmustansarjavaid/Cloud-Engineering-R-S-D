@@ -650,9 +650,9 @@ Exit SMS sandbox
 ## 🔐 PHASE 3️⃣ — Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
 > **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
-### 🟢 STEP 1️⃣ — CREATE USER & Groups (MANDATORY)
+### 1️⃣ — CREATE USER & Groups (MANDATORY)
 
-### 1️⃣ — CREATE ADMIN USER (MANDATORY)
+### 🟢 STEP 1️⃣ — CREATE ADMIN USER (MANDATORY)
 
 #### 1️⃣ Where:
 
@@ -682,7 +682,7 @@ Click Create user
 
 ✅ Admin account created
 
-### 2️⃣ — CREATE Employee USER (MANDATORY)
+### 🟢 STEP 2️⃣ — CREATE Employee USER (MANDATORY)
 
 ```
 Create user
@@ -698,7 +698,7 @@ Create user
 | **Message delivery**     | Email (default)                                        | Temporary password sent to the provided email        |
 | **Additional attributes** | Optional: name = "Cafe Admin" (if required by your app) | Add if your required attributes include name  
 
-### 3️⃣ — CREATE Admin Group (MANDATORY)
+### 🟢 STEP 3️⃣ — CREATE Admin Group (MANDATORY)
 
 #### 1️⃣ Where:
 
@@ -764,7 +764,7 @@ Cafe employees
 
 **✅ Both Groups created**
 
-### 4️⃣ — Assign Users to Groups (MANDATORY)
+### 🟢 STEP 4️⃣ — Assign Users to Groups (MANDATORY)
 
 #### 1️⃣ Where:
 
@@ -794,15 +794,104 @@ Cognito → User pools → Your user pool → Users
 
 - Save
 
+### 🧠 IMPORTANT: What Cognito Does Now
+
+When user logs in, Cognito adds this to JWT token:
+
+```
+"cognito:groups": ["Admin"]
+```
+or
+```
+"cognito:groups": ["Employee"]
+```
+
+This is 🔥 gold for authorization.
+
+### 🟢 STEP 5️⃣ — Use Groups in Lambda (REAL PERMISSIONS)
+
+This is where most labs fail — you won’t 😎
+
+#### 🔐 Example: Admin-Only Lambda
+
+```
+def lambda_handler(event, context):
+
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if "Admin" not in groups:
+        return {
+            "statusCode": 403,
+            "body": "Access denied: Admin only"
+        }
+
+    # Admin logic here
+    return {
+        "statusCode": 200,
+        "body": "Welcome Admin"
+    }
+```
+
+#### 👨‍🍳 Example: Employee-Only Lambda
+
+```
+def lambda_handler(event, context):
+
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if "Employee" not in groups:
+        return {
+            "statusCode": 403,
+            "body": "Access denied: Employee only"
+        }
+
+    # Employee logic here
+    return {
+        "statusCode": 200,
+        "body": "Welcome Employee"
+    }
+```
+
+### 🟢 STEP 6️⃣ — Protect APIs via API Gateway (Recommended)
+
+In API Gateway:
+
+Create Cognito Authorizer
+
+Attach it to your API routes
+
+API Gateway automatically:
+
+validates token
+
+injects user claims into Lambda
+
+No token = ❌
+Wrong group = ❌
+Correct group = ✅
 
 
+### 🟢 STEP 7️⃣ — 🎯 OPTIONAL (Advanced but Powerful)
+Attach IAM Role to Groups (Later)
 
+Example:
 
+Admin Group → IAM Role with DynamoDB + S3 + CloudWatch
 
+Employee Group → IAM Role with limited access
 
+This is useful if:
 
+you use AWS SDK directly from frontend
 
-#### 4️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+or Identity Pool
+
+For now → Lambda-based authorization is perfect
+---
+
+### 5️⃣ Callback / Return URL (MOST IMPORTANT STEP)
 
 > **the ❌ HTTP ERROR 400**
 
