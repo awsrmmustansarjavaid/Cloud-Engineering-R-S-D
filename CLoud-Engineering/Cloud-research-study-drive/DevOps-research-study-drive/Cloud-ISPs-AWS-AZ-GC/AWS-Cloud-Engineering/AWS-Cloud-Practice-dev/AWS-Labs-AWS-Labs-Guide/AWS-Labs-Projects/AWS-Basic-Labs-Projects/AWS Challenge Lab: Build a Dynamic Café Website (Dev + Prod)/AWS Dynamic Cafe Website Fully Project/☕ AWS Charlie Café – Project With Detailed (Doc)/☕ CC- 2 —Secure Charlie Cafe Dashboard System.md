@@ -524,7 +524,7 @@ Click Save changes
 
 ### 4️⃣ 
 
-### 2️⃣ Where to COPY your Cognito Domain (exact path)
+### 5️⃣ Where to COPY your Cognito Domain (exact path)
 
 You asked this directly, so here is the exact path 👇
 
