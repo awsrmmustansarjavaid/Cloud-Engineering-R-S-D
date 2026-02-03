@@ -623,6 +623,27 @@ sudo ./connect-rds.sh
 
 ### 2️⃣ cafe_db
 
+### ✅ Charlie Cafe – Order Processing & HR Schema Setup + Verification
+
+> **File name: setup_charlie_cafe_db_full.sh**
+
+```
+sudo nano setup_charlie_cafe_db_full.sh
+```
+
+[Order Processing & HR Schema Setup + Verification ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/connect-rds.sh)
+
+#### ▶️ How to Run
+
+```
+sudo chmod +x setup_charlie_cafe_db_full.sh
+```
+
+```
+sudo ./setup_charlie_cafe_db_full.sh
+```
+
+
 #### 1️⃣ Create Café Database
 
 ```sql
