@@ -558,6 +558,91 @@ For example !
 **✅ PHASE 4️⃣ STATUS**
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+
+## Charlie Cafe Basic Lab Configuration Test and Verification
+
+### Bash Script
+
+Perfect, this is a serious lab-grade requirement, so I’ll give you a clean, safe, no-bug, production-ready verification script that:
+
+✔ Combines LAMP verification + RDS verification
+
+✔ Shows test list before execution
+
+✔ Shows results during execution
+
+✔ Shows final summarized results
+
+✔ Exports full output to a file
+
+✔ Uploads that file to S3 automatically
+
+✔ Uses explicit AWS Access Key & Secret (you replace them)
+
+✔ Uses clear comments everywhere
+
+✔ Is read-only (no DB changes)
+
+✔ CSV export (machine-readable summary)
+
+✔ PDF report (human-readable audit report)
+
+✔ PDF report (human-readable audit report)
+
+✔ Auto-skips PDF if tool missing
+
+✔ Fully commented
+
+✔ Uploads TXT + CSV + PDF to S3
+
+### 📄 File Name: charlie_cafe_lab_verify.sh
+
+### 📦 Output Details
+
+#### Local file: Basic_Config_Test_Result_<DATE>.txt
+
+#### S3 bucket: charlie-cafe-s3-bucket
+
+#### S3 folder: Charlie Cafe Test and Verification/
+
+### 1️⃣ NEW DEPENDENCY (only for PDF)
+
+```
+sudo dnf install -y pandoc
+```
+
+**⚠️ (If you don’t install it, PDF step will auto-skip)**
+
+### 2️⃣ Create a file
+
+```
+sudo nano charlie_cafe_lab_test_verify.sh
+```
+
+### 3️⃣ Paset Script
+
+[Charlie Cafe Lab Basic Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_lab_test_verify.sh)
+
+### 4️⃣ How to Run
+
+```
+sudo chmod +x charlie_cafe_lab_test_verify.sh
+```
+
+```
+sudo ./charlie_cafe_lab_test_verify.sh
+```
+
+### 📂 Final Output in S3
+
+```
+charlie-cafe-s3-bucket/
+└── Charlie Cafe Test and Verification/
+    ├── Basic_Config_Test_Result_2026-02-03_10-41-22.txt
+    ├── Basic_Config_Test_Result_2026-02-03_10-41-22.csv
+    └── Basic_Config_Test_Result_2026-02-03_10-41-22.pdf
+```
 
 
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
