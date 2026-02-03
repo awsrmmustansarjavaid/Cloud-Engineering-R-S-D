@@ -1051,6 +1051,7 @@ For now → Lambda-based authorization is perfect
 ## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
 
 
+
 ### 1️⃣ SECURE API GATEWAY AUTH (MOST IMPORTANT) 
 
 ### 1️⃣ Create Cognito Authorizer
