@@ -522,28 +522,6 @@ Click Save changes
 
 **✔ Now your account recovery matches the lab**
 
-### ✅ FINAL VERDICT (IMPORTANT)
-
-#### ✅ You should do THIS:
-
-✔ Ignore choice-based sign-in
-
-✔ Keep password inactive there
-
-✔ Use Hosted UI login
-
-✔ Continue with Cognito login URL
-
-#### ✅ Your setup is 100% valid for:
-
-- Charlie Café lab
-
-- Admin dashboard
-
-- Production-style auth
-
-- API Gateway + Lambda
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
