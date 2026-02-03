@@ -689,6 +689,16 @@ or
 
 This is 🔥 gold for authorization.
 
+### 2️⃣ Backend - Cognito Role Base Access and Permission 
+
+#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
+
+
+
+
+
+
+
 ### 🟢 STEP 5️⃣ — Use Groups in Lambda (REAL PERMISSIONS)
 
 This is where most labs fail — you won’t 😎

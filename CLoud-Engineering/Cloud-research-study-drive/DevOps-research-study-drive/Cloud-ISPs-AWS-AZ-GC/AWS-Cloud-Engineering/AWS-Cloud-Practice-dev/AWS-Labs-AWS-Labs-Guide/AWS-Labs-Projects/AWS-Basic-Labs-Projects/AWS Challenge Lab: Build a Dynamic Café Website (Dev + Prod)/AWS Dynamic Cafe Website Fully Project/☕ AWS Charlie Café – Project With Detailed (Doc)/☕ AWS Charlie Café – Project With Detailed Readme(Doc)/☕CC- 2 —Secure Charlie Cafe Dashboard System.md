@@ -42,7 +42,8 @@ Database
 
 👉 If no, stop here
 
-## 🔐 PHASE  1️⃣ — PREREQUISITES (CHECK ONLY)
+## 🔐 PHASE  1️⃣ — Set Up Automatic HTTP → HTTPS Redirection
+> **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
 ✔️ 📄 File: dashboard.html
 
@@ -763,15 +764,6 @@ rgba(0,0,0,.55)
 
 - JWT ready
 
-**✅ PHASE 1 STATUS**
-
-> **🟢 PHASE 1 COMPLETE & VERIFIED**
-
----
-
-## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
-> **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
-
 **⚠️ ACM is FREE**
 
 #### ACM -  Optional - Request SSL Certificate (ACM) 
@@ -1005,12 +997,12 @@ Default CloudFront certificate (*.cloudfront.net)
 
 - No unnecessary complexity
 
-**✅ PHASE 2️⃣ STATUS**
+**✅ PHASE 1️⃣ STATUS**
 
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
-
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 3️⃣ — COGNITO INTEGRATION (PRODUCTION READY)
+## 🔐 PHASE 2️⃣ — Cognito Authentication infrastructure 
+> **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
 This phase is used to secure the Admin Order Dashboard of your Charlie Cafe project.
 
@@ -1250,6 +1242,65 @@ Cognito Login → SUCCESS → redirect to order-status.html
 **AWS Cognito does not allow username/password submission from your own HTML for security reasons.**
 
 **👉 This is by design.**
+
+---
+
+### 2️⃣ Backend - Cognito Role Base Access and Permission 
+
+#### The correct & professional way (recommended)
+
+#### ✅ Use Cognito Groups + JWT claims
+
+This is how real production systems do RBAC.
+
+#### Architecture (simple & clean)
+
+```
+Frontend
+   ↓ (login)
+Cognito User Pool
+   ↓ (JWT access_token)
+API Gateway (Cognito Authorizer)
+   ↓ (validated JWT)
+ONE Lambda Function
+   ↓
+Role-based logic inside Lambda
+```
+
+#### Why this is best
+
+✔ Fast to implement
+
+✔ Secure
+
+✔ Scales well
+
+✔ Easy to maintain
+
+✔ Only ONE Lambda
+
+### 3️⃣ What Cognito already gives you (magic part)
+
+When a user logs in, Cognito issues a JWT.
+
+Inside that JWT you already have:
+
+```
+"cognito:groups": ["admin"]
+```
+
+or 
+
+```
+"cognito:groups": ["employee"]
+```
+
+🔥 This is your role system
+No extra DB, no IAM tricks.
+
+---
+
+
 
 **✅ PHASE 2️⃣ & 3️⃣ STATUS**
 
