@@ -889,6 +889,7 @@ you use AWS SDK directly from frontend
 or Identity Pool
 
 For now → Lambda-based authorization is perfect
+
 ---
 
 ### 2️⃣ Callback / Return URL (MOST IMPORTANT STEP)
