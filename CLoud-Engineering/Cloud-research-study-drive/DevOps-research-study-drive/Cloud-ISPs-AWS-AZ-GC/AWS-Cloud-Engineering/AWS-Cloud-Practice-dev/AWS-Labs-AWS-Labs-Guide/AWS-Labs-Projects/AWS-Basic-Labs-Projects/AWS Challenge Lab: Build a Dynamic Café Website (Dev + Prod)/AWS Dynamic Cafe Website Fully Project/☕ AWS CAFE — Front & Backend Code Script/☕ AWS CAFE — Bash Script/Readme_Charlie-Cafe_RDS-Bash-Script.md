@@ -2306,6 +2306,18 @@ echo "Files include timestamp: $TIMESTAMP"
 echo "============================================================="
 ```
 
+### ✅ Why this works:
+
+- Installs all WeasyPrint dependencies (cairo, pango, gdk-pixbuf, libffi) that are required for PDF generation.
+
+- Installs pip if missing.
+
+- Installs WeasyPrint for the current user (--user) and adds $HOME/.local/bin to $PATH.
+
+- After this, the existing Pandoc PDF fallback using --pdf-engine=weasyprint will finally work, and a PDF will be created.
+
+- You don’t need to change anything else in your script — TXT + CSV + S3 upload will remain exactly the same.
+
 ### ✅ Key Fixes and Features:
 
 #### Pandoc Installation Fix
