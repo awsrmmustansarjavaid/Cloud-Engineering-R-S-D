@@ -276,33 +276,11 @@ Exit SMS sandbox
 
 **⚠️ Not recommended for labs**
 
-### 2️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+### 🌐 AWS Cognito Callback URL – Step-by-Step (Fix HTTP 400)
 
-> **the ❌ HTTP ERROR 400**
+#### 1️⃣ Find the REAL page URL
 
-#### This error happens only for ONE reason in Cognito:
-
-> **The redirect (callback) URL used in the browser does NOT exactly match the Callback URL configured in the App Client***
-
-**🟠 Cognito is extremely strict.**
-
-#### 🔎 What URL is your order-status.html really loaded from?
-
-You said:
-
-- EC2
-
-- Apache
-
-- ALB DNS name
-
-- Cloudfront
-
-So your real URL is something like:
-
-```
-http://<cloudfront>/cafe-admin-dashboard.html
-```
+Open your admin page in the browser and copy the exact full URL from the address bar.
 
 Example:
 
@@ -310,8 +288,102 @@ Example:
 https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 ```
 
+#### ⚠️ Must include:
 
----
+- https vs http
+
+- domain
+
+- file name
+
+- NO extra slash
+
+#### 2️⃣ Go to Cognito App Client
+
+- AWS Console → Cognito → User Pools
+
+→ Select your pool
+
+→ App integration
+
+→ App clients and analytics
+
+→ Click your App Client
+
+#### 3️⃣ Update Callback URL (MOST IMPORTANT)
+
+In Hosted UI / OAuth settings:
+
+#### Callback URL(s)
+
+Paste the exact same URL you copied:
+
+```
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+```
+
+✔ Exact match only
+
+❌ No wildcards
+
+❌ No different file name
+
+❌ No trailing /
+
+#### 4️⃣ Update Sign-out URL (Recommended)
+
+Use the same URL or your login page:
+
+```
+https://d2og2zrs47voou.cloudfront.net/index.html
+```
+
+#### 5️⃣ Save changes
+
+Click Save changes
+⏳ Wait 30–60 seconds (Cognito needs time to propagate)
+
+#### 6️⃣ Verify OAuth Settings
+
+Make sure these are enabled:
+
+✅ Authorization code grant
+
+✅ openid
+
+✅ email (or profile)
+
+#### 7️⃣ Test Login Again
+
+Open:
+
+```
+https://<your-domain>/index.html
+```
+
+- Click Login → should redirect back without HTTP 400 ✅
+
+### 🚨 Common Mistakes (99% failures)
+
+- http instead of https
+
+- /dashboard vs /dashboard.html
+
+- CloudFront URL vs ALB URL mismatch
+
+- Trailing slash /
+
+- Old cached URL in JS
+
+### 🧪 Quick Debug Tip
+
+- If error persists:
+
+- Open DevTools → Network
+
+- Look for redirect_uri=
+
+- Compare it character by character with Cognito callback URL
 
 
 ### ✅ FINAL VERDICT (IMPORTANT)
