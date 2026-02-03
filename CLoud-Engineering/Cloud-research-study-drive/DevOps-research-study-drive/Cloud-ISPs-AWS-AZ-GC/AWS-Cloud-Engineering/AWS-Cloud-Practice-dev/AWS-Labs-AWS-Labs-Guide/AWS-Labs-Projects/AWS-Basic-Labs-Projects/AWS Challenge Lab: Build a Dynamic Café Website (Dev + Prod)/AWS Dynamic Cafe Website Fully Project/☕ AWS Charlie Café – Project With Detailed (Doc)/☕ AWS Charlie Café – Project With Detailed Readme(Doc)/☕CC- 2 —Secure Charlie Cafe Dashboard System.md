@@ -1298,7 +1298,23 @@ or
 🔥 This is your role system
 No extra DB, no IAM tricks.
 
----
+#### 2️⃣ Attach this authorizer to your routes
+
+#### What “/admin/*” REALLY means (important)
+
+API Gateway does NOT auto-create routes like /admin/*.
+
+You must create actual routes, for example:
+
+```
+GET  /admin/dashboard
+POST /admin/create-user
+
+GET  /employee/orders
+POST /employee/order
+```
+
+**Then attach the same Cognito Authorizer to those routes.**
 
 
 
