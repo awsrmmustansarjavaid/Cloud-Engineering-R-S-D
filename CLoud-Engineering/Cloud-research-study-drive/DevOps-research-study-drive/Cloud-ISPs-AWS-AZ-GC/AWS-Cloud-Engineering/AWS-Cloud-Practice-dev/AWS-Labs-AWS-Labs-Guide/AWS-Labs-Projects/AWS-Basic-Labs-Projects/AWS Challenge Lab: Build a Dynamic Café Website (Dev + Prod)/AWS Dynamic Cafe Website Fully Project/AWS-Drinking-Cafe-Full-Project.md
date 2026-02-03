@@ -424,6 +424,34 @@ Attach this policy (or ensure it exists):
 
   - CloudWatchLogsFullAccess
 
+#### 🔟 Create IAM Policy Cognito Authorizer
+
+- **Custom Policy name:** 
+
+```
+Cognito-Authorizer-IAM
+```
+
+Attach this policy (or ensure it exists):
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+**✔️ Click Create policy**
+
 - **✔️ Click Create IAM ROLE**
 
 ### 6️⃣ EC2 Instance (Amazon Linux 2023)
