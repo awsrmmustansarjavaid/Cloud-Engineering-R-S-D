@@ -276,6 +276,44 @@ Exit SMS sandbox
 
 **⚠️ Not recommended for labs**
 
+### 2️⃣ Callback / Return URL (MOST IMPORTANT STEP)
+
+> **the ❌ HTTP ERROR 400**
+
+#### This error happens only for ONE reason in Cognito:
+
+> **The redirect (callback) URL used in the browser does NOT exactly match the Callback URL configured in the App Client***
+
+**🟠 Cognito is extremely strict.**
+
+#### 🔎 What URL is your order-status.html really loaded from?
+
+You said:
+
+- EC2
+
+- Apache
+
+- ALB DNS name
+
+- Cloudfront
+
+So your real URL is something like:
+
+```
+http://<cloudfront>/cafe-admin-dashboard.html
+```
+
+Example:
+
+```
+https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+```
+
+
+---
+
+
 ### ✅ FINAL VERDICT (IMPORTANT)
 
 #### ✅ You should do THIS:
