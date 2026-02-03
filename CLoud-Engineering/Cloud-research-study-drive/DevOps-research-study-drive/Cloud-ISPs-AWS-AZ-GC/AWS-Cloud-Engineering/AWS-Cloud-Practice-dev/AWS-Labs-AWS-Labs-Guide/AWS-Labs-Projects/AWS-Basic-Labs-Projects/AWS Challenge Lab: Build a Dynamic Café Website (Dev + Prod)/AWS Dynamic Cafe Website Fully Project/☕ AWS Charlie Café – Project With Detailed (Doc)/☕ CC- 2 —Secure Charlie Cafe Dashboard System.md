@@ -772,7 +772,8 @@ or Identity Pool
 For now → Lambda-based authorization is perfect
 
 ---
-### 3️⃣ Where to COPY your Cognito Domain (exact path)
+
+### 2️⃣ Where to COPY your Cognito Domain (exact path)
 
 You asked this directly, so here is the exact path 👇
 
@@ -809,7 +810,7 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 
 **📌 Copy ONLY this part (no https, no /login)**
 
-### 4️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
+### 3️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
 
 ### 🟢 STEP 1️⃣ cafe-admin-dashboard.html File (Recommanded)
 
@@ -830,7 +831,7 @@ sudo nano /var/www/html/order-status.html
 sudo systemctl restart httpd
 ```
 
-## Task 2️⃣ - Cognito Hosted UI Customize Design
+### 4️⃣ Task 2️⃣ - Cognito Hosted UI Customize Design
 
 > **⚠️ Note: Yes can change the Cognito Hosted UI design, but with limits.**
 
