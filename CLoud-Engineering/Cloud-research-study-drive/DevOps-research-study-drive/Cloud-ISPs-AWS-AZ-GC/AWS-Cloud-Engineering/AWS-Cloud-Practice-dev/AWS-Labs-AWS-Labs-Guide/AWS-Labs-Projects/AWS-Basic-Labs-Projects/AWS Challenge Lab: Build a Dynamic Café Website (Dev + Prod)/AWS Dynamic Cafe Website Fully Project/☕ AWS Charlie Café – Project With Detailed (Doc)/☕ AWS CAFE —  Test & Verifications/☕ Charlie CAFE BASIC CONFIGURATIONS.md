@@ -629,28 +629,28 @@ charlie-cafe-s3-bucket/
     └── Basic_Config_Test_Result_2026-02-03_10-41-22.csv
 ```
 
-### 4️⃣ wrapper bash script PDF/CSV to S3
+### 4️⃣ Exporting Bash Script Output to S3
 
 #### 1️⃣ Create A file 
 
 ```
-sudo nano charlie_cafe_test_runner.sh
+sudo nano export_bash_output_s3.sh
 ```
 
-[wrapper bash script PDF/CSV to S3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_test_runner.sh)
+[Exporting Bash Script Output to S3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/export_bash_output_s3.sh)
 
 ### 2️⃣ How to use:
 
 - Make script executable:
 
 ```
-sudo chmod +x charlie_cafe_test_runner.sh
+sudo chmod +x export_bash_output_s3.sh
 ```
 
 - Run your verification script through it:
 
 ```
-sudo ./charlie_cafe_test_runner.sh ./charlie_cafe_lab_verify.sh
+sudo ./export_bash_output_s3.sh
 ```
 
 
