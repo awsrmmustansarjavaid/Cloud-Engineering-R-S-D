@@ -412,28 +412,36 @@ EC2-Cafe-Secrets-Role
 
 ✅ Verifies all tables
 
-✅ Verifies columns
+✅ List ALL tables
 
-✅ Verifies indexes
+✅ DESCRIBE each table (manual-style verification)
 
-✅ Verifies sample data
+✅ Verify critical columns
+
+✅ Verify indexes / constraints
+
+✅ Show row counts per table
+
+✅ Show sample data
+
+✅ Read-only (NO schema changes)
 
 📊 Gives clear pass/fail output
 
 ```
-sudo nano verify_cafe_rds_schema.sh
+sudo nano verify_charlie_cafe_rds.sh
 ```
 
-[Charlie Cafe Lab RDS Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/verify_cafe_rds_schema.sh)
+[Charlie Cafe Lab RDS Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/verify_charlie_cafe_rds.sh)
 
 #### ▶️ How to Run
 
 ```
-sudo chmod +x verify_cafe_rds_schema.sh
+sudo chmod +x verify_charlie_cafe_rds.sh
 ```
 
 ```
-sudo ./verify_cafe_rds_schema.sh
+sudo ./verify_charlie_cafe_rds.sh
 ```
 
 
