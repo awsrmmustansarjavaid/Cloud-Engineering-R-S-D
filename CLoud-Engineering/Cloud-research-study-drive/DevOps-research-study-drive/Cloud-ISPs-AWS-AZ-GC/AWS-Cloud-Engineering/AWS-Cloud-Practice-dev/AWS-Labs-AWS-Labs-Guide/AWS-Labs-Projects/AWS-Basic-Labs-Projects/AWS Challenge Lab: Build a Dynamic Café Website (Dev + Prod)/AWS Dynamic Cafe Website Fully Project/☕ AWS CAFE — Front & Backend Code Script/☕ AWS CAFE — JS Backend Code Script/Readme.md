@@ -4078,3 +4078,18 @@ const CHARLIE = (() => {
 })();
 ```
 
+#### ✅ FINAL CONFIRMATION
+
+✔ Issue was in central-auth-api.js
+
+✔ Issue is now fixed
+
+✔ No redirect loop
+
+✔ Cognito OAuth flow is correct
+
+✔ You can safely open protected pages directly
+
+---
+
+
