@@ -692,6 +692,51 @@ const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
 
 **📌 Copy ONLY this part (no https, no /login)**
 
+### 6️⃣ - Cognito Hosted UI Customize Design
+
+> **⚠️ Note: Yes can change the Cognito Hosted UI design, but with limits.**
+
+### 1️⃣ The CORRECT & PROFESSIONAL approach (used in real projects)
+
+#### 1️⃣ Option A (RECOMMENDED – what you’re already using)
+
+> **Use Cognito Hosted UI for login, then redirect back to your frontend page.**
+
+#### Flow:
+
+```
+Your Cafe Frontend Page
+   ↓
+Redirect to Cognito Hosted UI
+   ↓
+Login
+   ↓
+Redirect back with JWT
+```
+
+#### This is:
+
+- Secure
+
+- AWS-recommended
+
+- Production-ready
+
+- Simple to maintain
+
+#### 2️⃣ Option B (Advanced – NOT needed now)
+
+- Use Cognito + Custom Auth + Amplify / SDK
+
+- More complex
+
+- More backend work
+
+- Not required for your use case
+
+**👉 My professional advice:**
+**Stick with Hosted UI + redirect (Option A).**
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
@@ -971,51 +1016,6 @@ sudo nano /var/www/html/order-status.html
 ```
 sudo systemctl restart httpd
 ```
-
-### 4️⃣ Task 2️⃣ - Cognito Hosted UI Customize Design
-
-> **⚠️ Note: Yes can change the Cognito Hosted UI design, but with limits.**
-
-### 1️⃣ The CORRECT & PROFESSIONAL approach (used in real projects)
-
-#### 1️⃣ Option A (RECOMMENDED – what you’re already using)
-
-> **Use Cognito Hosted UI for login, then redirect back to your frontend page.**
-
-#### Flow:
-
-```
-Your Cafe Frontend Page
-   ↓
-Redirect to Cognito Hosted UI
-   ↓
-Login
-   ↓
-Redirect back with JWT
-```
-
-#### This is:
-
-- Secure
-
-- AWS-recommended
-
-- Production-ready
-
-- Simple to maintain
-
-#### 2️⃣ Option B (Advanced – NOT needed now)
-
-- Use Cognito + Custom Auth + Amplify / SDK
-
-- More complex
-
-- More backend work
-
-- Not required for your use case
-
-**👉 My professional advice:**
-**Stick with Hosted UI + redirect (Option A).**
 
 **✅ PHASE 3️⃣ STATUS**
 
