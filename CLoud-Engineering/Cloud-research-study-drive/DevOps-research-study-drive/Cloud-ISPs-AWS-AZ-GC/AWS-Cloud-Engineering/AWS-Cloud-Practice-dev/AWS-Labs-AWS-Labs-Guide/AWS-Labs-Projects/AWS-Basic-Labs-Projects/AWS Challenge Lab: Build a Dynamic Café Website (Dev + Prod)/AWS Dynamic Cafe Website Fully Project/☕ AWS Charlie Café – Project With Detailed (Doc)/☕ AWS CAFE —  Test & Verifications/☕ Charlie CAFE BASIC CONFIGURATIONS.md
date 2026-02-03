@@ -626,8 +626,7 @@ sudo ./charlie_cafe_lab_test_verify.sh
 charlie-cafe-s3-bucket/
 └── Charlie Cafe Test and Verification/
     ├── Basic_Config_Test_Result_2026-02-03_10-41-22.txt
-    ├── Basic_Config_Test_Result_2026-02-03_10-41-22.csv
-    └── Basic_Config_Test_Result_2026-02-03_10-41-22.pdf
+    └── Basic_Config_Test_Result_2026-02-03_10-41-22.csv
 ```
 
 
