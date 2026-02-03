@@ -1015,15 +1015,15 @@ or Identity Pool
 
 For now → Lambda-based authorization is perfect
 
----
-
-
 
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 4️⃣ — SECURE API GATEWAY AUTH (MOST IMPORTANT) 
+## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
+
+
+### 1️⃣ SECURE API GATEWAY AUTH (MOST IMPORTANT) 
 
 ### 1️⃣ Create Cognito Authorizer
 
