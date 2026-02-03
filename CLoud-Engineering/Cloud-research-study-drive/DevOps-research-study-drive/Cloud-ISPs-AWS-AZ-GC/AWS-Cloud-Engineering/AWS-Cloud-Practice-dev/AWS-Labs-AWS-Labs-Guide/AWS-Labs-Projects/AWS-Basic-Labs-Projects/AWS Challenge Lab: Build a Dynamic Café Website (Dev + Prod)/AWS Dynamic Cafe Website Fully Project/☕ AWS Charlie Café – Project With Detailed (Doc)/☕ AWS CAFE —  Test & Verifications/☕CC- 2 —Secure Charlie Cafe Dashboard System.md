@@ -292,3 +292,150 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
+### Cognito Errors 1 - Invalid request
+
+> **The “Invalid request” error means one (or more) OAuth parameters don’t match Cognito’s App Client settings**
+
+
+### 🔥 ROOT CAUSE (the real problem)
+
+#### ❌ You are mixing login parameters incorrectly
+
+#### You opened this URL:
+
+```
+/login?client_id=...&logout_uri=...
+```
+
+**🚫 logout_uri is NOT valid on /login**
+
+#### ⚠️ For login, Cognito REQUIRES:
+
+```
+redirect_uri
+```
+
+> **So Cognito throws:**
+
+> **Invalid request – Please check your input**
+
+### ✅ CORRECT LOGIN URL (IMPORTANT)
+
+#### Use redirect_uri, not logout_uri
+
+```
+https://us-east-1hdcwdjqvz.auth.us-east-1.amazoncognito.com/login
+?response_type=token
+&client_id=3hcigucn7fmd11gvo9uuqud6fi
+&scope=openid+email+profile
+&redirect_uri=https://d159bqc5pw64hn.cloudfront.net/cafe-admin-dashboard.html
+```
+
+**👉 Open this exact URL in browser**
+
+### 🧠 WHY THIS HAPPENS (Cognito rules)
+
+| Action | Required Param                        |
+| ------ | ------------------------------------- |
+| Login  | `redirect_uri`                        |
+| Logout | `logout_uri`                          |
+| Both   | Must be **pre-allowed** in App Client |
+
+- You passed a logout parameter during login → OAuth spec violation → Cognito blocks it.
+
+### 🔧 REQUIRED COGNITO CONSOLE SETTINGS (CRITICAL)
+
+- Go to: Cognito → User Pool → App integration → App client settings
+
+#### ✅ Allowed OAuth Flows
+
+✔ Implicit grant
+
+✔ (Optional later) Authorization code grant
+
+#### ✅ Allowed OAuth Scopes
+
+✔ openid
+
+✔ email
+
+✔ profile
+
+#### ✅ Allowed Callback URLs (LOGIN)
+
+- Add EXACTLY (no typos, https matters):
+
+```
+https://d159bqc5pw64hn.cloudfront.net/cafe-admin-dashboard.html
+```
+
+- You may also add:
+
+```
+https://d159bqc5pw64hn.cloudfront.net/
+```
+
+#### ✅ Allowed Sign-out URLs (LOGOUT)
+
+```
+https://d159bqc5pw64hn.cloudfront.net/
+```
+
+#### ⚠️ Cognito is EXTREMELY strict
+
+- http ≠ https
+
+- trailing / matters
+
+- CloudFront domain must match exactly
+
+### ✅ YOUR central-auth-api.js (GOOD NEWS)
+
+Your code is mostly correct 💪
+Only one thing to be aware of:
+
+#### ✔ Login function is correct
+
+```
+login(redirectUrl = window.location.href) {
+    const url =
+        `https://${CONFIG.COGNITO_DOMAIN}/login` +
+        `?response_type=token` +
+        `&client_id=${CONFIG.CLIENT_ID}` +
+        `&scope=openid+email+profile` +
+        `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+    window.location.href = url;
+}
+```
+
+**➡️ Just make sure:**
+
+- redirectUrl is one of the allowed callback URLs
+
+- For admin dashboard, explicitly do:
+
+```
+CHARLIE.auth.login(
+  "https://d159bqc5pw64hn.cloudfront.net/cafe-admin-dashboard.html"
+);
+```
+
+### 🧪 QUICK DEBUG CHECKLIST (DO THIS)
+
+1️⃣ Fix login URL → use redirect_uri
+2️⃣ Confirm callback URL exists in Cognito
+3️⃣ Confirm logout URL exists in Cognito
+4️⃣ Ensure Implicit Grant is enabled
+5️⃣ Clear browser cache (Cognito is sticky)
+6️⃣ Retry in incognito window
+
+### 🟢 FINAL VERDICT
+
+✅ Cognito is healthy
+✅ Your domain is correct
+✅ Your JS auth architecture is solid
+❌ One wrong OAuth parameter caused the failure
+
+**Once you fix this → login will work instantly**
+
+----
