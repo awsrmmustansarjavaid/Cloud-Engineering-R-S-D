@@ -2193,14 +2193,21 @@ export AWS_DEFAULT_REGION="$AWS_REGION"
 # ===============================
 if ! command -v pandoc >/dev/null 2>&1; then
     echo "📦 Pandoc not found. Installing..."
-    if ! rpm -q epel-release >/dev/null 2>&1; then
-        echo "   → Installing epel-release..."
-        sudo amazon-linux-extras install epel -y || sudo yum install epel-release -y
-    fi
-    sudo yum install pandoc -y || {
-        echo "❌ Pandoc installation failed. Please install manually."
-        exit 1
-    }
+    PANDOC_VERSION="3.1.7"  # latest stable as of now
+    PANDOC_URL="https://github.com/jgm/pandoc/releases/download/$PANDOC_VERSION/pandoc-$PANDOC_VERSION-linux-amd64.tar.gz"
+
+    TMP_DIR=$(mktemp -d)
+    echo "   → Downloading pandoc $PANDOC_VERSION..."
+    curl -L "$PANDOC_URL" -o "$TMP_DIR/pandoc.tar.gz"
+
+    echo "   → Extracting pandoc..."
+    tar -xzf "$TMP_DIR/pandoc.tar.gz" -C "$TMP_DIR"
+
+    echo "   → Installing to /usr/local/bin..."
+    sudo cp "$TMP_DIR/pandoc-$PANDOC_VERSION/bin/pandoc" /usr/local/bin/
+    sudo chmod +x /usr/local/bin/pandoc
+
+    rm -rf "$TMP_DIR"
     echo "✅ Pandoc installed successfully"
 fi
 
