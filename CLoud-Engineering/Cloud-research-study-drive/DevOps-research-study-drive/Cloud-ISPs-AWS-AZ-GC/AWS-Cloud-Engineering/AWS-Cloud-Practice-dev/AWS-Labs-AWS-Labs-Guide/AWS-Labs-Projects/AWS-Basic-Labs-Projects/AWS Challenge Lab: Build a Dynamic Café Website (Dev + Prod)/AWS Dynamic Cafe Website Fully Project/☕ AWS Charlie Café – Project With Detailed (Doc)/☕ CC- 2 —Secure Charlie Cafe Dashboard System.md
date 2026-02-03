@@ -650,7 +650,9 @@ Exit SMS sandbox
 ## 🔐 PHASE 3️⃣ — Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
 > **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
-### 🟢 STEP 1️⃣ — CREATE ADMIN USER (MANDATORY)
+### 🟢 STEP 1️⃣ — CREATE USER & Groups (MANDATORY)
+
+### 1️⃣ — CREATE ADMIN USER (MANDATORY)
 
 #### 1️⃣ Where:
 
@@ -679,6 +681,126 @@ Create user
 Click Create user
 
 ✅ Admin account created
+
+### 2️⃣ — CREATE Employee USER (MANDATORY)
+
+```
+Create user
+```
+
+| Setting                  | Value / Recommendation                                 | Notes / Action Required                              |
+|--------------------------|--------------------------------------------------------|------------------------------------------------------|
+| **Username**             | Ali                                              | Use this exact username for consistency (case-sensitive in some flows) |
+| **Temporary password**   | Auto-generated (recommended) or Manual                 | If manual: Use a strong one like `C@fe@dmin$` (must meet password policy) |
+| **Suggested manual temp password** | C@fe@li$1                                            | Meets default policy: 8+ chars, upper/lower/number/special |
+| **Email**                | your-email@example.com                                 | Replace with your real email (used for verification & recovery) |
+| **Mark email as verified** | ✓ Yes (check the box)                                  | Critical: Enables immediate login without email verification step |
+| **Message delivery**     | Email (default)                                        | Temporary password sent to the provided email        |
+| **Additional attributes** | Optional: name = "Cafe Admin" (if required by your app) | Add if your required attributes include name  
+
+### 3️⃣ — CREATE Admin Group (MANDATORY)
+
+#### 1️⃣ Where:
+
+```
+Cognito → User pools → Your user pool → groups → Create group
+```
+
+#### 1️⃣ Create Admin Group
+
+- Group name: 
+
+```
+Cafe-Admin
+```
+
+- Description:
+
+```
+Cafe administrators
+```
+
+- Precedence:
+
+```
+1
+```
+
+- IAM role:
+
+```
+👉 Leave empty for now (we’ll attach later if needed)
+```
+
+- **Click Create group**
+
+#### 2️⃣ Create Employee Group
+
+- Group name: 
+
+```
+Cafe-Employee
+```
+
+- Description:
+
+```
+Cafe employees
+```
+
+- Precedence:
+
+```
+10
+```
+
+- IAM role:
+
+```
+👉 Leave empty for now (we’ll attach later if needed)
+```
+
+- **Click Create group**
+
+**✅ Both Groups created**
+
+### 4️⃣ — Assign Users to Groups (MANDATORY)
+
+#### 1️⃣ Where:
+
+```
+Cognito → User pools → Your user pool → Users
+```
+
+#### 1️⃣ Add Admin User to Admin Group
+
+- Click Admin user
+
+- Go to Groups
+
+- Click Add to group
+
+- Select Admin
+
+- Save
+
+#### 2️⃣ Add Employee User to Employee Group
+
+- Click Employee user
+
+- Go to Groups
+
+- Add to Employee
+
+- Save
+
+
+
+
+
+
+
+
 
 #### 4️⃣ Callback / Return URL (MOST IMPORTANT STEP)
 
