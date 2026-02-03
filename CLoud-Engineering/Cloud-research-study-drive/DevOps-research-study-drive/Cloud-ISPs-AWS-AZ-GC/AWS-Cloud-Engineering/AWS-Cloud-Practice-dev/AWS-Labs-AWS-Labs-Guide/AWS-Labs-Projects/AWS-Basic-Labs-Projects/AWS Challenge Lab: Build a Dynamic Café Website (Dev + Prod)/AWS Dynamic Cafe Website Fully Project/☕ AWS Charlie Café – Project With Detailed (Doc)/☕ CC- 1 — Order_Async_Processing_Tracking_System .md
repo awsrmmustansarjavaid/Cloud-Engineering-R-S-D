@@ -12,6 +12,12 @@
 ### READ Me About
 
 [☕ CC- 1 — Order Async Processing & Tracking System](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕%20CC-%201%20—%20Order_Async_Processing_Tracking_System.md)
+
+### ☕ AWS Charlie Café – Test & Verifications
+
+[Secure Charlie Cafe Dashboard System](./☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕CC-%201%20—%20Order_Async_Processing_Tracking_System%20.md)
+
+
 ---
 
 # SECTION 1️⃣ Cafe Order Processor
