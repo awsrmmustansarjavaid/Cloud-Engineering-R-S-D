@@ -951,43 +951,6 @@ For now → Lambda-based authorization is perfect
 
 ---
 
-### 2️⃣ Where to COPY your Cognito Domain (exact path)
-
-You asked this directly, so here is the exact path 👇
-
-### 🟢 STEP 1️⃣ AWS Console path:
-
-```
-Cognito
-→ User pools
-→ Your user pool
-→ App integration
-→ Domain
-```
-
-### 🟢 STEP 2️⃣ You will see something like:
-
-```
-Domain:
-us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com
-```
-
-👉 Copy ONLY this part
-
-❌ Do NOT include https://
-
-❌ Do NOT include /login
-
-**⚠️ Simple words: Do NOT add https:// inside the variable (your code already adds it)**
-
-#### Example:
-
-```
-const COGNITO_DOMAIN = "charlie-cafe-admin.auth.us-east-1.amazoncognito.com";
-```
-
-**📌 Copy ONLY this part (no https, no /login)**
-
 ### 3️⃣ ✅ FINAL WORKING Frontend File(READY TO USE)
 
 ### 🟢 STEP 1️⃣ cafe-admin-dashboard.html File (Recommanded)
