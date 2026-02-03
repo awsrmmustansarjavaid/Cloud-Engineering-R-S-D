@@ -2256,5 +2256,34 @@ echo "Files include timestamp: $TIMESTAMP"
 echo "============================================================="
 ```
 
+### ✅ Key Fixes and Features:
+
+#### Pandoc Installation Fix
+
+- Handles Amazon Linux 2 / 2023 by installing epel-release first.
+
+- Installs pandoc automatically if missing.
+
+#### General Purpose
+
+- You can run any bash script, not just your test scripts.
+
+- Multiple example paths included with comments.
+
+#### Output
+
+- Captures text output → converts to CSV and PDF.
+
+- Adds timestamp to filenames.
+
+#### S3 Upload
+
+- Creates folder: Charlie Cafe Test and Verification in your S3 bucket.
+
+- Uploads all 3 files.
+
+#### AWS Credentials
+
+- Replace AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY with your own.
 ---
 
