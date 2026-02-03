@@ -461,7 +461,7 @@ CafeDevWebServer
 
 ### ☕ AWS Charlie Café – Test & Verifications
 
-[☕ Charlie CAFE BASIC CONFIGURATIONS](./☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕%20Charlie%20CAFE%20BASIC%20CONFIGURATIONS.md)
+[☕ Charlie CAFE BASIC CONFIGURATIONS](../☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕%20Charlie%20CAFE%20BASIC%20CONFIGURATIONS.md)
 
 ---
 ## PHASE 2️⃣ — Development and Delopment LAMP Server 
