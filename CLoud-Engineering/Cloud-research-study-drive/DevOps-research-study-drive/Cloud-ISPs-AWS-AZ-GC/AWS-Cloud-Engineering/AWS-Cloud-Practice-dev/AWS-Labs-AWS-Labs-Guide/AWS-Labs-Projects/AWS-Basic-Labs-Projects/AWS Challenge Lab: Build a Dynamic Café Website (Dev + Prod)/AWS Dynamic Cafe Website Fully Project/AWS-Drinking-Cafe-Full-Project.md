@@ -627,6 +627,22 @@ sudo ./connect-rds.sh
 
 > **File name: setup_charlie_cafe_db_full.sh**
 
+✔️ Pulls DB creds from AWS Secrets Manager
+
+✔️ Connects to RDS MySQL
+
+✔️ Creates database
+
+✔️ Creates orders + HR tables
+
+✔️ Adds indexes
+
+✔️ Inserts test data
+
+✔️ Is idempotent (safe to re-run)
+
+✔️ Ends with clear verification output
+
 ```
 sudo nano setup_charlie_cafe_db_full.sh
 ```
