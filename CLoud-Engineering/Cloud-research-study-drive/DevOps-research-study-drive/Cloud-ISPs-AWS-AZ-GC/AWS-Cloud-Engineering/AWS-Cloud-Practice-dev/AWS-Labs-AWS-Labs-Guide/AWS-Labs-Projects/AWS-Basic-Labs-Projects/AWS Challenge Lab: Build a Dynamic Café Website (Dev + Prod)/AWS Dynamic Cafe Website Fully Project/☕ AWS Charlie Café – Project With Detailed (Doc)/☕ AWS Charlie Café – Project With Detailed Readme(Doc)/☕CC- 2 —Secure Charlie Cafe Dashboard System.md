@@ -2082,6 +2082,207 @@ You leveled up from junior backend → mid/senior backend thinking.
 
 ----
 
+## ✅ CafeOrderStatusRBACLambda ✅
+
+### ✅ New Lambda Function
+
+- 🔖 New Lambda name:
+
+```
+CafeOrderStatusRBACLambda
+```
+
+#### ✅ MERGED LAMBDA CODE (DROP-IN READY)
+
+[CafeOrderStatusRBACLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusRBACLambda.py)
+
+### 2️⃣ 🔐 API → Lambda wiring
+
+Make sure ALL routes point to:
+
+```
+CafeOrderStatusRBACLambda
+```
+
+#### Example:
+
+- /order-status → CafeOrderStatusRBACLambda
+
+- /admin/dashboard → CafeOrderStatusRBACLambda
+
+✔ Same Lambda, different paths
+
+✔ Path decides behavior
+
+### 1️⃣ CREATE OR UPDATE LAMBDA
+> **🔖 CafeOrderStatusRBACLambda**
+
+### 🧪 LAMBDA TEST JSON (ADMIN USER)
+
+Use this in Lambda → Test
+
+```
+{
+  "path": "/order-status",
+  "queryStringParameters": {
+    "date": "2026-01-17"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "admin_user",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
+```
+
+#### ✅ Expected:
+
+- statusCode: 200
+
+- Metrics + recent orders returned
+
+### 🧪 LAMBDA TEST JSON (EMPLOYEE USER – SHOULD FAIL)
+
+```
+{
+  "path": "/order-status",
+  "queryStringParameters": null,
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "employee_user",
+        "cognito:groups": "employee"
+      }
+    }
+  }
+}
+```
+
+#### ❌ Expected:
+
+```
+{
+  "error": "Admin access only"
+}
+```
+
+### 🧪 LAMBDA TEST JSON (NO ROLE / MISCONFIG)
+
+```
+{
+  "path": "/order-status",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "unknown_user"
+      }
+    }
+  }
+}
+```
+
+#### ❌ Expected:
+
+- 403 Forbidden
+
+### ✅ Test 1 — No token
+
+```
+curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
+
+#### Expected:
+
+```
+401 Unauthorized
+```
+
+✔ API Gateway working
+
+✅ Test 2 — Employee token
+
+```
+
+{
+  "path": "/order-status",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "employee_user",
+        "cognito:groups": "employee"
+      }
+    }
+  }
+}
+```
+
+Expected:
+
+```
+403 Admin access only
+```
+
+✔ RBAC working
+
+✅ Test 3 — Admin token
+
+```
+{
+  "path": "/order-status",
+  "queryStringParameters": {
+    "date": "2026-01-17"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "admin_user",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
+```
+
+#### Expected:
+
+Metrics
+
+Recent orders
+
+statusCode 200
+
+✔ Everything correct
+
+✅ Test 4 — Browser (REAL WORLD)
+
+1️⃣ Login via Cognito Hosted UI
+2️⃣ Access token in localStorage
+3️⃣ Frontend loads dashboard
+4️⃣ Network tab shows:
+
+```
+Authorization: Bearer eyJraWQiOi...
+```
+
+5️⃣ /order-status returns data
+
+✔ Production-ready
+
+🟢 FINAL VERDICT (VERY IMPORTANT)
+
+✅ Your configuration is NOW CORRECT
+✅ You are using best-practice RBAC
+✅ One Lambda is the right choice
+✅ No wasted work
+✅ No rewrite needed
+
+What you built is exactly how a senior backend engineer would do it under time pressure.
+**✅ CafeOrderStatusRBACLambda ✅ COMPLETE & VERIFIED**
+---
+
 
 
 **✅ PHASE 5️⃣ STATUS**

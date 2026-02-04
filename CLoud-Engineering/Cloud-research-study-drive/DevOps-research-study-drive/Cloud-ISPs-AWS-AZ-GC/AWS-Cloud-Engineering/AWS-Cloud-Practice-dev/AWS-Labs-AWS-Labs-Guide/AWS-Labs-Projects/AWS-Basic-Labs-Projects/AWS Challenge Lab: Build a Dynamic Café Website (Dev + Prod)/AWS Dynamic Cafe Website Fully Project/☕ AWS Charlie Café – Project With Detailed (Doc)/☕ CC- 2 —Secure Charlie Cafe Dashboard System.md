@@ -1169,32 +1169,17 @@ API_URL = ".../admin/order-status"
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 ### 1️⃣ CREATE OR UPDATE LAMBDA
 
-- **Runtime:** Python 3.12
-
-- **Permissions:** Create new role with basic Lambda permissions
-
-#### ✅ New Lambda Function (recommended)
-
-- 🔖 New Lambda name:
-
-```
-CafeOrderStatusRBACLambda
-```
-
-#### ✅ MERGED LAMBDA CODE (DROP-IN READY)
-
-[CafeOrderStatusRBACLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusRBACLambda.py)
-
-## 🛑  OlD Configurations -- Leave it 🛑
-
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
 - **Function name:** OrderStatusLambda
+
+- **Runtime:** Python 3.12
+
+- **Permissions:** Create new role with basic Lambda permissions
 
 ### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
 
@@ -1202,26 +1187,6 @@ CafeOrderStatusRBACLambda
 > Nothing else needs to change
 
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
-
-## 🛑  OlD Configurations 🛑
-
-### 2️⃣ 🔐 API → Lambda wiring
-
-Make sure ALL routes point to:
-
-```
-CafeOrderStatusRBACLambda
-```
-
-#### Example:
-
-- /order-status → CafeOrderStatusRBACLambda
-
-- /admin/dashboard → CafeOrderStatusRBACLambda
-
-✔ Same Lambda, different paths
-
-✔ Path decides behavior
 
 ### 3️⃣ 🔐 Add Environment Variables
 
