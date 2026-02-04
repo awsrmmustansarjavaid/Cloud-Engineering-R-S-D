@@ -669,7 +669,56 @@ Look for:
 
 ✔ Lambda imports from rbac import authorize
 
-### 3️⃣ Lambda Code Test
+### 3️⃣ Verify CLI SCRIPT TO UPDATE ALL LAMBDAS (spot check)
+
+```
+aws lambda get-function-configuration \
+  --function-name OrderStatusLambda
+```
+
+#### Look for:
+
+```
+"Layers": [
+  {
+    "Arn": "arn:aws:lambda:us-east-1:XXXX:layer:cafe-rbac-layer:2"
+  }
+]
+```
+
+### 3️⃣ VIEW AUDIT LOGS Test
+
+- Go to: CloudWatch → Log groups → /aws/lambda/<LambdaName>
+
+#### You’ll see logs like:
+
+```
+{
+  "timestamp": "2026-02-04T18:32:11",
+  "username": "charlie.admin",
+  "groups": ["admin"],
+  "path": "/admin/dashboard",
+  "decision": "ALLOW"
+}
+```
+
+**This is enterprise-grade RBAC auditing.**
+
+#### ✅ FINAL ARCHITECTURE
+
+```
+Cognito (Groups)
+     ↓
+API Gateway (Authorizer)
+     ↓
+Lambda
+     ↓
+RBAC Layer
+     ↓
+Audit Logs (CloudWatch)
+```
+
+### 4️⃣ Lambda Code Test
 
 - Name:
 
@@ -701,7 +750,7 @@ Test_OrderStatusLambda
 
 ✅ returns filtered orders
 
-### 4️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
+### 5️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
 
 #### 1️⃣ ❌ Without token
 

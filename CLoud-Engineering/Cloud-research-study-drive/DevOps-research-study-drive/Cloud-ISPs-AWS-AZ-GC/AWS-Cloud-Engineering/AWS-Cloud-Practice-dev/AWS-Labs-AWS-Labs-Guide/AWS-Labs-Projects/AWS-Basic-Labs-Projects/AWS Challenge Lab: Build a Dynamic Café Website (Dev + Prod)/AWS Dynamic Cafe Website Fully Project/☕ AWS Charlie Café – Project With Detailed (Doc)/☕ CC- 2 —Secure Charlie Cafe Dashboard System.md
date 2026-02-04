@@ -1288,10 +1288,60 @@ aws lambda update-function-configuration \
 
 - Layer version if newer
 
-### 2️⃣ 
+### 2️⃣ CLI SCRIPT TO UPDATE ALL LAMBDAS
 
+#### 1️⃣ Create update script
 
-### 2️⃣ CREATE OR UPDATE LAMBDA
+```
+sudo nano update_all_lambdas.sh
+```
+
+#### ✅ COPY THIS SCRIPT (SAFE VERSION)
+
+[update_all_lambdas.sh](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/update_all_lambdas.sh)
+
+#### 🧪 How to run
+
+```
+sudo chmod +x update_all_lambdas.sh
+```
+```
+sudo ./update_all_lambdas.sh
+```
+
+#### Expected output:
+
+```
+Updating OrderStatusLambda ...
+Updating PaymentLambda ...
+Updating AttendanceLambda ...
+✅ All Lambdas updated successfully
+```
+
+### 3️⃣ USING RBAC IN EACH LAMBDA
+> **(ONE LINE)**
+
+Inside every Lambda handler:
+
+```
+from rbac import authorize
+
+def lambda_handler(event, context):
+    authorize(event)   # ⬅ RBAC + audit log
+    
+    return {
+        "statusCode": 200,
+        "body": "OK"
+    }
+```
+
+❌ No duplication
+
+❌ No IAM mess
+
+❌ No multiple Lambdas for roles
+
+### 4️⃣ CREATE OR UPDATE LAMBDA
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
