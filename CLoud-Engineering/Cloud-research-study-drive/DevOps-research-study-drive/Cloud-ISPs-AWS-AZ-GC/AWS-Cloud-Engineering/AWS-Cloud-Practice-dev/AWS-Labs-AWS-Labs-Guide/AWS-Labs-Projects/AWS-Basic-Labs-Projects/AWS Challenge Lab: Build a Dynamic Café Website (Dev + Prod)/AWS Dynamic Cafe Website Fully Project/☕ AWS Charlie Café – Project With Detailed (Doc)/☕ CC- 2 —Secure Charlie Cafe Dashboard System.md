@@ -1210,7 +1210,20 @@ sudo nano cafe-rbac-layer/python/rbac.py
 
 - Save and exit (CTRL + O, ENTER, CTRL + X)
 
-#### 4️⃣ Create the ZIP (Layer package)
+#### 4️⃣ RBAC Layer Setup
+
+#### Method 1- Bash Script Charlie Cafe RBAC Layer Setup & Verification
+
+```
+sudo nano charlie_cafe_rbac_layer_test_verify.sh
+```
+
+[rbac.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/rbac.py)
+
+
+#### Method 2 Manual 1 T0 1
+
+#### 1️⃣ Create the ZIP (Layer package)
 
 Run this inside the folder that contains python/:
 
@@ -1232,7 +1245,7 @@ python/rbac.py
 python/permissions.json
 ```
 
-#### 5️⃣ Publish Lambda Layer using AWS CLI
+#### 2️⃣ Publish Lambda Layer using AWS CLI
 
 Make sure AWS CLI is configured
 
@@ -1260,7 +1273,7 @@ aws lambda publish-layer-version \
 }
 ```
 
-#### 6️⃣ Attach Layer to a Lambda (CLI)
+#### 3️⃣ Attach Layer to a Lambda (CLI)
 
 Example: attach to order-status Lambda
 
