@@ -1240,41 +1240,6 @@ DB_NAME = cafe
 
 - Same 
 
-### 6️⃣ 🔐 Test
-
-- Name:
-
-```
-Test_OrderStatusLambda
-```
-
-```
-{}
-```
-#### Expected Result
-
-```
-{
-  "statusCode": 200,
-  "headers": {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Authorization",
-    "Access-Control-Allow-Methods": "GET"
-  },
-```
-
-#### ✅ Result:
-
-```
-/order-status?date=YYYY-MM-DD
-```
-
-✅ returns filtered orders
-
-
-
-
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
 ### 4️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)

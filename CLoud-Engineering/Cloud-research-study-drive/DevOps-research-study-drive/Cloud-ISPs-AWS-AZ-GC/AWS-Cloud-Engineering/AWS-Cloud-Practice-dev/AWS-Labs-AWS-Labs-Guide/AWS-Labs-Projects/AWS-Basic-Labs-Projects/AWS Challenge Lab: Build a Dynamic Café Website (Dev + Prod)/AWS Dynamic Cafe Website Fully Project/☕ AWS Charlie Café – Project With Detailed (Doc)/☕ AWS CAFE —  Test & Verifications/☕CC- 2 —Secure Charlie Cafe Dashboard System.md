@@ -766,6 +766,42 @@ Authorization: Bearer eyJraWQiOi...
 
 What you built is exactly how a senior backend engineer would do it under time pressure.
 
+### ❌ Old Lambda Code Test
+
+- Name:
+
+```
+Test_OrderStatusLambda
+```
+
+```
+{}
+```
+#### Expected Result
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization",
+    "Access-Control-Allow-Methods": "GET"
+  },
+```
+
+#### ✅ Result:
+
+```
+/order-status?date=YYYY-MM-DD
+```
+
+✅ returns filtered orders
+
+
+
+
+
 
 **✅ PHASE 5️⃣ STATUS**
 
