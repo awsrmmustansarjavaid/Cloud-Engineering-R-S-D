@@ -1160,6 +1160,7 @@ API_URL = ".../admin/order-status"
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
+
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 ### 1️⃣ CREATE OR UPDATE LAMBDA
@@ -1176,13 +1177,7 @@ CafeOrderStatusRBACLambda
 
 [CafeOrderStatusRBACLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusRBACLambda.py)
 
-
-
-
-
-----
-
-## 🛑  OlD Configurations 1️⃣ CREATE OR UPDATE LAMBDA 🛑
+## 🛑  OlD Configurations -- Leave it 🛑
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
@@ -1198,6 +1193,8 @@ CafeOrderStatusRBACLambda
 > Nothing else needs to change
 
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
+
+## 🛑  OlD Configurations 🛑
 
 ### 3️⃣ 🔐 Add Environment Variables
 
