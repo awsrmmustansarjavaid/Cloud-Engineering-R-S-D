@@ -1065,11 +1065,9 @@ or /api/*
 ---
 ## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
 
-### 1️⃣ SECURE API GATEWAY AUTH (MOST IMPORTANT) 
+### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
 
-### 1️⃣ Create Cognito Authorizer
-
-#### 1️⃣ Create Cognito Authorizer
+### 1️⃣ Enable Cognito Authorizer
 
 - Go to AWS Console → API Gateway → REST API → YOUR_API
 
