@@ -971,9 +971,61 @@ https://cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>
 
 **✔ API created**
 
-#### 3️⃣ Create HTTP API (NOT REST)
+#### 3️⃣ Create Routes
 
+- Go to: API Gateway → Routes → Click Create
 
+#### Admin Routes 1
+
+- Method: GET
+
+- Path: /admin/dashboard
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Admin Routes 2
+
+- Method: POST
+
+- Path: /admin/create-user
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+> **💡 This is how /admin/* works**
+
+**📢 You manually create routes that start with /admin/**
+
+#### Employee Routes 1
+
+- Method: GET
+
+- Path: /employee/orders
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Employee Routes 2
+
+- Method: POST
+
+- Path: /employee/order
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
 
 
 #### 3️⃣ Attach this authorizer to your routes
