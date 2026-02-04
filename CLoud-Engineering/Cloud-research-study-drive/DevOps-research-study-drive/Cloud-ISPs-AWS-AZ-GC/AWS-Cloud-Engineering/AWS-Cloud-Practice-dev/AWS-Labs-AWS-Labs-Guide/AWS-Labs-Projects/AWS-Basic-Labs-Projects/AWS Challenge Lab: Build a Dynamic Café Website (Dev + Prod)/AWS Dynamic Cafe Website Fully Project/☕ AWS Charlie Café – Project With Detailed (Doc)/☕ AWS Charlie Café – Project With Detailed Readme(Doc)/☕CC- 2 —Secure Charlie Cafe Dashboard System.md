@@ -1316,7 +1316,87 @@ POST /employee/order
 
 **Then attach the same Cognito Authorizer to those routes.**
 
+### 🟢 STEP 5️⃣ — Use Groups in Lambda (REAL PERMISSIONS)
 
+This is where most labs fail — you won’t 😎
+
+#### 🔐 Example: Admin-Only Lambda
+
+```
+def lambda_handler(event, context):
+
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if "Admin" not in groups:
+        return {
+            "statusCode": 403,
+            "body": "Access denied: Admin only"
+        }
+
+    # Admin logic here
+    return {
+        "statusCode": 200,
+        "body": "Welcome Admin"
+    }
+```
+
+#### 👨‍🍳 Example: Employee-Only Lambda
+
+```
+def lambda_handler(event, context):
+
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if "Employee" not in groups:
+        return {
+            "statusCode": 403,
+            "body": "Access denied: Employee only"
+        }
+
+    # Employee logic here
+    return {
+        "statusCode": 200,
+        "body": "Welcome Employee"
+    }
+```
+
+### 🟢 STEP 6️⃣ — Protect APIs via API Gateway (Recommended)
+
+In API Gateway:
+
+Create Cognito Authorizer
+
+Attach it to your API routes
+
+API Gateway automatically:
+
+validates token
+
+injects user claims into Lambda
+
+No token = ❌
+Wrong group = ❌
+Correct group = ✅
+
+
+### 🟢 STEP 7️⃣ — 🎯 OPTIONAL (Advanced but Powerful)
+Attach IAM Role to Groups (Later)
+
+Example:
+
+Admin Group → IAM Role with DynamoDB + S3 + CloudWatch
+
+Employee Group → IAM Role with limited access
+
+This is useful if:
+
+you use AWS SDK directly from frontend
+
+or Identity Pool
+
+For now → Lambda-based authorization is perfect
 
 **✅ PHASE 2️⃣ & 3️⃣ STATUS**
 
