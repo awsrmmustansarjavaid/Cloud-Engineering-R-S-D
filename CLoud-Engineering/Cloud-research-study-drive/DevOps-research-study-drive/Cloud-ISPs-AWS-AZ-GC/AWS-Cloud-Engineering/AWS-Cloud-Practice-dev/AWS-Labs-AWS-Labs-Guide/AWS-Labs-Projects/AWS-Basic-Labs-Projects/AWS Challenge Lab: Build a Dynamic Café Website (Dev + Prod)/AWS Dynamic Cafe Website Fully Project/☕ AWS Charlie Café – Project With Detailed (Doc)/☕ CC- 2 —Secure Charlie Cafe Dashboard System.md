@@ -1210,24 +1210,75 @@ sudo nano cafe-rbac-layer/python/rbac.py
 
 - Save and exit (CTRL + O, ENTER, CTRL + X)
 
-#### 4️⃣ Verify files
+#### 4️⃣ Create the ZIP (Layer package)
+
+Run this inside the folder that contains python/:
 
 ```
-sudo tree cafe-rbac-layer
+cd cafe-rbac-layer
+zip -r cafe-rbac-layer.zip python
 ```
 
-#### Expected output:
+Verify zip contents:
 
 ```
-cafe-rbac-layer
-└── python
-    ├── rbac.py
-    └── permissions.json
+unzip -l cafe-rbac-layer.zip
 ```
 
-**If this does NOT match → STOP and fix**
+You MUST see:
 
+```
+python/rbac.py
+python/permissions.json
+```
 
+#### 5️⃣ Publish Lambda Layer using AWS CLI
+
+Make sure AWS CLI is configured
+
+```
+aws configure
+```
+**(Access key, secret, region, output)**
+
+Create the layer (Amazon Linux 2023 compatible)
+
+```
+aws lambda publish-layer-version \
+  --layer-name cafe-rbac-layer \
+  --description "Charlie Cafe Universal RBAC Layer" \
+  --zip-file fileb://cafe-rbac-layer.zip \
+  --compatible-runtimes python3.12 python3.11 python3.10
+```
+
+#### ✅ Expected output includes:
+
+```
+{
+  "LayerVersionArn": "arn:aws:lambda:us-east-1:XXXX:layer:cafe-rbac-layer:1",
+  "Version": 1
+}
+```
+
+#### 6️⃣ Attach Layer to a Lambda (CLI)
+
+Example: attach to order-status Lambda
+
+```
+aws lambda update-function-configuration \
+  --function-name CafeOrderStatusLambda \
+  --layers arn:aws:lambda:us-east-1:XXXX:layer:cafe-rbac-layer:1
+```
+
+#### 📌 Replace:
+
+- CafeOrderStatusLambda
+
+- Account ID
+
+- Region
+
+- Layer version if newer
 
 ### 2️⃣ CREATE OR UPDATE LAMBDA
 

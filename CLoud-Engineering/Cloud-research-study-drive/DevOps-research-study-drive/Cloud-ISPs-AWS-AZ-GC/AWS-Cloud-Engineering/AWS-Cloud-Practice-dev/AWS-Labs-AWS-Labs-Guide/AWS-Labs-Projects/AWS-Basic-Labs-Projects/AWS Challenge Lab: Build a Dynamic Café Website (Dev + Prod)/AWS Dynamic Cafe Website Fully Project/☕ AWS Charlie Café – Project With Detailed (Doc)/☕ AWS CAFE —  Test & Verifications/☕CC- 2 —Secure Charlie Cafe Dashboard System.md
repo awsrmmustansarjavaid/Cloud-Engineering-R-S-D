@@ -597,7 +597,66 @@ or
 ---
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
-### 1️⃣ Lambda Code Test
+### 1️⃣ Test - Verify files (RBAC)
+
+```
+sudo tree cafe-rbac-layer
+```
+
+#### Expected output:
+
+```
+cafe-rbac-layer
+└── python
+    ├── rbac.py
+    └── permissions.json
+```
+
+**If this does NOT match → STOP and fix**
+
+### 2️⃣ Test - Verify Layer (RBAC)
+> **Verify Layer is attached**
+
+```
+aws lambda get-function-configuration \
+  --function-name CafeOrderStatusLambda
+```
+
+Look for:
+
+```
+"Layers": [
+  {
+    "Arn": "arn:aws:lambda:us-east-1:XXXX:layer:cafe-rbac-layer:1"
+  }
+]
+```
+
+#### 🧠 COMMON MISTAKES (AVOID THESE)
+
+❌ Zipping rbac.py directly
+
+❌ Missing python/ folder
+
+❌ Wrong runtime version
+
+❌ Forgetting to attach layer to Lambda
+
+❌ Using uppercase role names in permissions.json
+
+#### ✅ FINAL CHECKLIST
+
+✔ Folder structure correct
+
+✔ ZIP contains python/rbac.py
+
+✔ Layer published successfully
+
+✔ Layer attached to Lambda
+
+✔ Lambda imports from rbac import authorize
+
+### 3️⃣ Lambda Code Test
 
 - Name:
 
@@ -656,8 +715,6 @@ Authorization: Bearer <access_token>
 ```
 
 - ✅ Receive JSON response
-
-
 
 
 **✅ PHASE 5️⃣ STATUS**
