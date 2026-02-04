@@ -55,6 +55,9 @@ def require_role(user, allowed_roles):
 ### Central Backend RBAC
 > **Update Version:1.01**
 
+✔️ Added central-auth-api.js
+
+✔️ permissions.json
 
 
 ```
