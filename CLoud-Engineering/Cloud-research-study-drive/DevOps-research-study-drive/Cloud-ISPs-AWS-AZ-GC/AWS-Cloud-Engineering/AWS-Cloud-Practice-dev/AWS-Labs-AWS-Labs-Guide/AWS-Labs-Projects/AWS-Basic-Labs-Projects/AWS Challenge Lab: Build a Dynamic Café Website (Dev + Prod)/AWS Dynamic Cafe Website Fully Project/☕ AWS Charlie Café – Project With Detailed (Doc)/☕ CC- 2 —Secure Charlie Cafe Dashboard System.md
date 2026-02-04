@@ -947,7 +947,28 @@ This is 🔥 gold for authorization.
 
 > **✅ This authorizer will validate JWTs automatically.**
 
-#### 2️⃣ Attach this authorizer to your routes
+#### 2️⃣ Create HTTP API (NOT REST)
+
+- Go to API Gateway ➡️ Create API ➡️ HTTP API
+
+- Click Build
+
+- Basic settings
+
+- HTTP API Name: charlie-cafe-api ➡️ Click Next 
+
+- Skip integrations for now ➡️ Click Next 
+
+- Click Create
+
+**✔ API created**
+
+#### 3️⃣ Create HTTP API (NOT REST)
+
+
+
+
+#### 3️⃣ Attach this authorizer to your routes
 
 /admin/*
 
