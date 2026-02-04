@@ -7,10 +7,8 @@
    ✔ Logout Button (Centralized)
    ✔ Role-Based Access (Admin / Employee)
    ✔ Secure API Gateway Calls
-   ✔ Orders + HR REST APIs
-   ✔ ADMIN ATTENDANCE ANALYTICS (PHASE 6)
-   ✔ ADMIN DASHBOARD ENHANCEMENTS (PHASE 7)
-   ✔ AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED) ✅ NEW
+   ✔ AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
+   ✔ UNIVERSAL RBAC (CENTRALIZED)
 ========================================================= */
 
 const CHARLIE = (() => {
@@ -21,15 +19,15 @@ const CHARLIE = (() => {
     const CONFIG = {
         REGION: "us-east-1",
 
-        // Cognito User Pool
+        // Cognito
         USER_POOL_ID: "us-east-1_HDcwDJqVz",
         CLIENT_ID: "3hcigucn7fmd11gvo9uuqud6fi",
-        COGNITO_DOMAIN: "us-east-1hdcwdjqvz.auth.us-east-1.amazoncognito.com",
+        COGNITO_DOMAIN: "us-east-1hdcwdjqvz.auth.us-east-1.amazonaws.com",
 
         // API Gateway
         API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
 
-        // CloudFront (Static Assets)
+        // CloudFront
         CLOUDFRONT_BASE: "https://d159bqc5pw64hn.cloudfront.net"
     };
 
@@ -49,12 +47,11 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       3️⃣ AUTH MODULE (LOGIN / LOGOUT / PROTECT)
+       3️⃣ AUTH MODULE
     ===================================================== */
     const auth = {
+
         login(
-            // 🔴 FIX: Do NOT use window.location.href
-            // ✅ Use a stable, pre-approved Cognito callback URL
             redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`
         ) {
             const url =
@@ -107,12 +104,15 @@ const CHARLIE = (() => {
     /* =====================================================
        4️⃣ SECURE FETCH (JWT AUTO ATTACH)
     ===================================================== */
+
     async function authFetch(url, options = {}) {
         const token = getToken();
+
         if (!token || isTokenExpired(token)) {
             auth.logout();
-            return;
+            return; // 🔐 intentionally return undefined
         }
+
         return fetch(url, {
             ...options,
             headers: {
@@ -123,26 +123,42 @@ const CHARLIE = (() => {
         });
     }
 
+    /* -----------------------------------------------------
+       🔧 FIX #1: Prevent crash when authFetch returns undefined
+       ----------------------------------------------------- */
     async function secureFetch(url, options = {}) {
-        return authFetch(url, options).then(res => res.json());
+        const res = await authFetch(url, options);
+        if (!res) return; // ✅ prevents `.then()` crash
+        return res.json();
     }
 
     /* =====================================================
-       5️⃣ ROLE & ACCESS CONTROL
+       5️⃣ ROLE & ACCESS CONTROL (NORMALIZED + SAFE)
     ===================================================== */
+
+    /* -----------------------------------------------------
+       🔧 FIX #2: Harden group extraction (missing / string / array)
+       ----------------------------------------------------- */
     function getUserRoles() {
         const token = getToken();
         if (!token) return [];
+
         const payload = parseJwt(token);
-        return payload["cognito:groups"] || [];
+        const groups = payload["cognito:groups"];
+
+        if (!groups) return [];
+
+        return Array.isArray(groups)
+            ? groups.map(r => r.toLowerCase())
+            : [String(groups).toLowerCase()];
     }
 
     function isAdmin() {
-        return getUserRoles().includes("Admin");
+        return getUserRoles().includes("admin");
     }
 
     function isEmployee() {
-        return getUserRoles().includes("Employee");
+        return getUserRoles().includes("employee");
     }
 
     function requireAdmin() {
@@ -163,22 +179,28 @@ const CHARLIE = (() => {
 
     /* =====================================================
        🔐 AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
-       -----------------------------------------------------
-       • Runs once per app
-       • Checks token every 30 seconds
-       • Logs out if expired or tampered
     ===================================================== */
+
+    /* -----------------------------------------------------
+       🔧 FIX #3: Prevent multiple logout / alert loops
+       ----------------------------------------------------- */
+    let logoutTriggered = false;
+
     function startAutoLogoutWatcher() {
         setInterval(() => {
+            if (logoutTriggered) return;
+
             const token = getToken();
             if (!token) return;
 
             try {
                 if (isTokenExpired(token)) {
+                    logoutTriggered = true;
                     alert("🔐 Session expired");
                     auth.logout();
                 }
             } catch {
+                logoutTriggered = true;
                 auth.logout();
             }
         }, 30000);
@@ -201,12 +223,12 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       8️⃣ PAGE INITIALIZER (AUTO + LOGOUT)
+       8️⃣ PAGE INITIALIZER
     ===================================================== */
     function initProtectedPage() {
         auth.protectPage();
         auth.setupLogoutButton();
-        startAutoLogoutWatcher(); // ✅ START AUTO LOGOUT
+        startAutoLogoutWatcher();
     }
 
     /* =====================================================
