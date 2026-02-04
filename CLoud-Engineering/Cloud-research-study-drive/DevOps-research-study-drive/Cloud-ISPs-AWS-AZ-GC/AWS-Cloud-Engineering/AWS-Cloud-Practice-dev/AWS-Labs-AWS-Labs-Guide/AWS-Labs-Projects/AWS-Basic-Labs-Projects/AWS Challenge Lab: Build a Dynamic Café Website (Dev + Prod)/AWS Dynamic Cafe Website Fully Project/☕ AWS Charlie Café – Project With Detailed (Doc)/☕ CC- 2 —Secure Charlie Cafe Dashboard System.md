@@ -1173,22 +1173,61 @@ API_URL = ".../admin/order-status"
 
 ### 1️⃣ Central UNIVERSAL Backend RBAC
 
-#### 1️⃣ Create UNIVERSAL backend RBAC file
+### 1️⃣ Create Lambda Layer (RBAC)
+
+#### 1️⃣ Create the folder structure
+
+```
+sudo mkdir -p cafe-rbac-layer/python
+```
+> **📌 python/ folder name is MANDATORY for Lambda layers**
+**⚠️ If you miss this → Lambda will not find rbac.py**
+
+#### 2️⃣ Create permissions.json
+
+```
+sudo nano cafe-rbac-layer/python/permissions.json
+```
+[permissions.json](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/permissions.json)
+
+- Save and exit.
+
+#### 🔐 Rule:
+
+- If path matches → check roles
+
+- If no rule → DENY by default (secure)
+
+#### 3️⃣ Create UNIVERSAL backend RBAC file
 > **📄 rbac.py (THIS IS YOUR BACKEND central-auth-api)**
 
 ```
-sudo nano rbac.py
+sudo nano cafe-rbac-layer/python/rbac.py
 ```
+- Paste your existing rbac.py code
 
 [rbac.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/rbac.py)
 
-#### 1️⃣ Create permissions.json
+- Save and exit (CTRL + O, ENTER, CTRL + X)
+
+#### 4️⃣ Verify files
 
 ```
-sudo nano permissions.json
+sudo tree cafe-rbac-layer
 ```
 
-[permissions.json](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/permissions.json)
+#### Expected output:
+
+```
+cafe-rbac-layer
+└── python
+    ├── rbac.py
+    └── permissions.json
+```
+
+**If this does NOT match → STOP and fix**
+
+
 
 ### 2️⃣ CREATE OR UPDATE LAMBDA
 
