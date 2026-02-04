@@ -1398,7 +1398,7 @@ or Identity Pool
 
 For now → Lambda-based authorization is perfect
 
-#### 2️⃣ Create HTTP API (Optional)
+#### 2️⃣ Create HTTP API (Optional - keep Existing REST API)
 > **👉 Since REST API is already built and verified**
 
 You do NOT need to switch.
