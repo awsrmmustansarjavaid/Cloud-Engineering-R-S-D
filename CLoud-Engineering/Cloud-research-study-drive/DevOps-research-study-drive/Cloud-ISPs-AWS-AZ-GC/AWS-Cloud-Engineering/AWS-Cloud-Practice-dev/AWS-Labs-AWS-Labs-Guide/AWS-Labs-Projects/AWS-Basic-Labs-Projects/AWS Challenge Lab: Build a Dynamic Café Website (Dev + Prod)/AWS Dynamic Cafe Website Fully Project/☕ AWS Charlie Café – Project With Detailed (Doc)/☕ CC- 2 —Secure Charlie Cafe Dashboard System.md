@@ -1176,9 +1176,17 @@ API_URL = ".../admin/order-status"
 #### 1️⃣ Create UNIVERSAL backend RBAC file
 > **📄 rbac.py (THIS IS YOUR BACKEND central-auth-api)**
 
+```
+sudo nano rbac.py
+```
+
 [rbac.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/rbac.py)
 
+```
+sudo nano permissions.json
+```
 
+[permissions.json](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/permissions.json)
 
 ### 2️⃣ CREATE OR UPDATE LAMBDA
 
