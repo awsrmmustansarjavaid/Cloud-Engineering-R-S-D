@@ -1242,9 +1242,11 @@ DB_NAME = cafe
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
+### 6️⃣ One universal RBAC logic
 
 
-#### 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
+
+### 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
 
 #### STEP 1️⃣ Open Cognito Hosted UI Login
 
@@ -1343,7 +1345,7 @@ fetch("https://API_ID.execute-api.REGION.amazonaws.com/status/order-status", {
 
 🎉 DONE — frontend token works.
 
-#### 🧪 METHOD 2 — curl (CLI / AWS TESTING)
+### 🧪 METHOD 2 — curl (CLI / AWS TESTING)
 
 Use this after you already have the token.
 
