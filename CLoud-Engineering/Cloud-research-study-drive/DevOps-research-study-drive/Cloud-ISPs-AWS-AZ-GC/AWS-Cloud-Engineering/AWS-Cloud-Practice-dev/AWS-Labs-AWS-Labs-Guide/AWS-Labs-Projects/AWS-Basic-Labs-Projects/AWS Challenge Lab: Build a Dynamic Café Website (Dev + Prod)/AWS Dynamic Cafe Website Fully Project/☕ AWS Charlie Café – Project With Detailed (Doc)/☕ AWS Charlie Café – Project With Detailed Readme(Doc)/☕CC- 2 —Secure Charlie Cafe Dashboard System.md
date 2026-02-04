@@ -1758,9 +1758,9 @@ This Lambda does ALL of this:
 ✅ Future-ready for more routes
 
 ---
-### 🌐 OLD LAMBDA VS NEW LAMBDA
+## 🌐 OLD LAMBDA VS NEW LAMBDA
 
-Big Picture (before code)
+### Big Picture (before code)
 
 Think of it like this:
 
@@ -1773,11 +1773,11 @@ New Merged Lambda = 🔐 Security + Data function
 The database logic is almost identical.
 The difference is SECURITY + ROLE AWARENESS.
 
-1️⃣ What BOTH codes have in common (important)
+### 1️⃣ What BOTH codes have in common (important)
 
 These parts are the same conceptually in both:
 
-✅ Environment variables
+#### ✅ Environment variables
 
 ```
 DB_HOST = os.environ['DB_HOST']
@@ -1790,7 +1790,7 @@ DB_NAME = os.environ['DB_NAME']
 ✔ No hard-coded secrets
 ✔ Best practice (good job)
 
-✅ Database connection
+#### ✅ Database connection
 
 ```
 def get_connection():
@@ -1801,7 +1801,7 @@ def get_connection():
 ✔ Same cursor type
 ✔ Same DB usage
 
-✅ Business logic (core feature)
+##### ✅ Business logic (core feature)
 
 Both do:
 
@@ -1824,11 +1824,11 @@ Return JSON
 This is important:
 You did NOT break anything.
 
-2️⃣ OLD LAMBDA — What it REALLY is
+### 2️⃣ OLD LAMBDA — What it REALLY is
 
 Let’s describe it in plain English:
 
-🔴 Old Lambda behavior
+#### 🔴 Old Lambda behavior
 
 “If API Gateway calls me, I will return order data.”
 
@@ -1842,7 +1842,7 @@ Let’s describe it in plain English:
 
 ❌ Cannot block users by permission
 
-⚠️ Security reality
+#### ⚠️ Security reality
 
 Security depends 100% on API Gateway only.
 
@@ -1852,20 +1852,20 @@ Someone attaches the Lambda to a public route
 
 Or authorizer is removed by mistake
 
-👉 Anyone can read your orders
+#### 👉 Anyone can read your orders
 
-Old Lambda mental model
+### Old Lambda mental model
 
 ```
 Frontend → API Gateway → Lambda → Database
                     (no identity awareness)
 ```
 
-3️⃣ NEW MERGED LAMBDA — What changed
+### 3️⃣ NEW MERGED LAMBDA — What changed
 
 Now let’s go step by step through what was added.
 
-🆕 A) Identity awareness (MOST IMPORTANT CHANGE)
+#### 🆕 A) Identity awareness (MOST IMPORTANT CHANGE)
 New code ONLY:
 
 ```
@@ -1897,7 +1897,7 @@ worked because it didn’t care about identity
 
 New code requires identity because it ENFORCES ROLES.
 
-🆕 B) Role extraction logic
+#### 🆕 B) Role extraction logic
 
 ```
 if isinstance(groups, str):
@@ -1917,7 +1917,7 @@ Employee limited
 
 This is real RBAC, not fake role checks.
 
-🆕 C) Path-based authorization (very professional)
+#### 🆕 C) Path-based authorization (very professional)
 
 ```
 path = event.get("path", "")
@@ -1946,7 +1946,7 @@ Later you can add:
 
 This is how senior engineers design APIs.
 
-🆕 D) Explicit security responses
+#### 🆕 D) Explicit security responses
 
 New helper:
 
@@ -1974,7 +1974,7 @@ Can return:
 
 This is correct HTTP behavior.
 
-4️⃣ Test JSON difference (WHY you were confused)
+### 4️⃣ Test JSON difference (WHY you were confused)
 Old Lambda test
 
 ```
@@ -2014,7 +2014,7 @@ This simulates API Gateway
 👉 This is NOT extra complexity
 👉 This is realistic production testing
 
-5️⃣ Feature comparison table (very important)
+### 5️⃣ Feature comparison table (very important)
 
 | Feature             | Old Lambda | New Merged Lambda |
 | ------------------- | ---------- | ----------------- |
@@ -2029,7 +2029,7 @@ This simulates API Gateway
 | Secure by design    | ❌          | ✅                 |
 | Scalable for future | ❌          | ✅                 |
 
-6️⃣ Why your new setup is CORRECT (no sugarcoating)
+### 6️⃣ Why your new setup is CORRECT (no sugarcoating)
 
 What you have now is:
 
@@ -2049,7 +2049,7 @@ What you have now is:
 
 This is exactly how RBAC is done in real systems.
 
-7️⃣ Final mental model (memorize this)
+### 7️⃣ Final mental model (memorize this)
 
 ```
 User logs in (Cognito)
@@ -2062,7 +2062,7 @@ Lambda (RBAC decision)
         ↓
 Database
 ```
-🟢 FINAL ANSWER TO YOUR QUESTION
+### 🟢 FINAL ANSWER TO YOUR QUESTION
 
 “What is the difference and what features both code have?”
 
