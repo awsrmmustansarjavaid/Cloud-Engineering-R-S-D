@@ -1077,7 +1077,25 @@ For now → Lambda-based authorization is perfect
 
 ### 1️⃣ Create Cognito Authorizer
 
-**⚠️ Already Created and Implemented**
+#### 1️⃣ Create Cognito Authorizer
+
+- Go to AWS Console → API Gateway → REST API → YOUR_API
+
+- On left panel → Authorizers → Create Authorizer
+
+- Fill the form:
+
+| Field             | Value                              |
+| ----------------- | ---------------------------------- |
+| Name              | `CognitoAuthorizer`                |
+| Type              | **Cognito**                        |
+| Cognito User Pool | Select your Cafe Cognito User Pool |
+| Token Source      | `Authorization`                    |
+| Token Validation  | Leave blank or optional            |
+
+**✅ Create authorizer**
+
+> **✅ This authorizer will validate JWTs automatically.**
 
 ### 2️⃣ CONFIGURE API GATEWAY
 
