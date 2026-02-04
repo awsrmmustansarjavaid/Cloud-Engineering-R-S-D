@@ -662,3 +662,381 @@ RBAC layer decides
 ✅ Fast to maintain
 
 You are now designing systems, not just Lambdas.
+---
+
+## New & Updated RBAC with Central-auth-api.js
+
+✅ WHAT WE WILL DELIVER (CLEAR SCOPE)
+
+1️⃣ Updated rbac.py (backend, Lambda Layer ready)
+– With clear comments
+– Path → role mapping
+– Secure-by-default
+
+2️⃣ Updated central-auth-api.js (same file, improved)
+– No new JS file
+– Roles normalized (important fix)
+– Matches backend RBAC logic
+
+3️⃣ Step-by-step configuration guide (NO jumps)
+– Cognito
+– API Gateway
+– Lambda
+– Layer
+– Testing
+
+1️⃣ UPDATED BACKEND RBAC (rbac.py)
+
+This version is production-grade, easy to read, and safe by default.
+
+📄 rbac.py (Lambda Layer or shared file)
+
+```
+# =====================================================
+# CHARLIE CAFE — CENTRAL UNIVERSAL RBAC ENGINE
+# =====================================================
+# • Used by ALL Lambdas
+# • Reads Cognito claims (already verified by API Gateway)
+# • Applies role-based access using permission matrix
+# • Secure-by-default (no rule = no access)
+# =====================================================
+
+import json
+import os
+
+# -----------------------------------------------------
+# Load permissions.json ONCE (cold start optimization)
+# -----------------------------------------------------
+PERMISSIONS_FILE = os.path.join(os.path.dirname(__file__), "permissions.json")
+
+with open(PERMISSIONS_FILE, "r") as f:
+    PERMISSIONS = json.load(f)
+
+
+def get_user_context(event):
+    """
+    Extract user identity and roles from Cognito Authorizer.
+
+    API Gateway already:
+    ✔ Validated JWT
+    ✔ Verified signature
+    ✔ Checked expiration
+    """
+
+    try:
+        claims = event["requestContext"]["authorizer"]["claims"]
+    except KeyError:
+        # No Cognito authorizer attached
+        return None
+
+    groups = claims.get("cognito:groups", [])
+
+    # Cognito sometimes returns groups as comma-separated string
+    if isinstance(groups, str):
+        groups = groups.split(",")
+
+    return {
+        "username": claims.get("cognito:username"),
+        "groups": groups
+    }
+
+
+def authorize(event):
+    """
+    Universal authorization function.
+
+    Steps:
+    1️⃣ Get user context
+    2️⃣ Identify API path
+    3️⃣ Match against permission matrix
+    4️⃣ Allow or deny
+    """
+
+    user = get_user_context(event)
+    if not user:
+        return False, "Unauthenticated"
+
+    path = event.get("path", "")
+
+    # Check permission rules
+    for rule in PERMISSIONS:
+        if path.startswith(rule["path"]):
+            allowed_roles = rule["roles"]
+
+            # Role match
+            if any(role in user["groups"] for role in allowed_roles):
+                return True, user
+
+            return False, "Access denied"
+
+    # 🔐 No matching rule → DENY
+    return False, "Access denied"
+```
+
+📄 permissions.json (NO code changes needed later)
+
+```
+[
+  { "path": "/order-status", "roles": ["admin"] },
+  { "path": "/attendance",   "roles": ["admin", "employee"] },
+  { "path": "/employee",     "roles": ["admin", "employee"] },
+  { "path": "/hr",           "roles": ["admin"] },
+  { "path": "/sales",        "roles": ["admin"] }
+]
+```
+
+🔥 Why this is powerful
+
+Add new API → edit JSON only
+
+Security team friendly
+
+Auditable
+
+No hardcoded if/else mess
+
+2️⃣ UPDATED central-auth-api.js (SAME FILE, FIXED)
+⚠️ IMPORTANT FIX YOU NEED
+
+Your backend uses:
+
+```
+admin
+employee
+```
+
+But your JS checks:
+
+```
+Admin
+Employee
+```
+
+❌ That will BREAK RBAC.
+
+✅ Updated & corrected version (key parts only)
+
+```
+/* =====================================================
+   5️⃣ ROLE & ACCESS CONTROL (FIXED + NORMALIZED)
+===================================================== */
+
+function getUserRoles() {
+    const token = getToken();
+    if (!token) return [];
+
+    const payload = parseJwt(token);
+    const groups = payload["cognito:groups"] || [];
+
+    // Normalize to lowercase for safety
+    return Array.isArray(groups)
+        ? groups.map(r => r.toLowerCase())
+        : [groups.toLowerCase()];
+}
+
+function isAdmin() {
+    return getUserRoles().includes("admin");
+}
+
+function isEmployee() {
+    return getUserRoles().includes("employee");
+}
+
+function requireAdmin() {
+    if (!isAdmin()) {
+        alert("❌ Admin access only");
+        auth.logout();
+        throw new Error("Admin access required");
+    }
+}
+
+function requireEmployee() {
+    if (!isEmployee() && !isAdmin()) {
+        alert("❌ Employee access only");
+        auth.logout();
+        throw new Error("Employee access required");
+    }
+}
+```
+
+✅ Result
+
+Frontend roles === Backend roles
+
+No mismatch bugs
+
+Same mental model on both sides
+
+3️⃣ HOW A LAMBDA USES RBAC (SUPER SHORT)
+Example: order_status.py
+
+```
+from rbac import authorize
+import json
+
+def lambda_handler(event, context):
+
+    allowed, result = authorize(event)
+
+    if not allowed:
+        return {
+            "statusCode": 403,
+            "body": json.dumps({ "error": result })
+        }
+
+    user = result  # username + groups
+
+    # -------------------------------
+    # BUSINESS LOGIC ONLY
+    # -------------------------------
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "message": "Order status data",
+            "user": user["username"]
+        })
+    }
+```
+
+👉 No Cognito parsing
+👉 No role logic
+👉 Clean & readable
+
+4️⃣ STEP-BY-STEP CONFIGURATION (NO SKIPS)
+Step 1️⃣ Cognito
+
+Create User Pool
+
+Create groups:
+
+admin
+
+employee
+
+Assign users to groups
+
+Enable Hosted UI
+
+Step 2️⃣ API Gateway
+
+REST API (keep your existing one)
+
+Create routes:
+
+/order-status
+
+/attendance
+
+/hr
+
+Attach Cognito Authorizer
+
+Authorization header: Authorization
+
+Step 3️⃣ Lambda Layer
+
+```
+cafe-rbac-layer/
+└── python/
+    ├── rbac.py
+    └── permissions.json
+```
+```
+zip -r cafe-rbac-layer.zip python
+```
+
+Upload:
+
+Lambda → Layers → Create layer
+
+Runtime: Python 3.12
+
+Attach to ALL Lambdas
+
+Step 4️⃣ Lambdas
+
+Import authorize
+
+Call it once
+
+Keep business logic unchanged
+
+Step 5️⃣ Frontend
+
+Use same central-auth-api.js
+
+Call:
+
+```
+CHARLIE.initProtectedPage();
+```
+
+Use:
+
+```
+CHARLIE.requireAdmin();
+```
+
+5️⃣ TESTING & VERIFICATION
+🧪 Admin → order-status (PASS)
+
+```
+{
+  "path": "/order-status",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "admin_user",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
+```
+
+✅ 200 OK
+
+🧪 Employee → order-status (FAIL)
+
+```
+{
+  "path": "/order-status",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "emp_user",
+        "cognito:groups": "employee"
+      }
+    }
+  }
+}
+```
+
+❌ 403 Access denied
+
+🌍 Real world
+
+Login via Hosted UI
+
+Token auto attached
+
+API Gateway validates
+
+RBAC layer authorizes
+
+Lambda runs
+
+🟢 FINAL VERDICT (IMPORTANT)
+
+✅ You DO NOT need new JS files
+✅ You DO NOT need merged Lambdas
+✅ You DO have universal RBAC
+✅ This matches frontend & backend perfectly
+✅ This is enterprise-grade architecture
+
+You are no longer “just coding” —
+you are designing systems now 👏
+
+---
+
+

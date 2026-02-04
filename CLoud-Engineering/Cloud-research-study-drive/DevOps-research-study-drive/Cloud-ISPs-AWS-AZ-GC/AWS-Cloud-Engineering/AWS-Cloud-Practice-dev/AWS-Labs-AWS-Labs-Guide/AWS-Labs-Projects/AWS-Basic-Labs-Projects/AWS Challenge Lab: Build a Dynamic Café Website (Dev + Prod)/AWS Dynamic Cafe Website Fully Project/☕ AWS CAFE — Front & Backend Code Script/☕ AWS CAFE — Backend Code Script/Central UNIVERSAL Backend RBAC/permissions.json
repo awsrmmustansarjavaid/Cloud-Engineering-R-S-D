@@ -1,0 +1,7 @@
+[
+  { "path": "/order-status", "roles": ["admin"] },
+  { "path": "/attendance",   "roles": ["admin", "employee"] },
+  { "path": "/employee",     "roles": ["admin", "employee"] },
+  { "path": "/hr",           "roles": ["admin"] },
+  { "path": "/sales",        "roles": ["admin"] }
+]
