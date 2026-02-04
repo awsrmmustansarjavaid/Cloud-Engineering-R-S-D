@@ -1218,8 +1218,16 @@ sudo nano cafe-rbac-layer/python/rbac.py
 sudo nano charlie_cafe_rbac_layer_test_verify.sh
 ```
 
-[rbac.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/rbac.py)
+[charlie_cafe_rbac_layer_test_verify.sh](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/rbac.py)
 
+#### 🧪 How to run
+
+```
+sudo chmod +x charlie_cafe_rbac_layer_test_verify.sh
+```
+```
+sudo ./charlie_cafe_rbac_layer_test_verify.sh
+```
 
 #### Method 2 Manual 1 T0 1
 
