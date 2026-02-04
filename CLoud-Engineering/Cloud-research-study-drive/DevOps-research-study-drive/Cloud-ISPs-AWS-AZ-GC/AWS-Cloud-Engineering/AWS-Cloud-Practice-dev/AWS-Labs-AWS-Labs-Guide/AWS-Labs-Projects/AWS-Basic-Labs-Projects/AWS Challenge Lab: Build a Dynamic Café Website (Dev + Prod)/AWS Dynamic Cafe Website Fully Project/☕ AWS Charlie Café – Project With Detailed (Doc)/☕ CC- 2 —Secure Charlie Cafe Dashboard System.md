@@ -933,17 +933,25 @@ This is 🔥 gold for authorization.
 
 - On left panel → Authorizers → Create Authorizer
 
-- Fill the form:
+- Authorizer name: cafe-cognito-authorizer
 
-| Field             | Value                              |
-| ----------------- | ---------------------------------- |
-| Name              | `CognitoAuthorizer`                |
-| Type              | **Cognito**                        |
-| Cognito User Pool | Select your Cafe Cognito User Pool |
-| Token Source      | `Authorization`                    |
-| Token Validation  | Leave blank or optional            |
+- Authorizer type: JWT
+
+- Identity source: $request.header.Authorization
+
+#### JWT settings: 
+
+- Issuer URL: 
+
+```
+https://cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>
+```
+
+- Audience: <APP_CLIENT_ID>
 
 **✅ Create authorizer**
+
+- ✔ Authorizer ready
 
 > **✅ This authorizer will validate JWTs automatically.**
 
@@ -1070,8 +1078,6 @@ For now → Lambda-based authorization is perfect
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 ## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
-
-
 
 ### 1️⃣ SECURE API GATEWAY AUTH (MOST IMPORTANT) 
 
