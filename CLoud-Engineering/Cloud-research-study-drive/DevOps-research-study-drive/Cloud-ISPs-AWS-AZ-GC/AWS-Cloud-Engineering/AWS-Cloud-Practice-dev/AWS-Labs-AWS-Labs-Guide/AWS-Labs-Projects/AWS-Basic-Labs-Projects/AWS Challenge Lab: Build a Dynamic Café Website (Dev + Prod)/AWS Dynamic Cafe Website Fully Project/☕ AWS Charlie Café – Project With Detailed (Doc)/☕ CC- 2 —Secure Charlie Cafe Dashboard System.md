@@ -949,8 +949,20 @@ GET /order-status
 - Lambda function → OrderStatusLambda
 
 ### 2️⃣ Create Routes
+> **You MUST manually create routes.
+> **API Gateway does NOT auto-create /admin/*.**
 
 - Go to: API Gateway → Routes → Click Create
+
+| Route                | Method | Auth    |
+| -------------------- | ------ | ------- |
+| `/order-status`      | GET    | Cognito |
+| `/admin/dashboard`   | GET    | Cognito |
+| `/admin/create-user` | POST   | Cognito |
+| `/employee/orders`   | GET    | Cognito |
+| `/employee/order`    | POST   | Cognito |
+
+> **✔ Attach CafeCognitoAuthorizer to ALL protected routes**
 
 #### Admin Routes 1
 
@@ -997,6 +1009,18 @@ GET /order-status
 - Method: POST
 
 - Path: /employee/order
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### order-status Routes 1
+
+- Method: GET
+
+- Path: /order-status
 
 - Integration: your Lambda
 
@@ -1136,10 +1160,29 @@ API_URL = ".../admin/order-status"
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 ### 1️⃣ CREATE OR UPDATE LAMBDA
+
+#### ✅ New Lambda Function (recommended)
+
+- 🔖 New Lambda name:
+
+```
+CafeOrderStatusRBACLambda
+```
+
+#### ✅ MERGED LAMBDA CODE (DROP-IN READY)
+
+[CafeOrderStatusRBACLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusRBACLambda.py)
+
+
+
+
+
+----
+
+## 🛑  OlD Configurations 1️⃣ CREATE OR UPDATE LAMBDA 🛑
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 

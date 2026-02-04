@@ -581,16 +581,106 @@ or
 | Attach authorizer where? | On EACH route        |
 | One Lambda or many?      | ✅ ONE                |
 
-
-
-
-
-
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 4️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+### 1️⃣ CREATE OR UPDATE LAMBDA
+
+### 1️⃣ CREATE OR UPDATE LAMBDA
+> **🔖 CafeOrderStatusRBACLambda**
+
+### 🧪 LAMBDA TEST JSON (ADMIN USER)
+
+Use this in Lambda → Test
+
+```
+{
+  "path": "/order-status",
+  "queryStringParameters": {
+    "date": "2026-01-17"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "admin_user",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
+```
+
+#### ✅ Expected:
+
+- statusCode: 200
+
+- Metrics + recent orders returned
+
+### 🧪 LAMBDA TEST JSON (EMPLOYEE USER – SHOULD FAIL)
+
+```
+{
+  "path": "/order-status",
+  "queryStringParameters": null,
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "employee_user",
+        "cognito:groups": "employee"
+      }
+    }
+  }
+}
+```
+
+#### ❌ Expected:
+
+```
+{
+  "error": "Admin access only"
+}
+```
+
+### 🧪 LAMBDA TEST JSON (NO ROLE / MISCONFIG)
+
+```
+{
+  "path": "/order-status",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "unknown_user"
+      }
+    }
+  }
+}
+```
+
+#### ❌ Expected:
+
+- 403 Forbidden
+
+
+
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+
 ### Cognito Errors 1 - Invalid request
 
 > **The “Invalid request” error means one (or more) OAuth parameters don’t match Cognito’s App Client settings**

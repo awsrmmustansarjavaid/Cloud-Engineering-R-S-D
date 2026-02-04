@@ -1267,6 +1267,15 @@ ONE Lambda Function
 Role-based logic inside Lambda
 ```
 
+```
+User → Cognito Login
+     → Access Token (JWT)
+     → API Gateway (Cognito Authorizer)
+     → Lambda (CafeOrderStatusRBACLambda)
+     → Lambda checks cognito:groups
+     → Allow / Deny + Business Logic
+```
+
 #### Why this is best
 
 ✔ Fast to implement
@@ -1430,24 +1439,6 @@ def response(code, message):
     }
 ```
 
-### 🟢 STEP 6️⃣ — Protect APIs via API Gateway (Recommended)
-
-In API Gateway:
-
-Create Cognito Authorizer
-
-Attach it to your API routes
-
-API Gateway automatically:
-
-validates token
-
-injects user claims into Lambda
-
-No token = ❌
-Wrong group = ❌
-Correct group = ✅
-
 
 ### 🟢 STEP 7️⃣ — 🎯 OPTIONAL (Advanced but Powerful)
 Attach IAM Role to Groups (Later)
@@ -1465,6 +1456,52 @@ you use AWS SDK directly from frontend
 or Identity Pool
 
 For now → Lambda-based authorization is perfect
+
+
+
+
+
+
+**✅ PHASE 2️⃣ & 3️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ & 3️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 4️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+### 1️⃣ Short answer — Why HTTP API when you already have REST API
+
+You do NOT need to switch.
+
+I suggested HTTP API because:
+
+Fewer clicks
+
+Cheaper
+
+Simpler UI
+
+Built-in JWT authorizer
+
+But your existing REST API is 100% valid and correct.
+There is NO technical advantage that forces you to migrate.
+
+👉 Professional answer:
+Keep REST API for this project.
+Do NOT rebuild.
+
+### 2️⃣ Cognito Authorizer vs JWT Authorizer (same result, different UI)
+
+| REST API (yours)             | HTTP API (mine)          |
+| ---------------------------- | ------------------------ |
+| Authorizer type: **Cognito** | Authorizer type: **JWT** |
+| Old UI                       | New UI                   |
+| More steps                   | Fewer steps              |
+| Same security                | Same security            |
+| Uses Cognito User Pool       | Uses Cognito User Pool   |
+
+
+✅ Both validate the SAME access token
+✅ Both inject claims into Lambda
 
 #### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
 
@@ -1565,40 +1602,7 @@ VERY IMPORTANT — Summary (tattoo this mentally)
 | Attach authorizer where? | On EACH route        |
 | One Lambda or many?      | ✅ ONE                |
 
-### 1️⃣ Short answer — Why HTTP API when you already have REST API
 
-You do NOT need to switch.
-
-I suggested HTTP API because:
-
-Fewer clicks
-
-Cheaper
-
-Simpler UI
-
-Built-in JWT authorizer
-
-But your existing REST API is 100% valid and correct.
-There is NO technical advantage that forces you to migrate.
-
-👉 Professional answer:
-Keep REST API for this project.
-Do NOT rebuild.
-
-### 2️⃣ Cognito Authorizer vs JWT Authorizer (same result, different UI)
-
-| REST API (yours)             | HTTP API (mine)          |
-| ---------------------------- | ------------------------ |
-| Authorizer type: **Cognito** | Authorizer type: **JWT** |
-| Old UI                       | New UI                   |
-| More steps                   | Fewer steps              |
-| Same security                | Same security            |
-| Uses Cognito User Pool       | Uses Cognito User Pool   |
-
-
-✅ Both validate the SAME access token
-✅ Both inject claims into Lambda
 
 Result inside Lambda is the same
 
@@ -1623,6 +1627,32 @@ cognito:groups
 cognito:username
 
 email
+
+### 🟢 STEP 6️⃣ — Protect APIs via API Gateway (Recommended)
+
+In API Gateway:
+
+Create Cognito Authorizer
+
+Attach it to your API routes
+
+API Gateway automatically:
+
+validates token
+
+injects user claims into Lambda
+
+No token = ❌
+Wrong group = ❌
+Correct group = ✅
+
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 👉 Your Lambda can already do role-based access
 You just weren’t using the groups yet.
@@ -1713,10 +1743,28 @@ Add fine-grained permissions later (orders:read, metrics:read)
 
 Add audit logging (who accessed what)
 
+---
+✅ New Lambda Function (Merged & Clean)
+🔖 New Lambda name (recommended)
 
-**✅ PHASE 2️⃣ & 3️⃣ STATUS**
+This Lambda does ALL of this:
 
-> **🟢 PHASE 2️⃣ & 3️⃣ COMPLETE & VERIFIED**
+✅ Cognito JWT validation (already done by API Gateway)
+
+✅ Role-based access (admin / employee)
+
+✅ Existing /order-status logic (metrics + recent orders)
+
+✅ Future-ready for more routes
+
+---
+
+
+
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
 ## 🔐 PHASE 6️⃣ — BACKEND DATE FILTER (LAMBDA)
 
