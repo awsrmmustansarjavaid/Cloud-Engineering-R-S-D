@@ -1171,7 +1171,12 @@ API_URL = ".../admin/order-status"
 ---
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
-### 1️⃣ CREATE OR UPDATE LAMBDA
+### 1️⃣
+
+
+
+
+### 2️⃣ CREATE OR UPDATE LAMBDA
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
@@ -1181,14 +1186,14 @@ API_URL = ".../admin/order-status"
 
 - **Permissions:** Create new role with basic Lambda permissions
 
-### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
+#### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
 
 > 🔁 This is a drop-in replacement
 > Nothing else needs to change
 
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
 
-### 3️⃣ 🔐 Add Environment Variables
+#### 3️⃣ 🔐 Add Environment Variables
 
 ```
 DB_HOST = <your-rds-endpoint>
@@ -1197,19 +1202,15 @@ DB_PASS = <your-db-password>
 DB_NAME = cafe
 ```
 
-### 4️⃣ 🔐 Attach Lambda Layer
+#### 4️⃣ 🔐 Attach Lambda Layer
 
 - Same 
 
-### 5️⃣ 🔐 Edit VPC
+#### 5️⃣ 🔐 Edit VPC
 
 - Same 
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
-
-### 6️⃣ One universal RBAC logic
-
-
 
 ### 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
 
