@@ -923,26 +923,7 @@ or
 
 This is 🔥 gold for authorization.
 
-### 2️⃣ Backend - Cognito Role Base Access and Permission 
 
-
-
-
-
-#### 4️⃣ Deploy
-
-- Click Deploy
-
-- Stage name: Prod
-
-- Click Deploy
-
-**✔ Your API is live**
-
-### Create cafe-auth-handler Lambda function
-
-- Go to AWS → Lambda → Click Create function 
- 
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
