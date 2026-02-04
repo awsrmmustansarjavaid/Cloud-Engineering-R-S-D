@@ -925,54 +925,49 @@ This is 🔥 gold for authorization.
 
 ### 2️⃣ Backend - Cognito Role Base Access and Permission 
 
-#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
 
-#### 1️⃣ Create Cognito Authorizer
 
-- Go to AWS Console → API Gateway → REST API → YOUR_API
 
-- On left panel → Authorizers → Create Authorizer
 
-- Authorizer name: cafe-cognito-authorizer
+#### 4️⃣ Deploy
 
-- Authorizer type: JWT
+- Click Deploy
 
-- Identity source: $request.header.Authorization
+- Stage name: Prod
 
-#### JWT settings: 
+- Click Deploy
 
-- Issuer URL: 
+**✔ Your API is live**
+
+### Create cafe-auth-handler Lambda function
+
+- Go to AWS → Lambda → Click Create function 
+ 
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
+
+### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
+
+- **AWS Console → API Gateway → REST API → /order-status**
+
+#### 1️⃣ Resource & Method
+
+- Go to Resources → /order-status
+
+- If GET method does not exist → click Actions → Create Method → GET
 
 ```
-https://cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>
+GET /order-status
 ```
 
-- Audience: <APP_CLIENT_ID>
+- Select Lambda Proxy Integration
 
-**✅ Create authorizer**
+- Lambda function → OrderStatusLambda
 
-- ✔ Authorizer ready
-
-> **✅ This authorizer will validate JWTs automatically.**
-
-#### 2️⃣ Create HTTP API (Optional - keep Existing REST API)
-> **👉 Since REST API is already built and verified**
-
-- Go to API Gateway ➡️ Create API ➡️ HTTP API
-
-- Click Build
-
-- Basic settings
-
-- HTTP API Name: charlie-cafe-api ➡️ Click Next 
-
-- Skip integrations for now ➡️ Click Next 
-
-- Click Create
-
-**✔ API created**
-
-#### 3️⃣ Create Routes
+#### 2️⃣ Create Routes
 
 - Go to: API Gateway → Routes → Click Create
 
@@ -1039,29 +1034,7 @@ or /api/*
 
 **✔ Now API Gateway blocks unauthenticated users**
 
-#### 4️⃣ Deploy
-
-- Click Deploy
-
-- Stage name: Prod
-
-- Click Deploy
-
-**✔ Your API is live**
-
-### Create cafe-auth-handler Lambda function
-
-- Go to AWS → Lambda → Click Create function 
- 
-**✅ PHASE 3️⃣ STATUS**
-
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
----
-## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
-
-### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
-
-### 1️⃣ Enable Cognito Authorizer
+### 2️⃣ Enable Cognito Authorizer
 
 - Go to AWS Console → API Gateway → REST API → YOUR_API
 
@@ -1081,25 +1054,7 @@ or /api/*
 
 > **✅ This authorizer will validate JWTs automatically.**
 
-### 2️⃣ CONFIGURE API GATEWAY
-
-- **AWS Console → API Gateway → REST API → /order-status**
-
-#### 1️⃣ Resource & Method
-
-- Go to Resources → /order-status
-
-- If GET method does not exist → click Actions → Create Method → GET
-
-```
-GET /order-status
-```
-
-- Select Lambda Proxy Integration
-
-- Lambda function → OrderStatusLambda
-
-#### 2️⃣ Cognito Authorizer (JWT validation)
+### 3️⃣ Cognito Authorizer (JWT validation)
 
 - **Go to: API Gateway → Your API → Authorizers → Create**
 
@@ -1115,7 +1070,7 @@ GET /order-status
 
 > **This does NOT enable CORS — this only validates JWT.**
 
-#### 3️⃣ Attach Authorizer to GET Method
+### 4️⃣ Attach Authorizer to GET Method
 
 - **Go to Resources → /order-status → GET → Method Request**
 
@@ -1127,7 +1082,7 @@ GET /order-status
 
 > **This ensures all GET requests require a valid JWT.**
 
-#### 4️⃣ Enable CORS (Cross-Origin Resource Sharing)
+### 5️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
 > **These are two separate things — enabling CORS is for frontend browser calls.**
 
@@ -1144,7 +1099,7 @@ GET /order-status
 > **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
 
 
-#### 5️⃣ Deploy API
+### 6️⃣ Deploy API
 
 - **Click Actions → Deploy API**
 

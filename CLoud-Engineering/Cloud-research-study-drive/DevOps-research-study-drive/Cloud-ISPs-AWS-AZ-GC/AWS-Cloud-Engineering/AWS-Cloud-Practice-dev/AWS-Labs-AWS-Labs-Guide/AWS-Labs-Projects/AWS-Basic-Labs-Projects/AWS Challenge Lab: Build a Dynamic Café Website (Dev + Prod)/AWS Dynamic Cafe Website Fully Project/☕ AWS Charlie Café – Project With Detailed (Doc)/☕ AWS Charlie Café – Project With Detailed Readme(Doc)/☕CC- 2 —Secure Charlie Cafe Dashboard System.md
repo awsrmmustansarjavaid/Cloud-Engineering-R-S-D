@@ -1398,6 +1398,36 @@ or Identity Pool
 
 For now → Lambda-based authorization is perfect
 
+#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
+
+#### 1️⃣ Create Cognito Authorizer
+
+- Go to AWS Console → API Gateway → REST API → YOUR_API
+
+- On left panel → Authorizers → Create Authorizer
+
+- Authorizer name: cafe-cognito-authorizer
+
+- Authorizer type: JWT
+
+- Identity source: $request.header.Authorization
+
+#### JWT settings: 
+
+- Issuer URL: 
+
+```
+https://cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>
+```
+
+- Audience: <APP_CLIENT_ID>
+
+**✅ Create authorizer**
+
+- ✔ Authorizer ready
+
+> **✅ This authorizer will validate JWTs automatically.**
+
 #### 2️⃣ Create HTTP API (Optional - keep Existing REST API)
 > **👉 Since REST API is already built and verified**
 
@@ -1421,6 +1451,20 @@ Professional advice:
 ✅ Keep REST API
 
 ❌ Don’t refactor a working backend
+
+- Go to API Gateway ➡️ Create API ➡️ HTTP API
+
+- Click Build
+
+- Basic settings
+
+- HTTP API Name: charlie-cafe-api ➡️ Click Next 
+
+- Skip integrations for now ➡️ Click Next 
+
+- Click Create
+
+**✔ API created**
 
 
 
