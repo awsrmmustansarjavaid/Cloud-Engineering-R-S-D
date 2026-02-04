@@ -1182,6 +1182,8 @@ sudo nano rbac.py
 
 [rbac.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Central%20Backend%20RBAC%20Script/rbac.py)
 
+#### 1️⃣ Create permissions.json
+
 ```
 sudo nano permissions.json
 ```
