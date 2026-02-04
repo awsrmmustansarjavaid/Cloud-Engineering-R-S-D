@@ -953,7 +953,7 @@ This is 🔥 gold for authorization.
 
 - **AWS Console → API Gateway → REST API → /order-status**
 
-#### 1️⃣ Resource & Method
+### 1️⃣ Resource & Method
 
 - Go to Resources → /order-status
 
@@ -967,7 +967,7 @@ GET /order-status
 
 - Lambda function → OrderStatusLambda
 
-#### 2️⃣ Create Routes
+### 2️⃣ Create Routes
 
 - Go to: API Gateway → Routes → Click Create
 
@@ -1034,7 +1034,7 @@ or /api/*
 
 **✔ Now API Gateway blocks unauthenticated users**
 
-### 2️⃣ Enable Cognito Authorizer
+### 3️⃣ Enable Cognito Authorizer
 
 - Go to AWS Console → API Gateway → REST API → YOUR_API
 
@@ -1054,7 +1054,7 @@ or /api/*
 
 > **✅ This authorizer will validate JWTs automatically.**
 
-### 3️⃣ Cognito Authorizer (JWT validation)
+### 4️⃣ Cognito Authorizer (JWT validation)
 
 - **Go to: API Gateway → Your API → Authorizers → Create**
 
@@ -1070,7 +1070,7 @@ or /api/*
 
 > **This does NOT enable CORS — this only validates JWT.**
 
-### 4️⃣ Attach Authorizer to GET Method
+### 5️⃣ Attach Authorizer to GET Method
 
 - **Go to Resources → /order-status → GET → Method Request**
 
@@ -1082,7 +1082,7 @@ or /api/*
 
 > **This ensures all GET requests require a valid JWT.**
 
-### 5️⃣ Enable CORS (Cross-Origin Resource Sharing)
+### 6️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
 > **These are two separate things — enabling CORS is for frontend browser calls.**
 
@@ -1099,7 +1099,7 @@ or /api/*
 > **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
 
 
-### 6️⃣ Deploy API
+### 7️⃣ Deploy API
 
 - **Click Actions → Deploy API**
 
