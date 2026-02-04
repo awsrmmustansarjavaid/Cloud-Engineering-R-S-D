@@ -1052,10 +1052,7 @@ or /api/*
 
 - Go to AWS → Lambda → Click Create function 
  
-- 
 
-
-```
 
 
 
