@@ -1362,6 +1362,74 @@ def lambda_handler(event, context):
     }
 ```
 
+### 5️⃣ ONE Lambda Function (this is the core)
+🔥 This Lambda handles ALL roles
+
+```
+import json
+
+def lambda_handler(event, context):
+    """
+    ONE Lambda function
+    Role-based access using Cognito groups
+    """
+
+    # ---------------------------
+    # Extract JWT claims
+    # ---------------------------
+    claims = event["requestContext"]["authorizer"]["claims"]
+
+    username = claims.get("cognito:username")
+    groups = claims.get("cognito:groups", "")
+
+    # Convert groups string to list
+    if isinstance(groups, str):
+        groups = groups.split(",")
+
+    # ---------------------------
+    # Role checks
+    # ---------------------------
+    is_admin = "admin" in groups
+    is_employee = "employee" in groups
+
+    path = event["rawPath"]
+
+    # ---------------------------
+    # Admin-only route
+    # ---------------------------
+    if path.startswith("/admin"):
+        if not is_admin:
+            return response(403, "❌ Admin access only")
+
+        return response(200, f"✅ Welcome Admin {username}")
+
+    # ---------------------------
+    # Employee route
+    # ---------------------------
+    if path.startswith("/employee"):
+        if not (is_admin or is_employee):
+            return response(403, "❌ Employee access only")
+
+        return response(200, f"✅ Welcome Employee {username}")
+
+    # ---------------------------
+    # Public authenticated route
+    # ---------------------------
+    return response(200, "✅ Authenticated user")
+
+
+def response(code, message):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps({
+            "message": message
+        })
+    }
+```
+
 ### 🟢 STEP 6️⃣ — Protect APIs via API Gateway (Recommended)
 
 In API Gateway:
@@ -1466,6 +1534,184 @@ Professional advice:
 
 **✔ API created**
 
+### STEP 7️⃣ — What Lambda Receives (important)
+
+Inside Lambda:
+
+```
+event["requestContext"]["authorizer"]["claims"]["cognito:groups"]
+```
+
+Example:
+
+```
+["admin"]
+```
+
+or
+
+```
+["employee"]
+```
+
+VERY IMPORTANT — Summary (tattoo this mentally)
+
+| Question                 | Answer               |
+| ------------------------ | -------------------- |
+| Do I need REST API?      | ❌ NO                 |
+| Should I use HTTP API?   | ✅ YES                |
+| Where are routes?        | API Gateway → Routes |
+| Are routes auto-created? | ❌ NO                 |
+| Attach authorizer where? | On EACH route        |
+| One Lambda or many?      | ✅ ONE                |
+
+### 1️⃣ Short answer — Why HTTP API when you already have REST API
+
+You do NOT need to switch.
+
+I suggested HTTP API because:
+
+Fewer clicks
+
+Cheaper
+
+Simpler UI
+
+Built-in JWT authorizer
+
+But your existing REST API is 100% valid and correct.
+There is NO technical advantage that forces you to migrate.
+
+👉 Professional answer:
+Keep REST API for this project.
+Do NOT rebuild.
+
+### 2️⃣ Cognito Authorizer vs JWT Authorizer (same result, different UI)
+
+| REST API (yours)             | HTTP API (mine)          |
+| ---------------------------- | ------------------------ |
+| Authorizer type: **Cognito** | Authorizer type: **JWT** |
+| Old UI                       | New UI                   |
+| More steps                   | Fewer steps              |
+| Same security                | Same security            |
+| Uses Cognito User Pool       | Uses Cognito User Pool   |
+
+
+✅ Both validate the SAME access token
+✅ Both inject claims into Lambda
+
+Result inside Lambda is the same
+
+3️⃣ VERY IMPORTANT — What actually matters (this is the key)
+In REST API (your setup), Lambda receives:
+
+```
+event["requestContext"]["authorizer"]["claims"]
+```
+In HTTP API (my example), Lambda receives:
+
+```
+event["requestContext"]["authorizer"]["claims"]
+```
+
+🔥 SAME OBJECT
+
+That means:
+
+cognito:groups
+
+cognito:username
+
+email
+
+👉 Your Lambda can already do role-based access
+You just weren’t using the groups yet.
+
+4️⃣ Your existing /order-status Lambda is NOT wrong
+
+Your current Lambda:
+
+✔ Uses REST API
+
+✔ Uses Cognito Authorizer
+
+✔ Validates JWT
+
+✔ Works with frontend
+
+✔ Production-ready
+
+What it does NOT yet do
+
+It does NOT check roles
+
+It allows any authenticated user
+
+That’s it. Nothing else is missing.
+
+5️⃣ Can you merge role-based access into your existing Lambda?
+✅ YES — this is the CORRECT way
+
+You do NOT create a new Lambda.
+
+You extend this Lambda:
+
+```
+claims = event["requestContext"]["authorizer"]["claims"]
+groups = claims.get("cognito:groups", "")
+
+if isinstance(groups, str):
+    groups = groups.split(",")
+
+is_admin = "admin" in groups
+```
+
+Then protect logic:
+
+```
+if not is_admin:
+    return {
+        "statusCode": 403,
+        "body": json.dumps({"message": "Admin only"})
+    }
+```
+
+6️⃣ REST API vs HTTP API — decision table (final)
+
+| Question                           | Answer |
+| ---------------------------------- | ------ |
+| Should you migrate now?            | ❌ NO   |
+| Is your REST API wrong?            | ❌ NO   |
+| Does Cognito authorizer work same? | ✅ YES  |
+| Can you do RBAC in REST API?       | ✅ YES  |
+| Can Lambda logic be reused?        | ✅ YES  |
+| Should you merge logic?            | ✅ YES  |
+
+
+7️⃣ What I recommend professionally
+
+For your current project:
+
+✅ Keep REST API
+✅ Keep OrderStatusLambda
+✅ Add role-based checks inside the same Lambda
+✅ Use Cognito groups only
+❌ Do NOT create new APIs
+❌ Do NOT rewrite infra
+
+This is exactly how a senior engineer would handle it under time pressure.
+
+8️⃣ Next logical improvement (when you’re ready)
+
+We can:
+
+Restrict /order-status → admin only
+
+Add /employee/orders → employee view (limited data)
+
+Add fine-grained permissions later (orders:read, metrics:read)
+
+Add audit logging (who accessed what)
 
 
 **✅ PHASE 2️⃣ & 3️⃣ STATUS**

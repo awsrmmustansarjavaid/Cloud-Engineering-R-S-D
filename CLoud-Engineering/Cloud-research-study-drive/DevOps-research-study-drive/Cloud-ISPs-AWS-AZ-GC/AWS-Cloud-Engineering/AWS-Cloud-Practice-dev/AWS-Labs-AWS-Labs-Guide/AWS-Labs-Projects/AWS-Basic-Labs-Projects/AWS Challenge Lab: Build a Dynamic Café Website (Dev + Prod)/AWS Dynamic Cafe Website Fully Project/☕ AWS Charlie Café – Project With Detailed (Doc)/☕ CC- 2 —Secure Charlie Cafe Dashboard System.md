@@ -1025,7 +1025,7 @@ or /api/*
 
 | Field             | Value                              |
 | ----------------- | ---------------------------------- |
-| Name              | `CognitoAuthorizer`                |
+| Name              | `CafeCognitoAuthorizer`                |
 | Type              | **Cognito**                        |
 | Cognito User Pool | Select your Cafe Cognito User Pool |
 | Token Source      | `Authorization`                    |
@@ -1033,7 +1033,8 @@ or /api/*
 
 **✅ Create authorizer**
 
-> **✅ This authorizer will validate JWTs automatically.**
+> **✔ This authorizer will validate JWTs automatically.**
+> **✔ Now API Gateway blocks unauthenticated users**
 
 ### 4️⃣ Cognito Authorizer (JWT validation)
 
