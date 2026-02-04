@@ -673,7 +673,98 @@ Use this in Lambda → Test
 
 - 403 Forbidden
 
+### ✅ Test 1 — No token
 
+```
+curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
+
+#### Expected:
+
+```
+401 Unauthorized
+```
+
+✔ API Gateway working
+
+✅ Test 2 — Employee token
+
+```
+
+{
+  "path": "/order-status",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "employee_user",
+        "cognito:groups": "employee"
+      }
+    }
+  }
+}
+```
+
+Expected:
+
+```
+403 Admin access only
+```
+
+✔ RBAC working
+
+✅ Test 3 — Admin token
+
+```
+{
+  "path": "/order-status",
+  "queryStringParameters": {
+    "date": "2026-01-17"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "admin_user",
+        "cognito:groups": "admin"
+      }
+    }
+  }
+}
+```
+
+#### Expected:
+
+Metrics
+
+Recent orders
+
+statusCode 200
+
+✔ Everything correct
+
+✅ Test 4 — Browser (REAL WORLD)
+
+1️⃣ Login via Cognito Hosted UI
+2️⃣ Access token in localStorage
+3️⃣ Frontend loads dashboard
+4️⃣ Network tab shows:
+
+```
+Authorization: Bearer eyJraWQiOi...
+```
+
+5️⃣ /order-status returns data
+
+✔ Production-ready
+
+🟢 FINAL VERDICT (VERY IMPORTANT)
+
+✅ Your configuration is NOW CORRECT
+✅ You are using best-practice RBAC
+✅ One Lambda is the right choice
+✅ No wasted work
+✅ No rewrite needed
+
+What you built is exactly how a senior backend engineer would do it under time pressure.
 
 
 **✅ PHASE 5️⃣ STATUS**

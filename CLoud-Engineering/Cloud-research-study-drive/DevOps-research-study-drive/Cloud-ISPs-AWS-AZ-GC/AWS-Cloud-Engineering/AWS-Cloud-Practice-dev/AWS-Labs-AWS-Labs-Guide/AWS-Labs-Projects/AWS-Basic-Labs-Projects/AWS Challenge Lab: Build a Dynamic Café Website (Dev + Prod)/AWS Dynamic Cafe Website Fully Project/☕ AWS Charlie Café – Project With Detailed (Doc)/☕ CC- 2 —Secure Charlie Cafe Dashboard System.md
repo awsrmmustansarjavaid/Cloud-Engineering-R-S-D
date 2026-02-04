@@ -1104,6 +1104,9 @@ or /api/*
 
 > **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
 
+✔ Enable CORS on each method
+
+✔ Especially for GET /order-status
 
 ### 7️⃣ Deploy API
 
@@ -1112,6 +1115,12 @@ or /api/*
 - **Stage: status (or admin if you created a new stage)**
 
 - **Save Invoke URL**
+
+✔ Deploy after every change
+
+✔ Stage can be status or admin
+
+✔ Frontend URL must match stage
 
 #### 📌 Copy new endpoint API URL:
 
@@ -1187,7 +1196,7 @@ CafeOrderStatusRBACLambda
 
 - **Function name:** OrderStatusLambda
 
-### 2️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
+### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
 
 > 🔁 This is a drop-in replacement
 > Nothing else needs to change
@@ -1195,6 +1204,24 @@ CafeOrderStatusRBACLambda
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
 
 ## 🛑  OlD Configurations 🛑
+
+### 2️⃣ 🔐 API → Lambda wiring
+
+Make sure ALL routes point to:
+
+```
+CafeOrderStatusRBACLambda
+```
+
+#### Example:
+
+- /order-status → CafeOrderStatusRBACLambda
+
+- /admin/dashboard → CafeOrderStatusRBACLambda
+
+✔ Same Lambda, different paths
+
+✔ Path decides behavior
 
 ### 3️⃣ 🔐 Add Environment Variables
 
