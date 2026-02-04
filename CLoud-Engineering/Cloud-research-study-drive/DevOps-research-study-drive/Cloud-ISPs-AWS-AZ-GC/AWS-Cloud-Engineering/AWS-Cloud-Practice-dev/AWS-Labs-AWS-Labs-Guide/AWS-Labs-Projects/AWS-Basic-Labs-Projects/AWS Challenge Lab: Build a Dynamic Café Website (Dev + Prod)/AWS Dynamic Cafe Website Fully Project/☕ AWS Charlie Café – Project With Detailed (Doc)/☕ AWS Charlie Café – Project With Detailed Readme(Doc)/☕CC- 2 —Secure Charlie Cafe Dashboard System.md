@@ -1656,6 +1656,11 @@ Correct group = ✅
 ---
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
+### 1️⃣ Central UNIVERSAL Backend RBAC
+
+link
+
+---
 👉 Your Lambda can already do role-based access
 You just weren’t using the groups yet.
 
@@ -2282,8 +2287,6 @@ Authorization: Bearer eyJraWQiOi...
 What you built is exactly how a senior backend engineer would do it under time pressure.
 **✅ CafeOrderStatusRBACLambda ✅ COMPLETE & VERIFIED**
 ---
-
-
 
 **✅ PHASE 5️⃣ STATUS**
 
