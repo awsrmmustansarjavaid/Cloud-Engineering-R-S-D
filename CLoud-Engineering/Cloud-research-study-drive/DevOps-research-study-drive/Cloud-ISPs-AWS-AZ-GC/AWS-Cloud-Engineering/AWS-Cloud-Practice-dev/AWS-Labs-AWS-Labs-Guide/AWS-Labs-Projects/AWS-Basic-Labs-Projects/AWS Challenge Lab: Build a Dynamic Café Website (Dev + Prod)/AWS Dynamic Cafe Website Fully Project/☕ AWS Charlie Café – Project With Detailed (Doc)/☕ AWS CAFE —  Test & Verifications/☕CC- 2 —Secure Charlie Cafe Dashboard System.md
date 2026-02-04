@@ -614,7 +614,20 @@ cafe-rbac-layer
 
 **If this does NOT match → STOP and fix**
 
-### 2️⃣ Test - Verify Layer (RBAC)
+### 2️⃣ Test - Verify zip contents:
+
+```
+unzip -l cafe-rbac-layer.zip
+```
+
+You MUST see:
+
+```
+python/rbac.py
+python/permissions.json
+```
+
+### 3️⃣ Test - Verify Layer (RBAC)
 > **Verify Layer is attached**
 
 ```

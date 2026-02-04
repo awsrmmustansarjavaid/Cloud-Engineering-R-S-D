@@ -1240,19 +1240,6 @@ cd cafe-rbac-layer
 zip -r cafe-rbac-layer.zip python
 ```
 
-Verify zip contents:
-
-```
-unzip -l cafe-rbac-layer.zip
-```
-
-You MUST see:
-
-```
-python/rbac.py
-python/permissions.json
-```
-
 #### 2️⃣ Publish Lambda Layer using AWS CLI
 
 Make sure AWS CLI is configured
@@ -1300,6 +1287,9 @@ aws lambda update-function-configuration \
 - Region
 
 - Layer version if newer
+
+### 2️⃣ 
+
 
 ### 2️⃣ CREATE OR UPDATE LAMBDA
 
