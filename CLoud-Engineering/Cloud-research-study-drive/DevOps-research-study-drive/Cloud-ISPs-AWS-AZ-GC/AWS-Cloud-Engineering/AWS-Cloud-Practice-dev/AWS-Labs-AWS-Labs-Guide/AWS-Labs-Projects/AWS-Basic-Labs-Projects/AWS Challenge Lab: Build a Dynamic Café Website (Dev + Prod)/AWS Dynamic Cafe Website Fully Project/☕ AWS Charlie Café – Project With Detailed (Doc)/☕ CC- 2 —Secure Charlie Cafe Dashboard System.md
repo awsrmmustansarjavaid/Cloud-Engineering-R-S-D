@@ -955,7 +955,8 @@ https://cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>
 
 > **✅ This authorizer will validate JWTs automatically.**
 
-#### 2️⃣ Create HTTP API (NOT REST)
+#### 2️⃣ Create HTTP API (Optional)
+> **👉 Since REST API is already built and verified**
 
 - Go to API Gateway ➡️ Create API ➡️ HTTP API
 
