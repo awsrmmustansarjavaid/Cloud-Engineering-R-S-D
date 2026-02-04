@@ -1165,6 +1165,10 @@ API_URL = ".../admin/order-status"
 
 ### 1️⃣ CREATE OR UPDATE LAMBDA
 
+- **Runtime:** Python 3.12
+
+- **Permissions:** Create new role with basic Lambda permissions
+
 #### ✅ New Lambda Function (recommended)
 
 - 🔖 New Lambda name:
@@ -1182,10 +1186,6 @@ CafeOrderStatusRBACLambda
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
 - **Function name:** OrderStatusLambda
-
-- **Runtime:** Python 3.12
-
-- **Permissions:** Create new role with basic Lambda permissions
 
 ### 2️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
 
