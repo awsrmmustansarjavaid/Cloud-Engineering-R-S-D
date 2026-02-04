@@ -1242,33 +1242,7 @@ DB_NAME = cafe
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
-### 4️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
 
-#### 1️⃣ ❌ Without token
-
-```
-curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
-```
-
-#### ✅ Expected:
-
-```
-401 Unauthorized
-```
-
-#### 2️⃣ ✅ With Frontend Token
-
-- Login via Cognito Hosted UI
-
-- Get a JWT access token
-
-- Call API Gateway with
-
-```
-Authorization: Bearer <access_token>
-```
-
-- ✅ Receive JSON response
 
 #### 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
 

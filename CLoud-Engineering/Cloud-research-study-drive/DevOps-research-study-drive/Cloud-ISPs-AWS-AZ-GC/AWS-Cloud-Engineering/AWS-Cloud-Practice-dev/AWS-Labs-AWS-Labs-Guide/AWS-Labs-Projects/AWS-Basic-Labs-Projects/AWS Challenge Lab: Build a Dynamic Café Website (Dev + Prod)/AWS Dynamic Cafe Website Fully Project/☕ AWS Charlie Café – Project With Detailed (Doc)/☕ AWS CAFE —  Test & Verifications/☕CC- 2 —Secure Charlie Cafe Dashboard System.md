@@ -766,7 +766,11 @@ Authorization: Bearer eyJraWQiOi...
 
 What you built is exactly how a senior backend engineer would do it under time pressure.
 
-### ❌ Old Lambda Code Test
+
+
+### ❌ Old Backend Configurations Test ( Leave them) ❌
+
+### 1️⃣ Old Lambda Code Test
 
 - Name:
 
@@ -798,9 +802,35 @@ Test_OrderStatusLambda
 
 ✅ returns filtered orders
 
+### 4️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
 
+#### 1️⃣ ❌ Without token
 
+```
+curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
 
+#### ✅ Expected:
+
+```
+401 Unauthorized
+```
+
+#### 2️⃣ ✅ With Frontend Token
+
+- Login via Cognito Hosted UI
+
+- Get a JWT access token
+
+- Call API Gateway with
+
+```
+Authorization: Bearer <access_token>
+```
+
+- ✅ Receive JSON response
+
+### ❌ Old Backend Configurations Test ❌
 
 
 **✅ PHASE 5️⃣ STATUS**
