@@ -1028,7 +1028,7 @@ https://cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>
 - Click Create
 
 
-#### 3️⃣ Attach this authorizer to your routes
+#### Attach this authorizer to your routes
 
 /admin/*
 
@@ -1038,8 +1038,15 @@ or /api/*
 
 **✔ Now API Gateway blocks unauthenticated users**
 
-#### 3️⃣ Attach this authorizer to your routes
+#### 4️⃣ Deploy
 
+- Click Deploy
+
+- Stage name: Prod
+
+- Click Deploy
+
+**✔ Your API is live**
 
 
 ### 🟢 STEP 5️⃣ — Use Groups in Lambda (REAL PERMISSIONS)

@@ -529,6 +529,64 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 **👍 This is production-style SPA + Cognito + API Gateway security.**
 
+### 2️⃣ Backend - Cognito Role Base Access and Permission 
+
+#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
+
+#### 1️⃣ Test Cognito Authorizer
+
+#### Call Admin Route
+
+```
+curl https://<api-id>.execute-api.<region>.amazonaws.com/admin/dashboard \
+  -H "Authorization: <ACCESS_TOKEN>"
+```
+
+#### Results
+
+| User group | Result |
+| ---------- | ------ |
+| admin      | ✅ 200  |
+| employee   | ❌ 403  |
+| no token   | ❌ 401  |
+
+#### 2️⃣ Test Lambda
+
+- #### Inside Lambda:
+
+```
+event["requestContext"]["authorizer"]["claims"]["cognito:groups"]
+```
+
+#### Example:
+
+```
+["admin"]
+```
+
+or
+
+```
+["employee"]
+```
+
+#### Summary
+
+| Question                 | Answer               |
+| ------------------------ | -------------------- |
+| Do I need REST API?      | ❌ NO                 |
+| Should I use HTTP API?   | ✅ YES                |
+| Where are routes?        | API Gateway → Routes |
+| Are routes auto-created? | ❌ NO                 |
+| Attach authorizer where? | On EACH route        |
+| One Lambda or many?      | ✅ ONE                |
+
+
+
+
+
+
+
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
