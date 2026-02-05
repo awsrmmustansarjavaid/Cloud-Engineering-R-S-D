@@ -501,6 +501,8 @@ You can run parts or the whole thing.
 
 #### Run on EC2 / CloudShell / Amazon Linux / Linux
 
+[charlie-cafe-pymysql-layer.sh](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie-cafe-pymysql-layer.sh)
+
 ```
 #!/bin/bash
 # ============================================================
