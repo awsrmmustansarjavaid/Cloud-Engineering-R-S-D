@@ -362,6 +362,7 @@ http://<EC2_PUBLIC_IP>/
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+
 ---
 ## PHASE 2️⃣ — VERIFY IAM ROLE
 
@@ -401,7 +402,11 @@ EC2-Cafe-Secrets-Role
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+## 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS COMPLETE ✅
 ---
+## 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS
+
 ## PHASE 3️⃣ — VERIFY CAFE DATABASE CONFIGURATIONS
 
 🔐 Reads DB creds from AWS Secrets Manager
@@ -558,7 +563,74 @@ For example !
 **✅ PHASE 4️⃣ STATUS**
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+
+## 📢 SECTION 2️⃣ CAFE BASIC CONFIGURATIONS COMPLETE ✅
 ---
+## 📢 SECTION 4️⃣ CAFE FRONTEND CONFIGURATIONS
+
+## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND central FOUNDATION (REUSABLE)
+
+### 1️⃣ Verify  file path
+
+#### 1️⃣ Verify central-auth-api.js
+
+```
+ls -lh /var/www/html/js/central-auth-api.js
+```
+
+#### 2️⃣ Verify central_cafe_style.css
+
+
+```
+ls -lh /var/www/html/css/central_cafe_style.css
+```
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## ☕ AWS CAFE - PHASE 3️⃣ FrontEnd Deployment Final Configurations
+
+#### 4️⃣ Open page in browser (MANDATORY)
+
+```
+http:// Your EC2 Public IP/index.php
+```
+
+```
+http:// Your EC2 Public IP/cafe-admin-dashboard.html
+```
+
+```
+http:// Your EC2 Public IP/orders.php
+```
+
+```
+http:// Your EC2 Public IP/order-status.html
+```
+
+```
+http:// Your EC2 Public IP/order-receipt.php
+```
+
+```
+http:// Your EC2 Public IP/admin-orders.php
+```
+
+```
+http:// Your EC2 Public IP/admin-orders.php
+```
+
+```
+http:// Your EC2 Public IP/payment-status.php
+```
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+
+## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+---`
 
 ## Charlie Cafe Basic Lab Configuration Test and Verification
 
@@ -657,13 +729,3 @@ sudo ./export_bash_output_s3.sh
 # 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
 
-
-# ☕ AWS CAFE — SALES ANALYTICS & REPORTING SYSTEM
-
-# 
-
-
-
-
-# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
----

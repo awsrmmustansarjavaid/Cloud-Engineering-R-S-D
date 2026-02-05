@@ -806,7 +806,6 @@ EXIT;
 ---
 ## PHASE 3️⃣ — Store DB Credentials in Secrets Manager
 
-
 ### 1️⃣ Store DB Credentials in Secrets Manager
 
 - Go to Secrets Manager → Store a new secret
@@ -950,11 +949,7 @@ sudo chown apache:apache /var/www/html/js/*
 sudo chmod 644 /var/www/html/js/*
 ```
 
-#### 4️⃣ Double-check file path
-
-```
-ls -lh /var/www/html/js/central-auth-api.js
-```
+---
 
 ### 2️⃣ Create the shared Central-cafe-style (IMPORTANT)
 
@@ -982,14 +977,6 @@ sudo chown apache:apache /var/www/html/css/*
 ```
 sudo chmod 644 /var/www/html/css/*
 ```
-
-#### 4️⃣ Double-check file path
-
-```
-ls -lh /var/www/html/css/central_cafe_style.css
-```
-
-
 
 **✅ PHASE 1️⃣ STATUS**
 
@@ -1228,44 +1215,9 @@ ls -lh /var/www/html/*
 sudo systemctl restart httpd
 ```
 
-#### 4️⃣ Open page in browser (MANDATORY)
-
-```
-http:// Your EC2 Public IP/index.php
-```
-
-```
-http:// Your EC2 Public IP/cafe-admin-dashboard.html
-```
-
-```
-http:// Your EC2 Public IP/orders.php
-```
-
-```
-http:// Your EC2 Public IP/order-status.html
-```
-
-```
-http:// Your EC2 Public IP/order-receipt.php
-```
-
-```
-http:// Your EC2 Public IP/admin-orders.php
-```
-
-```
-http:// Your EC2 Public IP/admin-orders.php
-```
-
-```
-http:// Your EC2 Public IP/payment-status.php
-```
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
----
 
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
