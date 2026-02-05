@@ -1,0 +1,148 @@
+/* ==========================================================
+   CENTRAL CAFE STYLE SHEET
+   File: central-cafe-style.css
+   Purpose:
+   - Centralized PRINT & THERMAL PRINT styling
+   - Reusable across all Charlie Cafe pages
+   - Keeps HTML clean (similar to central-auth-api.js)
+   ========================================================== */
+
+/* ==========================================================
+   GLOBAL PRINT STYLES (STANDARD A4 / NORMAL PRINTERS)
+   Applies automatically when browser print is triggered
+   ========================================================== */
+@media print {
+
+  /* Force clean white background for printing */
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide interactive or unnecessary elements */
+  button,
+  .btn,
+  .no-print,
+  nav,
+  footer,
+  .navbar {
+    display: none !important;
+  }
+
+  /* Make tables printer-friendly */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px;
+  }
+
+  th,
+  td {
+    border: 1px solid #000000 !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+    text-align: left;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: bold;
+  }
+
+  /* Headings alignment for printed reports */
+  h1, h2, h3 {
+    text-align: center !important;
+    margin-top: 10px;
+  }
+
+  /* Prevent page breaks inside important blocks */
+  table,
+  .receipt,
+  .invoice,
+  .print-section {
+    page-break-inside: avoid;
+  }
+
+  /* Reduce excessive margins added by browsers */
+  @page {
+    margin: 12mm;
+  }
+}
+
+
+/* ==========================================================
+   THERMAL PRINTER STYLES (80mm RECEIPT PRINTERS)
+   Activate by adding class="thermal-print" to <body>
+   Example:
+   <body class="thermal-print">
+   ========================================================== */
+@media print {
+
+  /* Thermal printer page width */
+  body.thermal-print {
+    width: 80mm;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    font-family: monospace !important;
+    font-size: 12px;
+  }
+
+  /* Receipt container */
+  .receipt {
+    width: 72mm;
+    margin: auto;
+  }
+
+  /* Receipt headings & text */
+  .receipt h4,
+  .receipt p {
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  /* Receipt table formatting */
+  .receipt table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .receipt td {
+    padding: 2px 0;
+    border: none !important; /* thermal printers don't like borders */
+  }
+
+  /* Dashed divider for totals */
+  .receipt .total {
+    border-top: 1px dashed #000000;
+    margin-top: 6px;
+    padding-top: 6px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* Hide everything except receipt when thermal printing */
+  body.thermal-print * {
+    visibility: hidden;
+  }
+
+  body.thermal-print .receipt,
+  body.thermal-print .receipt * {
+    visibility: visible;
+  }
+}
+
+/* ==========================================================
+   OPTIONAL UTILITIES (CAN BE USED IN HTML)
+   ========================================================== */
+
+/* Force element to print even if others are hidden */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+}
