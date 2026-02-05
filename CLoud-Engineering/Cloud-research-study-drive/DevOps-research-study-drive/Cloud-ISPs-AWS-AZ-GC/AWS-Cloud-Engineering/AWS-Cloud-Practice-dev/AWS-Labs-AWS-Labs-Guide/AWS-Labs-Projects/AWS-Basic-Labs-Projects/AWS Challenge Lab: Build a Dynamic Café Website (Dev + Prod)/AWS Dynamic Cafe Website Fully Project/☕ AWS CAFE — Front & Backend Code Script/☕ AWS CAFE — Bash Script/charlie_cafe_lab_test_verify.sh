@@ -1,21 +1,22 @@
 #!/bin/bash
 # =============================================================
 # Charlie Cafe Basic Lab Configuration Test and Verification
-# Update version: 1.1
+# Update version: 1.3
 #
-# NEW IN v1.1:
-# ✔ Web file path verification
-# ✔ Frontend asset validation
-# ✔ Localhost page availability checks (curl)
-#
-# OUTPUTS:
-# - TXT  (full console log)
-# - CSV  (test summary)
-# - PDF  (audit report)
+# INCLUDES:
+# ✔ LAMP stack verification
+# ✔ RDS connectivity & table validation (READ ONLY)
+# ✔ File path verification (HTML / CSS / JS)
+# ✔ Localhost page availability tests
+# ✔ HTML response content validation
+# ✔ RBAC token validation via curl (JWT)
+# ✔ TXT / CSV / PDF reporting
+# ✔ S3 upload
 #
 # SAFE MODE:
 # ✔ READ ONLY
-# ✔ NO DB CHANGES
+# ✔ NO DATABASE CHANGES
+# ✔ NO FILE MODIFICATION
 # =============================================================
 
 set -euo pipefail
@@ -32,8 +33,15 @@ export AWS_DEFAULT_REGION="us-east-1"
 # ===============================
 SECRET_ID="CafeDevDBSM"
 DB_NAME="cafe_db"
+
 S3_BUCKET="charlie-cafe-s3-bucket"
 S3_PREFIX="Charlie Cafe Test and Verification"
+
+# 🔐 RBAC CONFIG (READ-ONLY API)
+RBAC_TEST_URL="http://localhost/orders.php"
+RBAC_ACCESS_TOKEN="PASTE_VALID_ACCESS_TOKEN_HERE"
+
+WEB_ROOT="/var/www/html"
 
 TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')
 
@@ -71,16 +79,18 @@ warn() { echo -e "${YELLOW}! $1${NC}"; }
 # HEADER
 # ===============================
 echo "============================================================="
-echo "  Charlie Cafe Basic Lab Configuration Test and Verification"
-echo "  Started at: $(date)"
+echo " Charlie Cafe Basic Lab Configuration Test and Verification"
+echo " Update version: 1.3"
+echo " Started at: $(date)"
 echo "============================================================="
 echo
 
 # =============================================================
-# LAMP VERIFICATION
+# LAMP STACK VERIFICATION
 # =============================================================
 echo "🔧 LAMP STACK VERIFICATION"
 
+# Apache test
 if curl -s http://localhost | grep -qi "It works"; then
   ok "Apache serving default page"
   csv_pass "Apache" "Serving default page"
@@ -89,6 +99,7 @@ else
   csv_fail "Apache" "Not serving default page"
 fi
 
+# PHP CLI
 if command -v php >/dev/null; then
   ok "PHP CLI available"
   csv_pass "PHP CLI" "Installed"
@@ -97,6 +108,7 @@ else
   csv_fail "PHP CLI" "Not installed"
 fi
 
+# MySQL Client
 if command -v mysql >/dev/null; then
   ok "MySQL client installed"
   csv_pass "MySQL Client" "Installed"
@@ -106,7 +118,34 @@ else
 fi
 
 # =============================================================
-# FETCH DB CREDENTIALS
+# FILE PATH VERIFICATION
+# =============================================================
+echo
+echo "📂 FILE PATH VERIFICATION"
+
+FILES=(
+  "$WEB_ROOT/index.php"
+  "$WEB_ROOT/orders.php"
+  "$WEB_ROOT/order-status.html"
+  "$WEB_ROOT/order-receipt.php"
+  "$WEB_ROOT/admin-orders.php"
+  "$WEB_ROOT/payment-status.php"
+  "$WEB_ROOT/css/central_cafe_style.css"
+  "$WEB_ROOT/js/central-auth-api.js"
+)
+
+for f in "${FILES[@]}"; do
+  if [ -f "$f" ]; then
+    ok "File exists: $f"
+    csv_pass "File $f" "Exists"
+  else
+    fail "Missing file: $f"
+    csv_fail "File $f" "Missing"
+  fi
+done
+
+# =============================================================
+# FETCH RDS CREDENTIALS (READ-ONLY)
 # =============================================================
 echo
 echo "🔐 FETCHING RDS CREDENTIALS"
@@ -123,8 +162,8 @@ DB_PORT=$(echo "$SECRET_JSON" | jq -r '.port // 3306')
 
 MYSQL="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS $DB_NAME"
 
-ok "Secrets loaded"
-csv_pass "Secrets Manager" "Credentials fetched"
+ok "Secrets fetched successfully"
+csv_pass "Secrets Manager" "Credentials loaded"
 
 # =============================================================
 # RDS VERIFICATION
@@ -153,47 +192,13 @@ for t in "${TABLES[@]}"; do
 done
 
 # =============================================================
-# v1.1 — WEB FILE PATH VERIFICATION
+# LOCALHOST PAGE AVAILABILITY
 # =============================================================
 echo
-echo "📂 WEB FILE & ASSET VERIFICATION (v1.1)"
-
-# Root web directory
-if ls -lh /var/www/html/* >/dev/null 2>&1; then
-  ok "/var/www/html directory accessible"
-  csv_pass "Web Root" "/var/www/html accessible"
-else
-  fail "/var/www/html not accessible"
-  csv_fail "Web Root" "Directory missing or permission issue"
-fi
-
-# CSS file
-if [ -f /var/www/html/css/central_cafe_style.css ]; then
-  ok "CSS file found: central_cafe_style.css"
-  csv_pass "CSS File" "central_cafe_style.css exists"
-else
-  fail "Missing CSS file: central_cafe_style.css"
-  csv_fail "CSS File" "Missing"
-fi
-
-# JS file
-if [ -f /var/www/html/js/central-auth-api.js ]; then
-  ok "JS file found: central-auth-api.js"
-  csv_pass "JS File" "central-auth-api.js exists"
-else
-  fail "Missing JS file: central-auth-api.js"
-  csv_fail "JS File" "Missing"
-fi
-
-# =============================================================
-# v1.1 — LOCALHOST PAGE AVAILABILITY (curl)
-# =============================================================
-echo
-echo "🌐 LOCALHOST PAGE VERIFICATION (v1.1)"
+echo "🌐 LOCALHOST PAGE AVAILABILITY"
 
 PAGES=(
   "index.php"
-  "cafe-admin-dashboard.html"
   "orders.php"
   "order-status.html"
   "order-receipt.php"
@@ -202,14 +207,62 @@ PAGES=(
 )
 
 for page in "${PAGES[@]}"; do
-  if curl -s -o /dev/null -w "%{http_code}" "http://localhost/$page" | grep -q "200"; then
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost/$page")
+  if [ "$CODE" = "200" ]; then
     ok "Page reachable: $page"
-    csv_pass "Web Page $page" "HTTP 200 OK"
+    csv_pass "Page $page" "HTTP 200"
   else
-    fail "Page NOT reachable: $page"
-    csv_fail "Web Page $page" "Not reachable"
+    fail "Page error: $page ($CODE)"
+    csv_fail "Page $page" "HTTP $CODE"
   fi
 done
+
+# =============================================================
+# 🧾 HTML RESPONSE CONTENT VALIDATION
+# =============================================================
+echo
+echo "🧾 HTML RESPONSE CONTENT VALIDATION"
+
+declare -A HTML_KEYWORDS=(
+  ["index.php"]="Charlie Cafe"
+  ["orders.php"]="Order"
+  ["admin-orders.php"]="Admin"
+  ["payment-status.php"]="Payment"
+)
+
+for page in "${!HTML_KEYWORDS[@]}"; do
+  CONTENT=$(curl -s "http://localhost/$page")
+  if echo "$CONTENT" | grep -qi "${HTML_KEYWORDS[$page]}"; then
+    ok "Valid HTML content: $page"
+    csv_pass "HTML $page" "Keyword found"
+  else
+    fail "Invalid HTML content: $page"
+    csv_fail "HTML $page" "Keyword missing"
+  fi
+done
+
+# =============================================================
+# 🔐 RBAC TOKEN VALIDATION (JWT)
+# =============================================================
+echo
+echo "🔐 RBAC TOKEN VALIDATION"
+
+if [[ "$RBAC_ACCESS_TOKEN" == *"PASTE"* ]]; then
+  warn "RBAC token not configured — skipping"
+  csv_warn "RBAC Token" "Not configured"
+else
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+    -H "Authorization: Bearer $RBAC_ACCESS_TOKEN" \
+    "$RBAC_TEST_URL")
+
+  if [ "$CODE" = "200" ]; then
+    ok "RBAC token accepted"
+    csv_pass "RBAC Token" "Valid"
+  else
+    fail "RBAC token rejected ($CODE)"
+    csv_fail "RBAC Token" "Invalid or expired"
+  fi
+fi
 
 # =============================================================
 # PDF GENERATION
@@ -220,28 +273,27 @@ echo "📑 PDF REPORT GENERATION"
 if command -v pandoc >/dev/null; then
   pandoc "$TXT_FILE" -o "$PDF_FILE"
   ok "PDF report generated"
-  csv_pass "PDF Report" "Generated successfully"
+  csv_pass "PDF Report" "Generated"
 else
-  warn "pandoc not installed — skipping PDF"
-  csv_warn "PDF Report" "pandoc not installed"
+  warn "Pandoc not installed — skipping PDF"
+  csv_warn "PDF Report" "Pandoc missing"
 fi
 
 # =============================================================
-# UPLOAD ALL FILES TO S3
+# UPLOAD RESULTS TO S3
 # =============================================================
 echo
-echo "☁️ Uploading results to S3..."
+echo "☁️ Uploading results to S3"
 
 aws s3 cp "$TXT_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$TXT_FILE"
 aws s3 cp "$CSV_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$CSV_FILE"
-
 [ -f "$PDF_FILE" ] && aws s3 cp "$PDF_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$PDF_FILE"
 
-ok "All reports uploaded to S3"
+ok "All reports uploaded successfully"
 
 echo
 echo "============================================================="
-echo "✅ VERIFICATION COMPLETE (v1.1)"
+echo "✅ VERIFICATION COMPLETE — Update version 1.3"
 echo "TXT : $TXT_FILE"
 echo "CSV : $CSV_FILE"
 [ -f "$PDF_FILE" ] && echo "PDF : $PDF_FILE"
