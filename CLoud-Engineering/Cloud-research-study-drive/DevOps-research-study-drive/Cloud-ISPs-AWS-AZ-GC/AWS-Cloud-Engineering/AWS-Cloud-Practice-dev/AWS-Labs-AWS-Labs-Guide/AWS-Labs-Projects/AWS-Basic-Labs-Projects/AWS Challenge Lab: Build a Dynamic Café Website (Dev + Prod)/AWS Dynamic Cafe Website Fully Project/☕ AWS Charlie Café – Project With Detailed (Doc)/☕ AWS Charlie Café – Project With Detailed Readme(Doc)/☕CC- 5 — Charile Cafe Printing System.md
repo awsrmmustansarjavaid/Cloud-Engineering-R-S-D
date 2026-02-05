@@ -85,38 +85,21 @@ We pass data using:
 
 👉 sessionStorage is best (safe, temporary, clean)
 
-### ✅ print-hub.html (simplified but real)
+## 🔐 PHASE 1️⃣ Charlie Cafe - PRINTING (FRONTEND ONLY)
 
-```
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Charlie Cafe | Print Hub</title>
+### 1️⃣ Create a Dedicated Printing HTML (central-print.html)
 
-  <!-- Central print styles -->
-  <link rel="stylesheet" href="/print/central-cafe-style.css">
-</head>
+This file will:
 
-<body id="printBody">
+- Include central-cafe-style.css for all print styles
 
-  <!-- Print content injected here -->
-  <div id="printContainer"></div>
+- Include central-auth-api.js for browser printing functions
 
-  <!-- Print / Export Controls -->
-  <div class="no-print" style="text-align:center; margin-top:20px;">
-    <button onclick="window.print()">🖨️ Print</button>
-    <button onclick="exportCSV()">📊 Export CSV</button>
-    <button onclick="exportPDF()">📄 Export PDF</button>
-  </div>
+- Include optional export functionality (CSV/PDF)
 
-  <!-- Central print logic -->
-  <script src="/print/central-print.js"></script>
-</body>
-</html>
-```
+- Be reusable for any page: order.php, order-status.html, HR reports, etc.
 
-
+- Allow printing or exporting without duplicating code
 
 
 
