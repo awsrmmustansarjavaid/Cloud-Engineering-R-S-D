@@ -59,6 +59,58 @@ CTRL + O → ENTER
 CTRL + X
 ```
 
+#### Permissions
+
+```
+sudo chown apache:apache /var/www/html/central-print.html
+```
+```
+sudo chmod 644 /var/www/html/central-print.html
+```
+
+### 3️⃣ Using this Central Print File in Other Pages
+
+- Include a print button on any page, e.g., order-status.html:
+
+```
+<button class="btn btn-outline-dark" onclick="openCentralPrint('#ordersTable')">
+  🖨️ Print / Export
+</button>
+
+<script>
+function openCentralPrint(selector) {
+  const content = document.querySelector(selector).outerHTML;
+  const printWindow = window.open('/central-print.html', '_blank');
+  printWindow.onload = function() {
+    printWindow.centralPrint.loadContent(content);
+  }
+}
+</script>
+```
+
+#### ✅ Works for any table or section.
+
+### 4️⃣ UX / UI Features Added
+
+✔️ Fixed-bottom action buttons for testing (Print, Thermal, CSV, PDF)
+
+✔️ Keyboard shortcuts:
+
+✔️ Ctrl+P → Print A4
+
+✔️ Ctrl+T → Thermal print
+
+✔️ Ctrl+C → CSV export
+
+✔️ Ctrl+D → PDF export
+
+✔️ Alerts if no table found
+
+✔️ Fully responsive using Bootstrap
+
+✔️ Thermal print layout uses central-cafe-style.css
+
+a
 
 
 
