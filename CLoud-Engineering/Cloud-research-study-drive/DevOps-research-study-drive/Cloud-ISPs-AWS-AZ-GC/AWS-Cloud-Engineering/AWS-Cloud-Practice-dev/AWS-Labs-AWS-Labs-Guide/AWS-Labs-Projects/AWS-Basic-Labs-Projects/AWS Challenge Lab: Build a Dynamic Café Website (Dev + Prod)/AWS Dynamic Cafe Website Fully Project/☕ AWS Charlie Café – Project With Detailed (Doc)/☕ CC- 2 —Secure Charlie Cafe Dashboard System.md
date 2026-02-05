@@ -2218,7 +2218,6 @@ Authorization: Bearer <JWT>
 orders.csv
 ```
 
-
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
@@ -2232,55 +2231,9 @@ orders.csv
 
 ### 1️⃣ AWS COGNITO (ROLE SOURCE OF TRUTH)
 
-#### Step 1️⃣ — Create Groups (ONE TIME ONLY)
+### 1️⃣ API GATEWAY AUTHORIZATION (MANDATORY)
 
-- 📍 AWS Console → Cognito → User Pools → YourPool
-
-- Click Groups
-
-- Click Create group
-
-#### Create Group #1
-
-```
-Group name: Admin
-Description: Full access users
-```
-
-#### Create Group #2
-
-```
-Group name: Staff
-Description: Order-only users
-```
-
-✅ Done.
-
-These names are case-sensitive → Admin, Staff
-
-#### Step 2️⃣ — Assign Users to Groups
-
-- 📍 Cognito → Users
-
-- Select a user
-
-- Click Add to group
-
-- Choose:
-
-  - Admin → for admin users
-
-  - Staff → for employees
-
-#### 🧠 Cognito will now automatically inject this into JWT:
-
-```
-cognito:groups = ["Admin"]
-```
-
-### 2️⃣ API GATEWAY AUTHORIZATION (MANDATORY)
-
-#### Step 3️⃣ — Ensure Cognito Authorizer is Attached
+#### Step 1️⃣ — Ensure Cognito Authorizer is Attached
 
 - 📍 API Gateway → Your API
 
