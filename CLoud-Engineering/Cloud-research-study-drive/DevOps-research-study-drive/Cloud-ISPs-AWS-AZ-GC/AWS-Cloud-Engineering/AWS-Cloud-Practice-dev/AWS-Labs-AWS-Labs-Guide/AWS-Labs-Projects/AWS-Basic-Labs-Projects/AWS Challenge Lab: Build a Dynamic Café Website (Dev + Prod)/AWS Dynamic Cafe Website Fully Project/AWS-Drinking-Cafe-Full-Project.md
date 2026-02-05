@@ -1155,6 +1155,28 @@ CTRL + O → ENTER
 CTRL + X
 ```
 
+---
+### 7️⃣ Charlie Cafe Dedicated Printing HTML  (IMPORTANT)
+> **File Name: central-print.html**
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/payment-status.php
+```
+
+#### 2️⃣ code
+
+[payment-status.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
