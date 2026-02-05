@@ -85,6 +85,37 @@ We pass data using:
 
 👉 sessionStorage is best (safe, temporary, clean)
 
+### ✅ print-hub.html (simplified but real)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Charlie Cafe | Print Hub</title>
+
+  <!-- Central print styles -->
+  <link rel="stylesheet" href="/print/central-cafe-style.css">
+</head>
+
+<body id="printBody">
+
+  <!-- Print content injected here -->
+  <div id="printContainer"></div>
+
+  <!-- Print / Export Controls -->
+  <div class="no-print" style="text-align:center; margin-top:20px;">
+    <button onclick="window.print()">🖨️ Print</button>
+    <button onclick="exportCSV()">📊 Export CSV</button>
+    <button onclick="exportPDF()">📄 Export PDF</button>
+  </div>
+
+  <!-- Central print logic -->
+  <script src="/print/central-print.js"></script>
+</body>
+</html>
+```
+
 
 
 
