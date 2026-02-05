@@ -1203,12 +1203,6 @@ sudo chmod -R 644 /var/www/html
 
 **⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
 
-#### 2️⃣ Double-check file path
-
-```
-ls -lh /var/www/html/*
-```
-
 #### 3️⃣ Restart Apache (MANDATORY)
 
 ```

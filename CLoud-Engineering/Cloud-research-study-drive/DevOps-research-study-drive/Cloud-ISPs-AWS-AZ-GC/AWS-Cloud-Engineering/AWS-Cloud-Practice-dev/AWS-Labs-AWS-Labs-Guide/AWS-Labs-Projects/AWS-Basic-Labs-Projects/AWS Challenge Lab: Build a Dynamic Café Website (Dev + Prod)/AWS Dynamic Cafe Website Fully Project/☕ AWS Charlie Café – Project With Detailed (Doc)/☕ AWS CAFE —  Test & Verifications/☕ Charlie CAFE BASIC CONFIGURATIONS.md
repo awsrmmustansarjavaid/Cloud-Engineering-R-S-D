@@ -591,7 +591,13 @@ ls -lh /var/www/html/css/central_cafe_style.css
 ---
 ## ☕ AWS CAFE - PHASE 3️⃣ FrontEnd Deployment Final Configurations
 
-#### 4️⃣ Open page in browser (MANDATORY)
+### 1️⃣ Double-check file path
+
+```
+ls -lh /var/www/html/*
+```
+
+### 2️⃣ Open page in browser (MANDATORY)
 
 ```
 http:// Your EC2 Public IP/index.php
