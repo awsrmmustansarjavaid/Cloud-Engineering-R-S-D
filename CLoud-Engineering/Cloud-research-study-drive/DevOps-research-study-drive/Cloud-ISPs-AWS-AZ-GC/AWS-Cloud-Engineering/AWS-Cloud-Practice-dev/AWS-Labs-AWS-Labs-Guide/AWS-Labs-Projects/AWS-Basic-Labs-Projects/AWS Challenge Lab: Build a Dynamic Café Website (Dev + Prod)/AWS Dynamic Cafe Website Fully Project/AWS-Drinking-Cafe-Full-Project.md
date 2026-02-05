@@ -1069,11 +1069,104 @@ CTRL + X
 ```
 
 ---
+### 4️⃣ Charlie Cafe order-status.html  (IMPORTANT)
+> **File Name: order-status.html**
 
+#### 1️⃣ Create File
 
+```
+sudo nano /var/www/html/order-status.html
+```
 
+#### 2️⃣ CODE
 
+#### 🚨 IMPORTANT:
 
+#### Replace this line ONLY:
+
+```
+fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
+```
+
+#### With your real API:
+
+```
+fetch("https://abcd1234.execute-api.us-east-1.amazonaws.com/admin/order-status")
+```
+
+[order-status.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+---
+### 5️⃣ Charlie Cafe order-status.php  (IMPORTANT)
+> **File Name: order-status.php**
+
+#### ☕ FINAL order-receipt.php with print button (CAFE STYLED - Recommanded)
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/order-receipt.php
+```
+
+#### 2️⃣ code
+
+[order-receipt.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+---
+
+### 6️⃣ Charlie Cafe admin-orders.php  (IMPORTANT)
+> **File Name: admin-orders.php**
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/admin-orders.php
+```
+
+#### 2️⃣ code
+
+[admin-orders.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+---
+### 6️⃣ Charlie Cafe payment-status.php  (IMPORTANT)
+> **File Name: payment-status.php**
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/payment-status.php
+```
+
+#### 2️⃣ code
+
+[payment-status.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
 
 **✅ PHASE 2️⃣ STATUS**
 
@@ -1081,7 +1174,7 @@ CTRL + X
 ---
 ## ☕ AWS CAFE - PHASE 3️⃣ FrontEnd Deployment Final Configurations
 
-#### 1️⃣ Fix File Permissions
+#### 1️⃣ SECURITY & PERMISSIONS
 
 #### index.php
 
@@ -1091,6 +1184,16 @@ sudo chown apache:apache /var/www/html/index.php
 
 ```
 sudo chmod 644 /var/www/html/index.php
+```
+
+#### orders.php
+
+```
+sudo chown apache:apache /var/www/html/orders.php
+```
+
+```
+sudo chmod 644 /var/www/html/orders.php
 ```
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
@@ -1135,167 +1238,34 @@ http:// Your EC2 Public IP/index.php
 http:// Your EC2 Public IP/cafe-admin-dashboard.html
 ```
 
+```
+http:// Your EC2 Public IP/orders.php
+```
 
+```
+http:// Your EC2 Public IP/order-status.html
+```
+
+```
+http:// Your EC2 Public IP/order-receipt.php
+```
+
+```
+http:// Your EC2 Public IP/admin-orders.php
+```
+
+```
+http:// Your EC2 Public IP/admin-orders.php
+```
+
+```
+http:// Your EC2 Public IP/payment-status.php
+```
 
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ AWS CAFE - PHASE 4️⃣ 
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/orders.php
-```
-
-```
-sudo chmod 644 /var/www/html/orders.php
-```
-
-### 3️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-**✅ PHASE 4️⃣ STATUS**
-
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
----
-## ☕ AWS CAFE - PHASE 5️⃣ order-status.html 
-> **File Name: order-status.html **
-
-### 1️⃣ Create File
-
-```
-sudo nano /var/www/html/order-status.html
-```
-
-### 1️⃣ CODE
-
-#### 🚨 IMPORTANT:
-
-#### Replace this line ONLY:
-
-```
-fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
-```
-
-#### With your real API:
-
-```
-fetch("https://abcd1234.execute-api.us-east-1.amazonaws.com/admin/order-status")
-```
-
-#### 1️⃣ Simple order-status.html 
-
-[order-status.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
-
-#### 2️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-### 2️⃣ SECURITY & PERMISSIONS
-
-✅ 2.1 Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/order-status.html
-```
-```
-sudo chmod 644 /var/www/html/order-status.html
-```
-
-### 3️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-### 4️⃣ Open page in browser
-
-✔ Orders visible
-
-✔ Counts visible
-
-✔ Date/time visible
-
-**✅ PHASE 5️⃣ STATUS**
-
-> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
----
-## ☕ AWS CAFE - PHASE 6️⃣ order-status.php
-> **File Name: order-status.php **
-
-#### ☕ FINAL order-receipt.php with print button (CAFE STYLED - Recommanded)
-
-```
-sudo nano /var/www/html/order-receipt.php
-```
-
-[order-receipt.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
-
-### 2️⃣ SECURITY & PERMISSIONS
-
-#### ✅ 2.1 Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/order-receipt.php
-```
-```
-sudo chmod 644 /var/www/html/order-receipt.php
-```
-
-### 3️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-**✅ PHASE 6️⃣ STATUS**
-
-> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
----
-## ☕ AWS CAFE - PHASE 7️⃣ admin-orders.php
-> **File Name: admin-orders.php **
-
-```
-sudo nano admin-orders.php
-```
-
-[admin-orders.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
-
-```
-sudo systemctl restart httpd
-```
-
-**✅ PHASE 7️⃣ STATUS**
-
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
----
-## ☕ AWS CAFE - PHASE 7️⃣ payment-status.php
-
-```
-sudo nano payment-status.php
-```
-
-[payment-status.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
-
-```
-sudo systemctl restart httpd
-```
-
-**✅ PHASE 7️⃣ STATUS**
-
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
----
-
-
-
 
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
