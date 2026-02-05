@@ -154,7 +154,7 @@ pymysql-layer.zip   (few MB)
 
 
 
-
+[PyMySQL Lambda Layer via AWS CLI](./☕%20CC-%206%20—pymysql-layer.md)
 
 
 **✅ PHASE 1️⃣ STATUS**

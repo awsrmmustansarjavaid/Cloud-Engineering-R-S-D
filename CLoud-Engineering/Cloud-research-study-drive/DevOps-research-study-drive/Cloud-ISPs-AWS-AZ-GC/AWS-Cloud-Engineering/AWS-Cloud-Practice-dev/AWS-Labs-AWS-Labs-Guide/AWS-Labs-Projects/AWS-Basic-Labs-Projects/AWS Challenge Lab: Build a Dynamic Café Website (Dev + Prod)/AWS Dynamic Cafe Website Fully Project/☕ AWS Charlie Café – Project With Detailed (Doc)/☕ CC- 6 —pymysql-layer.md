@@ -1,4 +1,4 @@
-# Charlie Cafe - pymysql-layer
+# Charlie Cafe - PyMySQL Lambda Layer via AWS CLI
 
 ## PHASE 1️⃣ Basic pymysql-layer Configurations
 
