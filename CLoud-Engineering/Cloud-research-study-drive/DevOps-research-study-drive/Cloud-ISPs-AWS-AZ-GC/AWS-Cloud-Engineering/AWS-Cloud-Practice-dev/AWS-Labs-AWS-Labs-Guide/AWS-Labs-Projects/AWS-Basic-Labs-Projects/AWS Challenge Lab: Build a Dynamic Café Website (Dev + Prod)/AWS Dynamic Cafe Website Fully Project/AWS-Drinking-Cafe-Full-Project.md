@@ -916,26 +916,32 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 ---
 ## 📢 SECTION 4️⃣ CAFE FRONTEND CONFIGURATIONS
 
-## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND AUTH FOUNDATION (REUSABLE)
+## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND central FOUNDATION (REUSABLE)
 
-#### 1️⃣ Create the shared central-auth.js (IMPORTANT)
+### 1️⃣ Create the shared central-auth.js (IMPORTANT)
 > **This file will be reused across all pages.**
 
 - 📍 Place this in /js/central-auth.js
 
-#### Command to create the js directory
+#### 1️⃣ Command to create the js directory
 
 ```
 sudo mkdir -p /var/www/html/js
 ```
 
+#### 2️⃣ Command to create the .js file
+
 ```
 sudo nano /var/www/html/js/central-auth-api.js
 ```
 
+#### 3️⃣ Copy & Paste Script
+
 [central-auth-api.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
+
+#### 3️⃣ Fix File Permissions
 
 ```
 sudo chown apache:apache /var/www/html/js/*
@@ -944,28 +950,63 @@ sudo chown apache:apache /var/www/html/js/*
 sudo chmod 644 /var/www/html/js/*
 ```
 
-#### Double-check file path
+#### 4️⃣ Double-check file path
 
 ```
 ls -lh /var/www/html/js/central-auth-api.js
 ```
+
+### 2️⃣ Create the shared Central-cafe-style (IMPORTANT)
+
+#### 1️⃣ Command to create the css directory
+
+```
+sudo mkdir -p /var/www/html/css
+```
+
+#### 2️⃣ Create Central-cafe-style
+
+```
+sudo nano /var/www/html/css/central_cafe_style.css
+```
+
+#### 3️⃣ Copy & Paste CSS
+
+[central_cafe_style.css](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Central%20Style%20Css/central_cafe_style.css)
+
+#### 3️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/css/*
+```
+```
+sudo chmod 644 /var/www/html/css/*
+```
+
+#### 4️⃣ Double-check file path
+
+```
+ls -lh /var/www/html/css/central_cafe_style.css
+```
+
 
 
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ AWS CAFE - PHASE 2️⃣ HOME PAGE (index.php)
+## ☕ AWS CAFE - PHASE 2️⃣ FrontEnd Web Pages
+
+### 1️⃣ Charlie Cafe - index.php (IMPORTANT)
 > **File Name: index.php**
 
-
-### 1️⃣ Create index.php
+#### 1️⃣ Create index.php
 
 ```
 sudo nano /var/www/html/index.php
 ```
 
-### 2️⃣ Paste this clean landing page code:
+#### 2️⃣ Paste this clean landing page code:
 
 [index.php](.//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Index.php/Index.php)
 
@@ -978,7 +1019,71 @@ CTRL + O → ENTER
 CTRL + X
 ```
 
-#### 4️⃣ Fix File Permissions
+---
+
+### 2️⃣ Charlie Cafe Admin Dashboard Page (IMPORTANT)
+> **File Name: cafe-admin-dashboard.html**
+
+### 1️⃣ Create index.php
+
+```
+sudo nano /var/www/html/cafe-admin-dashboard.html
+```
+
+### 2️⃣ Paste this clean landing page code:
+
+[cafe-admin-dashboard.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+---
+### 3️⃣ Charlie Cafe orders.php (IMPORTANT)
+> **File Name: orders.php**
+
+###  Modify orders.php (Automation)
+
+* Remove direct DB insert
+* Send POST JSON to API Gateway
+
+#### 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
+
+#### 1️⃣ Create orders.php
+
+```
+sudo nano /var/www/html/orders.php
+```
+#### 2️⃣ MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+
+[orders.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+---
+
+
+
+
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## ☕ AWS CAFE - PHASE 3️⃣ FrontEnd Deployment Final Configurations
+
+#### 1️⃣ Fix File Permissions
+
+#### index.php
 
 ```
 sudo chown apache:apache /var/www/html/index.php
@@ -1008,93 +1113,35 @@ sudo chmod -R 644 /var/www/html
 
 **⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
 
-#### 5️⃣ Restart Apache (MANDATORY)
+#### 2️⃣ Double-check file path
+
+```
+ls -lh /var/www/html/*
+```
+
+#### 3️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
 
-#### 6️⃣ Open page in browser (MANDATORY)
+#### 4️⃣ Open page in browser (MANDATORY)
 
 ```
 http:// Your EC2 Public IP/index.php
 ```
 
-**✅ PHASE 2️⃣ STATUS**
-
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
----
-
-## ☕ AWS CAFE - PHASE 3️⃣ Charlie Cafe Admin Dashboard Page
-> **File Name: cafe-admin-dashboard.html**
-### 1️⃣ Create index.php
-
-```
-sudo nano /var/www/html/cafe-admin-dashboard.html
-```
-
-### 2️⃣ Paste this clean landing page code:
-
-[cafe-admin-dashboard.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
-
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
-
-#### 4️⃣ Fix File Permissions
-
-```
-sudo chown apache:apache /var/www/html/cafe-admin-dashboard.html
-```
-
-```
-sudo chmod 644 /var/www/html/cafe-admin-dashboard.html
-```
-
-#### 5️⃣ Restart Apache (MANDATORY)
-
-```
-sudo systemctl restart httpd
-```
-
-#### 6️⃣ Open page in browser (MANDATORY)
-
 ```
 http:// Your EC2 Public IP/cafe-admin-dashboard.html
 ```
+
+
 
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ AWS CAFE - PHASE 4️⃣ orders.php
-> **File Name: orders.php**
-
-##  Modify orders.php (Automation)
-
-* Remove direct DB insert
-* Send POST JSON to API Gateway
-
-## 🌐 Configuration for Insert Data in EC2 MariaDB server / RDS DB ( Recommanded)
-
-### 1️⃣ Create orders.php
-
-```
-sudo nano /var/www/html/orders.php
-```
-#### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
-
-[orders.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
-
-#### 3️⃣ Save File
-
-```
-CTRL + O → ENTER
-CTRL + X
-```
+## ☕ AWS CAFE - PHASE 4️⃣ 
 
 #### 4️⃣ Fix File Permissions
 

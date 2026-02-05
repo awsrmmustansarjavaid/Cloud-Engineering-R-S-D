@@ -2334,12 +2334,8 @@ row.dataset.total = order.total_amount;     // number
 
 **🚨 Without this → Today Summary WILL NOT WORK**
 
-### Print CSS (ONLY ONCE PER PAGE)
 
-Add this near </head>
-(you can also move it to a shared CSS later)
 
-[central_cafe_style.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Central%20Style%20Css/central_cafe_style.css)
 
 ### Load central-auth-api.js (VERY IMPORTANT)
 
