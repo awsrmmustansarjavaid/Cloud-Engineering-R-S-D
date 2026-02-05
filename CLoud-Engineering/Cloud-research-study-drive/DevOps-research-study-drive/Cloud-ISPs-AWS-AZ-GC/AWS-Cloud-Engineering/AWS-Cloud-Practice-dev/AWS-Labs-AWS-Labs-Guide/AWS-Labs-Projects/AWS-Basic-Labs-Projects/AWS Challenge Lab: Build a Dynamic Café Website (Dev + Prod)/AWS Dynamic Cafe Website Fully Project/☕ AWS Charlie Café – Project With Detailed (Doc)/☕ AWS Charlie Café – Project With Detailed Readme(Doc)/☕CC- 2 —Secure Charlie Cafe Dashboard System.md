@@ -3061,6 +3061,119 @@ If a rule exists in permissions.json, you do not write it again in Lambda.
 ## PHASE 2️⃣ - Admin vs Staff Roles 
 > **(Cognito + API Gateway + Lambda + Frontend)**
 
+You do NOT need those configurations anymore after you’ve adopted rbac.py, and you SHOULD remove them to avoid confusion and bugs.
+
+Let me be very explicit so there’s zero doubt.
+
+✅ WHAT YOU SHOULD DELETE FROM LAMBDA FILES
+
+If you are using central backend RBAC (rbac.py + permissions.json), then remove ALL of this from individual Lambdas:
+
+❌ Delete per-Lambda role logic
+claims = event["requestContext"]["authorizer"]["claims"]
+groups = claims.get("cognito:groups", [])
+if "Admin" not in groups:
+    return { "statusCode": 403 }
+
+❌ Delete hardcoded permission checks
+if role != "Admin":
+    return 403
+
+❌ Delete endpoint-specific role logic
+if export_csv and role != "Admin":
+
+❌ Delete duplicated security matrices
+# Admin-only
+# Staff-only
+
+
+Reason:
+This logic now lives in ONE place only → rbac.py
+
+✅ WHAT MUST STAY (DO NOT DELETE)
+1️⃣ API Gateway Cognito Authorizer
+
+MANDATORY
+
+Keep authorizer attached to routes
+
+This validates JWT signature, expiry, issuer
+
+Without this → rbac.py never runs securely
+
+2️⃣ rbac.py call in EVERY protected Lambda
+
+Minimal, clean, same everywhere:
+
+from rbac import authorize
+
+allowed, user = authorize(event)
+if not allowed:
+    return {
+        "statusCode": 403,
+        "body": json.dumps({"message": "Access denied"})
+    }
+
+
+That’s it.
+No more role logic in Lambdas.
+
+3️⃣ permissions.json
+
+This becomes your single source of truth:
+
+[
+  { "path": "/orders", "roles": ["admin", "employee"] },
+  { "path": "/metrics", "roles": ["admin"] },
+  { "path": "/export", "roles": ["admin"] }
+]
+
+
+Change access?
+👉 Change ONE file, not 20 Lambdas.
+
+4️⃣ Frontend RBAC (KEEP, but UX only)
+
+Your central-auth-api.js:
+
+isAdmin()
+
+requireAdmin()
+
+Hide buttons / pages
+
+⚠️ Frontend is NOT security, backend already enforces it.
+
+🧠 FINAL CLEAN ARCHITECTURE (THE RIGHT WAY)
+User
+ ↓
+Cognito (Auth + Groups)
+ ↓
+API Gateway (JWT verified)
+ ↓
+rbac.py (Authorize)
+ ↓
+Lambda Business Logic
+
+
+No duplication.
+No guessing.
+No drift.
+
+🚨 IMPORTANT WARNING
+
+Do NOT keep both systems (manual RBAC + central RBAC)
+
+That leads to:
+
+Conflicting rules
+
+Random 403 errors
+
+Debugging hell later
+
+You’re doing this the professional way now 👍
+
 ### 2️⃣ ADMIN VS STAFF ROLES
 
 ### 1️⃣ API GATEWAY AUTHORIZATION (MANDATORY)
