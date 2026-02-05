@@ -1649,113 +1649,169 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ## 🔐 PHASE 6️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
 
-### 🖊 Goal
+### 🔐 1️⃣  — ADD DENY ALERTS (CloudWatch Alarms)
 
-Secure your APIs using Cognito JWT, so:
+- AWS Console → CloudWatch → Logs → Log groups
 
-❌ No token → blocked
-
-❌ Invalid token → blocked
-
-✅ Admin → allowed
-
-✅ Staff → allowed/blocked based on Lambda logic
-
-### 🧠 WHAT YOU ARE BUILDING (MENTAL MODEL)
+- Choose:
 
 ```
-Browser
-  ↓
-User logs in (Cognito Hosted UI or Custom UI)
-  ↓
-Cognito returns JWT (ID token)
-  ↓
-Frontend sends JWT in Authorization header
-  ↓
-API Gateway Cognito Authorizer validates JWT
-  ↓
-Lambda receives verified claims
+/aws/lambda/<ANY lambda using RBAC>
 ```
 
-### 🧱 PREREQUISITES (DO NOT SKIP)
+#### Create Metric Filter
 
-Before starting PHASE 8, you MUST already have:
+- Click Actions → Create metric filter
 
-✔ Cognito User Pool
-
-✔ At least one user created
-
-✔ API Gateway already created
-
-✔ Lambda already connected to API
-
-If ANY of these are missing, STOP and tell me.
-
-### 🔐 1️⃣  — VERIFY COGNITO USER POOL (NO CONFIG YET)
-
-#### 1️⃣ Open AWS Console
-
-- Go to:
+- Filter pattern:
 
 ```
-AWS Console → Cognito → User Pools
+{ $.decision = "DENY" }
 ```
 
-#### 2️⃣ Click your User Pool
-
-- Example name:
+- Metric namespace:
 
 ```
-CafeUserPool
+CafeRBAC
 ```
 
-#### 3️⃣ Verify these EXIST (do not change yet)
-
-- Users tab → at least 1 user
-
-- App integration tab → App client exists
-
-- Domain → configured (for Hosted UI)
-
-✔ If all exist → continue
-
-❌ If missing → STOP
-
-### 🔐 2️⃣ — CREATE COGNITO GROUPS (VERY IMPORTANT)
-
-- **Inside User Pool → Click Groups**
-
-- **Click Create group**
-
-#### Create FIRST group:
+- Metric name:
 
 ```
-Group name: Admin
-Description: Cafe administrators
+DeniedRequests
 ```
 
-- **Click Create group**
-
-✔ Groups created
-❌ Do not skip
-
-### 👤 3️⃣ — ADD USERS TO GROUPS (MANDATORY)
-
-- **Cognito → Users**
-
-- Click a user (your email/username)
-
-- Click Add to group
-
-- Select:
+- Metric value:
 
 ```
-Admin
+1
 ```
 
-- Click Add
+**✅ Create filter**
 
-> **You must have at least one Admin user**
+#### Create Alarm
+
+- Go to CloudWatch → Alarms
+
+- Create alarm on metric:
+
+```
+CafeRBAC / DeniedRequests
+```
+
+- Condition:
+
+```
+>= 3 in 5 minutes
+```
+
+- Action:
+
+    - Send SNS email
+
+    - (Optional) Slack webhook later
+
+#### 📌 Result:
+
+> **You get alerted when someone is denied access repeatedly.**
+
+**🔥 Security teams LOVE this.**
+
+### 🔐 2️⃣  — ADD ROLE HIERARCHY
+
+- Add hierarchy map
+
+In rbac.py, near the top:
+
+```
+ROLE_HIERARCHY = {
+    "admin": ["admin", "employee"],
+    "employee": ["employee"],
+    "guest": ["guest"]
+}
+```
+
+- Expand user roles
+
+Replace this line:
+
+```
+groups = groups.split(",")
+```
+
+With:
+
+```
+expanded_roles = set()
+
+for role in groups:
+    expanded_roles.update(ROLE_HIERARCHY.get(role, []))
+
+groups = list(expanded_roles)
+```
+
+📌 Now:
+
+- Admin can access employee APIs automatically
+
+- You don’t duplicate permissions
+
+### 3️⃣ — ADD READ / WRITE PERMISSIONS permissions.json
+
+- Old (simple)
+
+```
+{
+  "path": "/admin",
+  "roles": ["admin"]
+}
+```
+
+- New (read / write aware)
+
+```
+[
+  {
+    "path": "/admin",
+    "methods": ["GET", "POST", "PUT", "DELETE"],
+    "roles": ["admin"]
+  },
+  {
+    "path": "/orders",
+    "methods": ["GET"],
+    "roles": ["admin", "employee"]
+  },
+  {
+    "path": "/orders",
+    "methods": ["POST"],
+    "roles": ["employee"]
+  }
+]
+```
+
+- Enforce method in RBAC
+
+In rbac.py, add:
+
+```
+method = event.get("requestContext", {}).get("http", {}).get("method")
+```
+
+Change rule check:
+
+```
+if path.startswith(rule["path"]) and method in rule["methods"]:
+```
+
+📌 Result:
+
+✔️ Same endpoint
+
+✔️ Different permissions
+
+✔️ No extra Lambdas
+
+✔️ No IAM mess
 
 ### 🌐 4️⃣ — CONFIGURE APP CLIENT (JWT ISSUED HERE)
 

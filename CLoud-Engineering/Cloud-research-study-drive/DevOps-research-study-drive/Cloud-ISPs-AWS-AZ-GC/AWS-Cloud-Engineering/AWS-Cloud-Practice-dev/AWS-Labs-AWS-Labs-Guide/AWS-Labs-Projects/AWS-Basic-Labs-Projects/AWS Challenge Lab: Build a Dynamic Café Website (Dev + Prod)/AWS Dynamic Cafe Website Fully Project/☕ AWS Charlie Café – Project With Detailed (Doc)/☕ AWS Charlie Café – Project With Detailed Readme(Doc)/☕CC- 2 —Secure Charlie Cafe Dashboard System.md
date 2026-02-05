@@ -2330,6 +2330,172 @@ orders = cursor.fetchall()
 
 > **🚫 No more backend changes needed**
 
+### 🖊 Goal
+
+Secure your APIs using Cognito JWT, so:
+
+❌ No token → blocked
+
+❌ Invalid token → blocked
+
+✅ Admin → allowed
+
+✅ Staff → allowed/blocked based on Lambda logic
+
+### 🧠 WHAT YOU ARE BUILDING (MENTAL MODEL)
+
+```
+Browser
+  ↓
+User logs in (Cognito Hosted UI or Custom UI)
+  ↓
+Cognito returns JWT (ID token)
+  ↓
+Frontend sends JWT in Authorization header
+  ↓
+API Gateway Cognito Authorizer validates JWT
+  ↓
+Lambda receives verified claims
+```
+
+### 🧱 PREREQUISITES (DO NOT SKIP)
+
+Before starting PHASE 8, you MUST already have:
+
+✔ Cognito User Pool
+
+✔ At least one user created
+
+✔ API Gateway already created
+
+✔ Lambda already connected to API
+
+If ANY of these are missing, STOP and tell me.
+
+### 🧭 BIG PICTURE (READ THIS FIRST)
+
+You already have FOUR layers:
+
+```
+Frontend (central-auth-api.js)
+        ↓
+API Gateway (Cognito Authorizer)
+        ↓
+Lambda Functions
+        ↓
+RBAC Layer (rbac.py + permissions.json)
+```
+
+**👉 ALL 4 things you asked about fit into ONLY TWO places:**
+
+| Feature                    | Where it belongs            |
+| -------------------------- | --------------------------- |
+| Deny alerts                | CloudWatch (outside Lambda) |
+| Role hierarchy             | RBAC layer (`rbac.py`)      |
+| Read / write permissions   | `permissions.json` + RBAC   |
+| JWT signature verification | API Gateway (NOT Lambda)    |
+
+
+### 1️⃣ ADD DENY ALERTS (CloudWatch Alarms)
+❓ Where does this live?
+
+👉 NOT in code logic
+👉 In CloudWatch using log patterns
+
+Your RBAC already logs:
+
+```
+"decision": "DENY"
+```
+
+That’s all we need.
+
+### 🔐 2️⃣  — ADD ROLE HIERARCHY
+
+❓ Where does this live?
+
+👉 ONLY inside rbac.py
+
+Role hierarchy means:
+
+```
+admin > employee > guest
+```
+Admin automatically inherits employee rights.
+
+### 3️⃣ — ADD READ / WRITE PERMISSIONS permissions.json
+
+❓ Where does this live?
+
+👉 permissions.json (NOT code)
+
+This keeps RBAC data-driven (very professional).
+
+4️⃣ JWT SIGNATURE VERIFICATION
+❓ Where does this live?
+
+👉 API Gateway — NOT in Lambda
+
+And this is VERY important.
+
+✅ YOU ALREADY HAVE THIS
+
+When you use:
+
+```
+API Gateway → Cognito Authorizer
+```
+
+AWS automatically does:
+
+✔ Signature verification
+
+✔ Token expiry check
+
+✔ Issuer validation
+
+✔ Audience validation
+
+That’s why inside Lambda you safely read:
+
+```
+event["requestContext"]["authorizer"]["claims"]
+```
+
+🚫 DO NOT re-verify JWT in Lambda
+That’s slow, costly, and unprofessional in AWS.
+
+🔐 OPTIONAL (Only if you remove API Gateway later)
+
+If someday you:
+
+Use ALB
+
+Use direct Lambda URLs
+
+THEN you verify JWT in Lambda using jwks.json.
+
+For now:
+
+❌ Don’t touch this.
+
+🧠 FINAL MAP (VERY IMPORTANT)
+
+```
+FEATURE                  LOCATION
+--------------------------------------------------
+Deny Alerts              CloudWatch Alarms
+Role Hierarchy           rbac.py
+Read/Write Permissions   permissions.json
+JWT Verification         API Gateway (Cognito)
+```
+
+### ☕ WHAT YOU SHOULD DO NEXT (ORDER)
+
+1️⃣ Add role hierarchy
+2️⃣ Add read/write permissions
+3️⃣ Create deny alert
+4️⃣ Test with admin & employee tokens
 
 **✅ PHASE 6️⃣ STATUS**
 
