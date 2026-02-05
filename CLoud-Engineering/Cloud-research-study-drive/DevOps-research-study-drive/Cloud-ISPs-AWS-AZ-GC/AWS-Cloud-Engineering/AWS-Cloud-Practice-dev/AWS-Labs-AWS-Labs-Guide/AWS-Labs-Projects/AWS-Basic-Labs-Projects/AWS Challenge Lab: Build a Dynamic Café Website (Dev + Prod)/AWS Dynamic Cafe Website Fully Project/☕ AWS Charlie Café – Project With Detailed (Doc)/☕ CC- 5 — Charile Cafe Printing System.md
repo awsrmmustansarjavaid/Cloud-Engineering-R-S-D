@@ -24,6 +24,10 @@
 
 ### 1️⃣ Create a Dedicated Printing HTML (central-print.html)
 
+Path: /var/www/html/central-print.html
+
+This will be the universal printing & export hub.
+
 This file will:
 
 - Include central-cafe-style.css for all print styles
@@ -36,22 +40,25 @@ This file will:
 
 - Allow printing or exporting without duplicating code
 
-#### 1️⃣ Create File
+### 1️⃣ Create File
 
 ```
 sudo nano /var/www/html/central-print.html
 ```
 
-#### 2️⃣ code
+### 2️⃣ Add Full HTML Template
+
+Paste this code into central-print.html. It is fully commented, contains thermal print, daily summary, CSV export, PDF export, and UX/UI features.
 
 [central-print.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System/central-print.html)
 
-#### 3️⃣ Save File
+#### Save File
 
 ```
 CTRL + O → ENTER
 CTRL + X
 ```
+
 
 
 
