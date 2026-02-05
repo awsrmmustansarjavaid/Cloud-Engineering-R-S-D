@@ -36,6 +36,23 @@ This file will:
 
 - Allow printing or exporting without duplicating code
 
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/central-print.html
+```
+
+#### 2️⃣ code
+
+[central-print.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System/central-print.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
 
 
 
