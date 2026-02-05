@@ -621,3 +621,6 @@ sudo ./upload-pymysql-layer.sh
 - Script automatically creates the Python folder, installs PyMySQL, zips it, and uploads to S3.
 
 - You can now attach the layer to any Lambda function by ARN.
+
+----
+

@@ -1,6 +1,12 @@
 #!/bin/bash
 # =============================================================
 # Charlie Cafe Basic Lab Configuration Test and Verification
+# Update version: 1.1
+#
+# NEW IN v1.1:
+# ✔ Web file path verification
+# ✔ Frontend asset validation
+# ✔ Localhost page availability checks (curl)
 #
 # OUTPUTS:
 # - TXT  (full console log)
@@ -75,7 +81,6 @@ echo
 # =============================================================
 echo "🔧 LAMP STACK VERIFICATION"
 
-# Apache
 if curl -s http://localhost | grep -qi "It works"; then
   ok "Apache serving default page"
   csv_pass "Apache" "Serving default page"
@@ -84,7 +89,6 @@ else
   csv_fail "Apache" "Not serving default page"
 fi
 
-# PHP CLI
 if command -v php >/dev/null; then
   ok "PHP CLI available"
   csv_pass "PHP CLI" "Installed"
@@ -93,7 +97,6 @@ else
   csv_fail "PHP CLI" "Not installed"
 fi
 
-# MySQL Client
 if command -v mysql >/dev/null; then
   ok "MySQL client installed"
   csv_pass "MySQL Client" "Installed"
@@ -150,6 +153,65 @@ for t in "${TABLES[@]}"; do
 done
 
 # =============================================================
+# v1.1 — WEB FILE PATH VERIFICATION
+# =============================================================
+echo
+echo "📂 WEB FILE & ASSET VERIFICATION (v1.1)"
+
+# Root web directory
+if ls -lh /var/www/html/* >/dev/null 2>&1; then
+  ok "/var/www/html directory accessible"
+  csv_pass "Web Root" "/var/www/html accessible"
+else
+  fail "/var/www/html not accessible"
+  csv_fail "Web Root" "Directory missing or permission issue"
+fi
+
+# CSS file
+if [ -f /var/www/html/css/central_cafe_style.css ]; then
+  ok "CSS file found: central_cafe_style.css"
+  csv_pass "CSS File" "central_cafe_style.css exists"
+else
+  fail "Missing CSS file: central_cafe_style.css"
+  csv_fail "CSS File" "Missing"
+fi
+
+# JS file
+if [ -f /var/www/html/js/central-auth-api.js ]; then
+  ok "JS file found: central-auth-api.js"
+  csv_pass "JS File" "central-auth-api.js exists"
+else
+  fail "Missing JS file: central-auth-api.js"
+  csv_fail "JS File" "Missing"
+fi
+
+# =============================================================
+# v1.1 — LOCALHOST PAGE AVAILABILITY (curl)
+# =============================================================
+echo
+echo "🌐 LOCALHOST PAGE VERIFICATION (v1.1)"
+
+PAGES=(
+  "index.php"
+  "cafe-admin-dashboard.html"
+  "orders.php"
+  "order-status.html"
+  "order-receipt.php"
+  "admin-orders.php"
+  "payment-status.php"
+)
+
+for page in "${PAGES[@]}"; do
+  if curl -s -o /dev/null -w "%{http_code}" "http://localhost/$page" | grep -q "200"; then
+    ok "Page reachable: $page"
+    csv_pass "Web Page $page" "HTTP 200 OK"
+  else
+    fail "Page NOT reachable: $page"
+    csv_fail "Web Page $page" "Not reachable"
+  fi
+done
+
+# =============================================================
 # PDF GENERATION
 # =============================================================
 echo
@@ -178,8 +240,9 @@ aws s3 cp "$CSV_FILE" "s3://$S3_BUCKET/$S3_PREFIX/$CSV_FILE"
 ok "All reports uploaded to S3"
 
 echo
-echo "✅ VERIFICATION COMPLETE"
+echo "============================================================="
+echo "✅ VERIFICATION COMPLETE (v1.1)"
 echo "TXT : $TXT_FILE"
 echo "CSV : $CSV_FILE"
 [ -f "$PDF_FILE" ] && echo "PDF : $PDF_FILE"
-echo
+echo "============================================================="
