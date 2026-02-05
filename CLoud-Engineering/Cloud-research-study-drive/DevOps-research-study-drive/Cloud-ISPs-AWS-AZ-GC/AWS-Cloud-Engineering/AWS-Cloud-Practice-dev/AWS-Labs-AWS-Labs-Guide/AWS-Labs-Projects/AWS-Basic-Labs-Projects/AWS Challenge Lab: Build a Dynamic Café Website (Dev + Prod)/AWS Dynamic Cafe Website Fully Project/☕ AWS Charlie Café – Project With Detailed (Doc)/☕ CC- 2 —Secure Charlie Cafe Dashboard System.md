@@ -2139,15 +2139,7 @@ You now have enterprise-grade frontend security:
 
 # SECTION 1️⃣  COMPLETE ✅
 ---
-# SECTION 2️⃣- 🏷️ Order Status – Advanced Features Guide
-
-#### Includes:
-
-- **▶️ 1️⃣ CSV Export (Backend + Frontend)**
-
-
-- **▶️ 2️⃣ Admin vs Staff Roles (Cognito + Lambda + Frontend)**
----
+# SECTION 2️⃣- 🏷️ Order Status – CSV Export
 
 ## PHASE 1️⃣ - CSV Export (Backend + Frontend)
 
