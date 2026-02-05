@@ -1162,12 +1162,12 @@ CTRL + X
 #### 1️⃣ Create File
 
 ```
-sudo nano /var/www/html/payment-status.php
+sudo nano /var/www/html/central-print.html
 ```
 
 #### 2️⃣ code
 
-[payment-status.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+[central-print.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System/central-print.html)
 
 #### 3️⃣ Save File
 
