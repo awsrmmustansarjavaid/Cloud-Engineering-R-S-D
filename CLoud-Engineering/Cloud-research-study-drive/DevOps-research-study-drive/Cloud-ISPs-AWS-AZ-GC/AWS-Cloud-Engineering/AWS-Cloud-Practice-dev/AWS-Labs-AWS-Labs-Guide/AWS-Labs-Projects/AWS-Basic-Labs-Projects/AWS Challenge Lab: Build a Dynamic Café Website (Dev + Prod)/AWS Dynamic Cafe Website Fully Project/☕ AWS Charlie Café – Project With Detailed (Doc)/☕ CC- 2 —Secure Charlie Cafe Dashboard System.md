@@ -2339,35 +2339,7 @@ row.dataset.total = order.total_amount;     // number
 Add this near </head>
 (you can also move it to a shared CSS later)
 
-```
-<style>
-@media print {
-  body {
-    background: #fff !important;
-  }
-
-  button,
-  .no-print {
-    display: none !important;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th, td {
-    border: 1px solid #000;
-    padding: 6px;
-    font-size: 12px;
-  }
-
-  h3 {
-    text-align: center;
-  }
-}
-</style>
-```
+[central_cafe_style.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
 
 ### Load central-auth-api.js (VERY IMPORTANT)
 
