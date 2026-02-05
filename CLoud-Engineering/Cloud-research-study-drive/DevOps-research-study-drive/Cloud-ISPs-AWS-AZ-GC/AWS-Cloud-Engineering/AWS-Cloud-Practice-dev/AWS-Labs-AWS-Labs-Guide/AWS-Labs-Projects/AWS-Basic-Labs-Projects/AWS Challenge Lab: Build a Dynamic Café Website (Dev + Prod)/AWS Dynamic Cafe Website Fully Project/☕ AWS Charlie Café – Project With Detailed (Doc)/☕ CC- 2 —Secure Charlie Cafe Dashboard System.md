@@ -2293,102 +2293,99 @@ window.printTodaySummary = function () {
 };
 ```
 
+**⚠️ Skip it because already added**
 
+### 2️⃣ Minimal HTML change (ONE TIME PER PAGE)
 
-### 1️⃣ — CONFIRM FILE YOU WILL MODIFY (NO JUMP)
+#### 🧩 Buttons (NO JS HERE)
 
-#### You must edit this file:
-
-```
-/var/www/html/order-status.html
-```
-
-✔ Same file where orders are shown
-
-✔ Same file used by staff/admin
-
-### 2️⃣ — BACKUP YOUR FILE (MANDATORY)
-
-#### Run:
+Place below <h3>Order Status</h3>
 
 ```
-sudo cp /var/www/html/order-status.html /var/www/html/order-status-backup.html
+<div class="d-flex gap-2 mb-3 no-print">
+  <button class="btn btn-outline-dark" onclick="printAllOrders()">
+    🖨️ Print All Orders
+  </button>
+
+  <button class="btn btn-outline-success" onclick="printTodaySummary()">
+    📄 Print Today Summary
+  </button>
+</div>
 ```
 
-### 3️⃣ — ADD PRINT BUTTONS (EXACT LOCATION)
+✔ No script
 
-#### 🔍 FIND THIS IN YOUR FILE:
+✔ No duplication
 
-```
-<h3>Order Status</h3>
-```
+✔ Uses central JS automatically
 
-#### ⬇️ IMMEDIATELY BELOW IT, PASTE THIS:
+### 3️⃣ Table row attributes (MANDATORY)
 
-[PRINT-ONLY.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.html)
-
-❌ Do NOT remove anything
-
-❌ Do NOT rename functions
-
-### 4️⃣ — ADD PRINT-ONLY CSS (VERY IMPORTANT)
-
-#### 🔍 FIND:
+Your table must look like this when rendered:
 
 ```
-</head>
+<table id="ordersTable" class="table">
+  <tbody>
+    <tr data-date="2026-02-05" data-total="15.50">
+      ...
+    </tr>
+  </tbody>
+</table>
 ```
 
-#### ⬆️ JUST ABOVE IT, PASTE:
-
-[PRINT-ONLY.css](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.css)
-
-✔ Ensures clean PDF
-
-✔ Hides buttons automatically
-
-### 5️⃣ — ADD JAVASCRIPT PRINT LOGIC
-
-#### 🔍 FIND THE END OF YOUR <script> TAG
-
-> **🔴 (OR CREATE ONE IF NOT EXISTS)**
-
-#### ⬇️ PASTE THIS FULL CODE:
-
-[PRINT-ONLY.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System%20Code%20Script/PRINT-ONLY.js)
-
-❌ Do NOT change function names
-
-❌ Do NOT move code
-
-### 6️⃣ — ENSURE TABLE HAS REQUIRED ATTRIBUTES
-
-#### 🔍 FIND YOUR ORDERS TABLE ROW LOOP
-
-Example:
+If rows are created in JS:
 
 ```
-<tr>
+row.dataset.date = order.order_date;        // YYYY-MM-DD
+row.dataset.total = order.total_amount;     // number
 ```
 
-#### 🔁 REPLACE WITH THIS:
+**🚨 Without this → Today Summary WILL NOT WORK**
+
+### Print CSS (ONLY ONCE PER PAGE)
+
+Add this near </head>
+(you can also move it to a shared CSS later)
 
 ```
-<tr data-date="2026-01-17" data-total="15">
+<style>
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  h3 {
+    text-align: center;
+  }
+}
+</style>
 ```
 
-#### ⚠️ IMPORTANT
+### Load central-auth-api.js (VERY IMPORTANT)
 
-- These values must already exist in JS when rendering rows.
-
-Example in JS:
+Make sure every page that prints has:
 
 ```
-row.dataset.date = order.order_date;
-row.dataset.total = order.total_amount;
+<script src="/js/central-auth-api.js"></script>
 ```
 
-✔ Required for today summary print
+**🛑 Load it after DOM elements (bottom of page or defer)**
 
 ### 🧾 ✅ FINAL UPDATED order-status.html (WITH PRINTING + COMMENTS)
 

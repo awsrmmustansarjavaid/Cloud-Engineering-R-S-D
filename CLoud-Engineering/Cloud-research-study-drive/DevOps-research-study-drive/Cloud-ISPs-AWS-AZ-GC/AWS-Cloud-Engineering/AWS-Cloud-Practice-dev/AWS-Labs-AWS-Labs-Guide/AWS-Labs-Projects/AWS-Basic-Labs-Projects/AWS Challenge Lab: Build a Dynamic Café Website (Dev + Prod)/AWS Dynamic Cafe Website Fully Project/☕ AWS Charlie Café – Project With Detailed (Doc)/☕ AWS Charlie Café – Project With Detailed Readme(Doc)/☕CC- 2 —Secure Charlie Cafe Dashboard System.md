@@ -3475,7 +3475,34 @@ staff-orders.html
                          ├── API calls
                          └── 🖨️ printing logic (NEW)
 ```
+### 1️⃣ Modify central-auth-api.js (MAIN WORK)
 
+Add this ONCE at the BOTTOM of central-auth-api.js
+(do NOT put inside auth/token logic)
+
+🔥 Why this is correct:
+
+Uses window. → callable from any HTML
+
+No dependency on page-specific JS
+
+Safe reload after print (prevents broken UI)
+
+### 🎯 What You Achieved (Big Win)
+
+✅ One printing system
+✅ Zero duplicated JS
+✅ Works for:
+
+admin
+
+staff
+
+reports
+
+future dashboards
+
+**You now have enterprise-grade frontend architecture 💪**
 
 
 #### How it works
