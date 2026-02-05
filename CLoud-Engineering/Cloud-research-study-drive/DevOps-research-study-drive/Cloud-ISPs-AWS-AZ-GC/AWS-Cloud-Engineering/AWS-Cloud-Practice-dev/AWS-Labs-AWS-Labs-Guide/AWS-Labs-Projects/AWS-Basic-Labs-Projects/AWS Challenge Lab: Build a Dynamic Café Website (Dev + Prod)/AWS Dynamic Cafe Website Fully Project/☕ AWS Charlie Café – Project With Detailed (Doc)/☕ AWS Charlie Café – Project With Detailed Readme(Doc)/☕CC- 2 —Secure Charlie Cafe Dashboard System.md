@@ -3440,6 +3440,44 @@ if(!userGroups.includes("Admin")){
 
 ## 🔐 PHASE 1️⃣ Charlie Cafe - PRINTING (FRONTEND ONLY)
 
+### 🧠 First — important truth (no sugar-coating)
+
+👉 Printing is 100% frontend behavior
+
+central-auth-api.js can host print logic
+
+But HTML still must include buttons + data attributes
+
+JS cannot print what doesn’t exist in DOM
+
+So the goal is:
+
+✅ One central printing engine
+✅ Pages only:
+
+include ONE JS file
+
+add 2 buttons
+
+ensure table rows have data-*
+
+### 🏗️ Target Architecture (Simple Mental Model)
+
+```
+order-status.html
+admin-orders.html
+staff-orders.html
+        │
+        ├── includes buttons (HTML only)
+        ├── includes table rows with data attributes
+        └── loads → central-auth-api.js  ✅
+                         ├── auth
+                         ├── API calls
+                         └── 🖨️ printing logic (NEW)
+```
+
+
+
 #### How it works
 
 ✔️ Uses window.print()
