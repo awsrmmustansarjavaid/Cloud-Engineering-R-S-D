@@ -783,6 +783,119 @@ Authorization: Bearer <access_token>
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 6️⃣ — FINAL SECURITY FLOW (MENTAL MODEL)
+
+### 🧪 1️⃣ — TEST ❌ NO JWT (EXPECTED FAIL)
+
+#### CURL / Postman / Browser test
+
+#### Request:
+
+```
+GET https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics
+```
+
+#### EXPECTED RESULT:
+
+```
+401 Unauthorized
+```
+
+✔ Correct → continue
+
+❌ If allowed → authorizer NOT attached
+
+### 🧪 2️⃣ — TEST ❌ INVALID JWT
+
+#### Add header:
+
+```
+Authorization: invalidtoken123
+```
+
+#### EXPECTED:
+
+```
+401 Unauthorized
+```
+
+✔ Correct → continue
+
+### 🧪 3️⃣ — TEST ✅ ADMIN JWT (EXPECTED SUCCESS)
+
+#### Add header:
+
+```
+Authorization: Bearer YOUR_ID_TOKEN
+```
+
+#### EXPECTED:
+
+```
+200 OK
+```
+
+✔ Lambda executes
+✔ Data returned
+
+### 🧪 4️⃣ — TEST STAFF USER (SECURITY VALIDATION)
+
+Login as Staff user, get ID token again.
+
+#### Call API with:
+
+```
+Authorization: Bearer STAFF_TOKEN
+```
+
+#### RESULT DEPENDS ON LAMBDA:
+
+- Analytics Lambda → ❌ 403
+
+- Orders Lambda → ✅ 200
+
+**✔ This proves end-to-end security**
+
+### 🧠 FINAL SECURITY FLOW (CONFIRMED)
+
+```
+No token        → API Gateway blocks (401)
+Invalid token   → API Gateway blocks (401)
+Valid token     → Claims injected
+Admin group     → Lambda allows
+Staff group     → Lambda restricted
+```
+
+### 🧪 PHASE 6️⃣ TEST CHECKLIST (ALL MUST PASS)
+
+✔ Token issued
+
+✔ Groups inside JWT
+
+✔ Authorizer attached
+
+✔ No token blocked
+
+✔ Invalid token blocked
+
+✔ Admin allowed
+
+✔ Staff restricted
+
+### ✅ PHASE 6️⃣ STATUS
+
+🟢 PHASE 6️⃣ COMPLETE
+
+🟢 PHASE 6️⃣ FULLY TESTED
+
+🟢 SAFE TO MOVE NEXT
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
+
+
 
 ### Cognito Errors 1 - Invalid request
 
