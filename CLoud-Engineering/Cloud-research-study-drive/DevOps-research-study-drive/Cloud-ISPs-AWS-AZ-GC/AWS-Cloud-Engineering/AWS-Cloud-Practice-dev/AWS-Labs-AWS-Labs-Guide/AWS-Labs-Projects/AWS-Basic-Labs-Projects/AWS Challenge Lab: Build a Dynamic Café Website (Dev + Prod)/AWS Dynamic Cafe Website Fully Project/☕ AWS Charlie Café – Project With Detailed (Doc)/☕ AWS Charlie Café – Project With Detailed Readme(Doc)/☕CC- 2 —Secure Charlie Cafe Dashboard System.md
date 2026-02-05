@@ -3058,7 +3058,263 @@ If a rule exists in permissions.json, you do not write it again in Lambda.
 ✅ Keep frontend checks
 
 🛑 Stop adding inline RBAC everywhere
+## PHASE 2️⃣ - Admin vs Staff Roles 
+> **(Cognito + API Gateway + Lambda + Frontend)**
 
+### 2️⃣ ADMIN VS STAFF ROLES
+
+### 1️⃣ API GATEWAY AUTHORIZATION (MANDATORY)
+
+#### Step 1️⃣ — Ensure Cognito Authorizer is Attached
+
+- 📍 API Gateway → Your API
+
+For EVERY protected route (orders, metrics, export):
+
+- Click route (GET /orders, GET /metrics, etc.)
+
+- Authorization → Cognito User Pool
+
+- Choose your user pool
+
+- Save & deploy
+
+**⚠️ If you skip this → Lambda receives unauthenticated users ❌**
+
+### 3️⃣ — LAMBDA ROLE EXTRACTION (BACKEND SECURITY)
+
+This applies to EVERY Lambda that serves protected data.
+
+#### Step 4️⃣ — Extract User Groups from JWT (CORE LOGIC)
+
+#### ✅ Lambda Template (COPY AS-IS)
+
+```
+import json
+
+def lambda_handler(event, context):
+    # -----------------------------
+    # 1️⃣ Extract JWT claims
+    # -----------------------------
+    claims = event["requestContext"]["authorizer"]["claims"]
+
+    # Cognito groups (Admin / Staff)
+    user_groups = claims.get("cognito:groups", [])
+
+    # Normalize role
+    if "Admin" in user_groups:
+        role = "Admin"
+    elif "Staff" in user_groups:
+        role = "Staff"
+    else:
+        # User has no role → blocked
+        return {
+            "statusCode": 403,
+            "body": json.dumps({"message": "Access denied"})
+        }
+
+    # -----------------------------
+    # 2️⃣ Continue based on role
+    # -----------------------------
+    # (Handled below per feature)
+```
+#### 🧠 Why this matters
+
+Even if someone manually opens admin-dashboard.html, backend will BLOCK them.
+
+### 4️⃣ — ROLE-BASED PERMISSIONS (BACKEND)
+
+#### Step 5️⃣ — Protect CSV Export (Admins Only)
+
+```
+# Example flag from query or path
+export_csv = event.get("queryStringParameters", {}).get("export")
+
+# Admin-only action
+if export_csv and role != "Admin":
+    return {
+        "statusCode": 403,
+        "body": json.dumps({"message": "Admins only"})
+    }
+```
+
+#### Step 6️⃣ — Protect Metrics Endpoint
+
+```
+# Metrics endpoint logic
+if role != "Admin":
+    return {
+        "statusCode": 403,
+        "body": json.dumps({"message": "Admins only"})
+    }
+
+# Fetch metrics safely here
+```
+
+#### Step 7️⃣ — Orders Endpoint (Admin + Staff)
+
+```
+# Orders are allowed for both roles
+# No restriction needed
+fetch_orders()
+```
+
+#### ✅ Backend Security Matrix
+
+| Endpoint      | Admin | Staff |
+| ------------- | ----- | ----- |
+| `/orders`     | ✅     | ✅     |
+| `/metrics`    | ✅     | ❌     |
+| `/export-csv` | ✅     | ❌     |
+
+
+### 5️⃣ — FRONTEND AUTH FOUNDATION (REUSABLE)
+
+### 6️⃣ — ADMIN DASHBOARD (ADMIN ONLY)
+
+#### Step 9️⃣ — Protect admin-dashboard.html
+
+```
+<script src="js/central-auth.js"></script>
+
+<script>
+    // 🚨 Block non-admin users
+    requireRole("Admin");
+</script>
+```
+
+#### Step 🔟 — Hide UI for Non-Admins (Extra Safety)
+
+```
+const userGroups = getUserRole();
+
+if (!userGroups.includes("Admin")) {
+    document.getElementById("exportCSVButton").style.display = "none";
+    document.getElementById("metricsSection").style.display = "none";
+}
+```
+
+⚠️ UI hiding = UX only, not security
+Backend already blocks access.
+
+### 7️⃣ — STAFF PAGE (ORDER STATUS)
+
+#### Step 1️⃣1️⃣ — Protect order-status.html
+
+```
+<script src="js/central-auth.js"></script>
+
+<script>
+    // Allow Admin or Staff
+    const groups = getUserRole();
+    if (!groups.includes("Admin") && !groups.includes("Staff")) {
+        alert("Access denied");
+        window.location.href = "login.html";
+    }
+</script>
+```
+
+#### Step 1️⃣2️⃣ — Hide Admin Features for Staff
+
+```
+const groups = getUserRole();
+
+if (!groups.includes("Admin")) {
+    document.getElementById("exportCSVButton").style.display = "none";
+    document.getElementById("metricsSection").style.display = "none";
+}
+```
+
+### 8️⃣ — VERIFY EVERYTHING (DO NOT SKIP)
+
+#### ✅ Test Case 1 — Admin User
+
+✔ Can open admin-dashboard.html
+
+✔ Can see metrics
+
+✔ Can export CSV
+
+✔ Can open order-status.html
+
+#### ✅ Test Case 2 — Staff User
+
+✔ Can open order-status.html
+
+❌ Cannot open admin-dashboard.html
+
+❌ Cannot access /metrics API
+
+❌ CSV export returns 403
+
+❌ Test Case 3 — Manual URL Hack
+
+#### Staff opens:
+
+```
+/export-csv
+```
+
+**👉 403 Forbidden (Backend stops it)**
+
+
+### 🔹 Lambda – Role-Based Permissions
+
+#### Admin
+
+- View metrics
+
+- View orders
+
+- Export CSV
+
+#### Staff
+
+- View orders only
+
+- Cannot export CSV
+
+#### Modify Lambda:
+
+```
+if export_csv and "Admin" not in user_groups:
+    return {"statusCode": 403, "body": "Admins only"}
+```
+
+### 🔹 Frontend – Role-Based UI
+
+#### Step 1 — Hide Buttons for Staff
+
+```
+if(!userGroups.includes("Admin")){
+    document.querySelector("#exportCSVButton").style.display = "none";
+    document.querySelector("#metrics").style.display = "none";
+}
+```
+
+✔ Now Staff only sees orders table.
+
+### ✅ Verification
+
+1️⃣ Admin user logs in → sees metrics + orders + CSV export → can download CSV
+
+2️⃣ Staff user logs in → sees only orders → cannot download CSV → metrics hidden
+
+--
+
+### 🏆 Summary of Features Added
+
+| Feature              | Status |
+| -------------------- | ------ |
+| CSV Export Backend   | ✅ Done |
+| CSV Export Frontend  | ✅ Done |
+| Admin vs Staff Roles | ✅ Done |
+| Role-Based UI        | ✅ Done |
+
+
+**✅ PHASE 2 STATUS**
+
+> **🟢 PHASE 2 COMPLETE & VERIFIED**
 
 **✅ PHASE 2️⃣ STATUS**
 
