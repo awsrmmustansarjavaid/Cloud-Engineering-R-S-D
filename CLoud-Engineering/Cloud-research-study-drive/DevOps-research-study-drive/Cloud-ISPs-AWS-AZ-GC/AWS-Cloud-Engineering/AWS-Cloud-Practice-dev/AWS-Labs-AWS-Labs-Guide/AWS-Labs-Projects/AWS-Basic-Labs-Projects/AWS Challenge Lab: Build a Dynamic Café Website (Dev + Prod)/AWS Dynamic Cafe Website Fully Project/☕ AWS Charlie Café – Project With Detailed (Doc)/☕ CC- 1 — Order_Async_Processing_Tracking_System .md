@@ -150,107 +150,11 @@ ls -lh pymysql-layer.zip
 pymysql-layer.zip   (few MB)
 ```
 
-### ### ✅ METHOD 1 — PyMySQL Lambda Layer via AWS CLI (NO S3)
+### ✅ METHOD 1 — PyMySQL Lambda Layer via AWS CLI (NO S3)
 
-#### 🔹 STEP 1 — Publish Lambda Layer USING AWS CLI (NO S3)
 
-🔥 This is what you want instead of S3
 
-```
-aws lambda publish-layer-version \
-  --layer-name pymysql-layer \
-  --description "PyMySQL Lambda Layer" \
-  --zip-file fileb://pymysql-layer.zip \
-  --compatible-runtimes python3.9 python3.10 python3.11
-```
 
-#### 🔹 STEP 2 — Confirm Layer was created
-
-```
-aws lambda list-layer-versions \
-  --layer-name pymysql-layer
-```
-
-#### 👁‍🗨 You should see:
-
-```
-{
-  "LayerVersions": [
-    {
-      "Version": 1,
-      "LayerVersionArn": "arn:aws:lambda:us-east-1:123456789012:layer:pymysql-layer:1"
-    }
-  ]
-}
-```
-
-#### ✅ Copy the LayerVersionArn
-
-#### 🔹 STEP 3 — Attach Layer to Lambda (CLI way)
-
-#### 3.1 Get current layers (IMPORTANT – don’t overwrite)
-
-```
-aws lambda get-function-configuration \
-  --function-name YOUR_LAMBDA_NAME
-```
-
-Check "Layers" section.
-
-#### 3.2 Update Lambda with PyMySQL layer
-
-⚠️ Replace ARN + function name
-
-```
-aws lambda update-function-configuration \
-  --function-name YOUR_LAMBDA_NAME \
-  --layers arn:aws:lambda:REGION:ACCOUNT_ID:layer:pymysql-layer:1
-```
-
-If you already have layers, include ALL layer ARNs together.
-
-#### 🔹 STEP 4 — Test inside Lambda (MANDATORY)
-
-In your Lambda code:
-
-```
-import pymysql
-
-def lambda_handler(event, context):
-    return {
-        "status": "ok",
-        "pymysql_version": pymysql.__version__
-    }
-```
-
-Invoke test → expect no import error.
-
-#### 🔹 STEP 5 — Common mistakes (READ THIS)
-
-❌ Installing pymysql globally
-❌ Zipping wrong folder
-❌ Missing python/ root directory
-❌ Using --zip-file file:// instead of fileb://
-❌ Wrong Python runtime
-
-#### 🔹 OPTIONAL — Cleanup local files
-
-```
-cd ..
-rm -rf pymysql-layer
-```
-
-#### ✅ FINAL RESULT
-
-You now have:
-
-✔ PyMySQL Lambda Layer
-
-✔ Created entirely via AWS CLI
-
-✔ No S3 bucket involved
-
-✔ Reusable across all Lambdas
 
 
 **✅ PHASE 1️⃣ STATUS**
