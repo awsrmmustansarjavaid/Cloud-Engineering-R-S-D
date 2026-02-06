@@ -138,6 +138,9 @@ body {
 
     <h4>HR & Attendance Dashboard</h4>
 
+    <!-- =====================================================
+         ✅ SUMMARY CARDS (EXISTING)
+    ===================================================== -->
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card bg-success text-white p-3">
@@ -160,8 +163,7 @@ body {
     </div>
 
     <!-- =====================================================
-         ADMIN DASHBOARD CONTROLS (SPEC)
-         These buttons map to load(type)
+         ADMIN DASHBOARD CONTROLS
     ===================================================== -->
     <div class="mb-3">
         <button class="btn btn-outline-primary" onclick="load('daily')">Daily</button>
@@ -170,12 +172,31 @@ body {
     </div>
 
     <!-- =====================================================
-         ✅ ADDED (SPEC COMPATIBILITY)
-         Placeholder required by shared spec
-         (Data is rendered via cards + table instead)
+         ✅ ADDED: FILTER DROPDOWN & EXPORT BUTTON
+         Purpose: Allow employee filtering & CSV export
     ===================================================== -->
-    <div id="summary-result" style="display:none;"></div>
+    <div class="container my-4">
+        <!-- Employee Filter -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="employeeFilter" class="form-label">Filter by Employee</label>
+                <select id="employeeFilter" class="form-select" onchange="loadDashboardData()">
+                    <option value="">All Employees</option>
+                    <!-- Employee options populated dynamically -->
+                </select>
+            </div>
+        </div>
 
+        <!-- Attendance Table -->
+        <div id="dashboard-table-container"></div>
+
+        <!-- Export Button -->
+        <button class="btn btn-primary mt-3" onclick="exportCSV()">Export CSV</button>
+    </div>
+
+    <!-- =====================================================
+         ✅ EXISTING TABLE (UNCHANGED)
+    ===================================================== -->
     <table class="table table-bordered text-white">
         <thead>
             <tr>
@@ -283,6 +304,20 @@ async function load(type) {
 ===================================================== */
 loadOrdersDashboard();
 load("daily");
+
+/* =====================================================
+   ✅ PLACEHOLDER FUNCTIONS FOR NEW FILTER + EXPORT
+   Must implement loadDashboardData() & exportCSV()
+===================================================== */
+function loadDashboardData() {
+    // Placeholder: populate table based on employeeFilter
+    console.log("loadDashboardData() triggered");
+}
+
+function exportCSV() {
+    // Placeholder: export table as CSV
+    console.log("exportCSV() triggered");
+}
 </script>
 
 </body>
