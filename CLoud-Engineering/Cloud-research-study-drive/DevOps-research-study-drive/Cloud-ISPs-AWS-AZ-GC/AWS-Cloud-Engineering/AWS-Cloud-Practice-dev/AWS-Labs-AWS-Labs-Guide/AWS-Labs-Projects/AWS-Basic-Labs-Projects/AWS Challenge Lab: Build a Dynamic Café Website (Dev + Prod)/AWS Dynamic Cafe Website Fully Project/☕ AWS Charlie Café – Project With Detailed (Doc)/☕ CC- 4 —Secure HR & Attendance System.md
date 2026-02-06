@@ -923,6 +923,7 @@ Authorization
 - Save & Redeploy API
 
 #### 5️⃣ Add ROLE CHECK
+> **⚠️ All these 5 HR Lambda Updated.. Skip this step**
 
 Now comes your ALLOWED_ROLE logic.
 
@@ -973,6 +974,7 @@ ALLOWED_ROLE = "Employee"
 ALLOWED_ROLE = "Admin"
 # SELECT all employees
 ```
+**⚠️ All these 5 HR Lambda Updated.. Skip this step**
 
 ### 4️⃣ REQUIRED API GATEWAY CONFIG
 
