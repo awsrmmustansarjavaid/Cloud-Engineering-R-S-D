@@ -7,7 +7,7 @@
 
 ### ☕ AWS Charlie Café – Test & Verifications
 
-[☕ CC- 3 —SALES ANALYTICS & REPORTING SYSTEM](./☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕CC-%202%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+[☕ CC- 3 —SALES ANALYTICS & REPORTING SYSTEM](./☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
 
 ---
 
