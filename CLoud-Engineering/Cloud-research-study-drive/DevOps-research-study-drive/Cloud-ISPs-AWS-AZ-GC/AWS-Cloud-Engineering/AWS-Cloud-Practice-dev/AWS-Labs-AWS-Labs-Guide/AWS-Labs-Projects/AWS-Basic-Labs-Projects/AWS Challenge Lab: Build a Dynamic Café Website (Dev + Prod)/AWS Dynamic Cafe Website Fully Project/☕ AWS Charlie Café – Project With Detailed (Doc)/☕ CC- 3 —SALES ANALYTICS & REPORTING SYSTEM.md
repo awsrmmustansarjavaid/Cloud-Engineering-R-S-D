@@ -528,13 +528,10 @@ Which your Lambda reads as:
 event['queryStringParameters']['period']
 ```
 
-
-
 **✅ PHASE 3 STATUS**
 
 > **🟢 PHASE 3 COMPLETE & VERIFIED**
 ---
-
 ## PHASE 4️⃣  BOOTSTRAP ANALYTICS UI
 
 ### 1️⃣ Create analytics.html
@@ -563,7 +560,6 @@ sudo chmod -R 755 /var/www
 ```
 sudo systemctl restart httpd
 ```
-
 
 **✅ PHASE 4 STATUS**
 
