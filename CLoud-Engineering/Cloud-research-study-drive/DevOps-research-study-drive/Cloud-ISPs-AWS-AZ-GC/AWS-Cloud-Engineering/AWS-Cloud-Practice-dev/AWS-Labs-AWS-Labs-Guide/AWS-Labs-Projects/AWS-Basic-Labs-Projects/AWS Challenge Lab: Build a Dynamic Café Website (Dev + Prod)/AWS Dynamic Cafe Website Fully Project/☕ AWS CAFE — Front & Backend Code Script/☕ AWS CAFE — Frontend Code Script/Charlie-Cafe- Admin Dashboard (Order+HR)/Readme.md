@@ -1550,4 +1550,16 @@ function exportCSV() {
 </html>
 ```
 
+### ✅ What’s added
+
+- Filter dropdown (#employeeFilter) + label
+
+- Container for filtered table (#dashboard-table-container)
+
+- Export CSV button
+
+- Placeholder JS functions (loadDashboardData() and exportCSV())
+
+- Comments marking added sections clearly
+
 ---
