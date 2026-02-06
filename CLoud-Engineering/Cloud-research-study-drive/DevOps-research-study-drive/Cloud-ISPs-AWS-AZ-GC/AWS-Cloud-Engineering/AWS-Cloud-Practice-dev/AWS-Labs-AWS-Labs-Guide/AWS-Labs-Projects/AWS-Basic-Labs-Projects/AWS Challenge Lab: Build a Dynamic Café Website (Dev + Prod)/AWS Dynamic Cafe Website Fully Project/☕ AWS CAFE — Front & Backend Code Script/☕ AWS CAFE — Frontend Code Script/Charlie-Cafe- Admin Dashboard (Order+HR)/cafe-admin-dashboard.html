@@ -138,9 +138,6 @@ body {
 
     <h4>HR & Attendance Dashboard</h4>
 
-    <!-- =====================================================
-         ✅ SUMMARY CARDS (EXISTING)
-    ===================================================== -->
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card bg-success text-white p-3">
@@ -162,41 +159,26 @@ body {
         </div>
     </div>
 
-    <!-- =====================================================
-         ADMIN DASHBOARD CONTROLS
-    ===================================================== -->
     <div class="mb-3">
         <button class="btn btn-outline-primary" onclick="load('daily')">Daily</button>
         <button class="btn btn-outline-primary" onclick="load('weekly')">Weekly</button>
         <button class="btn btn-outline-primary" onclick="load('monthly')">Monthly</button>
     </div>
 
-    <!-- =====================================================
-         ✅ ADDED: FILTER DROPDOWN & EXPORT BUTTON
-         Purpose: Allow employee filtering & CSV export
-    ===================================================== -->
+    <!-- Filter Dropdown & Export -->
     <div class="container my-4">
-        <!-- Employee Filter -->
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="employeeFilter" class="form-label">Filter by Employee</label>
                 <select id="employeeFilter" class="form-select" onchange="loadDashboardData()">
                     <option value="">All Employees</option>
-                    <!-- Employee options populated dynamically -->
                 </select>
             </div>
         </div>
-
-        <!-- Attendance Table -->
         <div id="dashboard-table-container"></div>
-
-        <!-- Export Button -->
         <button class="btn btn-primary mt-3" onclick="exportCSV()">Export CSV</button>
     </div>
 
-    <!-- =====================================================
-         ✅ EXISTING TABLE (UNCHANGED)
-    ===================================================== -->
     <table class="table table-bordered text-white">
         <thead>
             <tr>
@@ -219,11 +201,10 @@ body {
 
 <script>
 /* =====================================================
-   🔐 AUTH GUARD
+   🔹 UPDATED: USE CENTRAL INIT FUNCTION
+   Replaces individual protectPage + setupLogoutButton
 ===================================================== */
-CHARLIE.auth.protectPage();
-CHARLIE.auth.setupLogoutButton("logoutBtn","index.html");
-document.body.style.display = "block";
+CHARLIE.initProtectedPage();
 
 /* =====================================================
    🧭 SECTION SWITCHING
@@ -231,7 +212,6 @@ document.body.style.display = "block";
 function showSection(e, id) {
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-
     document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
     e.currentTarget.classList.add("active");
 }
@@ -241,15 +221,12 @@ function showSection(e, id) {
 ===================================================== */
 async function loadOrdersDashboard() {
     const data = await CHARLIE.api.getDashboardMetrics("today");
-
     document.getElementById("sales").innerText = `$${data.sales}`;
-    document.getElementById("ordersCount").innerText = data.orders;
+    document.getElementById("ordersCount").innerText = data.orders`;
     document.getElementById("drinksCount").innerText = data.drinks;
     document.getElementById("avgPrice").innerText = `$${data.avg}`;
-
     const table = document.getElementById("ordersTable");
     table.innerHTML = "";
-
     data.latest_orders.forEach(o => {
         table.innerHTML += `
             <tr>
@@ -264,20 +241,15 @@ async function loadOrdersDashboard() {
 }
 
 /* =====================================================
-   👥 HR DASHBOARD (EXISTING LOGIC)
+   👥 HR DASHBOARD
 ===================================================== */
 async function loadSummary(type) {
-    const data = await CHARLIE.api.adminAttendance[
-        `get${type.charAt(0).toUpperCase()+type.slice(1)}Summary`
-    ]();
-
+    const data = await CHARLIE.api.adminAttendance[`get${type.charAt(0).toUpperCase()+type.slice(1)}Summary`]();
     document.getElementById("cardPresent").innerText = data.summary.total_present;
     document.getElementById("cardAbsent").innerText = data.summary.total_absent;
     document.getElementById("cardLeaves").innerText = data.summary.total_leaves;
-
     const tbody = document.getElementById("attendanceBody");
     tbody.innerHTML = "";
-
     data.attendance.forEach(r => {
         tbody.innerHTML += `
             <tr>
@@ -291,9 +263,7 @@ async function loadSummary(type) {
 }
 
 /* =====================================================
-   ✅ ADDED (SPEC COMPATIBILITY)
-   Wrapper required by shared admin spec
-   Internally calls existing loadSummary()
+   ✅ ADMIN SPEC WRAPPER
 ===================================================== */
 async function load(type) {
     return loadSummary(type);
@@ -306,17 +276,21 @@ loadOrdersDashboard();
 load("daily");
 
 /* =====================================================
-   ✅ PLACEHOLDER FUNCTIONS FOR NEW FILTER + EXPORT
-   Must implement loadDashboardData() & exportCSV()
+   ✅ PLACEHOLDER FUNCTIONS FOR FILTER + EXPORT
 ===================================================== */
 function loadDashboardData() {
-    // Placeholder: populate table based on employeeFilter
     console.log("loadDashboardData() triggered");
 }
-
 function exportCSV() {
-    // Placeholder: export table as CSV
     console.log("exportCSV() triggered");
+}
+
+/* =====================================================
+   🔹 API CALL EXAMPLE (DOCUMENTATION)
+   How to call any secured endpoint centrally
+===================================================== */
+function exampleAPICall() {
+    CHARLIE.api.recordAttendance({ employee_id: "E101" });
 }
 </script>
 
