@@ -3,6 +3,9 @@ import os
 import pymysql
 from datetime import date, datetime
 
+# ----------------------------------------
+# DATABASE CONNECTION
+# ----------------------------------------
 connection = pymysql.connect(
     host=os.environ['DB_HOST'],
     user=os.environ['DB_USER'],
@@ -11,24 +14,40 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
+# ----------------------------------------
+# COMMON ROLE CHECK (RBAC)
+# ----------------------------------------
+def check_role(event, allowed_role):
+    """
+    Validates if user belongs to required Cognito group
+    """
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if isinstance(groups, str):
+        groups = [groups]
+
+    return allowed_role in groups
+
+# ----------------------------------------
+# LAMBDA HANDLER
+# ----------------------------------------
 def lambda_handler(event, context):
     try:
-        # -------------------------------
-        # AUTHORIZATION — ROLE CHECK
-        # -------------------------------
-        claims = event["requestContext"]["authorizer"]["claims"]
-        groups = claims.get("cognito:groups", [])
+        # ----------------------------------------
+        # AUTHORIZATION — EMPLOYEE ONLY
+        # ----------------------------------------
+        ALLOWED_ROLE = "Employee"
 
-        if isinstance(groups, str):
-            groups = [groups]
-
-        if "Employee" not in groups:
+        if not check_role(event, ALLOWED_ROLE):
             return response(403, "Forbidden")
 
-        # -------------------------------
-        # BUSINESS LOGIC (UNCHANGED)
-        # -------------------------------
+        # ----------------------------------------
+        # BUSINESS LOGIC — CHECK-IN
+        # ----------------------------------------
+        claims = event["requestContext"]["authorizer"]["claims"]
         cognito_user_id = claims["sub"]
+
         today = date.today()
         now = datetime.now().time()
 
@@ -57,6 +76,9 @@ def lambda_handler(event, context):
     except Exception as e:
         return response(500, str(e))
 
+# ----------------------------------------
+# STANDARD RESPONSE
+# ----------------------------------------
 def response(status, message):
     return {
         "statusCode": status,
