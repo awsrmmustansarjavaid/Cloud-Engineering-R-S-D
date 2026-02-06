@@ -13,8 +13,6 @@
 
 <!-- =====================================================
      STYLES
-     - Orders Dashboard styles → dashboard.html
-     - HR Dashboard styles → admin-dashboard.html
 ===================================================== -->
 <style>
 body {
@@ -24,7 +22,7 @@ body {
     display: none; /* 🔐 hidden until Cognito auth passes */
 }
 
-/* ===== SIDEBAR (MERGED) ===== */
+/* ===== SIDEBAR ===== */
 .sidebar {
     width: 250px;
     background: #151515;
@@ -53,7 +51,7 @@ body {
     padding: 25px;
 }
 
-/* ===== KPI CARDS (FROM dashboard.html) ===== */
+/* ===== KPI CARDS ===== */
 .kpi-card {
     border-radius: 20px;
     padding: 20px;
@@ -82,25 +80,21 @@ body {
 
 <!-- =====================================================
      SIDEBAR
-     SOURCE: MERGED (dashboard.html + admin-dashboard.html)
 ===================================================== -->
 <div class="sidebar">
     <h4>☕ Charlie Café</h4>
     <p class="text-muted">Admin Dashboard</p>
 
-    <!-- Orders Dashboard -->
     <a class="active" onclick="showSection(event,'orders')">
         <i class="bi bi-bag-check"></i> Orders
     </a>
 
-    <!-- HR Dashboard -->
     <a onclick="showSection(event,'hr')">
         <i class="bi bi-people"></i> HR / Attendance
     </a>
 
     <hr>
 
-    <!-- 🔐 WORKING Cognito Logout -->
     <a id="logoutBtn">
         <i class="bi bi-box-arrow-left"></i> Logout
     </a>
@@ -111,15 +105,10 @@ body {
 ===================================================== -->
 <div class="main">
 
-<!-- =====================================================
-     🛒 ORDERS DASHBOARD
-     SOURCE: dashboard.html
-===================================================== -->
+<!-- ================= ORDERS ================= -->
 <div id="orders" class="section active">
-
     <h4>Orders Dashboard</h4>
 
-    <!-- KPI CARDS -->
     <div class="row g-4 mb-4">
         <div class="col-md-3"><div class="kpi-card bg-green"><h6>Sales</h6><h3 id="sales">0</h3></div></div>
         <div class="col-md-3"><div class="kpi-card bg-purple"><h6>Orders</h6><h3 id="ordersCount">0</h3></div></div>
@@ -127,7 +116,6 @@ body {
         <div class="col-md-3"><div class="kpi-card bg-orange"><h6>Avg</h6><h3 id="avgPrice">$0</h3></div></div>
     </div>
 
-    <!-- ORDERS TABLE -->
     <div class="table-container">
         <h5>Latest Orders</h5>
         <table class="table table-hover text-white">
@@ -145,15 +133,11 @@ body {
     </div>
 </div>
 
-<!-- =====================================================
-     👥 HR / ATTENDANCE DASHBOARD
-     SOURCE: admin-dashboard.html
-===================================================== -->
+<!-- ================= HR / ATTENDANCE ================= -->
 <div id="hr" class="section">
 
     <h4>HR & Attendance Dashboard</h4>
 
-    <!-- SUMMARY CARDS -->
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card bg-success text-white p-3">
@@ -175,14 +159,23 @@ body {
         </div>
     </div>
 
-    <!-- CONTROLS -->
+    <!-- =====================================================
+         ADMIN DASHBOARD CONTROLS (SPEC)
+         These buttons map to load(type)
+    ===================================================== -->
     <div class="mb-3">
-        <button class="btn btn-outline-primary" onclick="loadSummary('daily')">Daily</button>
-        <button class="btn btn-outline-primary" onclick="loadSummary('weekly')">Weekly</button>
-        <button class="btn btn-outline-primary" onclick="loadSummary('monthly')">Monthly</button>
+        <button class="btn btn-outline-primary" onclick="load('daily')">Daily</button>
+        <button class="btn btn-outline-primary" onclick="load('weekly')">Weekly</button>
+        <button class="btn btn-outline-primary" onclick="load('monthly')">Monthly</button>
     </div>
 
-    <!-- TABLE -->
+    <!-- =====================================================
+         ✅ ADDED (SPEC COMPATIBILITY)
+         Placeholder required by shared spec
+         (Data is rendered via cards + table instead)
+    ===================================================== -->
+    <div id="summary-result" style="display:none;"></div>
+
     <table class="table table-bordered text-white">
         <thead>
             <tr>
@@ -205,10 +198,10 @@ body {
 
 <script>
 /* =====================================================
-   🔐 AUTH GUARD + LOGOUT (Cognito)
+   🔐 AUTH GUARD
 ===================================================== */
-CHARLIE.auth.protectPage();                 // login required
-CHARLIE.auth.setupLogoutButton("logoutBtn","index.html"); // ✔ WORKING SIGN-OUT
+CHARLIE.auth.protectPage();
+CHARLIE.auth.setupLogoutButton("logoutBtn","index.html");
 document.body.style.display = "block";
 
 /* =====================================================
@@ -223,8 +216,7 @@ function showSection(e, id) {
 }
 
 /* =====================================================
-   🛒 ORDERS DASHBOARD LOGIC
-   SOURCE: dashboard.html
+   🛒 ORDERS DASHBOARD
 ===================================================== */
 async function loadOrdersDashboard() {
     const data = await CHARLIE.api.getDashboardMetrics("today");
@@ -251,11 +243,12 @@ async function loadOrdersDashboard() {
 }
 
 /* =====================================================
-   👥 HR DASHBOARD LOGIC
-   SOURCE: admin-dashboard.html
+   👥 HR DASHBOARD (EXISTING LOGIC)
 ===================================================== */
 async function loadSummary(type) {
-    const data = await CHARLIE.api.adminAttendance[`get${type.charAt(0).toUpperCase()+type.slice(1)}Summary`]();
+    const data = await CHARLIE.api.adminAttendance[
+        `get${type.charAt(0).toUpperCase()+type.slice(1)}Summary`
+    ]();
 
     document.getElementById("cardPresent").innerText = data.summary.total_present;
     document.getElementById("cardAbsent").innerText = data.summary.total_absent;
@@ -277,10 +270,19 @@ async function loadSummary(type) {
 }
 
 /* =====================================================
+   ✅ ADDED (SPEC COMPATIBILITY)
+   Wrapper required by shared admin spec
+   Internally calls existing loadSummary()
+===================================================== */
+async function load(type) {
+    return loadSummary(type);
+}
+
+/* =====================================================
    🚀 INITIAL LOAD
 ===================================================== */
 loadOrdersDashboard();
-loadSummary("daily");
+load("daily");
 </script>
 
 </body>
