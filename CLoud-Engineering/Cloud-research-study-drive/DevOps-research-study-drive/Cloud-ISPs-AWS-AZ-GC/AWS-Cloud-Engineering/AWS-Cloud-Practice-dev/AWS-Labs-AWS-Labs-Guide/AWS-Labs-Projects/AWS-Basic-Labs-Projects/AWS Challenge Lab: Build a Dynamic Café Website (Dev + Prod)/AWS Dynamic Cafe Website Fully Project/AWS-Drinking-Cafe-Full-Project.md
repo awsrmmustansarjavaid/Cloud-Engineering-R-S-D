@@ -1175,6 +1175,26 @@ sudo nano /var/www/html/central-print.html
 CTRL + O → ENTER
 CTRL + X
 ```
+---
+### 8️⃣ Charlie Cafe analytics.html  (IMPORTANT)
+> **File Name: analytics.html**
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/analytics.html
+```
+
+#### 2️⃣ code
+
+[analytics.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
 
 
 **✅ PHASE 2️⃣ STATUS**
