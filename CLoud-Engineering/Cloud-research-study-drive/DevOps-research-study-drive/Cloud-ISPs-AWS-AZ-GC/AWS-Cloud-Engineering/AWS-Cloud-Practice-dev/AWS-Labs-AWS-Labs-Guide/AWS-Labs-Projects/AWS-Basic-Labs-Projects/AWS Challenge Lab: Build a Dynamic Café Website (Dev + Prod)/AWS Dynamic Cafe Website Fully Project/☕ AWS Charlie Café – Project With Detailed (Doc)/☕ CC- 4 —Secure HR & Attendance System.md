@@ -1210,6 +1210,7 @@ We will create one main Lambda that supports filtering and summary cards.
 - Deploy → Stage: prod
 
 ### STEP 4 — Admin Frontend — HTML Enhancements
+> **File Name: cafe-admin-dashboard.html**
 
 #### 4️⃣1 — Add Filter Dropdown & Summary Cards
 
