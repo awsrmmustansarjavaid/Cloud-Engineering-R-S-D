@@ -12,6 +12,15 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
+def check_role(event, allowed_role):
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if isinstance(groups, str):
+        groups = [groups]
+
+    return allowed_role in groups
+
 def json_serializer(obj):
     if isinstance(obj, Decimal):
         return float(obj)
@@ -20,20 +29,20 @@ def json_serializer(obj):
     return str(obj)
 
 def lambda_handler(event, context):
-    claims = event["requestContext"]["authorizer"]["claims"]
-    groups = claims.get("cognito:groups", [])
+    # ----------------------------------------
+    # AUTHORIZATION — EMPLOYEE ONLY
+    # ----------------------------------------
+    ALLOWED_ROLE = "Employee"
 
-    if isinstance(groups, str):
-        groups = [groups]
-
-    if "Employee" not in groups:
+    if not check_role(event, ALLOWED_ROLE):
         return forbidden()
 
+    claims = event["requestContext"]["authorizer"]["claims"]
     cognito_user_id = claims["sub"]
 
     with connection.cursor() as cursor:
         cursor.execute("""
-            SELECT l.leave_date, l.leave_type
+            SELECT leave_date, leave_type
             FROM leaves l
             JOIN employees e ON l.employee_id = e.employee_id
             WHERE e.cognito_user_id=%s
