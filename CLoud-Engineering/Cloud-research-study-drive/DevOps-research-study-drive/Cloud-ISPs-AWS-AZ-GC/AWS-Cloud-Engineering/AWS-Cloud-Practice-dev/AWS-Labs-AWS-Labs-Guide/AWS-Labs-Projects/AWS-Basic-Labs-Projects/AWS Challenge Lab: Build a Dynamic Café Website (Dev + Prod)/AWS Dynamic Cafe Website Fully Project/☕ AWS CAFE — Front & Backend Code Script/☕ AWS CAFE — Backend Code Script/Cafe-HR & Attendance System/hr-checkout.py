@@ -11,24 +11,31 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
+def check_role(event, allowed_role):
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if isinstance(groups, str):
+        groups = [groups]
+
+    return allowed_role in groups
+
 def lambda_handler(event, context):
     try:
-        # -------------------------------
-        # AUTHORIZATION — ROLE CHECK
-        # -------------------------------
-        claims = event["requestContext"]["authorizer"]["claims"]
-        groups = claims.get("cognito:groups", [])
+        # ----------------------------------------
+        # AUTHORIZATION — EMPLOYEE ONLY
+        # ----------------------------------------
+        ALLOWED_ROLE = "Employee"
 
-        if isinstance(groups, str):
-            groups = [groups]
-
-        if "Employee" not in groups:
+        if not check_role(event, ALLOWED_ROLE):
             return response(403, "Forbidden")
 
-        # -------------------------------
-        # BUSINESS LOGIC (UNCHANGED)
-        # -------------------------------
+        # ----------------------------------------
+        # BUSINESS LOGIC — CHECK-OUT
+        # ----------------------------------------
+        claims = event["requestContext"]["authorizer"]["claims"]
         cognito_user_id = claims["sub"]
+
         today = date.today()
         now = datetime.now().time()
 
@@ -54,10 +61,6 @@ def lambda_handler(event, context):
 def response(status, message):
     return {
         "statusCode": status,
-        "headers": {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Authorization,Content-Type",
-            "Access-Control-Allow-Methods": "POST,OPTIONS"
-        },
+        "headers": {"Access-Control-Allow-Origin": "*"},
         "body": json.dumps({"message": message})
     }
