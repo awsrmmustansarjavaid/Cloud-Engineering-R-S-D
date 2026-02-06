@@ -1,8 +1,8 @@
 import json
 import os
 import pymysql
-from decimal import Decimal
 import datetime
+from decimal import Decimal
 
 connection = pymysql.connect(
     host=os.environ['DB_HOST'],
@@ -12,6 +12,15 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
+def check_role(event, allowed_role):
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if isinstance(groups, str):
+        groups = [groups]
+
+    return allowed_role in groups
+
 def json_serializer(obj):
     if isinstance(obj, Decimal):
         return float(obj)
@@ -20,18 +29,15 @@ def json_serializer(obj):
     return str(obj)
 
 def lambda_handler(event, context):
-    # -------------------------------
-    # AUTHORIZATION — ROLE CHECK
-    # -------------------------------
-    claims = event["requestContext"]["authorizer"]["claims"]
-    groups = claims.get("cognito:groups", [])
+    # ----------------------------------------
+    # AUTHORIZATION — EMPLOYEE ONLY
+    # ----------------------------------------
+    ALLOWED_ROLE = "Employee"
 
-    if isinstance(groups, str):
-        groups = [groups]
-
-    if "Employee" not in groups:
+    if not check_role(event, ALLOWED_ROLE):
         return forbidden()
 
+    claims = event["requestContext"]["authorizer"]["claims"]
     cognito_user_id = claims["sub"]
 
     with connection.cursor() as cursor:
@@ -44,18 +50,13 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "headers": {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Authorization,Content-Type"
-        },
+        "headers": {"Access-Control-Allow-Origin": "*"},
         "body": json.dumps(employee, default=json_serializer)
     }
 
 def forbidden():
     return {
         "statusCode": 403,
-        "headers": {
-            "Access-Control-Allow-Origin": "*"
-        },
+        "headers": {"Access-Control-Allow-Origin": "*"},
         "body": json.dumps({"message": "Forbidden"})
     }
