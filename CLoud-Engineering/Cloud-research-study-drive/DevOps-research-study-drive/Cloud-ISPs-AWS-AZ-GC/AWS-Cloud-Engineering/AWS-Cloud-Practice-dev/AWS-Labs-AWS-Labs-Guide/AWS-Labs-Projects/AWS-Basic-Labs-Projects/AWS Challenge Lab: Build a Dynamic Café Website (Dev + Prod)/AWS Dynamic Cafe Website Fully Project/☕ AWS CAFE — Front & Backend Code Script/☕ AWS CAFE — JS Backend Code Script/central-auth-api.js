@@ -104,7 +104,6 @@ const CHARLIE = (() => {
     /* =====================================================
        4️⃣ SECURE FETCH (JWT AUTO ATTACH)
     ===================================================== */
-
     async function authFetch(url, options = {}) {
         const token = getToken();
 
@@ -123,9 +122,7 @@ const CHARLIE = (() => {
         });
     }
 
-    /* -----------------------------------------------------
-       🔧 FIX #1: Prevent crash when authFetch returns undefined
-       ----------------------------------------------------- */
+    // 🔧 FIX #1: Prevent crash when authFetch returns undefined
     async function secureFetch(url, options = {}) {
         const res = await authFetch(url, options);
         if (!res) return; // ✅ prevents `.then()` crash
@@ -135,10 +132,7 @@ const CHARLIE = (() => {
     /* =====================================================
        5️⃣ ROLE & ACCESS CONTROL (NORMALIZED + SAFE)
     ===================================================== */
-
-    /* -----------------------------------------------------
-       🔧 FIX #2: Harden group extraction (missing / string / array)
-       ----------------------------------------------------- */
+    // 🔧 FIX #2: Harden group extraction (missing / string / array)
     function getUserRoles() {
         const token = getToken();
         if (!token) return [];
@@ -180,10 +174,6 @@ const CHARLIE = (() => {
     /* =====================================================
        🔐 AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
     ===================================================== */
-
-    /* -----------------------------------------------------
-       🔧 FIX #3: Prevent multiple logout / alert loops
-       ----------------------------------------------------- */
     let logoutTriggered = false;
 
     function startAutoLogoutWatcher() {
@@ -223,70 +213,86 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       8️⃣ PAGE INITIALIZER
+       8️⃣ PAGE INITIALIZER (UPDATED)
+       🔹 Accepts options for flexible setup
+       🔹 Centralizes auth, logout, auto-logout
     ===================================================== */
-    function initProtectedPage() {
-        auth.protectPage();
-        auth.setupLogoutButton();
+    function initProtectedPage(options = {}) {
+        const {
+            requireAuth = true,        // 🔐 protect page by default
+            enableLogout = true,       // ✅ setup logout button by default
+            logoutButtonId = "logoutBtn" // default logout button
+        } = options;
+
+        // Step 1: Protect page if required
+        if (requireAuth) {
+            auth.protectPage();
+        }
+
+        // Step 2: Setup logout button if required
+        if (enableLogout) {
+            auth.setupLogoutButton(logoutButtonId);
+        }
+
+        // Step 3: Start auto logout watcher (centralized)
         startAutoLogoutWatcher();
     }
 
-    // =======================================================
-    // 9️⃣ 🖨️ CHARLIE CAFE — CENTRAL BROWSER PRINTING SYSTEM
-    // Used by all admin/staff pages
-    // =======================================================
-
+    /* =====================================================
+       9️⃣ 🖨️ CHARLIE CAFE — CENTRAL BROWSER PRINTING SYSTEM
+       Used by all admin/staff pages
+    ===================================================== */
     window.printAllOrders = function () {
-    console.log("🖨️ Printing all orders...");
-    window.print();
+        console.log("🖨️ Printing all orders...");
+        window.print();
     };
 
     window.printTodaySummary = function () {
-    console.log("📄 Printing today's summary...");
+        console.log("📄 Printing today's summary...");
 
-    const table = document.querySelector("#ordersTable tbody");
+        const table = document.querySelector("#ordersTable tbody");
 
-    if (!table) {
-    alert("❌ Orders table not found");
-    return;
-    }
+        if (!table) {
+            alert("❌ Orders table not found");
+            return;
+        }
 
-    const rows = table.querySelectorAll("tr");
-    const today = new Date().toISOString().split("T")[0];
+        const rows = table.querySelectorAll("tr");
+        const today = new Date().toISOString().split("T")[0];
 
-    let totalOrders = 0;
-    let totalAmount = 0;
+        let totalOrders = 0;
+        let totalAmount = 0;
 
-    rows.forEach(row => {
-    const orderDate = row.dataset.date;
-    const amount = parseFloat(row.dataset.total || 0);
+        rows.forEach(row => {
+            const orderDate = row.dataset.date;
+            const amount = parseFloat(row.dataset.total || 0);
 
-    if (orderDate === today) {
-      totalOrders++;
-      totalAmount += amount;
-    }
-    });
+            if (orderDate === today) {
+                totalOrders++;
+                totalAmount += amount;
+            }
+        });
 
-    const summaryHTML = `
-    <div style="padding:20px">
-      <h3 style="text-align:center">☕ Charlie Cafe — Daily Summary</h3>
-      <hr>
-      <p><strong>Date:</strong> ${today}</p>
-      <p><strong>Total Orders:</strong> ${totalOrders}</p>
-      <p><strong>Total Sales:</strong> $${totalAmount.toFixed(2)}</p>
-    </div>
-  ` ;
+        const summaryHTML = `
+            <div style="padding:20px">
+                <h3 style="text-align:center">☕ Charlie Cafe — Daily Summary</h3>
+                <hr>
+                <p><strong>Date:</strong> ${today}</p>
+                <p><strong>Total Orders:</strong> ${totalOrders}</p>
+                <p><strong>Total Sales:</strong> $${totalAmount.toFixed(2)}</p>
+            </div>
+        `;
 
-    const originalContent = document.body.innerHTML;
-    document.body.innerHTML = summaryHTML;
+        const originalContent = document.body.innerHTML;
+        document.body.innerHTML = summaryHTML;
 
-    window.print();
+        window.print();
 
-    // Restore page after print
-    document.body.innerHTML = originalContent;
-    location.reload(); // ensures JS state restores cleanly
+        // Restore page after print
+        document.body.innerHTML = originalContent;
+        location.reload(); // ensures JS state restores cleanly
     };
-    
+
     /* =====================================================
        🔟 EXPORT (PUBLIC API)
     ===================================================== */
@@ -297,7 +303,7 @@ const CHARLIE = (() => {
         api,
         assets,
         secureFetch,
-        initProtectedPage,
+        initProtectedPage,   // ✅ fully enhanced
         getUserRoles,
         isAdmin,
         isEmployee,

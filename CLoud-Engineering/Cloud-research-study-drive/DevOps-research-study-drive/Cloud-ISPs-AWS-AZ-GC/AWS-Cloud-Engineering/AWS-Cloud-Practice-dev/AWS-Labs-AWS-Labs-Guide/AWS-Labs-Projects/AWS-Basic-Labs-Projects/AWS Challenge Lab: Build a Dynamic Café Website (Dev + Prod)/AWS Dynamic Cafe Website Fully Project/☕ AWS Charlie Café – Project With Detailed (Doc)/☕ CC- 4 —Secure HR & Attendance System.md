@@ -1410,9 +1410,11 @@ Example item inserted later:
 
 ### 3️⃣ 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
 
-### 🟢 OPTION 1 (RECOMMENDED)
+### 🟢 OPTION 1 (RECOMMENDED But Already Added & Code Updated) 
 
 **👉 Keep EVERYTHING inside central-auth-api.js**
+
+**⚠️ All reead added and code Updated.. Skip this step**
 
 This is what large production apps do.
 
