@@ -277,5 +277,407 @@ These give you full control per page without writing new CSS every time.
 You’re thinking like a system designer, not just “getting it to work” — that’s solid 💪
 
 ---
+### CENTRAL CAFE STYLE SHEET
+
+> **Update Version:1.1**
+
+### ✅ What I fixed (very important)
+
+#### ❌ Problem (before)
+
+central-cafe-style.css accidentally contained:
+
+<html>, <head>, <nav>, JS, inline <style>
+
+This would break all pages loading it as CSS
+
+#### ✅ Solution (now)
+
+The file is now PURE CSS ONLY
+
+All:
+
+- navbar styles
+
+- background image styles
+
+- button styles
+
+- print + thermal styles
+
+are centralized correctly
+
+This is now safe to include on every page.
+
+### 📁 Final File Structure (recommended)
+
+```
+/var/www/html/
+│
+├── css/
+│   └── central-cafe-style.css   ✅ (THIS FILE)
+│
+├── js/
+│   └── central-auth-api.js
+│
+├── images/
+│   ├── cafe-background.jpg
+│   └── charlie-logo.png
+│
+├── central-print.html
+├── order-status.html
+├── order.php
+└── hr-report.html
+```
+
+### 🎨 What was ADDED to central-cafe-style.css
+
+#### 1️⃣ Global UI system (ALL pages)
+
+Base font & colors
+
+.cafe-bg → cafe background image
+
+.cafe-overlay → white readable overlay
+
+Mobile-safe defaults
+
+#### 2️⃣ Shared Navbar (Bootstrap-friendly)
+
+```
+<nav class="navbar navbar-expand-lg navbar-dark navbar-cafe">
+```
+
+Gradient cafe theme
+
+Logo support
+
+Mobile responsive
+
+One navbar style for all pages
+
+#### 3️⃣ Printing / Export UI buttons
+
+Reusable button classes:
+
+.btn-print 🖨️
+
+.btn-thermal 🔥
+
+.btn-csv 🗄️
+
+.btn-pdf 📄
+
+.print-action-bar (floating bottom bar)
+
+No inline CSS needed anymore.
+
+#### 4️⃣ Print & Thermal (kept + improved)
+
+A4 browser print
+
+Thermal receipt (80mm)
+
+Page-break protection
+
+Auto-hide UI
+
+Receipt-only visibility
+
+### 🧩 How to use this CSS in ANY page
+
+#### 1️⃣ Load once in <head>
+
+```
+<link rel="stylesheet" href="/css/central-cafe-style.css">
+```
+
+#### 2️⃣ Enable cafe background
+
+```
+<body class="cafe-bg">
+  <div class="container cafe-overlay">
+    ...
+  </div>
+</body>
+```
+
+#### 3️⃣ Standard Navbar (copy ONCE per page)
+
+```
+<nav class="navbar navbar-expand-lg navbar-dark navbar-cafe">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="/images/charlie-logo.png"> Charlie Cafe
+    </a>
+  </div>
+</nav>
+```
+
+#### 4️⃣ Print / Export Buttons (no custom CSS)
+
+```
+<div class="print-action-bar no-print">
+  <button class="btn btn-cafe btn-print">🖨️ Print</button>
+  <button class="btn btn-cafe btn-thermal">🔥 Thermal</button>
+  <button class="btn btn-cafe btn-csv">🗄️ CSV</button>
+  <button class="btn btn-cafe btn-pdf">📄 PDF</button>
+</div>
+```
+
+### 🧠 Architectural Win (big one)
+
+You now have:
+
+✅ ONE CSS file for the entire cafe lab
+
+✅ ZERO inline styles
+
+✅ Mobile-first Bootstrap-friendly
+
+✅ Print-safe
+
+✅ Thermal-safe
+
+✅ Scales to:
+
+admin dashboard
+
+POS
+
+HR reports
+
+finance exports
+
+This is exactly how real production systems are structured.
 
 
+```
+/* ==========================================================
+   CENTRAL CAFE STYLE SHEET
+   File: central-cafe-style.css
+   Project: Charlie Cafe Lab (Frontend + Printing + Export)
+   Purpose:
+   - Global UI/UX styling for ALL cafe pages
+   - Centralized PRINT & THERMAL PRINT styles
+   - Responsive Bootstrap-friendly layout helpers
+   - Avoid CSS duplication across pages
+   ========================================================== */
+
+/* ==========================================================
+   1️⃣ GLOBAL BASE STYLES (ALL PAGES)
+   ========================================================== */
+
+/* Default body styling */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Cafe background (used on dashboards & print hub) */
+body.cafe-bg {
+  background-image: url('/images/cafe-background.jpg'); /* Cafe theme image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Overlay for readability on background images */
+.cafe-overlay {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ==========================================================
+   2️⃣ NAVBAR (SHARED ACROSS ALL PAGES)
+   ========================================================== */
+
+.navbar-cafe {
+  background: linear-gradient(90deg, #2b2b2b, #000000);
+}
+
+.navbar-cafe .navbar-brand {
+  font-weight: bold;
+  color: #ffffff !important;
+}
+
+.navbar-cafe .navbar-brand img {
+  height: 40px;
+  margin-right: 8px;
+}
+
+.navbar-cafe .nav-link {
+  color: #e0e0e0 !important;
+}
+
+.navbar-cafe .nav-link:hover {
+  color: #ffc107 !important; /* cafe accent */
+}
+
+/* Mobile navbar spacing */
+@media (max-width: 768px) {
+  .navbar-cafe .navbar-brand {
+    font-size: 16px;
+  }
+}
+
+/* ==========================================================
+   3️⃣ BUTTONS & ACTION UI (PRINT / EXPORT)
+   ========================================================== */
+
+.btn-cafe {
+  border-radius: 50px;
+  padding: 10px 18px;
+  font-size: 14px;
+}
+
+.btn-print {
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+.btn-thermal {
+  background-color: #fd7e14;
+  color: #ffffff;
+}
+
+.btn-csv {
+  background-color: #198754;
+  color: #ffffff;
+}
+
+.btn-pdf {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+/* Floating action bar (bottom) */
+.print-action-bar {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 9999;
+}
+
+/* ==========================================================
+   4️⃣ GLOBAL PRINT STYLES (A4 / NORMAL PRINTERS)
+   ========================================================== */
+@media print {
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide UI-only elements */
+  button,
+  .btn,
+  .no-print,
+  nav,
+  footer,
+  .navbar {
+    display: none !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px;
+  }
+
+  th,
+  td {
+    border: 1px solid #000000 !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: bold;
+  }
+
+  h1, h2, h3 {
+    text-align: center !important;
+  }
+
+  table,
+  .receipt,
+  .invoice,
+  .print-section {
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}
+
+/* ==========================================================
+   5️⃣ THERMAL PRINTER STYLES (80mm RECEIPTS)
+   ========================================================== */
+@media print {
+
+  body.thermal-print {
+    width: 80mm;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    font-family: monospace !important;
+    font-size: 12px;
+  }
+
+  .receipt {
+    width: 72mm;
+    margin: auto;
+  }
+
+  .receipt h4,
+  .receipt p {
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  .receipt table {
+    width: 100%;
+    font-size: 11px;
+  }
+
+  .receipt td {
+    padding: 2px 0;
+    border: none !important;
+  }
+
+  .receipt .total {
+    border-top: 1px dashed #000000;
+    margin-top: 6px;
+    padding-top: 6px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  body.thermal-print * {
+    visibility: hidden;
+  }
+
+  body.thermal-print .receipt,
+  body.thermal-print .receipt * {
+    visibility: visible;
+  }
+}
+
+/* ==========================================================
+   6️⃣ PRINT UTILITIES
+   ========================================================== */
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+}
+```
