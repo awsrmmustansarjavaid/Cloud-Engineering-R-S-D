@@ -1,3 +1,111 @@
+# Charlie-Cafe -Secure HR & Attendance System
+
+## hr-attendance.html
+
+> **Update Version:1.0**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HR Attendance Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { display:none; background:#f8f9fa; }
+</style>
+</head>
+
+<body>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>📊 HR Attendance Dashboard</h2>
+        <button id="logoutBtn" class="btn btn-danger">Logout</button>
+    </div>
+
+    <hr>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input id="employeeId" class="form-control" placeholder="Employee ID">
+        </div>
+        <div class="col-md-4">
+            <input id="date" type="date" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary w-100" onclick="loadAttendance()">Search</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Employee ID</th>
+                <th>Date</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+            </tr>
+        </thead>
+        <tbody id="attendanceTable"></tbody>
+    </table>
+</div>
+
+<script src="js/central-auth-api.js"></script>
+
+<script>
+/* 🔐 Protect page (Admin only) */
+CHARLIE.auth.protectPage();
+CHARLIE.auth.setupLogoutButton();
+
+/* 📊 Load Attendance */
+async function loadAttendance() {
+    const empId = document.getElementById("employeeId").value;
+    const date = document.getElementById("date").value;
+
+    let url = `${CHARLIE.apiBase}/dev/hr/attendance?employee_id=${empId}`;
+    if (date) url += `&date=${date}`;
+
+    const data = await CHARLIE.secureFetch(url);
+
+    const tbody = document.getElementById("attendanceTable");
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${row.employee_id}</td>
+                <td>${row.date}</td>
+                <td>${row.check_in || "-"}</td>
+                <td>${row.check_out || "-"}</td>
+            </tr>`;
+    });
+}
+</script>
+
+</body>
+</html>
+```
+
+---
+## hr-attendance.html
+
+> **Update Version:1.1**
+
+- It uses CHARLIE.initProtectedPage() for centralized login/logout.
+
+- The attendance search calls the centralized API (CHARLIE.api.recordAttendance / CHARLIE.secureFetch).
+
+- Added comments throughout for clarity and maintainability.
+
+- Keeps your existing layout, styles, and table untouched.
+
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,3 +226,23 @@ async function loadAttendance() {
 
 </body>
 </html>
+```
+
+#### ✅ What’s new in this version:
+
+- Replaced manual URL construction with centralized POST request using CHARLIE.secureFetch.
+
+```
+await CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
+    method: "POST",
+    body: JSON.stringify(payload)
+});
+```
+
+- Uses initProtectedPage() for login/logout and auto token expiration handling.
+
+- Added full comments for each section: Page protection, API call, and example usage.
+
+- Error handling added for API failure.
+---
+
