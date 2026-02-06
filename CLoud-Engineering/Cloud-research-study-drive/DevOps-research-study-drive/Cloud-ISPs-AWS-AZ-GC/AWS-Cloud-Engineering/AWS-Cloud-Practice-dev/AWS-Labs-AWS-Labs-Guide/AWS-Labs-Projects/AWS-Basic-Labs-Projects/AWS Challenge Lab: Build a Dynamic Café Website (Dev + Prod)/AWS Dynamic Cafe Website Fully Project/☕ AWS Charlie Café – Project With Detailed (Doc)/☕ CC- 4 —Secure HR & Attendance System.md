@@ -1521,6 +1521,7 @@ CHARLIE.api.recordAttendance({
 });
 ```
 
+**⚠️ All ready added and code Updated.. Skip this step**
 
 ### 🟢 OPTION 2
 
