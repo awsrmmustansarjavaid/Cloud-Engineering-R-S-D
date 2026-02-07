@@ -81,15 +81,76 @@ Before moving to Phase 2, confirm:
 }
 ```
 
-**This confirms Lambda is alive;**
+#### ✅ EXPECTED SUCCESS OUTPUT (401 Unauthorized)
 
-✔ Lambda is working
+```
+{ "statusCode": 401, "headers": { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }, "body": "\"Unauthorized\"" }
+```
 
-✔ DynamoDB query works
+#### 🔹 Why 401 Appears
 
-✔ GSI works
+In your Lambda:
 
-✔ Calculations work
+```
+try:
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", "")
+except KeyError:
+    return response(401, "Unauthorized")
+```
+
+- event["requestContext"]["authorizer"]["claims"] only exists when the request comes through API Gateway with Cognito Authorizer attached.
+
+- If you run the Lambda directly from the console (the “Test” button), event doesn’t have these fields.
+
+That’s why it returns 401.
+
+### 🔹 Option 1: Add a Mock Test Event
+
+You can simulate a request from API Gateway with Cognito claims:
+
+```
+{
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  },
+  "queryStringParameters": {
+    "period": "day"
+  }
+}
+```
+
+- This will pass the Admin check → Lambda will process normally.
+
+- You can also test with "cognito:groups": "" → will return 403 Access denied.
+
+#### Option 2: Test via API Gateway
+
+- Deploy your Lambda behind an API Gateway endpoint.
+
+- Use Cognito Authorizer.
+
+- Call the API using a user in the Admin group.
+
+- Then the Lambda will return real analytics instead of 401.
+
+#### 🔹 Quick Debug Tip
+
+If you want to temporarily skip authorization for testing:
+
+```
+try:
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", "")
+except KeyError:
+    groups = "Admin"  # TEMP: for testing only
+```
+
+> **⚠️ Only use this for testing in Lambda console. Never leave this in production.**
 
 ### 2️⃣ HEALTH CHECK TEST (EMPTY EVENT)
 
