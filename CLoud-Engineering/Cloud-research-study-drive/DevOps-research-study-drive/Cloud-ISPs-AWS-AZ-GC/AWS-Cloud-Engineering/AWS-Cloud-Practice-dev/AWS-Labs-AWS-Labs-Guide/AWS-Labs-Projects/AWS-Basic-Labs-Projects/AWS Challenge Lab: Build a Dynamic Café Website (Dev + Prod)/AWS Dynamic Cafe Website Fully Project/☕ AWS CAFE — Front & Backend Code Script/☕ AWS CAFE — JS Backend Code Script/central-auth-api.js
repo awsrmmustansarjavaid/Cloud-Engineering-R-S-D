@@ -166,83 +166,103 @@ const CHARLIE = (() => {
         }, 30000);
     }
     /* =====================================================
-       6️⃣ API GATEWAY ENDPOINTS
-    ===================================================== */
-    const api = {
-        /* 🛒 ORDERS */
-        placeOrder(payload) {
-            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(res => res.json());
-        },
+   6️⃣ API GATEWAY ENDPOINTS (UPDATED)
+===================================================== */
+const api = {
+    /* 🛒 ORDERS */
+    placeOrder(payload) {
+        return fetch(`${CONFIG.API_BASE}/dev/orders`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    },
 
-        // ────────────────────────────────────────────────
-        // NEW: Order Status endpoint (from API Gateway /prod/order-status)
-        // Uses secureFetch → attaches JWT automatically (recommended for protected endpoints)
-        // If this endpoint is public/no-auth → change back to plain fetch(...)
-        // ────────────────────────────────────────────────
-        getOrderStatus(orderId) {
-            return secureFetch(
-                `${CONFIG.API_BASE}/prod/order-status/order-status?order_id=${encodeURIComponent(orderId)}`
-            );
-        },
+    // ────────────────────────────────────────────────
+    // Order Status endpoints (all three Lambda functions)
+    // Uses secureFetch → attaches JWT automatically
+    // ────────────────────────────────────────────────
+    
+    // 1️⃣ OrderStatusLambda
+    getOrderStatus(orderId) {
+        return secureFetch(
+            `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
+        );
+    },
 
-        updateOrder(payload) {
-            return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-        },
-        /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
-        recordAttendance(payload) {
-            requireEmployee();
-            return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-        },
-        getAttendance(employeeId) {
-            requireEmployee();
-            return secureFetch(
-                `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
-            );
-        },
-        /* 👨‍💼 HR — ADMIN ONLY */
-        getAllEmployees() {
+    // 2️⃣ CafeOrderStatusLambda
+    getCafeOrderStatus(orderId) {
+        return secureFetch(
+            `${CONFIG.API_BASE}/status/cafe-order-status?order_id=${encodeURIComponent(orderId)}`
+        );
+    },
+
+    // 3️⃣ GetOrderStatusLambda
+    getGetOrderStatus(orderId) {
+        return secureFetch(
+            `${CONFIG.API_BASE}/status/get-order-status?order_id=${encodeURIComponent(orderId)}`
+        );
+    },
+
+    // ────────────────────────────────────────────────
+    updateOrder(payload) {
+        return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+    },
+
+    /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
+    recordAttendance(payload) {
+        requireEmployee();
+        return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+    },
+    getAttendance(employeeId) {
+        requireEmployee();
+        return secureFetch(
+            `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+        );
+    },
+
+    /* 👨‍💼 HR — ADMIN ONLY */
+    getAllEmployees() {
+        requireAdmin();
+        return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+    },
+
+    /* 📊 ADMIN ATTENDANCE ANALYTICS */
+    adminAttendance: {
+        getDailySummary() {
             requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+            return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
         },
-        /* 📊 ADMIN ATTENDANCE ANALYTICS */
-        adminAttendance: {
-            getDailySummary() {
-                requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
-            },
-            getWeeklySummary() {
-                requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
-            },
-            getMonthlySummary() {
-                requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
-            }
+        getWeeklySummary() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
         },
-        /* 📈 ADMIN DASHBOARD */
-        adminDashboard: {
-            fetchData(employeeId = "") {
-                requireAdmin();
-                let url = `${CONFIG.API_BASE}/admin/dashboard`;
-                if (employeeId) url += `?employee_id=${employeeId}`;
-                return secureFetch(url);
-            },
-            fetchEmployees() {
-                requireAdmin();
-                return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
-            }
+        getMonthlySummary() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
         }
-    };
+    },
+
+    /* 📈 ADMIN DASHBOARD */
+    adminDashboard: {
+        fetchData(employeeId = "") {
+            requireAdmin();
+            let url = `${CONFIG.API_BASE}/admin/dashboard`;
+            if (employeeId) url += `?employee_id=${employeeId}`;
+            return secureFetch(url);
+        },
+        fetchEmployees() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
+        }
+    }
+};
     /* =====================================================
        7️⃣ CLOUDFRONT ASSETS
     ===================================================== */
