@@ -954,7 +954,7 @@ GET /order-status
 
 - Go to: API Gateway → Resource → Click Create
 
-| Route                | Method | Auth    |
+| Resource               | Method | Auth    |
 | -------------------- | ------ | ------- |
 | `/order-status`      | GET    | Cognito |
 | `/admin/dashboard`   | GET    | Cognito |
