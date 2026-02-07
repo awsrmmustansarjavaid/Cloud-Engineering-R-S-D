@@ -80,6 +80,23 @@ EC2-Cafe-Secrets-Role
 }
 ```
 
+- **IAM Role for EC2 (Secrets Access) Policies**
+
+- name: Lambda_test_EC2-CLI 
+
+```json
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": "lambda:InvokeFunction",
+			"Resource": "arn:aws:lambda:us-east-1:your aws account id :function:*"
+		}
+	]
+}
+```
+
 **⚠️ Attach role to EC2 (NO reboot).**
 
 - **✔️ Click Create IAM ROLE**
