@@ -1806,21 +1806,14 @@ Click Deploy
 
 ### 🌐 STEP 7 — CREATE API GATEWAY (READ-ONLY)
 
-#### 1️⃣ Open API Gateway
+#### 1️⃣ Open API Gateway 
 
-- Create → REST API → New API
-
-
-##### Name:
-
-```
-CafeOrderStatusAPI
-```
+- Open → REST API 
 
 #### 2️⃣ Create Resource
 
 ```
-/order-status
+/cafe-order-status
 ```
 
 #### 3️⃣ Create GET Method
@@ -1854,7 +1847,7 @@ prod
 #### Example:
 
 ```
-https://xxxx.execute-api.us-east-1.amazonaws.com/prod/order-status
+https://xxxx.execute-api.us-east-1.amazonaws.com/status/cafe-order-status
 ```
 
 ### 🧪 STEP 8 — TEST API (CRITICAL)
@@ -1872,7 +1865,7 @@ This file is frontend-only and SAFE
 Inside the PHP file, ONLY replace this line:
 
 ```
-$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=$orderId";
+$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=$orderId";
 ```
 
 **🔁 Replace with your real API Gateway URL**
