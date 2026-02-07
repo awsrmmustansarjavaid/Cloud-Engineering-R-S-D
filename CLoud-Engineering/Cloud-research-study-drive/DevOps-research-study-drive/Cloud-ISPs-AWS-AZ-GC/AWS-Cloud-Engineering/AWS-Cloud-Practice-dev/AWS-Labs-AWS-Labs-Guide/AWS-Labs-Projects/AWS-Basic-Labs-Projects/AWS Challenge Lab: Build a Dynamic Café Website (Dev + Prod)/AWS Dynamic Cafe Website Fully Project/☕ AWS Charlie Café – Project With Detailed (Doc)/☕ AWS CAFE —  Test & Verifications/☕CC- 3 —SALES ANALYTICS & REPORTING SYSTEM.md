@@ -123,6 +123,18 @@ You can simulate a request from API Gateway with Cognito claims:
   }
 }
 ```
+#### ✅ EXPECTED
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"period\": \"day\", \"total_sales\": 0.0, \"total_cost\": 0.0, \"profit\": 0.0, \"orders_count\": 6, \"profit_per_item\": [{\"item\": \"Unknown Item\", \"quantity\": 4, \"sales\": 0.0, \"cost\": 0.0, \"profit\": 0.0}]}"
+}
+```
 
 - This will pass the Admin check → Lambda will process normally.
 
