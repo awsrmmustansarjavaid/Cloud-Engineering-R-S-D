@@ -70,6 +70,81 @@ CafeOrders
 
 **⚠️ If any attribute is missing, analytics will break.**
 
+#### 🔄 Update Table
+
+#### ✅ REQUIRED ATTRIBUTES (recap)
+
+Every COMPLETED order must have:
+
+order_id (String)
+
+order_date (String → YYYY-MM-DD)
+
+order_timestamp (Number → Unix)
+
+total_amount (Number)
+
+total_cost (Number)
+
+order_status (String → COMPLETED)
+
+#### 1️⃣ Basic test item (CASH payment – PENDING)
+
+⚠️ Even though payment is PENDING, this order is COMPLETED operationally, so analytics can count it.
+
+```
+{
+  "order_id": { "S": "ORD-TEST-001" },
+
+  "order_date": { "S": "2026-01-14" },
+  "order_timestamp": { "N": "1736850600" },
+
+  "table_number": { "N": "5" },
+  "item": { "S": "Coffee" },
+  "quantity": { "N": "2" },
+
+  "total_amount": { "N": "6" },
+  "total_cost": { "N": "4" },
+
+  "payment_method": { "S": "CASH" },
+  "payment_status": { "S": "PENDING" },
+
+  "status": { "S": "RECEIVED" },
+  "order_status": { "S": "COMPLETED" },
+
+  "created_at": { "S": "2026-01-14T10:30:00Z" }
+}
+```
+
+#### 2️⃣ Another test item (CARD payment – PAID)
+
+```
+{
+  "order_id": { "S": "ORD-TEST-002" },
+
+  "order_date": { "S": "2026-01-14" },
+  "order_timestamp": { "N": "1736850600" },
+
+  "table_number": { "N": "5" },
+  "item": { "S": "Coffee" },
+  "quantity": { "N": "2" },
+
+  "total_amount": { "N": "6" },
+  "total_cost": { "N": "4" },
+
+  "payment_method": { "S": "CARD" },
+  "payment_status": { "S": "PAID" },
+
+  "status": { "S": "RECEIVED" },
+  "order_status": { "S": "COMPLETED" },
+
+  "created_at": { "S": "2026-01-14T10:30:00Z" }
+}
+```
+
+
+
+
 #### 📌 IMPORTANT
 
 - order_timestamp is required for fast filtering
