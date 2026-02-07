@@ -939,6 +939,17 @@ Content-Type: application/json
 }
 ```
 
+### 8️⃣ Test each endpoint
+
+Test each endpoint using Postman or browser:
+
+```
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/employee/orders
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=123
+```
+
+**✅ You should get responses from respective Lambda functions.**
 
 
 **✅ After this, your API Gateway + Lambda + front-end integration is fully professional, secure, and working.**
