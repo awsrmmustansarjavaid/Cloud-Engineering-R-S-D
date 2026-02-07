@@ -7,16 +7,18 @@ from decimal import Decimal
 # ==================================================
 # ✅ ENVIRONMENT VARIABLES (DO NOT HARD-CODE)
 # ==================================================
+try:
+    ORDERS_TABLE_NAME = os.environ["ORDERS_TABLE_NAME"]  # Must match your Lambda env var
+except KeyError:
+    raise Exception("Environment variable ORDERS_TABLE_NAME is missing!")
 
-DYNAMODB_TABLE_NAME = os.environ["DYNAMODB_TABLE_NAME"]
-AWS_REGION = os.environ["AWS_REGION"]
+AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")  # Default region
 
 # ==================================================
 # DO NOT CHANGE BELOW
 # ==================================================
-
 dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
-table = dynamodb.Table(DYNAMODB_TABLE_NAME)
+table = dynamodb.Table(ORDERS_TABLE_NAME)
 
 def response(status_code, body):
     return {
@@ -33,7 +35,6 @@ def lambda_handler(event, context):
     # =====================================================
     # 🔐 PHASE 12 — ROLE-BASED ACCESS (ADMIN ONLY)
     # =====================================================
-
     try:
         claims = event["requestContext"]["authorizer"]["claims"]
         groups = claims.get("cognito:groups", "")
@@ -46,7 +47,6 @@ def lambda_handler(event, context):
     # =====================================================
     # 📅 GET PERIOD (day / week / month)
     # =====================================================
-
     period = "day"
     if event.get("queryStringParameters"):
         period = event["queryStringParameters"].get("period", "day")
@@ -54,14 +54,15 @@ def lambda_handler(event, context):
     # =====================================================
     # 📦 READ ORDERS FROM DYNAMODB
     # =====================================================
-
-    scan = table.scan()
-    orders = scan.get("Items", [])
+    try:
+        scan = table.scan()
+        orders = scan.get("Items", [])
+    except Exception as e:
+        return response(500, f"Error reading DynamoDB table: {str(e)}")
 
     # =====================================================
     # 📊 PHASE 11 — PROFIT PER ITEM
     # =====================================================
-
     total_sales = Decimal("0")
     total_cost = Decimal("0")
 
@@ -72,16 +73,14 @@ def lambda_handler(event, context):
     })
 
     for o in orders:
-
         # ✅ Only COMPLETED orders
         if o.get("order_status") != "COMPLETED":
             continue
 
-        qty = int(o["quantity"])
-        price = Decimal(str(o["item_price"]))
-        cost = Decimal(str(o["item_cost"]))
-
-        item_name = o["item_name"]
+        qty = int(o.get("quantity", 0))
+        price = Decimal(str(o.get("item_price", 0)))
+        cost = Decimal(str(o.get("item_cost", 0)))
+        item_name = o.get("item_name", "Unknown Item")
 
         sales_value = price * qty
         cost_value = cost * qty
@@ -94,7 +93,6 @@ def lambda_handler(event, context):
         item_stats[item_name]["cost"] += cost_value
 
     profit_per_item = []
-
     for item, data in item_stats.items():
         profit_per_item.append({
             "item": item,
@@ -107,7 +105,6 @@ def lambda_handler(event, context):
     # =====================================================
     # 📤 FINAL RESPONSE (EXACT FORMAT)
     # =====================================================
-
     return response(200, {
         "period": period,
         "total_sales": float(total_sales),
