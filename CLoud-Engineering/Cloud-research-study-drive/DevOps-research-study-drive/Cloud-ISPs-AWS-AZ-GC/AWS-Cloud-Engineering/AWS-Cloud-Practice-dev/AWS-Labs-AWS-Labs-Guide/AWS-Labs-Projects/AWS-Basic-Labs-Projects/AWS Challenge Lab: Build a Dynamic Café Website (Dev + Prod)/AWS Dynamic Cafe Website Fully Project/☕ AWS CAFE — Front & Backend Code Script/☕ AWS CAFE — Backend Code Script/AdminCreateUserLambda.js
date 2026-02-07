@@ -1,8 +1,10 @@
 export const handler = async (event) => {
-    console.log("Event body:", event.body);
+    console.log("Event:", event);
 
-    const request = JSON.parse(event.body);
-    const username = request.username;
+    // Safely parse body
+    const request = event.body ? JSON.parse(event.body) : {};
+
+    const username = request.username || "unknown";
     const role = request.role || "employee";
 
     const response = {
