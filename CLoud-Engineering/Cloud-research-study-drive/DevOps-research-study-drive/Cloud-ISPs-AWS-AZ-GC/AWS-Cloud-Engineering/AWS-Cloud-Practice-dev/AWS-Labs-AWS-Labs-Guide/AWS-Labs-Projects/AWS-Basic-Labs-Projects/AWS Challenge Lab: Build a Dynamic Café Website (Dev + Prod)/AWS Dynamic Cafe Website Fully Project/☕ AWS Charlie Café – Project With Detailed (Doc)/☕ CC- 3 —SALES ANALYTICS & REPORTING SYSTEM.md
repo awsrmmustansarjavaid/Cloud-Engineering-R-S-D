@@ -415,9 +415,11 @@ Execution role: Create new role
 
 - Click Edit → Add environment variable
 
-| Variable            | Example      |
-| ------------------- | ------------ |
-| `ORDERS_TABLE_NAME` | `CafeOrders` |
+| Variable          | Example    |                                     |
+| ----------------- | ---------- | ----------------------------------- |
+| ORDERS_TABLE_NAME | CafeOrders |                                     |
+| AWS_REGION        | us-east-1  | *(optional, defaults to us-east-1)* |
+
 
 👉 Click Save
 
