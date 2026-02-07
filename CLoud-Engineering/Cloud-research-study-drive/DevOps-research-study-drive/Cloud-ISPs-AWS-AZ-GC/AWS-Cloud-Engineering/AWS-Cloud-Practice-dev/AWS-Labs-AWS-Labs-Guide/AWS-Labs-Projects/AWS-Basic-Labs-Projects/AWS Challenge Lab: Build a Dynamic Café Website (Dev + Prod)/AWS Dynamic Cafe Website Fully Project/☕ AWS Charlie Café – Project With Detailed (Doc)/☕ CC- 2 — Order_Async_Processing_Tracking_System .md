@@ -2207,6 +2207,7 @@ def lambda_handler(event, context):
         cursor.close()
         conn.close()
 ```
+#### ⚠️ Already Added And CafeOrderStatusLambda.py code is updated... Skip this step
 
 [CafeOrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda.py)
 
