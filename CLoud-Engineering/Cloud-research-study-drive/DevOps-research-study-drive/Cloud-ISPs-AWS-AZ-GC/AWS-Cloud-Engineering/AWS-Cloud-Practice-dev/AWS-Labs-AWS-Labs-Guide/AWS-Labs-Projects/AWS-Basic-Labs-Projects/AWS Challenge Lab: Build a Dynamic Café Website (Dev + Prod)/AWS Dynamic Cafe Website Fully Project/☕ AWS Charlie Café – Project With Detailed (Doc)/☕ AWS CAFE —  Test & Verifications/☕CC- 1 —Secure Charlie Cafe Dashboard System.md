@@ -708,7 +708,7 @@ Test_AdminDashboardLambda
 #### ✅ Expected Result
 
 ```
-
+  "statusCode": 200,
 ```
 
 ### 6️⃣ Lambda Code Test
@@ -730,7 +730,7 @@ Test_AdminCreateUserLambda
 #### ✅ Expected Result
 
 ```
-
+  "statusCode": 200,
 ```
 
 ### 7️⃣ Lambda Code Test
@@ -754,7 +754,7 @@ Test_EmployeeOrdersLambda
 #### ✅ Expected Result
 
 ```
-
+  "statusCode": 200,
 ```
 
 ### 8️⃣ Lambda Code Test
@@ -782,8 +782,10 @@ Test_EmployeeOrderLambda
 #### ✅ Expected Result
 
 ```
-
+  "statusCode": 200,
 ```
+
+
 
 **✅ PHASE 4️⃣ STATUS**
 
