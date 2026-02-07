@@ -560,7 +560,7 @@ charlie-cafe-RouterLambda
 - **Description:**
 
 ```
-Allow Lambda to Invoke permissions for your three target Lambdas
+Allow Lambda invoke permissions for other Lambdas.
 ```
 
 #### 1️⃣ Create IAM Policy Cognito Authorizer
