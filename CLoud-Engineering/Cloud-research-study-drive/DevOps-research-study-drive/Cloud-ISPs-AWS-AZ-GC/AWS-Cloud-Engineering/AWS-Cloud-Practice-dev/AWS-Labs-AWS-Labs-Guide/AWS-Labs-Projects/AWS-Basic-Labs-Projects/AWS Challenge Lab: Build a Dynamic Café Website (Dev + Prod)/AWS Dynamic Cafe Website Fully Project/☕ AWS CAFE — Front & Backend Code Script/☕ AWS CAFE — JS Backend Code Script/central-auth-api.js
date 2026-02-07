@@ -11,6 +11,7 @@
    ✔ UNIVERSAL RBAC (CENTRALIZED)
 ========================================================= */
 const CHARLIE = (() => {
+
     /* =====================================================
        1️⃣ GLOBAL CONFIG
     ===================================================== */
@@ -21,10 +22,11 @@ const CHARLIE = (() => {
         CLIENT_ID: "3hcigucn7fmd11gvo9uuqud6fi",
         COGNITO_DOMAIN: "us-east-1hdcwdjqvz.auth.us-east-1.amazonaws.com",
         // API Gateway
-        API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
+        API_BASE: "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com",
         // CloudFront
         CLOUDFRONT_BASE: "https://d159bqc5pw64hn.cloudfront.net"
     };
+
     /* =====================================================
        2️⃣ TOKEN HELPERS
     ===================================================== */
@@ -37,13 +39,12 @@ const CHARLIE = (() => {
     function getToken() {
         return localStorage.getItem("access_token");
     }
+
     /* =====================================================
        3️⃣ AUTH MODULE
     ===================================================== */
     const auth = {
-        login(
-            redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`
-        ) {
+        login(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`) {
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/login` +
                 `?response_type=token` +
@@ -86,6 +87,7 @@ const CHARLIE = (() => {
             });
         }
     };
+
     /* =====================================================
        4️⃣ SECURE FETCH (JWT AUTO ATTACH)
     ===================================================== */
@@ -104,16 +106,16 @@ const CHARLIE = (() => {
             }
         });
     }
-    // 🔧 FIX #1: Prevent crash when authFetch returns undefined
+
     async function secureFetch(url, options = {}) {
         const res = await authFetch(url, options);
-        if (!res) return; // ✅ prevents `.then()` crash
+        if (!res) return;
         return res.json();
     }
+
     /* =====================================================
        5️⃣ ROLE & ACCESS CONTROL (NORMALIZED + SAFE)
     ===================================================== */
-    // 🔧 FIX #2: Harden group extraction (missing / string / array)
     function getUserRoles() {
         const token = getToken();
         if (!token) return [];
@@ -144,6 +146,7 @@ const CHARLIE = (() => {
             throw new Error("Employee access required");
         }
     }
+
     /* =====================================================
        🔐 AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
     ===================================================== */
@@ -165,104 +168,98 @@ const CHARLIE = (() => {
             }
         }, 30000);
     }
+
     /* =====================================================
-   6️⃣ API GATEWAY ENDPOINTS (UPDATED)
-===================================================== */
-const api = {
-    /* 🛒 ORDERS */
-    placeOrder(payload) {
-        return fetch(`${CONFIG.API_BASE}/dev/orders`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        }).then(res => res.json());
-    },
-
-    // ────────────────────────────────────────────────
-    // Order Status endpoints (all three Lambda functions)
-    // Uses secureFetch → attaches JWT automatically
-    // ────────────────────────────────────────────────
-    
-    // 1️⃣ OrderStatusLambda
-    getOrderStatus(orderId) {
-        return secureFetch(
-            `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
-        );
-    },
-
-    // 2️⃣ CafeOrderStatusLambda
-    getCafeOrderStatus(orderId) {
-        return secureFetch(
-            `${CONFIG.API_BASE}/status/cafe-order-status?order_id=${encodeURIComponent(orderId)}`
-        );
-    },
-
-    // 3️⃣ GetOrderStatusLambda
-    getGetOrderStatus(orderId) {
-        return secureFetch(
-            `${CONFIG.API_BASE}/status/get-order-status?order_id=${encodeURIComponent(orderId)}`
-        );
-    },
-
-    // ────────────────────────────────────────────────
-    updateOrder(payload) {
-        return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-
-    /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
-    recordAttendance(payload) {
-        requireEmployee();
-        return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-    getAttendance(employeeId) {
-        requireEmployee();
-        return secureFetch(
-            `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
-        );
-    },
-
-    /* 👨‍💼 HR — ADMIN ONLY */
-    getAllEmployees() {
-        requireAdmin();
-        return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
-    },
-
-    /* 📊 ADMIN ATTENDANCE ANALYTICS */
-    adminAttendance: {
-        getDailySummary() {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
+       6️⃣ API GATEWAY ENDPOINTS (UPDATED)
+    ===================================================== */
+    const api = {
+        /* 🛒 ORDERS */
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
         },
-        getWeeklySummary() {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
+
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
         },
-        getMonthlySummary() {
+
+        // ────────────────────────────────────────────────
+        // ORDER STATUS ENDPOINTS (3 LAMBDAS)
+        // ────────────────────────────────────────────────
+        getOrderStatus(orderId) {
+            return secureFetch(
+                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
+            );
+        },
+        getCafeOrderStatus(orderId) {
+            return secureFetch(
+                `${CONFIG.API_BASE}/status/cafe-order-status?order_id=${encodeURIComponent(orderId)}`
+            );
+        },
+        getGetOrderStatus(orderId) {
+            return secureFetch(
+                `${CONFIG.API_BASE}/status/get-order-status?order_id=${encodeURIComponent(orderId)}`
+            );
+        },
+
+        /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
+        recordAttendance(payload) {
+            requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+        getAttendance(employeeId) {
+            requireEmployee();
+            return secureFetch(
+                `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+            );
+        },
+
+        /* 👨‍💼 HR — ADMIN ONLY */
+        getAllEmployees() {
             requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+        },
+
+        /* 📊 ADMIN ATTENDANCE ANALYTICS */
+        adminAttendance: {
+            getDailySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
+            },
+            getWeeklySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
+            },
+            getMonthlySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
+            }
+        },
+
+        /* 📈 ADMIN DASHBOARD */
+        adminDashboard: {
+            fetchData(employeeId = "") {
+                requireAdmin();
+                let url = `${CONFIG.API_BASE}/admin/dashboard`;
+                if (employeeId) url += `?employee_id=${employeeId}`;
+                return secureFetch(url);
+            },
+            fetchEmployees() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
+            }
         }
-    },
+    };
 
-    /* 📈 ADMIN DASHBOARD */
-    adminDashboard: {
-        fetchData(employeeId = "") {
-            requireAdmin();
-            let url = `${CONFIG.API_BASE}/admin/dashboard`;
-            if (employeeId) url += `?employee_id=${employeeId}`;
-            return secureFetch(url);
-        },
-        fetchEmployees() {
-            requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
-        }
-    }
-};
     /* =====================================================
        7️⃣ CLOUDFRONT ASSETS
     ===================================================== */
@@ -271,43 +268,29 @@ const api = {
             return `${CONFIG.CLOUDFRONT_BASE}/${path}`;
         }
     };
+
     /* =====================================================
-       8️⃣ PAGE INITIALIZER (UPDATED)
-       🔹 Accepts options for flexible setup
-       🔹 Centralizes auth, logout, auto-logout
+       8️⃣ PAGE INITIALIZER
     ===================================================== */
     function initProtectedPage(options = {}) {
-        const {
-            requireAuth = true, // 🔐 protect page by default
-            enableLogout = true, // ✅ setup logout button by default
-            logoutButtonId = "logoutBtn" // default logout button
-        } = options;
-        // Step 1: Protect page if required
-        if (requireAuth) {
-            auth.protectPage();
-        }
-        // Step 2: Setup logout button if required
-        if (enableLogout) {
-            auth.setupLogoutButton(logoutButtonId);
-        }
-        // Step 3: Start auto logout watcher (centralized)
+        const { requireAuth = true, enableLogout = true, logoutButtonId = "logoutBtn" } = options;
+        if (requireAuth) auth.protectPage();
+        if (enableLogout) auth.setupLogoutButton(logoutButtonId);
         startAutoLogoutWatcher();
     }
+
     /* =====================================================
-       9️⃣ 🖨️ CHARLIE CAFE — CENTRAL BROWSER PRINTING SYSTEM
-       Used by all admin/staff pages
+       9️⃣ BROWSER PRINT FUNCTIONS
     ===================================================== */
     window.printAllOrders = function () {
         console.log("🖨️ Printing all orders...");
         window.print();
     };
+
     window.printTodaySummary = function () {
         console.log("📄 Printing today's summary...");
         const table = document.querySelector("#ordersTable tbody");
-        if (!table) {
-            alert("❌ Orders table not found");
-            return;
-        }
+        if (!table) return alert("❌ Orders table not found");
         const rows = table.querySelectorAll("tr");
         const today = new Date().toISOString().split("T")[0];
         let totalOrders = 0;
@@ -332,12 +315,12 @@ const api = {
         const originalContent = document.body.innerHTML;
         document.body.innerHTML = summaryHTML;
         window.print();
-        // Restore page after print
         document.body.innerHTML = originalContent;
-        location.reload(); // ensures JS state restores cleanly
+        location.reload();
     };
+
     /* =====================================================
-       🔟 EXPORT (PUBLIC API)
+       🔟 EXPORT
     ===================================================== */
     return {
         CONFIG,
@@ -346,11 +329,12 @@ const api = {
         api,
         assets,
         secureFetch,
-        initProtectedPage, // ✅ fully enhanced
+        initProtectedPage,
         getUserRoles,
         isAdmin,
         isEmployee,
         requireAdmin,
         requireEmployee
     };
+
 })();
