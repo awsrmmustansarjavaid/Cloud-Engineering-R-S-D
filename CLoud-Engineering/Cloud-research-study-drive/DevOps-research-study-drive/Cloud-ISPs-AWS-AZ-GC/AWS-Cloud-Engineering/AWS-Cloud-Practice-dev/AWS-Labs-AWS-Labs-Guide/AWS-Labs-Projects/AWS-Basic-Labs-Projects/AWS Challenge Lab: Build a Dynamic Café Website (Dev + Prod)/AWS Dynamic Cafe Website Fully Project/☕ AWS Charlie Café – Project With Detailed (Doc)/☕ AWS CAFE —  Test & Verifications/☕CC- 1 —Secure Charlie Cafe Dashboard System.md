@@ -529,7 +529,20 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 **👍 This is production-style SPA + Cognito + API Gateway security.**
 
-### 2️⃣ Backend - Cognito Role Base Access and Permission 
+## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
+
+### 1️⃣ CREATE OrderStatusLambda
+
+
+
+
+
+
+
+
+
+
+
 
 #### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
 

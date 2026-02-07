@@ -1100,7 +1100,11 @@ def lambda_handler(event, context):
 
 ❌ No multiple Lambdas for roles
 
-### 4️⃣ CREATE OR UPDATE LAMBDA
+---
+
+### 4️⃣ CREATE New Lambda Functions 
+
+### 1️⃣ CREATE OrderStatusLambda
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
@@ -1136,7 +1140,43 @@ DB_NAME = cafe
 
 > **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
 
-### 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
+### 2️⃣ CREATE AdminDashboardLambda
+
+- **Function name:** AdminDashboardLambda
+
+- **Runtime:** Node.js 18.x
+
+[AdminDashboardLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminDashboardLambda.js)
+
+### 3️⃣ CREATE AdminCreateUserLambda
+
+- **Function name:** AdminCreateUserLambda
+
+- **Runtime:** Node.js 18.x
+
+[AdminCreateUserLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminCreateUserLambda.js)
+
+### 4️⃣ CREATE EmployeeOrdersLambda
+
+- **Function name:** EmployeeOrdersLambda
+
+- **Runtime:** Node.js 18.x
+
+[EmployeeOrdersLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrdersLambda.py)
+
+
+### 5️⃣ CREATE EmployeeOrderLambda
+
+- **Function name:** EmployeeOrderLambda
+
+- **Runtime:** Node.js 18.x
+
+[EmployeeOrderLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrderLambda.py)
+
+---
+
+
+### 5️⃣ 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
 
 #### STEP 1️⃣ Open Cognito Hosted UI Login
 
