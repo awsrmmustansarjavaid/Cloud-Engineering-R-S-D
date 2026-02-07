@@ -1466,6 +1466,18 @@ GET /order-status
 
 - Lambda function → OrderStatusLambda
 
+#### Overview of your resources and Lambda mapping
+
+| Resource Path        | Method | Lambda Function        | Notes               |
+| -------------------- | ------ | ---------------------- | ------------------- |
+| `/admin/dashboard`   | GET    | AdminDashboardLambda*  | Admin only          |
+| `/admin/create-user` | POST   | AdminCreateUserLambda* | Admin only          |
+| `/employee/orders`   | GET    | EmployeeOrdersLambda*  | Employee + Admin    |
+| `/employee/order`    | POST   | EmployeeOrderLambda*   | Employee + Admin    |
+| `/order-status`      | GET    | OrderStatusLambda      | Order status checks |
+
+**You’ll need to create separate Lambdas for admin/employee if not already done.**
+
 ### 2️⃣ Create Resource
 > **You MUST manually create routes.
 > **API Gateway does NOT auto-create /admin/*.**
