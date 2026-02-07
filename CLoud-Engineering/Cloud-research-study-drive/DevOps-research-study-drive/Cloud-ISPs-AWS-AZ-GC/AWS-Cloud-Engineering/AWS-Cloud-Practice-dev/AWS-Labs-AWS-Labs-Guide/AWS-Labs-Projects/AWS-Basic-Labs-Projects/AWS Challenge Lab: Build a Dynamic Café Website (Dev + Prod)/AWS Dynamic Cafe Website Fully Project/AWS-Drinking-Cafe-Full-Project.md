@@ -96,6 +96,84 @@ EC2-Cafe-Secrets-Role
 	]
 }
 ```
+ or 
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "FullLambdaAccessForTesting",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DynamoDBFull",
+      "Effect": "Allow",
+      "Action": "dynamodb:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "SQSFull",
+      "Effect": "Allow",
+      "Action": "sqs:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "S3FullForTesting",
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "SecretsManagerFull",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "RDSManagementAndConnect",
+      "Effect": "Allow",
+      "Action": [
+        "rds:*",
+        "rds-data:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "APIGatewayManagement",
+      "Effect": "Allow",
+      "Action": "apigateway:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudWatchLogsAndMetrics",
+      "Effect": "Allow",
+      "Action": [
+        "logs:*",
+        "cloudwatch:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ALBFullAccess",
+      "Effect": "Allow",
+      "Action": "elasticloadbalancing:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudFrontFull",
+      "Effect": "Allow",
+      "Action": "cloudfront:*",
+      "Resource": "*"
+    }
+  ]
+}
+```
 
 **⚠️ Attach role to EC2 (NO reboot).**
 
