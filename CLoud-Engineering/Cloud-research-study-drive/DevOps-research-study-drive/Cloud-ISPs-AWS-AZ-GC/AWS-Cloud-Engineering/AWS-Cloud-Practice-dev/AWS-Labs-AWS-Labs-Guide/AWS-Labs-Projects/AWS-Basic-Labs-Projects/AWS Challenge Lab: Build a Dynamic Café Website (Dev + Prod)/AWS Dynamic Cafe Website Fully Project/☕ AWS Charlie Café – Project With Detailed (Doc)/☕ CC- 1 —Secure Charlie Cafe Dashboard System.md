@@ -946,7 +946,7 @@ Make sure your three existing Lambdas are working individually:
 
 ### 2️⃣ Create the Router Lambda
 
-- Go to AWS Lambda → Create function → Author from scratch.
+1️⃣ Go to AWS Lambda → Create function → Author from scratch.
 
     - Name: OrderStatusRouterLambda
 
@@ -954,7 +954,7 @@ Make sure your three existing Lambdas are working individually:
 
     - Permissions: Create a new role with basic Lambda permissions
 
-- After creation, attach Invoke permissions for your three target Lambdas:
+2️⃣ After creation, attach Invoke permissions for your three target Lambdas:
 
     - Go to IAM → Roles → find your Lambda role → Attach policy → JSON
 
@@ -975,9 +975,9 @@ Make sure your three existing Lambdas are working individually:
 }
 ```
 
-- Copy the router Lambda code I shared earlier into the Lambda function editor.
+3️⃣ Copy the router Lambda code I shared earlier into the Lambda function editor.
 
-- Save and test with a sample event:
+4️⃣ Save and test with a sample event:
 
 ```
 {
@@ -994,6 +994,29 @@ Make sure your three existing Lambdas are working individually:
 - Change to "12345" → should invoke OrderStatusLambda.
 
 **✅ This confirms the router is working.**
+
+### 3️⃣ Connect Router Lambda to API Gateway
+
+Go to API Gateway → your REST API → Resources → /order-status
+
+You currently have multiple GET methods; we will replace them.
+
+For one GET method:
+
+Integration type → Lambda Proxy
+
+Lambda → select OrderStatusRouterLambda
+
+Click Save → Deploy API to your stage (prod)
+
+Now there’s only one /order-status GET integrated with your router Lambda.
+
+Your front-end code stays the same:
+
+```
+CHARLIE.api.getOrderStatus(orderId);
+```
+
 
 
 ### 2️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
