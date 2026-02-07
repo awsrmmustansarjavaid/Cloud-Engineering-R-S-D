@@ -930,247 +930,6 @@ This is 🔥 gold for authorization.
 ---
 ## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
 
-### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
-
-- **AWS Console → API Gateway → REST API → /order-status**
-
-### 1️⃣ Resource & Method
-
-- Go to Resources → /order-status
-
-- If GET method does not exist → click Actions → Create Method → GET
-
-```
-GET /order-status
-```
-
-- Select Lambda Proxy Integration
-
-- Lambda function → OrderStatusLambda
-
-### 2️⃣ Create Resource
-> **You MUST manually create routes.
-> **API Gateway does NOT auto-create /admin/*.**
-
-- Go to: API Gateway → Resource → Click Create
-
-| Resource               | Method | Auth    |
-| -------------------- | ------ | ------- |
-| `/order-status`      | GET    | Cognito |
-| `/admin/dashboard`   | GET    | Cognito |
-| `/admin/create-user` | POST   | Cognito |
-| `/employee/orders`   | GET    | Cognito |
-| `/employee/order`    | POST   | Cognito |
-
-> **✔ Attach CafeCognitoAuthorizer to ALL protected Resource**
-
-#### Admin Resource 1
-
-- Method: GET
-
-- Path: /admin/dashboard
-
-- Integration: your Lambda
-
-- Authorization: cafe-cognito-authorizer
-
-- Click Create
-
-#### Admin Resource 2
-
-- Method: POST
-
-- Path: /admin/create-user
-
-- Integration: your Lambda
-
-- Authorization: cafe-cognito-authorizer
-
-- Click Create
-
-> **💡 This is how /admin/* works**
-
-**📢 You manually create Resource that start with /admin/**
-
-#### Employee Resource 1
-
-- Method: GET
-
-- Path: /employee/orders
-
-- Integration: your Lambda
-
-- Authorization: cafe-cognito-authorizer
-
-- Click Create
-
-#### Employee Resource 2
-
-- Method: POST
-
-- Path: /employee/order
-
-- Integration: your Lambda
-
-- Authorization: cafe-cognito-authorizer
-
-- Click Create
-
-#### order-status Resource 1
-
-- Method: GET
-
-- Path: /order-status
-
-- Integration: your Lambda
-
-- Authorization: cafe-cognito-authorizer
-
-- Click Create
-
-
-#### Attach this authorizer to your Resource
-
-/admin/*
-
-/employee/*
-
-or /api/*
-
-**✔ Now API Gateway blocks unauthenticated users**
-
-### 3️⃣ Enable Cognito Authorizer
-
-- Go to AWS Console → API Gateway → REST API → YOUR_API
-
-- On left panel → Authorizers → Create Authorizer
-
-- Fill the form:
-
-| Field             | Value                              |
-| ----------------- | ---------------------------------- |
-| Name              | `CafeCognitoAuthorizer`                |
-| Type              | **Cognito**                        |
-| Cognito User Pool | Select your Cafe Cognito User Pool |
-| Token Source      | `Authorization`                    |
-| Token Validation  | Leave blank or optional            |
-
-**✅ Create authorizer**
-
-> **✔ This authorizer will validate JWTs automatically.**
-> **✔ Now API Gateway blocks unauthenticated users**
-
-### 4️⃣ Cognito Authorizer (JWT validation)
-
-- **Go to: API Gateway → Your API → Authorizers → Create**
-
-- **Name:** CognitoAuthorizer
-
-- **Type:** Cognito
-
-- Select your Cafe Cognito User Pool
-
-- **Token source:** Authorization
-
-- Save ✅
-
-> **This does NOT enable CORS — this only validates JWT.**
-
-### 5️⃣ Attach Authorizer to GET Method
-
-- **Go to Resources → /order-status → GET → Method Request**
-
-- **Find Authorization → select CognitoAuthorizer**
-
-- Select CognitoAuthorizer from the dropdown
-
-- Save ✅
-
-> **This ensures all GET requests require a valid JWT.**
-
-### 6️⃣ Enable CORS (Cross-Origin Resource Sharing)
-
-> **These are two separate things — enabling CORS is for frontend browser calls.**
-
-- Click GET → Actions → Enable CORS
-
-- A popup appears:
-
-  - Check “Replace existing CORS headers” ✅
-
-- Click Enable CORS
-
-- Confirm popup: “Yes, replace existing headers” ✅
-
-> **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
-
-✔ Enable CORS on each method
-
-✔ Especially for GET /order-status
-
-### 7️⃣ Deploy API
-
-- **Click Actions → Deploy API**
-
-- **Stage: status (or admin if you created a new stage)**
-
-- **Save Invoke URL**
-
-✔ Deploy after every change
-
-✔ Stage can be status or admin
-
-✔ Frontend URL must match stage
-
-#### 📌 Copy new endpoint API URL:
-
-```
-https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
-```
-> **OR**
-
-```
-https://xxx.execute-api.region.amazonaws.com/admin/order-status
-```
-
-#### 👉 Paste this into frontend once
-
-#### 🔁 Update frontend:
-
-```
-API_URL = ".../status/order-status"
-```
-
-> **OR**
-
-```
-API_URL = ".../admin/order-status"
-```
-
-#### ✅ Result:
-
-- ❌ No login → 401
-
-
-- ✅ Login → data loads
-
-### ✅ KEY POINTS
-
-| Task                     | Done? | Notes                             |
-| ------------------------ | ----- | --------------------------------- |
-| Cognito authorizer       | ✅     | Validates JWT                     |
-| Attach authorizer to GET | ✅     | Required for /order-status        |
-| Enable CORS              | ✅     | Needed for frontend browser calls |
-| Deploy API               | ✅     | Required after changes            |
-| Update frontend API_URL  | ✅     | Matches the stage URL             |
-
-
-**✅ PHASE 4️⃣ STATUS**
-
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
----
-## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
-
 ### 1️⃣ Central UNIVERSAL Backend RBAC
 
 ### 1️⃣ Create Lambda Layer (RBAC)
@@ -1624,7 +1383,7 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 **✔ Everything works → Phase Complete**
 
-### ✅ PHASE 5️⃣ COMPLETION CHECKLIST
+### ✅ PHASE 4️⃣ COMPLETION CHECKLIST
 
 ✔️ Lambda created/updated
 
@@ -1641,6 +1400,248 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 ✔️ Frontend chart + auto-refresh works
 
 ✔️ Tested manually via API & frontend
+
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
+
+- **AWS Console → API Gateway → REST API → /order-status**
+
+### 1️⃣ Resource & Method
+
+- Go to Resources → /order-status
+
+- If GET method does not exist → click Actions → Create Method → GET
+
+```
+GET /order-status
+```
+
+- Select Lambda Proxy Integration
+
+- Lambda function → OrderStatusLambda
+
+### 2️⃣ Create Resource
+> **You MUST manually create routes.
+> **API Gateway does NOT auto-create /admin/*.**
+
+- Go to: API Gateway → Resource → Click Create
+
+| Resource               | Method | Auth    |
+| -------------------- | ------ | ------- |
+| `/order-status`      | GET    | Cognito |
+| `/admin/dashboard`   | GET    | Cognito |
+| `/admin/create-user` | POST   | Cognito |
+| `/employee/orders`   | GET    | Cognito |
+| `/employee/order`    | POST   | Cognito |
+
+> **✔ Attach CafeCognitoAuthorizer to ALL protected Resource**
+
+#### Admin Resource 1
+
+- Method: GET
+
+- Path: /admin/dashboard
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Admin Resource 2
+
+- Method: POST
+
+- Path: /admin/create-user
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+> **💡 This is how /admin/* works**
+
+**📢 You manually create Resource that start with /admin/**
+
+#### Employee Resource 1
+
+- Method: GET
+
+- Path: /employee/orders
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Employee Resource 2
+
+- Method: POST
+
+- Path: /employee/order
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### order-status Resource 1
+
+- Method: GET
+
+- Path: /order-status
+
+- Integration: your Lambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+
+#### Attach this authorizer to your Resource
+
+/admin/*
+
+/employee/*
+
+or /api/*
+
+**✔ Now API Gateway blocks unauthenticated users**
+
+### 3️⃣ Enable Cognito Authorizer
+
+- Go to AWS Console → API Gateway → REST API → YOUR_API
+
+- On left panel → Authorizers → Create Authorizer
+
+- Fill the form:
+
+| Field             | Value                              |
+| ----------------- | ---------------------------------- |
+| Name              | `CafeCognitoAuthorizer`                |
+| Type              | **Cognito**                        |
+| Cognito User Pool | Select your Cafe Cognito User Pool |
+| Token Source      | `Authorization`                    |
+| Token Validation  | Leave blank or optional            |
+
+**✅ Create authorizer**
+
+> **✔ This authorizer will validate JWTs automatically.**
+> **✔ Now API Gateway blocks unauthenticated users**
+
+### 4️⃣ Cognito Authorizer (JWT validation)
+
+- **Go to: API Gateway → Your API → Authorizers → Create**
+
+- **Name:** CognitoAuthorizer
+
+- **Type:** Cognito
+
+- Select your Cafe Cognito User Pool
+
+- **Token source:** Authorization
+
+- Save ✅
+
+> **This does NOT enable CORS — this only validates JWT.**
+
+### 5️⃣ Attach Authorizer to GET Method
+
+- **Go to Resources → /order-status → GET → Method Request**
+
+- **Find Authorization → select CognitoAuthorizer**
+
+- Select CognitoAuthorizer from the dropdown
+
+- Save ✅
+
+> **This ensures all GET requests require a valid JWT.**
+
+### 6️⃣ Enable CORS (Cross-Origin Resource Sharing)
+
+> **These are two separate things — enabling CORS is for frontend browser calls.**
+
+- Click GET → Actions → Enable CORS
+
+- A popup appears:
+
+  - Check “Replace existing CORS headers” ✅
+
+- Click Enable CORS
+
+- Confirm popup: “Yes, replace existing headers” ✅
+
+> **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
+
+✔ Enable CORS on each method
+
+✔ Especially for GET /order-status
+
+### 7️⃣ Deploy API
+
+- **Click Actions → Deploy API**
+
+- **Stage: status (or admin if you created a new stage)**
+
+- **Save Invoke URL**
+
+✔ Deploy after every change
+
+✔ Stage can be status or admin
+
+✔ Frontend URL must match stage
+
+#### 📌 Copy new endpoint API URL:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
+> **OR**
+
+```
+https://xxx.execute-api.region.amazonaws.com/admin/order-status
+```
+
+#### 👉 Paste this into frontend once
+
+#### 🔁 Update frontend:
+
+```
+API_URL = ".../status/order-status"
+```
+
+> **OR**
+
+```
+API_URL = ".../admin/order-status"
+```
+
+#### ✅ Result:
+
+- ❌ No login → 401
+
+
+- ✅ Login → data loads
+
+### ✅ KEY POINTS
+
+| Task                     | Done? | Notes                             |
+| ------------------------ | ----- | --------------------------------- |
+| Cognito authorizer       | ✅     | Validates JWT                     |
+| Attach authorizer to GET | ✅     | Required for /order-status        |
+| Enable CORS              | ✅     | Needed for frontend browser calls |
+| Deploy API               | ✅     | Required after changes            |
+| Update frontend API_URL  | ✅     | Matches the stage URL             |
+
 
 **✅ PHASE 5️⃣ STATUS**
 
