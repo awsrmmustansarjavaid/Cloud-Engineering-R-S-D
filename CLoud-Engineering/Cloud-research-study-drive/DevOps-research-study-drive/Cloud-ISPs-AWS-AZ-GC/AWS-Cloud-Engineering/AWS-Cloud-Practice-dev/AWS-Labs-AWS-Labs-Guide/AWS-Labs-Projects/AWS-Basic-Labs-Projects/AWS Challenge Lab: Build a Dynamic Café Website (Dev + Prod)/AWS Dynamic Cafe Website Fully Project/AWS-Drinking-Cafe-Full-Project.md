@@ -549,6 +549,50 @@ Attach this policy (or ensure it exists):
 
 - **✔️ Click Create IAM ROLE**
 
+### 3️⃣ IAM Role for Router Lambda
+
+- **IAM Role Name:**
+
+```
+charlie-cafe-RouterLambda
+```
+
+- **Description:**
+
+```
+Allow Lambda to Invoke permissions for your three target Lambdas
+```
+
+#### 1️⃣ Create IAM Policy Cognito Authorizer
+
+- **Custom Policy name:** 
+
+```
+OrderStatusRouterLambda
+```
+
+Attach this policy (or ensure it exists):
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:InvokeFunction",
+            "Resource": [
+                "arn:aws:lambda:us-east-1:123456789012:function:GetOrderStatusLambda",
+                "arn:aws:lambda:us-east-1:123456789012:function:CafeOrderStatusLambda",
+                "arn:aws:lambda:us-east-1:123456789012:function:OrderStatusLambda"
+            ]
+        }
+    ]
+}
+```
+**Replace ARN with  Your Lambda Functions**
+
+**✔️ Click Create policy**
+
 ### 6️⃣ EC2 Instance (Amazon Linux 2023)
 
  * EC2 Name : 
