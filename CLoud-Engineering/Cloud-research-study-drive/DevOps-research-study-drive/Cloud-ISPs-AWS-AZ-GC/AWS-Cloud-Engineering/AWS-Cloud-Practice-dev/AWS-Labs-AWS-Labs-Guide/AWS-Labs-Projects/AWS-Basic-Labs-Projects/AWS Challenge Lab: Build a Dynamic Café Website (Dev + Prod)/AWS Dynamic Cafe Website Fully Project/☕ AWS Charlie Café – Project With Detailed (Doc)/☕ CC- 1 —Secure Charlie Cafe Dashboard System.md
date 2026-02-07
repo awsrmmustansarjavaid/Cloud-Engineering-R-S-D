@@ -930,7 +930,73 @@ This is 🔥 gold for authorization.
 ---
 ## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
 
-### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
+### 1️⃣ Router Lambda
+
+### 1️⃣ Prepare for Router Lambda
+
+Make sure your three existing Lambdas are working individually:
+
+- GetOrderStatusLambda
+
+- CafeOrderStatusLambda
+
+- OrderStatusLambda
+
+**Note their ARNs (you’ll need them for IAM permissions).**
+
+### 2️⃣ Create the Router Lambda
+
+- Go to AWS Lambda → Create function → Author from scratch.
+
+    - Name: OrderStatusRouterLambda
+
+    - Runtime: Node.js 18.x
+
+    - Permissions: Create a new role with basic Lambda permissions
+
+- After creation, attach Invoke permissions for your three target Lambdas:
+
+    - Go to IAM → Roles → find your Lambda role → Attach policy → JSON
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:InvokeFunction",
+            "Resource": [
+                "arn:aws:lambda:us-east-1:123456789012:function:GetOrderStatusLambda",
+                "arn:aws:lambda:us-east-1:123456789012:function:CafeOrderStatusLambda",
+                "arn:aws:lambda:us-east-1:123456789012:function:OrderStatusLambda"
+            ]
+        }
+    ]
+}
+```
+
+- Copy the router Lambda code I shared earlier into the Lambda function editor.
+
+- Save and test with a sample event:
+
+```
+{
+  "queryStringParameters": {
+    "order_id": "C-12345"
+  }
+}
+```
+
+- Should invoke CafeOrderStatusLambda.
+
+- Change to "G-12345" → should invoke GetOrderStatusLambda.
+
+- Change to "12345" → should invoke OrderStatusLambda.
+
+**✅ This confirms the router is working.**
+
+
+### 2️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
 
 - **AWS Console → API Gateway → REST API → /order-status**
 
