@@ -10,47 +10,37 @@
    ✔ AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
    ✔ UNIVERSAL RBAC (CENTRALIZED)
 ========================================================= */
-
 const CHARLIE = (() => {
-
     /* =====================================================
        1️⃣ GLOBAL CONFIG
     ===================================================== */
     const CONFIG = {
         REGION: "us-east-1",
-
         // Cognito
         USER_POOL_ID: "us-east-1_HDcwDJqVz",
         CLIENT_ID: "3hcigucn7fmd11gvo9uuqud6fi",
         COGNITO_DOMAIN: "us-east-1hdcwdjqvz.auth.us-east-1.amazonaws.com",
-
         // API Gateway
         API_BASE: "https://a1053skr51.execute-api.us-east-1.amazonaws.com",
-
         // CloudFront
         CLOUDFRONT_BASE: "https://d159bqc5pw64hn.cloudfront.net"
     };
-
     /* =====================================================
        2️⃣ TOKEN HELPERS
     ===================================================== */
     function parseJwt(token) {
         return JSON.parse(atob(token.split(".")[1]));
     }
-
     function isTokenExpired(token) {
         return parseJwt(token).exp * 1000 < Date.now();
     }
-
     function getToken() {
         return localStorage.getItem("access_token");
     }
-
     /* =====================================================
        3️⃣ AUTH MODULE
     ===================================================== */
     const auth = {
-
         login(
             redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`
         ) {
@@ -62,7 +52,6 @@ const CHARLIE = (() => {
                 `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
             window.location.href = url;
         },
-
         logout(redirectUrl = window.location.origin) {
             localStorage.removeItem("access_token");
             const url =
@@ -71,7 +60,6 @@ const CHARLIE = (() => {
                 `&logout_uri=${encodeURIComponent(redirectUrl)}`;
             window.location.href = url;
         },
-
         handleRedirect() {
             if (!window.location.hash) return;
             const params = new URLSearchParams(window.location.hash.substring(1));
@@ -81,7 +69,6 @@ const CHARLIE = (() => {
                 window.location.hash = "";
             }
         },
-
         protectPage() {
             this.handleRedirect();
             const token = getToken();
@@ -91,7 +78,6 @@ const CHARLIE = (() => {
             }
             document.body.style.display = "block";
         },
-
         setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "index.html") {
             const btn = document.getElementById(buttonId);
             if (!btn) return;
@@ -100,18 +86,15 @@ const CHARLIE = (() => {
             });
         }
     };
-
     /* =====================================================
        4️⃣ SECURE FETCH (JWT AUTO ATTACH)
     ===================================================== */
     async function authFetch(url, options = {}) {
         const token = getToken();
-
         if (!token || isTokenExpired(token)) {
             auth.logout();
             return; // 🔐 intentionally return undefined
         }
-
         return fetch(url, {
             ...options,
             headers: {
@@ -121,14 +104,12 @@ const CHARLIE = (() => {
             }
         });
     }
-
     // 🔧 FIX #1: Prevent crash when authFetch returns undefined
     async function secureFetch(url, options = {}) {
         const res = await authFetch(url, options);
         if (!res) return; // ✅ prevents `.then()` crash
         return res.json();
     }
-
     /* =====================================================
        5️⃣ ROLE & ACCESS CONTROL (NORMALIZED + SAFE)
     ===================================================== */
@@ -136,25 +117,19 @@ const CHARLIE = (() => {
     function getUserRoles() {
         const token = getToken();
         if (!token) return [];
-
         const payload = parseJwt(token);
         const groups = payload["cognito:groups"];
-
         if (!groups) return [];
-
         return Array.isArray(groups)
             ? groups.map(r => r.toLowerCase())
             : [String(groups).toLowerCase()];
     }
-
     function isAdmin() {
         return getUserRoles().includes("admin");
     }
-
     function isEmployee() {
         return getUserRoles().includes("employee");
     }
-
     function requireAdmin() {
         if (!isAdmin()) {
             alert("❌ Admin access only");
@@ -162,7 +137,6 @@ const CHARLIE = (() => {
             throw new Error("Admin access required");
         }
     }
-
     function requireEmployee() {
         if (!isEmployee() && !isAdmin()) {
             alert("❌ Employee access only");
@@ -170,19 +144,15 @@ const CHARLIE = (() => {
             throw new Error("Employee access required");
         }
     }
-
     /* =====================================================
        🔐 AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
     ===================================================== */
     let logoutTriggered = false;
-
     function startAutoLogoutWatcher() {
         setInterval(() => {
             if (logoutTriggered) return;
-
             const token = getToken();
             if (!token) return;
-
             try {
                 if (isTokenExpired(token)) {
                     logoutTriggered = true;
@@ -195,12 +165,10 @@ const CHARLIE = (() => {
             }
         }, 30000);
     }
-
     /* =====================================================
        6️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
     const api = {
-
         /* 🛒 ORDERS */
         placeOrder(payload) {
             return fetch(`${CONFIG.API_BASE}/dev/orders`, {
@@ -210,10 +178,15 @@ const CHARLIE = (() => {
             }).then(res => res.json());
         },
 
+        // ────────────────────────────────────────────────
+        // NEW: Order Status endpoint (from API Gateway /prod/order-status)
+        // Uses secureFetch → attaches JWT automatically (recommended for protected endpoints)
+        // If this endpoint is public/no-auth → change back to plain fetch(...)
+        // ────────────────────────────────────────────────
         getOrderStatus(orderId) {
-            return fetch(
-                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
-            ).then(res => res.json());
+            return secureFetch(
+                `${CONFIG.API_BASE}/prod/order-status/order-status?order_id=${encodeURIComponent(orderId)}`
+            );
         },
 
         updateOrder(payload) {
@@ -222,7 +195,6 @@ const CHARLIE = (() => {
                 body: JSON.stringify(payload)
             });
         },
-
         /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
         recordAttendance(payload) {
             requireEmployee();
@@ -231,20 +203,17 @@ const CHARLIE = (() => {
                 body: JSON.stringify(payload)
             });
         },
-
         getAttendance(employeeId) {
             requireEmployee();
             return secureFetch(
                 `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
             );
         },
-
         /* 👨‍💼 HR — ADMIN ONLY */
         getAllEmployees() {
             requireAdmin();
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
         },
-
         /* 📊 ADMIN ATTENDANCE ANALYTICS */
         adminAttendance: {
             getDailySummary() {
@@ -260,7 +229,6 @@ const CHARLIE = (() => {
                 return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
             }
         },
-
         /* 📈 ADMIN DASHBOARD */
         adminDashboard: {
             fetchData(employeeId = "") {
@@ -275,7 +243,6 @@ const CHARLIE = (() => {
             }
         }
     };
-
     /* =====================================================
        7️⃣ CLOUDFRONT ASSETS
     ===================================================== */
@@ -284,7 +251,6 @@ const CHARLIE = (() => {
             return `${CONFIG.CLOUDFRONT_BASE}/${path}`;
         }
     };
-
     /* =====================================================
        8️⃣ PAGE INITIALIZER (UPDATED)
        🔹 Accepts options for flexible setup
@@ -292,25 +258,21 @@ const CHARLIE = (() => {
     ===================================================== */
     function initProtectedPage(options = {}) {
         const {
-            requireAuth = true,        // 🔐 protect page by default
-            enableLogout = true,       // ✅ setup logout button by default
+            requireAuth = true, // 🔐 protect page by default
+            enableLogout = true, // ✅ setup logout button by default
             logoutButtonId = "logoutBtn" // default logout button
         } = options;
-
         // Step 1: Protect page if required
         if (requireAuth) {
             auth.protectPage();
         }
-
         // Step 2: Setup logout button if required
         if (enableLogout) {
             auth.setupLogoutButton(logoutButtonId);
         }
-
         // Step 3: Start auto logout watcher (centralized)
         startAutoLogoutWatcher();
     }
-
     /* =====================================================
        9️⃣ 🖨️ CHARLIE CAFE — CENTRAL BROWSER PRINTING SYSTEM
        Used by all admin/staff pages
@@ -319,33 +281,25 @@ const CHARLIE = (() => {
         console.log("🖨️ Printing all orders...");
         window.print();
     };
-
     window.printTodaySummary = function () {
         console.log("📄 Printing today's summary...");
-
         const table = document.querySelector("#ordersTable tbody");
-
         if (!table) {
             alert("❌ Orders table not found");
             return;
         }
-
         const rows = table.querySelectorAll("tr");
         const today = new Date().toISOString().split("T")[0];
-
         let totalOrders = 0;
         let totalAmount = 0;
-
         rows.forEach(row => {
             const orderDate = row.dataset.date;
             const amount = parseFloat(row.dataset.total || 0);
-
             if (orderDate === today) {
                 totalOrders++;
                 totalAmount += amount;
             }
         });
-
         const summaryHTML = `
             <div style="padding:20px">
                 <h3 style="text-align:center">☕ Charlie Cafe — Daily Summary</h3>
@@ -355,17 +309,13 @@ const CHARLIE = (() => {
                 <p><strong>Total Sales:</strong> $${totalAmount.toFixed(2)}</p>
             </div>
         `;
-
         const originalContent = document.body.innerHTML;
         document.body.innerHTML = summaryHTML;
-
         window.print();
-
         // Restore page after print
         document.body.innerHTML = originalContent;
         location.reload(); // ensures JS state restores cleanly
     };
-
     /* =====================================================
        🔟 EXPORT (PUBLIC API)
     ===================================================== */
@@ -376,12 +326,11 @@ const CHARLIE = (() => {
         api,
         assets,
         secureFetch,
-        initProtectedPage,   // ✅ fully enhanced
+        initProtectedPage, // ✅ fully enhanced
         getUserRoles,
         isAdmin,
         isEmployee,
         requireAdmin,
         requireEmployee
     };
-
 })();
