@@ -575,14 +575,14 @@ For example !
 #### 1️⃣ Verify central-auth-api.js
 
 ```
-ls -lh /var/www/html/js/central-auth-api.js
+sudo ls -lh /var/www/html/js/central-auth-api.js
 ```
 
 #### 2️⃣ Verify central_cafe_style.css
 
 
 ```
-ls -lh /var/www/html/css/central_cafe_style.css
+sudo ls -lh /var/www/html/css/central_cafe_style.css
 ```
 
 **✅ PHASE 1️⃣ STATUS**
@@ -594,7 +594,7 @@ ls -lh /var/www/html/css/central_cafe_style.css
 ### 1️⃣ Double-check file path
 
 ```
-ls -lh /var/www/html/*
+sudo ls -lh /var/www/html/*
 ```
 
 ### 2️⃣ Open page in browser (MANDATORY)
