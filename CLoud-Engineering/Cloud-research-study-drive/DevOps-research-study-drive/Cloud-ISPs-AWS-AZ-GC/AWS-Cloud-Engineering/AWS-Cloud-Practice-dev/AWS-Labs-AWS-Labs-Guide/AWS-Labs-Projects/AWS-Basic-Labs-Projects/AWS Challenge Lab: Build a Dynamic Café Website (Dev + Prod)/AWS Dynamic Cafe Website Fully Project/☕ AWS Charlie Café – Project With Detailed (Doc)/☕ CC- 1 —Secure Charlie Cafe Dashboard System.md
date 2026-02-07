@@ -948,11 +948,11 @@ GET /order-status
 
 - Lambda function → OrderStatusLambda
 
-### 2️⃣ Create Routes
+### 2️⃣ Create Resource
 > **You MUST manually create routes.
 > **API Gateway does NOT auto-create /admin/*.**
 
-- Go to: API Gateway → Routes → Click Create
+- Go to: API Gateway → Resource → Click Create
 
 | Route                | Method | Auth    |
 | -------------------- | ------ | ------- |
@@ -962,9 +962,9 @@ GET /order-status
 | `/employee/orders`   | GET    | Cognito |
 | `/employee/order`    | POST   | Cognito |
 
-> **✔ Attach CafeCognitoAuthorizer to ALL protected routes**
+> **✔ Attach CafeCognitoAuthorizer to ALL protected Resource**
 
-#### Admin Routes 1
+#### Admin Resource 1
 
 - Method: GET
 
@@ -976,7 +976,7 @@ GET /order-status
 
 - Click Create
 
-#### Admin Routes 2
+#### Admin Resource 2
 
 - Method: POST
 
@@ -990,9 +990,9 @@ GET /order-status
 
 > **💡 This is how /admin/* works**
 
-**📢 You manually create routes that start with /admin/**
+**📢 You manually create Resource that start with /admin/**
 
-#### Employee Routes 1
+#### Employee Resource 1
 
 - Method: GET
 
@@ -1004,7 +1004,7 @@ GET /order-status
 
 - Click Create
 
-#### Employee Routes 2
+#### Employee Resource 2
 
 - Method: POST
 
@@ -1016,7 +1016,7 @@ GET /order-status
 
 - Click Create
 
-#### order-status Routes 1
+#### order-status Resource 1
 
 - Method: GET
 
@@ -1029,7 +1029,7 @@ GET /order-status
 - Click Create
 
 
-#### Attach this authorizer to your routes
+#### Attach this authorizer to your Resource
 
 /admin/*
 
