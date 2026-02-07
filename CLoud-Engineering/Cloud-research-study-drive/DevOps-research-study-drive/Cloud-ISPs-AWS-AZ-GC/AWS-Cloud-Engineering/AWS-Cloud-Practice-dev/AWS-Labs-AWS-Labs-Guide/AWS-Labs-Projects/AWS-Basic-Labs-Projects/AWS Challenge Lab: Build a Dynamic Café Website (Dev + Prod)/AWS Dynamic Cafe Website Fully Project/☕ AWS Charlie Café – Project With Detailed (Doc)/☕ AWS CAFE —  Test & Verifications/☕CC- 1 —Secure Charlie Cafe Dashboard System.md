@@ -529,86 +529,12 @@ https://us-east-1qxbqjnjww.auth.us-east-1.amazoncognito.com/login
 
 **👍 This is production-style SPA + Cognito + API Gateway security.**
 
-## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
-
-### 1️⃣ CREATE OrderStatusLambda
-
-
-
-
-
-
-
-
-
-
-
-
-#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
-
-#### 1️⃣ Test Cognito Authorizer
-
-#### Call Admin Route
-
-```
-curl https://<api-id>.execute-api.<region>.amazonaws.com/admin/dashboard \
-  -H "Authorization: <ACCESS_TOKEN>"
-```
-
-#### Results
-
-| User group | Result |
-| ---------- | ------ |
-| admin      | ✅ 200  |
-| employee   | ❌ 403  |
-| no token   | ❌ 401  |
-
-#### 2️⃣ Test Lambda
-
-- #### Inside Lambda:
-
-```
-event["requestContext"]["authorizer"]["claims"]["cognito:groups"]
-```
-
-#### Example:
-
-```
-["admin"]
-```
-
-or
-
-```
-["employee"]
-```
-
-#### Summary
-
-| Question                 | Answer               |
-| ------------------------ | -------------------- |
-| Do I need REST API?      | ❌ NO                 |
-| Should I use HTTP API?   | ✅ YES                |
-| Where are routes?        | API Gateway → Routes |
-| Are routes auto-created? | ❌ NO                 |
-| Attach authorizer where? | On EACH route        |
-| One Lambda or many?      | ✅ ONE                |
-
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 4️⃣ — BACKEND DATE FILTER (LAMBDA)
 
-
-
-
-
-**✅ PHASE 4️⃣ STATUS**
-
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
----
-## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
+## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
 
 ### 1️⃣ Test - Verify files (RBAC)
 
@@ -739,6 +665,8 @@ Audit Logs (CloudWatch)
 Test_OrderStatusLambda
 ```
 
+#### JSON
+
 ```
 {}
 ```
@@ -762,6 +690,156 @@ Test_OrderStatusLambda
 ```
 
 ✅ returns filtered orders
+
+### 5️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_AdminDashboardLambda
+```
+
+#### JSON
+
+```
+{}
+```
+
+#### ✅ Expected Result
+
+```
+
+```
+
+### 6️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_AdminCreateUserLambda
+```
+
+#### JSON
+
+```
+{
+  "body": "{\"username\": \"john.doe\", \"role\": \"employee\"}"
+}
+```
+
+#### ✅ Expected Result
+
+```
+
+```
+
+### 7️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_EmployeeOrdersLambda
+```
+
+#### JSON
+
+```
+{
+  "queryStringParameters": {
+    "employee_id": "alice"
+  }
+}
+```
+
+#### ✅ Expected Result
+
+```
+
+```
+
+### 8️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_EmployeeOrderLambda
+```
+
+#### JSON
+
+```
+{
+  "order_id": "O-103",
+  "employee": "alice",
+  "items": [
+    { "name": "Latte", "quantity": 2, "price": 5 },
+    { "name": "Bagel", "quantity": 1, "price": 3 }
+  ],
+  "total": 13
+}
+```
+
+#### ✅ Expected Result
+
+```
+
+```
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
+
+#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
+
+#### 1️⃣ Test Cognito Authorizer
+
+#### Call Admin Route
+
+```
+curl https://<api-id>.execute-api.<region>.amazonaws.com/admin/dashboard \
+  -H "Authorization: <ACCESS_TOKEN>"
+```
+
+#### Results
+
+| User group | Result |
+| ---------- | ------ |
+| admin      | ✅ 200  |
+| employee   | ❌ 403  |
+| no token   | ❌ 401  |
+
+#### 2️⃣ Test Lambda
+
+- #### Inside Lambda:
+
+```
+event["requestContext"]["authorizer"]["claims"]["cognito:groups"]
+```
+
+#### Example:
+
+```
+["admin"]
+```
+
+or
+
+```
+["employee"]
+```
+
+#### Summary
+
+| Question                 | Answer               |
+| ------------------------ | -------------------- |
+| Do I need REST API?      | ❌ NO                 |
+| Should I use HTTP API?   | ✅ YES                |
+| Where are routes?        | API Gateway → Routes |
+| Are routes auto-created? | ❌ NO                 |
+| Attach authorizer where? | On EACH route        |
+| One Lambda or many?      | ✅ ONE                |
 
 ### 5️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
 
