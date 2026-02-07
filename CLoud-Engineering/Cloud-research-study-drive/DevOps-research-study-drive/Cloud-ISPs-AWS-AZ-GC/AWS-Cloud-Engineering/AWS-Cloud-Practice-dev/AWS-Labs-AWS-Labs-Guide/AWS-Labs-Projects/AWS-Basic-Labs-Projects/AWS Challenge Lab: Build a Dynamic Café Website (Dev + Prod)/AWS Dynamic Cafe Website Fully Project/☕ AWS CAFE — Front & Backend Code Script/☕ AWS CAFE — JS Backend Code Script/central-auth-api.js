@@ -200,7 +200,80 @@ const CHARLIE = (() => {
        6️⃣ API GATEWAY ENDPOINTS
     ===================================================== */
     const api = {
-        /* unchanged */
+
+        /* 🛒 ORDERS */
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        getOrderStatus(orderId) {
+            return fetch(
+                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
+            ).then(res => res.json());
+        },
+
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
+        recordAttendance(payload) {
+            requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        getAttendance(employeeId) {
+            requireEmployee();
+            return secureFetch(
+                `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+            );
+        },
+
+        /* 👨‍💼 HR — ADMIN ONLY */
+        getAllEmployees() {
+            requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
+        },
+
+        /* 📊 ADMIN ATTENDANCE ANALYTICS */
+        adminAttendance: {
+            getDailySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
+            },
+            getWeeklySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
+            },
+            getMonthlySummary() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
+            }
+        },
+
+        /* 📈 ADMIN DASHBOARD */
+        adminDashboard: {
+            fetchData(employeeId = "") {
+                requireAdmin();
+                let url = `${CONFIG.API_BASE}/admin/dashboard`;
+                if (employeeId) url += `?employee_id=${employeeId}`;
+                return secureFetch(url);
+            },
+            fetchEmployees() {
+                requireAdmin();
+                return secureFetch(`${CONFIG.API_BASE}/admin/employees`);
+            }
+        }
     };
 
     /* =====================================================
