@@ -1466,6 +1466,10 @@ GET /order-status
 
 - Lambda function → OrderStatusLambda
 
+### 2️⃣ Create Resource
+> **You MUST manually create routes.
+> **API Gateway does NOT auto-create /admin/*.**
+
 #### Overview of your resources and Lambda mapping
 
 | Resource Path        | Method | Lambda Function        | Notes               |
@@ -1477,10 +1481,6 @@ GET /order-status
 | `/order-status`      | GET    | OrderStatusLambda      | Order status checks |
 
 **You’ll need to create separate Lambdas for admin/employee if not already done.**
-
-### 2️⃣ Create Resource
-> **You MUST manually create routes.
-> **API Gateway does NOT auto-create /admin/*.**
 
 - Go to: API Gateway → Resource → Click Create
 
@@ -1500,7 +1500,7 @@ GET /order-status
 
 - Path: /admin/dashboard
 
-- Integration: your Lambda
+- Integration: AdminDashboardLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -1512,7 +1512,7 @@ GET /order-status
 
 - Path: /admin/create-user
 
-- Integration: your Lambda
+- Integration: AdminCreateUserLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -1528,7 +1528,7 @@ GET /order-status
 
 - Path: /employee/orders
 
-- Integration: your Lambda
+- Integration: EmployeeOrdersLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -1540,7 +1540,7 @@ GET /order-status
 
 - Path: /employee/order
 
-- Integration: your Lambda
+- Integration: EmployeeOrderLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -1552,7 +1552,7 @@ GET /order-status
 
 - Path: /order-status
 
-- Integration: your Lambda
+- Integration: OrderStatusLambda
 
 - Authorization: cafe-cognito-authorizer
 
