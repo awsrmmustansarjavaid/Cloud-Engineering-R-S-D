@@ -785,6 +785,29 @@ Test_EmployeeOrderLambda
   "statusCode": 200,
 ```
 
+### 9️⃣ Verification
+
+- Go to Lambda → Monitoring → View Logs
+
+- Check CloudWatch Logs for each Lambda
+
+#### Confirm:
+
+- /admin/dashboard → AdminDashboardLambda response
+
+- /admin/create-user → AdminCreateUserLambda response
+
+- /employee/orders → EmployeeOrdersLambda response
+
+- /employee/order → EmployeeOrderLambda response
+
+#### Test JWT Authorization:
+
+- Access without token → should fail
+
+- Access with token → should succeed
+
+
 
 
 **✅ PHASE 4️⃣ STATUS**
@@ -793,9 +816,9 @@ Test_EmployeeOrderLambda
 ---
 ## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
 
-#### STEP 1️⃣ API Gateway – Enable Cognito Authorizer
+### 1️⃣ API Gateway – Enable Cognito Authorizer
 
-#### 1️⃣ Test Cognito Authorizer
+### 1️⃣ Test Cognito Authorizer
 
 #### Call Admin Route
 
@@ -812,7 +835,7 @@ curl https://<api-id>.execute-api.<region>.amazonaws.com/admin/dashboard \
 | employee   | ❌ 403  |
 | no token   | ❌ 401  |
 
-#### 2️⃣ Test Lambda
+### 2️⃣ Test Lambda
 
 - #### Inside Lambda:
 
@@ -843,7 +866,7 @@ or
 | Attach authorizer where? | On EACH route        |
 | One Lambda or many?      | ✅ ONE                |
 
-### 5️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
+### 3️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
 
 #### 1️⃣ ❌ Without token
 
@@ -870,6 +893,54 @@ Authorization: Bearer <access_token>
 ```
 
 - ✅ Receive JSON response
+
+### 4️⃣ GET /admin/dashboard
+
+```
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/status/admin/dashboard
+Authorization: Bearer <token>
+```
+
+### 5️⃣ POST /admin/create-user
+
+```
+POST https://<api-id>.execute-api.us-east-1.amazonaws.com/status/admin/create-user
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "role": "employee"
+}
+```
+
+### 6️⃣ GET /employee/orders
+
+```
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/status/employee/orders?employee_id=alice
+Authorization: Bearer <token>
+```
+
+### 7️⃣ POST /employee/order
+
+```
+POST https://<api-id>.execute-api.us-east-1.amazonaws.com/status/employee/order
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "order_id": "O-103",
+  "employee": "alice",
+  "items": [
+    { "name": "Latte", "quantity": 2, "price": 5 },
+    { "name": "Bagel", "quantity": 1, "price": 3 }
+  ],
+  "total": 13
+}
+```
+
+
+
 
 
 **✅ PHASE 5️⃣ STATUS**
