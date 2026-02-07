@@ -1524,20 +1524,20 @@ CafeOrdersAPI
 ### 2️⃣ Create Resource
 
 ```
-Resource name: order-status
-Resource path: /order-status
+Resource name: get-order-status
+Resource path: /get-order-status
 ```
 
 Click Create resource
 
 ### 3️⃣ Create NEW METHOD
 
-Select /order-status
+Select /get-order-status
 
 Click Create Method
 
 ```
-GET /order-status
+GET /get-order-status
 ```
 
 - **Method:** GET
@@ -1555,7 +1555,7 @@ Click Create method
 
 ### 4️⃣ Enable CORS (VERY IMPORTANT)
 
-Select /order-status
+Select /get-order-status
 
 Actions → Enable CORS
 
@@ -1582,13 +1582,13 @@ Click Deploy
 #### 🌐 FINAL API URL
 
 ```
-GET https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
+GET https://xxxxx.execute-api.us-east-1.amazonaws.com/status/get-order-status
 ```
 
 #### 🧪 TEST IT (MUST WORK)
 
 ```
-curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
+curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/get-order-status
 ```
 
 #### ✅ You MUST see JSON like:
@@ -1614,13 +1614,13 @@ curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/order-status
 #### Open browser:
 
 ```
-https://API_ID.execute-api.region.amazonaws.com/status/order-status
+https://API_ID.execute-api.region.amazonaws.com/status/get-order-status
 ```
 
 #### Example;
 
 ```
-https://a1053skr51.execute-api.us-east-1.amazonaws.com/status/order-status
+https://a1053skr51.execute-api.us-east-1.amazonaws.com/status/get-order-status
 ```
 
 ✔ JSON visible
