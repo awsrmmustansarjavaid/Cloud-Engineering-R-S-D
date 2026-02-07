@@ -997,26 +997,115 @@ Make sure your three existing Lambdas are working individually:
 
 ### 3️⃣ Connect Router Lambda to API Gateway
 
-Go to API Gateway → your REST API → Resources → /order-status
+1️⃣ Go to API Gateway → your REST API → Resources → /order-status
 
-You currently have multiple GET methods; we will replace them.
+- You currently have multiple GET methods; we will replace them.
 
-For one GET method:
+2️⃣ For one GET method:
 
-Integration type → Lambda Proxy
+- Integration type → Lambda Proxy
 
-Lambda → select OrderStatusRouterLambda
+- Lambda → select OrderStatusRouterLambda
 
-Click Save → Deploy API to your stage (prod)
+- Click Save → Deploy API to your stage (prod)
 
-Now there’s only one /order-status GET integrated with your router Lambda.
+3️⃣ Now there’s only one /order-status GET integrated with your router Lambda.
 
-Your front-end code stays the same:
+4️⃣ Your front-end code stays the same:
 
 ```
 CHARLIE.api.getOrderStatus(orderId);
 ```
 
+**No changes needed here.**
+
+### 4️⃣ — Delete the old duplicate resources
+
+1️⃣ Go to API Gateway → Resources → /order-status
+
+2️⃣ You’ll see two or more GET methods listed (duplicates)
+
+3️⃣ For each extra method you want to delete:
+
+- Click Method → Actions → Delete Method
+
+4️⃣ If there are duplicate resources (sometimes created by mistake):
+
+- Select the resource → Actions → Delete Resource
+
+- Confirm deletion
+
+**⚠️ Important: Only delete the duplicates that are not in use. Keep one /order-status GET with router Lambda.**
+
+5️⃣ Deploy API again after deletion.
+
+### 5️⃣ — Verify everything works
+
+#### A. Test via Lambda console
+
+#### Event example:
+
+```
+{
+  "queryStringParameters": {
+    "order_id": "C-12345"
+  }
+}
+```
+
+- Check CloudWatch logs for router Lambda → confirm it invokes the correct target Lambda.
+
+#### B. Test via API Gateway URL
+
+Example URL:
+
+```
+https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=C-12345
+```
+
+- Response should be the same as if the original Lambda was called.
+
+- Change order_id prefix → test other Lambdas.
+
+#### C. Test via front-end
+
+```
+CHARLIE.api.getOrderStatus("C-12345").then(console.log);
+CHARLIE.api.getOrderStatus("G-54321").then(console.log);
+CHARLIE.api.getOrderStatus("123456").then(console.log);
+```
+
+- All three should return proper results.
+
+- No change required in your central-auth-api.js.
+
+### 6️⃣ — Optional: Add new Lambda later
+
+- Add new Lambda (e.g., SpecialOrderStatusLambda)
+
+- Attach IAM invoke permission to OrderStatusRouterLambda
+
+#### Update router Lambda logic:
+
+```
+if(orderId.startsWith("S-")) {
+   targetLambdaName = "SpecialOrderStatusLambda";
+}
+```
+
+- Deploy router Lambda → done.
+
+- No front-end change needed.
+
+### ✅ After this setup:
+
+- Single /order-status GET → one router Lambda → calls correct backend Lambda.
+
+- Front-end stays clean.
+
+- Old duplicate resources safely deleted.
+
+- Easy to maintain and scale.
 
 
 ### 2️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
