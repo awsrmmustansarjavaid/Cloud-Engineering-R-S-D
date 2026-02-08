@@ -1855,6 +1855,31 @@ window.addEventListener("load", () => {
 </html>
 ```
 
+#### ✅ WHAT THIS FIXES (IMPORTANT)
+
+✔ No syntax errors
+✔ No missing API functions
+✔ No auto logout loops
+✔ No API calls before auth
+✔ No white screen
+✔ Cognito Hosted UI redirect works
+✔ Admin-only logic is safe
+✔ CloudFront-ready
+
+#### 🔒 EXPECTED BEHAVIOR (THIS IS CORRECT)
+
+- Open page
+
+- Redirects to Cognito Hosted UI
+
+- Login
+
+- Redirects back
+
+- Dashboard becomes visible
+
+- APIs load safely
+
 ----
 
 ### dashboard-login.html
