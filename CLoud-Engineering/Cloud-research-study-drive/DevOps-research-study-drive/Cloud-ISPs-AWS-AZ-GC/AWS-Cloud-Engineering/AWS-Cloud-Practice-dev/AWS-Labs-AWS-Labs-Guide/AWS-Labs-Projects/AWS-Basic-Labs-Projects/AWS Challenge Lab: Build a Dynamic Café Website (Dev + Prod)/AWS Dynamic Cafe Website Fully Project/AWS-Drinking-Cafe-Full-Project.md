@@ -1334,7 +1334,7 @@ sudo nano /var/www/html/analytics.html
 CTRL + O → ENTER
 CTRL + X
 ```
-### 8️⃣ dashboard-login.html
+### 9️⃣ dashboard-login.html
 
 #### 1️⃣ Create File
 
