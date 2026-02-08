@@ -712,7 +712,7 @@ charlie-cafe-s3-bucket/
 sudo nano Charlie-Cafe-Final-Verify-Test.sh
 ```
 
-[Charlie Cafe Lab Basic Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_lab_test_verify.sh)
+[Charlie-Cafe-Final-Verify-Test.sh](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Charile%20Cafe%20Mega%20Testing%20Bash-Script/Charlie-Cafe-Final-Verify-Test.sh)
 
 ```
 sudo chmod +x Charlie-Cafe-Final-Verify-Test.sh
@@ -722,13 +722,91 @@ sudo chmod +x Charlie-Cafe-Final-Verify-Test.sh
 sudo ./Charlie-Cafe-Final-Verify-Test.sh
 ```
 
-#### 💿 Replace with Yours
+#### 💿 Things to Replace / Configure in Script
 
-1. API Gateway EndPoints
+- #### S3 Bucket Name
 
-2. ARN of Lambda 
+    - Variable: OUTPUT_S3_BUCKET
 
-3. 
+    - Example: charlie-cafe-test-results
+
+- #### API Gateway Base URLs
+
+Variables:
+
+    - API_DEV → Development endpoint
+
+    - API_PROD → Production endpoint
+
+    - API_STATUS → Status endpoint
+
+Example:
+
+```
+API_DEV="https://abcd1234.execute-api.us-east-1.amazonaws.com/dev"
+API_PROD="https://abcd1234.execute-api.us-east-1.amazonaws.com/prod"
+API_STATUS="https://abcd1234.execute-api.us-east-1.amazonaws.com/status"
+```
+
+- #### ALB Domain Name
+
+    - Variable: ALB_DOMAIN
+
+    - Example: charlie-cafe-alb-123456789.us-east-1.elb.amazonaws.com
+
+- #### CloudFront Domain Name
+
+    - Variable: CLOUDFRONT_DOMAIN
+
+    - Example: abcd1234.cloudfront.net
+
+- #### AWS Region
+
+    - Variable: AWS_REGION
+
+    - Example: us-east-1
+
+- #### Secrets Manager Secret Name for DB
+
+    - Variable: SECRET_ID
+
+    - Example: CafeDevDBSM
+
+- #### Database Name
+
+    - Variable: DB_NAME
+
+    - Example: cafe_db
+
+- #### Optional: Test Data / Payloads
+
+    - JSON payloads for API POST requests or Lambda invocations
+
+    - Example:
+
+```
+'{"table_number":1,"customer_name":"Test","item":"Coffee","quantity":2}'
+```
+
+- #### Optional: Local Web Root Path
+
+    - Variable: WEB_ROOT
+
+    - Example: /var/www/html
+
+- #### Optional: Lambda Function Names
+
+    - Used in invoke_lambda calls
+
+    - Example:
+
+```
+CafeOrderProcessor
+CafeMenuLambda
+CafeOrderApiLambda
+```
+
+#### ✅ Once you replace these variables with your real environment values, the mega script will run without needing AWS Access Keys (it will use EC2 IAM roles / instance credentials).
 
 
 ### 4️⃣ Exporting Bash Script Output to S3
