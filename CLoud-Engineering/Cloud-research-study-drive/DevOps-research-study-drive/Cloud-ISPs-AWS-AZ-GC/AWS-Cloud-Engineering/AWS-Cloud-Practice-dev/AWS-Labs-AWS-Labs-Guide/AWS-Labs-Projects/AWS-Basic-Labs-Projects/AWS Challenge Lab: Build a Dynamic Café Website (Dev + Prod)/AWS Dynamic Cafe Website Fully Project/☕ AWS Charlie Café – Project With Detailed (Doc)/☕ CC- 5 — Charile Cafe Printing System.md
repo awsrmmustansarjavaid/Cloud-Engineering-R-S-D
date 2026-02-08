@@ -1278,5 +1278,802 @@ analytics_2026-01-01.pdf
 
 > **🟢 PHASE 7 COMPLETE & VERIFIED**
 ---
+## PHASE 1️⃣3️⃣  CSV EXPORT (PROFESSIONAL)
+
+### 1️⃣ — Cafe Analytics CSV Lambda
+
+- **Go to: AWS Console → Lambda → Create function**
+
+#### 1️⃣ Create new Lambda function
+
+| Field         | Value                  |
+| ------------- | ---------------------- |
+| Function name | CafeAnalyticsCSVLambda |
+| Runtime       | Python 3.10            |
+| Architecture  | x86_64                 |
+
+- **Create function**
+
+**✅ Lambda is created**
+
+### 2️⃣ SET LAMBDA PERMISSIONS (VERY IMPORTANT)
+
+- **Go to Configuration → Permissions**
+- **Click IAM Role name (blue link)**
+- **IAM → Add permissions → Attach policies**
+
+#### Attach ALL:
+
+✔ AmazonDynamoDBReadOnlyAccess
+
+✔ AWSLambdaBasicExecutionRole
+
+- **Click Add permissions**
+
+**✅ Lambda can now read DynamoDB**
+
+### 3️⃣ CafeAnalyticsCSVLambda CODE
+
+[CafeAnalyticsCSVLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsCSVLambda.py)
+
+#### DEPLOY LAMBDA
+
+- **Click Deploy**
+- **Wait for Success message**
+
+**Code is live**
+
+### 4️⃣ CREATE API GATEWAY ENDPOINT
+
+- **Go to: API Gateway → Your API**
+
+- **Select existing /analytics resource**
+
+#### 1️⃣ New API Resource
+
+```
+GET /analytics/csv
+```
+
+#### Fill:
+
+| Field         | Value |
+| ------------- | ----- |
+| Resource Name | csv   |
+| Resource Path | csv   |
+
+**✔ Click Create Resource**
+
+#### 2️⃣ CREATE GET METHOD
+
+- **Select /analytics/csv**
+- **Click Create Method → GET**
+
+#### Method Setup:
+
+| Setting          | Value                  |
+| ---------------- | ---------------------- |
+| Integration type | Lambda                 |
+| Lambda function  | CafeAnalyticsCSVLambda |
+| Use Lambda proxy | ✔ Enabled              |
+
+- **Click Save**
+
+#### 3️⃣ ENABLE COGNITO AUTHORIZER
+
+- **Open GET /analytics/csv**
+- **Click Method Request**
+- **Set:**
+
+```
+Authorization → Cognito Authorizer
+```
+
+- **Choose same authorizer used for analytics**
+
+- **✔ Save**
+
+#### 4️⃣ — DEPLOY API
+
+- **Click Deploy API**
+- **Choose stage:**
+
+```
+prod
+```
+
+- **Click Deploy**
+
+### 5️⃣ TEST CSV EXPORT (MANDATORY)
+
+#### 1️⃣ TEST AS ADMIN (SUCCESS)
+
+#### Use browser or curl:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/analytics/csv
+```
+
+✔ Logged in as Admin
+
+#### ✅ EXPECTED RESULT:
+
+#### ⬇️ File downloads automatically:
+
+```
+cafe-analytics.csv
+```
+
+#### 2️⃣ Open file → Should show:
+
+```
+Item,Quantity,Sales,Cost,Profit
+Latte,10,50,30,20
+Espresso,5,25,15,10
+```
+
+#### 2️⃣ ❌ TEST AS STAFF (BLOCKED)
+
+- Login as Staff
+
+- Open same URL
+
+#### ✅ EXPECTED RESULT:
+
+```
+403 Access denied
+```
+
+✔ Security verified
+
+### ✅ PHASE 13 FINAL STATUS
+
+🟢 PHASE 13 COMPLETE
+
+🟢 TESTED
+
+🟢 ADMIN-ONLY CSV DOWNLOAD
+
+🟢 NO EXISTING SYSTEM BROKEN
+
+**✅ PHASE 13 STATUS**
+
+> **🟢 PHASE 13 COMPLETE & VERIFIED**
+---
+## PHASE 1️⃣4️⃣  DAILY AUTO PDF WITH TABLES & LOGO
+
+### 1️⃣ CREATE Or Open existing S3 BUCKET
+
+```
+charlie-cafe-s3-bucket
+```
+
+### 2️⃣ Region:
+
+✔ Same region as Lambda
+
+### 3️⃣ Settings:
+
+✔ Block all public access → ON
+
+✔ Bucket versioning → Optional (OFF is fine)
+
+- **Create bucket**
+
+#### ✅ Bucket created
+
+### 4️⃣ UPLOAD LOGO FILE (VERY IMPORTANT)
+
+```
+Cafelogo.png
+```
+
+#### ⚠️ Exact name is REQUIRED
+> **(Case-sensitive)**
+
+#### ✅ Logo stored in S3
+
+### 5️⃣ CREATE PDF LAMBDA
+
+#### Basic Configuration
+
+| Parameter            | Value                  |
+|----------------------|------------------------|
+| Creation method      | Author from scratch    |
+| Function name        | CafeDailyPDFLambda     |
+| Runtime              | Python 3.10            |
+| Architecture         | x86_64                 |
+
+- **✔️ Create function**
+
+### 6️⃣ ADD REPORTLAB LAYER (REQUIRED)
+
+#### 1️⃣ Prepare reportlab.zip
+
+Your zip must contain:
+
+```
+python/
+ └── reportlab/
+```
+
+#### 2️⃣ Go to:
+
+```
+Lambda → Layers → Create layer
+```
+
+#### 3️⃣ Layer name:
+
+```
+reportlab-layer
+```
+
+#### 4️⃣ Upload ZIP:
+
+```
+reportlab.zip
+```
+
+#### 5️⃣ Compatible runtime:
+
+```
+Python 3.10
+```
+
+- **✔️ Create layer**
+
+#### 6️⃣ Attach Layer to Lambda
+
+```
+Lambda → CafeDailyPDFLambda → Layers → Add layer
+```
+
+✔ Select existing layer
+
+✔ Choose reportlab-layer
+
+✔ Click Add
+
+### 7️⃣ IAM PERMISSIONS (NO MISS)
+
+#### 1️⃣ Open Lambda:
+
+```
+Configuration → Permissions
+```
+
+#### 2️⃣ Click Role name:
+
+```
+CafeDailyPDFLambda-role-xxxx
+```
+
+#### 3️⃣ Attach policies:
+
+```
+AmazonS3FullAccess
+AmazonDynamoDBReadOnlyAccess
+```
+
+✔ Save
+
+### 8️⃣ REPLACE LAMBDA CODE (FULL FINAL CODE)
+
+> **⚠️ DELETE ALL EXISTING CODE FIRST**
+
+Then PASTE EVERYTHING BELOW
+
+#### 1️⃣ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
+
+[CafeDailyPDFLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeDailyPDFLambda.py)
+
+✔ Click Deploy
+
+✔ Wait for success
+
+#### 2️⃣ USE ENVIRONMENT VARIABLES
+
+- Open your CafeDailyPDFLambda → Configuration → Environment variables
+
+- Add the following keys & values exactly:
+
+| Key            | Value                  |
+| -------------- | ---------------------- |
+| BUCKET_NAME    | charlie-cafe-s3-bucket |
+| LOGO_KEY       | Cafelogo.png           |
+| DYNAMODB_TABLE | CafeOrders             |
+| AWS_REGION     | ap-south-1             |
+
+- Save changes.
+
+- In the code, the Lambda reads these using os.environ.get(...).
+
+**⚡ Benefit: You no longer need to edit code when bucket/table changes.**
+
+#### 3️⃣ MANUAL TEST (MANDATORY BEFORE NEXT PHASE)
+
+- **Lambda → Test → Create test event**
+- **Event name:**
+
+```
+manual-test
+```
+
+- **Event JSON:**
+
+```
+{}
+```
+
+- **Test**
+
+#### ✅ EXPECTED RESULT
+
+✔ StatusCode: 200
+
+✔ Message:
+
+```
+PDF generated and uploaded
+```
+
+#### 4️⃣ VERIFY PDF OUTPUT
+
+- **S3 → charlie-cafe-s3-bucket → daily_reports/**
+
+- **File exists:** daily_YYYY-MM-DD.pdf
+
+- **Download & open PDF**
+
+✔ Logo visible
+
+✔ Table visible
+
+✔ Correct profit values
+
+
+### 9️⃣ EventBridge Rule (AUTOMATION)
+
+- **Amazon EventBridge → Rules → Create rule**
+
+#### 1️⃣ Rule Details
+
+- **Rule name: (optional, but recommended)**
+
+```
+DailyCafePDFRule
+```
+
+- **Description: (optional, but recommended)**
+
+```
+Triggers CafeDailyPDFLambda every day at midnight UTC
+```
+
+- **Define pattern:**
+
+- **➡️ Choose Schedule**
+
+#### 2️⃣ Schedule Pattern (CRON)
+
+- Select Cron expression
+
+- Enter exact UTC cron expression:
+
+> **(midnight UTC)**
+
+```
+cron(0 0 * * ? *)
+```
+
+#### 🕐 TEST – EventBridge – Multiple Schedules for Lambda
+
+#### 🕐 TEST – SHORT SCHEDULE (10-Minute Test - Recommanded)
+> **Calculate Next 10-Minute Trigger Time (UTC)**
+
+- Suppose your current UTC time is 15:20
+
+- Add 10 minutes → 15:30
+
+- You need cron expression for UTC 15:30 today
+
+```
+cron(30 15 * * ? *)
+```
+
+#### 💡 Format reminder:
+
+```
+cron(Minute Hour Day-of-Month Month Day-of-Week Year)
+```
+
+#### 🕐 TEST – Every 10 minutes SCHEDULE
+> **Every 10 minutes → quick refresh/testing or frequent updates**
+
+#### Cron expression:
+
+```
+cron(0/10 * * * ? *)
+```
+
+#### Explanation:
+
+- 0/10 → start at minute 0, repeat every 10 minutes
+
+- * → every hour, every day, every month
+
+- ? → placeholder for day-of-week (required by AWS cron)
+
+- * → every year
+
+
+#### 🕐 TEST – Every hour SCHEDULE
+> **Every hour → summary report**
+
+#### Cron expression:
+
+```
+cron(0 0/1 * * ? *)
+```
+
+#### Explanation:
+
+- 0 → run at 0th minute
+
+- 0/1 → every 1 hour
+
+- * → every day, every month
+
+- ? → placeholder for day-of-week
+
+- * → every year
+
+✔ Daily midnight PDF
+
+✔ Stored in S3
+
+#### 💡 Explanation:
+
+| Field        | Value | Meaning                  |
+| ------------ | ----- | ------------------------ |
+| Minute       | 0     | At 0 minutes             |
+| Hour         | 0     | At 0 hour (midnight UTC) |
+| Day-of-month | *     | Every day                |
+| Month        | *     | Every month              |
+| Day-of-week  | ?     | No specific day of week  |
+| Year         | *     | Every year               |
+
+> **This will run every day at midnight UTC**
+
+#### 3️⃣ Add Target
+
+- Scroll down to Select targets → Lambda function
+
+- In the dropdown, select:
+
+```
+CafeDailyPDFLambda
+```
+
+- Click Create a new role for this specific resource (if not using existing)
+
+`- Or choose existing IAM role that allows EventBridge → Lambda invoke
+
+**✔ This IAM role must have permission to invoke your Lambda**
+
+#### 4️⃣ Configure Dead Letter Queue (Optional but recommended)
+
+- Keep default None (for now)
+
+- Or add SQS if you want retries
+
+#### 5️⃣ Tags (Optional)
+
+Add tags like:
+
+```
+Environment: Production
+Project: CharlieCafeLab
+```
+
+#### 6️⃣ Review + Create
+
+- Review all settings carefully
+
+- Click Create rule**
+
+✅ Rule created
+
+✅ You now have EventBridge → Lambda
+
+#### 7️⃣ Verify Lambda Trigger
+
+- **Go to Lambda → CafeDailyPDFLambda → Configuration → Triggers**
+
+- You should see:
+
+```
+EventBridge (DailyCafePDFRule)
+```
+
+#### 8️⃣ Manual Test (Before waiting for midnight)
+
+- **Go to Lambda → CafeDailyPDFLambda → Test**
+
+- **Event JSON:**
+
+```
+{}
+```
+
+- **Click Test**
+
+- Verify S3 bucket:
+
+```
+charlie-cafe-s3-bucket/daily_reports/
+```
+
+- File exists: daily_YYYY-MM-DD.pdf
+
+- Logo + table visible
+
+> **This ensures EventBridge will run correctly at schedule**
+
+
+**✅ PHASE 14 STATUS**
+
+> **🟢 PHASE 14 COMPLETE & VERIFIED**
+---
+## 🖨 PHASE 1️⃣5️⃣ PDF BUTTON INTEGRATION
+
+> **FRONTEND → EXISTING LAMBDA**
+
+**🏷 You already did backend correctly ✅ Now we only connect buttons.**
+
+### ✅ Method 1️⃣ -  FINAL UPDATED order-status.html
+
+[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+
+#### 5️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+#### 6️⃣ Fix File Permissions
+
+```
+sudo chown apache:apache /var/www/html/order-status.html
+```
+
+```
+sudo chmod 644 /var/www/html/order-status.html
+```
+
+#### 7️⃣ Restart Apache (MANDATORY)
+
+```
+sudo systemctl restart httpd
+```
+
+#### 8️⃣ Open page in browser
+
+```
+http://EC2 Public IP/order-status.html
+```
+
+### 6️⃣ Test (DO NOT SKIP)
+
+#### 1️⃣ Open page
+
+```
+https://YOUR_EC2 Public IP/order-status.html
+```
+
+#### 2️⃣ You should be redirected to Cognito login
+
+#### 3️⃣ TEST 1️⃣ — STAFF USER (RBAC + ORDER STATUS)
+
+#### 🎯 Purpose
+
+#### Verify:
+
+- Login works
+
+- Order dashboard loads
+
+- Analytics & PDF are hidden
+
+#### Steps
+
+1️⃣ Open order-status.html in browser
+
+2️⃣ You are redirected to Cognito Login
+
+3️⃣ Login using a Staff user (belongs to Staff group)
+
+4️⃣ After login, confirm:
+
+✔ Orders table loads
+
+✔ Metrics cards show
+
+✔ Chart shows
+
+❌ Analytics button NOT visible
+
+❌ PDF button NOT visible
+
+**✅ PASS RESULT**
+
+> **Staff can see orders only**
+
+#### 4️⃣ Logout as STAFF USER
+
+#### 5️⃣ TEST 2️⃣ — ADMIN USER (Analytics + PDF)
+
+#### 🎯 Purpose
+
+#### Verify:
+
+- Admin privileges
+
+- Analytics + PDF access
+
+####  Steps
+
+1️⃣ Logout
+
+2️⃣ Open order-status.html again
+
+3️⃣ Login using an Admin user (belongs to Admin group)
+
+4️⃣ After login, confirm:
+
+✔ Orders dashboard loads
+
+✔ Analytics button visible
+
+✔ PDF button visible
+
+5️⃣ Click 📊 Analytics
+
+  - Metrics load
+
+  - No errors
+
+6️⃣ Click 📄 PDF
+
+  - New tab opens
+
+  - PDF downloads or opens
+
+**✅ PASS RESULT**
+
+> **Admin sees everything**
+
+#### 6️⃣ Logout as Admin USER
+
+#### 7️⃣ 🔴 IF ANYTHING FAILS (Quick Fix)
+
+#### 1️⃣ ❌ Analytics/PDF not showing for Admin?
+
+#### Check:
+
+```
+parseJwt(token)["cognito:groups"]
+```
+
+**👉 Admin must be in Cognito group Admin**
+
+#### 2️⃣ ❌ Redirect loop?
+
+#### Check:
+
+- Redirect URI exactly matches Cognito App Client
+
+- No trailing slash mismatch
+
+### 🧪 FINAL TEST CHECKLIST (DO NOT SKIP)
+
+✔ Staff cannot see PDF
+
+✔ Admin sees PDF
+
+✔ Admin PDF opens
+
+✔ Staff print works
+
+✔ Mobile view OK
+
+✔ Dark/light toggle works
+
+✔ Analytics link opens
+
+✔ Lambda still works
+
+### ✅ CURRENT STATUS
+
+🟢 Frontend printing — COMPLETE
+
+🟢 Backend PDF — COMPLETE
+
+🟢 RBAC — COMPLETE
+
+🟢 UI professional — COMPLETE
+
+
+**✅ PHASE 15 STATUS**
+
+> **🟢 PHASE 15 COMPLETE & VERIFIED**
+---
+
+## PHASE 1️⃣6️⃣  Test
+
+### 1️⃣  - 📄 PDF – HOW IT WORKS FROM ORDER STATUS PAGE
+
+✔ Click 📊 Analytics
+
+✔ Click 📄 PDF Report
+
+✔ Calls /report/pdf
+
+✔ Lambda generates PDF
+
+✔ Browser downloads it
+
+❌ No duplication
+
+❌ No extra UI
+
+❌ No confusion
+
+### 2️⃣ - ⏰ MONTH-END AUTO PDF (NO UI)
+
+#### Already handled by:
+
+```
+EventBridge → CafePDFReportLambda
+cron(0/10 * * * ? *)
+```
+
+**No Order Status page change needed.**
+
+### ✅ FINAL SYSTEM CHECKLIST CONFIRMATION
+
+✔ You used existing Order Status system
+
+✔ You did not create new page
+
+✔ You did not modify backend logic
+
+✔ You added professional analytics
+
+✔ You added PDF reports
+
+✔ You kept everything secure & clean
+
+✔ CSV Export
+
+✔ Role-based analytics
+
+✔ Auto cost calculation
+
+✔ Profit per item
+
+✔ Daily PDF with logo & table
+
+✔ Exact API response format
+
+✔ No duplicate systems
+
+✔ Production ready
+
+**✅ PHASE 16 STATUS**
+
+> **🟢 PHASE 16 COMPLETE & VERIFIED**
 
 # SECTION 1️⃣  COMPLETE ✅
