@@ -1342,27 +1342,7 @@ CTRL + X
 ---
 ## ☕ AWS CAFE - PHASE 3️⃣ FrontEnd Deployment Final Configurations
 
-#### 1️⃣ SECURITY & PERMISSIONS
-
-#### index.php
-
-```
-sudo chown apache:apache /var/www/html/index.php
-```
-
-```
-sudo chmod 644 /var/www/html/index.php
-```
-
-#### orders.php
-
-```
-sudo chown apache:apache /var/www/html/orders.php
-```
-
-```
-sudo chmod 644 /var/www/html/orders.php
-```
+### 1️⃣ SECURITY & PERMISSIONS
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
 
@@ -1384,7 +1364,10 @@ sudo chmod -R 644 /var/www/html
 
 **⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
 
-#### 3️⃣ Restart Apache (MANDATORY)
+### 2️⃣ 
+
+
+### 3️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
