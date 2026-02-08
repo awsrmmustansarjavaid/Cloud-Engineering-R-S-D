@@ -345,7 +345,7 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 - checkout_time should be NULL
 
-### 3️⃣ Test hr-checkout Lambda
+### 4️⃣ Test hr-checkout Lambda
 
 #### Step 1 — Open Lambda Console
 
@@ -410,7 +410,7 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 > **checkout_time should now be populated**
 
-### 4️⃣ Test hr-employee-profile Lambda
+### 5️⃣ Test hr-employee-profile Lambda
 
 #### Step 1 — Open Lambda Console → hr-employee-profile → Test
 
@@ -453,7 +453,7 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 > **Confirms Lambda can read employees table from RDS**
 
-### 5️⃣ Test hr-attendance-history Lambda
+### 6️⃣ Test hr-attendance-history Lambda
 
 #### Step 1 — Open Lambda → hr-attendance-history → Test
 
@@ -496,7 +496,7 @@ SELECT * FROM attendance WHERE employee_id = 1;
 
 > **Confirms RDS attendance table integration**
 
-### 6️⃣ Test hr-leaves-holidays Lambda
+### 7️⃣ Test hr-leaves-holidays Lambda
 
 #### Step 1 — Open Lambda → hr-leaves-holidays → Test
 
