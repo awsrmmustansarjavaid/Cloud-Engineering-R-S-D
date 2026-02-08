@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Charlie Café ☕ | Unified Admin Dashboard</title>
+<title>Charlie Café ☕ | Admin Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- =====================================================
-     BOOTSTRAP + ICONS (COMMON)
+     BOOTSTRAP + ICONS
 ===================================================== -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -15,11 +15,16 @@
      STYLES
 ===================================================== -->
 <style>
+/* -----------------------------------------------------
+   IMPORTANT:
+   Page stays hidden until Cognito auth passes.
+   DO NOT REMOVE THIS.
+----------------------------------------------------- */
 body {
     background-color: #0f0f10;
     color: #fff;
     font-family: 'Segoe UI', sans-serif;
-    display: none; /* 🔐 hidden until Cognito auth passes */
+    display: none;
 }
 
 /* ===== SIDEBAR ===== */
@@ -95,6 +100,7 @@ body {
 
     <hr>
 
+    <!-- Central logout handled by central-auth-api.js -->
     <a id="logoutBtn">
         <i class="bi bi-box-arrow-left"></i> Logout
     </a>
@@ -110,10 +116,30 @@ body {
     <h4>Orders Dashboard</h4>
 
     <div class="row g-4 mb-4">
-        <div class="col-md-3"><div class="kpi-card bg-green"><h6>Sales</h6><h3 id="sales">0</h3></div></div>
-        <div class="col-md-3"><div class="kpi-card bg-purple"><h6>Orders</h6><h3 id="ordersCount">0</h3></div></div>
-        <div class="col-md-3"><div class="kpi-card bg-blue"><h6>Drinks</h6><h3 id="drinksCount">0</h3></div></div>
-        <div class="col-md-3"><div class="kpi-card bg-orange"><h6>Avg</h6><h3 id="avgPrice">$0</h3></div></div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-green">
+                <h6>Sales</h6>
+                <h3 id="sales">$0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-purple">
+                <h6>Orders</h6>
+                <h3 id="ordersCount">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-blue">
+                <h6>Drinks</h6>
+                <h3 id="drinksCount">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-orange">
+                <h6>Avg</h6>
+                <h3 id="avgPrice">$0</h3>
+            </div>
+        </div>
     </div>
 
     <div class="table-container">
@@ -133,9 +159,8 @@ body {
     </div>
 </div>
 
-<!-- ================= HR / ATTENDANCE ================= -->
+<!-- ================= HR ================= -->
 <div id="hr" class="section">
-
     <h4>HR & Attendance Dashboard</h4>
 
     <div class="row mb-4">
@@ -159,50 +184,24 @@ body {
         </div>
     </div>
 
-    <div class="mb-3">
-        <button class="btn btn-outline-primary" onclick="load('daily')">Daily</button>
-        <button class="btn btn-outline-primary" onclick="load('weekly')">Weekly</button>
-        <button class="btn btn-outline-primary" onclick="load('monthly')">Monthly</button>
-    </div>
-
-    <!-- Filter Dropdown & Export -->
-    <div class="container my-4">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="employeeFilter" class="form-label">Filter by Employee</label>
-                <select id="employeeFilter" class="form-select" onchange="loadDashboardData()">
-                    <option value="">All Employees</option>
-                </select>
-            </div>
-        </div>
-        <div id="dashboard-table-container"></div>
-        <button class="btn btn-primary mt-3" onclick="exportCSV()">Export CSV</button>
-    </div>
-
-    <table class="table table-bordered text-white">
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Date</th>
-                <th>Check-In</th>
-                <th>Check-Out</th>
-            </tr>
-        </thead>
-        <tbody id="attendanceBody"></tbody>
-    </table>
+    <button class="btn btn-outline-primary" onclick="loadHR('daily')">Daily</button>
+    <button class="btn btn-outline-primary" onclick="loadHR('weekly')">Weekly</button>
+    <button class="btn btn-outline-primary" onclick="loadHR('monthly')">Monthly</button>
 </div>
 
 </div>
 
 <!-- =====================================================
-     CENTRAL AUTH (MANDATORY)
+     CENTRAL AUTH (MUST LOAD FIRST)
 ===================================================== -->
 <script src="js/central-auth-api.js"></script>
 
 <script>
 /* =====================================================
-   🔹 UPDATED: USE CENTRAL INIT FUNCTION
-   Replaces individual protectPage + setupLogoutButton
+   🔐 AUTH INITIALIZATION
+   - Redirects to Cognito if not logged in
+   - Shows page only after token is valid
+   - Enables logout button
 ===================================================== */
 CHARLIE.initProtectedPage();
 
@@ -217,81 +216,68 @@ function showSection(e, id) {
 }
 
 /* =====================================================
-   🛒 ORDERS DASHBOARD
+   🛒 ORDERS DASHBOARD (ADMIN ONLY)
 ===================================================== */
 async function loadOrdersDashboard() {
-    const data = await CHARLIE.api.getDashboardMetrics("today");
-    document.getElementById("sales").innerText = `$${data.sales}`;
-    document.getElementById("ordersCount").innerText = data.orders`;
-    document.getElementById("drinksCount").innerText = data.drinks;
-    document.getElementById("avgPrice").innerText = `$${data.avg}`;
-    const table = document.getElementById("ordersTable");
-    table.innerHTML = "";
-    data.latest_orders.forEach(o => {
-        table.innerHTML += `
-            <tr>
-                <td>${o.customer_name || "Anonymous"}</td>
-                <td>${o.item}</td>
-                <td>${o.quantity}</td>
-                <td>${o.table_number || "-"}</td>
-                <td>${o.date}</td>
-            </tr>
-        `;
-    });
+    if (!CHARLIE.isAdmin()) return;
+
+    try {
+        const data = await CHARLIE.api.adminDashboard.fetchData();
+
+        document.getElementById("sales").innerText = `$${data.sales || 0}`;
+        document.getElementById("ordersCount").innerText = data.orders || 0;
+        document.getElementById("drinksCount").innerText = data.drinks || 0;
+        document.getElementById("avgPrice").innerText = `$${data.avg || 0}`;
+
+        const table = document.getElementById("ordersTable");
+        table.innerHTML = "";
+
+        (data.latest_orders || []).forEach(o => {
+            table.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || "Anonymous"}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || "-"}</td>
+                    <td>${o.date}</td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        console.error("Orders dashboard error:", err);
+    }
 }
 
 /* =====================================================
-   👥 HR DASHBOARD
+   👥 HR DASHBOARD (ADMIN ONLY)
 ===================================================== */
-async function loadSummary(type) {
-    const data = await CHARLIE.api.adminAttendance[`get${type.charAt(0).toUpperCase()+type.slice(1)}Summary`]();
-    document.getElementById("cardPresent").innerText = data.summary.total_present;
-    document.getElementById("cardAbsent").innerText = data.summary.total_absent;
-    document.getElementById("cardLeaves").innerText = data.summary.total_leaves;
-    const tbody = document.getElementById("attendanceBody");
-    tbody.innerHTML = "";
-    data.attendance.forEach(r => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${r.name}</td>
-                <td>${r.date}</td>
-                <td>${r.checkin_time || "-"}</td>
-                <td>${r.checkout_time || "-"}</td>
-            </tr>
-        `;
-    });
+async function loadHR(type) {
+    if (!CHARLIE.isAdmin()) return;
+
+    try {
+        const fn = CHARLIE.api.adminAttendance[
+            `get${type.charAt(0).toUpperCase() + type.slice(1)}Summary`
+        ];
+
+        const data = await fn();
+
+        document.getElementById("cardPresent").innerText = data.summary.total_present;
+        document.getElementById("cardAbsent").innerText = data.summary.total_absent;
+        document.getElementById("cardLeaves").innerText = data.summary.total_leaves;
+
+    } catch (err) {
+        console.error("HR dashboard error:", err);
+    }
 }
 
 /* =====================================================
-   ✅ ADMIN SPEC WRAPPER
+   🚀 LOAD DATA AFTER AUTH SUCCESS
 ===================================================== */
-async function load(type) {
-    return loadSummary(type);
-}
-
-/* =====================================================
-   🚀 INITIAL LOAD
-===================================================== */
-loadOrdersDashboard();
-load("daily");
-
-/* =====================================================
-   ✅ PLACEHOLDER FUNCTIONS FOR FILTER + EXPORT
-===================================================== */
-function loadDashboardData() {
-    console.log("loadDashboardData() triggered");
-}
-function exportCSV() {
-    console.log("exportCSV() triggered");
-}
-
-/* =====================================================
-   🔹 API CALL EXAMPLE (DOCUMENTATION)
-   How to call any secured endpoint centrally
-===================================================== */
-function exampleAPICall() {
-    CHARLIE.api.recordAttendance({ employee_id: "E101" });
-}
+window.addEventListener("load", () => {
+    loadOrdersDashboard();
+    loadHR("daily");
+});
 </script>
 
 </body>
