@@ -175,11 +175,6 @@ http://ALB-DNS-NAME/cafe-admin-dashboard.html
 
 [CloudFront ALB & Central-Auth-Api Troubleshooting](./CloudFront_ALB_Central-Auth-Api.md)
 
-
-
-
-
-
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
