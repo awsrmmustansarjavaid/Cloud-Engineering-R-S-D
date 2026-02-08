@@ -65,7 +65,209 @@ DB_HOST, DB_NAME, DB_USER, DB_PASS
 
 - Attach Layer to all HR Lambdas
 
-### 2️⃣ Test hr-checkin Lambda
+### 2️⃣ Test hr-attendance
+
+- Navigate: Lambda → hr-attendance → Test
+
+#### ✅ TEST 1 — CHECK-IN (SUCCESS)
+
+🔹 Lambda Test Event Name
+
+HR-CheckIn-Success
+
+🔹 Event JSON
+
+```
+{
+  "resource": "/hr/attendance/checkin",
+  "path": "/hr/attendance/checkin",
+  "httpMethod": "POST",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-123",
+        "cognito:groups": ["Employee"]
+      }
+    }
+  }
+}
+```
+
+✅ Expected Result
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-in successful\"}"
+}
+```
+
+🧠 Database Effect
+
+✔ New row inserted in attendance
+✔ checkin_time filled
+✔ checkout_time = NULL
+
+❌ TEST 2 — CHECK-IN AGAIN (ALREADY CHECKED IN)
+
+🔹 Event JSON (same as above)
+
+```
+{
+  "resource": "/hr/attendance/checkin",
+  "path": "/hr/attendance/checkin",
+  "httpMethod": "POST",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-123",
+        "cognito:groups": ["Employee"]
+      }
+    }
+  }
+}
+```
+
+✅ Expected Result
+
+```
+{
+  "statusCode": 400,
+  "body": "{\"message\": \"Already checked in today\"}"
+}
+```
+
+✅ TEST 3 — CHECK-OUT (SUCCESS)
+🔹 Lambda Test Event Name
+
+HR-CheckOut-Success
+
+🔹 Event JSON
+
+```
+{
+  "resource": "/hr/attendance/checkout",
+  "path": "/hr/attendance/checkout",
+  "httpMethod": "POST",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-123",
+        "cognito:groups": ["Employee"]
+      }
+    }
+  }
+}
+```
+
+✅ Expected Result
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Check-out successful\"}"
+}
+```
+
+🧠 Database Effect
+
+✔ Existing row updated
+✔ checkout_time populated
+
+❌ TEST 4 — CHECK-OUT WITHOUT CHECK-IN
+🔹 Event JSON
+
+```
+{
+  "resource": "/hr/attendance/checkout",
+  "path": "/hr/attendance/checkout",
+  "httpMethod": "POST",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "new-cognito-user",
+        "cognito:groups": ["Employee"]
+      }
+    }
+  }
+}
+```
+
+❌ Expected Result
+
+```
+{
+  "statusCode": 400,
+  "body": "{\"message\": \"Check-in required before checkout\"}"
+}
+```
+
+❌ TEST 5 — UNAUTHORIZED USER (NOT EMPLOYEE)
+🔹 Event JSON
+
+```
+{
+  "resource": "/hr/attendance/checkin",
+  "path": "/hr/attendance/checkin",
+  "httpMethod": "POST",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "admin-user-001",
+        "cognito:groups": ["Admin"]
+      }
+    }
+  }
+}
+```
+
+❌ Expected Result
+
+```
+{
+  "statusCode": 403,
+  "body": "{\"message\": \"Forbidden\"}"
+}
+```
+
+❌ TEST 6 — INVALID ROUTE
+🔹 Event JSON
+
+```
+{
+  "resource": "/hr/attendance/delete",
+  "path": "/hr/attendance/delete",
+  "httpMethod": "POST",
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "sub": "cognito-user-123",
+        "cognito:groups": ["Employee"]
+      }
+    }
+  }
+}
+```
+
+❌ Expected Result
+
+```
+{
+  "statusCode": 404,
+  "body": "{\"message\": \"Invalid attendance action\"}"
+}
+```
+
+🧪 PRO TESTING TIP (CloudWatch)
+
+Add this temporarily if you want clean logs:
+
+```
+print("PATH:", path)
+print("USER:", cognito_user_id)
+```
+
+### 3️⃣ Test hr-checkin Lambda
 
 #### Step 1 — Open Lambda Console
 
