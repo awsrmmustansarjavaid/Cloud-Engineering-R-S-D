@@ -206,7 +206,7 @@ http://ALB-DNS-NAME/cafe-admin-dashboard.html
 
 > **(or just /* if you’re tired 😄)***
 
-### 🛠️ FIX OPTION 2 (ORIGIN PERMISSION ISSUE)
+### 2️⃣ 🛠️ FIX OPTION 2 (ORIGIN PERMISSION ISSUE)
 
 #### If origin is EC2 / ALB:
 
