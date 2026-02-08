@@ -535,6 +535,12 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/report/pdf?page=order-statu
 AnalyticsPDFTest
 ```
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 #### 1️⃣ Test Event JSON (COPY EXACTLY)
 
 ```
@@ -658,6 +664,12 @@ function downloadOrderPDF(){
 
 - Click CafePDFReportLambda
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 #### 2️⃣ OPEN TRIGGERS TAB
 
 - Scroll to Function overview
@@ -680,6 +692,12 @@ function downloadOrderPDF(){
 | Rule name        | `DailyOrderPDF`                 |
 | Rule description | Generate Order Status PDF daily |
 | Rule type        | **Schedule expression**         |
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 #### 5️⃣ ADD CRON SCHEDULE
 
@@ -995,6 +1013,12 @@ Uploaded to S3: cafe-reports
 
 **✅ ADD EVENTBRIDGE TRIGGER TO CafePDFReportLambda**
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 ### 1️⃣ CREATE DAILY ORDER STATUS PDF EVENTBRIDGE RULE
 
 #### 1️⃣ Go to EventBridge
@@ -1108,6 +1132,12 @@ cron(0 0/1 * * ? *)
 #### 3️⃣ Add Target
 
 - **Target:** Lambda function → CafePDFReportLambda
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 - **Configure input:**
 
@@ -1227,6 +1257,12 @@ cron(0 0/1 * * ? *)
 
 - **Function:** CafePDFReportLambda
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 #### 5️⃣ Lambda Input JSON (VERY IMPORTANT)
 
 ```
@@ -1340,6 +1376,12 @@ analytics_2026-01-01.pdf
 
 - **Go to: AWS Console → Lambda → Create function**
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 #### 1️⃣ Create new Lambda function
 
 | Field         | Value                  |
@@ -1371,6 +1413,12 @@ analytics_2026-01-01.pdf
 ### 3️⃣ CafeAnalyticsCSVLambda CODE
 
 [CafeAnalyticsCSVLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsCSVLambda.py)
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 #### DEPLOY LAMBDA
 
@@ -1412,6 +1460,12 @@ GET /analytics/csv
 | Integration type | Lambda                 |
 | Lambda function  | CafeAnalyticsCSVLambda |
 | Use Lambda proxy | ✔ Enabled              |
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 - **Click Save**
 
@@ -1531,6 +1585,12 @@ Cafelogo.png
 
 ### 5️⃣ CREATE PDF LAMBDA
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 #### Basic Configuration
 
 | Parameter            | Value                  |
@@ -1585,6 +1645,13 @@ Python 3.10
 Lambda → CafeDailyPDFLambda → Layers → Add layer
 ```
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
+
 ✔ Select existing layer
 
 ✔ Choose reportlab-layer
@@ -1623,6 +1690,13 @@ Then PASTE EVERYTHING BELOW
 #### 1️⃣ FINAL PDF GENERATION LAMBDA (COPY-PASTE SAFE)
 
 [CafeDailyPDFLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeDailyPDFLambda.py)
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 
 ✔ Click Deploy
 
@@ -1706,6 +1780,13 @@ DailyCafePDFRule
 ```
 Triggers CafeDailyPDFLambda every day at midnight UTC
 ```
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 
 - **Define pattern:**
 
@@ -1812,6 +1893,13 @@ cron(0 0/1 * * ? *)
 CafeDailyPDFLambda
 ```
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
+
 - Click Create a new role for this specific resource (if not using existing)
 
 `- Or choose existing IAM role that allows EventBridge → Lambda invoke
@@ -1846,6 +1934,12 @@ Project: CharlieCafeLab
 #### 7️⃣ Verify Lambda Trigger
 
 - **Go to Lambda → CafeDailyPDFLambda → Configuration → Triggers**
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 - You should see:
 
@@ -2166,6 +2260,12 @@ page_type = event.get("queryStringParameters", {}).get("page", "analytics")
 
 - We can add "attendance":
 
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
+
 ```
 elif page_type == "attendance":
     elements.append(Paragraph("📋 Employee Attendance Report", styles["Title"]))
@@ -2261,6 +2361,12 @@ https://<your-api-gateway>/generate-pdf?page=attendance
 ### 1️⃣ Step 1️⃣ – Update CafePDFReportLambda for HR & Attendance
 
 > *8We are going to add a new page_type branch for HR/Attendance reports.**
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 #### Updated Lambda Code
 
