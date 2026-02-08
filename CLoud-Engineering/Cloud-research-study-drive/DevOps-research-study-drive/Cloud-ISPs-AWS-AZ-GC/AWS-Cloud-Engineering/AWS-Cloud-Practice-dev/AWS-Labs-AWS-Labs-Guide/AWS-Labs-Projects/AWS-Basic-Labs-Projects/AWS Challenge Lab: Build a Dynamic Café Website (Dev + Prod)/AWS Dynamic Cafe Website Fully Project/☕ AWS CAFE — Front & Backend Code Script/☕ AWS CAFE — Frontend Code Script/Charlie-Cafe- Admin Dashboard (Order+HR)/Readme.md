@@ -1852,3 +1852,66 @@ window.addEventListener("load", () => {
 </body>
 </html>
 ```
+
+----
+
+### dashboard-login.html
+
+> **Update Version: 1.0**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: #0f0f10;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.card {
+    background: #1c1c1e;
+    border-radius: 15px;
+    padding: 30px;
+    width: 350px;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h3>☕ Charlie Café</h3>
+    <p class="text-muted">Admin & Staff Login</p>
+
+    <!-- Cognito Hosted UI -->
+    <button class="btn btn-warning w-100 mt-3" onclick="login()">
+        Login with Cognito
+    </button>
+</div>
+
+<script src="js/central-auth-api.js"></script>
+<script>
+function login() {
+    CHARLIE.auth.login(
+        `${window.location.origin}/cafe-admin-dashboard.html`
+    );
+}
+</script>
+
+</body>
+</html>
+```
+
+----
