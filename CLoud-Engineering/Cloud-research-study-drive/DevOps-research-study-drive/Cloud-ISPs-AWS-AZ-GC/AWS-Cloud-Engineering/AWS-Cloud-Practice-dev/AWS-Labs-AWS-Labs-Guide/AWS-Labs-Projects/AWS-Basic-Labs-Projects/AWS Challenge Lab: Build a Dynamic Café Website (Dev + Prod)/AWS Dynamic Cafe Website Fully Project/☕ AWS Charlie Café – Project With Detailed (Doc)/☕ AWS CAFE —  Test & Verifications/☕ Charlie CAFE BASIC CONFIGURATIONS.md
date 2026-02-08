@@ -817,7 +817,7 @@ CafeOrderApiLambda
 sudo nano export_bash_output_s3.sh
 ```
 
-[Exporting Bash Script Output to S3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/export_bash_output_s3.sh)
+[Exporting Bash Script Output to S3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/export_bash_output_s3/export_bash_output_s3.sh)
 
 ### 2️⃣ How to use:
 
