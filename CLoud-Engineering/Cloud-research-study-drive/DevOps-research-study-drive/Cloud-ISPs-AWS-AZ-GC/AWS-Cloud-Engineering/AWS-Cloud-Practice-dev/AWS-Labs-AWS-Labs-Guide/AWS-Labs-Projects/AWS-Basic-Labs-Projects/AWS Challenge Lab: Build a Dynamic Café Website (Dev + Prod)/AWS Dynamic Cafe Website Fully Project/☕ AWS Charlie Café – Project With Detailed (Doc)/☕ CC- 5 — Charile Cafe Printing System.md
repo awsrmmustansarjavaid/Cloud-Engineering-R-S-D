@@ -160,9 +160,6 @@ secureFetch(`${API_BASE}/reports/export?type=csv`)
 ✔ Zero duplication
 
 
-
-
-
 ----
 ## PHASE 2️⃣  ☕ MULTI-PAGE SUPPORT PDF GENERATION LAMBDA (REPORTLAB)
 
@@ -171,6 +168,8 @@ secureFetch(`${API_BASE}/reports/export?type=csv`)
 > **(PHASE 5 & 6)**
 
 ### 1️⃣ Create Cafe PDF Report Lambda
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
 
 #### 1️⃣ CREATE LAMBDA
 
@@ -204,6 +203,8 @@ Runtime: Python 3.10
 #### 1️⃣ UPDATED CafePDFReportLambda FULL PYTHON CODE (PDF for BOTH PAGES)
 
 [CafePDFReportLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafePDFReportLambda.py)
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
 
 #### 2️⃣ 🔐 Environment Variables Required
 
@@ -397,6 +398,12 @@ You are now on POST – Setup page
 | Lambda proxy integration | ✅ CHECKED           |
 | Lambda function          | CafePDFReportLambda |
 | Use default timeout      | ✅                   |
+
+#### 📢 ❗️ ❎ Ignore all the old PDF/CSV Lambdas. Use only the new CafeCentralExportLambda for all exports and reports. Replace the old Lambdas in API Gateway with this one.❎ ❗️ 
+
+#### Replace 
+
+| Lambda function          | CafeCentralExportLambda |
 
 **⚠️ Region must match Lambda region**
 
