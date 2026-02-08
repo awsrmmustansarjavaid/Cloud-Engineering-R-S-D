@@ -919,6 +919,123 @@ CloudFront cached old JS → invalidation required
 JS errors in central-auth-api.js (check Console)
 
 ---
+### 1️⃣ Immediate Issue in HTML / JS
+
+Inside your HTML, in the loadOrdersDashboard function:
+
+```
+document.getElementById("ordersCount").innerText = data.orders`;
+```
+
+Notice the backtick at the end of the line:
+
+```
+data.orders`
+```
+
+✅ This is a syntax error. It will break all subsequent JS, so the browser stops executing scripts → page remains blank.
+
+Fix:
+
+```
+document.getElementById("ordersCount").innerText = data.orders;
+```
+
+### Other minor JS issues
+
+loadOrdersDashboard() and load("daily") are called immediately.
+
+If CHARLIE.api.getDashboardMetrics or CHARLIE.api.adminAttendance.getDailySummary fails (e.g., JWT missing, API 403), it will throw unhandled promise errors → white page.
+
+You should wrap in try/catch to prevent breaking the page:
+
+```
+async function loadOrdersDashboard() {
+    try {
+        const data = await CHARLIE.api.getDashboardMetrics("today");
+        document.getElementById("sales").innerText = `$${data.sales}`;
+        document.getElementById("ordersCount").innerText = data.orders; // <-- FIXED
+        document.getElementById("drinksCount").innerText = data.drinks;
+        document.getElementById("avgPrice").innerText = `$${data.avg}`;
+        const table = document.getElementById("ordersTable");
+        table.innerHTML = "";
+        data.latest_orders.forEach(o => {
+            table.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || "Anonymous"}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || "-"}</td>
+                    <td>${o.date}</td>
+                </tr>
+            `;
+        });
+    } catch (err) {
+        console.error("Failed to load orders dashboard:", err);
+    }
+}
+
+async function load(type) {
+    try {
+        await loadSummary(type);
+    } catch (err) {
+        console.error("Failed to load HR dashboard:", err);
+    }
+}
+```
+
+### 2️⃣ CloudFront-specific issues
+
+Paths are relative:
+
+```
+<script src="js/central-auth-api.js"></script>
+```
+
+CloudFront serves files from the root of the distribution, so the browser tries to load /js/central-auth-api.js relative to the HTML location.
+
+If your HTML is at /cafe-admin-dashboard.html, the browser looks for /cafe-admin-dashboard.html/js/central-auth-api.js → 404.
+
+### ✅ Fix: Use absolute paths with CloudFront base:
+
+```
+<script src="https://dc65q9cmuuula.cloudfront.net/js/central-auth-api.js"></script>
+```
+
+Or use your CHARLIE.assets.url() function dynamically if needed.
+
+### 3️⃣ CloudFront caching
+
+You already confirmed that CloudFront returns 200 OK for JS.
+
+But old HTML or old JS may still be cached → white page.
+
+Invalidate the cache for your HTML + JS + CSS:
+
+```
+/cafe-admin-dashboard.html
+/js/central-auth-api.js
+```
+
+### 4️⃣ Steps to fix your white page
+
+Fix the JS syntax error in loadOrdersDashboard (data.orders\`` → data.orders`)
+
+Wrap async calls in try/catch (optional but recommended)
+
+Update HTML JS references to absolute CloudFront paths:
+
+```
+<script src="https://dc65q9cmuuula.cloudfront.net/js/central-auth-api.js"></script>
+```
+
+Invalidate CloudFront cache for all changed files
+
+Open browser console and verify no errors
+
+#### ✅ After these steps, your white page will disappear, and the dashboard should render properly.
+
+---
 
 
 
