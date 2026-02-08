@@ -240,6 +240,34 @@ sudo systemctl restart nginx
 sudo systemctl restart httpd
 ```
 
+####  🔍 QUICK TEST (DO THIS NOW)
+
+Try opening directly in browser:
+
+```
+https://dc65q9cmuuula.cloudfront.net/js/central-auth-api.js
+```
+
+#### ✅ Expected result:
+
+You should see raw JavaScript code
+
+- ❌ If you see 403 → CloudFront is still blocking
+
+#### 🧪 TEMP DEBUG (OPTIONAL BUT POWERFUL)
+
+Add this at the TOP of your HTML (temporarily):
+
+```
+<script>
+  alert("HTML loaded");
+</script>
+```
+
+- If you see the alert → HTML is fine
+
+- If JS still fails → confirms CloudFront JS block
+
 
 
 
