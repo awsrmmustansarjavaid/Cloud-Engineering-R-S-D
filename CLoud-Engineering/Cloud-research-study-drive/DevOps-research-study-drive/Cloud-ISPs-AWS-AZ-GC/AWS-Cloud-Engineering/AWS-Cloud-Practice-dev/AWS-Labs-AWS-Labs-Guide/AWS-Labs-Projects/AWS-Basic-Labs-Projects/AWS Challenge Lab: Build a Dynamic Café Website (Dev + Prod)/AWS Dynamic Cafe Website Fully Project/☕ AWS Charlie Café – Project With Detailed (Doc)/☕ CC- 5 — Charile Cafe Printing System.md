@@ -115,7 +115,7 @@ function openCentralPrint(selector) {
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 5️⃣  ☕ MULTI-PAGE SUPPORT PDF GENERATION LAMBDA (REPORTLAB)
+## PHASE 2️⃣  ☕ MULTI-PAGE SUPPORT PDF GENERATION LAMBDA (REPORTLAB)
 
 ### 📄 Printing System 2 — Server PDF (Lambda + ReportLab)
 
@@ -247,11 +247,11 @@ order-status_report_2026-01-17.pdf
 **✅ You now have both PDFs.**
 
 
-**✅ PHASE 5 STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 5 COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 6️⃣  CONNECT PDF BUTTON WITH API ( API GATEWAY)
+## PHASE 3️⃣  CONNECT PDF BUTTON WITH API ( API GATEWAY)
 
 ### 1️⃣ CONFIGURE API GATEWAY (FOR MULTI-PAGE PDF)
 
@@ -586,11 +586,11 @@ function downloadOrderPDF(){
 **❗ DO NOT MOVE TO NEXT PHASE UNTIL ALL TESTS ABOVE PASS**
 
 
-**✅ PHASE 6 STATUS**
+**✅ PHASE 3️⃣ STATUS**
 
-> **🟢 PHASE 6 COMPLETE & VERIFIED**
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 7️⃣  Automation Monthly Auto Report
+## PHASE 4️⃣  Automation Monthly Auto Report
 
 ### 2️⃣ METHOD 1- EventBridge Schedule Using Lambda Trigger  (Recommanded)
 
@@ -1274,11 +1274,11 @@ analytics_2026-01-01.pdf
 
 🧠 Enterprise-grade design
 
-**✅ PHASE 7 STATUS**
+**✅ PHASE 4️⃣ STATUS**
 
-> **🟢 PHASE 7 COMPLETE & VERIFIED**
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 1️⃣3️⃣  CSV EXPORT (PROFESSIONAL)
+## PHASE 5️⃣  CSV EXPORT (PROFESSIONAL)
 
 ### 1️⃣ — Cafe Analytics CSV Lambda
 
@@ -1426,7 +1426,7 @@ Espresso,5,25,15,10
 
 ✔ Security verified
 
-### ✅ PHASE 13 FINAL STATUS
+### ✅ PHASE 5️⃣ FINAL STATUS
 
 🟢 PHASE 13 COMPLETE
 
@@ -1436,11 +1436,11 @@ Espresso,5,25,15,10
 
 🟢 NO EXISTING SYSTEM BROKEN
 
-**✅ PHASE 13 STATUS**
+**✅ PHASE 5️⃣ STATUS**
 
-> **🟢 PHASE 13 COMPLETE & VERIFIED**
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 1️⃣4️⃣  DAILY AUTO PDF WITH TABLES & LOGO
+## PHASE 6️⃣  DAILY AUTO PDF WITH TABLES & LOGO
 
 ### 1️⃣ CREATE Or Open existing S3 BUCKET
 
@@ -1822,11 +1822,11 @@ charlie-cafe-s3-bucket/daily_reports/
 > **This ensures EventBridge will run correctly at schedule**
 
 
-**✅ PHASE 14 STATUS**
+**✅ PHASE 6️⃣ STATUS**
 
-> **🟢 PHASE 14 COMPLETE & VERIFIED**
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
-## 🖨 PHASE 1️⃣5️⃣ PDF BUTTON INTEGRATION
+## 🖨 PHASE 7️⃣ PDF BUTTON INTEGRATION
 
 > **FRONTEND → EXISTING LAMBDA**
 
@@ -2006,12 +2006,12 @@ parseJwt(token)["cognito:groups"]
 🟢 UI professional — COMPLETE
 
 
-**✅ PHASE 15 STATUS**
+**✅ PHASE 7️⃣ STATUS**
 
-> **🟢 PHASE 15 COMPLETE & VERIFIED**
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 1️⃣6️⃣  Test
+## PHASE 8️⃣  Test
 
 ### 1️⃣  - 📄 PDF – HOW IT WORKS FROM ORDER STATUS PAGE
 
@@ -2072,11 +2072,346 @@ cron(0/10 * * * ? *)
 
 ✔ Production ready
 
-**✅ PHASE 16 STATUS**
+**✅ PHASE 8️⃣ STATUS**
 
-> **🟢 PHASE 16 COMPLETE & VERIFIED**
+> **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 9️⃣ — Update CafePDFReportLambda for HR & Attendance
+
+### 📃 Research and Development (Just for CaseStudy)
+
+#### 1️⃣ Can we reuse the existing PDF Lambda?
+
+✅ Yes, you can reuse it, because:
+
+- Your current Lambda already:
+
+    - Generates a PDF using ReportLab
+
+    - Uploads it to S3
+
+    - Handles dynamic content based on page_type
+
+- It’s generic enough to handle any tabular report, including attendance or employee reports
+
+- It already has environment variables for S3 bucket and files, so you don’t need a new Lambda for PDF generation unless you want totally separate deployment for HR.
+
+#### 2️⃣ How to integrate HR/Attendance into existing Lambda
+
+#### Step 1: Add a new page_type for HR
+
+#### In your Lambda:
+
+```
+page_type = event.get("queryStringParameters", {}).get("page", "analytics")
+```
+
+- Right now it checks "analytics" or "order-status"
+
+- We can add "attendance":
+
+```
+elif page_type == "attendance":
+    elements.append(Paragraph("📋 Employee Attendance Report", styles["Title"]))
+    elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+    elements.append(Spacer(1, 15))
+
+    # Fetch attendance data from RDS
+    import pymysql
+
+    connection = pymysql.connect(
+        host=os.environ['DB_HOST'],
+        user=os.environ['DB_USER'],
+        password=os.environ['DB_PASS'],
+        database=os.environ['DB_NAME'],
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT e.name, e.job_title, a.attendance_date, a.checkin_time, a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            ORDER BY a.attendance_date DESC
+        """)
+        records = cursor.fetchall()
+
+    table_data = [["Employee", "Job Title", "Date", "Check-In", "Check-Out"]]
+    for r in records:
+        table_data.append([
+            r["name"],
+            r["job_title"],
+            str(r["attendance_date"]),
+            str(r.get("checkin_time") or ""),
+            str(r.get("checkout_time") or "")
+        ])
+
+    table = Table(table_data, colWidths=[120, 100, 80, 60, 60])
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.darkgreen),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+        ("ALIGN", (0,0), (-1,-1), "CENTER"),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+        ("BACKGROUND", (0,1), (-1,-1), colors.lightgrey)
+    ]))
+
+    elements.append(table)
+```
+
+#### Step 2: Add HR-specific environment variables
+
+- DB_HOST → RDS endpoint
+
+- DB_NAME → cafedb
+
+- DB_USER / DB_PASS → credentials
+
+- S3 bucket can remain the same (or use a new folder hr/attendance/ for organization)
+
+#### Step 3: Use page=attendance in your API call
+
+Example URL from frontend:
+
+```
+https://<your-api-gateway>/generate-pdf?page=attendance
+```
+
+- Lambda will detect page_type="attendance" and generate Attendance PDF
+
+- No need for new Lambda function
+
+- You save time and resources
+
+#### ✅ My Recommendation (Time-Saving, Professional)
+
+- Do not create a new Lambda for PDF yet
+
+- Use your existing PDF Lambda
+
+- Just add a new page_type branch for "attendance" (and optionally "employee-profile" if needed)
+
+- Hook your HR Lambda data (attendance, leaves, profile) via RDS queries inside this branch
+
+#### This way:
+
+- 1 Lambda handles all PDF generation
+
+- No duplication
+
+- Easy maintenance
+
 ---
 
+### 1️⃣ Step 1️⃣ – Update CafePDFReportLambda for HR & Attendance
 
+> *8We are going to add a new page_type branch for HR/Attendance reports.**
 
+#### Updated Lambda Code
+
+```
+import os
+import boto3
+import io
+import datetime
+import pymysql  # Required for RDS access
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Image, Spacer
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
+# =======================
+# ENVIRONMENT VARIABLES
+# =======================
+ORDERS_TABLE_NAME = os.environ.get("ORDERS_TABLE_NAME")  # Existing DynamoDB orders table
+REPORTS_BUCKET_NAME = os.environ.get("REPORTS_BUCKET_NAME")  # S3 bucket for storing PDFs
+LOGO_FILE_NAME = os.environ.get("LOGO_FILE_NAME", "")  # Optional logo file
+DB_HOST = os.environ.get("DB_HOST")  # RDS endpoint for HR/Attendance
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASS = os.environ.get("DB_PASS")
+
+# =======================
+# AWS CLIENTS
+# =======================
+dynamodb = boto3.resource("dynamodb")
+orders_table = dynamodb.Table(ORDERS_TABLE_NAME)
+s3 = boto3.client("s3")
+
+# =======================
+# DATABASE CONNECTION
+# =======================
+def get_db_connection():
+    """Return a pymysql connection to RDS"""
+    return pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+def lambda_handler(event, context):
+    """Main Lambda Handler"""
+    
+    # Determine type of report to generate
+    page_type = event.get("queryStringParameters", {}).get("page", "analytics")
+    today = datetime.date.today()
+
+    # PDF buffer setup
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    # =======================
+    # LOGO (OPTIONAL)
+    # =======================
+    if LOGO_FILE_NAME:
+        try:
+            elements.append(Image(LOGO_FILE_NAME, width=120, height=60))
+            elements.append(Spacer(1, 20))
+        except:
+            pass
+
+    # =======================
+    # CAFE SALES ANALYTICS PDF
+    # =======================
+    if page_type == "analytics":
+        elements.append(Paragraph("📊 Cafe Sales Analytics Report", styles["Title"]))
+        elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+        elements.append(Spacer(1, 15))
+        total_sales = 12000
+        total_cost = 8000
+        profit = total_sales - total_cost
+        data = [
+            ["Metric", "Amount"],
+            ["Total Sales", total_sales],
+            ["Total Cost", total_cost],
+            ["Profit", profit]
+        ]
+        table = Table(data, colWidths=[200, 150])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.brown),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+            ("ALIGN", (0,0), (-1,-1), "CENTER"),
+            ("GRID", (0,0), (-1,-1), 1, colors.black),
+            ("BACKGROUND", (0,1), (-1,-1), colors.beige)
+        ]))
+        elements.append(table)
+
+    # =======================
+    # ORDER STATUS PDF
+    # =======================
+    elif page_type == "order-status":
+        elements.append(Paragraph("📝 Cafe Order Status Report", styles["Title"]))
+        elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+        elements.append(Spacer(1, 15))
+        orders = orders_table.scan().get("Items", [])
+        table_data = [["Order ID", "Item", "Qty", "Cost", "Price", "Profit"]]
+        for o in orders:
+            qty = int(o.get("quantity", 1))
+            cost = float(o.get("item_cost", 0)) * qty
+            price = float(o.get("item_price", 0)) * qty
+            profit = price - cost
+            table_data.append([
+                o.get("order_id"),
+                o.get("item_name"),
+                qty,
+                cost,
+                price,
+                profit
+            ])
+        table = Table(table_data, colWidths=[80, 110, 50, 60, 60, 60])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.darkblue),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+            ("ALIGN", (0,0), (-1,-1), "CENTER"),
+            ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+            ("BACKGROUND", (0,1), (-1,-1), colors.lightgrey)
+        ]))
+        elements.append(table)
+
+    # =======================
+    # HR & ATTENDANCE PDF
+    # =======================
+    elif page_type == "attendance":
+        elements.append(Paragraph("📋 Employee Attendance Report", styles["Title"]))
+        elements.append(Paragraph(f"Generated: {today}", styles["Normal"]))
+        elements.append(Spacer(1, 15))
+
+        # Connect to RDS and fetch attendance & employee data
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT e.name, e.job_title, a.attendance_date, a.checkin_time, a.checkout_time
+                FROM attendance a
+                JOIN employees e ON a.employee_id = e.employee_id
+                ORDER BY a.attendance_date DESC
+            """)
+            records = cursor.fetchall()
+
+        # Create table data
+        table_data = [["Employee", "Job Title", "Date", "Check-In", "Check-Out"]]
+        for r in records:
+            table_data.append([
+                r["name"],
+                r["job_title"],
+                str(r["attendance_date"]),
+                str(r.get("checkin_time") or ""),
+                str(r.get("checkout_time") or "")
+            ])
+
+        # Format table
+        table = Table(table_data, colWidths=[120, 100, 80, 60, 60])
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.darkgreen),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.whitesmoke),
+            ("ALIGN", (0,0), (-1,-1), "CENTER"),
+            ("GRID", (0,0), (-1,-1), 0.5, colors.black),
+            ("BACKGROUND", (0,1), (-1,-1), colors.lightgrey)
+        ]))
+        elements.append(table)
+
+    # =======================
+    # BUILD PDF
+    # =======================
+    doc.build(elements)
+    buffer.seek(0)
+
+    # Upload to S3
+    s3_key = f"{page_type}_report_{today}.pdf"
+    s3.put_object(
+        Bucket=REPORTS_BUCKET_NAME,
+        Key=s3_key,
+        Body=buffer.getvalue(),
+        ContentType="application/pdf"
+    )
+
+    # Return PDF as response (for testing)
+    return {
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/pdf"},
+        "body": buffer.getvalue().decode("latin1"),
+        "isBase64Encoded": False
+    }
+```
+
+#### ✅ What changed / added:
+
+- Added elif page_type == "attendance"
+
+    - Queries RDS attendance & employees table
+
+    - Generates a table PDF
+
+- Added pymysql connection inside Lambda (environment variables required)
+
+Fully commented code
+
+- No other code changes, still handles analytics and order-status
+
+**✅ PHASE 9️⃣ STATUS**
+
+> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
+---
 # SECTION 1️⃣  COMPLETE ✅
