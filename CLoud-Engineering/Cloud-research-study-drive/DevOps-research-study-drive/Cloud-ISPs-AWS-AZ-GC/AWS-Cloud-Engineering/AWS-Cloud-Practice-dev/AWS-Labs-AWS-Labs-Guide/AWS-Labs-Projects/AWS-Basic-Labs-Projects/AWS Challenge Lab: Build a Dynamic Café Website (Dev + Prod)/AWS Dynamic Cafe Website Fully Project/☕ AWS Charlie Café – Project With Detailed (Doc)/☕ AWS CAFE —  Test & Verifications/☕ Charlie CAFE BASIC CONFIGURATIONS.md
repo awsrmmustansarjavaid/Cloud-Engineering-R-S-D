@@ -658,6 +658,12 @@ Then:
 curl -I https://dc65q9cmuuula.cloudfront.net/js/central-auth-api.js
 ```
 
+Run the fixes above and paste only this output back:
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
 **✅ All three must return 200 OK.**
 
 
