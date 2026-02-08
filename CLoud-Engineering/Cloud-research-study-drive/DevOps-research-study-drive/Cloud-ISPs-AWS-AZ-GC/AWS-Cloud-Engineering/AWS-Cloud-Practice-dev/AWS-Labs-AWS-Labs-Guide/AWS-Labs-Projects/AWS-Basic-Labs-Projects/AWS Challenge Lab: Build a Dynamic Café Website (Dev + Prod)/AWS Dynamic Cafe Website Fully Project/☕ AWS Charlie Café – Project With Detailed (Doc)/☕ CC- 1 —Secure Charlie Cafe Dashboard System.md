@@ -406,13 +406,13 @@ email   ← OK (this is fine)
 #### 4️⃣ Return URL
 
 ```
-d2og2zrs47voou.cloudfront.net
+https://YOUR_CLOUDFRONT_DOMAIN/
 ```
 
 #### For Example:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+https://YOUR_CLOUDFRONT_DOMAIN/cafe-admin-dashboard.html
 ```
 
 #### Now click the button at bottom-right:
@@ -561,7 +561,7 @@ https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
 #### Add the same:
 
 ```
-https://d2og2zrs47voou.cloudfront.net/cafe-admin-dashboard.html
+https://d2og2zrs47voou.cloudfront.net/dashboard-login.html
 ```
 
 > **Cognito is strict: must be HTTPS + exact path, no trailing slash.**

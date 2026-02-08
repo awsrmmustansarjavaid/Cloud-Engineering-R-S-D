@@ -1,15 +1,16 @@
 /* =========================================================
-   CHARLIE CAFE — CENTRAL AUTH + API CONFIG (FINAL)
+   CHARLIE CAFE — CENTRAL AUTH + API CONFIG (STABLE FINAL)
    ---------------------------------------------------------
    ✔ Cognito Hosted UI Login / Logout
    ✔ Token Handling (Access Token)
-   ✔ Page Protection (Auto Redirect)
-   ✔ Logout Button (Centralized)
-   ✔ Role-Based Access (Admin / Employee)
+   ✔ Page Protection (No White Screen)
+   ✔ Central Logout Button
+   ✔ Role-Based Access Control (Admin / Employee)
    ✔ Secure API Gateway Calls
-   ✔ AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
-   ✔ UNIVERSAL RBAC (CENTRALIZED)
+   ✔ Auto Logout on Token Expiry
+   ✔ All API Gateway Endpoints Preserved
 ========================================================= */
+
 const CHARLIE = (() => {
 
     /* =====================================================
@@ -17,33 +18,43 @@ const CHARLIE = (() => {
     ===================================================== */
     const CONFIG = {
         REGION: "us-east-1",
+
         // Cognito
         USER_POOL_ID: "us-east-1_HDcwDJqVz",
         CLIENT_ID: "3hcigucn7fmd11gvo9uuqud6fi",
         COGNITO_DOMAIN: "us-east-1hdcwdjqvz.auth.us-east-1.amazonaws.com",
+
         // API Gateway
         API_BASE: "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com",
+
         // CloudFront
         CLOUDFRONT_BASE: "https://d159bqc5pw64hn.cloudfront.net"
     };
 
     /* =====================================================
-       2️⃣ TOKEN HELPERS
+       2️⃣ TOKEN HELPERS (SAFE)
     ===================================================== */
     function parseJwt(token) {
         return JSON.parse(atob(token.split(".")[1]));
     }
+
     function isTokenExpired(token) {
-        return parseJwt(token).exp * 1000 < Date.now();
+        try {
+            return parseJwt(token).exp * 1000 < Date.now();
+        } catch {
+            return true;
+        }
     }
+
     function getToken() {
         return localStorage.getItem("access_token");
     }
 
     /* =====================================================
-       3️⃣ AUTH MODULE
+       3️⃣ AUTH MODULE (No White Screen, Safe Redirect)
     ===================================================== */
     const auth = {
+
         login(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`) {
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/login` +
@@ -53,7 +64,8 @@ const CHARLIE = (() => {
                 `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
             window.location.href = url;
         },
-        logout(redirectUrl = window.location.origin) {
+
+        logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/index.html`) {
             localStorage.removeItem("access_token");
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/logout` +
@@ -61,6 +73,8 @@ const CHARLIE = (() => {
                 `&logout_uri=${encodeURIComponent(redirectUrl)}`;
             window.location.href = url;
         },
+
+        /* Handle redirect after Cognito login */
         handleRedirect() {
             if (!window.location.hash) return;
             const params = new URLSearchParams(window.location.hash.substring(1));
@@ -70,6 +84,8 @@ const CHARLIE = (() => {
                 window.location.hash = "";
             }
         },
+
+        /* Protect page — only shows content if logged in */
         protectPage() {
             this.handleRedirect();
             const token = getToken();
@@ -77,25 +93,26 @@ const CHARLIE = (() => {
                 this.login();
                 return;
             }
+            // Show content after auth passes
             document.body.style.display = "block";
         },
-        setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "index.html") {
+
+        /* Setup logout button */
+        setupLogoutButton(buttonId = "logoutBtn") {
             const btn = document.getElementById(buttonId);
             if (!btn) return;
-            btn.addEventListener("click", () => {
-                this.logout(redirectUrl);
-            });
+            btn.addEventListener("click", () => this.logout());
         }
     };
 
     /* =====================================================
-       4️⃣ SECURE FETCH (JWT AUTO ATTACH)
+       4️⃣ SECURE FETCH — JWT AUTO ATTACH
     ===================================================== */
     async function authFetch(url, options = {}) {
         const token = getToken();
         if (!token || isTokenExpired(token)) {
             auth.logout();
-            return; // 🔐 intentionally return undefined
+            return;
         }
         return fetch(url, {
             ...options,
@@ -114,24 +131,26 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       5️⃣ ROLE & ACCESS CONTROL (NORMALIZED + SAFE)
+       5️⃣ ROLE & ACCESS CONTROL
     ===================================================== */
     function getUserRoles() {
         const token = getToken();
         if (!token) return [];
         const payload = parseJwt(token);
-        const groups = payload["cognito:groups"];
-        if (!groups) return [];
+        const groups = payload["cognito:groups"] || [];
         return Array.isArray(groups)
             ? groups.map(r => r.toLowerCase())
             : [String(groups).toLowerCase()];
     }
+
     function isAdmin() {
         return getUserRoles().includes("admin");
     }
+
     function isEmployee() {
         return getUserRoles().includes("employee");
     }
+
     function requireAdmin() {
         if (!isAdmin()) {
             alert("❌ Admin access only");
@@ -139,6 +158,7 @@ const CHARLIE = (() => {
             throw new Error("Admin access required");
         }
     }
+
     function requireEmployee() {
         if (!isEmployee() && !isAdmin()) {
             alert("❌ Employee access only");
@@ -148,7 +168,7 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       🔐 AUTO LOGOUT ON TOKEN EXPIRY (CENTRALIZED)
+       6️⃣ AUTO LOGOUT ON TOKEN EXPIRY
     ===================================================== */
     let logoutTriggered = false;
     function startAutoLogoutWatcher() {
@@ -170,9 +190,10 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       6️⃣ API GATEWAY ENDPOINTS (UPDATED)
+       7️⃣ API GATEWAY ENDPOINTS (FULL)
     ===================================================== */
     const api = {
+
         /* 🛒 ORDERS */
         placeOrder(payload) {
             return fetch(`${CONFIG.API_BASE}/dev/orders`, {
@@ -189,26 +210,19 @@ const CHARLIE = (() => {
             });
         },
 
-        // ────────────────────────────────────────────────
-        // ORDER STATUS ENDPOINTS (3 LAMBDAS)
-        // ────────────────────────────────────────────────
         getOrderStatus(orderId) {
-            return secureFetch(
-                `${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`
-            );
-        },
-        getCafeOrderStatus(orderId) {
-            return secureFetch(
-                `${CONFIG.API_BASE}/status/cafe-order-status?order_id=${encodeURIComponent(orderId)}`
-            );
-        },
-        getGetOrderStatus(orderId) {
-            return secureFetch(
-                `${CONFIG.API_BASE}/status/get-order-status?order_id=${encodeURIComponent(orderId)}`
-            );
+            return secureFetch(`${CONFIG.API_BASE}/status/order-status?order_id=${encodeURIComponent(orderId)}`);
         },
 
-        /* 🧑‍🍳 HR — EMPLOYEE + ADMIN */
+        getCafeOrderStatus(orderId) {
+            return secureFetch(`${CONFIG.API_BASE}/status/cafe-order-status?order_id=${encodeURIComponent(orderId)}`);
+        },
+
+        getGetOrderStatus(orderId) {
+            return secureFetch(`${CONFIG.API_BASE}/status/get-order-status?order_id=${encodeURIComponent(orderId)}`);
+        },
+
+        /* 🧑‍🍳 HR — Employee + Admin */
         recordAttendance(payload) {
             requireEmployee();
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance`, {
@@ -216,20 +230,19 @@ const CHARLIE = (() => {
                 body: JSON.stringify(payload)
             });
         },
+
         getAttendance(employeeId) {
             requireEmployee();
-            return secureFetch(
-                `${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
-            );
+            return secureFetch(`${CONFIG.API_BASE}/dev/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`);
         },
 
-        /* 👨‍💼 HR — ADMIN ONLY */
+        /* 👨‍💼 HR — Admin Only */
         getAllEmployees() {
             requireAdmin();
             return secureFetch(`${CONFIG.API_BASE}/dev/hr/employees`);
         },
 
-        /* 📊 ADMIN ATTENDANCE ANALYTICS */
+        /* 📊 Admin Attendance Analytics */
         adminAttendance: {
             getDailySummary() {
                 requireAdmin();
@@ -245,7 +258,7 @@ const CHARLIE = (() => {
             }
         },
 
-        /* 📈 ADMIN DASHBOARD */
+        /* 📈 Admin Dashboard */
         adminDashboard: {
             fetchData(employeeId = "") {
                 requireAdmin();
@@ -261,7 +274,7 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       7️⃣ CLOUDFRONT ASSETS
+       8️⃣ CLOUDFRONT ASSETS
     ===================================================== */
     const assets = {
         url(path) {
@@ -270,7 +283,7 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       8️⃣ PAGE INITIALIZER
+       9️⃣ PAGE INITIALIZER
     ===================================================== */
     function initProtectedPage(options = {}) {
         const { requireAuth = true, enableLogout = true, logoutButtonId = "logoutBtn" } = options;
@@ -280,7 +293,7 @@ const CHARLIE = (() => {
     }
 
     /* =====================================================
-       9️⃣ BROWSER PRINT FUNCTIONS
+       🔟 BROWSER PRINT FUNCTIONS (OPTIONAL)
     ===================================================== */
     window.printAllOrders = function () {
         console.log("🖨️ Printing all orders...");
@@ -288,13 +301,13 @@ const CHARLIE = (() => {
     };
 
     window.printTodaySummary = function () {
-        console.log("📄 Printing today's summary...");
         const table = document.querySelector("#ordersTable tbody");
         if (!table) return alert("❌ Orders table not found");
+
         const rows = table.querySelectorAll("tr");
         const today = new Date().toISOString().split("T")[0];
-        let totalOrders = 0;
-        let totalAmount = 0;
+        let totalOrders = 0, totalAmount = 0;
+
         rows.forEach(row => {
             const orderDate = row.dataset.date;
             const amount = parseFloat(row.dataset.total || 0);
@@ -303,6 +316,7 @@ const CHARLIE = (() => {
                 totalAmount += amount;
             }
         });
+
         const summaryHTML = `
             <div style="padding:20px">
                 <h3 style="text-align:center">☕ Charlie Cafe — Daily Summary</h3>
@@ -312,6 +326,7 @@ const CHARLIE = (() => {
                 <p><strong>Total Sales:</strong> $${totalAmount.toFixed(2)}</p>
             </div>
         `;
+
         const originalContent = document.body.innerHTML;
         document.body.innerHTML = summaryHTML;
         window.print();
@@ -320,11 +335,10 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       🔟 EXPORT
+       1️⃣1️⃣ EXPORT MODULE
     ===================================================== */
     return {
         CONFIG,
-        apiBase: CONFIG.API_BASE,
         auth,
         api,
         assets,
