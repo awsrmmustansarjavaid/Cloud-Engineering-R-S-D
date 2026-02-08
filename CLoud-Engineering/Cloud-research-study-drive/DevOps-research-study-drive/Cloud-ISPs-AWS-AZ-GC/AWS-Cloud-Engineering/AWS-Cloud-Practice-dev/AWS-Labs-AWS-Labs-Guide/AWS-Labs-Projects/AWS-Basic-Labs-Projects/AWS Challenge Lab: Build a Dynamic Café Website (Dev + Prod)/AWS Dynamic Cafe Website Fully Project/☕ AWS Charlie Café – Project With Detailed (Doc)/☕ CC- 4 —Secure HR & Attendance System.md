@@ -192,17 +192,30 @@ sudo ./setup_cafe_hr_attendance.sh
 
 ## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
-### 1️⃣ Create Lambda: hr-checkin
-
-#### Step 1️⃣: Open Lambda
+### 1️⃣ Lambda: hr-checkin & hr-checkinout
 
 - AWS Console → Lambda
 
 - Click Create function
 
-#### Step 2️⃣: Function Basics
-
 - Author from scratch
+
+- Runtime: Python 3.12
+
+- Architecture: x86_64
+
+- Use existing role: cafe-hr-lambda-role
+
+### Option - A hr-attendance
+
+> **a single merged Lambda, Check-in and check-out are the same domain action (attendance), just different operations.**
+
+[hr-attendance.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-attendance.py)
+
+
+### Option - B hr-checkin & hr-checkinout
+
+### 1️⃣ Create Lambda: hr-checkin
 
 #### Function name:
 
@@ -210,25 +223,23 @@ sudo ./setup_cafe_hr_attendance.sh
 hr-checkin
 ```
 
-#### Runtime:
+> **Replace entire code with this:**
+
+[hr-checkin.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkin.py)
+
+### 2️⃣ Create Lambda: hr-checkout
+> **Repeat Steps Exactly Like hr-checkin**
+
+#### Function name:
 
 ```
-Python 3.12
+hr-checkout
 ```
-
-- Architecture: x86_64
-
-#### Execution role:
-
-- Use existing role
-
-#### Select:
-
-```
-cafe-hr-lambda-role
-```
+[hr-checkout.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkout.py)
 
 - Click Create function
+
+- Click Deploy
 
 #### Step 3️⃣: Configure Environment Variables
 
@@ -256,31 +267,6 @@ cafe-hr-lambda-role
 - Security group: Lambda SG that allows RDS access
 
 - Click Save
-
-#### Step 5️⃣: Lambda Code (Check-In)
-
-> **Replace entire code with this:**
-
-[hr-checkin.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkin.py)
-
-- Click Deploy
-
-### 2️⃣ Create Lambda: hr-checkout
-> **Repeat Steps Exactly Like hr-checkin**
-
-#### Only change:
-
-#### 1️⃣ Function name:
-
-```
-hr-checkout
-```
-
-#### 2️⃣ Code:
-
-[hr-checkout.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkout.py)
-
-- Deploy.
 
 ### 3️⃣ Create Lambda: hr-employee-profile
 
@@ -370,6 +356,18 @@ HR Secure Attendance & Employee Management API
 
 | Resource           | Path                  | Lambda Function         |
 | ------------------ | --------------------- | ----------------------- |
+| checkin           | `/checkin`            | `hr-attendance`            |
+| checkout         | `/checkout`           | `hr-attendance`           |
+| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
+| Attendance History | `/attendance-history` | `hr-attendance-history` |
+| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
+
+**⚠️ If you are following optional -B then follow this below configureations**
+
+> **We will create 5 resources, one for each Lambda.**
+
+| Resource           | Path                  | Lambda Function         |
+| ------------------ | --------------------- | ----------------------- |
 | checkin           | `/checkin`            | `hr-checkin`            |
 | checkout         | `/checkout`           | `hr-checkout`           |
 | Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
@@ -418,9 +416,9 @@ HR Secure Attendance & Employee Management API
 
 #### Lambda Function:
 
-    - /checkin → hr-checkin
+    - /checkin → hr-attendance
 
-    - /checkout → hr-checkout
+    - /checkout → hr-attendance
 
     - /employee-profile → hr-employee-profile
 
