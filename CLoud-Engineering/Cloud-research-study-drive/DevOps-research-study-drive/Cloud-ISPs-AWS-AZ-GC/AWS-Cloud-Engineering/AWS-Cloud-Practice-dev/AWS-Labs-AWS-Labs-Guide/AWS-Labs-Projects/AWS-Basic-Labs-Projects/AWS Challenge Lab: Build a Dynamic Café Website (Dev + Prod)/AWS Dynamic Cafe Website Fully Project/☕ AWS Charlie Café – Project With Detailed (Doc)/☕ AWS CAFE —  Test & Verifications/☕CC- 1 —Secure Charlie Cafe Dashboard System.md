@@ -171,6 +171,84 @@ http://ALB-DNS-NAME/cafe-admin-dashboard.html
 | Return URL | ALB DNS + `/cafe-admin-dashboard.html` |
 | CloudFront | Later (optional)               |
 
+----
+### 1️⃣ 🛠️ FIX OPTION 1 (FASTEST & RECOMMENDED)
+
+####  ✔️ Allow JS files in CloudFront Behavior
+
+- Go to: CloudFront → Distribution → Behaviors
+
+- Edit the behavior that serves your site (usually /*):
+
+- Set these EXACTLY:
+
+- Path pattern: /*
+
+- Viewer protocol policy: Redirect HTTP to HTTPS
+
+- Allowed HTTP methods: GET, HEAD
+
+- Cache policy: CachingOptimized
+
+- Origin request policy: AllViewerExceptHostHeader
+
+- Compress objects automatically: YES
+
+- Then SAVE.
+
+👉 After that:
+
+#### Invalidate cache
+
+```
+/js/central-auth-api.js
+```
+
+> **(or just /* if you’re tired 😄)***
+
+### 🛠️ FIX OPTION 2 (ORIGIN PERMISSION ISSUE)
+
+#### If origin is EC2 / ALB:
+
+➡️ On EC2, run:
+
+```
+ls -l html/js/central-auth-api.js
+```
+
+You MUST see something like:
+
+```
+-rw-r--r-- 1 ec2-user ec2-user
+```
+
+➡️ If not:
+
+```
+chmod 644 html/js/central-auth-api.js
+chmod 755 html/js
+```
+
+➡️ Restart web server:
+
+```
+sudo systemctl restart nginx
+```
+# or
+
+```
+sudo systemctl restart httpd
+```
+
+
+
+
+
+
+
+
+
+
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
