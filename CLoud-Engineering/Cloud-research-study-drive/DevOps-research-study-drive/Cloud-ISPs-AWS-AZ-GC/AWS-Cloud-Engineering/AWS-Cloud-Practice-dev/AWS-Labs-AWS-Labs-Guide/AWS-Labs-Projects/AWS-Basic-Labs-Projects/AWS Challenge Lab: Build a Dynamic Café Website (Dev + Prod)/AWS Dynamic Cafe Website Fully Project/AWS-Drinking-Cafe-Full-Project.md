@@ -1334,6 +1334,25 @@ sudo nano /var/www/html/analytics.html
 CTRL + O → ENTER
 CTRL + X
 ```
+### 8️⃣ dashboard-login.html
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/dashboard-login.html
+```
+
+#### 2️⃣ code
+
+[dashboard-login.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/dashboard-login.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
 
 
 **✅ PHASE 2️⃣ STATUS**
