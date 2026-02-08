@@ -1349,6 +1349,11 @@ CTRL + X
 ```
 sudo chown apache:apache /var/www/html/*
 ```
+
+```
+sudo chmod -R 755 /var/www/html/*
+```
+
 ```
 sudo chmod 644 /var/www/html/*
 ```
