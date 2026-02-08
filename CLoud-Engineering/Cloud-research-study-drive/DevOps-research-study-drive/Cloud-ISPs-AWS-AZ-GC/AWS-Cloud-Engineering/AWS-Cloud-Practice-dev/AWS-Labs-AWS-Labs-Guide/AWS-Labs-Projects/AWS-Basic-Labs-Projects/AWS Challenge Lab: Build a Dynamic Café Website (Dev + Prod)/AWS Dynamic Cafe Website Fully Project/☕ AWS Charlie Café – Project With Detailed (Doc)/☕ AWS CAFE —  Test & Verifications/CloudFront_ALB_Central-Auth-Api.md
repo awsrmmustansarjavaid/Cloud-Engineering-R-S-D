@@ -527,6 +527,73 @@ AddType application/javascript .js
 sudo systemctl restart httpd
 ```
 
+### 🧪 VERIFY (THIS MUST TURN GREEN)
+
+Run again:
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
+#### ✅ EXPECTED:
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/javascript
+```
+
+Then:
+
+```
+curl -I http://charlie-cafe-alb-1179524333.us-east-1.elb.amazonaws.com/js/central-auth-api.js
+```
+
+Then:
+
+```
+curl -I https://dc65q9cmuuula.cloudfront.net/js/central-auth-api.js
+```
+
+**✅ All three must return 200 OK.**
+
+### 🛑 DO NOT TOUCH YOUR JS FILE
+
+❌ Do NOT add anything inside central-auth-api.js
+
+❌ Do NOT change permissions to 777
+
+❌ Do NOT disable CloudFront
+
+❌ Do NOT waste time on Cognito
+
+Your JS file is perfect.
+
+### 🧠 WHY HTML WORKS BUT JS DOESN’T
+
+Apache default configs sometimes allow:
+
+```
+/var/www/html/*.html
+```
+
+but deny subfolders unless explicitly allowed.
+
+That’s exactly what we see.
+
+### 🏁 WHEN THIS IS FIXED
+
+✔ White page disappears
+
+✔ CHARLIE loads
+
+✔ Cognito redirects work
+
+✔ Admin dashboard loads
+
+✔ Printing system works
+
+✔ You keep your sanity 😄
+
 
 
 

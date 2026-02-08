@@ -631,6 +631,36 @@ http:// Your EC2 Public IP/admin-orders.php
 http:// Your EC2 Public IP/payment-status.php
 ```
 
+### 3️⃣ VERIFY (THIS MUST TURN GREEN)
+
+Run again:
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
+#### ✅ EXPECTED:
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/javascript
+```
+
+Then:
+
+```
+curl -I http://charlie-cafe-alb-1179524333.us-east-1.elb.amazonaws.com/js/central-auth-api.js
+```
+
+Then:
+
+```
+curl -I https://dc65q9cmuuula.cloudfront.net/js/central-auth-api.js
+```
+
+**✅ All three must return 200 OK.**
+
+
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
