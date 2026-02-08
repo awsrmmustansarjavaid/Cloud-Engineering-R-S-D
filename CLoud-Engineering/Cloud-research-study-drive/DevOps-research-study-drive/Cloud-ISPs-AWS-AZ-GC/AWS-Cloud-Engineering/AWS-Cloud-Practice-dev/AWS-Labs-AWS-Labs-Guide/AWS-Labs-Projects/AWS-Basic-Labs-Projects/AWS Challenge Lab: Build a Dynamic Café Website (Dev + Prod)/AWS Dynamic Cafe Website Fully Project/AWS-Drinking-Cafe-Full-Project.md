@@ -1369,14 +1369,57 @@ sudo chmod -R 644 /var/www/html
 
 **⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
 
-### 2️⃣ 
+### 2️⃣ ALLOW /var/www/html/js IN APACHE
 
+Open Apache main config:
 
-### 3️⃣ Restart Apache (MANDATORY)
+```
+sudo nano /etc/httpd/conf/httpd.conf
+```
+
+Find this block (or similar):
+
+```
+<Directory "/var/www/html">
+    AllowOverride None
+    Require all denied
+</Directory>
+```
+
+🔥 CHANGE IT TO:
+
+```
+<Directory "/var/www/html">
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+### 3️⃣ EXPLICITLY ALLOW JS DIRECTORY (BEST PRACTICE)
+
+Add this at the bottom of the file:
+
+```
+<Directory "/var/www/html/js">
+    Require all granted
+</Directory>
+```
+
+### 4️⃣ SET PROPER MIME TYPE FOR JS
+
+Still in the same file, add (or ensure exists):
+
+```
+AddType application/javascript .js
+```
+
+### 5️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
 ```
+
+
 
 **✅ PHASE 3️⃣ STATUS**
 
