@@ -600,7 +600,325 @@ That’s exactly what we see.
 
 ✔ You keep your sanity 😄
 
+### 🔥 THE LIKELY CAUSE
 
+Since you tried editing /etc/httpd/conf/httpd.conf and it didn’t fix:
+
+You are likely running SELinux / Amazon Linux security context.
+
+Or there is a /etc/httpd/conf.d/ override (e.g., welcome.conf, ssl.conf, security.conf) blocking access to subdirectories like /js.
+
+Another common culprit: Require all denied in a <Directory> block higher up, e.g., in /etc/httpd/conf.d/welcome.conf.
+
+Also, Amazon Linux 2 with Apache 2.4+ has SELinux enforcing httpd_sys_content_t. If the JS file doesn’t have correct context → 403.
+
+### ✅ HOW TO FIX THIS
+
+#### 1️⃣ Check SELinux status
+
+```
+getenforce
+```
+
+Enforcing → SELinux could be blocking Apache from serving /js
+
+Permissive → SELinux is not the problem
+
+If Enforcing, we need to fix the context.
+
+#### 2️⃣ Check file context (if SELinux is enabled)
+
+```
+ls -Z /var/www/html/js/central-auth-api.js
+```
+
+You should see:
+
+```
+-rw-r--r--. apache apache unconfined_u:object_r:httpd_sys_content_t:s0 ...
+```
+
+If context is wrong → Apache blocks it (403).
+
+#### Fix SELinux context
+
+```
+sudo restorecon -Rv /var/www/html/js
+```
+
+#### 3️⃣ Ensure <Directory> allows access
+
+Check /etc/httpd/conf/httpd.conf:
+
+```
+<Directory "/var/www/html">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+Then add explicitly for JS:
+
+```
+<Directory "/var/www/html/js">
+    Require all granted
+</Directory>
+```
+
+#### 4️⃣ Check for .htaccess overrides
+
+```
+ls -la /var/www/html/js/.htaccess
+```
+
+If exists, check for Deny from all → comment it out.
+
+#### 5️⃣ Restart Apache
+
+```
+sudo systemctl restart httpd
+```
+
+#### 6️⃣ Test locally (CRUCIAL)
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
+✅ Should return 200 OK
+✅ If yes → ALB and CloudFront automatically work
+
+#### ⚡ Quick test if SELinux is blocking (temporary)
+
+```
+sudo setenforce 0
+curl -I http://localhost/js/central-auth-api.js
+```
+
+If this returns 200 → SELinux was the problem.
+
+Do not leave SELinux disabled permanently, fix the context with restorecon.
+
+#### 💡 Important: You do NOT need to modify central-auth-api.js at all. This is purely a server permission issue.
+
+### Step 1: Verify SELinux
+
+You already ran:
+
+```
+getenforce
+# Output: Permissive
+```
+
+Since SELinux is Permissive, it won’t block access, but Apache still requires proper file context. So we need to make sure your JS files have the correct SELinux context.
+
+### Step 2: Correct Ownership and Permissions Recursively
+
+You only changed /var/www/html/*. If /js and .htaccess inside /js are still wrong, Apache can’t read them.
+
+```
+sudo chown -R apache:apache /var/www/html
+sudo find /var/www/html -type d -exec chmod 755 {} \;
+sudo find /var/www/html -type f -exec chmod 644 {} \;
+```
+
+#### ✅ Explanation:
+
+Directories: 755 (rwx for owner, rx for group/others)
+
+Files: 644 (rw for owner, r for group/others)
+
+Recursive ensures all nested files/folders are correct
+
+### Step 3: Fix SELinux Context
+
+Set proper context for Apache to read JS, CSS, PHP files:
+
+```
+sudo restorecon -Rv /var/www/html
+```
+
+Check context:
+
+```
+ls -Z /var/www/html/js
+```
+
+You should see something like:
+
+```
+-rw-r--r--. apache apache unconfined_u:object_r:httpd_sys_content_t:s0 central-auth-api.js
+```
+
+If it’s not httpd_sys_content_t, that’s why Apache 403s.
+
+### Step 4: Check .htaccess Restrictions
+
+ls: cannot access '.htaccess': Permission denied means either SELinux context or directory permissions are wrong. .htaccess must be readable:
+
+```
+sudo chmod 644 /var/www/html/js/.htaccess
+sudo restorecon -v /var/www/html/js/.htaccess
+```
+
+### Step 5: Verify Apache Config Allows .htaccess
+
+Open /etc/httpd/conf/httpd.conf (or your virtual host) and ensure:
+
+```
+<Directory "/var/www/html">
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+Then restart Apache:
+
+```
+sudo systemctl restart httpd
+```
+
+### Step 6: Test Access
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
+#### ✅ Should return:
+
+```
+HTTP/1.1 200 OK
+```
+
+### ⚡ Quick One-Line Fix (Recursively fixes everything for html/js folder):
+
+```
+sudo chown -R apache:apache /var/www/html && sudo find /var/www/html -type d -exec chmod 755 {} \; && sudo find /var/www/html -type f -exec chmod 644 {} \; && sudo restorecon -Rv /var/www/html && sudo systemctl restart httpd
+```
+
+**✅ This is the fastest working solution on Amazon Linux for 403 issues on Apache.**
+
+---
+
+### Step 1: Check Browser Console
+
+Open your browser → Developer Tools → Console (F12). Look for:
+
+Failed to load resource errors
+
+Uncaught ReferenceError or TypeError in JS
+
+404s for CSS, JS, images
+
+On CloudFront, common issues:
+
+Paths in HTML are relative (js/central-auth-api.js)
+CloudFront may require full relative path or absolute path:
+
+```
+<script src="/js/central-auth-api.js"></script>
+```
+
+Make sure your HTML refers to JS/CSS with the correct CloudFront path.
+
+### Step 2: Check Resource URLs
+
+From your screenshot, your HTML references:
+
+bootstrap.min.css
+
+bootstrap-icons.css
+
+central-auth-api.js
+
+But CloudFront may not have the correct folder structure. For example:
+
+CloudFront root → cafe-admin-dashboard.html
+
+js/central-auth-api.js must exist in CloudFront (/js/central-auth-api.js)
+
+CSS must exist in CloudFront root if referenced as bootstrap.min.css
+
+If paths don’t match, browser can’t load CSS/JS → white page.
+
+### ✅ Fix: Use absolute paths or proper folder structure:
+
+```
+<!-- CSS -->
+<link rel="stylesheet" href="/bootstrap.min.css">
+<link rel="stylesheet" href="/bootstrap-icons.css">
+
+<!-- JS -->
+<script src="/js/central-auth-api.js"></script>
+```
+
+### Step 3: Check JS Errors (Most Likely Cause)
+
+If central-auth-api.js runs and has runtime errors, nothing renders. Common mistakes:
+
+Functions not defined (CHARLIE.initProtectedPage undefined)
+
+DOM elements not found (document.getElementById('xyz') fails)
+
+CloudFront caching old JS
+
+### Step 4: Invalidate CloudFront Cache
+
+If you updated files on S3/Origin but CloudFront cached old content:
+
+```
+# In AWS Console → CloudFront → Invalidate
+```
+
+Invalidate:
+
+```
+*
+```
+
+Or just the affected files:
+
+```
+/js/central-auth-api.js
+/cafe-admin-dashboard.html
+```
+
+### Step 5: Check HTML and JS Structure
+
+Make sure your HTML has a root container:
+
+```
+<body>
+  <div id="app"></div>
+  <script src="/js/central-auth-api.js"></script>
+  <script>
+    CHARLIE.initProtectedPage();
+  </script>
+</body>
+```
+
+If the JS expects elements that don’t exist, nothing will show → white page.
+
+### Step 6: Verify Network Tab
+
+In browser DevTools → Network tab:
+
+All CSS/JS must return 200 OK
+
+No 403/404 errors
+
+JS must be loaded before your inline <script> calls it
+
+💡 Most likely causes here:
+
+Wrong relative paths on CloudFront (HTML → JS/CSS/images)
+
+CloudFront cached old JS → invalidation required
+
+JS errors in central-auth-api.js (check Console)
+
+---
 
 
 

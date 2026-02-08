@@ -664,6 +664,56 @@ Run the fixes above and paste only this output back:
 curl -I http://localhost/js/central-auth-api.js
 ```
 
+#### 4️⃣ Ensure <Directory> allows access
+
+Check /etc/httpd/conf/httpd.conf:
+
+```
+<Directory "/var/www/html">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+Then add explicitly for JS:
+
+```
+<Directory "/var/www/html/js">
+    Require all granted
+</Directory>
+```
+
+#### 5️⃣ Check for .htaccess overrides
+
+```
+ls -la /var/www/html/js/.htaccess
+```
+
+If exists, check for Deny from all → comment it out.
+
+#### 6️⃣ Restart Apache
+
+```
+sudo systemctl restart httpd
+```
+
+#### 7️⃣ Test locally (CRUCIAL)
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
+### ⚡ Quick One-Line Fix (Recursively fixes everything for html/js folder):
+
+```
+sudo chown -R apache:apache /var/www/html && sudo find /var/www/html -type d -exec chmod 755 {} \; && sudo find /var/www/html -type f -exec chmod 644 {} \; && sudo restorecon -Rv /var/www/html && sudo systemctl restart httpd
+```
+
+✅ Should return 200 OK
+✅ If yes → ALB and CloudFront automatically work
+
+
 **✅ All three must return 200 OK.**
 
 
