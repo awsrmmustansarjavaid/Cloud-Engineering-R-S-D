@@ -158,7 +158,7 @@
         <a class="navbar-brand" href="#"><i class="bi bi-cup-fill"></i> Charlie Cafe</a>
 
         <div class="ms-auto">
-            <a href="cafe-admin-dashboard.html" class="btn btn-dashboard">
+            <a href="dashboard-login.html" class="btn btn-dashboard">
                 <i class="bi bi-box-arrow-in-right"></i> Login
             </a>
         </div>
