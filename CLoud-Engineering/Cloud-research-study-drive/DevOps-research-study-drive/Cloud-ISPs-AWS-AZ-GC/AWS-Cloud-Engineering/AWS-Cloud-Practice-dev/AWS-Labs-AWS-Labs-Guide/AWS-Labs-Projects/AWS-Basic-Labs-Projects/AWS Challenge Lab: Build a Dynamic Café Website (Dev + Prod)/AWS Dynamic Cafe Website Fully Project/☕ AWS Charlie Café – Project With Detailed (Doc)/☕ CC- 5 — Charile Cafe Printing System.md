@@ -115,6 +115,25 @@ function openCentralPrint(selector) {
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+## PHASE 2️⃣ Cafe Central Export 
+
+### 1️⃣ Create Cafe Export Lambda
+
+#### 1️⃣ CREATE LAMBDA
+
+```
+Name: CafeCentralExportLambda
+Runtime: Python 3.10
+```
+
+[CafeCentralExportLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeCentralExportLambda.py)
+
+
+
+
+
+
+----
 ## PHASE 2️⃣  ☕ MULTI-PAGE SUPPORT PDF GENERATION LAMBDA (REPORTLAB)
 
 ### 📄 Printing System 2 — Server PDF (Lambda + ReportLab)

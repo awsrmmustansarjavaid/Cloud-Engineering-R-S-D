@@ -105,6 +105,157 @@ This file will:
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 2️⃣ Cafe Central Export 
+
+### 1️⃣ What your current Lambda functions are doing (clean breakdown)
+
+Before merging, we need to be very explicit about responsibilities.
+
+#### 🔹 A. CafePDFReportLambda (analytics + order-status)
+
+Purpose
+
+Generates PDF reports
+
+Data source: DynamoDB (orders)
+
+Output:
+
+Returns PDF in API response
+
+Uploads PDF to S3
+
+Controlled by:
+
+?page=analytics
+?page=order-status
+
+
+Problems
+
+Hardcoded analytics values
+
+Mixed concerns (PDF + data logic)
+
+No auth check
+
+Logic duplicated in other Lambdas
+
+#### 🔹 B. CafeAnalyticsCSVLambda
+
+Purpose
+
+Generates CSV analytics
+
+Data source: DynamoDB
+
+Filters only COMPLETED orders
+
+Admin-only via Cognito groups
+
+Output:
+
+CSV download via API Gateway
+
+This is GOOD logic and we’ll reuse it almost as-is.
+
+#### 🔹 C. CafeDailyPDFLambda
+
+Purpose
+
+Generates daily PDF summary
+
+Data source: DynamoDB
+
+Uploads PDF to S3 only
+
+No API response body for browser usage
+
+Problems
+
+Uses /tmp filesystem (fine but inconsistent)
+
+Separate PDF logic
+
+Not connected to frontend printing
+
+#### 🔹 D. CafePDFReportLambda (extended – attendance + RDS)
+
+Purpose
+
+PDF reports for:
+
+Cafe analytics
+
+Order status
+
+HR attendance
+
+Data source:
+
+DynamoDB
+
+RDS (MySQL)
+
+Output:
+
+PDF + S3 upload
+
+This is actually your “core reporting engine” already, just not structured well.
+
+### 2️⃣ The CORRECT merge strategy (no bugs, no API breakage)
+
+#### ❌ Wrong way
+
+One giant if/else mess
+
+Multiple endpoints per Lambda
+
+Mixed auth logic everywhere
+
+### ✅ Right way (what we’ll do)
+
+🔐 ONE Lambda
+
+📌 ONE API Gateway endpoint
+
+🎯 MULTIPLE actions via query parameters
+
+```
+GET /reports/export
+```
+
+Controlled by:
+
+| Query param | Meaning                                      |
+| ----------- | -------------------------------------------- |
+| `type`      | `pdf` or `csv`                               |
+| `report`    | `analytics`, `orders`, `daily`, `attendance` |
+| `date`      | optional (YYYY-MM-DD)                        |
+
+This maps perfectly to your central-auth-api.js and central-printing.html.
+
+### 3️⃣ Final merged Lambda: CafeCentralExportLambda
+
+#### ✅ What this Lambda supports
+
+✔ PDF (ReportLab)
+✔ CSV
+✔ DynamoDB
+✔ RDS
+✔ Cognito Admin check
+✔ S3 storage
+✔ Browser download
+✔ Central frontend compatibility
+
+
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
 
 # SECTION 1️⃣  COMPLETE ✅
 ---
