@@ -171,7 +171,9 @@ http://ALB-DNS-NAME/cafe-admin-dashboard.html
 | Return URL | ALB DNS + `/cafe-admin-dashboard.html` |
 | CloudFront | Later (optional)               |
 
-----
+### 3️⃣ CloudFront ALB & Central-Auth-Api Troubleshooting
+
+[CloudFront ALB & Central-Auth-Api Troubleshooting](./CloudFront_ALB_Central-Auth-Api.md)
 
 
 

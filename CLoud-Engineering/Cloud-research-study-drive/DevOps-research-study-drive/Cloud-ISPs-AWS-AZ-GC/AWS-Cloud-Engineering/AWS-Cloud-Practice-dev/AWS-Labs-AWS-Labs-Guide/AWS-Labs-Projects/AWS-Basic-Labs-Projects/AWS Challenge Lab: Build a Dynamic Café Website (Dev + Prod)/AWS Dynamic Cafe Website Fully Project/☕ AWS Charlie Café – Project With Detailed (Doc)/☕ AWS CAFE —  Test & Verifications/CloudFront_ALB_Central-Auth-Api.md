@@ -292,4 +292,37 @@ EC2 (Apache)
 
 **Everything you built already works — CloudFront just wasn’t pointing at the right place.**
 
+### 🎯 GOAL
+
+Verify one by one:
+
+1️⃣ Apache on EC2
+
+2️⃣ ALB → EC2
+
+3️⃣ CloudFront → ALB
+
+We already know CloudFront is failing — now we prove why.
+
+### ✅ STEP 1 — TEST APACHE LOCALLY (EC2)
+
+SSH into EC2 and run:
+
+```
+curl -I http://localhost/js/central-auth-api.js
+```
+
+✅ EXPECTED (GOOD):
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/javascript
+```
+
+❌ If NOT 200 → Apache config issue
+📌 Share output
+
+### ✅ STEP 2 — TEST APACHE FULL FILE
+
+```
 
