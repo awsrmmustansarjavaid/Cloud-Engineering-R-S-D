@@ -129,6 +129,36 @@ Runtime: Python 3.10
 [CafeCentralExportLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeCentralExportLambda.py)
 
 
+#### 2️⃣ Environment Variables
+
+Set these in Lambda Configuration → Environment variables:
+
+```
+ORDERS_TABLE_NAME = CafeOrders
+REPORTS_BUCKET_NAME = charlie-cafe-s3-bucket
+LOGO_S3_KEY = Cafelogo.png
+
+DB_HOST = your-rds-endpoint.amazonaws.com
+DB_NAME = cafe_hr
+DB_USER = admin
+DB_PASS = password
+AWS_REGION = ap-south-1
+```
+
+### 2️⃣ How this connects PERFECTLY with central-printing.html
+
+Your frontend can now do:
+
+```
+secureFetch(`${API_BASE}/reports/export?type=pdf&report=daily`)
+secureFetch(`${API_BASE}/reports/export?type=csv`)
+```
+
+✔ Same endpoint
+✔ Same auth
+✔ Same printing page
+✔ Zero duplication
+
 
 
 
