@@ -706,6 +706,30 @@ charlie-cafe-s3-bucket/
     ├── Basic_Config_Test_Result_2026-02-03_10-41-22.txt
     └── Basic_Config_Test_Result_2026-02-03_10-41-22.csv
 ```
+### 4️⃣ Final & Last Charlie Cafe Test
+
+```
+sudo nano Charlie-Cafe-Final-Verify-Test.sh
+```
+
+[Charlie Cafe Lab Basic Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_lab_test_verify.sh)
+
+```
+sudo chmod +x Charlie-Cafe-Final-Verify-Test.sh
+```
+
+```
+sudo ./Charlie-Cafe-Final-Verify-Test.sh
+```
+
+#### 💿 Replace with Yours
+
+1. API Gateway EndPoints
+
+2. ARN of Lambda 
+
+3. 
+
 
 ### 4️⃣ Exporting Bash Script Output to S3
 

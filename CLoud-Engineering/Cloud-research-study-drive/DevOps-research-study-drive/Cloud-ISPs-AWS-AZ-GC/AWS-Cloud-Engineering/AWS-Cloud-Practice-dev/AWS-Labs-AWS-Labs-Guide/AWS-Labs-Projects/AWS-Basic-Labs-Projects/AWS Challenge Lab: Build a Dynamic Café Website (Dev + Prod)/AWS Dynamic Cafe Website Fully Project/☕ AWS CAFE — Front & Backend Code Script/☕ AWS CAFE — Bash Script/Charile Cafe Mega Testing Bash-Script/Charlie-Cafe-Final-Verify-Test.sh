@@ -1,215 +1,210 @@
 #!/usr/bin/env bash
-# =============================================================
-# ☕ CHARLIE CAFE — MEGA FULL SYSTEM VERIFICATION SCRIPT
-# Version: 2026 Final Edition
-# Purpose: Verify everything — LAMP, AWS, RDS, API, Lambda, S3, SQS
-# SAFE: READ-ONLY, NON-DESTRUCTIVE
-# =============================================================
+# ==============================================================
+# CHARLIE CAFE ☕ — MEGA FULL TEST & VERIFICATION SCRIPT
+# Version: 2026-Final
+# Purpose: Combines all system, DB, Lambda, API, SQS, and web checks
+# Author: IT Charlie
+# ==============================================================
 
-# ── SAFETY SETTINGS ─────────────────────────────────────────
 set -euo pipefail
+export LC_ALL=C
 
-# ── COLORS ─────────────────────────────────────────────────
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-MAGENTA='\033[0;35m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-bold() { echo -e "\033[1m$1\033[0m"; }
-
-# ── HELPER FUNCTIONS ────────────────────────────────────────
-ok()    { echo -e "${GREEN}✓ OK${NC} - $1"; }
-fail()  { echo -e "${RED}✗ FAIL${NC} - $1"; ((FAILURES++)); }
-warn()  { echo -e "${YELLOW}! WARN${NC} - $1"; }
-info()  { echo -e "${CYAN}➤ INFO${NC} - $1"; }
-
-invoke_lambda() {
-  NAME=$1
-  PAYLOAD=$2
-  echo -e "${MAGENTA}▶ Invoking Lambda: ${NAME}${NC}"
-  aws lambda invoke \
-    --function-name "${NAME}" \
-    --payload "${PAYLOAD}" \
-    --region "${AWS_REGION}" \
-    "/tmp/${NAME}.json" >/dev/null 2>&1 || warn "Lambda ${NAME} failed"
-  cat "/tmp/${NAME}.json" || true
-  echo
-}
-
-FAILURES=0
-
-# ── CONFIGURATION ─────────────────────────────────────────
+# =========================
+# CONFIGURATION
+# =========================
 AWS_REGION="us-east-1"
 SECRET_ID="CafeDevDBSM"
+DB_NAME="cafe_db"
+S3_BUCKET="charlie-cafe-lab-output"
+WEB_ROOT="/var/www/html"
+
 API_DEV="https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/dev"
 API_PROD="https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/prod"
 API_STATUS="https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/status"
-S3_BUCKET="charlie-cafe-s3-bucket"
-LAYER_KEY="layers/pymysql-layer.zip"
-WEB_ROOT="/var/www/html"
+
 ALB_DOMAIN="charlie-cafe-alb-1179524333.us-east-1.elb.amazonaws.com"
 CLOUDFRONT_DOMAIN="dc65q9cmuuula.cloudfront.net"
-ACCOUNT_ID="910599465397"
+
 QUEUE_NAME="CafeOrdersQueue"
-DB_NAME="cafe_db"
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
-echo "============================================================"
-bold "☕ CHARLIE CAFE FULL SYSTEM VERIFICATION START"
-echo "Started at: $(date '+%Y-%m-%d %H:%M:%S')"
-echo "============================================================"
+OUTPUT_FILE="/tmp/charlie_cafe_full_test_$(date '+%Y%m%d_%H%M%S').log"
+touch "$OUTPUT_FILE"
 
-# =============================================================
-# 🖥️ SYSTEM & LAMP STACK
-# =============================================================
-echo -e "\n${BLUE}==== SYSTEM & LAMP STACK ====${NC}"
-info "OS & Instance Info"
-cat /etc/os-release | grep PRETTY_NAME
-PUBLIC_IP=$(curl -s -m 3 http://169.254.169.254/latest/meta-data/public-ipv4 || echo "N/A")
-echo "Public IPv4: $PUBLIC_IP"
+# =========================
+# COLORS
+# =========================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+MAGENTA='\033[1;35m'
+CYAN='\033[1;36m'
+NC='\033[0m'
 
-# Apache / httpd
-systemctl is-active --quiet httpd && ok "Apache running" || fail "Apache not running"
-command -v httpd >/dev/null && ok "httpd binary found ($(httpd -v | head -n1))" || warn "httpd not found"
-command -v apache2 >/dev/null && ok "apache2 binary found ($(apache2 -v | head -n1))" || true
+ok()    { echo -e "${GREEN}✓ OK${NC} - $1" | tee -a "$OUTPUT_FILE"; }
+fail()  { echo -e "${RED}✗ FAIL${NC} - $1" | tee -a "$OUTPUT_FILE"; ((FAILURES++)); }
+warn()  { echo -e "${YELLOW}! WARN${NC} - $1" | tee -a "$OUTPUT_FILE"; }
 
-# PHP & extensions
+# =========================
+# COUNTER
+# =========================
+FAILURES=0
+
+echo "=============================================================" | tee -a "$OUTPUT_FILE"
+echo " CHARLIE CAFE ☕ — FULL SYSTEM & AWS VERIFICATION SCRIPT" | tee -a "$OUTPUT_FILE"
+echo " Started at: $(date '+%Y-%m-%d %H:%M:%S')" | tee -a "$OUTPUT_FILE"
+echo "=============================================================" | tee -a "$OUTPUT_FILE"
+
+# ==============================================================
+# SYSTEM CHECKS — LAMP / WEB / LOCAL
+# ==============================================================
+echo -e "\n${BLUE}🖥️  SYSTEM & LOCAL VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
+
+# OS info
+echo "• OS release:" | tee -a "$OUTPUT_FILE"
+cat /etc/os-release | grep PRETTY_NAME | tee -a "$OUTPUT_FILE"
+
+# Apache check
+if systemctl is-active --quiet httpd; then ok "Apache running"; else fail "Apache not running"; fi
 command -v php >/dev/null && ok "PHP installed ($(php -v | head -n1))" || fail "PHP missing"
-php -m | grep -qi mysqlnd && ok "PHP mysqlnd extension loaded" || fail "PHP mysqlnd missing"
+php -m | grep -qi mysqlnd && ok "PHP mysqlnd extension loaded" || fail "mysqlnd missing"
 
 # MySQL client
-command -v mysql >/dev/null && ok "MySQL client installed ($(mysql --version | head -n1))" || fail "MySQL client missing"
+command -v mysql >/dev/null && ok "MySQL client installed" || fail "MySQL client missing"
 
 # Web root
-[ -d "$WEB_ROOT" ] && ok "Web root exists: $WEB_ROOT" || fail "Web root missing"
-[ -d "$WEB_ROOT/js" ] && ok "JS directory exists" || warn "JS directory missing"
+if [ -d "$WEB_ROOT" ]; then
+    ok "Web root exists: $WEB_ROOT"
+else
+    fail "Web root missing: $WEB_ROOT"
+fi
 [ -f "$WEB_ROOT/js/central-auth-api.js" ] && ok "central-auth-api.js present" || warn "central-auth-api.js missing"
 
-# =============================================================
-# 🌐 LOCAL / WEB SERVER TEST
-# =============================================================
-echo -e "\n${CYAN}==== WEB SERVER TEST ====${NC}"
-curl -s http://localhost >/tmp/apache_test.html
-grep -qi "It works\|Apache" /tmp/apache_test.html && ok "Apache default page detected" || warn "Default page not detected"
-rm -f /tmp/apache_test.html
-curl -s http://localhost/info.php | grep -qi phpinfo && ok "info.php working" || warn "info.php not working"
+# Test local web server
+curl -s http://localhost >/tmp/charlie_local_test.html
+grep -qi "It works\|Apache" /tmp/charlie_local_test.html && ok "Apache serves content on port 80" || warn "Default page not detected"
+rm -f /tmp/charlie_local_test.html
+curl -s http://localhost/info.php | grep -qi phpinfo && ok "PHP info.php working" || warn "info.php not working"
 
-# =============================================================
-# ☁️ AWS CLI & IAM
-# =============================================================
-echo -e "\n${MAGENTA}==== AWS CLI & IAM ====${NC}"
+# ==============================================================
+# AWS CLI & IAM VERIFICATION
+# ==============================================================
+echo -e "\n${MAGENTA}☁️  AWS CLI & IAM VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
+
 command -v aws >/dev/null && ok "AWS CLI installed" || fail "AWS CLI missing"
-aws sts get-caller-identity >/dev/null 2>&1 && ok "AWS credentials valid" || fail "AWS credentials invalid"
+aws sts get-caller-identity >/dev/null 2>&1 && ok "AWS credentials / IAM role valid" || fail "AWS credentials invalid or missing"
 
-IMDS_CHECK=$(curl -s -m 3 http://169.254.169.254/latest/meta-data/ || echo "")
-[ -n "$IMDS_CHECK" ] && ok "EC2 metadata reachable (IMDS)" || warn "Cannot reach EC2 metadata"
+# ==============================================================
+# SECRETS MANAGER & RDS DATABASE
+# ==============================================================
+echo -e "\n${CYAN}🔐  SECRETS MANAGER & DATABASE${NC}" | tee -a "$OUTPUT_FILE"
 
-ROLE=$(curl -s -m 3 http://169.254.169.254/latest/meta-data/iam/info || true)
-[[ $ROLE == *"arn:aws:iam::"* ]] && ok "IAM role attached" || warn "No IAM role attached"
+SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id "$SECRET_ID" --region "$AWS_REGION" --query SecretString --output text)
+if [ -n "$SECRET_JSON" ]; then
+    ok "Fetched DB secret"
+else
+    fail "Failed to fetch DB secret"
+fi
 
-# =============================================================
-# 🔐 SECRETS MANAGER
-# =============================================================
-echo -e "\n${YELLOW}==== SECRETS MANAGER ====${NC}"
-SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id "$SECRET_ID" --region "$AWS_REGION" --query SecretString --output text 2>/dev/null)
-[ -n "$SECRET_JSON" ] && ok "Fetched DB secret" || fail "Failed to fetch DB secret"
 DB_USER=$(echo "$SECRET_JSON" | jq -r '.username')
 DB_PASS=$(echo "$SECRET_JSON" | jq -r '.password')
 DB_HOST=$(echo "$SECRET_JSON" | jq -r '.host')
 DB_PORT=$(echo "$SECRET_JSON" | jq -r '.port // 3306')
 
-# =============================================================
-# 🗄 DATABASE VERIFICATION (RDS)
-# =============================================================
-echo -e "\n${GREEN}==== DATABASE (RDS) VERIFICATION ====${NC}"
-MYSQL_BASE="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS"
-MYSQL_DB="$MYSQL_BASE $DB_NAME"
-MYSQL_SILENT="$MYSQL_DB -sN"
+MYSQL_CMD="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS $DB_NAME -sN"
 
-# Connection test
-$MYSQL_DB -e "SELECT 1;" >/dev/null && ok "DB connection successful" || fail "DB connection failed"
+# Test DB connection
+if $MYSQL_CMD -e "SELECT 1;" >/dev/null 2>&1; then ok "Database connection OK"; else fail "Cannot connect to DB"; fi
 
-# Database exists
-$MYSQL_BASE -e "SHOW DATABASES LIKE '$DB_NAME';" | grep "$DB_NAME" >/dev/null && ok "Database '$DB_NAME' exists" || fail "Database missing"
-
-# Required tables
+# Verify required tables
 REQUIRED_TABLES=("orders" "employees" "attendance" "leaves" "holidays")
-for t in "${REQUIRED_TABLES[@]}"; do
-  $MYSQL_SILENT -e "SHOW TABLES LIKE '$t';" | grep "$t" >/dev/null && ok "Table exists: $t" || fail "Missing table: $t"
+for table in "${REQUIRED_TABLES[@]}"; do
+    if $MYSQL_CMD -e "SHOW TABLES LIKE '$table';" | grep "$table" >/dev/null; then
+        ok "Table exists: $table"
+    else
+        fail "Missing table: $table"
+    fi
 done
 
-# Describe tables & critical columns
-TABLES=$($MYSQL_SILENT -e "SHOW TABLES;")
+# Verify critical columns
+$MYSQL_CMD -e "SHOW COLUMNS FROM orders LIKE 'table_number';" | grep table_number >/dev/null && ok "orders.table_number exists" || fail "orders.table_number missing"
+$MYSQL_CMD -e "SHOW COLUMNS FROM orders LIKE 'item_cost';" | grep item_cost >/dev/null && ok "orders.item_cost exists" || fail "orders.item_cost missing"
+$MYSQL_CMD -e "SHOW COLUMNS FROM orders LIKE 'total_cost';" | grep total_cost >/dev/null && ok "orders.total_cost exists" || fail "orders.total_cost missing"
+
+$MYSQL_CMD -e "SHOW COLUMNS FROM attendance LIKE 'attendance_date';" | grep attendance_date >/dev/null && ok "attendance.attendance_date exists" || fail "attendance.attendance_date missing"
+
+# List tables & row counts
+echo "📊 Row counts per table:" | tee -a "$OUTPUT_FILE"
+TABLES=$($MYSQL_CMD -e "SHOW TABLES;")
 for table in $TABLES; do
-  echo -e "${CYAN}🔍 DESCRIBE $table${NC}"
-  $MYSQL_DB -e "DESCRIBE $table;"
-done
-
-# Orders table critical columns
-for col in table_number item_cost total_cost; do
-  $MYSQL_SILENT -e "SHOW COLUMNS FROM orders LIKE '$col';" | grep "$col" >/dev/null && ok "orders.$col exists" || fail "orders.$col missing"
-done
-
-# Attendance table critical column
-$MYSQL_SILENT -e "SHOW COLUMNS FROM attendance LIKE 'attendance_date';" | grep attendance_date >/dev/null && ok "attendance.attendance_date exists" || fail "attendance.attendance_date missing"
-
-# Index verification
-$MYSQL_DB -e "SHOW INDEX FROM orders WHERE Key_name='idx_table_number';" | grep idx_table_number >/dev/null && ok "idx_table_number exists" || warn "idx_table_number missing (optional)"
-$MYSQL_DB -e "SHOW INDEX FROM attendance;" | grep employee_id >/dev/null && ok "Attendance unique/index exists" || warn "Attendance index missing"
-
-# Row counts
-for table in $TABLES; do
-  COUNT=$($MYSQL_SILENT -e "SELECT COUNT(*) FROM $table;")
-  echo -e " • $table : $COUNT rows"
+    COUNT=$($MYSQL_CMD -e "SELECT COUNT(*) FROM $table;")
+    echo " • $table : $COUNT rows" | tee -a "$OUTPUT_FILE"
 done
 
 # Sample order
-echo "🧪 Sample order row:"
-$MYSQL_DB -e "SELECT id, table_number, item, quantity, created_at FROM orders LIMIT 1;"
+echo "🧪 Sample order record:" | tee -a "$OUTPUT_FILE"
+$MYSQL_CMD -e "SELECT id, table_number, item, quantity, created_at FROM orders LIMIT 1;"
 
-# =============================================================
-# 📡 API GATEWAY TESTS
-# =============================================================
-echo -e "\n${MAGENTA}==== API GATEWAY TESTS ====${NC}"
-curl -s "${API_STATUS}/order-status" >/dev/null && ok "Order status API reachable" || warn "Order status API not reachable"
-curl -s -X POST "${API_DEV}/orders/cash-payment" -H "Content-Type: application/json" -d '{"order_id":"TEST-ORDER"}' >/dev/null && ok "Cash payment endpoint reachable" || warn "Cash payment endpoint unreachable"
+# ==============================================================
+# API GATEWAY VERIFICATION
+# ==============================================================
+echo -e "\n${YELLOW}📡  API GATEWAY TESTS${NC}" | tee -a "$OUTPUT_FILE"
 
-# =============================================================
-# 📦 LAMBDA & S3
-# =============================================================
-echo -e "\n${BLUE}==== LAMBDA & S3 ====${NC}"
-aws s3 ls "s3://$S3_BUCKET/$LAYER_KEY" >/dev/null 2>&1 && ok "PyMySQL Lambda layer found in S3" || fail "PyMySQL Lambda layer missing"
+curl -s "$API_DEV/orders" >/dev/null && ok "API /orders reachable (dev)" || warn "API /orders not reachable"
+curl -s -X POST "$API_DEV/orders/cash-payment" -H "Content-Type: application/json" -d '{"order_id":"ORD-TEST"}' >/dev/null && ok "Cash payment endpoint reachable" || warn "Cash payment not reachable"
+curl -s "$API_STATUS/order-status" >/dev/null && ok "Order status API reachable" || warn "Order status API not reachable"
+
+# ==============================================================
+# ALB & CLOUDFRONT STATIC FILE TESTS
+# ==============================================================
+echo -e "\n${BLUE}🌐 ALB & CLOUDFRONT STATIC FILE TESTS${NC}" | tee -a "$OUTPUT_FILE"
+curl -I http://${ALB_DOMAIN}/js/central-auth-api.js >/dev/null && ok "ALB static file reachable" || warn "ALB static file failed"
+curl -I https://${CLOUDFRONT_DOMAIN}/js/central-auth-api.js >/dev/null && ok "CloudFront static file reachable" || warn "CloudFront static file failed"
+
+# ==============================================================
+# SQS VERIFICATION
+# ==============================================================
+echo -e "\n${MAGENTA}📬 SQS QUEUE VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
+aws sqs get-queue-attributes --queue-url https://sqs.${AWS_REGION}.amazonaws.com/${ACCOUNT_ID}/${QUEUE_NAME} --attribute-names ApproximateNumberOfMessages >/dev/null && ok "SQS queue accessible" || fail "Cannot access SQS queue"
+
+# ==============================================================
+# LAMBDA INVOCATION TESTS
+# ==============================================================
+echo -e "\n${CYAN}⚡ LAMBDA INVOCATION TESTS${NC}" | tee -a "$OUTPUT_FILE"
+
+invoke_lambda () {
+  NAME=$1
+  PAYLOAD=$2
+  echo "▶ Invoking Lambda: ${NAME}" | tee -a "$OUTPUT_FILE"
+  aws lambda invoke --function-name "${NAME}" --payload "${PAYLOAD}" --region "${AWS_REGION}" /tmp/${NAME}.json >/dev/null
+  cat /tmp/${NAME}.json | tee -a "$OUTPUT_FILE"
+  echo
+}
 
 # Sample Lambda invocations
 invoke_lambda CafeOrderProcessor '{"body":"{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"}'
+invoke_lambda CafeMenuLambda '{}'
+invoke_lambda GetOrderStatusLambda '{}'
 invoke_lambda CafeAnalyticsLambda '{"queryStringParameters":{"period":"today"}}'
+invoke_lambda CafePDFReportLambda '{"queryStringParameters":{"page":"analytics"}}'
 
-# =============================================================
-# ☁️ CLOUDFRONT / ALB
-# =============================================================
-echo -e "\n${CYAN}==== ALB & CLOUDFRONT ====${NC}"
-curl -I http://${ALB_DOMAIN}/js/central-auth-api.js >/dev/null && ok "ALB static file reachable" || warn "ALB static file unreachable"
-curl -I https://${CLOUDFRONT_DOMAIN}/js/central-auth-api.js >/dev/null && ok "CloudFront static file reachable" || warn "CloudFront static file unreachable"
-
-# =============================================================
-# 📨 SQS QUEUE
-# =============================================================
-echo -e "\n${YELLOW}==== SQS QUEUE ====${NC}"
-aws sqs get-queue-attributes --queue-url https://sqs.${AWS_REGION}.amazonaws.com/${ACCOUNT_ID}/${QUEUE_NAME} --attribute-names ApproximateNumberOfMessages >/dev/null && ok "SQS queue reachable" || warn "SQS queue unreachable"
-
-# =============================================================
-# ✅ FINAL RESULT CARD
-# =============================================================
-echo -e "\n${MAGENTA}============================================================${NC}"
-bold "                    ☕ CHARLIE CAFE RESULT CARD"
-echo -e "Started: $(date '+%Y-%m-%d %H:%M:%S')"
-echo "------------------------------------------------------------"
+# ==============================================================
+# FINAL SUMMARY & RESULT CARD
+# ==============================================================
+echo -e "\n${GREEN}==================== RESULT CARD ====================${NC}" | tee -a "$OUTPUT_FILE"
 if [ $FAILURES -eq 0 ]; then
-  echo -e "${GREEN}✅ ALL CHECKS PASSED — SYSTEM HEALTHY${NC}"
+    echo -e "${GREEN}ALL CHECKS PASSED ✅${NC}" | tee -a "$OUTPUT_FILE"
 else
-  echo -e "${RED}❌ $FAILURES ISSUE(S) DETECTED${NC}"
-  echo "Review the detailed logs above"
+    echo -e "${RED}${FAILURES} ISSUES DETECTED ❌${NC}" | tee -a "$OUTPUT_FILE"
+    echo "Review the log above" | tee -a "$OUTPUT_FILE"
 fi
-echo "============================================================"
+echo -e "${GREEN}====================================================${NC}" | tee -a "$OUTPUT_FILE"
+
+# ==============================================================
+# EXPORT LOG TO S3
+# ==============================================================
+echo "Uploading log to S3 bucket: $S3_BUCKET"
+aws s3 cp "$OUTPUT_FILE" "s3://$S3_BUCKET/" >/dev/null && ok "Log uploaded to S3" || warn "Failed to upload log"
+
+echo "✅ Charlie Cafe FULL VERIFICATION COMPLETED"
