@@ -352,7 +352,7 @@ HR Secure Attendance & Employee Management API
 
 ### 2️⃣ Create Resources (Paths)
 
-> **We will create 5 resources, one for each Lambda.**
+#### Optional - A 
 
 | Resource           | Path                  | Lambda Function         |
 | ------------------ | --------------------- | ----------------------- |
@@ -363,6 +363,8 @@ HR Secure Attendance & Employee Management API
 | Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
 
 **⚠️ If you are following optional -B then follow this below configureations**
+
+#### Optional - B 
 
 > **We will create 5 resources, one for each Lambda.**
 
