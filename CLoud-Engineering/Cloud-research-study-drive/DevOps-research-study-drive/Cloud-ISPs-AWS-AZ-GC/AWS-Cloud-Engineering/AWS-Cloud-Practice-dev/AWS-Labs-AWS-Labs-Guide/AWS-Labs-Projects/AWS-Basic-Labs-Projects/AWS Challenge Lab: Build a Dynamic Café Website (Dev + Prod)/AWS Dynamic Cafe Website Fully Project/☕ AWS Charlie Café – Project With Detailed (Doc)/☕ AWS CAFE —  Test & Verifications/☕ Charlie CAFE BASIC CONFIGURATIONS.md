@@ -722,7 +722,7 @@ sudo chmod +x Charlie-Cafe-Final-Verify-Test.sh
 sudo ./Charlie-Cafe-Final-Verify-Test.sh
 ```
 
-#### 💿 Things to Replace / Configure in Script
+### 💿 Things to Replace / Configure in Script
 
 - #### S3 Bucket Name
 
