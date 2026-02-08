@@ -1,147 +1,202 @@
 #!/bin/bash
-# ============================================================================
-# ☕ Charlie Café — Bash Output → TXT / CSV / PDF → S3
+# =============================================================================
+# ☕ Charlie Café — Enterprise Test & Verification Export System
+#
+# FEATURES:
+# - ASCII company logo
+# - Colorized PASS / FAIL (terminal-safe)
+# - One PDF per service
+# - One MASTER PDF
+# - Header & footer (lab name + author + page no)
+# - TXT / CSV / PDF → S3
 #
 # PLATFORM : Amazon Linux 2023
-# PDF MODE : enscript + ghostscript (NO pandoc / NO latex / NO weasyprint)
-# SAFE     : Read-only execution of target script
-# ============================================================================
+# PDF CORE : enscript + ghostscript (ROCK SOLID)
+# =============================================================================
 
 set -Eeuo pipefail
 
-# ----------------------------------------------------------------------------
-# USER CONFIGURATION
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# LAB IDENTITY
+# -----------------------------------------------------------------------------
+LAB_NAME="Charlie Café ☕ — Test & Verification Lab"
+AUTHOR_NAME="IT Charlie"
+ENVIRONMENT="Amazon Linux 2023 (EC2)"
+
+# -----------------------------------------------------------------------------
+# AWS CONFIG
+# -----------------------------------------------------------------------------
+AWS_REGION="us-east-1"
 S3_BUCKET="charlie-cafe-s3-bucket"
 S3_PREFIX="Charlie-Cafe/Test-Verification"
-AWS_REGION="us-east-1"
 
-# ===============================
-# SPECIFY THE BASH SCRIPT TO RUN
-# ===============================
-# Only one path should be active at a time
+# -----------------------------------------------------------------------------
+# TEST SCRIPTS (SERVICE LEVEL)
+# -----------------------------------------------------------------------------
+TEST_SCRIPTS=(
+  "./charlie_cafe_lab_test_verify.sh"
+  # "./api_gateway_test.sh"
+  # "./lambda_test.sh"
+)
 
-# Example 1: Script in same folder as exporter
-#TARGET_BASH_SCRIPT="./connect_rds.sh"
+# -----------------------------------------------------------------------------
+# COLORS (TERMINAL ONLY)
+# -----------------------------------------------------------------------------
+GREEN="\e[32m"
+RED="\e[31m"
+YELLOW="\e[33m"
+RESET="\e[0m"
 
-# Example 2: Script one folder above exporter
-#TARGET_BASH_SCRIPT="../connect_rds.sh"
-
-# Example 3: Script in subfolder relative to exporter
-#TARGET_BASH_SCRIPT="./subfolder/connect_rds.sh"
-
-# Example 4: Absolute path anywhere
-#TARGET_BASH_SCRIPT="/var/www/html/bash_script/connect_rds.sh"
-
-# Example 5: Script in home directory
-#TARGET_BASH_SCRIPT="$HOME/connect_rds.sh"
-
-# Example 6: Script in /tmp folder
-#TARGET_BASH_SCRIPT="/tmp/connect_rds.sh"
-
-# ✅ Uncomment the one you want to run:
-TARGET_BASH_SCRIPT="./charlie_cafe_lab_test_verify.sh"
-
-# ----------------------------------------------------------------------------
-# VALIDATION
-# ----------------------------------------------------------------------------
-if [[ ! -f "$TARGET_BASH_SCRIPT" ]]; then
-  echo "❌ Target script not found: $TARGET_BASH_SCRIPT"
-  exit 1
-fi
-
-# ----------------------------------------------------------------------------
-# TIMESTAMP & FILES
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# TIMESTAMP & WORKSPACE
+# -----------------------------------------------------------------------------
 TIMESTAMP="$(date '+%Y-%m-%d_%H-%M-%S')"
+BASE_DIR="/tmp/charlie-cafe-$TIMESTAMP"
+MASTER_TXT="$BASE_DIR/master_report.txt"
+mkdir -p "$BASE_DIR"
 
-WORKDIR="/tmp/bash-report-$TIMESTAMP"
-mkdir -p "$WORKDIR"
+# -----------------------------------------------------------------------------
+# ASCII LOGO
+# -----------------------------------------------------------------------------
+read -r -d '' ASCII_LOGO <<'EOF'
+   ██████╗██╗  ██╗ █████╗ ██████╗ ██╗     ██╗███████╗
+  ██╔════╝██║  ██║██╔══██╗██╔══██╗██║     ██║██╔════╝
+  ██║     ███████║███████║██████╔╝██║     ██║█████╗
+  ██║     ██╔══██║██╔══██║██╔══██╗██║     ██║██╔══╝
+  ╚██████╗██║  ██║██║  ██║██║  ██║███████╗██║███████╗
+   ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚══════╝
+                    ☕ CHARLIE CAFÉ
+EOF
 
-OUTPUT_TXT="$WORKDIR/output_$TIMESTAMP.txt"
-OUTPUT_CSV="$WORKDIR/output_$TIMESTAMP.csv"
-OUTPUT_PS="$WORKDIR/output_$TIMESTAMP.ps"
-OUTPUT_PDF="$WORKDIR/output_$TIMESTAMP.pdf"
-
-# ----------------------------------------------------------------------------
-# INSTALL PREREQUISITES (Amazon Linux 2023)
-# ----------------------------------------------------------------------------
-echo "📦 Installing required packages..."
-
-sudo dnf install -y \
-  awscli \
-  enscript \
-  ghostscript \
-  util-linux \
-  coreutils
-
-echo "✅ Packages installed"
-
-# ----------------------------------------------------------------------------
-# AWS REGION (IAM ROLE OR ENV CREDS EXPECTED)
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# INSTALL DEPENDENCIES
+# -----------------------------------------------------------------------------
+echo "📦 Installing prerequisites..."
+sudo dnf install -y awscli enscript ghostscript coreutils util-linux
 export AWS_DEFAULT_REGION="$AWS_REGION"
+echo "✅ Ready"
 
-# ----------------------------------------------------------------------------
-# RUN TARGET SCRIPT & CAPTURE OUTPUT
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# MASTER REPORT HEADER
+# -----------------------------------------------------------------------------
 {
-  echo "===================================================="
-  echo "☕ Charlie Café — Test & Verification Report"
-  echo "Script     : $TARGET_BASH_SCRIPT"
-  echo "Executed   : $(date)"
-  echo "EC2 Host   : $(hostname)"
-  echo "===================================================="
+  echo "$ASCII_LOGO"
   echo
-  bash "$TARGET_BASH_SCRIPT"
-} 2>&1 | tee "$OUTPUT_TXT"
+  echo "$LAB_NAME"
+  echo "Prepared by : $AUTHOR_NAME"
+  echo "Environment : $ENVIRONMENT"
+  echo "Generated   : $(date)"
+  echo "============================================================"
+  echo
+} > "$MASTER_TXT"
 
-# ----------------------------------------------------------------------------
-# TXT → CSV (1 line per row, Excel-safe)
-# ----------------------------------------------------------------------------
-awk '{ gsub(/"/,"\"\""); print "\"" $0 "\"" }' "$OUTPUT_TXT" > "$OUTPUT_CSV"
+TOTAL=0
+PASSED=0
+FAILED=0
 
-# ----------------------------------------------------------------------------
-# TXT → PDF (ROCK-SOLID METHOD)
-# ----------------------------------------------------------------------------
-echo "📄 Generating PDF..."
+# -----------------------------------------------------------------------------
+# RUN TESTS (PER SERVICE)
+# -----------------------------------------------------------------------------
+for SCRIPT in "${TEST_SCRIPTS[@]}"; do
+  ((TOTAL++))
+  SERVICE_NAME="$(basename "$SCRIPT" .sh)"
+  SERVICE_DIR="$BASE_DIR/$SERVICE_NAME"
+  mkdir -p "$SERVICE_DIR"
 
-enscript "$OUTPUT_TXT" \
+  SERVICE_TXT="$SERVICE_DIR/${SERVICE_NAME}.txt"
+  SERVICE_PS="$SERVICE_DIR/${SERVICE_NAME}.ps"
+  SERVICE_PDF="$SERVICE_DIR/${SERVICE_NAME}.pdf"
+
+  {
+    echo "$ASCII_LOGO"
+    echo
+    echo "SERVICE REPORT: $SERVICE_NAME"
+    echo "Started at: $(date)"
+    echo "------------------------------------------------------------"
+  } > "$SERVICE_TXT"
+
+  START=$(date +%s)
+
+  if [[ -x "$SCRIPT" ]]; then
+    if bash "$SCRIPT" >> "$SERVICE_TXT" 2>&1; then
+      RESULT="PASS"
+      ((PASSED++))
+      echo -e "${GREEN}[PASS]${RESET} $SERVICE_NAME"
+    else
+      RESULT="FAIL"
+      ((FAILED++))
+      echo -e "${RED}[FAIL]${RESET} $SERVICE_NAME"
+    fi
+  else
+    RESULT="FAIL (Not Executable)"
+    ((FAILED++))
+    echo -e "${RED}[FAIL]${RESET} $SERVICE_NAME (not executable)"
+  fi
+
+  END=$(date +%s)
+  DURATION=$((END - START))
+
+  {
+    echo
+    echo "------------------------------------------------------------"
+    echo "Result        : [$RESULT]"
+    echo "Execution Time: ${DURATION}s"
+    echo "Completed at  : $(date)"
+    echo
+  } >> "$SERVICE_TXT"
+
+  # Append to MASTER
+  cat "$SERVICE_TXT" >> "$MASTER_TXT"
+
+  # Generate SERVICE PDF
+  enscript "$SERVICE_TXT" \
+    --font=Courier10 \
+    --word-wrap \
+    --header="$LAB_NAME" \
+    --footer="Prepared by: $AUTHOR_NAME | Page \$%" \
+    --no-job-header \
+    -p "$SERVICE_PS"
+
+  ps2pdf "$SERVICE_PS" "$SERVICE_PDF"
+
+  aws s3 cp "$SERVICE_PDF" "s3://$S3_BUCKET/$S3_PREFIX/services/$SERVICE_NAME.pdf"
+done
+
+# -----------------------------------------------------------------------------
+# MASTER SUMMARY
+# -----------------------------------------------------------------------------
+{
+  echo "============================================================"
+  echo "📊 MASTER SUMMARY"
+  echo "Total Services : $TOTAL"
+  echo "Passed         : $PASSED"
+  echo "Failed         : $FAILED"
+  echo "============================================================"
+} >> "$MASTER_TXT"
+
+# -----------------------------------------------------------------------------
+# MASTER PDF
+# -----------------------------------------------------------------------------
+MASTER_PS="$BASE_DIR/master.ps"
+MASTER_PDF="$BASE_DIR/Charlie-Cafe-Master-Report_$TIMESTAMP.pdf"
+
+enscript "$MASTER_TXT" \
   --font=Courier10 \
-  --margins=72:72:72:72 \
   --word-wrap \
-  --no-header \
-  -p "$OUTPUT_PS"
+  --header="$LAB_NAME" \
+  --footer="Prepared by: $AUTHOR_NAME | Page \$%" \
+  --no-job-header \
+  -p "$MASTER_PS"
 
-ps2pdf "$OUTPUT_PS" "$OUTPUT_PDF"
+ps2pdf "$MASTER_PS" "$MASTER_PDF"
 
-if [[ ! -f "$OUTPUT_PDF" ]]; then
-  echo "❌ PDF generation failed"
-  exit 1
-fi
+aws s3 cp "$MASTER_PDF" "s3://$S3_BUCKET/$S3_PREFIX/master/$(basename "$MASTER_PDF")"
 
-echo "✅ PDF generated successfully"
-
-# ----------------------------------------------------------------------------
-# UPLOAD TO S3
-# ----------------------------------------------------------------------------
-echo "☁️ Uploading to S3..."
-
-aws s3 cp "$OUTPUT_TXT" "s3://$S3_BUCKET/$S3_PREFIX/$(basename "$OUTPUT_TXT")"
-aws s3 cp "$OUTPUT_CSV" "s3://$S3_BUCKET/$S3_PREFIX/$(basename "$OUTPUT_CSV")"
-aws s3 cp "$OUTPUT_PDF" "s3://$S3_BUCKET/$S3_PREFIX/$(basename "$OUTPUT_PDF")"
-
-# ----------------------------------------------------------------------------
-# CLEANUP
-# ----------------------------------------------------------------------------
-rm -rf "$WORKDIR"
-
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # DONE
-# ----------------------------------------------------------------------------
-echo "===================================================="
-echo "🎉 EXPORT COMPLETED SUCCESSFULLY"
-echo "📄 PDF  : s3://$S3_BUCKET/$S3_PREFIX/$(basename "$OUTPUT_PDF")"
-echo "📊 CSV  : Uploaded"
-echo "📝 TXT  : Uploaded"
-echo "===================================================="
+# -----------------------------------------------------------------------------
+echo "============================================================"
+echo -e "🎉 ${GREEN}EXPORT COMPLETE${RESET}"
+echo "📄 Master PDF uploaded"
+echo "☁️ S3 Bucket: s3://$S3_BUCKET/$S3_PREFIX/"
+echo "============================================================"
