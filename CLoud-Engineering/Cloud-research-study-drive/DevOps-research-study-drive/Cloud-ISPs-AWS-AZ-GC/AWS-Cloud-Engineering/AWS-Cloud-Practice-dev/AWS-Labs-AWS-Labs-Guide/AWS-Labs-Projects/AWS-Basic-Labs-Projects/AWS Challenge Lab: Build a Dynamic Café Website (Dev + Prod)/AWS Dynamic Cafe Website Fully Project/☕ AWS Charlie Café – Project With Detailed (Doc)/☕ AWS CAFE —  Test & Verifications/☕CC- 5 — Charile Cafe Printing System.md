@@ -206,29 +206,8 @@ Admin access required
 
 🔐 Backend security is correct
 
-### 🧠 Quick sanity checklist (PASS / FAIL)
+### 2️⃣ — Test from API Gateway (NO FRONTEND YET)
 
-| Check                            | Expected      |
-| -------------------------------- | ------------- |
-| Admin PDF                        | 200 + S3 file |
-| Admin CSV                        | 200 + CSV     |
-| Non-Admin                        | 403           |
-| API Gateway unchanged            | ✅             |
-| central-printing.html compatible | ✅             |
-
-### Final verdict (important)
-
-You didn’t just “merge Lambdas” — you:
-
-Built a central export service
-
-Reduced maintenance by 70%
-
-Made frontend printing future-proof
-
-Kept API Gateway clean and stable
-
-STEP 9️⃣ — Test from API Gateway (NO FRONTEND YET)
 ✅ Test PDF
 
 ```
@@ -271,7 +250,7 @@ Expected:
 403 Admin access required
 ```
 
-STEP 🔟 — Test from Browser (FINAL TEST)
+### 3️⃣ — Test from Browser (FINAL TEST)
 
 Login as Admin
 
@@ -287,18 +266,38 @@ Analytics CSV
 ✔ No CORS error
 ✔ No auth error
 
-🧠 FINAL MENTAL MODEL (REMEMBER THIS)
 
-API Gateway = one door
+### 🧠 Quick sanity checklist (PASS / FAIL)
 
-Lambda = one brain
+| Check                            | Expected      |
+| -------------------------------- | ------------- |
+| Admin PDF                        | 200 + S3 file |
+| Admin CSV                        | 200 + CSV     |
+| Non-Admin                        | 403           |
+| API Gateway unchanged            | ✅             |
+| central-printing.html compatible | ✅             |
 
-Query params = instructions
+### Final verdict (important)
 
-central-printing.html = one control panel
+- You didn’t just “merge Lambdas” — you:
 
-You have now built a real production export system, not a lab hack.
+- Built a central export service
 
+- Reduced maintenance by 70%
+
+- Made frontend printing future-proof
+
+- Kept API Gateway clean and stable
+
+- API Gateway = one door
+
+- Lambda = one brain
+
+- Query params = instructions
+
+- central-printing.html = one control panel
+
+- You have now built a real production export system, not a lab hack.
 
 
 **✅ PHASE 2️⃣ STATUS**
