@@ -35,10 +35,7 @@ body {
   z-index: 1000;
   box-shadow: 0 3px 10px rgba(0,0,0,0.5);
 }
-
-.navbar-brand i {
-  margin-right: 8px;
-}
+.navbar-brand i { margin-right: 8px; }
 
 /* ===================== SIDEBAR ===================== */
 .sidebar {
@@ -50,7 +47,6 @@ body {
   left: 0;
   padding-top: 80px;
 }
-
 .sidebar a {
   display: flex;
   align-items: center;
@@ -60,23 +56,11 @@ body {
   text-decoration: none;
   font-weight: 500;
 }
-
-.sidebar a:hover {
-  background: #3b1f0e;
-  color: #ff9800;
-}
-
-.sidebar a.active {
-  background: #3b1f0e;
-  color: #ff9800;
-  border-left: 4px solid #ff9800;
-}
+.sidebar a:hover { background: #3b1f0e; color: #ff9800; }
+.sidebar a.active { background: #3b1f0e; color: #ff9800; border-left: 4px solid #ff9800; }
 
 /* ===================== MAIN CONTENT ===================== */
-.main-content {
-  margin-left: 240px;
-  padding-top: 100px;
-}
+.main-content { margin-left: 240px; padding-top: 100px; }
 
 /* ===================== CONTAINER ===================== */
 .container-box {
@@ -91,35 +75,12 @@ body {
 }
 
 /* ===================== HEADINGS ===================== */
-h3 {
-  text-align: center;
-  font-weight: bold;
-  color: #ffddaa;
-}
+h3 { text-align: center; font-weight: bold; color: #ffddaa; }
 
 /* ===================== BUTTONS ===================== */
-.form-select, .btn {
-  border-radius: 50px;
-  font-weight: bold;
-}
-
-/* Load Data Button */
-.btn-primary {
-  background: linear-gradient(45deg, #a0522d, #d2b48c);
-  border: none;
-}
-
-/* Download PDF Button */
-.btn-success {
-  background: linear-gradient(45deg, #ff5722, #ff9800); /* strong color */
-  border: none;
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.form-select, .btn { border-radius: 50px; font-weight: bold; }
+.btn-primary { background: linear-gradient(45deg, #a0522d, #d2b48c); border: none; }
+.btn-success { background: linear-gradient(45deg, #ff5722, #ff9800); border: none; position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 6px; }
 
 /* ===================== METRIC CARDS ===================== */
 .card {
@@ -134,23 +95,9 @@ h3 {
 
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 768px) {
-  .sidebar {
-    position: relative;
-    width: 100%;
-    min-height: auto;
-  }
-  .main-content {
-    margin-left: 0;
-    padding-top: 140px;
-  }
-
-  .btn-success {
-    position: relative;
-    top: 0;
-    right: 0;
-    width: 100%;
-    justify-content: center;
-  }
+  .sidebar { position: relative; width: 100%; min-height: auto; }
+  .main-content { margin-left: 0; padding-top: 140px; }
+  .btn-success { position: relative; top: 0; right: 0; width: 100%; justify-content: center; }
 }
 </style>
 </head>
@@ -172,10 +119,8 @@ h3 {
   <a href="dashboard.html"><i class="bi bi-house-fill"></i> Main Dashboard</a>
   <a href="analytics.html" class="active"><i class="bi bi-graph-up"></i> Analytics</a>
   <a href="order-status.html"><i class="bi bi-box-seam"></i> Order Status</a>
-
   <hr class="text-secondary">
-
-  <!-- Cognito Logout Button -->
+  <!-- Logout Button -->
   <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
 </div>
 
@@ -193,7 +138,6 @@ h3 {
         <option value="month">This Month</option>
       </select>
 
-      <!-- Load Data Button with icon -->
       <button class="btn btn-primary" onclick="loadData()">
         <i class="bi bi-arrow-clockwise"></i> Load Data
       </button>
@@ -252,15 +196,29 @@ h3 {
 <script src="central-auth-api.js"></script>
 
 <script>
-/* ===================== PAGE PROTECTION & LOGOUT ===================== */
-document.addEventListener("DOMContentLoaded", async () => {
-  CHARLIE.initProtectedPage({ requireAuth: true, enableLogout: true, logoutButtonId: "logoutBtn" });
-});
-
-/* ===================== API CONFIG ===================== */
-const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod";
+/* ===================== CONFIG ===================== */
+const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod"; // Replace with your API Gateway
 const ANALYTICS_API = `${API_BASE_URL}/analytics`;
 const PDF_API = `${API_BASE_URL}/report/pdf`;
+
+/* ===================== PAGE PROTECTION & LOGOUT ===================== */
+document.addEventListener("DOMContentLoaded", async () => {
+  // Protect page and attach logout
+  CHARLIE.initProtectedPage({
+    requireAuth: true,
+    enableLogout: true,
+    logoutButtonId: "logoutBtn"
+  });
+
+  // Cognito logout redirect (if central-auth-api.js defines cognitoLogout)
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    if (typeof cognitoLogout === "function") {
+      cognitoLogout();
+    } else {
+      console.warn("cognitoLogout() not defined in central-auth-api.js");
+    }
+  });
+});
 
 /* ===================== LOAD ANALYTICS DATA ===================== */
 function loadData() {
@@ -288,19 +246,16 @@ function loadData() {
             tension: 0.3
           }]
         },
-        options: {
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } }
-        }
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
       });
 
       new bootstrap.Toast(document.getElementById("dataToast")).show();
     });
 }
 
-/* ===================== DOWNLOAD PDF ===================== */
+/* ===================== PDF DOWNLOAD ===================== */
 function downloadPDF() {
-  CHARLIE.downloadReport('pdf','daily'); // Use central export Lambda
+  CHARLIE.downloadReport('pdf','daily'); // Uses central export Lambda
 }
 
 /* ===================== CENTRAL PRINT HOOK ===================== */
@@ -308,14 +263,10 @@ function openCentralPrint(selector) {
   const content = document.querySelector(selector).outerHTML;
   const printWindow = window.open('central-printing.html', '_blank');
 
-  // Wait for central-printing.html to load
-  printWindow.centralPrint = {
-    loadContent: function(htmlContent) {
-      document.body.innerHTML = htmlContent;
-    }
-  };
+  // Inject content into <div id="printContent"> of central-printing.html
   printWindow.onload = function() {
-    printWindow.centralPrint.loadContent(content);
+    const container = printWindow.document.getElementById('printContent');
+    if (container) container.innerHTML = content;
   };
 }
 </script>
