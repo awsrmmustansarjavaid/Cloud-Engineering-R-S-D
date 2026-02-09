@@ -184,7 +184,7 @@ Create this path:
     └── /export
 ```
 
-Steps:
+#### Steps:
 
 - Click Resources
 
@@ -204,67 +204,67 @@ Steps:
 
 #### STEP 3️⃣ Create GET Method
 
-On /reports/export:
+- On /reports/export:
 
-Click Create Method
+- Click Create Method
 
-Select GET
+- Select GET
 
-Integration type: Lambda Function
+- Integration type: Lambda Function
 
-Lambda function: CafeCentralExportLambda
+- Lambda function: CafeCentralExportLambda
 
-✅ Enable Lambda Proxy Integration
+#### ✅ Enable Lambda Proxy Integration
 
-Save
+- Save
 
 #### STEP 4️⃣ — Attach Cognito Authorizer
 
 You already use Cognito, so reuse it.
 
-🔐 Attach Authorizer
+#### 🔐 Attach Authorizer
 
-Click GET /reports/export
+- Click GET /reports/export
 
-Method Request
+- Method Request
 
-Authorization:
+- Authorization:
 
-Select your Cognito User Pool Authorizer
+  - Select your Cognito User Pool Authorizer
 
-Save
+- Save
 
 Now:
 
-Only logged-in users reach Lambda
+  - Only logged-in users reach Lambda
 
-Lambda itself checks Admin group
+  - Lambda itself checks Admin group
 
 #### STEP 5️⃣ — Enable CORS (VERY IMPORTANT)
 
 On /reports/export:
 
-Actions → Enable CORS
+- Actions → Enable CORS
 
-Allow:
+- Allow:
 
-GET
+  - GET
 
-Headers: Authorization,Content-Type
+  - Headers: Authorization,Content-Type
 
-Save
+- Save
 
-Deploy API
+- Deploy API
 
 Without this, browser downloads will FAIL.
 
 #### STEP 6️⃣ — Deploy API
 
-Actions → Deploy API
+- Actions → Deploy API
 
-Stage: prod (or your stage)
+- Stage: prod (or your stage)
 
-Note the URL:
+- Note the URL:
 
 ```
 https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod
@@ -299,6 +299,8 @@ async function downloadReport(type, report) {
   URL.revokeObjectURL(a.href);
 }
 ```
+
+
 
 #### STEP 8️⃣ — Connect Buttons in central-printing.html
 

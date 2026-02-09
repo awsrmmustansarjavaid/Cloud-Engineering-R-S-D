@@ -228,7 +228,76 @@ Made frontend printing future-proof
 
 Kept API Gateway clean and stable
 
+STEP 9️⃣ — Test from API Gateway (NO FRONTEND YET)
+✅ Test PDF
 
+```
+{
+  "queryStringParameters": {
+    "type": "pdf",
+    "report": "daily"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  }
+}
+```
+
+Expected:
+
+Status 200
+
+PDF binary response
+
+File uploaded to S3
+
+❌ Test without Admin
+
+```
+{
+  "queryStringParameters": {
+    "type": "csv"
+  }
+}
+```
+
+Expected:
+
+```
+403 Admin access required
+```
+
+STEP 🔟 — Test from Browser (FINAL TEST)
+
+Login as Admin
+
+Open central-printing.html
+
+Click:
+
+Daily PDF
+
+Analytics CSV
+
+✔ File downloads
+✔ No CORS error
+✔ No auth error
+
+🧠 FINAL MENTAL MODEL (REMEMBER THIS)
+
+API Gateway = one door
+
+Lambda = one brain
+
+Query params = instructions
+
+central-printing.html = one control panel
+
+You have now built a real production export system, not a lab hack.
 
 
 
