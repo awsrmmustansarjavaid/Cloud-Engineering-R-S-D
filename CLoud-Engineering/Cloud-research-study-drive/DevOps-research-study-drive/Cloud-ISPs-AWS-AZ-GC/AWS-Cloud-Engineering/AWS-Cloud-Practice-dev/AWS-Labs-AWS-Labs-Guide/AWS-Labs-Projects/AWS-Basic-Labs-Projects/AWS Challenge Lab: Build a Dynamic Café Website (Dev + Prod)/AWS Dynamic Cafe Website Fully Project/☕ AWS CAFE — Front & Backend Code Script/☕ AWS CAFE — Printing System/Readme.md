@@ -181,3 +181,87 @@
 
 
 ---
+### central-print.html
+
+> **Updated Version:1.1**
+
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe — Printing Center</title>
+    <script src="path/to/charlie-central-auth.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; display: none; }
+        button { margin: 5px; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>☕ Charlie Cafe — Printing Center</h1>
+
+    <div id="buttons">
+        <button onclick="CHARLIE.printAllOrders()">🖨️ Print All Orders</button>
+        <button onclick="CHARLIE.printTodaySummary()">📊 Print Today's Summary</button>
+        <button onclick="CHARLIE.downloadReport('pdf', 'daily')">📄 Download PDF Report</button>
+        <button onclick="CHARLIE.downloadReport('csv')">📑 Download CSV Export</button>
+        <button id="logoutBtn">🔒 Logout</button>
+    </div>
+
+</body>
+
+<script>
+    // Initialize page with auth protection + logout button
+    CHARLIE.initProtectedPage({ requireAuth: true, enableLogout: true, logoutButtonId: "logoutBtn" });
+</script>
+
+</html>
+```
+
+### 1️⃣ How It Works
+
+1. Auth protection
+
+```
+CHARLIE.initProtectedPage()
+```
+
+Ensures only logged-in users see the page. Auto-redirects to Cognito login if not logged in.
+
+2. Logout button
+- Central logout works via your CHARLIE.auth.logout().
+
+3. Printing & Reports
+
+- CHARLIE.printAllOrders() → prints all orders (uses current DOM table)
+
+- CHARLIE.printTodaySummary() → prints daily summary
+
+- CHARLIE.downloadReport("pdf") → downloads PDF
+
+- CHARLIE.downloadReport("csv") → downloads CSV
+
+4. Roles respected
+
+- If an endpoint requires admin, your secureFetch + requireAdmin() ensures unauthorized users cannot perform actions.
+
+### 2️⃣ Optional Improvements
+
+- Dynamic orders table: fetch from CHARLIE.api.getOrderStatus() or CHARLIE.api.getCafeOrderStatus() and render in the table.
+
+- Conditional buttons for roles:
+
+```
+if(!CHARLIE.isAdmin()) {
+    document.querySelector("#buttons button:nth-child(3)").style.display = "none";
+}
+```
+
+- Styling for print: you can add a @media print { ... } CSS block to make it look professional on paper.
+
+---
+
+
+
