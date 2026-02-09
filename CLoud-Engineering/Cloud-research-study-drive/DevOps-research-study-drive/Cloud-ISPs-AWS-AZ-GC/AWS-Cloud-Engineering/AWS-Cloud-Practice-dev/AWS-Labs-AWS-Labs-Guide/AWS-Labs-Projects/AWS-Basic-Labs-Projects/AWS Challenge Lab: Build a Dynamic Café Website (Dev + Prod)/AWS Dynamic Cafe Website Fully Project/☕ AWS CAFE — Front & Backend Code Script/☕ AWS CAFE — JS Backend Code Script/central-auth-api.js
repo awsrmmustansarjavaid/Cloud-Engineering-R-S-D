@@ -108,6 +108,48 @@ const CHARLIE = (() => {
     /* =====================================================
        4️⃣ SECURE FETCH — JWT AUTO ATTACH
     ===================================================== */
+
+    /* =====================================================
+   4️⃣1️⃣ SECURE FILE DOWNLOAD (PDF / CSV)
+   -----------------------------------------------------
+   ✔ Uses authFetch (NOT secureFetch)
+   ✔ Supports binary (PDF) and text (CSV)
+   ✔ Does NOT affect existing APIs
+    ===================================================== */
+async function downloadReport(type, report = "") {
+
+    // Build export URL
+    let url = `${CONFIG.API_BASE}/reports/export?type=${type}`;
+    if (report) url += `&report=${report}`;
+
+    // Use authFetch so JWT is attached
+    const response = await authFetch(url);
+
+    if (!response || !response.ok) {
+        alert("❌ Failed to download report");
+        return;
+    }
+
+    // Decide filename
+    const filename = report
+        ? `${report}.${type}`
+        : `export.${type}`;
+
+    // Convert response to Blob (works for PDF & CSV)
+    const blob = await response.blob();
+
+    // Trigger browser download
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    URL.revokeObjectURL(a.href);
+    document.body.removeChild(a);
+}
+
     async function authFetch(url, options = {}) {
         const token = getToken();
         if (!token || isTokenExpired(token)) {
@@ -343,6 +385,7 @@ const CHARLIE = (() => {
         api,
         assets,
         secureFetch,
+        downloadReport,   // ✅ ADD THIS
         initProtectedPage,
         getUserRoles,
         isAdmin,
