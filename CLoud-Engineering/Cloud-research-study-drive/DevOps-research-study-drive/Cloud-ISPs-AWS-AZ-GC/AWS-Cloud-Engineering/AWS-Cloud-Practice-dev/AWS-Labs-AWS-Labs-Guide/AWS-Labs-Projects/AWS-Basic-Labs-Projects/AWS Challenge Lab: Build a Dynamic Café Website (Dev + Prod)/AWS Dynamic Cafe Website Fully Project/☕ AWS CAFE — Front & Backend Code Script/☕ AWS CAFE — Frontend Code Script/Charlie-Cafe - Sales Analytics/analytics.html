@@ -87,6 +87,7 @@ body {
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   max-width: 1100px;
   margin: auto;
+  position: relative;
 }
 
 /* ===================== HEADINGS ===================== */
@@ -162,7 +163,6 @@ h3 {
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-dark">
   <div class="container-fluid">
-    <!-- Added cafe icon -->
     <a class="navbar-brand" href="index.html"><i class="bi bi-cup-fill"></i> Charlie Cafe</a>
   </div>
 </nav>
@@ -181,7 +181,7 @@ h3 {
 
 <!-- ===================== MAIN CONTENT ===================== -->
 <div class="main-content">
-  <div class="container-box position-relative">
+  <div class="container-box">
 
     <h3><i class="bi bi-bar-chart-fill"></i> Cafe Sales Analytics</h3>
 
@@ -192,9 +192,15 @@ h3 {
         <option value="week">Last 7 Days</option>
         <option value="month">This Month</option>
       </select>
+
       <!-- Load Data Button with icon -->
       <button class="btn btn-primary" onclick="loadData()">
         <i class="bi bi-arrow-clockwise"></i> Load Data
+      </button>
+
+      <!-- Central Print Button -->
+      <button class="btn btn-outline-dark" onclick="openCentralPrint('.main-content')">
+        🖨️ Print / Export
       </button>
     </div>
 
@@ -208,10 +214,11 @@ h3 {
     <!-- ===================== CHART ===================== -->
     <canvas id="chart" class="mt-4" height="120"></canvas>
 
-    <!-- ===================== PDF ===================== -->
+    <!-- ===================== PDF DOWNLOAD BUTTON ===================== -->
     <button class="btn btn-success" onclick="downloadPDF()">
       <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
     </button>
+
   </div>
 </div>
 </div>
@@ -242,38 +249,18 @@ h3 {
 </div>
 
 <!-- ===================== CENTRAL AUTH JS ===================== -->
-<!-- This file handles Cognito login, logout, token storage, and page protection -->
 <script src="central-auth-api.js"></script>
 
 <script>
-/* ===================== PAGE PROTECTION ===================== */
+/* ===================== PAGE PROTECTION & LOGOUT ===================== */
 document.addEventListener("DOMContentLoaded", async () => {
-  // Protect page: redirect to login if no valid token
-  await protectPage();
-
-  // Attach logout to button
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    cognitoLogout(); // From central-auth-api.js
-  });
+  CHARLIE.initProtectedPage({ requireAuth: true, enableLogout: true, logoutButtonId: "logoutBtn" });
 });
 
 /* ===================== API CONFIG ===================== */
 const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod";
 const ANALYTICS_API = `${API_BASE_URL}/analytics`;
 const PDF_API = `${API_BASE_URL}/report/pdf`;
-
-/* ===================== WELCOME TOAST ===================== */
-document.addEventListener("DOMContentLoaded", () => {
-  const today = new Date().toISOString().split("T")[0];
-  const lastSeen = localStorage.getItem("analyticsWelcome");
-
-  if (lastSeen !== today) {
-    new bootstrap.Toast(document.getElementById("welcomeToast"), {
-      delay: 2500
-    }).show();
-    localStorage.setItem("analyticsWelcome", today);
-  }
-});
 
 /* ===================== LOAD ANALYTICS DATA ===================== */
 function loadData() {
@@ -282,7 +269,6 @@ function loadData() {
   fetch(`${ANALYTICS_API}?period=${period}`)
     .then(res => res.json())
     .then(data => {
-
       document.getElementById("sales").innerText = data.total_sales;
       document.getElementById("cost").innerText = data.total_cost;
       document.getElementById("profit").innerText = data.profit;
@@ -314,7 +300,23 @@ function loadData() {
 
 /* ===================== DOWNLOAD PDF ===================== */
 function downloadPDF() {
-  window.open(PDF_API);
+  CHARLIE.downloadReport('pdf','daily'); // Use central export Lambda
+}
+
+/* ===================== CENTRAL PRINT HOOK ===================== */
+function openCentralPrint(selector) {
+  const content = document.querySelector(selector).outerHTML;
+  const printWindow = window.open('central-printing.html', '_blank');
+
+  // Wait for central-printing.html to load
+  printWindow.centralPrint = {
+    loadContent: function(htmlContent) {
+      document.body.innerHTML = htmlContent;
+    }
+  };
+  printWindow.onload = function() {
+    printWindow.centralPrint.loadContent(content);
+  };
 }
 </script>
 
