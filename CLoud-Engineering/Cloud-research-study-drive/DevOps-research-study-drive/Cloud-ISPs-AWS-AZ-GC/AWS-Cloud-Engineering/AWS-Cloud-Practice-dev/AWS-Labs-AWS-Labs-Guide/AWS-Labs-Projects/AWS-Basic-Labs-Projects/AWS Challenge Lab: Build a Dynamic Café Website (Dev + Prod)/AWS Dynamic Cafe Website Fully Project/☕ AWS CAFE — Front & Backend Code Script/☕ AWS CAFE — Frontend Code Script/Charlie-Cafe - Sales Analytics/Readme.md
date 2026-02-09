@@ -3518,6 +3518,28 @@ function openCentralPrint(selector) {
 </html>
 ```
 
+### ✅ Key Fixes
 
+Removed duplicate central-auth-api.js.
+
+Added API_BASE_URL & endpoints for analytics & PDF.
+
+Logout button now triggers Cognito logout via cognitoLogout().
+
+Central printing now injects into <div id="printContent"> to avoid white page.
+
+Clean comments for every section.
+
+Fully protected page with CHARLIE.initProtectedPage().
+
+#### 💡 Important: Make sure your central-printing.html has:
+
+```
+<div id="printContent"></div>
+```
+
+Otherwise, the print content will not appear.
 ---
+
+
 
