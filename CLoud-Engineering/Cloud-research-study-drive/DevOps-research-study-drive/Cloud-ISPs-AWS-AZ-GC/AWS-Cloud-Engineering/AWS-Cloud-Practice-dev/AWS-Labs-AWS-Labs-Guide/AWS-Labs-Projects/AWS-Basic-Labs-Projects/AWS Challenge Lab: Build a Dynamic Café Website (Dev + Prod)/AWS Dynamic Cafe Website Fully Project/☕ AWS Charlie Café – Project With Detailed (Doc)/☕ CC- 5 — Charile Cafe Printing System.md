@@ -276,33 +276,7 @@ This becomes:
 API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
 ```
 
-### 4️⃣ — Updated central-auth-api.js (Skip it)
-
-Add ONE helper function (don’t change everything).
-
-```
-async function downloadReport(type, report) {
-  const url = `${CONFIG.API_BASE}/reports/export?type=${type}&report=${report}`;
-
-  const response = await secureFetch(url);
-
-  if (!response.ok) {
-    alert("❌ Failed to download report");
-    return;
-  }
-
-  const blob = await response.blob();
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `${report}.${type}`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-```
-
-#### ⚠️ Because Already Added
-
-
+### 4️⃣ — 
 
 
 
