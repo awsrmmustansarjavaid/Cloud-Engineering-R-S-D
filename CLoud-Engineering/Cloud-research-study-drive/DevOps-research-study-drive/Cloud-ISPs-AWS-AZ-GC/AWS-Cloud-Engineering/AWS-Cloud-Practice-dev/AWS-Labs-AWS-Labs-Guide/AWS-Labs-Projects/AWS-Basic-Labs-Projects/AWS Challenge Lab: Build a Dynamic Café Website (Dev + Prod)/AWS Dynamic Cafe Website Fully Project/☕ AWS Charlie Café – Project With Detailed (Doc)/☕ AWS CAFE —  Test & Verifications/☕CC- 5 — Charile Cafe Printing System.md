@@ -323,9 +323,31 @@ order-status_report_2026-02-09.pdf
 ---
 ## PHASE 3️⃣ Cafe Central Export 
 
+### 1️⃣ — Testing & Validation
+
+For 10-min test, wait for the trigger → check Lambda logs in CloudWatch.
+
+Confirm report is generated successfully (PDF/CSV).
+
+Once verified, switch to daily/hourly schedules.
+
+#### ✅ Pro Tips for Professional Setup
+
+✔️ Use meaningful rule names: CafeDailyPDF, CafeHourlyCSV, Cafe10MinTest
+
+✔️ Enable CloudWatch Logs on Lambda → check for failures
+
+✔️ Always test short interval first before production schedules
+
+✔️ Use input JSON to dynamically control report type → avoids multiple Lambdas
+
+✔️ Deploy stage prod in API Gateway → matches CONFIG.API_BASE
 
 
+**✅ PHASE 3️⃣ STATUS**
 
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
 
 # SECTION 1️⃣ Charlie Cafe - PRINTING System
 ---

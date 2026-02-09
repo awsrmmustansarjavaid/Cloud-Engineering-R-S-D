@@ -389,27 +389,6 @@ Hourly: cron(0 0/1 * * ? *) → every hour
 
 Each schedule can pass different input JSON for different report types.
 
-#### Step 7️⃣ — Testing & Validation
-
-For 10-min test, wait for the trigger → check Lambda logs in CloudWatch.
-
-Confirm report is generated successfully (PDF/CSV).
-
-Once verified, switch to daily/hourly schedules.
-
-#### ✅ Pro Tips for Professional Setup
-
-✔️ Use meaningful rule names: CafeDailyPDF, CafeHourlyCSV, Cafe10MinTest
-
-✔️ Enable CloudWatch Logs on Lambda → check for failures
-
-✔️ Always test short interval first before production schedules
-
-✔️ Use input JSON to dynamically control report type → avoids multiple Lambdas
-
-✔️ Deploy stage prod in API Gateway → matches CONFIG.API_BASE
-
-
 
 # SECTION 1️⃣ Charlie Cafe - PRINTING System
 ---
