@@ -145,7 +145,29 @@ DB_PASS = password
 AWS_REGION = ap-south-1
 ```
 
-### 2️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
+###  2️⃣ ADD REPORTLAB LAYER
+
+- **Lambda → Layers → Create layer**
+
+- **Upload reportlab.zip** (contains reportlab library)
+
+- **Attach layer to:** CafeCentralExportLambda
+
+- **Required S3 PERMISSION:**
+
+    - **Attach IAM policy:**
+
+        - **AmazonS3FullAccess**
+
+        - **CloudWatchLogsFullAccess**
+
+        - **AmazonDynamoDBReadOnlyAccess**
+
+** ⚠️ if you want to pull real data from DynamoDB**
+
+
+
+### 3️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
 
 You already have the Lambda.
 Now we create ONE API Gateway resource and connect it.
