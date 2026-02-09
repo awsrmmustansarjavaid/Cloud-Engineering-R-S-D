@@ -15,7 +15,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-/* ================= BODY + BACKGROUND ================= */
 body {
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
@@ -28,7 +27,6 @@ body {
     color: #fff;
 }
 
-/* ================= SIDEBAR ================= */
 .sidebar {
     width: 240px;
     min-height: 100vh;
@@ -57,11 +55,7 @@ body {
     color: #fff;
     border-left: 4px solid #ff9800;
 }
-.sidebar a.logout-btn i {
-    color: #ff4d4d;
-}
 
-/* ================= NAVBAR ================= */
 .navbar {
     background-color: rgba(59, 31, 14, 0.9) !important;
     position: fixed;
@@ -73,14 +67,12 @@ body {
     color: #ff9800 !important;
 }
 
-/* ================= MAIN CONTENT ================= */
 .main-content {
     margin-left: 240px;
     padding-top: 100px;
     padding-bottom: 50px;
 }
 
-/* ================= STATUS CONTAINER ================= */
 .status-container {
     background: rgba(30, 30, 30, 0.85);
     border-radius: 20px;
@@ -89,22 +81,13 @@ body {
     margin: auto;
 }
 
-/* ================= METRICS CARDS ================= */
 .card-metric {
     background: rgba(59, 31, 14, 0.85);
     border-radius: 15px;
     padding: 20px;
     text-align: center;
-    transition: transform 0.2s;
-}
-.card-metric:hover {
-    transform: scale(1.05);
-}
-.card-metric h6 {
-    color: #ff9800;
 }
 
-/* ================= BUTTONS ================= */
 .btn-transparent {
     background: rgba(255,255,255,0.1);
     border: 1px solid #ff9800;
@@ -112,22 +95,11 @@ body {
     display: flex;
     align-items: center;
 }
-.btn-transparent i {
-    margin-right: 8px;
-}
+.btn-transparent i { margin-right: 8px; }
 
-/* ================= TABLE ================= */
-.table th, .table td {
-    vertical-align: middle;
-}
-.table-hover tbody tr:hover {
-    background-color: rgba(255, 152, 0, 0.2);
-}
-
-/* ================= RESPONSIVE ================= */
 @media (max-width:768px){
     .main-content { margin-left: 0; padding-top: 120px; }
-    .sidebar { width: 100%; height: auto; position: relative; padding-top: 20px;}
+    .sidebar { width: 100%; position: relative; }
 }
 </style>
 </head>
@@ -154,39 +126,48 @@ body {
 
 <!-- ================= MAIN CONTENT ================= -->
 <div class="main-content">
-    <div class="container">
-        <div class="status-container">
+<div class="container">
+<div class="status-container">
 
-            <h2 class="text-center mb-4"><i class="bi bi-cup-straw"></i> Live Order Status</h2>
+<h2 class="text-center mb-4"><i class="bi bi-cup-straw"></i> Live Order Status</h2>
 
-            <!-- ================= CSV EXPORT BUTTON ================= -->
-            <div class="d-flex justify-content-end mb-4">
-                <button class="btn btn-transparent" onclick="exportCSV()">
-                    <i class="bi bi-download"></i> Export CSV
-                </button>
-            </div>
+<!-- ================= ACTION BUTTONS ================= -->
+<div class="d-flex justify-content-end gap-2 mb-4">
 
-            <!-- ================= METRICS ================= -->
-            <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+    <!-- 🖨️ CENTRAL PRINT -->
+    <button class="btn btn-transparent"
+            onclick="openCentralPrint('#ordersPrintArea')">
+        <i class="bi bi-printer"></i> Print / Export
+    </button>
 
-            <!-- ================= ORDERS TABLE ================= -->
-            <div class="table-responsive">
-                <table class="table table-hover text-white">
-                    <thead>
-                        <tr>
-                            <th>Customer</th>
-                            <th>Item</th>
-                            <th>Qty</th>
-                            <th>Table</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="orders"></tbody>
-                </table>
-            </div>
+    <!-- 📄 CSV EXPORT -->
+    <button class="btn btn-transparent" onclick="exportCSV()">
+        <i class="bi bi-download"></i> Export CSV
+    </button>
 
-        </div>
-    </div>
+</div>
+
+<!-- ================= METRICS ================= -->
+<div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
+
+<!-- ================= ORDERS TABLE (PRINTABLE AREA) ================= -->
+<div id="ordersPrintArea" class="table-responsive">
+    <table class="table table-hover text-white">
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Table</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody id="orders"></tbody>
+    </table>
+</div>
+
+</div>
+</div>
 </div>
 
 </div>
@@ -194,25 +175,41 @@ body {
 <!-- ================= BOOTSTRAP JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ================= CENTRAL AUTH (REQUIRED) ================= -->
+<!-- ================= CENTRAL AUTH ================= -->
 <script src="/js/central-auth-api.js"></script>
 
 <script>
-/* =========================================================
-   PROTECT PAGE — redirect to login if not authenticated
-   ========================================================= */
+/* =====================================================
+   🖨️ CENTRAL PRINT FUNCTION (SAFE)
+   ===================================================== */
+function openCentralPrint(selector) {
+    const target = document.querySelector(selector);
+
+    if (!target) {
+        alert("Printable section not found.");
+        return;
+    }
+
+    const printWindow = window.open("/central-print.html", "_blank");
+
+    printWindow.onload = function () {
+        if (printWindow.centralPrint &&
+            typeof printWindow.centralPrint.loadContent === "function") {
+            printWindow.centralPrint.loadContent(target.outerHTML);
+        } else {
+            console.error("centralPrint not available");
+        }
+    };
+}
+
+/* ================= AUTH PROTECTION ================= */
 CHARLIE.auth.protectPage();
 
-/* =========================================================
-   LOGOUT HANDLER
-   ========================================================= */
 document.querySelector(".logout-btn").onclick = () => {
     CHARLIE.auth.logout();
 };
 
-/* =========================================================
-   FETCH DASHBOARD DATA (METRICS + ORDERS)
-   ========================================================= */
+/* ================= LOAD DATA ================= */
 document.addEventListener("DOMContentLoaded", () => {
 
     CHARLIE.authFetch(`${CHARLIE.CONFIG.API_BASE}/order-status`)
@@ -228,7 +225,6 @@ document.addEventListener("DOMContentLoaded", () => {
         metricsDiv.innerHTML = "";
         ordersBody.innerHTML = "";
 
-        // Render metrics cards with cafe icon
         data.metrics.forEach(m => {
             metricsDiv.innerHTML += `
                 <div class="col-6 col-md-3">
@@ -240,7 +236,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>`;
         });
 
-        // Render recent orders
         data.recent_orders.forEach(o => {
             ordersBody.innerHTML += `
                 <tr>
@@ -262,9 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-/* =========================================================
-   CSV EXPORT FUNCTION (ADMIN ONLY)
-   ========================================================= */
+/* ================= CSV EXPORT ================= */
 function exportCSV() {
     const url = `${CHARLIE.CONFIG.API_BASE}/order-status?export=true`;
     CHARLIE.authFetch(url)
@@ -274,16 +267,13 @@ function exportCSV() {
         })
         .then(blob => {
             const link = document.createElement("a");
-            link.href = window.URL.createObjectURL(blob);
+            link.href = URL.createObjectURL(blob);
             link.download = "orders.csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         })
-        .catch(err => {
-            alert("❌ " + err.message);
-            console.error(err);
-        });
+        .catch(err => alert("❌ " + err.message));
 }
 </script>
 
