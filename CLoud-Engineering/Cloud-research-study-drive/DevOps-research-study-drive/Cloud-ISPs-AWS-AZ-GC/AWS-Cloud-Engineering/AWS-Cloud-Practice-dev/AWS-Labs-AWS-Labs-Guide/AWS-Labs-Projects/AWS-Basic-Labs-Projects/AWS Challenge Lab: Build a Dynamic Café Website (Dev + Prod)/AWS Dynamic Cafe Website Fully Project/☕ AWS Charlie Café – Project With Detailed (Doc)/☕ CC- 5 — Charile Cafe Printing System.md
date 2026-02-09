@@ -276,7 +276,7 @@ This becomes:
 API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
 ```
 
-### 4️⃣ — Update central-auth-api.js
+### 4️⃣ — Updated central-auth-api.js (Skip it)
 
 Add ONE helper function (don’t change everything).
 
@@ -299,6 +299,8 @@ async function downloadReport(type, report) {
   URL.revokeObjectURL(a.href);
 }
 ```
+
+#### ⚠️ Because Already Added
 
 ### 5️⃣ — Connect Buttons in central-printing.html
 
