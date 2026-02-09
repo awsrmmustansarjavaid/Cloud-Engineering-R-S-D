@@ -266,6 +266,22 @@ Analytics CSV
 ✔ No CORS error
 ✔ No auth error
 
+### 4️⃣ — Verify S3
+
+- **Go to S3 → your bucket.**
+
+You should see:
+
+```
+analytics_report_2026-01-17.pdf
+order-status_report_2026-01-17.pdf
+```
+
+- Click → Download → Open in PDF viewer.
+
+**✅ You now have both PDFs.**
+
+
 
 ### 🧠 Quick sanity checklist (PASS / FAIL)
 
