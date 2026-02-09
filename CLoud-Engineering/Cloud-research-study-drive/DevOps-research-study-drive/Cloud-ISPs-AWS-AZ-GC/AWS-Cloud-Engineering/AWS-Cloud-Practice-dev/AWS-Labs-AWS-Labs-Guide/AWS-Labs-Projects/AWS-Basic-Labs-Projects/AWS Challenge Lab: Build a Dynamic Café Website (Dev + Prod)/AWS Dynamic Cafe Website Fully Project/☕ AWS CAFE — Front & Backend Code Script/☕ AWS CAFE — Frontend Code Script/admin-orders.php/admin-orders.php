@@ -1,6 +1,6 @@
 <?php
 // ===================================================
-// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (Updated with Cognito & UI/UX)
+// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (Updated with Cognito & UI/UX + Central Print)
 // ===================================================
 
 // API endpoints
@@ -83,10 +83,15 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
 }
 .btn-paid:disabled { opacity:0.6; cursor:not-allowed; }
 
-/* LOGIN BUTTON - strong color with icon */
+/* Login button */
 .btn-login {
     background: linear-gradient(135deg, #ff5722, #ff9800);
     border:none; border-radius:50px; color:#fff; display:flex; align-items:center; gap:6px;
+}
+
+/* Central Print Button */
+.btn-print {
+    margin-bottom: 15px;
 }
 
 /* Responsive Table */
@@ -100,13 +105,11 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
 </head>
 <body>
 
-<!-- ===================== HEADER ===================== -->
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h3><i class="bi bi-speedometer2"></i> Charlie Café – Orders Dashboard</h3>
         <div class="d-flex gap-2 align-items-center">
             <span class="text-muted">Cashier Panel • Auto-refresh 30s</span>
-            <!-- Login button (Cognito hosted UI) -->
             <button class="btn btn-login" id="loginBtn"><i class="bi bi-person-circle"></i> Login</button>
         </div>
     </div>
@@ -117,10 +120,16 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
         </div>
     <?php endif; ?>
 
-    <!-- ===================== DASHBOARD CARD ===================== -->
     <div class="dashboard-card">
         <div class="table-responsive">
-            <table class="table table-hover align-middle text-white">
+
+            <!-- ===================== CENTRAL PRINT BUTTON ===================== -->
+            <button class="btn btn-outline-dark btn-print" onclick="openCentralPrint('#ordersTable')">
+                🖨️ Print / Export
+            </button>
+
+            <!-- ===================== ORDERS TABLE ===================== -->
+            <table class="table table-hover align-middle text-white" id="ordersTable">
                 <thead>
                     <tr>
                         <th>Order ID</th>
@@ -191,15 +200,15 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
                     <?php endif; ?>
                 </tbody>
             </table>
+
         </div>
     </div>
 </div>
 
-<!-- ===================== JAVASCRIPT ===================== -->
+<!-- ===================== JS ===================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- ===================== CENTRAL AUTH ===================== -->
 <script src="central-auth-api.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
     // Protect page – redirect to login if not authenticated
@@ -210,7 +219,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         cognitoLogin(); // Opens hosted UI
     });
 
-    // Auto-refresh every 30s (demo)
+    // Auto-refresh every 30s
     setInterval(() => location.reload(), 30000);
 });
 
@@ -240,6 +249,26 @@ async function markAsPaid(button){
         button.disabled=false;
         button.innerHTML=`<i class="bi bi-check2-circle"></i> Mark Paid`;
     }
+}
+
+/* ===================== CENTRAL PRINT FUNCTION ===================== */
+/* Works for any table or section using #selector */
+function openCentralPrint(selector) {
+    const target = document.querySelector(selector);
+    if (!target) {
+        alert('Print section not found!');
+        return;
+    }
+    const content = target.outerHTML;
+    const printWindow = window.open('/central-print.html', '_blank');
+
+    // Wait until centralPrint object is ready
+    const timer = setInterval(() => {
+        if (printWindow && printWindow.centralPrint) {
+            printWindow.centralPrint.loadContent(content);
+            clearInterval(timer);
+        }
+    }, 100);
 }
 </script>
 </body>
