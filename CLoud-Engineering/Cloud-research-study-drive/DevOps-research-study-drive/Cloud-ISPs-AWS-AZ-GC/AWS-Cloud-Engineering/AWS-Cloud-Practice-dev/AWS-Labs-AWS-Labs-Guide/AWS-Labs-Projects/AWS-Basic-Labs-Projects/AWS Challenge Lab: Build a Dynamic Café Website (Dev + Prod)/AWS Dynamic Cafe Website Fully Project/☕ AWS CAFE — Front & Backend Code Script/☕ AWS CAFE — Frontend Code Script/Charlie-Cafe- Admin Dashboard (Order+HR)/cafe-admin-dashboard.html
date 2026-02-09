@@ -5,20 +5,15 @@
 <title>Charlie Café ☕ | Admin Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- =====================================================
-     BOOTSTRAP + ICONS
-===================================================== -->
+<!-- ================= BOOTSTRAP + ICONS ================= -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- =====================================================
-     STYLES
-===================================================== -->
+<!-- ================= STYLES ================= -->
 <style>
 /* -----------------------------------------------------
    IMPORTANT:
    Page stays hidden until Cognito auth passes.
-   DO NOT REMOVE THIS.
 ----------------------------------------------------- */
 body {
     background-color: #0f0f10;
@@ -78,14 +73,18 @@ body {
 /* ===== SECTION TOGGLING ===== */
 .section { display: none; }
 .section.active { display: block; }
+
+/* ===== PRINT BUTTON ===== */
+.print-btn {
+    display: inline-block;
+    margin-bottom: 15px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
+<!-- ================= SIDEBAR ================= -->
 <div class="sidebar">
     <h4>☕ Charlie Café</h4>
     <p class="text-muted">Admin Dashboard</p>
@@ -106,9 +105,7 @@ body {
     </a>
 </div>
 
-<!-- =====================================================
-     MAIN CONTENT
-===================================================== -->
+<!-- ================= MAIN CONTENT ================= -->
 <div class="main">
 
 <!-- ================= ORDERS ================= -->
@@ -144,6 +141,12 @@ body {
 
     <div class="table-container">
         <h5>Latest Orders</h5>
+
+        <!-- 🔹 CENTRAL PRINT BUTTON -->
+        <button class="btn btn-outline-dark print-btn" onclick="openCentralPrint('#ordersTable')">
+            🖨️ Print / Export
+        </button>
+
         <table class="table table-hover text-white">
             <thead>
                 <tr>
@@ -191,9 +194,7 @@ body {
 
 </div>
 
-<!-- =====================================================
-     CENTRAL AUTH (MUST LOAD FIRST)
-===================================================== -->
+<!-- ================= CENTRAL AUTH ================= -->
 <script src="js/central-auth-api.js"></script>
 
 <script>
@@ -216,7 +217,7 @@ function showSection(e, id) {
 }
 
 /* =====================================================
-   🛒 ORDERS DASHBOARD (ADMIN ONLY)
+   🚀 LOAD ORDERS DASHBOARD
 ===================================================== */
 async function loadOrdersDashboard() {
     if (!CHARLIE.isAdmin()) return;
@@ -250,7 +251,7 @@ async function loadOrdersDashboard() {
 }
 
 /* =====================================================
-   👥 HR DASHBOARD (ADMIN ONLY)
+   👥 LOAD HR DASHBOARD
 ===================================================== */
 async function loadHR(type) {
     if (!CHARLIE.isAdmin()) return;
@@ -272,7 +273,28 @@ async function loadHR(type) {
 }
 
 /* =====================================================
-   🚀 LOAD DATA AFTER AUTH SUCCESS
+   🔹 CENTRAL PRINT FUNCTION
+   Works for any table or section
+===================================================== */
+function openCentralPrint(selector) {
+    const target = document.querySelector(selector);
+    if (!target) {
+        alert('Print section not found!');
+        return;
+    }
+    const content = target.outerHTML;
+    const printWindow = window.open('/central-print.html', '_blank');
+
+    const timer = setInterval(() => {
+        if (printWindow && printWindow.centralPrint) {
+            printWindow.centralPrint.loadContent(content);
+            clearInterval(timer);
+        }
+    }, 100);
+}
+
+/* =====================================================
+   🚀 INITIAL DATA LOAD AFTER AUTH
 ===================================================== */
 window.addEventListener("load", () => {
     loadOrdersDashboard();
