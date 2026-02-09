@@ -1,28 +1,16 @@
 <?php
-/* =====================================================
-   CHARLIE CAFE – SINGLE ORDER STATUS WITH CENTRAL PRINT
-   FILE: FINAL-single-order-status-with-print-button.php
-   ===================================================== */
+/* ===============================
+   CONFIGURATION SECTION
+   👉 REPLACE API URL WITH YOUR OWN
+   =============================== */
 
-/* -------------------------------
-   1️⃣ BASIC CONFIG
--------------------------------- */
 $orderId = $_GET['order_id'] ?? '';
 
-/* 🔴 REPLACE WITH YOUR REAL API */
-$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=" . urlencode($orderId);
+/* 🔴 REPLACE this API URL */
+$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=$orderId";
 
-/* -------------------------------
-   2️⃣ FETCH API DATA (SAFE)
--------------------------------- */
-$data = null;
-
-if ($orderId) {
-    $response = @file_get_contents($apiUrl);
-    if ($response !== false) {
-        $data = json_decode($response, true);
-    }
-}
+$response = @file_get_contents($apiUrl);
+$data = json_decode($response, true);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,17 +21,17 @@ if ($orderId) {
 
 <!-- ===============================
      BOOTSTRAP CSS
-================================ -->
+     =============================== -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- ===============================
-     GOOGLE FONT
-================================ -->
+     GOOGLE FONT (CAFE STYLE)
+     =============================== -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <!-- ===============================
-     CUSTOM STYLE
-================================ -->
+     CUSTOM CAFE CSS
+     =============================== -->
 <style>
 body {
   font-family: 'Poppins', sans-serif;
@@ -73,10 +61,10 @@ body {
   padding: 8px 14px;
 }
 
-/* 🔹 BUTTON NOW FIXED BELOW THANK-YOU MESSAGE */
 .print-btn {
-  display: block;
-  margin: 20px auto 0 auto;
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
 footer {
@@ -90,22 +78,26 @@ footer {
 
 <body>
 
+<!-- ===============================
+     PRINT BUTTON (TOP RIGHT)
+     =============================== -->
+<button onclick="printPage()" class="btn btn-dark print-btn">
+  🖨 Print Receipt
+</button>
+
 <div class="container d-flex justify-content-center align-items-center" style="min-height:100vh;">
   <div class="col-md-6">
 
-    <!-- ===============================
-         ORDER CARD (PRINT TARGET)
-    ================================ -->
-    <div class="cafe-card position-relative" id="orderPrintArea">
+    <div class="cafe-card position-relative">
 
       <h3 class="cafe-title mb-3 text-center">☕ Charlie Cafe</h3>
       <p class="text-center text-muted mb-4">Order Status Details</p>
 
-      <?php if (!$orderId || !$data || isset($data['error'])): ?>
+      <?php if (!$data || isset($data['error'])): ?>
 
         <!-- ❌ ERROR STATE -->
         <div class="alert alert-danger text-center">
-          ❌ Order not found or invalid Order ID
+          ❌ Order not found or invalid order ID
         </div>
 
       <?php else: ?>
@@ -116,27 +108,21 @@ footer {
         <p>
           <strong>Status:</strong>
           <span class="badge bg-success badge-status">
-            <?= htmlspecialchars($data['status'] ?? 'N/A') ?>
+            <?= htmlspecialchars($data['status']) ?>
           </span>
         </p>
 
         <hr>
 
-        <p><strong>Item:</strong> <?= htmlspecialchars($data['order']['item'] ?? '-') ?></p>
-        <p><strong>Quantity:</strong> <?= htmlspecialchars($data['order']['quantity'] ?? '-') ?></p>
-        <p><strong>Date:</strong> <?= htmlspecialchars($data['order']['created_at'] ?? '-') ?></p>
+        <p><strong>Item:</strong> <?= htmlspecialchars($data['order']['item']) ?></p>
+        <p><strong>Quantity:</strong> <?= htmlspecialchars($data['order']['quantity']) ?></p>
+        <p><strong>Date:</strong> <?= htmlspecialchars($data['order']['created_at']) ?></p>
 
         <hr>
 
-        <div class="text-center fw-bold text-success mb-3">
+        <div class="text-center fw-bold text-success">
           ☕ Thank you for ordering with Charlie Cafe!
         </div>
-
-        <!-- 🔹 PRINT BUTTON BELOW THANK-YOU MESSAGE -->
-        <button class="btn btn-dark print-btn"
-                onclick="openCentralPrint('#orderPrintArea')">
-          🖨 Print / Export
-        </button>
 
       <?php endif; ?>
 
@@ -150,37 +136,12 @@ footer {
 </div>
 
 <!-- ===============================
-     CENTRAL PRINT SCRIPT
-================================ -->
+     JAVASCRIPT
+     =============================== -->
 <script>
-/*
-|--------------------------------------------------------------------------
-| CENTRAL PRINT HANDLER (BUG-FREE)
-|--------------------------------------------------------------------------
-| • Works for ANY section
-| • No race conditions
-| • Safe window handling
-|--------------------------------------------------------------------------
-*/
-function openCentralPrint(selector) {
-
-  const target = document.querySelector(selector);
-  if (!target) {
-    alert('Print section not found!');
-    return;
-  }
-
-  const content = target.outerHTML;
-
-  const printWindow = window.open('/central-print.html', '_blank');
-
-  /* Ensure content loads AFTER window is ready */
-  const timer = setInterval(() => {
-    if (printWindow && printWindow.centralPrint) {
-      printWindow.centralPrint.loadContent(content);
-      clearInterval(timer);
-    }
-  }, 100);
+/* 🔹 PRINT FUNCTION */
+function printPage() {
+  window.print();
 }
 </script>
 
