@@ -145,21 +145,7 @@ DB_PASS = password
 AWS_REGION = ap-south-1
 ```
 
-### 2️⃣ How this connects PERFECTLY with central-printing.html
-
-Your frontend can now do:
-
-```
-secureFetch(`${API_BASE}/reports/export?type=pdf&report=daily`)
-secureFetch(`${API_BASE}/reports/export?type=csv`)
-```
-
-✔ Same endpoint
-✔ Same auth
-✔ Same printing page
-✔ Zero duplication
-
-### 3️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
+### 2️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
 
 You already have the Lambda.
 Now we create ONE API Gateway resource and connect it.
@@ -276,7 +262,7 @@ This becomes:
 API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
 ```
 
-### 4️⃣ — 
+### 3️⃣ — 
 
 
 

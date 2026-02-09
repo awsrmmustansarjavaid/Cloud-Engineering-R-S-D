@@ -278,6 +278,23 @@ Replace your test buttons (or add new ones):
 </html>
 ```
 
+### ✅ How this connects PERFECTLY with central-printing.html
+
+Your frontend can now do:
+
+```
+secureFetch(`${API_BASE}/reports/export?type=pdf&report=daily`)
+secureFetch(`${API_BASE}/reports/export?type=csv`)
+```
+
+✔ Same endpoint
+
+✔ Same auth
+
+✔ Same printing page
+
+✔ Zero duplication
+
 ### 1️⃣ How It Works
 
 1. Auth protection
