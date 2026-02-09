@@ -276,7 +276,7 @@ This becomes:
 API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
 ```
 
-#### STEP 7️⃣ — Update central-auth-api.js
+### 4️⃣ — Update central-auth-api.js
 
 Add ONE helper function (don’t change everything).
 
@@ -300,9 +300,7 @@ async function downloadReport(type, report) {
 }
 ```
 
-
-
-#### STEP 8️⃣ — Connect Buttons in central-printing.html
+### 5️⃣ — Connect Buttons in central-printing.html
 
 Replace your test buttons (or add new ones):
 
