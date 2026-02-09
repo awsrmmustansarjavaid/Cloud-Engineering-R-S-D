@@ -35,8 +35,12 @@ const CHARLIE = (() => {
        2️⃣ TOKEN HELPERS (SAFE)
     ===================================================== */
     function parseJwt(token) {
+    try {
         return JSON.parse(atob(token.split(".")[1]));
+    } catch {
+        return {};
     }
+}
 
     function isTokenExpired(token) {
         try {
@@ -107,6 +111,8 @@ const CHARLIE = (() => {
 
     /* =====================================================
        4️⃣ AUTH FETCH (BASE)
+       ✔ JWT attached
+       ✔ DOES NOT force Content-Type (important for PDF/CSV)
     ===================================================== */
     async function authFetch(url, options = {}) {
         const token = getToken();
@@ -115,30 +121,37 @@ const CHARLIE = (() => {
             return;
         }
 
+        const headers = {
+            Authorization: "Bearer " + token,
+            ...(options.headers || {})
+        };
+
         return fetch(url, {
-            method: options.method || "GET", // ✅ explicit GET default
+            method: options.method || "GET",
             ...options,
-            headers: {
-                ...(options.headers || {}),
-                Authorization: "Bearer " + token,
-                "Content-Type": "application/json"
-            }
+            headers
         });
     }
 
     /* =====================================================
        4️⃣1️⃣ SECURE FETCH (JSON ONLY)
-       ⚠ DO NOT use for PDF / CSV
+       ⚠ NEVER use this for file downloads
     ===================================================== */
     async function secureFetch(url, options = {}) {
         const res = await authFetch(url, options);
         if (!res) return;
+
+        // Safety: ensure JSON response
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+            throw new Error("secureFetch received non-JSON response");
+        }
+
         return res.json();
     }
 
     /* =====================================================
        4️⃣2️⃣ FILE EXPORT (PDF / CSV)
-       ✔ Correct placement (AFTER authFetch)
     ===================================================== */
     async function downloadReport(type, report = "") {
 
@@ -206,23 +219,26 @@ const CHARLIE = (() => {
        6️⃣ AUTO LOGOUT ON TOKEN EXPIRY
     ===================================================== */
     let logoutTriggered = false;
-    function startAutoLogoutWatcher() {
-        setInterval(() => {
-            if (logoutTriggered) return;
-            const token = getToken();
-            if (!token) return;
-            try {
-                if (isTokenExpired(token)) {
-                    logoutTriggered = true;
-                    alert("🔐 Session expired");
-                    auth.logout();
-                }
-            } catch {
-                logoutTriggered = true;
-                auth.logout();
-            }
-        }, 30000);
-    }
+let logoutWatcherStarted = false;
+
+function startAutoLogoutWatcher() {
+    if (logoutWatcherStarted) return;
+    logoutWatcherStarted = true;
+
+    setInterval(() => {
+        if (logoutTriggered) return;
+
+        const token = getToken();
+        if (!token) return;
+
+        if (isTokenExpired(token)) {
+            logoutTriggered = true;
+            alert("🔐 Session expired");
+            auth.logout();
+        }
+    }, 30000);
+}
+
 
     /* =====================================================
        7️⃣ API GATEWAY ENDPOINTS (FULL)
@@ -231,12 +247,11 @@ const CHARLIE = (() => {
 
         /* 🛒 ORDERS */
         placeOrder(payload) {
-            return fetch(`${CONFIG.API_BASE}/dev/orders`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(res => res.json());
-        },
+    return secureFetch(`${CONFIG.API_BASE}/dev/orders`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
 
         updateOrder(payload) {
             return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
