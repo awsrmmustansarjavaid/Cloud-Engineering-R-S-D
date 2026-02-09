@@ -37,7 +37,7 @@ const CHARLIE = (() => {
     function parseJwt(token) {
     try {
         return JSON.parse(atob(token.split(".")[1]));
-    } catch {
+    } catch (e) {
         return {};
     }
 }
@@ -243,15 +243,18 @@ function startAutoLogoutWatcher() {
     /* =====================================================
        7️⃣ API GATEWAY ENDPOINTS (FULL)
     ===================================================== */
+      // ⚠️ NOTE:
+// This project intentionally mixes /dev and non-stage endpoints.
+// Ensure API Gateway stage mapping & CloudFront behaviors are aligned.
+
     const api = {
 
-        /* 🛒 ORDERS */
         placeOrder(payload) {
     return secureFetch(`${CONFIG.API_BASE}/dev/orders`, {
         method: "POST",
         body: JSON.stringify(payload)
     });
-}
+},
 
         updateOrder(payload) {
             return secureFetch(`${CONFIG.API_BASE}/dev/order-update`, {
