@@ -3539,7 +3539,278 @@ Fully protected page with CHARLIE.initProtectedPage().
 ```
 
 Otherwise, the print content will not appear.
+
 ---
+### Updated analytics.html
+> **Updated Version:5.5**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cafe Analytics ☕</title>
+
+<!-- ===================== BOOTSTRAP CSS ===================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ===================== BOOTSTRAP ICONS ===================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- ===================== CHART.JS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ===================== GLOBAL ===================== */
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:
+    linear-gradient(rgba(58,44,31,0.75), rgba(58,44,31,0.75)),
+    url('https://images.unsplash.com/photo-1509042239860-f550ce710b93');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+
+/* ===================== NAVBAR ===================== */
+.navbar {
+  background-color: #3b1f0e !important;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #2b160a;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 80px;
+}
+.sidebar a {
+  display: flex;
+  gap: 10px;
+  padding: 14px 24px;
+  color: #ddd;
+  text-decoration: none;
+}
+.sidebar a.active,
+.sidebar a:hover {
+  background: #3b1f0e;
+  color: #ff9800;
+}
+
+/* ===================== MAIN ===================== */
+.main-content {
+  margin-left: 240px;
+  padding-top: 100px;
+}
+
+/* ===================== CONTAINER ===================== */
+.container-box {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  position: relative;
+}
+
+/* ===================== CARDS ===================== */
+.card {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  text-align: center;
+  border-radius: 12px;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn-success {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .sidebar { position: relative; width: 100%; }
+  .main-content { margin-left: 0; padding-top: 140px; }
+  .btn-success { position: relative; width: 100%; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="navbar navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="cafe-admin-dashboard.html">
+      <i class="bi bi-cup-fill"></i> Charlie Cafe
+    </a>
+  </div>
+</nav>
+
+<!-- ===================== SIDEBAR ===================== -->
+<div class="sidebar">
+  <a href="cafe-admin-dashboard.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+  <a class="active" href="analytics.html"><i class="bi bi-graph-up"></i> Analytics</a>
+  <a href="order-status.html"><i class="bi bi-box-seam"></i> Orders</a>
+  <hr class="text-secondary">
+  <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
+</div>
+
+<!-- ===================== MAIN ===================== -->
+<div class="main-content">
+  <div class="container-box">
+
+    <h3 class="text-center mb-4">📊 Cafe Sales Analytics</h3>
+
+    <!-- FILTER -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <select id="period" class="form-select w-auto">
+        <option value="today">Today</option>
+        <option value="week">Last 7 Days</option>
+        <option value="month">This Month</option>
+      </select>
+
+      <button class="btn btn-primary" onclick="loadData()">Load Data</button>
+      <button class="btn btn-outline-light" onclick="openCentralPrint('.container-box')">
+        🖨️ Print / Export
+      </button>
+    </div>
+
+    <!-- METRICS -->
+    <div class="row mt-4 g-4">
+      <div class="col-md-4"><div class="card p-3">💰 Sales: <span id="sales">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">💳 Cost: <span id="cost">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">📈 Profit: <span id="profit">0</span></div></div>
+    </div>
+
+    <!-- CHART -->
+    <canvas id="chart" class="mt-4" height="120"></canvas>
+
+    <!-- PDF -->
+    <button class="btn btn-success" onclick="downloadPDF()">
+      <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
+    </button>
+
+  </div>
+</div>
+
+<!-- ===================== TOASTS ===================== -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="welcomeToast" class="toast">
+    <div class="toast-header">
+      <strong class="me-auto">Analytics</strong>
+      <button class="btn-close" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body">Welcome to Analytics Dashboard</div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="dataToast" class="toast">
+    <div class="toast-header bg-success text-white">
+      <strong class="me-auto">Success</strong>
+      <button class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body">Analytics updated</div>
+  </div>
+</div>
+
+<!-- ===================== CENTRAL AUTH ===================== -->
+<script src="central-auth-api.js"></script>
+
+<!-- ===================== BOOTSTRAP JS (FIXED ORDER) ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ===================== CONFIG ===================== */
+const ANALYTICS_API = `${API_BASE_URL}/analytics`; // API_BASE_URL comes from central-auth-api.js
+
+/* ===================== INIT ===================== */
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Protect page
+  CHARLIE.initProtectedPage({
+    requireAuth: true,
+    enableLogout: true,
+    logoutButtonId: "logoutBtn"
+  });
+
+  // Safe toast
+  const toastEl = document.getElementById("welcomeToast");
+  if (toastEl) new bootstrap.Toast(toastEl).show();
+});
+
+/* ===================== LOAD DATA ===================== */
+async function loadData() {
+  try {
+    const period = document.getElementById("period").value;
+    const res = await CHARLIE.secureFetch(`${ANALYTICS_API}?period=${period}`);
+    const data = await res.json();
+
+    sales.textContent = data.total_sales ?? 0;
+    cost.textContent = data.total_cost ?? 0;
+    profit.textContent = data.profit ?? 0;
+
+    if (window.salesChart) window.salesChart.destroy();
+
+    window.salesChart = new Chart(chart, {
+      type: "bar",
+      data: {
+        labels: ["Sales", "Cost", "Profit"],
+        datasets: [{
+          data: [data.total_sales, data.total_cost, data.profit],
+          backgroundColor: ["#ffcc80","#ffab91","#c5e1a5"]
+        }]
+      },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    new bootstrap.Toast(document.getElementById("dataToast")).show();
+
+  } catch (e) {
+    console.error(e);
+    alert("Failed to load analytics");
+  }
+}
+
+/* ===================== PDF ===================== */
+function downloadPDF() {
+  CHARLIE.downloadReport("pdf", "daily");
+}
+
+/* ===================== PRINT ===================== */
+function openCentralPrint(selector) {
+  const target = document.querySelector(selector);
+  if (!target) return;
+
+  const win = window.open("central-printing.html", "_blank");
+  if (!win) return alert("Popup blocked");
+
+  win.onload = () => {
+    const container = win.document.getElementById("printContent");
+    if (container) container.innerHTML = target.outerHTML;
+  };
+}
+</script>
+
+</body>
+</html>
+```
+
+---
+### Updated analytics.html
+> **Updated Version:5.6**
+
 
 
 
