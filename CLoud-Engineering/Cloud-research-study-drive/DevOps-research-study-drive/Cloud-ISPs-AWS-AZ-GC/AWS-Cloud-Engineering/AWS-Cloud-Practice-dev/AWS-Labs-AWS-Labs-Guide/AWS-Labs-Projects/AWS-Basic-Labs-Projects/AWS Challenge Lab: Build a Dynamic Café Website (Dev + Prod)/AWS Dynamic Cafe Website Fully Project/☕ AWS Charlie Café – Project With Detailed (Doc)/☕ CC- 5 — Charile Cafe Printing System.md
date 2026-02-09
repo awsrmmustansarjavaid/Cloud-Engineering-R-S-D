@@ -316,49 +316,6 @@ Replace your test buttons (or add new ones):
 </button>
 ```
 
-STEP 9️⃣ — Test from API Gateway (NO FRONTEND YET)
-✅ Test PDF
-
-```
-{
-  "queryStringParameters": {
-    "type": "pdf",
-    "report": "daily"
-  },
-  "requestContext": {
-    "authorizer": {
-      "claims": {
-        "cognito:groups": "Admin"
-      }
-    }
-  }
-}
-```
-
-Expected:
-
-Status 200
-
-PDF binary response
-
-File uploaded to S3
-
-❌ Test without Admin
-
-```
-{
-  "queryStringParameters": {
-    "type": "csv"
-  }
-}
-```
-
-Expected:
-
-```
-403 Admin access required
-```
-
 
 
 
