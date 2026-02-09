@@ -273,8 +273,9 @@ Analytics CSV
 You should see:
 
 ```
-analytics_report_2026-01-17.pdf
-order-status_report_2026-01-17.pdf
+daily_report_2026-02-09.pdf
+analytics_report_2026-02-09.csv
+order-status_report_2026-02-09.pdf
 ```
 
 - Click → Download → Open in PDF viewer.
