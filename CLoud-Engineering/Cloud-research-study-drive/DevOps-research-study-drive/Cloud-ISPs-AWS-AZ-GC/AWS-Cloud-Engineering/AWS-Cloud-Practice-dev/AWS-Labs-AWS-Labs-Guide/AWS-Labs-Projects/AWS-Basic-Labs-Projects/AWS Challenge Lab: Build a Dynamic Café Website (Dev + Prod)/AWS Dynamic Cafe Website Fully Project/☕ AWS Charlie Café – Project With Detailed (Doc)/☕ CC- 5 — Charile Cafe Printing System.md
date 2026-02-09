@@ -288,10 +288,126 @@ API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 3️⃣ Cafe Central Export 
+## PHASE 3️⃣ Automation Report 
+
+### EventBridge Schedule Using Lambda Trigger (Recommanded)
+
+- Go to AWS Console → Lambda → CafeCentralExportLambda
+
+#### Step 1️⃣ — Add EventBridge Trigger
+
+Click "Add trigger" in the Function overview.
+
+Select EventBridge (CloudWatch Events) as the trigger.
+
+Choose “Create a new rule”.
+
+#### Step 2️⃣ — Configure EventBridge Rule
+
+| Field            | Value                                   |
+| ---------------- | --------------------------------------- |
+| Rule name        | e.g., `DailyOrderPDF`                   |
+| Rule description | Generate PDF / CSV report automatically |
+| Rule type        | **Schedule expression**                 |
 
 
+#### Step 3️⃣ — Define Schedule (Pakistan Time)
 
+> **📢 AWS cron uses UTC, Pakistan Standard Time (PST) = UTC+5.**
+
+> **Example: you want midnight PKT, that is 19:00 UTC previous day.**
+
+Daily Report (Midnight Pakistan Time)
+
+```
+cron(0 19 * * ? *)
+```
+
+🔔 0 → minute 0
+
+🔔 19 → hour in UTC (midnight PKT)
+
+🔔 * * ? * → every day, every month, every year
+
+#### 🕑 Hourly Report
+
+```
+cron(0 0/1 * * ? *)
+```
+
+🔔 Every hour at minute 0
+
+#### 🕑 Every 10 Minutes (For Testing)
+
+```
+cron(0/10 * * * ? *)
+```
+
+🔔 Every 10 minutes starting at minute 0
+
+#### ✅ Notes
+
+🔔 ? → required placeholder for day-of-week
+
+🔔 AWS uses cron(Minute Hour Day-of-Month Month Day-of-Week Year)
+
+#### Step 4️⃣ — Configure Input for Lambda
+
+- Scroll to Configure input in EventBridge trigger.
+
+- Select “Constant (JSON text)”.
+
+- Paste mandatory JSON (example for order status PDF):
+
+```
+{
+  "queryStringParameters": {
+    "page": "order-status"
+  }
+}
+```
+
+> **This tells your Lambda which report to generate. You can modify "page" to "analytics" for other reports.**
+
+#### Step 5️⃣ — Add Trigger & Deploy
+
+Click Add to attach the EventBridge rule.
+
+Trigger will appear in Lambda diagram.
+
+Test your schedule by setting a short interval (10 min) first.
+
+#### Step 6️⃣ — Optional: Multiple Schedules
+
+You can add multiple EventBridge rules to the same Lambda:
+
+Daily: cron(0 19 * * ? *) → PKT midnight
+
+Hourly: cron(0 0/1 * * ? *) → every hour
+
+10-Min Test: cron(0/10 * * * ? *) → every 10 min
+
+Each schedule can pass different input JSON for different report types.
+
+#### Step 7️⃣ — Testing & Validation
+
+For 10-min test, wait for the trigger → check Lambda logs in CloudWatch.
+
+Confirm report is generated successfully (PDF/CSV).
+
+Once verified, switch to daily/hourly schedules.
+
+#### ✅ Pro Tips for Professional Setup
+
+✔️ Use meaningful rule names: CafeDailyPDF, CafeHourlyCSV, Cafe10MinTest
+
+✔️ Enable CloudWatch Logs on Lambda → check for failures
+
+✔️ Always test short interval first before production schedules
+
+✔️ Use input JSON to dynamically control report type → avoids multiple Lambdas
+
+✔️ Deploy stage prod in API Gateway → matches CONFIG.API_BASE
 
 
 
