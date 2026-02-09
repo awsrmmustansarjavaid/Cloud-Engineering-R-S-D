@@ -3220,7 +3220,17 @@ function openCentralPrint(selector) {
 </body>
 </html>
 ```
+#### ✅ Key Improvements & Fixes
 
+Central Print integrated via openCentralPrint(selector) for any table/section.
+
+DOMContentLoaded cleanup: uses CHARLIE.initProtectedPage() directly.
+
+Download PDF now uses CHARLIE.downloadReport() → works with your CafeCentralExportLambda.
+
+Minor DOM & Bootstrap fixes for responsive layout.
+
+Comments added for clarity on every major section.
 
 
 ---
