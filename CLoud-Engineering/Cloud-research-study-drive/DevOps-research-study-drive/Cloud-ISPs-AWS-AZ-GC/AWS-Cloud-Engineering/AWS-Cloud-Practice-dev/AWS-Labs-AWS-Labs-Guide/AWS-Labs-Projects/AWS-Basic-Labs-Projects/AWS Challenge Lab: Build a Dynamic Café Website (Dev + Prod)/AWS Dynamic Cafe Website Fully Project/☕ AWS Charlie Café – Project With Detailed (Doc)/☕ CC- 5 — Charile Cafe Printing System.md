@@ -159,12 +159,12 @@ secureFetch(`${API_BASE}/reports/export?type=csv`)
 ✔ Same printing page
 ✔ Zero duplication
 
-### STEP 3️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
+### 3️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
 
 You already have the Lambda.
 Now we create ONE API Gateway resource and connect it.
 
-#### STEP 4️⃣ Create / Open REST API
+#### STEP 1️⃣ Create / Open REST API
 
 In AWS Console:
 
@@ -175,7 +175,7 @@ API Gateway → APIs → (Create API OR open existing Cafe API)
 
 If you already have a cafe backend API → use the same one.
 
-#### 🔹 3.2 Create Resource
+#### STEP 2️⃣ Create Resource
 
 Create this path:
 
@@ -202,7 +202,7 @@ Steps:
 /reports/export
 ```
 
-🔹 3.3 Create GET Method
+#### STEP 3️⃣ Create GET Method
 
 On /reports/export:
 
@@ -218,7 +218,7 @@ Lambda function: CafeCentralExportLambda
 
 Save
 
-STEP 4️⃣ — Attach Cognito Authorizer
+#### STEP 4️⃣ — Attach Cognito Authorizer
 
 You already use Cognito, so reuse it.
 
@@ -240,7 +240,7 @@ Only logged-in users reach Lambda
 
 Lambda itself checks Admin group
 
-STEP 5️⃣ — Enable CORS (VERY IMPORTANT)
+#### STEP 5️⃣ — Enable CORS (VERY IMPORTANT)
 
 On /reports/export:
 
@@ -258,7 +258,7 @@ Deploy API
 
 Without this, browser downloads will FAIL.
 
-STEP 6️⃣ — Deploy API
+#### STEP 6️⃣ — Deploy API
 
 Actions → Deploy API
 
@@ -276,7 +276,7 @@ This becomes:
 API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
 ```
 
-STEP 7️⃣ — Update central-auth-api.js
+#### STEP 7️⃣ — Update central-auth-api.js
 
 Add ONE helper function (don’t change everything).
 
@@ -300,7 +300,7 @@ async function downloadReport(type, report) {
 }
 ```
 
-STEP 8️⃣ — Connect Buttons in central-printing.html
+#### STEP 8️⃣ — Connect Buttons in central-printing.html
 
 Replace your test buttons (or add new ones):
 
