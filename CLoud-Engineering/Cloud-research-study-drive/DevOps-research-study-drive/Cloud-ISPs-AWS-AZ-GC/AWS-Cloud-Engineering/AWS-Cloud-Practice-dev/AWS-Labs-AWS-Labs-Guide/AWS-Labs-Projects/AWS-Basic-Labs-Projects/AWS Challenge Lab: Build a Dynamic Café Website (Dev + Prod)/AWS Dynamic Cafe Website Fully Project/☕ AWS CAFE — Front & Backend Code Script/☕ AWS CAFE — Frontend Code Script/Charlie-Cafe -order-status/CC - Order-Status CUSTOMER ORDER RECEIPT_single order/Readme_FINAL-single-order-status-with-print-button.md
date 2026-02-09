@@ -354,3 +354,15 @@ function openCentralPrint(selector) {
 </body>
 </html>
 ```
+
+#### ✅ What Changed
+
+Removed position: absolute; top-right from the print button.
+
+Added display: block; margin: 20px auto 0 auto; → centers it below the thank-you message.
+
+mb-3 on the thank-you message ensures spacing.
+
+Fully bug-free JS for central print.
+
+---
