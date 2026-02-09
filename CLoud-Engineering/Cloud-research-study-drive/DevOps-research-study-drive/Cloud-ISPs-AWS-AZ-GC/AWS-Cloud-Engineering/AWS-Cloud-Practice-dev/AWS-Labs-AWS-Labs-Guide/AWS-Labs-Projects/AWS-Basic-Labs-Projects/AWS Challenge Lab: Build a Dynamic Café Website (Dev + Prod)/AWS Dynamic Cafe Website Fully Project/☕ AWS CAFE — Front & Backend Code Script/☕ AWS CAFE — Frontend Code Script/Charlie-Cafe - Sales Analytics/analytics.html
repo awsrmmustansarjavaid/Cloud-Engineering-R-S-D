@@ -57,10 +57,17 @@ body {
   font-weight: 500;
 }
 .sidebar a:hover { background: #3b1f0e; color: #ff9800; }
-.sidebar a.active { background: #3b1f0e; color: #ff9800; border-left: 4px solid #ff9800; }
+.sidebar a.active {
+  background: #3b1f0e;
+  color: #ff9800;
+  border-left: 4px solid #ff9800;
+}
 
 /* ===================== MAIN CONTENT ===================== */
-.main-content { margin-left: 240px; padding-top: 100px; }
+.main-content {
+  margin-left: 240px;
+  padding-top: 100px;
+}
 
 /* ===================== CONTAINER ===================== */
 .container-box {
@@ -75,12 +82,31 @@ body {
 }
 
 /* ===================== HEADINGS ===================== */
-h3 { text-align: center; font-weight: bold; color: #ffddaa; }
+h3 {
+  text-align: center;
+  font-weight: bold;
+  color: #ffddaa;
+}
 
 /* ===================== BUTTONS ===================== */
-.form-select, .btn { border-radius: 50px; font-weight: bold; }
-.btn-primary { background: linear-gradient(45deg, #a0522d, #d2b48c); border: none; }
-.btn-success { background: linear-gradient(45deg, #ff5722, #ff9800); border: none; position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 6px; }
+.form-select, .btn {
+  border-radius: 50px;
+  font-weight: bold;
+}
+.btn-primary {
+  background: linear-gradient(45deg, #a0522d, #d2b48c);
+  border: none;
+}
+.btn-success {
+  background: linear-gradient(45deg, #ff5722, #ff9800);
+  border: none;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
 /* ===================== METRIC CARDS ===================== */
 .card {
@@ -95,22 +121,27 @@ h3 { text-align: center; font-weight: bold; color: #ffddaa; }
 
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 768px) {
-  .sidebar { position: relative; width: 100%; min-height: auto; }
+  .sidebar { position: relative; width: 100%; }
   .main-content { margin-left: 0; padding-top: 140px; }
-  .btn-success { position: relative; top: 0; right: 0; width: 100%; justify-content: center; }
+  .btn-success {
+    position: relative;
+    width: 100%;
+    top: 0;
+    right: 0;
+    justify-content: center;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===================== DASHBOARD CONTAINER ===================== -->
-<div id="dashboard-container">
-
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="cafe-admin-dashboard.html"><i class="bi bi-cup-fill"></i> Charlie Cafe</a>
+    <a class="navbar-brand" href="cafe-admin-dashboard.html">
+      <i class="bi bi-cup-fill"></i> Charlie Cafe
+    </a>
   </div>
 </nav>
 
@@ -120,7 +151,6 @@ h3 { text-align: center; font-weight: bold; color: #ffddaa; }
   <a href="analytics.html" class="active"><i class="bi bi-graph-up"></i> Analytics</a>
   <a href="order-status.html"><i class="bi bi-box-seam"></i> Order Status</a>
   <hr class="text-secondary">
-  <!-- Logout Button -->
   <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
 </div>
 
@@ -142,7 +172,7 @@ h3 { text-align: center; font-weight: bold; color: #ffddaa; }
         <i class="bi bi-arrow-clockwise"></i> Load Data
       </button>
 
-      <!-- Central Print Button -->
+      <!-- Central print -->
       <button class="btn btn-outline-dark" onclick="openCentralPrint('.main-content')">
         🖨️ Print / Export
       </button>
@@ -150,28 +180,27 @@ h3 { text-align: center; font-weight: bold; color: #ffddaa; }
 
     <!-- ===================== METRICS ===================== -->
     <div class="row mt-4 g-4">
-      <div class="col-md-4"><div class="card p-3"><i class="bi bi-currency-dollar"></i> Sales: <span id="sales">0</span></div></div>
-      <div class="col-md-4"><div class="card p-3"><i class="bi bi-wallet2"></i> Cost: <span id="cost">0</span></div></div>
-      <div class="col-md-4"><div class="card p-3"><i class="bi bi-graph-up-arrow"></i> Profit: <span id="profit">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">💰 Sales: <span id="sales">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">💳 Cost: <span id="cost">0</span></div></div>
+      <div class="col-md-4"><div class="card p-3">📈 Profit: <span id="profit">0</span></div></div>
     </div>
 
     <!-- ===================== CHART ===================== -->
     <canvas id="chart" class="mt-4" height="120"></canvas>
 
-    <!-- ===================== PDF DOWNLOAD BUTTON ===================== -->
+    <!-- ===================== PDF ===================== -->
     <button class="btn btn-success" onclick="downloadPDF()">
       <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
     </button>
 
   </div>
 </div>
-</div>
 
 <!-- ===================== TOASTS ===================== -->
 <div class="toast-container position-fixed top-0 end-0 p-3">
   <div id="welcomeToast" class="toast">
     <div class="toast-header">
-      <strong class="me-auto"><i class="bi bi-graph-up"></i> Analytics</strong>
+      <strong class="me-auto">📊 Analytics</strong>
       <button class="btn-close" data-bs-dismiss="toast"></button>
     </div>
     <div class="toast-body">
@@ -183,89 +212,93 @@ h3 { text-align: center; font-weight: bold; color: #ffddaa; }
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
   <div id="dataToast" class="toast">
     <div class="toast-header bg-success text-white">
-      <strong class="me-auto"><i class="bi bi-check-circle-fill"></i> Data Loaded</strong>
+      <strong class="me-auto">✅ Data Loaded</strong>
       <button class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
     </div>
     <div class="toast-body">
-      ✅ Analytics updated successfully!
+      Analytics updated successfully!
     </div>
   </div>
 </div>
 
-<!-- ===================== CENTRAL AUTH JS ===================== -->
+<!-- ===================== CENTRAL AUTH ===================== -->
 <script src="central-auth-api.js"></script>
 
 <script>
 /* ===================== CONFIG ===================== */
-const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod"; // Replace with your API Gateway
+const API_BASE_URL = "https://API_ID.execute-api.REGION.amazonaws.com/prod"; // CHANGE THIS
 const ANALYTICS_API = `${API_BASE_URL}/analytics`;
-const PDF_API = `${API_BASE_URL}/report/pdf`;
 
-/* ===================== PAGE PROTECTION & LOGOUT ===================== */
-document.addEventListener("DOMContentLoaded", async () => {
-  // Protect page and attach logout
+/* ===================== PAGE INIT ===================== */
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Protect page with Cognito
   CHARLIE.initProtectedPage({
     requireAuth: true,
     enableLogout: true,
     logoutButtonId: "logoutBtn"
   });
 
-  // Cognito logout redirect (if central-auth-api.js defines cognitoLogout)
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (typeof cognitoLogout === "function") {
-      cognitoLogout();
-    } else {
-      console.warn("cognitoLogout() not defined in central-auth-api.js");
-    }
-  });
+  // Show welcome toast
+  new bootstrap.Toast(document.getElementById("welcomeToast")).show();
 });
 
-/* ===================== LOAD ANALYTICS DATA ===================== */
-function loadData() {
-  const period = document.getElementById("period").value;
+/* ===================== LOAD ANALYTICS (SECURE) ===================== */
+async function loadData() {
+  try {
+    const period = document.getElementById("period").value;
 
-  fetch(`${ANALYTICS_API}?period=${period}`)
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("sales").innerText = data.total_sales;
-      document.getElementById("cost").innerText = data.total_cost;
-      document.getElementById("profit").innerText = data.profit;
+    // AUTHENTICATED request
+    const response = await CHARLIE.secureFetch(`${ANALYTICS_API}?period=${period}`);
+    const data = await response.json();
 
-      const ctx = document.getElementById("chart").getContext("2d");
-      if (window.salesChart) window.salesChart.destroy();
+    document.getElementById("sales").innerText = data.total_sales;
+    document.getElementById("cost").innerText = data.total_cost;
+    document.getElementById("profit").innerText = data.profit;
 
-      window.salesChart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: ["Sales", "Cost", "Profit"],
-          datasets: [{
-            data: [data.total_sales, data.total_cost, data.profit],
-            borderColor: "#ffddaa",
-            backgroundColor: "rgba(255,221,170,0.3)",
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-      });
+    const ctx = document.getElementById("chart").getContext("2d");
+    if (window.salesChart) window.salesChart.destroy();
 
-      new bootstrap.Toast(document.getElementById("dataToast")).show();
+    window.salesChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Sales", "Cost", "Profit"],
+        datasets: [{
+          data: [data.total_sales, data.total_cost, data.profit],
+          backgroundColor: ["#ffcc80", "#ffab91", "#c5e1a5"]
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
     });
+
+    new bootstrap.Toast(document.getElementById("dataToast")).show();
+
+  } catch (err) {
+    console.error("Analytics error:", err);
+    alert("Failed to load analytics data");
+  }
 }
 
-/* ===================== PDF DOWNLOAD ===================== */
+/* ===================== PDF EXPORT ===================== */
 function downloadPDF() {
-  CHARLIE.downloadReport('pdf','daily'); // Uses central export Lambda
+  CHARLIE.downloadReport("pdf", "daily");
 }
 
-/* ===================== CENTRAL PRINT HOOK ===================== */
+/* ===================== CENTRAL PRINT ===================== */
 function openCentralPrint(selector) {
-  const content = document.querySelector(selector).outerHTML;
-  const printWindow = window.open('central-printing.html', '_blank');
+  const content = document.querySelector(selector)?.outerHTML;
+  const printWindow = window.open("central-printing.html", "_blank");
 
-  // Inject content into <div id="printContent"> of central-printing.html
-  printWindow.onload = function() {
-    const container = printWindow.document.getElementById('printContent');
+  if (!printWindow) {
+    alert("Popup blocked. Please allow popups to print.");
+    return;
+  }
+
+  printWindow.onload = () => {
+    const container = printWindow.document.getElementById("printContent");
     if (container) container.innerHTML = content;
   };
 }
