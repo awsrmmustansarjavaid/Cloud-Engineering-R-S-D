@@ -6303,57 +6303,17 @@ const CHARLIE = (() => {
     };
 
     /* =====================================================
-       4️⃣ SECURE FETCH — JWT AUTO ATTACH
+       4️⃣ AUTH FETCH (BASE)
     ===================================================== */
-
-    /* =====================================================
-   4️⃣1️⃣ SECURE FILE DOWNLOAD (PDF / CSV)
-   -----------------------------------------------------
-   ✔ Uses authFetch (NOT secureFetch)
-   ✔ Supports binary (PDF) and text (CSV)
-   ✔ Does NOT affect existing APIs
-    ===================================================== */
-async function downloadReport(type, report = "") {
-
-    // Build export URL
-    let url = `${CONFIG.API_BASE}/reports/export?type=${type}`;
-    if (report) url += `&report=${report}`;
-
-    // Use authFetch so JWT is attached
-    const response = await authFetch(url);
-
-    if (!response || !response.ok) {
-        alert("❌ Failed to download report");
-        return;
-    }
-
-    // Decide filename
-    const filename = report
-        ? `${report}.${type}`
-        : `export.${type}`;
-
-    // Convert response to Blob (works for PDF & CSV)
-    const blob = await response.blob();
-
-    // Trigger browser download
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-
-    // Cleanup
-    URL.revokeObjectURL(a.href);
-    document.body.removeChild(a);
-}
-
     async function authFetch(url, options = {}) {
         const token = getToken();
         if (!token || isTokenExpired(token)) {
             auth.logout();
             return;
         }
+
         return fetch(url, {
+            method: options.method || "GET", // ✅ explicit GET default
             ...options,
             headers: {
                 ...(options.headers || {}),
@@ -6363,10 +6323,43 @@ async function downloadReport(type, report = "") {
         });
     }
 
+    /* =====================================================
+       4️⃣1️⃣ SECURE FETCH (JSON ONLY)
+       ⚠ DO NOT use for PDF / CSV
+    ===================================================== */
     async function secureFetch(url, options = {}) {
         const res = await authFetch(url, options);
         if (!res) return;
         return res.json();
+    }
+
+    /* =====================================================
+       4️⃣2️⃣ FILE EXPORT (PDF / CSV)
+       ✔ Correct placement (AFTER authFetch)
+    ===================================================== */
+    async function downloadReport(type, report = "") {
+
+        let url = `${CONFIG.API_BASE}/reports/export?type=${type}`;
+        if (report) url += `&report=${report}`;
+
+        const response = await authFetch(url, { method: "GET" });
+
+        if (!response || !response.ok) {
+            alert("❌ Failed to download report");
+            return;
+        }
+
+        const filename = report ? `${report}.${type}` : `export.${type}`;
+        const blob = await response.blob();
+
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        URL.revokeObjectURL(a.href);
+        document.body.removeChild(a);
     }
 
     /* =====================================================
