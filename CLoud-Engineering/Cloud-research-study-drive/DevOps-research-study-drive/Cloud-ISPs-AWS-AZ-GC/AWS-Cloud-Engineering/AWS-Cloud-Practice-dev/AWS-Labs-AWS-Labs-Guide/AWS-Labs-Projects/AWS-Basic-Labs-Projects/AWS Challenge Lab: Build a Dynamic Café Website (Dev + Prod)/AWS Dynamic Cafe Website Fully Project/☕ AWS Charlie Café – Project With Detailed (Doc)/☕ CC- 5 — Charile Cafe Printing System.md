@@ -302,21 +302,7 @@ async function downloadReport(type, report) {
 
 #### ⚠️ Because Already Added
 
-### 5️⃣ — Connect Buttons in central-printing.html
 
-Replace your test buttons (or add new ones):
-
-```
-<button class="btn btn-danger"
-        onclick="downloadReport('pdf','daily')">
-  📄 Daily PDF
-</button>
-
-<button class="btn btn-success"
-        onclick="downloadReport('csv','analytics')">
-  🗂 Analytics CSV
-</button>
-```
 
 
 
