@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ==============================================================
 # CHARLIE CAFE ☕ — MEGA FULL TEST & VERIFICATION SCRIPT
-# Version: 2026-Final
-# Purpose: Combines all system, DB, Lambda, API, SQS, and web checks
+# Version: 2026-Final-Updated
+# Purpose: Combines all system, DB, Lambda, API, SQS, PDF/CSV export, and web checks
 # Author: IT Charlie
 # ==============================================================
 
@@ -56,16 +56,16 @@ echo " CHARLIE CAFE ☕ — FULL SYSTEM & AWS VERIFICATION SCRIPT" | tee -a "$OU
 echo " Started at: $(date '+%Y-%m-%d %H:%M:%S')" | tee -a "$OUTPUT_FILE"
 echo "=============================================================" | tee -a "$OUTPUT_FILE"
 
-# ==============================================================
+# ============================================================== 
 # SYSTEM CHECKS — LAMP / WEB / LOCAL
-# ==============================================================
+# ============================================================== 
 echo -e "\n${BLUE}🖥️  SYSTEM & LOCAL VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
 
 # OS info
 echo "• OS release:" | tee -a "$OUTPUT_FILE"
 cat /etc/os-release | grep PRETTY_NAME | tee -a "$OUTPUT_FILE"
 
-# Apache check
+# Apache & PHP
 if systemctl is-active --quiet httpd; then ok "Apache running"; else fail "Apache not running"; fi
 command -v php >/dev/null && ok "PHP installed ($(php -v | head -n1))" || fail "PHP missing"
 php -m | grep -qi mysqlnd && ok "PHP mysqlnd extension loaded" || fail "mysqlnd missing"
@@ -87,25 +87,19 @@ grep -qi "It works\|Apache" /tmp/charlie_local_test.html && ok "Apache serves co
 rm -f /tmp/charlie_local_test.html
 curl -s http://localhost/info.php | grep -qi phpinfo && ok "PHP info.php working" || warn "info.php not working"
 
-# ==============================================================
+# ============================================================== 
 # AWS CLI & IAM VERIFICATION
-# ==============================================================
+# ============================================================== 
 echo -e "\n${MAGENTA}☁️  AWS CLI & IAM VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
-
 command -v aws >/dev/null && ok "AWS CLI installed" || fail "AWS CLI missing"
 aws sts get-caller-identity >/dev/null 2>&1 && ok "AWS credentials / IAM role valid" || fail "AWS credentials invalid or missing"
 
-# ==============================================================
+# ============================================================== 
 # SECRETS MANAGER & RDS DATABASE
-# ==============================================================
+# ============================================================== 
 echo -e "\n${CYAN}🔐  SECRETS MANAGER & DATABASE${NC}" | tee -a "$OUTPUT_FILE"
-
 SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id "$SECRET_ID" --region "$AWS_REGION" --query SecretString --output text)
-if [ -n "$SECRET_JSON" ]; then
-    ok "Fetched DB secret"
-else
-    fail "Failed to fetch DB secret"
-fi
+if [ -n "$SECRET_JSON" ]; then ok "Fetched DB secret"; else fail "Failed to fetch DB secret"; fi
 
 DB_USER=$(echo "$SECRET_JSON" | jq -r '.username')
 DB_PASS=$(echo "$SECRET_JSON" | jq -r '.password')
@@ -146,31 +140,75 @@ done
 echo "🧪 Sample order record:" | tee -a "$OUTPUT_FILE"
 $MYSQL_CMD -e "SELECT id, table_number, item, quantity, created_at FROM orders LIMIT 1;"
 
-# ==============================================================
-# API GATEWAY VERIFICATION
-# ==============================================================
-echo -e "\n${YELLOW}📡  API GATEWAY TESTS${NC}" | tee -a "$OUTPUT_FILE"
+# ============================================================== 
+# API GATEWAY VERIFICATION — PDF / CSV / ADMIN TESTS
+# ============================================================== 
+echo -e "\n${YELLOW}📡  API GATEWAY PDF/CSV & ADMIN TESTS${NC}" | tee -a "$OUTPUT_FILE"
 
-curl -s "$API_DEV/orders" >/dev/null && ok "API /orders reachable (dev)" || warn "API /orders not reachable"
-curl -s -X POST "$API_DEV/orders/cash-payment" -H "Content-Type: application/json" -d '{"order_id":"ORD-TEST"}' >/dev/null && ok "Cash payment endpoint reachable" || warn "Cash payment not reachable"
-curl -s "$API_STATUS/order-status" >/dev/null && ok "Order status API reachable" || warn "Order status API not reachable"
+# Helper function to call API and check result
+test_api() {
+    DESC=$1
+    URL=$2
+    PAYLOAD=$3
+    EXPECTED_STATUS=$4
+    RESPONSE_FILE="/tmp/api_test_$(date +%s).json"
+    
+    echo "▶ Testing: $DESC" | tee -a "$OUTPUT_FILE"
+    if [ -n "$PAYLOAD" ]; then
+        aws lambda invoke --function-name "$URL" --payload "$PAYLOAD" --region "$AWS_REGION" $RESPONSE_FILE >/dev/null 2>&1
+        STATUS=$(jq -r '.statusCode // empty' $RESPONSE_FILE || echo "0")
+    else
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+    fi
+    
+    if [ "$STATUS" -eq "$EXPECTED_STATUS" ]; then
+        ok "$DESC (status $STATUS)"
+    else
+        fail "$DESC (expected $EXPECTED_STATUS, got $STATUS)"
+    fi
+    cat $RESPONSE_FILE | tee -a "$OUTPUT_FILE"
+}
 
-# ==============================================================
+# ✅ PDF Analytics Test
+test_api "PDF Analytics (Admin)" "$API_DEV/pdf-report" '{"queryStringParameters":{"type":"pdf","report":"analytics"},"requestContext":{"authorizer":{"claims":{"cognito:groups":"Admin"}}}}' 200
+
+# ✅ CSV Export Test
+test_api "CSV Analytics (Admin)" "$API_DEV/csv-report" '{"queryStringParameters":{"type":"csv"},"requestContext":{"authorizer":{"claims":{"cognito:groups":"Admin"}}}}' 200
+
+# ❌ Non-admin test
+test_api "PDF Daily (Non-Admin)" "$API_DEV/pdf-report" '{"queryStringParameters":{"type":"pdf","report":"daily"}}' 403
+
+# ============================================================== 
+# S3 VERIFICATION — CHECK FILES GENERATED
+# ============================================================== 
+echo -e "\n${BLUE}📂 S3 FILE VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
+
+REPORTS=("daily_report" "analytics_report" "order-status_report")
+for report in "${REPORTS[@]}"; do
+    FILE=$(aws s3 ls "s3://$S3_BUCKET/exports/" | grep "$report" | awk '{print $4}' || echo "")
+    if [ -n "$FILE" ]; then
+        ok "Found S3 file: $FILE"
+    else
+        fail "Missing S3 file for $report"
+    fi
+done
+
+# ============================================================== 
 # ALB & CLOUDFRONT STATIC FILE TESTS
-# ==============================================================
+# ============================================================== 
 echo -e "\n${BLUE}🌐 ALB & CLOUDFRONT STATIC FILE TESTS${NC}" | tee -a "$OUTPUT_FILE"
 curl -I http://${ALB_DOMAIN}/js/central-auth-api.js >/dev/null && ok "ALB static file reachable" || warn "ALB static file failed"
 curl -I https://${CLOUDFRONT_DOMAIN}/js/central-auth-api.js >/dev/null && ok "CloudFront static file reachable" || warn "CloudFront static file failed"
 
-# ==============================================================
+# ============================================================== 
 # SQS VERIFICATION
-# ==============================================================
+# ============================================================== 
 echo -e "\n${MAGENTA}📬 SQS QUEUE VERIFICATION${NC}" | tee -a "$OUTPUT_FILE"
 aws sqs get-queue-attributes --queue-url https://sqs.${AWS_REGION}.amazonaws.com/${ACCOUNT_ID}/${QUEUE_NAME} --attribute-names ApproximateNumberOfMessages >/dev/null && ok "SQS queue accessible" || fail "Cannot access SQS queue"
 
-# ==============================================================
+# ============================================================== 
 # LAMBDA INVOCATION TESTS
-# ==============================================================
+# ============================================================== 
 echo -e "\n${CYAN}⚡ LAMBDA INVOCATION TESTS${NC}" | tee -a "$OUTPUT_FILE"
 
 invoke_lambda () {
@@ -189,9 +227,9 @@ invoke_lambda GetOrderStatusLambda '{}'
 invoke_lambda CafeAnalyticsLambda '{"queryStringParameters":{"period":"today"}}'
 invoke_lambda CafePDFReportLambda '{"queryStringParameters":{"page":"analytics"}}'
 
-# ==============================================================
+# ============================================================== 
 # FINAL SUMMARY & RESULT CARD
-# ==============================================================
+# ============================================================== 
 echo -e "\n${GREEN}==================== RESULT CARD ====================${NC}" | tee -a "$OUTPUT_FILE"
 if [ $FAILURES -eq 0 ]; then
     echo -e "${GREEN}ALL CHECKS PASSED ✅${NC}" | tee -a "$OUTPUT_FILE"
@@ -201,9 +239,9 @@ else
 fi
 echo -e "${GREEN}====================================================${NC}" | tee -a "$OUTPUT_FILE"
 
-# ==============================================================
+# ============================================================== 
 # EXPORT LOG TO S3
-# ==============================================================
+# ============================================================== 
 echo "Uploading log to S3 bucket: $S3_BUCKET"
 aws s3 cp "$OUTPUT_FILE" "s3://$S3_BUCKET/" >/dev/null && ok "Log uploaded to S3" || warn "Failed to upload log"
 
