@@ -159,6 +159,207 @@ secureFetch(`${API_BASE}/reports/export?type=csv`)
 ✔ Same printing page
 ✔ Zero duplication
 
+### STEP 3️⃣ — Attach Lambda to API Gateway (MOST IMPORTANT)
+
+You already have the Lambda.
+Now we create ONE API Gateway resource and connect it.
+
+#### STEP 4️⃣ Create / Open REST API
+
+In AWS Console:
+
+```
+API Gateway → APIs → (Create API OR open existing Cafe API)
+→ REST API
+```
+
+If you already have a cafe backend API → use the same one.
+
+#### 🔹 3.2 Create Resource
+
+Create this path:
+
+```
+/reports
+    └── /export
+```
+
+Steps:
+
+- Click Resources
+
+- Select /
+
+- Create Resource → name: reports
+
+- Select /reports
+
+- Create Resource → name: export
+
+- Final path:
+
+```
+/reports/export
+```
+
+🔹 3.3 Create GET Method
+
+On /reports/export:
+
+Click Create Method
+
+Select GET
+
+Integration type: Lambda Function
+
+Lambda function: CafeCentralExportLambda
+
+✅ Enable Lambda Proxy Integration
+
+Save
+
+STEP 4️⃣ — Attach Cognito Authorizer
+
+You already use Cognito, so reuse it.
+
+🔐 Attach Authorizer
+
+Click GET /reports/export
+
+Method Request
+
+Authorization:
+
+Select your Cognito User Pool Authorizer
+
+Save
+
+Now:
+
+Only logged-in users reach Lambda
+
+Lambda itself checks Admin group
+
+STEP 5️⃣ — Enable CORS (VERY IMPORTANT)
+
+On /reports/export:
+
+Actions → Enable CORS
+
+Allow:
+
+GET
+
+Headers: Authorization,Content-Type
+
+Save
+
+Deploy API
+
+Without this, browser downloads will FAIL.
+
+STEP 6️⃣ — Deploy API
+
+Actions → Deploy API
+
+Stage: prod (or your stage)
+
+Note the URL:
+
+```
+https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod
+```
+
+This becomes:
+
+```
+API_BASE = "https://xxxxx.execute-api.ap-south-1.amazonaws.com/prod"
+```
+
+STEP 7️⃣ — Update central-auth-api.js
+
+Add ONE helper function (don’t change everything).
+
+```
+async function downloadReport(type, report) {
+  const url = `${CONFIG.API_BASE}/reports/export?type=${type}&report=${report}`;
+
+  const response = await secureFetch(url);
+
+  if (!response.ok) {
+    alert("❌ Failed to download report");
+    return;
+  }
+
+  const blob = await response.blob();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${report}.${type}`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+```
+
+STEP 8️⃣ — Connect Buttons in central-printing.html
+
+Replace your test buttons (or add new ones):
+
+```
+<button class="btn btn-danger"
+        onclick="downloadReport('pdf','daily')">
+  📄 Daily PDF
+</button>
+
+<button class="btn btn-success"
+        onclick="downloadReport('csv','analytics')">
+  🗂 Analytics CSV
+</button>
+```
+
+STEP 9️⃣ — Test from API Gateway (NO FRONTEND YET)
+✅ Test PDF
+
+```
+{
+  "queryStringParameters": {
+    "type": "pdf",
+    "report": "daily"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  }
+}
+```
+
+Expected:
+
+Status 200
+
+PDF binary response
+
+File uploaded to S3
+
+❌ Test without Admin
+
+```
+{
+  "queryStringParameters": {
+    "type": "csv"
+  }
+}
+```
+
+Expected:
+
+```
+403 Admin access required
+```
+
+
 
 
 
