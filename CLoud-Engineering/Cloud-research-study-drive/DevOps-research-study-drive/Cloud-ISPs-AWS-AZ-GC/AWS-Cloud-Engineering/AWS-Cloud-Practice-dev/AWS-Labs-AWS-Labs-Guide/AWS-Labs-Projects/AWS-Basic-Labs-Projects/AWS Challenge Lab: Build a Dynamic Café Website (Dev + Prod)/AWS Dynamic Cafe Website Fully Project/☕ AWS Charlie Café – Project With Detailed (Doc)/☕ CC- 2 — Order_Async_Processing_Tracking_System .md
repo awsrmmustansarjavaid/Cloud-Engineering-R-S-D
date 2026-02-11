@@ -1289,7 +1289,7 @@ Click Create item
 ```
 {
   "metric": {
-    "S": "TOTAL_ORDERS"
+    "S": "TODAY_ORDERS"
   },
   "count": {
     "N": "0"
