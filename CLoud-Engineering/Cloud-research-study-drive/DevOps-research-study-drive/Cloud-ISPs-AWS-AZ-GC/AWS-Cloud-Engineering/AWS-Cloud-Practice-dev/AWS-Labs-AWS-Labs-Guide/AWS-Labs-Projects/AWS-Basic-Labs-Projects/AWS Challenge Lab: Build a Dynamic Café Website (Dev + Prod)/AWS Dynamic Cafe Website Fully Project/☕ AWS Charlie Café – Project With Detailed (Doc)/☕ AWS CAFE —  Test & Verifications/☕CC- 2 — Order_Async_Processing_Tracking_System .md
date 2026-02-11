@@ -1365,6 +1365,19 @@ statusCode: 200
 status: RECEIVED
 ```
 
+#### Example;
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "{\"order_id\": \"ORD-TEST-123\", \"status\": \"RECEIVED\", \"order\": {\"table_number\": 3, \"customer_name\": \"charlie\", \"item\": \"Coffee\", \"quantity\": 2, \"created_at\": \"2026-02-11 12:20:28\"}}"
+}
+```
+
 ### 🧪 STEP 7 — TEST API (CRITICAL)
 
 #### Browser test:
