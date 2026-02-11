@@ -1626,6 +1626,19 @@ curl -X POST \
 
 ```
 {
+  "body": "{\"order_id\": \"ORD-123\", \"status\": \"PREPARING\"}"
+}
+```
+
+#### Expected:
+
+```
+200 OK
+```
+
+
+```
+{
   "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"PREPARING\"}",
   "httpMethod": "POST",
   "path": "/order-update",
@@ -1645,6 +1658,19 @@ curl -X POST \
 
 ```
 {
+  "body": "{\"order_id\": \"ORD-123\", \"status\": \"READY\"}"
+}
+```
+
+#### Expected:
+
+```
+200 OK
+```
+
+
+```
+{
   "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"COMPLETED\"}",
   "httpMethod": "POST",
   "path": "/order-update",
@@ -1661,6 +1687,19 @@ curl -X POST \
 #### Test 3: READY → COMPLETED
 
 - Name: CafeOrderWorkerLambda_READY-COMPLETED
+
+```
+{
+  "body": "{\"order_id\": \"ORD-123\", \"status\": \"COMPLETED\"}"
+}
+```
+
+#### Expected:
+
+```
+200 OK
+```
+
 
 ```
 {
@@ -1685,6 +1724,20 @@ curl -X POST \
 
 ```
 {
+  "body": "{\"order_id\": \"ORD-123\", \"status\": \"PREPARING\"}"
+}
+```
+
+#### Expected:
+
+```
+400
+Invalid status transition
+```
+
+
+```
+{
   "body": "{\"order_id\": \"ORD-20260131-1234\", \"status\": \"PREPARING\"}",
   "httpMethod": "POST",
   "path": "/order-update",
@@ -1701,6 +1754,19 @@ curl -X POST \
 #### Test 5: Negative Test: Non-existent order
 
 - Name: CafeOrderWorkerLambda_Negative-Non-existent
+
+```
+{
+  "body": "{\"order_id\": \"ORD-FAKE-9999\", \"status\": \"PREPARING\"}"
+}
+```
+
+#### Expected:
+
+```
+404
+Order not found
+```
 
 ```
 {
