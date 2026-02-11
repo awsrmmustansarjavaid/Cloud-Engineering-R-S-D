@@ -1908,6 +1908,50 @@ POST /orders/cash-payment
 }
 ```
 
+curl is usually pre-installed on EC2 instances. For your API:
+
+```
+curl -X POST \
+  https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment \
+  -H "Content-Type: application/json" \
+  -d '{
+        "order_id": "12345",
+        "amount": 50,
+        "customer": "John Doe"
+      }'
+```
+
+#### Expected:
+
+```
+{"success": true, "message": "Order marked for cash payment"}
+```
+
+Explanation:
+
+-X POST → specifies POST request
+
+-H "Content-Type: application/json" → sets header to JSON
+
+-d '{...}' → JSON body of the request
+
+Expected result:
+You should get a JSON response from your Lambda/API Gateway, e.g.:
+
+```
+{
+  "message": "Order 12345 created successfully",
+  "order": {
+    "order_id": "12345",
+    "amount": 50,
+    "customer": "John Doe"
+  }
+}
+```
+
+
+
+
 #### ✅ Test 2 — DynamoDB Check
 
 Open DynamoDB item:
