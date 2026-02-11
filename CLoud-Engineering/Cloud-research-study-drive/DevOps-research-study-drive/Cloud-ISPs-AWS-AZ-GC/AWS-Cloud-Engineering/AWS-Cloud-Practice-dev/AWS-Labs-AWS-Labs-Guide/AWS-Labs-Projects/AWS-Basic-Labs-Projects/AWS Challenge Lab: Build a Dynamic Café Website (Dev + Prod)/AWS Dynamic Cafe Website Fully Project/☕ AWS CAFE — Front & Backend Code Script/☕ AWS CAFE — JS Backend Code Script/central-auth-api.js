@@ -59,6 +59,7 @@ const CHARLIE = (() => {
     ===================================================== */
     const auth = {
 
+        // Login — redirect to Cognito hosted login
         login(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`) {
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/login` +
@@ -69,6 +70,7 @@ const CHARLIE = (() => {
             window.location.href = url;
         },
 
+        // Logout — clear token & redirect to dashboard-login
         logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/index.html`) {
             localStorage.removeItem("access_token");
             const url =
@@ -78,7 +80,7 @@ const CHARLIE = (() => {
             window.location.href = url;
         },
 
-        /* Handle redirect after Cognito login */
+        // Handle token after Cognito login redirect
         handleRedirect() {
             if (!window.location.hash) return;
             const params = new URLSearchParams(window.location.hash.substring(1));
@@ -89,7 +91,7 @@ const CHARLIE = (() => {
             }
         },
 
-        /* Protect page — only shows content if logged in */
+        // Protect page — show content only if logged in
         protectPage() {
             this.handleRedirect();
             const token = getToken();
@@ -97,16 +99,15 @@ const CHARLIE = (() => {
                 this.login();
                 return;
             }
-            // Show content after auth passes
-            document.body.style.display = "block";
+            document.body.style.display = "block"; // Show page after auth passes
         },
 
-        /* Setup logout button with optional redirect */
-```````setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "dashboard-login.html") {
-    ```const btn = document.getElementById(buttonId);
-    ```if (!btn) return;
-    ```btn.addEventListener("click", () => this.logout(redirectUrl));
-```````}
+        // Setup logout button with optional redirect
+        setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "dashboard-login.html") {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+            btn.addEventListener("click", () => this.logout(redirectUrl));
+        }
     };
 
     /* =====================================================
