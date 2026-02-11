@@ -1891,8 +1891,6 @@ order-status.php?order_id=ORD-XXXX
 
 #### ✅ Test 1 — Manual API Test
 
-- Lambda name: CashPaymentLambda
-
 Use Postman / curl:
 
 ```
@@ -1933,7 +1931,7 @@ payment_status = PENDING
 
 #### ✅ Test 4 — Test Event JSON (for Lambda Console)
 
-- Go to your Lambda → Test tab
+- Go to your Lambda → CashPaymentLambda → Test tab
 
 - Click Create new event (or Configure test event)
 
@@ -2014,7 +2012,6 @@ Basic successful test (most common)
   "body": "{\"success\": true, \"message\": \"Order marked for cash payment\"}"
 }
 ```
-
 
 **✅ PHASE 1️⃣ STATUS**
 
