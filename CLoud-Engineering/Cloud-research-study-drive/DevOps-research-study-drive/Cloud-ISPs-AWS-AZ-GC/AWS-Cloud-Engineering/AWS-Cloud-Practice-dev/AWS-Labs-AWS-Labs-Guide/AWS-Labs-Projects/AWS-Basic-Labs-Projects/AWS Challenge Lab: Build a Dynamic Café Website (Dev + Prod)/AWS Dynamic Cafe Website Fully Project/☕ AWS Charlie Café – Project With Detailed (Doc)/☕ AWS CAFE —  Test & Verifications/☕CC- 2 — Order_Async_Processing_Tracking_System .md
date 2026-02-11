@@ -1425,7 +1425,7 @@ STEP 2️⃣ Copy order status URL
 Example:
 
 ```
-https://your EC2 Public IP/order-status.php?order_id=12345
+https://your EC2 Public IP/order-status.php?order_id=ORD-123
 ```
 
 STEP 3️⃣ Open link in browser
