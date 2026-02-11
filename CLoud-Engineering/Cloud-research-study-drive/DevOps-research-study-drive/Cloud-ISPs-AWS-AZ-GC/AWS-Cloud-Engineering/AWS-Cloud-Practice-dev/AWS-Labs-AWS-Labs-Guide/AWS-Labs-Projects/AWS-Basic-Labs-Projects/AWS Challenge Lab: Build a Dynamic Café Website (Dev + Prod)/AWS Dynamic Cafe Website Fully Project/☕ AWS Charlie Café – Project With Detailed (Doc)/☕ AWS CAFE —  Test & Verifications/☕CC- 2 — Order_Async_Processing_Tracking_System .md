@@ -1347,6 +1347,8 @@ DynamoDB counts updated ✅
 ### 🧪 STEP 5 — TEST LAMBDA (MANDATORY)
 
 #### Create test event:
+> **Lambda name: CafeOrderStatusLambda**
+
 
 ```
 {
