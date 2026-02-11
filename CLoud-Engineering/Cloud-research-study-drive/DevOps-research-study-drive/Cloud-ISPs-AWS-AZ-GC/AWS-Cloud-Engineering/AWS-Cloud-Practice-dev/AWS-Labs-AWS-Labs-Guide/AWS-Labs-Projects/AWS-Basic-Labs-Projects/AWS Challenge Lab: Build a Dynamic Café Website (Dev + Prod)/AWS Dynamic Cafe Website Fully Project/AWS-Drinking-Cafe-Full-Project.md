@@ -1274,7 +1274,7 @@ CTRL + X
 ```
 
 ---
-### 6️⃣ Charlie Cafe payment-status.php  (IMPORTANT)
+### 7️⃣ Charlie Cafe payment-status.php  (IMPORTANT)
 > **File Name: payment-status.php**
 
 #### 1️⃣ Create File
@@ -1295,7 +1295,7 @@ CTRL + X
 ```
 
 ---
-### 7️⃣ Charlie Cafe Dedicated Printing HTML  (IMPORTANT)
+### 8️⃣ Charlie Cafe Dedicated Printing HTML  (IMPORTANT)
 > **File Name: central-print.html**
 
 #### 1️⃣ Create File
@@ -1315,7 +1315,7 @@ CTRL + O → ENTER
 CTRL + X
 ```
 ---
-### 8️⃣ Charlie Cafe analytics.html  (IMPORTANT)
+### 9️⃣ Charlie Cafe analytics.html  (IMPORTANT)
 > **File Name: analytics.html**
 
 #### 1️⃣ Create File
@@ -1334,7 +1334,7 @@ sudo nano /var/www/html/analytics.html
 CTRL + O → ENTER
 CTRL + X
 ```
-### 9️⃣ dashboard-login.html
+### 🔟 dashboard-login.html
 
 #### 1️⃣ Create File
 
@@ -1353,7 +1353,7 @@ CTRL + O → ENTER
 CTRL + X
 ```
 
-### 🔟 price-list.html
+### 1️⃣1️⃣ price-list.html
 
 
 #### 1️⃣ Create File
