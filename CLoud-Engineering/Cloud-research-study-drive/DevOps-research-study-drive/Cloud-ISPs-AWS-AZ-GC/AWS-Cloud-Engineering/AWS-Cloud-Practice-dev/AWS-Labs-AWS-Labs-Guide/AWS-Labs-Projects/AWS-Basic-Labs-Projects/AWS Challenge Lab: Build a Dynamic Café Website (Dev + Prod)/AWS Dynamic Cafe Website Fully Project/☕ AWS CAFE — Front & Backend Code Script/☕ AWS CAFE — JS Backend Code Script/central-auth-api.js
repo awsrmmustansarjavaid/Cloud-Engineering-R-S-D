@@ -71,12 +71,19 @@ const CHARLIE = (() => {
         },
 
         // Logout — clear token & redirect to dashboard-login
-        logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/index.html`) {
+        logout(redirectUrl) {
             localStorage.removeItem("access_token");
+
+            // If redirectUrl not provided, use CloudFront dashboard-login.html
+            redirectUrl = redirectUrl || `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`;
+
+            // Construct Cognito logout URL
             const url =
                 `https://${CONFIG.COGNITO_DOMAIN}/logout` +
                 `?client_id=${CONFIG.CLIENT_ID}` +
                 `&logout_uri=${encodeURIComponent(redirectUrl)}`;
+
+            // Redirect browser to logout
             window.location.href = url;
         },
 
@@ -102,14 +109,19 @@ const CHARLIE = (() => {
             document.body.style.display = "block"; // Show page after auth passes
         },
 
-        // Setup logout button with optional redirect
-        setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "dashboard-login.html") {
+        // ✅ Setup logout button with **full CloudFront redirect**
+        setupLogoutButton(buttonId = "logoutBtn") {
             const btn = document.getElementById(buttonId);
             if (!btn) return;
+
+            // Always use absolute URL for Cognito logout (required by Cognito)
+            const redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`;
+
             btn.addEventListener("click", () => this.logout(redirectUrl));
         }
     };
 
+    
     /* =====================================================
        4️⃣ AUTH FETCH (BASE)
        ✔ JWT attached
