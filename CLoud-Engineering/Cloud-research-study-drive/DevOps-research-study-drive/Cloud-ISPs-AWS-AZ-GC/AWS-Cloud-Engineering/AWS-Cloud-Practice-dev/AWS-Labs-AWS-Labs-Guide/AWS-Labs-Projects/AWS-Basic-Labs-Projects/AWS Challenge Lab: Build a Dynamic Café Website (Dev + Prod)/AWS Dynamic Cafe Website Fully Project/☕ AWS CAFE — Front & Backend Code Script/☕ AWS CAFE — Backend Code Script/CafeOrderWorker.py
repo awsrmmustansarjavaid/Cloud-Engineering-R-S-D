@@ -10,6 +10,11 @@ dynamodb = boto3.resource('dynamodb')
 # ---------- CONSTANTS ----------
 SECRET_NAME = "CafeDevDBSM"
 DYNAMODB_TABLE = "CafeMenu"
+METRICS_TABLE = "CafeOrderMetrics"
+
+# ---------- DYNAMODB TABLES ----------
+menu_table = dynamodb.Table(DYNAMODB_TABLE)
+metrics_table = dynamodb.Table(METRICS_TABLE)
 
 # ---------- GET DB CREDS ----------
 def get_db_secret():
@@ -33,8 +38,6 @@ def lambda_handler(event, context):
         autocommit=False
     )
 
-    menu_table = dynamodb.Table(DYNAMODB_TABLE)
-
     try:
         with connection.cursor() as cursor:
             for record in event["Records"]:
@@ -55,7 +58,7 @@ def lambda_handler(event, context):
                     (table_number, customer_name, item, quantity)
                 )
 
-                # ---------- UPDATE DYNAMODB ----------
+                # ---------- UPDATE MENU TABLE (ORDER COUNT PER ITEM) ----------
                 menu_table.update_item(
                     Key={"item": item},
                     UpdateExpression="ADD orders :inc",
@@ -64,15 +67,37 @@ def lambda_handler(event, context):
                     }
                 )
 
+                # ---------- UPDATE TOTAL ORDERS METRIC ----------
+                metrics_table.update_item(
+                    Key={"metric": "TOTAL_ORDERS"},
+                    UpdateExpression="ADD #c :inc",
+                    ExpressionAttributeNames={"#c": "count"},
+                    ExpressionAttributeValues={
+                        ":inc": Decimal(1)
+                    }
+                )
+
+                # ---------- UPDATE TODAY ORDERS METRIC ----------
+                metrics_table.update_item(
+                    Key={"metric": "TODAY_ORDERS"},
+                    UpdateExpression="ADD #c :inc",
+                    ExpressionAttributeNames={"#c": "count"},
+                    ExpressionAttributeValues={
+                        ":inc": Decimal(1)
+                    }
+                )
+
                 print("✅ Order processed:", order)
 
+        # Commit only after all records succeed
         connection.commit()
+
         return {"statusCode": 200}
 
     except Exception as e:
         connection.rollback()
         print("❌ WORKER FAILED:", str(e))
-        raise e  # REQUIRED for SQS retry
+        raise e  # Required for SQS retry
 
     finally:
         connection.close()

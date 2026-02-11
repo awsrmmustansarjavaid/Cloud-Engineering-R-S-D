@@ -1,103 +1,52 @@
 import json
-import boto3
 import pymysql
-from decimal import Decimal
+import os
 
-# ---------- AWS CLIENTS ----------
-secrets_client = boto3.client('secretsmanager')
-dynamodb = boto3.resource('dynamodb')
+VALID_FLOW = {
+    "RECEIVED": "PREPARING",
+    "PREPARING": "READY",
+    "READY": "COMPLETED"
+}
 
-# ---------- CONSTANTS ----------
-SECRET_NAME = "CafeDevDBSM"
-DYNAMODB_TABLE = "CafeMenu"
-METRICS_TABLE = "CafeOrderMetrics"
-
-# ---------- DYNAMODB TABLES ----------
-menu_table = dynamodb.Table(DYNAMODB_TABLE)
-metrics_table = dynamodb.Table(METRICS_TABLE)
-
-# ---------- GET DB CREDS ----------
-def get_db_secret():
-    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
-    return json.loads(response["SecretString"])
-
-# ---------- LAMBDA HANDLER ----------
-def lambda_handler(event, context):
-
-    print("📩 Worker Lambda triggered by SQS")
-    print("Event:", json.dumps(event))
-
-    secret = get_db_secret()
-
-    connection = pymysql.connect(
-        host=secret["host"],
-        user=secret["username"],
-        password=secret["password"],
-        database=secret["dbname"],
-        connect_timeout=10,
-        autocommit=False
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASS"],
+        database=os.environ["DB_NAME"]
     )
 
-    try:
-        with connection.cursor() as cursor:
-            for record in event["Records"]:
-                order = json.loads(record["body"])
+def lambda_handler(event, context):
+    data = json.loads(event["body"])
+    order_id = data["order_id"]
+    new_status = data["status"]
 
-                table_number = int(order["table_number"])
-                customer_name = order["customer_name"]
-                item = order["item"]
-                quantity = int(order["quantity"])
+    conn = get_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-                # ---------- INSERT INTO RDS ----------
-                cursor.execute(
-                    """
-                    INSERT INTO orders
-                    (table_number, customer_name, item, quantity)
-                    VALUES (%s, %s, %s, %s)
-                    """,
-                    (table_number, customer_name, item, quantity)
-                )
+    cursor.execute("SELECT status FROM orders WHERE order_id=%s", (order_id,))
+    order = cursor.fetchone()
 
-                # ---------- UPDATE MENU TABLE (ORDER COUNT PER ITEM) ----------
-                menu_table.update_item(
-                    Key={"item": item},
-                    UpdateExpression="ADD orders :inc",
-                    ExpressionAttributeValues={
-                        ":inc": Decimal(quantity)
-                    }
-                )
+    if not order:
+        return {"statusCode":404,"body":"Order not found"}
 
-                # ---------- UPDATE TOTAL ORDERS METRIC ----------
-                metrics_table.update_item(
-                    Key={"metric": "TOTAL_ORDERS"},
-                    UpdateExpression="ADD #c :inc",
-                    ExpressionAttributeNames={"#c": "count"},
-                    ExpressionAttributeValues={
-                        ":inc": Decimal(1)
-                    }
-                )
+    current_status = order["status"]
 
-                # ---------- UPDATE TODAY ORDERS METRIC ----------
-                metrics_table.update_item(
-                    Key={"metric": "TODAY_ORDERS"},
-                    UpdateExpression="ADD #c :inc",
-                    ExpressionAttributeNames={"#c": "count"},
-                    ExpressionAttributeValues={
-                        ":inc": Decimal(1)
-                    }
-                )
+    if VALID_FLOW.get(current_status) != new_status:
+        return {"statusCode":400,"body":"Invalid status transition"}
 
-                print("✅ Order processed:", order)
+    cursor.execute("""
+        UPDATE orders SET status=%s WHERE order_id=%s
+    """, (new_status, order_id))
 
-        # Commit only after all records succeed
-        connection.commit()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-        return {"statusCode": 200}
-
-    except Exception as e:
-        connection.rollback()
-        print("❌ WORKER FAILED:", str(e))
-        raise e  # Required for SQS retry
-
-    finally:
-        connection.close()
+    return {
+        "statusCode":200,
+        "body":json.dumps({
+            "order_id": order_id,
+            "status": new_status
+        })
+    }
