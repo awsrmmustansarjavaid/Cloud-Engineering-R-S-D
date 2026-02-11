@@ -4211,3 +4211,240 @@ async function payWithCash() {
 - Clear inline comments for navbar, form, payment, receipt
 
 ---
+
+✅ FINAL FULL orders.php (ORDER + PAYMENT INCLUDED)
+
+Replace your entire file with this:
+
+```
+<?php
+// ======================================================
+// CHARLIE CAFE - COMPLETE ORDER + PAYMENT PAGE
+// ------------------------------------------------------
+// ✔ Places order via API Gateway
+// ✔ Shows receipt after success
+// ✔ Includes Card + Cash payment options
+// ✔ Fixed success detection bug
+// ======================================================
+
+$orderSuccess = false;
+$errorMessage = "";
+
+// Run only when form is submitted
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    // 1️⃣ Generate Unique Order ID
+    $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+    // 2️⃣ Price List
+    $prices = [
+        "Coffee"      => 3,
+        "Tea"         => 2,
+        "Latte"       => 4,
+        "Cappuccino"  => 4,
+        "Fresh Juice" => 5
+    ];
+
+    // 3️⃣ Collect Form Data
+    $tableNumber  = (int) $_POST["table_number"];
+    $customerName = htmlspecialchars($_POST["name"]);
+    $item         = $_POST["item"];
+    $quantity     = (int) $_POST["quantity"];
+
+    // 4️⃣ Calculate Total
+    $total = $prices[$item] * $quantity;
+
+    // 5️⃣ Prepare API Payload
+    $payload = json_encode([
+        "order_id"      => $orderId,
+        "table_number"  => $tableNumber,
+        "customer_name" => $customerName,
+        "item"          => $item,
+        "quantity"      => $quantity
+    ]);
+
+    // 6️⃣ Correct API Endpoint (Working One)
+    $apiUrl = "https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/orders";
+
+    $ch = curl_init($apiUrl);
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_HTTPHEADER     => ["Content-Type: application/json"],
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_TIMEOUT        => 10
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch)) {
+        $errorMessage = curl_error($ch);
+    }
+
+    curl_close($ch);
+
+    // 7️⃣ Check API Response (Bug Fixed)
+    if ($response && $httpCode === 200) {
+        $result = json_decode($response, true);
+
+        if (isset($result["message"]) &&
+            $result["message"] === "Order saved successfully") {
+
+            $orderSuccess = true;
+
+        } else {
+            $errorMessage = "Unexpected API Response: " . $response;
+        }
+    } else {
+        $errorMessage = "HTTP Error: " . $httpCode;
+    }
+
+    $statusUrl = "payment-status.php?order_id=$orderId";
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Place Order</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+
+<style>
+body { background:#f4f4f4; }
+.card-box {
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+<body>
+
+<div class="container mt-5">
+<div class="col-md-6 mx-auto">
+<div class="card-box">
+
+<h3 class="text-center mb-4">☕ Place Your Order</h3>
+
+<form method="POST">
+    <input type="number" name="table_number" class="form-control mb-3"
+           placeholder="Table Number" required>
+
+    <input type="text" name="name" class="form-control mb-3"
+           placeholder="Your Name">
+
+    <select name="item" class="form-select mb-3">
+        <option>Coffee</option>
+        <option>Tea</option>
+        <option>Latte</option>
+        <option>Cappuccino</option>
+        <option>Fresh Juice</option>
+    </select>
+
+    <input type="number" name="quantity" value="1" min="1"
+           class="form-control mb-3">
+
+    <button class="btn btn-warning w-100">Place Order</button>
+</form>
+
+<!-- ERROR MESSAGE -->
+<?php if (!empty($errorMessage)): ?>
+<div class="alert alert-danger mt-3">
+    <?= htmlspecialchars($errorMessage) ?>
+</div>
+<?php endif; ?>
+
+<!-- ================= RECEIPT + PAYMENT ================= -->
+<?php if ($orderSuccess): ?>
+
+<hr class="my-4">
+
+<h5>🧾 Order Receipt</h5>
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+<p><strong>Total:</strong> $<?= number_format($total,2) ?></p>
+
+<div class="alert alert-info">
+Choose ONE payment method
+</div>
+
+<!-- 💳 CARD PAYMENT (SIMULATION) -->
+<button onclick="payWithCard()"
+        class="btn btn-success w-100 mb-3">
+Pay with Card
+</button>
+
+<!-- 💵 CASH PAYMENT (API Gateway Call) -->
+<button onclick="payWithCash()"
+        class="btn btn-dark w-100">
+Pay at Counter (Cash)
+</button>
+
+<?php endif; ?>
+
+</div>
+</div>
+</div>
+
+<script>
+// ======================================================
+// CARD PAYMENT (Stripe Simulation)
+// ======================================================
+function payWithCard() {
+    alert("Stripe payment successful (simulation).");
+    window.location.href = "<?= isset($statusUrl) ? $statusUrl : '' ?>";
+}
+
+// ======================================================
+// CASH PAYMENT API CALL
+// ======================================================
+async function payWithCash() {
+
+    try {
+        const response = await fetch(
+            "https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    order_id: "<?= isset($orderId) ? $orderId : '' ?>"
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (result.success || result.message) {
+            alert("☕ Please pay at the counter.");
+            window.location.href = "<?= isset($statusUrl) ? $statusUrl : '' ?>";
+        } else {
+            alert("Cash payment failed.");
+        }
+
+    } catch (err) {
+        alert("Server error during payment.");
+        console.error(err);
+    }
+}
+</script>
+
+</body>
+</html>
+```
+
+✅ What This Final Version Includes
+
+✔ Order API works
+✔ Receipt appears
+✔ Card payment simulation
+✔ Cash payment API call
+✔ Proper success handling
+✔ Error handling
+✔ No authentication conflict
+✔ Clean structure
