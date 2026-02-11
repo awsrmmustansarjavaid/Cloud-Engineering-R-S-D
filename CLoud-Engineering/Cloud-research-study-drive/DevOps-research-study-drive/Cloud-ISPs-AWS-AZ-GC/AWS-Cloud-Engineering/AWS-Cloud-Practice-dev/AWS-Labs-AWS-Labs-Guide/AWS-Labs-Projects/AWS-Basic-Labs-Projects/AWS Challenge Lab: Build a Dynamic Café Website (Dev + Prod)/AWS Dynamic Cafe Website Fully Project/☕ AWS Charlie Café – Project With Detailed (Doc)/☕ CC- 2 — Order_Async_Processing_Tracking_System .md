@@ -1338,6 +1338,70 @@ metrics_table.update_item(
 )
 ```
 
+#### 📢 your current CafeOrderWorker does NOT update CafeOrderMetrics yet.
+
+Right now it only updates:
+
+```
+menu_table = dynamodb.Table(DYNAMODB_TABLE)  # CafeMenu
+```
+
+It does NOT reference:
+
+```
+CafeOrderMetrics
+```
+
+### ✅ What You Need To Add 
+
+#### 1️⃣ Add this near your constants:
+
+```
+METRICS_TABLE = "CafeOrderMetrics"
+metrics_table = dynamodb.Table(METRICS_TABLE)
+```
+
+#### 2️⃣ Inside the loop, after the RDS insert, add:
+
+```
+# ---------- UPDATE TOTAL ORDERS ----------
+metrics_table.update_item(
+    Key={"metric": "TOTAL_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+
+# ---------- UPDATE TODAY ORDERS ----------
+metrics_table.update_item(
+    Key={"metric": "TODAY_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+```
+
+#### ✅ Place it right after:
+
+```
+cursor.execute(...)
+```
+
+#### ✅ Your DynamoDB Items Are Now Correct
+
+You now have:
+
+```
+{ "metric": "TOTAL_ORDERS", "count": 0 }
+{ "metric": "TODAY_ORDERS", "count": 0 }
+```
+
+✔ Perfect
+
+✔ No duplicates
+
+✔ Correct partition keys
+
 ### 3️⃣ ✅ FINAL WORKER LAMBDA CODE
 
 #### Below is the FINAL, READY-TO-DEPLOY Worker Lambda code with:
