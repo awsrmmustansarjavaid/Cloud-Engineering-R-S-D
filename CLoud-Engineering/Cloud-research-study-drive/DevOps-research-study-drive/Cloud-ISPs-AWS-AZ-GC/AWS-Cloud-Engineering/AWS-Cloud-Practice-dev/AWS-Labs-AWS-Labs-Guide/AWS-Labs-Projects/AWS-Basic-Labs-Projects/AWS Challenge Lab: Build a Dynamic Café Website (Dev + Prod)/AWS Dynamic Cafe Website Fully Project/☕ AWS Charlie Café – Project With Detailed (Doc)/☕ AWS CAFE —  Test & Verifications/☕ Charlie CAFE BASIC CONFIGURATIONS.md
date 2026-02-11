@@ -956,7 +956,7 @@ sudo ./export_bash_output_s3.sh
 ### 1️⃣ Create the frontend HTML file
 
 ```
-sudo nano charlie-cafe-verify.html
+sudo nano /var/www/html/charlie-cafe-verify.html
 ```
 
 ```
@@ -1062,11 +1062,11 @@ async function loadCSV() {
 ```
 
 ```
-sudo chown apache:apache charlie-cafe-verify.html
+sudo chown apache:apache /var/www/html/charlie-cafe-verify.html
 ```
 
 ```
-sudo chmod 644 charlie-cafe-verify.html
+sudo chmod 644 /var/www/html/charlie-cafe-verify.html
 ```
 
 ```
