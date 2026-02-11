@@ -973,6 +973,93 @@ sudo chmod 644 /var/www/html/charlie-cafe-verify.html
 sudo systemctl restart httpd
 ```
 
+### 2️⃣ upload your /var/www/html/ folder as a ZIP to an S3 bucket
+
+### 1️⃣ Navigate to a working directory
+
+Let’s go somewhere safe like /home/ec2-user/:
+
+```
+cd /home/ec2-user/
+```
+
+### 2️⃣ Create a ZIP of your HTML folder
+
+Use zip to compress the /var/www/html/ folder. Name the ZIP html.zip:
+
+```
+sudo zip -r html.zip /var/www/html/
+```
+
+#### Explanation:
+
+-r → recursive (include subfolders like css, js)
+
+/var/www/html/ → folder to compress
+
+html.zip → ZIP file created in current directory (/home/ec2-user/)
+
+#### Check the ZIP:
+
+```
+ls -lh html.zip
+```
+
+### 3️⃣ Upload ZIP to S3 under a folder charliecafe-dev
+
+S3 “folders” are just part of the object key. Use this command:
+
+```
+aws s3 cp html.zip s3://charlie-cafe-s3-bucket/charliecafe-dev/html.zip --region us-east-1
+```
+
+#### Explanation:
+
+html.zip → local file
+
+s3://charlie-cafe-s3-bucket/charliecafe-dev/html.zip → S3 path (creates charliecafe-dev/ folder automatically)
+
+--region us-east-1 → AWS region
+
+#### Check if it uploaded:
+
+```
+aws s3 ls s3://charlie-cafe-s3-bucket/charliecafe-dev/
+```
+
+#### You should see:
+
+```
+2026-02-11 17:45  123456 html.zip
+```
+
+### ✅ Optional: Upload entire HTML folder directly without ZIP
+
+If you want all files and subfolders uploaded as-is to charliecafe-dev/:
+
+```
+aws s3 cp /var/www/html/ s3://charlie-cafe-s3-bucket/charliecafe-dev/ --recursive --region us-east-1
+```
+
+--recursive → uploads all files and subfolders
+
+S3 will mirror the folder structure under charliecafe-dev/
+
+#### Check:
+
+```
+aws s3 ls s3://charlie-cafe-s3-bucket/charliecafe-dev/
+```
+
+#### ✅ Summary of commands:
+
+```
+cd /home/ec2-user/
+sudo zip -r html.zip /var/www/html/
+aws s3 cp html.zip s3://charlie-cafe-s3-bucket/charliecafe-dev/html.zip --region us-east-1
+# OR to upload all files directly
+aws s3 cp /var/www/html/ s3://charlie-cafe-s3-bucket/charliecafe-dev/ --recursive --region us-east-1
+```
 
 # 📢 SECTION 4️⃣  COMPLETE ✅
 ---`
