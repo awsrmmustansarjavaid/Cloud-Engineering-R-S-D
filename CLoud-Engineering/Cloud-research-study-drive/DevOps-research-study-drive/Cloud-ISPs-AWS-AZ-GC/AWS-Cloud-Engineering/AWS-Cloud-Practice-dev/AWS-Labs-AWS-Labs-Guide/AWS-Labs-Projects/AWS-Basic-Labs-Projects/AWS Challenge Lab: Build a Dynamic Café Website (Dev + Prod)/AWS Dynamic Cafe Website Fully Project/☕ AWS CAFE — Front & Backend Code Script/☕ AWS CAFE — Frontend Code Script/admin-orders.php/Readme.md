@@ -1292,3 +1292,264 @@ function openCentralPrint(selector) {
 Here’s the fully updated code:
 
 ```
+<?php
+// ===================================================
+// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (PHP kept for Mark Paid & Print)
+// ===================================================
+
+// API endpoints (still used for Mark Paid)
+$markPaidApi  = "https://a1053skr51.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charlie Café ☕ | Orders Dashboard</title>
+
+<!-- ===================== BOOTSTRAP CSS ===================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ===================== BOOTSTRAP ICONS ===================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --cafe-bg:#1a110b; --cafe-card:#3a251c;
+    --cafe-cream:#f5e9d4; --cafe-text:#e8d9c0;
+    --cafe-accent:#c97b44; --cafe-accent-dark:#a15f32;
+    --cafe-success:#6b9e78; --cafe-pending:#d9a66d; --cafe-shadow:0 12px 40px rgba(0,0,0,0.55);
+}
+body {
+    font-family:'Poppins',sans-serif; color:var(--cafe-text);
+    min-height:100vh; background:var(--cafe-bg)
+    url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920')
+    center/cover fixed no-repeat;
+}
+body::before {
+    content:""; position:fixed; inset:0;
+    background:rgba(26,17,11,.68); backdrop-filter:blur(3.5px); z-index:-1;
+}
+.container { max-width:1400px; padding:3rem 1rem; }
+h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
+.dashboard-card { background:rgba(58,37,28,.82); border-radius:24px; padding:2.2rem; box-shadow:var(--cafe-shadow); }
+
+.badge-paid { background:var(--cafe-success); color:#fff; }
+.badge-pending { background:var(--cafe-pending); color:#1a110b; }
+.badge-card { background:#6b829e; color:#fff; }
+
+.btn-paid {
+    background:linear-gradient(135deg,var(--cafe-accent),var(--cafe-accent-dark));
+    border:none; border-radius:50px; color:#fff; display:flex; align-items:center; gap:6px;
+}
+.btn-paid:disabled { opacity:0.6; cursor:not-allowed; }
+
+.btn-logout {
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    border:none; border-radius:50px; color:#fff; display:flex; align-items:center; gap:6px;
+}
+
+.btn-print { margin-bottom: 15px; }
+
+.table-hover tbody tr:hover { background: rgba(255,221,170,0.1); }
+@media(max-width:768px){
+    .container { padding:2rem 0.5rem; }
+    .dashboard-card { padding:1.5rem; }
+    .btn-paid, .btn-logout { width:100%; justify-content:center; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h3><i class="bi bi-speedometer2"></i> Charlie Café – Orders Dashboard</h3>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="text-muted">Cashier Panel • Auto-refresh 30s</span>
+            <!-- ✅ Working Logout Button -->
+            <button class="btn btn-logout" id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="table-responsive">
+
+            <!-- ===================== CENTRAL PRINT BUTTON ===================== -->
+            <button class="btn btn-outline-dark btn-print" onclick="openCentralPrint('#ordersTable')">
+                🖨️ Print / Export
+            </button>
+
+            <!-- ===================== ORDERS TABLE ===================== -->
+            <table class="table table-hover align-middle text-white" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Table</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Orders will be populated by JS using Cognito auth -->
+                    <tr><td colspan="7" class="text-center py-5 text-muted">Loading orders...</td></tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<!-- ===================== JS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="central-auth-api.js?v=2"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    // 🔐 Protect page using Cognito (redirects to login if not authenticated)
+    await protectPage();
+
+    // ✅ Bind logout button
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        cognitoLogout(); // Central-auth-api.js handles Cognito logout
+    });
+
+    // Load orders from API using Cognito token
+    await loadOrders();
+
+    // Auto-refresh every 30s
+    setInterval(loadOrders, 30000);
+});
+
+// ============================================
+// 🔹 LOAD ORDERS FROM API WITH COGNITO AUTH
+// ============================================
+async function loadOrders(){
+    try {
+        const token = await CHARLIE.getIdToken(); // Get Cognito JWT
+        const res = await fetch("https://a1053skr51.execute-api.us-east-1.amazonaws.com/dev/orders", {
+            headers: { "Authorization": token }
+        });
+        const orders = await res.json();
+
+        const tbody = document.querySelector("#ordersTable tbody");
+        tbody.innerHTML = "";
+
+        if(!orders || orders.length===0){
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted">
+                No orders found yet ☕<br><small>(New orders appear automatically)</small>
+            </td></tr>`;
+            return;
+        }
+
+        orders.forEach(order=>{
+            const method = order.payment_method||'UNKNOWN';
+            const status = order.payment_status||'UNKNOWN';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${order.order_id||'—'}</td>
+                    <td>${order.table_number||0}</td>
+                    <td>${order.item||'—'}</td>
+                    <td>${order.quantity||0}</td>
+                    <td>${renderPaymentMethod(method)}</td>
+                    <td>${renderPaymentStatus(status)}</td>
+                    <td>${renderActionButton(method,status,order.order_id)}</td>
+                </tr>
+            `;
+        });
+
+    } catch(err){
+        console.error(err);
+        const tbody = document.querySelector("#ordersTable tbody");
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-danger">
+            ⚠️ Failed to load orders. Please refresh.
+        </td></tr>`;
+    }
+}
+
+// Render payment badges
+function renderPaymentMethod(method){
+    if(method==='CARD') return `<span class="badge badge-card"><i class="bi bi-credit-card-2-front-fill"></i> CARD</span>`;
+    if(method==='CASH') return `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>`;
+    return `<span class="badge bg-dark">${method}</span>`;
+}
+
+// Render payment status badges
+function renderPaymentStatus(status){
+    if(status==='PAID') return `<span class="badge badge-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`;
+    return `<span class="badge badge-pending"><i class="bi bi-clock-fill"></i> PENDING</span>`;
+}
+
+// Render action button
+function renderActionButton(method,status,orderId){
+    if(method==='CASH' && status==='PENDING'){
+        return `<button class="btn btn-paid btn-sm mark-paid-btn"
+            onclick="markAsPaid(this,'${orderId}')">
+            <i class="bi bi-check2-circle"></i> Mark Paid
+        </button>`;
+    }
+    if(status==='PAID'){
+        return `<a href="print-order.php?order_id=${encodeURIComponent(orderId)}"
+            class="btn btn-outline-light btn-sm">
+            <i class="bi bi-printer-fill"></i> Print
+        </a>`;
+    }
+    return '—';
+}
+
+// ============================================
+// 🔹 MARK CASH ORDERS AS PAID
+// ============================================
+async function markAsPaid(button, orderId){
+    if(!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
+
+    button.disabled = true;
+    button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
+
+    try{
+        const res = await fetch("<?= $markPaidApi ?>", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({order_id:orderId})
+        });
+        const data = await res.json();
+        if(data.success){
+            alert("☕ Payment marked as PAID successfully!");
+            loadOrders();
+        } else {
+            alert("❌ Failed: "+(data.error||data.message||"Unknown error"));
+        }
+    }catch(err){
+        console.error(err);
+        alert("Server error, try again.");
+    }finally{
+        button.disabled=false;
+        button.innerHTML=`<i class="bi bi-check2-circle"></i> Mark Paid`;
+    }
+}
+
+/* ===================== CENTRAL PRINT FUNCTION ===================== */
+function openCentralPrint(selector) {
+    const target = document.querySelector(selector);
+    if (!target) { alert('Print section not found!'); return; }
+    const content = target.outerHTML;
+    const printWindow = window.open('/central-print.html', '_blank');
+
+    const timer = setInterval(() => {
+        if (printWindow && printWindow.centralPrint) {
+            printWindow.centralPrint.loadContent(content);
+            clearInterval(timer);
+        }
+    }, 100);
+}
+</script>
+</body>
+</html>
+```
