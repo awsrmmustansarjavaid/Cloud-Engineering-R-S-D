@@ -1622,7 +1622,7 @@ curl -X POST \
 
 #### Test 1: RECEIVED → PREPARING
 
-- Name: Test_RECEIVED-PREPARING
+- Name: CafeOrderWorkerLambda_RECEIVED-PREPARING
 
 ```
 {
@@ -1641,7 +1641,7 @@ curl -X POST \
 
 #### Test 2: PREPARING → READY
 
-- Name: Test_PREPARING-READY
+- Name: CafeOrderWorkerLambda_PREPARING-READY
 
 ```
 {
@@ -1660,7 +1660,7 @@ curl -X POST \
 
 #### Test 3: READY → COMPLETED
 
-- Name: Test_READY-COMPLETED
+- Name: CafeOrderWorkerLambda_READY-COMPLETED
 
 ```
 {
@@ -1681,7 +1681,7 @@ curl -X POST \
 
 > **⚠️ e.g. try to go back to PREPARING after COMPLETED**
 
-- Name: Test_Negative-Invalid
+- Name: CafeOrderWorkerLambda_Negative-Invalid
 
 ```
 {
@@ -1700,7 +1700,7 @@ curl -X POST \
 
 #### Test 5: Negative Test: Non-existent order
 
-- Name: Test_Negative-Non-existent
+- Name: CafeOrderWorkerLambda_Negative-Non-existent
 
 ```
 {
@@ -1722,7 +1722,7 @@ curl -X POST \
 #### 1️⃣ Test directly in browser
 
 ```
-https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=ORD-XXXX
+https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=ORD-XXXX
 ```
 
 #### 2️⃣ Expected JSON
