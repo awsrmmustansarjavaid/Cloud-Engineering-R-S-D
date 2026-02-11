@@ -716,6 +716,31 @@ sudo chown -R apache:apache /var/www/html && sudo find /var/www/html -type d -ex
 
 **✅ All three must return 200 OK.**
 
+#### ⚠️ Use * to apply it to all files (all extensions) in the directory:
+
+```
+sudo chown apache:apache /var/www/html/*
+```
+
+```
+sudo chmod -R 755 /var/www/html/*
+```
+
+```
+sudo chmod 644 /var/www/html/*
+```
+
+#### 👉 If you also want subdirectories included, use:
+
+```
+sudo chown -R apache:apache /var/www/html
+```
+```
+sudo chmod -R 644 /var/www/html
+```
+
+**⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
+
 
 **✅ PHASE 3️⃣ STATUS**
 

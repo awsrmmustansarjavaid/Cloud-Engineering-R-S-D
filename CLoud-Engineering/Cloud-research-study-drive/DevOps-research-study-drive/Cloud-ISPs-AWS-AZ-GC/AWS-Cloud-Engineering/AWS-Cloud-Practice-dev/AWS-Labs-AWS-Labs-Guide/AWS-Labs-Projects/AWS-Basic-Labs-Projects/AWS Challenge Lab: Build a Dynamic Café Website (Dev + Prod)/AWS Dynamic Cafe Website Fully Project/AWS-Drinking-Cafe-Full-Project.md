@@ -1458,31 +1458,6 @@ sudo chmod +x apache_permissions.sh
 sudo ./apache_permissions.sh
 ```
 
-#### ⚠️ Use * to apply it to all files (all extensions) in the directory:
-
-```
-sudo chown apache:apache /var/www/html/*
-```
-
-```
-sudo chmod -R 755 /var/www/html/*
-```
-
-```
-sudo chmod 644 /var/www/html/*
-```
-
-#### 👉 If you also want subdirectories included, use:
-
-```
-sudo chown -R apache:apache /var/www/html
-```
-```
-sudo chmod -R 644 /var/www/html
-```
-
-**⚠️ Note: 644 on directories can break access; if needed, say so and I’ll give the correct mixed permissions.**
-
 ### 2️⃣ ALLOW /var/www/html/js IN APACHE
 
 Open Apache main config:
