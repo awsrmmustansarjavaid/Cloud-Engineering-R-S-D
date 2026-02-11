@@ -1115,6 +1115,40 @@ Fetching DB secret...
 AccessDeniedException: User is not authorized to perform secretsmanager:GetSecretValue
 ```
 
+### 🧪 Updated Test JSON 
+
+Use this in Test → Configure test event:
+
+```
+{
+  "Records": [
+    {
+      "body": "{\"table_number\": 2, \"customer_name\": \"MetricsTest\", \"item\": \"Coffee\", \"quantity\": 1}"
+    }
+  ]
+}
+```
+
+#### ✅ After Testing You Should See:
+
+#### In CafeOrderMetrics table:
+
+```
+TOTAL_ORDERS   → count increases
+TODAY_ORDERS   → count increases
+```
+
+#### In CafeMenu table:
+
+```
+Coffee → orders increases
+```
+
+#### In RDS orders table:
+
+- New row inserted.
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**

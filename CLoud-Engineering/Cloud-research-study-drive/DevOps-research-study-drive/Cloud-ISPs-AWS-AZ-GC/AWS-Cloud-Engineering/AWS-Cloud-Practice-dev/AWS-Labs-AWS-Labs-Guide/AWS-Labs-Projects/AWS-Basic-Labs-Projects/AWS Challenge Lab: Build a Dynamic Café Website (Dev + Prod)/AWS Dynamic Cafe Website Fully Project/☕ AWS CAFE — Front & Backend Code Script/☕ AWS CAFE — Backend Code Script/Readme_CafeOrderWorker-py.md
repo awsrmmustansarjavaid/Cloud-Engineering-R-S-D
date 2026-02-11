@@ -209,5 +209,57 @@ def lambda_handler(event, context):
         connection.close()
 ```
 
+#### 🔎 What This Now Does
+
+For every order:
+
+✅ Inserts into RDS
+
+✅ Increments item count in CafeMenu
+
+✅ Increments TOTAL_ORDERS
+
+✅ Increments TODAY_ORDERS
+
+✅ Commits only if everything succeeds
+
+This is safe for SQS retry behavior.
+
+### 🧪 Updated Test JSON 
+
+Use this in Test → Configure test event:
+
+```
+{
+  "Records": [
+    {
+      "body": "{\"table_number\": 2, \"customer_name\": \"MetricsTest\", \"item\": \"Coffee\", \"quantity\": 1}"
+    }
+  ]
+}
+```
+
+#### ✅ After Testing You Should See:
+
+#### In CafeOrderMetrics table:
+
+```
+TOTAL_ORDERS   → count increases
+TODAY_ORDERS   → count increases
+```
+
+#### In CafeMenu table:
+
+```
+Coffee → orders increases
+```
+
+#### In RDS orders table:
+
+- New row inserted.
+
+---
+
+
 
 
