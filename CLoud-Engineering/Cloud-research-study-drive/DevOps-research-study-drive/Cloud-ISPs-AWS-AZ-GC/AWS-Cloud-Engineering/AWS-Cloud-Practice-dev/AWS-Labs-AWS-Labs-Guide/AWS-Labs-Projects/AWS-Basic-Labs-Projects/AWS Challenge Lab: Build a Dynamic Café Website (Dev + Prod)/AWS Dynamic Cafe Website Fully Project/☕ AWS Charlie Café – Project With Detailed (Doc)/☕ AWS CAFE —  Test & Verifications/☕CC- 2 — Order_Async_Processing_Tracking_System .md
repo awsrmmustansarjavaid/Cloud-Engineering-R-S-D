@@ -1383,8 +1383,16 @@ status: RECEIVED
 #### Browser test:
 
 ```
-https://xxxx.execute-api.us-east-1.amazonaws.com/status/order-status?order_id=ORD-123
+https://xxxx.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=ORD-123
 ```
+
+#### Example:
+
+```
+https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=ORD-123
+```
+
+
 
 You should get JSON response.
 
