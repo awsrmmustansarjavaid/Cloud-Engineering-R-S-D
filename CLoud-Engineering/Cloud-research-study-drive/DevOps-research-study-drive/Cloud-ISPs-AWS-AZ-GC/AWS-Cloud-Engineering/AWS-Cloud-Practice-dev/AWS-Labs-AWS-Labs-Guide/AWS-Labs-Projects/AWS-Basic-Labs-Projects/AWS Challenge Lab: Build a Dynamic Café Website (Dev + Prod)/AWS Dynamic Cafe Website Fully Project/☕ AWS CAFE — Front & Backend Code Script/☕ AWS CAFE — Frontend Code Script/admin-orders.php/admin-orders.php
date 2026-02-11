@@ -207,7 +207,7 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
 
 <!-- ===================== JS ===================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="central-auth-api.js"></script>
+<script src="central-auth-api.js?v=2"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
