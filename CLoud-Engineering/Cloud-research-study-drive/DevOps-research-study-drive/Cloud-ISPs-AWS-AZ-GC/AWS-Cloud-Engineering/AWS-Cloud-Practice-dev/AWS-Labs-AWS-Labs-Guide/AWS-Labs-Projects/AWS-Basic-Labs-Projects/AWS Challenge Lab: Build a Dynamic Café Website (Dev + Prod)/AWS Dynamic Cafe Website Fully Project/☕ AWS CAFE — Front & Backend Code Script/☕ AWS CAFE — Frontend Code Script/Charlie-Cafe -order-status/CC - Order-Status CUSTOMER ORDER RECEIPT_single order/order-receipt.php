@@ -1,6 +1,6 @@
 <?php 
 // ================= CONFIG =================
-$apiBaseUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status";
+$apiBaseUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/order-status";
 
 // ================= VALIDATE INPUT =================
 if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
