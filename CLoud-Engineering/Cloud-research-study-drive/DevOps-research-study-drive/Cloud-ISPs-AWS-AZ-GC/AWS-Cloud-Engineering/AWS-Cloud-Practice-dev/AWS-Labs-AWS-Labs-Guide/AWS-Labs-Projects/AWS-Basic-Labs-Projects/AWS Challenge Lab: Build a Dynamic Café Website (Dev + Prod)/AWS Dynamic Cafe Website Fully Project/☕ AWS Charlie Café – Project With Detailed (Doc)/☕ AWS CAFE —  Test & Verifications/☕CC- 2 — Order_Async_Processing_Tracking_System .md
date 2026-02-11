@@ -1618,6 +1618,8 @@ curl -X POST \
 
 ### 🧪 STEP 6 — TEST STATUS FLOW (MANDATORY)
 
+> **Lambda Name: CafeOrderWorkerLambda**
+
 #### Test 1: RECEIVED → PREPARING
 
 - Name: Test_RECEIVED-PREPARING
