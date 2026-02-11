@@ -1392,6 +1392,12 @@ https://xxxx.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_
 https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=ORD-123
 ```
 
+#### Expected output:
+
+```
+{"order_id": "ORD-123", "status": "RECEIVED", "order": {"table_number": 3, "customer_name": "charlie", "item": "Coffee", "quantity": 2, "created_at": "2026-02-11 12:20:28"}}
+```
+
 
 
 You should get JSON response.
