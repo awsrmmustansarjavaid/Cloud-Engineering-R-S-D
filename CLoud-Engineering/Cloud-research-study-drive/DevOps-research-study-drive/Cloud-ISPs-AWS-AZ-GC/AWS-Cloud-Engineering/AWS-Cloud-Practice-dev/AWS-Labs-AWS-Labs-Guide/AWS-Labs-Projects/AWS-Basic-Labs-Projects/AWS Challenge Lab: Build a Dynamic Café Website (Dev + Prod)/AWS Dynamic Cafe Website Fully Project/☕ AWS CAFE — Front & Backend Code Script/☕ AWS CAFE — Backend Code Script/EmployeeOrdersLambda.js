@@ -1,3 +1,8 @@
+// Lambda: EmployeeOrdersLambda
+// Runtime: Node.js 18.x
+
+
+
 export const handler = async (event) => {
     console.log("Event:", event);
 
