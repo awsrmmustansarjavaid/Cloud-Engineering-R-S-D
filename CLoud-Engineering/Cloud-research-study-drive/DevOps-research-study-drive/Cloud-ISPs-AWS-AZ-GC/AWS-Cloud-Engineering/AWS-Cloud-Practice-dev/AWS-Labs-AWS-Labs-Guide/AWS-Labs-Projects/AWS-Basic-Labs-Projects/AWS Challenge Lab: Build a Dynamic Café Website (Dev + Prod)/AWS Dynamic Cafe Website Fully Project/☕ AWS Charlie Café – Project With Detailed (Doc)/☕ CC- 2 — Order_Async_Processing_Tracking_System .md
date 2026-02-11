@@ -1903,7 +1903,7 @@ Enable Lambda Proxy Integration
 #### Stage name:
 
 ```
-prod
+status
 ```
 
 **Copy Invoke URL**
