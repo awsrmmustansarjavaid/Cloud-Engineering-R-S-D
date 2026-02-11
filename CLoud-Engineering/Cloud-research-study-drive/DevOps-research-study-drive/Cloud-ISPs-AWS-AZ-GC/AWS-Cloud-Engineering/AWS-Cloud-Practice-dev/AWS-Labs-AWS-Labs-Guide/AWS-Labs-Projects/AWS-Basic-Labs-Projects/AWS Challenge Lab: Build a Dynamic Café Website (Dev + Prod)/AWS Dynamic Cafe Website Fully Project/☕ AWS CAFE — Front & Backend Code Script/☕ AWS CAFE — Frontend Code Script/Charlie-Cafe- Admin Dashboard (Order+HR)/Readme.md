@@ -2548,3 +2548,320 @@ window.addEventListener("load", () => {
 
 
 ---
+
+### cafe-admin-dashboard.html
+
+new update....
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP + ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- ================= STYLES ================= -->
+<style>
+/* -----------------------------------------------------
+   IMPORTANT:
+   Page stays hidden until Cognito auth passes.
+----------------------------------------------------- */
+body {
+    background-color: #0f0f10;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    display: none;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+}
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+.sidebar a:hover,
+.sidebar a.active {
+    background: #ff9800;
+    color: #000;
+}
+
+/* ===== MAIN ===== */
+.main {
+    margin-left: 260px;
+    padding: 25px;
+}
+
+/* ===== KPI CARDS ===== */
+.kpi-card {
+    border-radius: 20px;
+    padding: 20px;
+    color: white;
+}
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+
+/* ===== TABLE ===== */
+.table-container {
+    margin-top: 30px;
+    background: #1c1c1e;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* ===== SECTION TOGGLING ===== */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ===== PRINT BUTTON ===== */
+.print-btn {
+    display: inline-block;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <h4>☕ Charlie Café</h4>
+    <p class="text-muted">Admin Dashboard</p>
+
+    <a class="active" onclick="showSection(event,'orders')">
+        <i class="bi bi-bag-check"></i> Orders
+    </a>
+
+    <a onclick="showSection(event,'hr')">
+        <i class="bi bi-people"></i> HR / Attendance
+    </a>
+
+    <hr>
+
+    <!-- Central logout handled by central-auth-api.js -->
+    <a id="logoutBtn">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main">
+
+<!-- ================= ORDERS ================= -->
+<div id="orders" class="section active">
+    <h4>Orders Dashboard</h4>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="kpi-card bg-green">
+                <h6>Sales</h6>
+                <h3 id="sales">$0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-purple">
+                <h6>Orders</h6>
+                <h3 id="ordersCount">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-blue">
+                <h6>Drinks</h6>
+                <h3 id="drinksCount">0</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card bg-orange">
+                <h6>Avg</h6>
+                <h3 id="avgPrice">$0</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h5>Latest Orders</h5>
+
+        <!-- 🔹 CENTRAL PRINT BUTTON -->
+        <button class="btn btn-outline-dark print-btn" onclick="openCentralPrint('#ordersTable')">
+            🖨️ Print / Export
+        </button>
+
+        <table class="table table-hover text-white">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Table</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= HR ================= -->
+<div id="hr" class="section">
+    <h4>HR & Attendance Dashboard</h4>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white p-3">
+                <h6>Total Present</h6>
+                <h3 id="cardPresent">0</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white p-3">
+                <h6>Total Absent</h6>
+                <h3 id="cardAbsent">0</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark p-3">
+                <h6>Total Leaves</h6>
+                <h3 id="cardLeaves">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-outline-primary" onclick="loadHR('daily')">Daily</button>
+    <button class="btn btn-outline-primary" onclick="loadHR('weekly')">Weekly</button>
+    <button class="btn btn-outline-primary" onclick="loadHR('monthly')">Monthly</button>
+</div>
+
+</div>
+
+<!-- ================= CENTRAL AUTH ================= -->
+<script src="js/central-auth-api.js"></script>
+
+<script>
+/* =====================================================
+   🔐 AUTH INITIALIZATION
+   - Redirects to Cognito if not logged in
+   - Shows page only after token is valid
+   - Enables logout button
+===================================================== */
+CHARLIE.initProtectedPage({
+    enableLogout: true,
+    logoutButtonId: "logoutBtn",
+    logoutRedirectUrl: "dashboard-login.html"  // ← ADD THIS
+});
+
+/* =====================================================
+   🧭 SECTION SWITCHING
+===================================================== */
+function showSection(e, id) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+    e.currentTarget.classList.add("active");
+}
+
+/* =====================================================
+   🚀 LOAD ORDERS DASHBOARD
+===================================================== */
+async function loadOrdersDashboard() {
+    if (!CHARLIE.isAdmin()) return;
+
+    try {
+        const data = await CHARLIE.api.adminDashboard.fetchData();
+
+        document.getElementById("sales").innerText = `$${data.sales || 0}`;
+        document.getElementById("ordersCount").innerText = data.orders || 0;
+        document.getElementById("drinksCount").innerText = data.drinks || 0;
+        document.getElementById("avgPrice").innerText = `$${data.avg || 0}`;
+
+        const table = document.getElementById("ordersTable");
+        table.innerHTML = "";
+
+        (data.latest_orders || []).forEach(o => {
+            table.innerHTML += `
+                <tr>
+                    <td>${o.customer_name || "Anonymous"}</td>
+                    <td>${o.item}</td>
+                    <td>${o.quantity}</td>
+                    <td>${o.table_number || "-"}</td>
+                    <td>${o.date}</td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        console.error("Orders dashboard error:", err);
+    }
+}
+
+/* =====================================================
+   👥 LOAD HR DASHBOARD
+===================================================== */
+async function loadHR(type) {
+    if (!CHARLIE.isAdmin()) return;
+
+    try {
+        const fn = CHARLIE.api.adminAttendance[
+            `get${type.charAt(0).toUpperCase() + type.slice(1)}Summary`
+        ];
+
+        const data = await fn();
+
+        document.getElementById("cardPresent").innerText = data.summary.total_present;
+        document.getElementById("cardAbsent").innerText = data.summary.total_absent;
+        document.getElementById("cardLeaves").innerText = data.summary.total_leaves;
+
+    } catch (err) {
+        console.error("HR dashboard error:", err);
+    }
+}
+
+/* =====================================================
+   🔹 CENTRAL PRINT FUNCTION
+   Works for any table or section
+===================================================== */
+function openCentralPrint(selector) {
+    const target = document.querySelector(selector);
+    if (!target) {
+        alert('Print section not found!');
+        return;
+    }
+    const content = target.outerHTML;
+    const printWindow = window.open('/central-print.html', '_blank');
+
+    const timer = setInterval(() => {
+        if (printWindow && printWindow.centralPrint) {
+            printWindow.centralPrint.loadContent(content);
+            clearInterval(timer);
+        }
+    }, 100);
+}
+
+/* =====================================================
+   🚀 INITIAL DATA LOAD AFTER AUTH
+===================================================== */
+window.addEventListener("load", () => {
+    loadOrdersDashboard();
+    loadHR("daily");
+});
+</script>
+
+</body>
+</html>
+```
