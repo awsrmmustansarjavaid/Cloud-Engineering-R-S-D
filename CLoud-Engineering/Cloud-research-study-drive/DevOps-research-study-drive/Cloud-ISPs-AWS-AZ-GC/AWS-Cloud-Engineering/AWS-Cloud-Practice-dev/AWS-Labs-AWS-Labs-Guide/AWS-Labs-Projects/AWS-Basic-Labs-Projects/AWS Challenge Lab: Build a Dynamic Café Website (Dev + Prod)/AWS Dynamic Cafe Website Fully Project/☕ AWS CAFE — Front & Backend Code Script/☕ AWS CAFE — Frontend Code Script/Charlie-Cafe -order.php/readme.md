@@ -4450,6 +4450,11 @@ async function payWithCash() {
 ✔ Clean structure
 
 ----
+### ✅ Updated orders.php
+> **Updated Version: 5.2**
+
+No Cognito / Auth headers needed
+
 
 ```
 <?php
@@ -4669,3 +4674,6 @@ async function payWithCash() {
 </body>
 </html>
 ```
+
+---
+
