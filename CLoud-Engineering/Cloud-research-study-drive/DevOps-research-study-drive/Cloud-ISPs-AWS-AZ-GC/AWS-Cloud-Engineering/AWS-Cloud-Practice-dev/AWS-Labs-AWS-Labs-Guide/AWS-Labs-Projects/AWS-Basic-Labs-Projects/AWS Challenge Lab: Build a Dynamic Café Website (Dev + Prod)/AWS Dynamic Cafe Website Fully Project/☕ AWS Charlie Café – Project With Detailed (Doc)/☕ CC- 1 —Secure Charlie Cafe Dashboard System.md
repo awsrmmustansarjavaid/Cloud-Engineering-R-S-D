@@ -973,6 +973,17 @@ sudo nano cafe-rbac-layer/python/rbac.py
 
 #### Method 1- Bash Script Charlie Cafe RBAC Layer Setup & Verification
 
+#### Bash Script Charlie Cafe RBAC Layer Setup (S3)
+
+```
+sudo nano charlie_cafe_rbac_layer_S3_test_verify.sh
+```
+
+[charlie_cafe_rbac_layer_S3_test_verify.sh](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_rbac_layer_S3_test_verify.sh)
+
+
+#### Bash Script Charlie Cafe RBAC Layer Setup (AWS EC2 CLI)
+
 ```
 sudo nano charlie_cafe_rbac_layer_test_verify.sh
 ```
