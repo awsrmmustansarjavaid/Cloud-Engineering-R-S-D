@@ -2275,7 +2275,7 @@ def lambda_handler(event, context):
 #### 📌 Requirement: Your backend must expose a GET order status API like:
 
 ```
-GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=ORD-XXXX
+GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=ORD-XXXX
 ```
 
 #### 📁 WHERE THIS FILE BELONGS
