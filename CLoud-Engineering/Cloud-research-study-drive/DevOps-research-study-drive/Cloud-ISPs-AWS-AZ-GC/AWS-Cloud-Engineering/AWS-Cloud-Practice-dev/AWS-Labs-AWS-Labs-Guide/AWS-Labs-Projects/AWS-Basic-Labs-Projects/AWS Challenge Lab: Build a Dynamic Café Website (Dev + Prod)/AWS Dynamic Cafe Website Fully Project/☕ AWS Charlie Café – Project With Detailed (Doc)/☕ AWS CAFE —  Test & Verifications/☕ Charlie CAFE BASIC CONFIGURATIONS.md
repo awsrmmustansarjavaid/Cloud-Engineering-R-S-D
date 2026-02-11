@@ -966,28 +966,37 @@ sudo nano /var/www/html/charlie-cafe-verify.html
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Charlie Cafe Lab Verification</title>
+
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
+/* -------------------
+   General Page Styles
+   ------------------- */
 body {
     background-color: #fff8f0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+/* Page Header */
 h1 {
     color: #b22222;
-    margin-top: 20px;
 }
-table th, table td {
-    vertical-align: middle !important;
-}
+
+/* Table row status colors */
 .PASS { color: green; font-weight: bold; }
 .FAIL { color: red; font-weight: bold; }
 .WARN { color: orange; font-weight: bold; }
-#logo { width: 60px; }
-#aws-logo { width: 40px; }
+
+/* Logo styles */
+#logo {
+    font-size: 2.5rem;  /* Coffee cup emoji size */
+}
+
+/* Print button spacing */
 .print-btn {
     margin-top: 20px;
 }
@@ -995,19 +1004,29 @@ table th, table td {
 </head>
 <body>
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-        <div class="d-flex align-items-center">
-            <img id="logo" src="https://img.icons8.com/color/96/coffee.png" alt="Charlie Cafe Logo"/>
-            <h1 class="ms-3">Charlie Cafe Lab Verification</h1>
-        </div>
-        <img id="aws-logo" src="https://img.icons8.com/color/48/aws.png" alt="AWS Logo"/>
+
+    <!-- =======================
+         Header with Logo
+         ======================= -->
+    <div class="d-flex align-items-center mt-4 mb-3">
+        <!-- Charlie Cafe logo as coffee cup + title -->
+        <span id="logo" role="img" aria-label="Coffee Cup">☕</span>
+        <h1 class="ms-3">Charlie Cafe Lab Verification</h1>
     </div>
 
+    <!-- =======================
+         CSV Input & Load Button
+         ======================= -->
     <div class="input-group mb-3">
         <input type="text" id="csvUrl" class="form-control" placeholder="Enter CSV URL from S3" aria-label="CSV URL">
-        <button class="btn btn-primary" onclick="loadCSV()"><i class="bi bi-arrow-repeat"></i> Load Results</button>
+        <button class="btn btn-primary" onclick="loadCSV()">
+            <i class="bi bi-arrow-repeat"></i> Load Results
+        </button>
     </div>
 
+    <!-- =======================
+         Result Table
+         ======================= -->
     <div class="table-responsive">
         <table id="resultTable" class="table table-striped table-bordered align-middle">
             <thead class="table-dark">
@@ -1022,34 +1041,52 @@ table th, table td {
         </table>
     </div>
 
-    <button class="btn btn-success print-btn" onclick="window.print()"><i class="bi bi-printer-fill"></i> Print Result</button>
+    <!-- =======================
+         Print Button
+         ======================= -->
+    <button class="btn btn-success print-btn" onclick="window.print()">
+        <i class="bi bi-printer-fill"></i> Print Result
+    </button>
 </div>
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
+/* =====================================================
+   Function: loadCSV()
+   Purpose: Fetch CSV from S3 URL and populate table
+   ===================================================== */
 async function loadCSV() {
     const url = document.getElementById('csvUrl').value.trim();
-    if (!url) return alert('Please enter a CSV URL.');
+
+    if (!url) {
+        alert('Please enter a CSV URL.');
+        return;
+    }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url); // Fetch CSV from S3
         if (!response.ok) throw new Error('Cannot fetch CSV. Check URL or permissions.');
         const text = await response.text();
 
-        const rows = text.split('\n').slice(1); // skip header
+        const rows = text.split('\n').slice(1); // skip header row
         const tbody = document.querySelector('#resultTable tbody');
-        tbody.innerHTML = '';
+        tbody.innerHTML = ''; // Clear previous results
 
         rows.forEach(row => {
-            if (!row.trim()) return;
+            if (!row.trim()) return; // Skip empty lines
             const cols = row.split(',');
             const tr = document.createElement('tr');
+
+            // Determine status color class
             const status = cols[1]?.replace(/"/g,'') || '';
-            tr.innerHTML = `<td>${cols[0]?.replace(/"/g,'')}</td>
-                            <td class="${status}">${status}</td>
-                            <td>${cols[2]?.replace(/"/g,'')}</td>
-                            <td>${cols[3]?.replace(/"/g,'')}</td>`;
+            tr.innerHTML = `
+                <td>${cols[0]?.replace(/"/g,'')}</td>
+                <td class="${status}">${status}</td>
+                <td>${cols[2]?.replace(/"/g,'')}</td>
+                <td>${cols[3]?.replace(/"/g,'')}</td>
+            `;
             tbody.appendChild(tr);
         });
     } catch (err) {
