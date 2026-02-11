@@ -746,10 +746,12 @@ sudo chmod -R 644 /var/www/html
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 
-## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+# 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
 
-## Charlie Cafe Basic Lab Configuration Test and Verification
+# 📢 SECTION 4️⃣ Charlie Cafe Verification 
+
+## PHASE 1️⃣ Charlie Cafe Basic Lab Configuration Test and Verification
 
 ### Bash Script
 
@@ -944,7 +946,135 @@ sudo chmod +x export_bash_output_s3.sh
 sudo ./export_bash_output_s3.sh
 ```
 
+**✅ PHASE 1️⃣ STATUS**
 
-# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+
 ---
+## PHASE 2️⃣ FrontEnd Web 
+
+### 1️⃣ Create the frontend HTML file
+
+```
+sudo nano charlie-cafe-verify.html
+```
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charlie Cafe Lab Verification</title>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body {
+    background-color: #fff8f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+h1 {
+    color: #b22222;
+    margin-top: 20px;
+}
+table th, table td {
+    vertical-align: middle !important;
+}
+.PASS { color: green; font-weight: bold; }
+.FAIL { color: red; font-weight: bold; }
+.WARN { color: orange; font-weight: bold; }
+#logo { width: 60px; }
+#aws-logo { width: 40px; }
+.print-btn {
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <div class="d-flex align-items-center">
+            <img id="logo" src="https://img.icons8.com/color/96/coffee.png" alt="Charlie Cafe Logo"/>
+            <h1 class="ms-3">Charlie Cafe Lab Verification</h1>
+        </div>
+        <img id="aws-logo" src="https://img.icons8.com/color/48/aws.png" alt="AWS Logo"/>
+    </div>
+
+    <div class="input-group mb-3">
+        <input type="text" id="csvUrl" class="form-control" placeholder="Enter CSV URL from S3" aria-label="CSV URL">
+        <button class="btn btn-primary" onclick="loadCSV()"><i class="bi bi-arrow-repeat"></i> Load Results</button>
+    </div>
+
+    <div class="table-responsive">
+        <table id="resultTable" class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Test</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <button class="btn btn-success print-btn" onclick="window.print()"><i class="bi bi-printer-fill"></i> Print Result</button>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+async function loadCSV() {
+    const url = document.getElementById('csvUrl').value.trim();
+    if (!url) return alert('Please enter a CSV URL.');
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Cannot fetch CSV. Check URL or permissions.');
+        const text = await response.text();
+
+        const rows = text.split('\n').slice(1); // skip header
+        const tbody = document.querySelector('#resultTable tbody');
+        tbody.innerHTML = '';
+
+        rows.forEach(row => {
+            if (!row.trim()) return;
+            const cols = row.split(',');
+            const tr = document.createElement('tr');
+            const status = cols[1]?.replace(/"/g,'') || '';
+            tr.innerHTML = `<td>${cols[0]?.replace(/"/g,'')}</td>
+                            <td class="${status}">${status}</td>
+                            <td>${cols[2]?.replace(/"/g,'')}</td>
+                            <td>${cols[3]?.replace(/"/g,'')}</td>`;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        alert('Error loading CSV: ' + err.message);
+    }
+}
+</script>
+</body>
+</html>
+```
+
+```
+sudo chown apache:apache charlie-cafe-verify.html
+```
+
+```
+sudo chmod 644 charlie-cafe-verify.html
+```
+
+```
+sudo systemctl restart httpd
+```
+
+
+# 📢 SECTION 4️⃣  COMPLETE ✅
+---`
+
 
