@@ -20,15 +20,15 @@ const CHARLIE = (() => {
         REGION: "us-east-1",
 
         // Cognito
-        USER_POOL_ID: "us-east-1_HDcwDJqVz",
-        CLIENT_ID: "3hcigucn7fmd11gvo9uuqud6fi",
-        COGNITO_DOMAIN: "us-east-1hdcwdjqvz.auth.us-east-1.amazonaws.com",
+        USER_POOL_ID: "us-east-1_oeMWJar3T",
+        CLIENT_ID: "42haggs0jctmq5rnaajfi3hmqu",
+        COGNITO_DOMAIN: "us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
 
         // API Gateway
         API_BASE: "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com",
 
         // CloudFront
-        CLOUDFRONT_BASE: "https://d159bqc5pw64hn.cloudfront.net"
+        CLOUDFRONT_BASE: "https://d163j9zwndcxgl.cloudfront.net"
     };
 
     /* =====================================================
