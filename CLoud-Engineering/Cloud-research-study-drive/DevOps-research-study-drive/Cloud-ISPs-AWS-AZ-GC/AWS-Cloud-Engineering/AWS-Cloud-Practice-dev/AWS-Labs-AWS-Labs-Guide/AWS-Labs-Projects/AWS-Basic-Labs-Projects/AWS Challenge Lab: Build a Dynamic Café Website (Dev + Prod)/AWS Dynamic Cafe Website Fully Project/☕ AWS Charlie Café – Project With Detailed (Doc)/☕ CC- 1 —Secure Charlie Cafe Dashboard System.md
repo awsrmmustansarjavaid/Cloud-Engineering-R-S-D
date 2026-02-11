@@ -1136,9 +1136,9 @@ def lambda_handler(event, context):
 
 ```
 DB_HOST = <your-rds-endpoint>
-DB_USER = admin
+DB_USER = cafe_user
 DB_PASS = <your-db-password>
-DB_NAME = cafe
+DB_NAME = cafe_db
 ```
 
 #### 4️⃣ 🔐 Attach Lambda Layer
