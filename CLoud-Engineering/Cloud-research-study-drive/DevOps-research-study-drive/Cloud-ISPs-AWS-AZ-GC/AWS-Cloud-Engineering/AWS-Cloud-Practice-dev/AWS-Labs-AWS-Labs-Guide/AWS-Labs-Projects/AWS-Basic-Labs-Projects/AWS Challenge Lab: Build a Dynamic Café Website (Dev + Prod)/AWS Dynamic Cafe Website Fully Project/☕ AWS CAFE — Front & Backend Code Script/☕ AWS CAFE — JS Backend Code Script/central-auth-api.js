@@ -101,12 +101,12 @@ const CHARLIE = (() => {
             document.body.style.display = "block";
         },
 
-        /* Setup logout button */
-        setupLogoutButton(buttonId = "logoutBtn") {
-            const btn = document.getElementById(buttonId);
-            if (!btn) return;
-            btn.addEventListener("click", () => this.logout());
-        }
+        /* Setup logout button with optional redirect */
+```````setupLogoutButton(buttonId = "logoutBtn", redirectUrl = "dashboard-login.html") {
+    ```const btn = document.getElementById(buttonId);
+    ```if (!btn) return;
+    ```btn.addEventListener("click", () => this.logout(redirectUrl));
+```````}
     };
 
     /* =====================================================
