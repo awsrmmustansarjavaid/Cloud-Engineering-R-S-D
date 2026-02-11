@@ -1,13 +1,13 @@
 <?php
 // ===================================================
-// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (Updated with Cognito & UI/UX + Central Print)
+// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (No Cognito)
 // ===================================================
 
 // API endpoints
-$ordersApi    = "https://a1053skr51.execute-api.us-east-1.amazonaws.com/dev/orders";
-$markPaidApi  = "https://a1053skr51.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid";
+$ordersApi    = "https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/orders";
+$markPaidApi  = "https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid";
 
-// Fetch orders
+// Fetch orders (no auth headers needed)
 $ch = curl_init($ordersApi);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
@@ -38,8 +38,6 @@ if ($response !== false && $httpCode === 200) {
 
 <!-- ===================== BOOTSTRAP CSS ===================== -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- ===================== BOOTSTRAP ICONS ===================== -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
 <!-- Google Fonts -->
@@ -83,23 +81,15 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
 }
 .btn-paid:disabled { opacity:0.6; cursor:not-allowed; }
 
-/* Login button */
-.btn-login {
-    background: linear-gradient(135deg, #ff5722, #ff9800);
-    border:none; border-radius:50px; color:#fff; display:flex; align-items:center; gap:6px;
-}
-
 /* Central Print Button */
-.btn-print {
-    margin-bottom: 15px;
-}
+.btn-print { margin-bottom: 15px; }
 
 /* Responsive Table */
 .table-hover tbody tr:hover { background: rgba(255,221,170,0.1); }
 @media(max-width:768px){
     .container { padding:2rem 0.5rem; }
     .dashboard-card { padding:1.5rem; }
-    .btn-paid, .btn-login { width:100%; justify-content:center; }
+    .btn-paid { width:100%; justify-content:center; }
 }
 </style>
 </head>
@@ -108,15 +98,12 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h3><i class="bi bi-speedometer2"></i> Charlie Café – Orders Dashboard</h3>
-        <div class="d-flex gap-2 align-items-center">
-            <span class="text-muted">Cashier Panel • Auto-refresh 30s</span>
-            <button class="btn btn-login" id="loginBtn"><i class="bi bi-person-circle"></i> Login</button>
-        </div>
+        <span class="text-muted">Cashier Panel • Auto-refresh 30s</span>
     </div>
 
     <?php if (isset($fetchError)): ?>
         <div class="alert alert-warning text-center">
-            ⚠️ <?= htmlspecialchars($fetchError) ?> — Please check API or try refreshing.
+            ⚠️ <?= htmlspecialchars($fetchError) ?> — Please check API or refresh.
         </div>
     <?php endif; ?>
 
@@ -207,23 +194,9 @@ h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
 
 <!-- ===================== JS ===================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="central-auth-api.js?v=2"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    // Protect page – redirect to login if not authenticated
-    await protectPage();
-
-    // Bind Cognito login button
-    document.getElementById("loginBtn").addEventListener("click", () => {
-        cognitoLogin(); // Opens hosted UI
-    });
-
-    // Auto-refresh every 30s
-    setInterval(() => location.reload(), 30000);
-});
-
-// Mark CASH orders as PAID
+// ===================== MARK CASH ORDERS AS PAID =====================
 async function markAsPaid(button){
     const orderId = button.getAttribute('data-order-id');
     if(!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
@@ -231,45 +204,44 @@ async function markAsPaid(button){
     button.disabled = true;
     button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
 
-    try{
+    try {
         const res = await fetch("<?= $markPaidApi ?>", {
             method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({order_id:orderId})
+            headers:{"Content-Type":"application/json"}, // no Cognito / Auth
+            body: JSON.stringify({order_id: orderId})
         });
         const data = await res.json();
         if(data.success){
             alert("☕ Payment marked as PAID successfully!");
             location.reload();
-        } else alert("❌ Failed: "+(data.error||data.message||"Unknown error"));
-    }catch(err){
+        } else {
+            alert("❌ Failed: "+(data.error||data.message||"Unknown error"));
+        }
+    } catch(err){
         console.error(err);
         alert("Server error, try again.");
-    }finally{
+    } finally {
         button.disabled=false;
         button.innerHTML=`<i class="bi bi-check2-circle"></i> Mark Paid`;
     }
 }
 
-/* ===================== CENTRAL PRINT FUNCTION ===================== */
-/* Works for any table or section using #selector */
+// ===================== CENTRAL PRINT FUNCTION =====================
 function openCentralPrint(selector) {
     const target = document.querySelector(selector);
-    if (!target) {
-        alert('Print section not found!');
-        return;
-    }
+    if (!target) { alert('Print section not found!'); return; }
     const content = target.outerHTML;
     const printWindow = window.open('/central-print.html', '_blank');
-
-    // Wait until centralPrint object is ready
     const timer = setInterval(() => {
-        if (printWindow && printWindow.centralPrint) {
+        if(printWindow && printWindow.centralPrint){
             printWindow.centralPrint.loadContent(content);
             clearInterval(timer);
         }
     }, 100);
 }
+
+// Auto-refresh every 30s
+setInterval(() => location.reload(), 30000);
 </script>
 </body>
 </html>
