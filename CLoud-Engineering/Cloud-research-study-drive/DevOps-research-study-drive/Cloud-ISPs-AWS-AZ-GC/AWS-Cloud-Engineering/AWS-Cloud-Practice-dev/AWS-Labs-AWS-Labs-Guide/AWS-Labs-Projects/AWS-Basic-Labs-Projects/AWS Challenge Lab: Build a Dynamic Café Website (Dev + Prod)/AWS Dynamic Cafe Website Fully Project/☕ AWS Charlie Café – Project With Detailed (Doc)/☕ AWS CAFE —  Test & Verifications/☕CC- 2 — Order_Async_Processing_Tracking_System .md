@@ -1891,6 +1891,8 @@ order-status.php?order_id=ORD-XXXX
 
 #### ✅ Test 1 — Manual API Test
 
+- Lambda name: CashPaymentLambda
+
 Use Postman / curl:
 
 ```
