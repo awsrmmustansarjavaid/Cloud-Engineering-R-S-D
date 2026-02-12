@@ -735,5 +735,229 @@ If you’re building a frontend app → Always choose Public client
 
 ---
 
+### ✅ 2️⃣ OAuth Grant Type — Which Is Recommended?
+
+You asked:
+
+#### Option 1: ✔ Implicit grant (Recommended)
+
+#### Option 2: ✔ Authorization code grant (Optional)
+
+⚠️ The UI is misleading.
+
+### 🔥 The REAL Recommendation (2026 Security Standard)
+
+#### ✅ Authorization Code Grant (WITH PKCE) → Highly Recommended
+
+### ❌ Implicit Grant → Not Recommended anymore
+
+Why?
+
+#### ❌ Implicit Grant
+
+- Tokens returned in browser URL
+
+- Less secure
+
+- Considered legacy
+
+- Being phased out in modern OAuth security best practices
+
+### ✅ Authorization Code Grant (with PKCE)
+
+- More secure
+
+- Industry standard
+
+- Recommended by OAuth 2.1
+
+#### Used by:
+
+- Google
+
+- Microsoft
+
+- Auth0
+
+- Okta
+
+- AWS Amplify
+
+### 📍 Where to configure OAuth in new UI
+
+- Go to User Pool
+
+- Open App integration
+
+- Click your App client
+
+- Go to Login pages / Hosted UI
+
+- Click Edit
+
+- Under OAuth 2.0 grant types
+
+#### Choose:
+
+✅ Authorization code grant
+
+❌ Do NOT select Implicit grant (unless legacy reason)
+
+### 🎯 Final Recommendation Summary
+
+If you're building:
+
+#### 🔹 SPA (React, Angular, Vue)
+
+- Client type → Public
+
+- Grant type → Authorization Code Grant
+
+- Enable PKCE (automatic for public clients)
+
+#### 🔹 Backend Server App
+
+- Client type → Confidential
+
+- Grant type → Authorization Code Grant
+
+### 🚀 Clean Best-Practice Setup (Modern Secure Setup)
+
+- Public Client
+
+- Authorization Code Grant
+
+- PKCE enabled
+
+- No Implicit grant
+
+- Use HTTPS callback URL
+
+- Enable only required scopes (openid, email, profile)
+---
+
+## 🚨 FIRST: Your Current Problem
+
+```
+CloudFront → SPA (HTML/JS)
+↓
+Cognito Hosted UI
+↓
+API Gateway (Cognito Authorizer)
+↓
+Lambda
+↓
+RDS + DynamoDB
+```
+
+You are mixing:
+
+- SPA (browser login)
+
+- PHP backend (curl)
+
+- Cognito protected API Gateway
+
+That combination changes what grant type you should use.
+
+So let’s fix the confusion.
+
+### 🔥 CRITICAL CORRECTION
+
+Earlier configuration used:
+
+```
+response_type=token
+Implicit Grant
+```
+
+⚠️ That is NOT ideal for your setup anymore.
+
+### ✅ WHAT YOU SHOULD USE (FOR CHARLIE CAFE)
+
+Since:
+
+- You are using SPA (CloudFront frontend)
+
+- API Gateway protected by Cognito Authorizer
+
+- Sometimes testing via curl
+
+- No real server-side session handling
+
+You should use:
+
+✅ Authorization Code Grant (NOT Implicit)
+
+✅ Public Client (NO client secret)
+
+✅ PKCE (automatic for SPA)
+
+### ❌ Why Implicit Is Causing Problems
+
+#### Implicit:
+
+- Returns token in URL fragment (#access_token=...)
+
+- Harder to debug
+
+- Doesn’t issue refresh token reliably
+
+- Not recommended by OAuth 2.1
+
+- Can cause 400 if scopes or config mismatch
+
+#### If you get:
+
+- 400 Bad Request from Cognito login
+
+- “invalid_request”
+
+- white screen after redirect
+
+- curl failing with 401
+
+#### Most of the time it’s:
+
+✔ wrong redirect URI
+
+✔ wrong response_type
+
+✔ client secret enabled
+
+✔ mismatch grant type
+
+## Old Wrong Configurations 
+
+
+
+### 🎯 FINAL RECOMMENDED CONFIG FOR YOU
+
+- Go to: Cognito → User Pool → App Integration → App Client → Edit
+
+#### 1️⃣ App Client
+
+| Setting       | Value         |
+| ------------- | ------------- |
+| App type      | Public client |
+| Client secret | ❌ Disabled    |
+If secret exists → DELETE this app client → recreate as Public.
+
+2️⃣ OAuth 2.0 Grant Types
+
+✔ Authorization code grant
+❌ DO NOT enable Implicit grant
+
+3️⃣ Scopes
+
+✔ openid
+✔ email
+✔ profile
+
+Nothing else.
+
+4️⃣ Change Your Login URL
+
+Instead of:
 
 
