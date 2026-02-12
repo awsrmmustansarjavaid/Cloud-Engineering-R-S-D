@@ -722,6 +722,17 @@ But this is NOT recommended for public apps.
 - Safer.
 - Easier.
 
+### 🎯 When to Use Public vs Confidential
+
+| Application Type                  | Recommended Client Type |
+| --------------------------------- | ----------------------- |
+| React / Angular SPA               | ✅ Public (No Secret)    |
+| Mobile App                        | ✅ Public                |
+| Backend Server (Node, .NET, Java) | ✅ Confidential          |
+| Machine-to-machine                | ✅ Confidential          |
+
+If you’re building a frontend app → Always choose Public client
+
 ---
 
 
