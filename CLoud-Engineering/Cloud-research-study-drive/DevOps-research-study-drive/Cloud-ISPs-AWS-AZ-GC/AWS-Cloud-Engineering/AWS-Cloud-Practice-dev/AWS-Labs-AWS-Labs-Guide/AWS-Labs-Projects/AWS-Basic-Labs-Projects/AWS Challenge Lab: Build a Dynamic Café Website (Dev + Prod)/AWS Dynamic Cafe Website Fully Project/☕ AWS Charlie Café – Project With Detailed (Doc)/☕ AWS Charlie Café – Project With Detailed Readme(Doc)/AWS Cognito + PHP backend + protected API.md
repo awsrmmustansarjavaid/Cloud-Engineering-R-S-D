@@ -187,19 +187,19 @@ Stateless + secure.
 
 ### 💡 If You Want Stronger Enterprise Setup
 
-You can:
+#### You can:
 
-Use API Gateway + Cognito Authorizer
+- Use API Gateway + Cognito Authorizer
 
-Then PHP doesn’t verify token manually
+- Then PHP doesn’t verify token manually
 
-API Gateway sends user claims to PHP
+- API Gateway sends user claims to PHP
 
 This is more scalable.
 
 ### 🎯 I Need From You To Diagnose Exactly
 
-Tell me:
+#### Tell me:
 
 Are you using API Gateway or direct PHP server?
 
@@ -216,22 +216,24 @@ Are you using ID token or access token?
 Is your app client configured with secret?
 
 ---
+## 📢 Exactly how to get Cognito tokens
+
 
 ### ✅ METHOD 1 — From Frontend (Most Common – Recommended)
 
-If you are using:
+#### If you are using:
 
-Web app (React / Angular / Vue / HTML JS)
+    - Web app (React / Angular / Vue / HTML JS)
 
-Mobile app
+    - Mobile app
 
-Hosted UI
+    - Hosted UI
 
 You authenticate user → Cognito returns tokens.
 
 ### 🔹 Option A: Using Cognito Hosted UI (Easiest)
 
-Step 1 – Redirect user to login URL
+#### Step 1 – Redirect user to login URL
 
 
 ```
@@ -242,9 +244,11 @@ client_id=YOUR_CLIENT_ID
 &redirect_uri=https://yourapp.com/callback
 ```
 
-After login → Cognito redirects to:
+#### After login → Cognito redirects to:
 
 ```
 https://yourapp.com/callback?code=AUTH_CODE
 ```
+
+
 
