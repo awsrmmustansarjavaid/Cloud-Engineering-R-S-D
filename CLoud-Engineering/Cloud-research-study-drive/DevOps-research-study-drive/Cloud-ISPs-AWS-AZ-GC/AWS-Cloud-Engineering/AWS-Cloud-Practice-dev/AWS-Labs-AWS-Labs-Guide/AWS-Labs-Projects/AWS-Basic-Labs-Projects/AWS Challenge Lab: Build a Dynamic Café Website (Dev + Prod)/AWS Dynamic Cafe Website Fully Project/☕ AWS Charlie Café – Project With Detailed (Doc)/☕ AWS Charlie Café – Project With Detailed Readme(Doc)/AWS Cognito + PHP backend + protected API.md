@@ -250,5 +250,340 @@ client_id=YOUR_CLIENT_ID
 https://yourapp.com/callback?code=AUTH_CODE
 ```
 
+Step 2 – Exchange Code for Tokens
+
+Send POST request to:
+
+```
+https://YOUR_DOMAIN.auth.YOUR_REGION.amazoncognito.com/oauth2/token
+```
+
+Example (PHP CURL):
+
+```
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, "https://YOUR_DOMAIN.auth.YOUR_REGION.amazoncognito.com/oauth2/token");
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+    'grant_type' => 'authorization_code',
+    'client_id' => 'YOUR_CLIENT_ID',
+    'code' => $_GET['code'],
+    'redirect_uri' => 'https://yourapp.com/callback'
+]));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+echo $response;
+```
+
+You Will Receive:
+
+```
+{
+  "access_token": "eyJraWQiOiJLT...",
+  "id_token": "eyJraWQiOiJLT...",
+  "refresh_token": "eyJjdHkiOiJKV1Qi...",
+  "expires_in": 3600,
+  "token_type": "Bearer"
+}
+```
+
+Use access_token for API calls.
+
+✅ METHOD 2 — Using USERNAME + PASSWORD (Direct API Call)
+
+If you want server-side login (no hosted UI).
+
+Send request to:
+
+```
+https://cognito-idp.YOUR_REGION.amazonaws.com/
+```
+
+Headers:
+
+```
+X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
+Content-Type: application/x-amz-json-1.1
+```
+
+Example PHP
+
+```
+$data = [
+    "AuthFlow" => "USER_PASSWORD_AUTH",
+    "ClientId" => "YOUR_CLIENT_ID",
+    "AuthParameters" => [
+        "USERNAME" => "user@email.com",
+        "PASSWORD" => "userpassword"
+    ]
+];
+
+$ch = curl_init("https://cognito-idp.YOUR_REGION.amazonaws.com/");
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Content-Type: application/x-amz-json-1.1",
+    "X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth"
+]);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+echo $response;
+```
+
+You will get:
+
+```
+{
+  "AuthenticationResult": {
+    "AccessToken": "...",
+    "IdToken": "...",
+    "RefreshToken": "...",
+    "ExpiresIn": 3600
+  }
+}
+```
+
+⚠️ IMPORTANT:
+
+For this to work:
+
+In App Client settings:
+
+Enable ALLOW_USER_PASSWORD_AUTH
+
+Disable client secret (if public app)
+
+Steps Method 2 (USERNAME + PASSWORD login directly from PHP).
+
+✅ STEP 1 — Configure Cognito Correctly (Very Important)
+
+Go to:
+
+AWS Console → Cognito → User Pools → Your Pool → App clients
+
+🔹 1. Create / Edit App Client
+
+Make sure:
+
+✅ DO NOT enable "Generate client secret"
+(If secret is enabled, login will fail unless you calculate secret hash.)
+
+🔹 2. Enable Auth Flow
+
+Go to:
+
+App client → Authentication flows
+
+Enable:
+
+✅ ALLOW_USER_PASSWORD_AUTH
+✅ ALLOW_REFRESH_TOKEN_AUTH
+
+Save changes.
+
+✅ STEP 2 — PHP Login Code (USERNAME + PASSWORD)
+
+This will call Cognito directly.
+
+Replace:
+
+YOUR_REGION
+
+YOUR_CLIENT_ID
+
+✅ Working PHP Example
+
+```
+<?php
+
+$region = "us-east-1"; // change
+$clientId = "YOUR_CLIENT_ID";
+
+$username = "user@email.com";
+$password = "UserPassword123!";
+
+$data = [
+    "AuthFlow" => "USER_PASSWORD_AUTH",
+    "ClientId" => $clientId,
+    "AuthParameters" => [
+        "USERNAME" => $username,
+        "PASSWORD" => $password
+    ]
+];
+
+$ch = curl_init("https://cognito-idp.$region.amazonaws.com/");
+
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Content-Type: application/x-amz-json-1.1",
+    "X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth"
+]);
+
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+
+if (curl_errno($ch)) {
+    echo 'Curl error: ' . curl_error($ch);
+}
+
+curl_close($ch);
+
+$result = json_decode($response, true);
+
+print_r($result);
+```
+
+✅ Successful Response Example
+
+If login correct:
+
+```
+{
+  "AuthenticationResult": {
+    "AccessToken": "eyJraWQiOiJLT...",
+    "IdToken": "eyJraWQiOiJLT...",
+    "RefreshToken": "eyJjdHkiOiJKV1Qi...",
+    "ExpiresIn": 3600,
+    "TokenType": "Bearer"
+  }
+}
+```
+
+Use:
+
+```
+$accessToken = $result['AuthenticationResult']['AccessToken'];
+```
+
+Send this to your protected API:
+
+```
+Authorization: Bearer ACCESS_TOKEN
+```
+
+🚨 Common Errors & Fix
+❌ Error: NotAuthorizedException
+
+Reason:
+
+Wrong password
+
+User not confirmed
+
+App client secret enabled
+
+❌ Error: InvalidParameterException: USER_PASSWORD_AUTH is not enabled
+
+Fix:
+Enable ALLOW_USER_PASSWORD_AUTH in app client.
+
+❌ Error: SECRET_HASH missing
+
+This means:
+You enabled client secret.
+
+Either:
+
+Disable client secret (recommended)
+OR
+
+Implement secret hash (I can give code if needed)
+
+✅ STEP 3 — Refresh Token (After 1 Hour)
+
+When access token expires:
+
+```
+$data = [
+    "AuthFlow" => "REFRESH_TOKEN_AUTH",
+    "ClientId" => $clientId,
+    "AuthParameters" => [
+        "REFRESH_TOKEN" => $refreshToken
+    ]
+];
+```
+
+Call same endpoint.
+
+🔐 IMPORTANT SECURITY NOTE
+
+Method 2 means:
+
+You are handling raw passwords in PHP backend.
+
+Best practice:
+
+Use HTTPS only
+
+Never log passwords
+
+Do not store passwords
+
+🏗 Recommended Architecture For Production
+
+Better approach:
+
+Frontend login → Cognito
+Frontend sends access token → PHP
+PHP only verifies token
+
+More secure + scalable.
+
+
+
+✅ METHOD 3 — Using AWS Amplify (Frontend Only)
+
+If using JavaScript:
+
+```
+import { Auth } from 'aws-amplify';
+
+const user = await Auth.signIn(email, password);
+
+const session = await Auth.currentSession();
+
+const accessToken = session.getAccessToken().getJwtToken();
+const idToken = session.getIdToken().getJwtToken();
+```
+
+🔥 Which One Should You Use?
+
+For your PHP backend project:
+
+Best Architecture:
+
+Frontend → Cognito login
+Frontend → Send access_token to PHP
+PHP → Verify JWT
+
+Do NOT login from PHP unless absolutely required.
+
+🎯 Quick Checklist For You
+
+Go to:
+
+AWS Console → Cognito → User Pool → App Clients
+
+Check:
+
+App client has NO secret (if web app)
+
+ALLOW_USER_PASSWORD_AUTH enabled (if using API login)
+
+OAuth flows enabled (if using Hosted UI)
+
+---
+
+
+
 
 
