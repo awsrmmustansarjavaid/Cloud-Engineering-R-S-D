@@ -498,9 +498,9 @@ OR
 
 - Implement secret hash (I can give code if needed)
 
-✅ STEP 3 — Refresh Token (After 1 Hour)
+### ✅ STEP 3 — Refresh Token (After 1 Hour)
 
-When access token expires:
+#### When access token expires:
 
 ```
 $data = [
@@ -514,23 +514,23 @@ $data = [
 
 Call same endpoint.
 
-🔐 IMPORTANT SECURITY NOTE
+### 🔐 IMPORTANT SECURITY NOTE
 
-Method 2 means:
+- Method 2 means:
 
-You are handling raw passwords in PHP backend.
+    - You are handling raw passwords in PHP backend.
 
-Best practice:
+- Best practice:
 
-Use HTTPS only
+    - Use HTTPS only
 
-Never log passwords
+    - Never log passwords
 
-Do not store passwords
+    - Do not store passwords
 
-🏗 Recommended Architecture For Production
+### 🏗 Recommended Architecture For Production
 
-Better approach:
+#### Better approach:
 
 Frontend login → Cognito
 Frontend sends access token → PHP
@@ -540,9 +540,9 @@ More secure + scalable.
 
 
 
-✅ METHOD 3 — Using AWS Amplify (Frontend Only)
+### ✅ METHOD 3 — Using AWS Amplify (Frontend Only)
 
-If using JavaScript:
+#### If using JavaScript:
 
 ```
 import { Auth } from 'aws-amplify';
@@ -555,11 +555,11 @@ const accessToken = session.getAccessToken().getJwtToken();
 const idToken = session.getIdToken().getJwtToken();
 ```
 
-🔥 Which One Should You Use?
+### 🔥 Which One Should You Use?
 
-For your PHP backend project:
+#### For your PHP backend project:
 
-Best Architecture:
+#### Best Architecture:
 
 Frontend → Cognito login
 Frontend → Send access_token to PHP
@@ -567,19 +567,17 @@ PHP → Verify JWT
 
 Do NOT login from PHP unless absolutely required.
 
-🎯 Quick Checklist For You
+### 🎯 Quick Checklist For You
 
-Go to:
+- Go to: AWS Console → Cognito → User Pool → App Clients
 
-AWS Console → Cognito → User Pool → App Clients
+#### Check:
 
-Check:
+- App client has NO secret (if web app)
 
-App client has NO secret (if web app)
+- ALLOW_USER_PASSWORD_AUTH enabled (if using API login)
 
-ALLOW_USER_PASSWORD_AUTH enabled (if using API login)
-
-OAuth flows enabled (if using Hosted UI)
+- OAuth flows enabled (if using Hosted UI)
 
 ---
 
@@ -589,21 +587,19 @@ OAuth flows enabled (if using Hosted UI)
 2️⃣ How to disable it
 3️⃣ What to do if it cannot be disabled
 
-✅ How To Check If Client Secret Is Enabled
+### ✅ How To Check If Client Secret Is Enabled
 
-Go to:
+- Go to: AWS Console → Cognito → User Pools → Your User Pool → App integration → App clients
 
-AWS Console → Cognito → User Pools → Your User Pool → App integration → App clients
+- Click on your App Client.
 
-Click on your App Client.
-
-Look for this field:
+- Look for this field:
 
 ```
 Client secret
 ```
 
-If you see:
+#### If you see:
 
 ```
 Client secret: ***************
@@ -611,7 +607,7 @@ Client secret: ***************
 
 👉 That means secret IS enabled.
 
-If you see:
+#### If you see:
 
 ```
 No client secret
@@ -619,35 +615,33 @@ No client secret
 
 👉 That means secret is disabled (this is what you want for web/mobile apps).
 
-❗ Important AWS Rule
+### ❗ Important AWS Rule
 
-You CANNOT disable client secret on an existing app client.
+- You CANNOT disable client secret on an existing app client.
 
-AWS does NOT allow editing this after creation.
+- AWS does NOT allow editing this after creation.
 
 So if secret is enabled → you must create a new app client.
 
-✅ How To Disable Client Secret (Correct Way)
+### ✅ How To Disable Client Secret (Correct Way)
 
 You must create a NEW app client.
 
-Step-by-step
+### Step-by-step
 
-Go to:
+- Go to: User Pool → App integration → App clients
 
-User Pool → App integration → App clients
+#### Click:
 
-Click:
+- ➕ Create app client
 
-➕ Create app client
+#### Now:
 
-Now:
+#### 🔹 VERY IMPORTANT
 
-🔹 VERY IMPORTANT
+#### When creating:
 
-When creating:
-
-UNSELECT / DO NOT CHECK:
+- UNSELECT / DO NOT CHECK:
 
 ```
 Generate client secret
@@ -655,24 +649,23 @@ Generate client secret
 
 This must be unchecked.
 
-🔹 Enable Authentication Flow
+#### 🔹 Enable Authentication Flow
 
 After creation:
 
-Go to:
+- Go to: App client → Authentication flows
 
-App client → Authentication flows
-
-Enable:
+#### Enable:
 
 ✅ ALLOW_USER_PASSWORD_AUTH
+
 ✅ ALLOW_REFRESH_TOKEN_AUTH
 
-Save.
+- Save.
 
 ✅ After That
 
-Use the NEW client ID in your PHP code:
+#### Use the NEW client ID in your PHP code:
 
 ```
 $clientId = "NEW_CLIENT_ID";
@@ -680,9 +673,9 @@ $clientId = "NEW_CLIENT_ID";
 
 Now your USER_PASSWORD_AUTH will work without SECRET_HASH error.
 
-🚨 If You Keep Using Client With Secret Enabled
+### 🚨 If You Keep Using Client With Secret Enabled
 
-You will get this error:
+#### You will get this error:
 
 ```
 SECRET_HASH was not received
@@ -690,7 +683,7 @@ SECRET_HASH was not received
 
 If for some reason you MUST use secret-enabled client, then you must calculate secret hash.
 
-Example:
+#### Example:
 
 ```
 function calculateSecretHash($username, $clientId, $clientSecret) {
@@ -705,7 +698,7 @@ function calculateSecretHash($username, $clientId, $clientSecret) {
 }
 ```
 
-Then add:
+#### Then add:
 
 ```
 "SECRET_HASH" => calculateSecretHash($username, $clientId, $clientSecret)
@@ -713,21 +706,21 @@ Then add:
 
 But this is NOT recommended for public apps.
 
-🎯 Best Practice For Your PHP Backend
+### 🎯 Best Practice For Your PHP Backend
 
-If this is:
+#### If this is:
 
-Web app
+- Web app
 
-Mobile app
+- Mobile app
 
-API backend
+- API backend
 
 👉 Create new App Client WITHOUT secret.
 
-Cleaner.
-Safer.
-Easier.
+- Cleaner.
+- Safer.
+- Easier.
 
 ---
 
