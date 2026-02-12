@@ -583,7 +583,153 @@ OAuth flows enabled (if using Hosted UI)
 
 ---
 
+## Cognito Client Secret
 
+1️⃣ How to check if client secret is enabled
+2️⃣ How to disable it
+3️⃣ What to do if it cannot be disabled
+
+✅ How To Check If Client Secret Is Enabled
+
+Go to:
+
+AWS Console → Cognito → User Pools → Your User Pool → App integration → App clients
+
+Click on your App Client.
+
+Look for this field:
+
+```
+Client secret
+```
+
+If you see:
+
+```
+Client secret: ***************
+```
+
+👉 That means secret IS enabled.
+
+If you see:
+
+```
+No client secret
+```
+
+👉 That means secret is disabled (this is what you want for web/mobile apps).
+
+❗ Important AWS Rule
+
+You CANNOT disable client secret on an existing app client.
+
+AWS does NOT allow editing this after creation.
+
+So if secret is enabled → you must create a new app client.
+
+✅ How To Disable Client Secret (Correct Way)
+
+You must create a NEW app client.
+
+Step-by-step
+
+Go to:
+
+User Pool → App integration → App clients
+
+Click:
+
+➕ Create app client
+
+Now:
+
+🔹 VERY IMPORTANT
+
+When creating:
+
+UNSELECT / DO NOT CHECK:
+
+```
+Generate client secret
+```
+
+This must be unchecked.
+
+🔹 Enable Authentication Flow
+
+After creation:
+
+Go to:
+
+App client → Authentication flows
+
+Enable:
+
+✅ ALLOW_USER_PASSWORD_AUTH
+✅ ALLOW_REFRESH_TOKEN_AUTH
+
+Save.
+
+✅ After That
+
+Use the NEW client ID in your PHP code:
+
+```
+$clientId = "NEW_CLIENT_ID";
+```
+
+Now your USER_PASSWORD_AUTH will work without SECRET_HASH error.
+
+🚨 If You Keep Using Client With Secret Enabled
+
+You will get this error:
+
+```
+SECRET_HASH was not received
+```
+
+If for some reason you MUST use secret-enabled client, then you must calculate secret hash.
+
+Example:
+
+```
+function calculateSecretHash($username, $clientId, $clientSecret) {
+    return base64_encode(
+        hash_hmac(
+            'sha256',
+            $username . $clientId,
+            $clientSecret,
+            true
+        )
+    );
+}
+```
+
+Then add:
+
+```
+"SECRET_HASH" => calculateSecretHash($username, $clientId, $clientSecret)
+```
+
+But this is NOT recommended for public apps.
+
+🎯 Best Practice For Your PHP Backend
+
+If this is:
+
+Web app
+
+Mobile app
+
+API backend
+
+👉 Create new App Client WITHOUT secret.
+
+Cleaner.
+Safer.
+Easier.
+
+---
 
 
 
