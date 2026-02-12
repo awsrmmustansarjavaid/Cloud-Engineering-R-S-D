@@ -6,11 +6,11 @@
 
 User logs in via Cognito → Cognito returns:
 
-id_token
+-    id_token
 
-access_token
+-    access_token
 
-refresh_token
+-    refresh_token
 
 ### ⚠️ IMPORTANT: 
 
@@ -19,48 +19,48 @@ NOT id_token.
 
 ### 2️⃣ Client Calls Your PHP Backend
 
-Client must send:
+#### Client must send:
 
 ```
 Authorization: Bearer ACCESS_TOKEN
 ```
 
-Example:
+#### Example:
 
 ```
 GET /api/profile
 Authorization: Bearer eyJraWQiOiJLT...
 ```
 
-3️⃣ PHP Backend Must Verify JWT Token
+### 3️⃣ PHP Backend Must Verify JWT Token
 
-Your PHP server must:
+#### Your PHP server must:
 
-Extract token from header
+-    Extract token from header
 
-Decode JWT
+-    Decode JWT
 
-Verify signature using Cognito public keys
+-    Verify signature using Cognito public keys
 
-Validate:
+#### Validate:
 
-issuer (iss)
+-    issuer (iss)
 
-audience (client_id)
+-    audience (client_id)
 
-expiration (exp)
+-    expiration (exp)
 
-token_use = access
+-    token_use = access
 
-✅ Correct PHP JWT Verification (Production Way)
+### ✅ Correct PHP JWT Verification (Production Way)
 
-Install Firebase JWT:
+#### Install Firebase JWT:
 
 ```
 composer require firebase/php-jwt
 ```
 
-Example PHP Code
+#### Example PHP Code
 
 ```
 require 'vendor/autoload.php';
@@ -98,17 +98,18 @@ try {
     echo "Unauthorized: " . $e->getMessage();
 }
 ```
+---
+### 🚨 Most Common Cognito Access Token Issues
 
-🚨 Most Common Cognito Access Token Issues
-❌ 1. Using ID Token Instead of Access Token
+### ❌ 1. Using ID Token Instead of Access Token
 
-Access token has:
+#### Access token has:
 
 ```
 "token_use": "access"
 ```
 
-ID token has:
+#### ID token has:
 
 ```
 "token_use": "id"
@@ -116,9 +117,9 @@ ID token has:
 
 If you validate wrong one → it fails.
 
-❌ 2. Wrong Issuer Check
+### ❌ 2. Wrong Issuer Check
 
-Issuer must match exactly:
+#### Issuer must match exactly:
 
 ```
 https://cognito-idp.YOUR_REGION.amazonaws.com/YOUR_USER_POOL_ID
@@ -126,11 +127,11 @@ https://cognito-idp.YOUR_REGION.amazonaws.com/YOUR_USER_POOL_ID
 
 Even a small mismatch = invalid token.
 
-❌ 3. Token Expired
+### ❌ 3. Token Expired
 
 Access token expires in 1 hour by default.
 
-Check:
+#### Check:
 
 ```
 exp
@@ -138,25 +139,25 @@ exp
 
 If expired → use refresh token.
 
-❌ 4. API Gateway Cognito Authorizer Misconfigured
+### ❌ 4. API Gateway Cognito Authorizer Misconfigured
 
-If using API Gateway:
+#### If using API Gateway:
 
-Authorizer must use User Pool
+- Authorizer must use User Pool
 
-Token Source: Authorization
+- Token Source: Authorization
 
-Must send Bearer <token>
+- Must send Bearer <token>
 
-❌ 5. Wrong App Client (No Secret vs With Secret)
+### ❌ 5. Wrong App Client (No Secret vs With Secret)
 
 If your app client has a secret and you're using public frontend login, it will fail unless you implement secret hash.
 
-For mobile/web apps:
+##### For mobile/web apps:
 
-Disable "Generate client secret"
+- Disable "Generate client secret"
 
-🔎 Debugging Checklist For You
+### 🔎 Debugging Checklist For You
 
 Since you suspect access token issue, check:
 
@@ -175,7 +176,7 @@ not expired
 
 Make sure PHP verifies using Cognito JWKS.
 
-🏗 Recommended Clean Architecture (Best Practice)
+### 🏗 Recommended Clean Architecture (Best Practice)
 
 Frontend → Cognito
 Frontend → API (with Access Token)
@@ -184,7 +185,7 @@ NO session handling required
 
 Stateless + secure.
 
-💡 If You Want Stronger Enterprise Setup
+### 💡 If You Want Stronger Enterprise Setup
 
 You can:
 
@@ -196,7 +197,7 @@ API Gateway sends user claims to PHP
 
 This is more scalable.
 
-🎯 I Need From You To Diagnose Exactly
+### 🎯 I Need From You To Diagnose Exactly
 
 Tell me:
 
@@ -216,7 +217,7 @@ Is your app client configured with secret?
 
 ---
 
-✅ METHOD 1 — From Frontend (Most Common – Recommended)
+### ✅ METHOD 1 — From Frontend (Most Common – Recommended)
 
 If you are using:
 
@@ -228,7 +229,8 @@ Hosted UI
 
 You authenticate user → Cognito returns tokens.
 
-🔹 Option A: Using Cognito Hosted UI (Easiest)
+### 🔹 Option A: Using Cognito Hosted UI (Easiest)
+
 Step 1 – Redirect user to login URL
 
 
