@@ -159,22 +159,22 @@ If your app client has a secret and you're using public frontend login, it will 
 
 ### 🔎 Debugging Checklist For You
 
-Since you suspect access token issue, check:
+#### Since you suspect access token issue, check:
 
-Decode token at:
+#### Decode token at:
 https://jwt.io
 
-Verify:
+#### Verify:
 
-token_use = access
+    - token_use = access
 
-correct iss
+    - correct iss
 
-correct client_id
+    - correct client_id
 
-not expired
+    - not expired
 
-Make sure PHP verifies using Cognito JWKS.
+- Make sure PHP verifies using Cognito JWKS.
 
 ### 🏗 Recommended Clean Architecture (Best Practice)
 
