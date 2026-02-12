@@ -250,15 +250,15 @@ client_id=YOUR_CLIENT_ID
 https://yourapp.com/callback?code=AUTH_CODE
 ```
 
-Step 2 – Exchange Code for Tokens
+#### Step 2 – Exchange Code for Tokens
 
-Send POST request to:
+#### Send POST request to:
 
 ```
 https://YOUR_DOMAIN.auth.YOUR_REGION.amazoncognito.com/oauth2/token
 ```
 
-Example (PHP CURL):
+#### Example (PHP CURL):
 
 ```
 $ch = curl_init();
@@ -279,7 +279,7 @@ curl_close($ch);
 echo $response;
 ```
 
-You Will Receive:
+#### You Will Receive:
 
 ```
 {
@@ -293,24 +293,24 @@ You Will Receive:
 
 Use access_token for API calls.
 
-✅ METHOD 2 — Using USERNAME + PASSWORD (Direct API Call)
+### ✅ METHOD 2 — Using USERNAME + PASSWORD (Direct API Call)
 
 If you want server-side login (no hosted UI).
 
-Send request to:
+#### Send request to:
 
 ```
 https://cognito-idp.YOUR_REGION.amazonaws.com/
 ```
 
-Headers:
+#### Headers:
 
 ```
 X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth
 Content-Type: application/x-amz-json-1.1
 ```
 
-Example PHP
+#### Example PHP
 
 ```
 $data = [
@@ -337,7 +337,7 @@ curl_close($ch);
 echo $response;
 ```
 
-You will get:
+#### You will get:
 
 ```
 {
@@ -350,55 +350,52 @@ You will get:
 }
 ```
 
-⚠️ IMPORTANT:
+### ⚠️ IMPORTANT:
 
-For this to work:
+#### For this to work:
 
-In App Client settings:
+#### In App Client settings:
 
-Enable ALLOW_USER_PASSWORD_AUTH
+- Enable ALLOW_USER_PASSWORD_AUTH
 
-Disable client secret (if public app)
+- Disable client secret (if public app)
 
-Steps Method 2 (USERNAME + PASSWORD login directly from PHP).
+### Steps Method 2 (USERNAME + PASSWORD login directly from PHP).
 
-✅ STEP 1 — Configure Cognito Correctly (Very Important)
+### ✅ STEP 1 — Configure Cognito Correctly (Very Important)
 
-Go to:
+- Go to: AWS Console → Cognito → User Pools → Your Pool → App clients
 
-AWS Console → Cognito → User Pools → Your Pool → App clients
+#### 🔹 1. Create / Edit App Client
 
-🔹 1. Create / Edit App Client
+#### Make sure:
 
-Make sure:
-
-✅ DO NOT enable "Generate client secret"
+#### ✅ DO NOT enable "Generate client secret"
 (If secret is enabled, login will fail unless you calculate secret hash.)
 
-🔹 2. Enable Auth Flow
+#### 🔹 2. Enable Auth Flow
 
-Go to:
+- Go to: App client → Authentication flows
 
-App client → Authentication flows
-
-Enable:
+#### Enable:
 
 ✅ ALLOW_USER_PASSWORD_AUTH
+
 ✅ ALLOW_REFRESH_TOKEN_AUTH
 
 Save changes.
 
-✅ STEP 2 — PHP Login Code (USERNAME + PASSWORD)
+### ✅ STEP 2 — PHP Login Code (USERNAME + PASSWORD)
 
 This will call Cognito directly.
 
-Replace:
+- Replace:
 
-YOUR_REGION
+- YOUR_REGION
 
-YOUR_CLIENT_ID
+- YOUR_CLIENT_ID
 
-✅ Working PHP Example
+#### ✅ Working PHP Example
 
 ```
 <?php
@@ -442,9 +439,9 @@ $result = json_decode($response, true);
 print_r($result);
 ```
 
-✅ Successful Response Example
+### ✅ Successful Response Example
 
-If login correct:
+#### If login correct:
 
 ```
 {
@@ -458,45 +455,48 @@ If login correct:
 }
 ```
 
-Use:
+#### Use:
 
 ```
 $accessToken = $result['AuthenticationResult']['AccessToken'];
 ```
 
-Send this to your protected API:
+#### Send this to your protected API:
 
 ```
 Authorization: Bearer ACCESS_TOKEN
 ```
 
-🚨 Common Errors & Fix
-❌ Error: NotAuthorizedException
+### 🚨 Common Errors & Fix
 
-Reason:
+### ❌ Error: NotAuthorizedException
 
-Wrong password
+#### Reason:
 
-User not confirmed
+- Wrong password
 
-App client secret enabled
+- User not confirmed
 
-❌ Error: InvalidParameterException: USER_PASSWORD_AUTH is not enabled
+- App client secret enabled
 
-Fix:
-Enable ALLOW_USER_PASSWORD_AUTH in app client.
+### ❌ Error: InvalidParameterException: USER_PASSWORD_AUTH is not enabled
 
-❌ Error: SECRET_HASH missing
+#### Fix:
 
-This means:
-You enabled client secret.
+- Enable ALLOW_USER_PASSWORD_AUTH in app client.
 
-Either:
+### ❌ Error: SECRET_HASH missing
 
-Disable client secret (recommended)
+#### This means:
+- You enabled client secret.
+
+#### Either:
+
+- Disable client secret (recommended)
+
 OR
 
-Implement secret hash (I can give code if needed)
+- Implement secret hash (I can give code if needed)
 
 ✅ STEP 3 — Refresh Token (After 1 Hour)
 
