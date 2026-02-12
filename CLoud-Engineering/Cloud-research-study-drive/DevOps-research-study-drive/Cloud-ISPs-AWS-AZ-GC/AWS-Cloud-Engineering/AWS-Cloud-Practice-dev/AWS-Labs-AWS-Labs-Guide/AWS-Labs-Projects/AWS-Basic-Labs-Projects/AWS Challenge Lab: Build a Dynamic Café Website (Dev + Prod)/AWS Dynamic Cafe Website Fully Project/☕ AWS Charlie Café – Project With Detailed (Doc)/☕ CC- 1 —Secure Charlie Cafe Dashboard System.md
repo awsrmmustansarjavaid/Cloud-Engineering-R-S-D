@@ -28,7 +28,7 @@ You have TWO EASY OPTIONS
 
 > **This is the simplest HTTPS solution.**
 
-#### STEP 1️⃣ — CREATE APPLICATION LOAD BALANCER
+### STEP 1️⃣ — CREATE APPLICATION LOAD BALANCER
 
 ```
 EC2 → Load Balancers → Create Load Balancer
@@ -40,7 +40,7 @@ EC2 → Load Balancers → Create Load Balancer
 Application Load Balancer
 ```
 
-#### STEP 2️⃣ — BASIC ALB Configuration
+### STEP 2️⃣ — BASIC ALB Configuration
 
 
 | Setting                  | Value / Selection                                      | Notes / Requirement                          |
@@ -53,7 +53,7 @@ Application Load Balancer
 | **Availability Zones**   | At least 2 AZs (where public subnets exist)            | Improves high availability                   |
 
 
-#### STEP 3️⃣ — SECURITY GROUP
+### STEP 3️⃣ — SECURITY GROUP
 
 #### Allow:
 
@@ -61,7 +61,7 @@ Application Load Balancer
 HTTPS 443  0.0.0.0/0
 ```
 
-#### STEP 4️⃣ — Target Group Configuration (for EC2 registration)
+### STEP 4️⃣ — Target Group Configuration (for EC2 registration)
 
 
 | Setting                  | Value / Selection                          | Notes / Requirement                                      |
@@ -72,7 +72,7 @@ HTTPS 443  0.0.0.0/0
 | **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
 | **Health check path**    | / (or /cafe-admin-dashboard.html)                  | Path ALB uses to check if instance is healthy            |
 
-#### STEP 5️⃣ — Add Listener to ALB 
+### STEP 5️⃣ — Add Listener to ALB 
 
 #### - Add HTTP listener 
 
@@ -93,7 +93,7 @@ HTTPS 443  0.0.0.0/0
 | **Default action**       | Forward to target group (e.g., cafe-target-group)      | Routes HTTPS traffic to your EC2 instance(s)                                        |
 | **HTTP → HTTPS redirect** | Add separate HTTP:80 listener with redirect rule       | Recommended: Redirect all HTTP traffic to HTTPS                                     |
 
-#### STEP 6️⃣ — GET ALB DNS NAME
+### STEP 6️⃣ — GET ALB DNS NAME
 
 Example:
 
@@ -103,7 +103,7 @@ https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
 
 ### 2️⃣ — CLOUD FRONT
 
-#### 🧱 STEP 1️⃣ — CloudFront Origin (ALB)
+### 🧱 STEP 1️⃣ — CloudFront Origin (ALB)
 
 #### Go to:
 
@@ -137,7 +137,7 @@ AWS Console → CloudFront → Create Distribution
 
 ❌ Do NOT select S3
 
-#### 🌐 STEP 2️⃣ — Default Cache Behavior (VERY IMPORTANT)
+### 🌐 STEP 2️⃣ — Default Cache Behavior (VERY IMPORTANT)
 
 >**Go to:** Behaviors → Default → Edit
 
@@ -175,11 +175,11 @@ Status = Deployed
 xxxxx.cloudfront.net
 ```
 
-#### 🔐 STEP 3️⃣ — CloudFront General Configuration
+### 🔐 STEP 3️⃣ — CloudFront General Configuration
 
 > **This step finalizes the CloudFront distribution behavior and ensures it works correctly with ALB + Cognito Hosted UI without breaking authentication or routing.**
 
-#### 1️⃣ ⚙️ General Configuration
+### 1️⃣ ⚙️ General Configuration
 
 - **Configure the following settings in CloudFront → Distribution → General.**
 
@@ -191,7 +191,7 @@ xxxxx.cloudfront.net
 
 🔁 Can be enabled later in production
 
-#### 2️⃣ Default Root Object (Optional but Recommended)
+### 2️⃣ Default Root Object (Optional but Recommended)
 
 ```
 cafe-admin-dashboard.html
@@ -200,7 +200,7 @@ cafe-admin-dashboard.html
 **⚠️ Do NOT add /order-status.html to Origin Path**
 **Origin Path must remain empty.**
 
-#### 🧠 Correct CloudFront Path Logic
+### 🧠 Correct CloudFront Path Logic
 
 | Configuration Item   | Value                             |
 | -------------------- | --------------------------------- |
@@ -215,7 +215,7 @@ This ensures:
 CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
 ```
 
-#### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
+### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
 
 **👉 Invalidation tells CloudFront to delete cached copies immediately.**
 
@@ -237,7 +237,7 @@ invalidation path:
 /cafe-admin-dashboard.html
 ```
 
-#### 5️⃣ Click Create invalidation
+### 5️⃣ Click Create invalidation
 
 ⏳ Status will show:
 
@@ -247,7 +247,7 @@ In Progress → Completed
 
 Usually completes in 1–3 minutes.
 
-#### How to Confirm Invalidation Worked
+### How to Confirm Invalidation Worked
 
 After status = Completed:
 
@@ -267,7 +267,7 @@ https://xxxxx.cloudfront.net/cafe-admin-dashboard.html
 
 You should see latest code.
 
-#### Common Mistakes (Avoid These)
+### Common Mistakes (Avoid These)
 
 ❌ Invalidating:
 
@@ -281,7 +281,7 @@ cafe-admin-dashboard.html
 
 ❌ Forgetting invalidation after JS changes
 
-#### Important Notes:
+### Important Notes:
 
 ✔ /order-status.html is the correct invalidation path
 
@@ -291,7 +291,7 @@ cafe-admin-dashboard.html
 
 ✔ Required when testing Cognito changes
 
-#### 🔐 STEP 4️⃣ — CloudFront SSL Certificate (Optional)
+### 🔐 STEP 4️⃣ — CloudFront SSL Certificate (Optional)
 Viewer Certificate
 
 Choose:
@@ -307,11 +307,11 @@ Default CloudFront certificate (*.cloudfront.net)
 ❌ No ACM needed here
 
 
-#### 5️⃣ CloudFront Validation (VERY IMPORTANT)
+### 5️⃣ CloudFront Validation (VERY IMPORTANT)
 
 > **After configuration, always validate CloudFront before integrating Cognito.**
 
-#### 🔍 Validation Checklist
+### 🔍 Validation Checklist
 
 #### 1️⃣ Distribution Status
 
@@ -339,7 +339,7 @@ d2og2zrs47voou.cloudfront.net
 
 ### 1️⃣ Basic Cognito Configuration — DEFINE YOUR APPLICATION
 
-#### ✅ STEP 1️⃣ Application type
+### ✅ STEP 1️⃣ Application type
 
 > **👉 SELECT THIS (CORRECT FOR YOUR PROJECT)**
 
@@ -347,7 +347,7 @@ d2og2zrs47voou.cloudfront.net
 ✅ Single-page application (SPA)
 ```
 
-#### ✅ STEP 2️⃣ Name your application
+### ✅ STEP 2️⃣ Name your application
 
 Example:
 
@@ -357,7 +357,7 @@ CharlieCafeAdminSPA
 
 **❕ (Name doesn’t matter technically)**
 
-#### ✅ STEP 3️⃣ — CONFIGURE OPTIONS (VERY IMPORTANT)
+### ✅ STEP 3️⃣ — CONFIGURE OPTIONS (VERY IMPORTANT)
 
 #### 1️⃣ Options for sign-in identifiers
 
@@ -420,8 +420,50 @@ https://YOUR_CLOUDFRONT_DOMAIN/cafe-admin-dashboard.html
 ```
 🟠 Create user directory
 ```
+### 2️⃣ — How to Disable / Avoid Cognito Client Secret
 
-### 2️⃣ — OPEN THE ACTUAL USER POOL (THIS IS THE MISSING STEP)
+- In Cognito, the client secret is created at the App Client level, not at the User Pool level.
+
+- You cannot disable a client secret after the app client is created.
+
+> **If it was created with a secret, you must create a new app client without one.**
+
+#### 📍 Where to configure it (New Cognito Layout)
+
+#### Step-by-step:
+
+- Go to Amazon Cognito
+
+- Click User pools
+
+- Select your User Pool
+
+- Go to App integration tab
+
+- Under App clients and analytics
+
+- Click Create app client
+
+#### Now you’ll see:
+
+- “Client type”
+
+#### Choose:
+
+- Public client → ❌ NO client secret (Recommended for SPA / Mobile apps)
+
+- Confidential client → ✅ Creates client secret (For backend/server apps)
+
+#### 👉 To disable client secret:
+
+- Choose Public client
+
+That’s it.
+
+
+
+
+### 3️⃣ — OPEN THE ACTUAL USER POOL (THIS IS THE MISSING STEP)
 
 > **📢 After creation completes:**
 
@@ -444,7 +486,7 @@ Amazon Cognito → User pools
 
 **You are now INSIDE the User Pool, not the app wizard.**
 
-#### ✅ STEP 1️⃣  PASSWORD POLICY 
+### ✅ STEP 1️⃣  PASSWORD POLICY 
 
 #### Path:
 
@@ -472,7 +514,7 @@ Password policy
 
 **✔ Password policy = OK**
 
-#### ✅ STEP 2️⃣ Multi-factor authentication (MFA)
+### ✅ STEP 2️⃣ Multi-factor authentication (MFA)
 
 #### 1️⃣ Path:
 
@@ -490,7 +532,7 @@ User pool → Authentication → Sign-in experience → Account recovery
 
 Click Save changes
 
-#### ✅ STEP 3️⃣ ACCOUNT RECOVERY 
+### ✅ STEP 3️⃣ ACCOUNT RECOVERY 
 
 #### 1️⃣ Path:
 
@@ -512,7 +554,7 @@ User pool → Sign-in experience → Account recovery
 
 Click Save changes
 
-#### ✅ SUMMARY
+### ✅ SUMMARY
 
 | Requirement      | Status              |
 | ---------------- | ------------------- |
