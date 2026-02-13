@@ -20,4 +20,85 @@
 ## 🔐 PHASE 1️⃣ — Cognito Authentication infrastructure 
 > **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
+Cognito configuration from scratch based on your NEW architecture plan:
+
+✅ Public routes (no login)
+
+✅ Protected routes (Cognito + Groups)
+
+✅ One prod stage
+
+✅ Role-based backend enforcement
+
+✅ SPA for management team
+
+✅ PHP for public ordering
+
+This will be clean, production-ready, and aligned with your new API structure.
+
+We will rebuild Cognito properly using:
+
+Amazon Cognito
+
+Amazon API Gateway
+
+AWS Lambda
+
+### 🔐 FINAL COGNITO DESIGN (BASED ON YOUR NEW PLAN)
+
+We will configure:
+
+- 1 User Pool
+
+- 1 Public App Client (NO client secret)
+
+- Hosted UI login
+
+- Role groups:
+
+    - Admin
+
+    - Manager
+
+    - Employee
+
+- OAuth Authorization Code Grant (NOT implicit anymore)
+
 ### 1️⃣ Basic Cognito Configuration — DEFINE YOUR APPLICATION
+
+> **🚀 STEP-BY-STEP — CLEAN NEW COGNITO SETUP**
+
+### 🟢 STEP 1 — Create User Pool (Clean Setup)
+
+- Go to: AWS Console → Cognito → User pools → Create user pool
+
+#### 1️⃣ Application Type
+
+- Choose: ✅ Single-page application (SPA)
+
+- Click Next.
+
+#### 2️⃣ Sign-in Options
+
+- Select: ☑ Username
+
+#### DO NOT select:
+
+❌ Email
+
+❌ Phone
+
+This keeps login simple:
+
+```
+admin
+manager1
+employee1
+```
+
+- Click Next.
+
+
+
+
+
