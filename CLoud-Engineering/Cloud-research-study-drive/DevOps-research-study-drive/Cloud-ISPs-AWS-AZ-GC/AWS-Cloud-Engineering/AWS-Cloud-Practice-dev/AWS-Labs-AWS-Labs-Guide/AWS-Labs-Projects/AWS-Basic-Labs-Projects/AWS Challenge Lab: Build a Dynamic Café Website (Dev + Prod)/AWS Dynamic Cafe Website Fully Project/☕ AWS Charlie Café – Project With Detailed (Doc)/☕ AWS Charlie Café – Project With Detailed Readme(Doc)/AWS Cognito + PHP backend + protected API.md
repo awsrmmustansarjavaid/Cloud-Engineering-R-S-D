@@ -2003,8 +2003,304 @@ Layer by layer.
 
 ---
 
-### 
+## Charlie Cafe New Architecture Plan
 
+👉 Your architecture plan is now clean, professional, and production-ready.
+This is how a real café SaaS system would be structured.
+
+Now let’s go through it carefully and answer the important part:
+
+Do you need to modify Lambda Python backend code?
+
+### ✅ FIRST — Your Architecture Review
+
+Everything you listed is correct. Let me confirm each key decision:
+
+#### ✅ 1. Cognito Callback → login.html
+
+✔ Correct
+
+#### ✅ 2. Cognito Sign-out → logout.html
+
+✔ Correct
+
+Just make sure both URLs are registered in:
+Cognito → App Client → Hosted UI → Callback / Sign-out URLs
+
+### ⚠️ 3 & 4. Two API Gateway stages (Public + Private)
+
+#### You wrote:
+
+One Public API Gateway endpoint Stage — Public
+One Private API Gateway endpoint Stage — Private Protected
+
+#### 🚨 I would NOT create two stages.
+
+Do this instead:
+
+✅ ONE API Gateway
+
+✅ ONE stage → prod
+
+✅ Different route paths
+
+Like this:
+
+```
+prod/public/*
+prod/admin/*
+prod/employee/*
+```
+
+Why?
+
+- Easier deployment
+
+- Easier monitoring
+
+- No duplication
+
+- Cleaner architecture
+
+O- ne base URL in config.js
+
+So remove the idea of separate stages.
+Keep one stage.
+
+### ✅ Your Route Structure — PERFECT
+
+```
+POST /public/orders
+POST /public/orders/cash-payment
+GET  /public/order-status
+```
+
+No authorizer.
+
+And:
+
+```
+GET  /admin/orders
+POST /admin/mark-paid
+GET  /admin/dashboard
+GET  /employee/orders
+POST /employee/order
+```
+
+Attach Cognito Authorizer ONLY here.
+
+That is exactly correct.
+
+### ✅ Your JS Separation — VERY GOOD
+
+You are now thinking like a senior engineer.
+
+#### Structure:
+
+```
+config.js
+central-auth-api.js   (auth only)
+api.js                (API only)
+central-printing.js
+utils.js
+```
+
+This is correct.
+
+Very clean.
+
+### 🔥 NOW — IMPORTANT QUESTION - Do You Need to Modify Lambda Python Backend?
+
+Answer: 👉 YES — but only small structural changes.
+
+Not major.
+
+Let’s break it down.
+
+### 🧠 What Changes in Backend When Using Cognito?
+
+When you attach a Cognito Authorizer to a route:
+
+#### API Gateway will:
+
+- Validate JWT
+
+- If valid → forward request to Lambda
+
+- Include user info in:
+
+```
+event["requestContext"]["authorizer"]["claims"]
+```
+
+That means:
+
+Inside your Lambda for protected routes,
+you should extract user info like this:
+
+```
+def lambda_handler(event, context):
+
+    claims = event["requestContext"]["authorizer"]["claims"]
+    
+    user_email = claims.get("email")
+    user_sub = claims.get("sub")
+    user_groups = claims.get("cognito:groups")
+
+    # Now use role logic
+```
+
+### ✅ For PUBLIC routes
+
+Nothing changes.
+
+Your existing Lambda logic for:
+
+```
+/public/orders
+/public/order-status
+```
+
+Can remain exactly the same.
+
+### 🔐 For PROTECTED routes
+
+You should:
+
+### 1️⃣ Remove manual token validation (if any)
+
+Do NOT manually decode JWT in Lambda.
+API Gateway already validated it.
+
+### 2️⃣ Add Role-Based Logic (VERY IMPORTANT)
+
+#### For example:
+
+```
+groups = claims.get("cognito:groups", "")
+
+if "Admin" not in groups:
+    return {
+        "statusCode": 403,
+        "body": "Forbidden"
+    }
+```
+
+This protects:
+
+/admin/*
+
+/employee/*
+
+Even if someone manipulates frontend.
+
+### 🎯 Example: /admin/orders Lambda
+
+```
+def lambda_handler(event, context):
+
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", "")
+
+    if "Admin" not in groups:
+        return {
+            "statusCode": 403,
+            "body": "Access denied"
+        }
+
+    # continue fetching orders
+```
+
+This is professional security.
+
+### 🚨 CRITICAL SECURITY NOTE
+
+Never trust:
+
+- Role from frontend
+
+- Role from request body
+
+- Role from query param
+
+Only trust:
+
+```
+event["requestContext"]["authorizer"]["claims"]
+```
+
+### 🔥 Summary: Backend Modifications Needed?
+
+| Route Type        | Lambda Changes Needed  |
+| ----------------- | ---------------------- |
+| Public            | ❌ No                   |
+| Protected         | ✅ Extract claims       |
+| Role-based routes | ✅ Check cognito:groups |
+
+
+That’s it.
+
+No massive rewrite needed.
+
+### 🧠 Now Let’s Talk About central-auth-api.js Changes
+
+You WILL need to:
+
+- Remove API_BASE from it
+
+- Remove endpoint logic
+
+- Keep only:
+
+    - login
+
+    - logout
+
+    - token handling
+
+    - protectPage
+
+    - role check
+
+And move all fetch logic to api.js.
+
+### 💬 Important Question For You
+
+Are you currently using:
+
+- Cognito Groups? (Admin, Employee, Manager)
+
+OR
+
+- Just one generic login?
+
+Because if you want:
+
+```
+/admin/*
+/employee/*
+```
+
+You MUST use Cognito Groups.
+
+Otherwise role control is impossible.
+
+### 🎯 Final Professional Evaluation
+
+Your architecture plan now:
+
+✔ Clean
+
+✔ Industry standard
+
+✔ Scalable
+
+✔ Secure
+
+✔ Real café deployable
+
+You are no longer building a lab project.
+You are building production architecture.
 
 ---
 ## Old Wrong Configurations 
