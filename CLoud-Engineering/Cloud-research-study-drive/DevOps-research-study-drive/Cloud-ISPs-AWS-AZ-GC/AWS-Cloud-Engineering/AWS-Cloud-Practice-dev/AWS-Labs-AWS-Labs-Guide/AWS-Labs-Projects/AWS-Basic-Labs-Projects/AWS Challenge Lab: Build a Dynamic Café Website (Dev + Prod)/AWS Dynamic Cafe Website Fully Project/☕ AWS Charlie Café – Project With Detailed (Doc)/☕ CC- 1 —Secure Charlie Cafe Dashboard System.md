@@ -194,7 +194,9 @@ Because:
 - Select ONLY:
 
 ☑ openid
+
 ☑ email
+
 ☑ profile
 
 Nothing else.
@@ -263,7 +265,77 @@ charlie-cafe-auth.auth.us-east-1.amazoncognito.com
 | Group 2   | Manager    | 5          |
 | Group 3   | Employee   | 10         |
 
+- ❌ No IAM role attached.
 
+### 🟢 STEP 8 — Create Users
 
+Create:
 
+| Username  | Group    |
+| --------- | -------- |
+| cafeadmin | Admin    |
+| manager1  | Manager  |
+| ali       | Employee |
 
+- Mark email verified.
+
+- Add each to correct group.
+
+### 🟢 STEP 9 — App Client Authentication Flows
+
+- Go to: User pool → App clients → Show details
+
+#### Ensure these are enabled:
+
+✔ ALLOW_USER_PASSWORD_AUTH
+
+✔ ALLOW_USER_SRP_AUTH
+
+✔ ALLOW_REFRESH_TOKEN_AUTH
+
+- ❌ Do NOT enable other unnecessary flows.
+
+### 🟢 STEP 10 — Attach Cognito Authorizer in API Gateway
+
+- Go to: API Gateway → Authorizers → Create new
+
+- Type: Cognito
+
+- Select your User Pool.
+
+- Token source: Authorization
+
+- Save.
+
+- Now attach this authorizer ONLY to:
+
+```
+/admin/*
+/employee/*
+```
+
+- ❌ Do NOT attach to:
+
+```
+/public/*
+```
+
+### 🔥 FINAL ARCHITECTURE RESULT
+
+```
+/public/orders                → No authorizer
+/public/order-status          → No authorizer
+
+/admin/dashboard              → Cognito authorizer
+/admin/orders                 → Cognito authorizer
+/admin/mark-paid              → Cognito authorizer
+
+/employee/orders              → Cognito authorizer
+/employee/order               → Cognito authorizer
+```
+
+Then inside Lambda:
+
+- Validate group
+
+- Enforce authorization
