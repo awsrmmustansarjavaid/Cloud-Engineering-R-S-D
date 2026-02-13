@@ -1588,6 +1588,8 @@ For a real café:
 ✔ API Gateway has public + protected routes
 ✔ No PHP for protected routes
 
+## 
+
 
 
 
