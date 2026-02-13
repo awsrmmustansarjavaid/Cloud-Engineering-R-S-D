@@ -1269,7 +1269,324 @@ That means:
 
 We will get there.
 
+### 🚨 ROOT PROBLEM IN YOUR Previous Architecture PROJECT
 
+You currently have TWO completely different architectures mixed together:
+
+### 🟢 Architecture A (Secure SPA + Cognito)
+
+Used in:
+
+central-auth-api.js
+
+CloudFront frontend
+
+API_BASE = p4vrr4b60c.execute-api...
+
+Cognito Authorizer attached
+
+JWT required
+
+### 🔴 Architecture B (Old Public PHP + No Auth)
+
+Used in:
+
+orders.php
+
+admin-orders.php
+
+API = q8rq19tfka.execute-api...
+
+No Authorization header
+
+No Cognito protection
+
+You are literally calling two different APIs:
+
+```
+JS SPA → https://p4vrr4b60c.execute-api...
+PHP pages → https://q8rq19tfka.execute-api...
+```
+
+That alone explains:
+
+400 errors
+
+Unauthorized
+
+curl failing
+
+data not loading
+
+confusion about Cognito
+
+You are debugging two systems at once.
+
+🎯 FIRST DECISION YOU MUST MAKE
+
+Do you want:
+
+OPTION 1️⃣ Public customer ordering (no login)
+
+Customers place orders without Cognito
+
+AND
+
+OPTION 2️⃣ Admin / Employee dashboard protected by Cognito
+
+👉 This is the correct real-world café architecture.
+
+Customers do NOT login.
+Staff login.
+
+🔥 PROFESSIONAL ARCHITECTURE FOR CHARLIE CAFE
+
+Here is what a real café production system would look like:
+
+🟢 Public APIs (NO Cognito)
+
+Used by:
+
+orders.php
+
+payment
+
+order-status
+
+Example:
+
+```
+POST /public/orders
+POST /public/orders/cash-payment
+GET  /public/order-status
+```
+
+No JWT.
+No Cognito.
+Open but validated in Lambda.
+
+🔐 Protected APIs (Cognito Required)
+
+Used by:
+
+Admin dashboard
+
+HR
+
+Attendance
+
+Reports
+
+Mark paid
+
+Analytics
+
+Example:
+
+```
+GET  /admin/orders
+POST /admin/mark-paid
+GET  /admin/dashboard
+GET  /admin/attendance
+```
+
+Protected by:
+Cognito Authorizer
+
+🧠 WHY YOUR CURRENT PHP IS WRONG
+
+In admin-orders.php you are doing:
+
+```
+curl_init($ordersApi);
+```
+
+No Authorization header.
+
+If you attach Cognito Authorizer to that endpoint,
+it will return:
+
+401 Unauthorized
+
+That is correct behavior.
+
+⚠️ SECOND MAJOR ISSUE IN YOUR JS
+
+Your central-auth-api.js is using:
+
+```
+response_type=token
+```
+
+That is Implicit Flow.
+
+Earlier I told you to move to Authorization Code,
+but your code is clearly still Implicit.
+
+Your entire token handling logic:
+
+```
+window.location.hash
+access_token
+```
+
+ONLY works with Implicit flow.
+
+So if you switch Cognito to Authorization Code
+without changing JS,
+your login will break.
+
+🎯 WHAT I RECOMMEND FOR YOU (FINAL ARCHITECTURE)
+
+Since this is a lab but you want production style:
+
+✅ KEEP IMPLICIT FLOW (For Now)
+
+Yes — I am overriding earlier advice for your specific situation.
+
+Why?
+
+Because:
+
+You are not using Amplify
+
+You are not exchanging auth code
+
+Your JS already works with hash tokens
+
+Simpler for your lab
+
+But:
+
+Use Implicit ONLY for Admin SPA.
+Not for PHP.
+
+🏗 CLEAN ARCHITECTURE PLAN
+STEP 1 — Separate APIs Properly
+
+In API Gateway:
+
+Public Stage (No Cognito Authorizer)
+
+```
+/public/orders
+/public/orders/cash-payment
+/public/order-status
+```
+
+Used by:
+
+orders.php
+
+payment
+
+tracking page
+
+Protected Stage (With Cognito Authorizer)
+
+```
+/admin/orders
+/admin/mark-paid
+/admin/dashboard
+/admin/hr/*
+```
+
+Used by:
+
+CloudFront SPA
+
+central-auth-api.js
+
+🔥 STEP 2 — Stop Using PHP For Admin
+
+This is critical.
+
+Your admin-orders.php should NOT exist anymore.
+
+Replace it with:
+
+CloudFront admin-orders.html
+
+Using central-auth-api.js
+
+Using secureFetch()
+
+PHP + Cognito browser auth = messy architecture.
+
+🔥 STEP 3 — Fix Your API_BASE Confusion
+
+You currently have:
+
+JS:
+
+```
+p4vrr4b60c.execute-api...
+```
+
+PHP:
+
+```
+q8rq19tfka.execute-api...
+```
+
+Choose ONE API Gateway.
+
+Delete the other.
+
+Deploy clean.
+
+🧩 WHY YOU GOT 400 ERRORS
+
+Because you likely:
+
+Enabled Cognito authorizer on /dev/orders
+
+But PHP didn’t send JWT
+
+So API Gateway rejected
+
+So curl returned 401 or 400
+
+So white screen
+
+That is correct behavior.
+
+🎯 FINAL PROFESSIONAL STRUCTURE
+
+Customer side:
+
+```
+orders.php  → public API (no auth)
+```
+
+Admin side:
+
+```
+CloudFront SPA
+central-auth-api.js
+Cognito login
+Protected API
+```
+
+Do NOT mix them.
+
+🔍 Now Let’s Fix Your Project Properly
+
+Answer these 3 things:
+
+1️⃣ Do you want customers to login? (Yes/No)
+2️⃣ Do you want to keep PHP admin dashboard? (Yes/No)
+3️⃣ Are you ready to delete one of the API Gateways and standardize?
+
+💬 My Honest Professional Advice
+
+For a real café:
+
+✔ Customers do NOT login
+✔ Staff login via Cognito
+✔ Admin dashboard is SPA
+✔ API Gateway has public + protected routes
+✔ No PHP for protected routes
 
 
 
