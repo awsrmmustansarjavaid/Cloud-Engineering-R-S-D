@@ -2303,6 +2303,381 @@ You are no longer building a lab project.
 You are building production architecture.
 
 ---
+## Charlie Cafe Cognito Security Foundation Structure
+
+### 🔐 PART 1 — Final Cognito Groups Structure (Professional Design)
+
+For a café business like Charlie Café, keep it simple but scalable.
+
+### 🎯 Recommended Groups in Amazon Cognito
+
+Create these groups inside your User Pool:
+
+### 1️⃣ Admin
+
+- Full system access
+
+- Can mark paid
+
+- Can see dashboard
+
+- Can manage employees
+
+- Can see financial reports
+
+### 2️⃣ Manager
+
+- Can view dashboard
+
+- Can view orders
+
+- Can mark paid
+
+- Cannot manage system settings
+
+### 3️⃣ Employee
+
+- Can view assigned orders
+
+- Can update order status
+
+- Cannot access dashboard analytics
+
+- Cannot mark paid
+
+### 📌 Why Only 3 Groups?
+
+Because:
+
+- CEO → belongs to Admin
+
+- Owner → belongs to Admin
+
+- Supervisor → belongs to Manager
+
+Do NOT overcomplicate with 10 roles.
+
+Keep it:
+
+```
+Admin
+Manager
+Employee
+```
+
+Simple = secure + maintainable.
+
+### 🔧 How To Assign
+
+Cognito → User Pool → Groups → Create groups
+
+Then assign users to groups manually (or later via admin panel).
+
+### 🔐 PART 2 — Final Lambda Protected Route Template
+
+This is the MOST important part of backend security.
+
+Never trust frontend.
+
+### 🏗 How API Gateway Works With Cognito
+
+When route has Cognito Authorizer:
+
+API Gateway validates JWT.
+
+Then Lambda receives:
+
+```
+event["requestContext"]["authorizer"]["claims"]
+```
+
+### 🔒 Universal Protected Lambda Template
+
+Use this for ALL protected routes.
+
+```
+import json
+
+def get_user_claims(event):
+    return event.get("requestContext", {}) \
+                .get("authorizer", {}) \
+                .get("claims", {})
+
+
+def check_group_access(claims, allowed_groups):
+    user_groups = claims.get("cognito:groups", "")
+
+    if not user_groups:
+        return False
+
+    # groups may come as comma separated string
+    user_groups_list = user_groups.split(",")
+
+    for group in allowed_groups:
+        if group in user_groups_list:
+            return True
+
+    return False
+
+
+def lambda_handler(event, context):
+
+    claims = get_user_claims(event)
+
+    # Route example: /admin/orders
+    if not check_group_access(claims, ["Admin", "Manager"]):
+        return {
+            "statusCode": 403,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Forbidden"})
+        }
+
+    # SAFE ZONE BELOW
+    user_email = claims.get("email")
+    user_id = claims.get("sub")
+
+    # Your business logic here
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "message": "Success",
+            "user": user_email
+        })
+    }
+```
+
+### 🎯 Access Rules Example
+
+| Route            | Allowed Groups           |
+| ---------------- | ------------------------ |
+| /admin/dashboard | Admin only               |
+| /admin/orders    | Admin, Manager           |
+| /admin/mark-paid | Admin only               |
+| /employee/orders | Admin, Manager, Employee |
+
+
+### 🔥 IMPORTANT
+
+Even though API Gateway validates token,
+you MUST check group access inside Lambda.
+
+Because:
+
+Someone could try calling route directly.
+
+JWT may be valid but wrong role.
+
+Security must exist in backend.
+
+### 🧠 PART 3 — Refactor central-auth-api.js Step-by-Step
+
+Now we clean it.
+
+Your current file mixes:
+
+- Auth
+
+- API calls
+
+- Route definitions
+
+- Printing
+
+- UI logic
+
+We will reduce it to AUTH ONLY.
+
+### STEP 1 — Remove API_BASE from central-auth-api.js
+
+Delete:
+
+```
+const API_BASE = ...
+```
+
+That goes to config.js.
+
+### STEP 2 — Create config.js
+
+```
+export const CONFIG = {
+    REGION: "us-east-1",
+    CLIENT_ID: "xxxxxxxx",
+    COGNITO_DOMAIN: "your-domain.auth.us-east-1.amazoncognito.com",
+    API_BASE: "https://your-api-id.execute-api.us-east-1.amazonaws.com/prod",
+    CLOUDFRONT_BASE: "https://your-cloudfront-url"
+};
+```
+
+No logic inside.
+
+### STEP 3 — central-auth-api.js (FINAL VERSION STRUCTURE)
+
+This file should ONLY contain:
+
+✔ login()
+
+✔ logout()
+
+✔ handleRedirect()
+
+✔ getToken()
+
+✔ isTokenExpired()
+
+✔ protectPage()
+
+✔ getUserGroups()
+
+✔ hasRole()
+
+### 🏗 Clean Auth Structure
+
+```
+import { CONFIG } from "./config.js";
+
+const Auth = {
+
+    login() {
+        const loginUrl =
+            `https://${CONFIG.COGNITO_DOMAIN}/login?` +
+            `response_type=token&` +
+            `client_id=${CONFIG.CLIENT_ID}&` +
+            `redirect_uri=${CONFIG.CLOUDFRONT_BASE}/login.html`;
+
+        window.location.href = loginUrl;
+    },
+
+    logout() {
+        localStorage.removeItem("access_token");
+
+        const logoutUrl =
+            `https://${CONFIG.COGNITO_DOMAIN}/logout?` +
+            `client_id=${CONFIG.CLIENT_ID}&` +
+            `logout_uri=${CONFIG.CLOUDFRONT_BASE}/logout.html`;
+
+        window.location.href = logoutUrl;
+    },
+
+    handleRedirect() {
+        const hash = window.location.hash;
+
+        if (hash.includes("access_token")) {
+            const params = new URLSearchParams(hash.substring(1));
+            const token = params.get("access_token");
+            localStorage.setItem("access_token", token);
+            window.location.hash = "";
+        }
+    },
+
+    getToken() {
+        return localStorage.getItem("access_token");
+    },
+
+    parseJwt(token) {
+        return JSON.parse(atob(token.split('.')[1]));
+    },
+
+    getUserGroups() {
+        const token = this.getToken();
+        if (!token) return [];
+
+        const payload = this.parseJwt(token);
+        return payload["cognito:groups"] || [];
+    },
+
+    hasRole(role) {
+        const groups = this.getUserGroups();
+        return groups.includes(role);
+    },
+
+    protectPage(allowedRoles = []) {
+        const token = this.getToken();
+
+        if (!token) {
+            this.login();
+            return;
+        }
+
+        if (allowedRoles.length > 0) {
+            const hasAccess = allowedRoles.some(role =>
+                this.hasRole(role)
+            );
+
+            if (!hasAccess) {
+                alert("Access denied");
+                window.location.href = "/unauthorized.html";
+            }
+        }
+    }
+};
+
+export default Auth;
+```
+
+### STEP 4 — api.js
+
+Now protected fetch:
+
+```
+import { CONFIG } from "./config.js";
+import Auth from "./central-auth-api.js";
+
+export function protectedFetch(endpoint, options = {}) {
+    const token = Auth.getToken();
+
+    return fetch(`${CONFIG.API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export function publicFetch(endpoint, options = {}) {
+    return fetch(`${CONFIG.API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+            ...options.headers,
+            "Content-Type": "application/json"
+        }
+    });
+}
+```
+
+### 🔥 On Protected Page Example
+
+```
+import Auth from "./central-auth-api.js";
+
+Auth.protectPage(["Admin", "Manager"]);
+```
+
+### 🎯 FINAL RESULT
+
+After this:
+
+✔ One API Gateway
+
+✔ One stage
+
+✔ Public routes open
+
+✔ Protected routes secured
+
+✔ Lambda checks groups
+
+✔ Clean frontend separation
+
+✔ Professional architecture
+
+You are now building:
+
+Production-ready secure café SaaS system.
+
+
 ## Old Wrong Configurations 
 
 
