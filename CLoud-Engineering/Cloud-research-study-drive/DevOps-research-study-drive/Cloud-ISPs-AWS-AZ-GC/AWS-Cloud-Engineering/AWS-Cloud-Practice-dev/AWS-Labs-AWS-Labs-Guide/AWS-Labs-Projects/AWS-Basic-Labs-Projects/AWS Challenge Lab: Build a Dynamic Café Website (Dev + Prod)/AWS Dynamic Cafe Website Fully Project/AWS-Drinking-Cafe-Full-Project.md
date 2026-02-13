@@ -1511,7 +1511,328 @@ sudo systemctl restart httpd
 **✅ PHASE 3️⃣ STATUS**
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 4️⃣ — Set Up Automatic HTTP → HTTPS Redirection
 
+> **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
+
+### 1️⃣  — HTTPS REQUIREMENT (CRITICAL)
+
+**⚠️ Cognito does NOT allow HTTP except localhost.**
+
+So we must add HTTPS.
+
+You have TWO EASY OPTIONS
+
+### 1️⃣  — USE ALB
+
+> **This is the simplest HTTPS solution.**
+
+### STEP 1️⃣ — CREATE APPLICATION LOAD BALANCER
+
+```
+EC2 → Load Balancers → Create Load Balancer
+```
+
+#### Choose:
+
+```
+Application Load Balancer
+```
+
+### STEP 2️⃣ — BASIC ALB Configuration
+
+
+| Setting                  | Value / Selection                                      | Notes / Requirement                          |
+|--------------------------|--------------------------------------------------------|----------------------------------------------|
+| **Name**                 | charlie-cafe-alb                                       | Unique name for your ALB                     |
+| **Scheme**               | Internet-facing                                        | Allows public internet access                |
+| **IP address type**      | IPv4                                                   | Standard for most setups                     |
+| **VPC**                  | Same VPC as your EC2 instance                          | Must match EC2 placement                     |
+| **Subnets**              | Select at least 2 **public** subnets                   | Required for internet-facing ALB; choose different Availability Zones if possible |
+| **Availability Zones**   | At least 2 AZs (where public subnets exist)            | Improves high availability                   |
+
+
+### STEP 3️⃣ — SECURITY GROUP
+
+#### Allow:
+
+```
+HTTPS 443  0.0.0.0/0
+```
+
+### STEP 4️⃣ — Target Group Configuration (for EC2 registration)
+
+
+| Setting                  | Value / Selection                          | Notes / Requirement                                      |
+|--------------------------|--------------------------------------------|----------------------------------------------------------|
+| **Type**                 | Instance                                   | Standard for registering EC2 instances by ID             |
+| **Protocol**             | HTTP                                       | Matches your web server on EC2 (use HTTPS only if EC2 already has SSL) |
+| **Port**                 | 80                                         | Default HTTP port your web server listens on             |
+| **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
+| **Health check path**    | / (or /cafe-admin-dashboard.html)                  | Path ALB uses to check if instance is healthy            |
+
+### STEP 5️⃣ — Add Listener to ALB 
+
+#### - Add HTTP listener 
+
+- **Listener:** HTTP 80
+
+- **Target Group:** Select Your Target Group
+
+#### - Add HTTPS listener (Optional)
+
+
+| Setting                  | Value / Selection                                      | Notes / Requirement                                                                 |
+|--------------------------|--------------------------------------------------------|-------------------------------------------------------------------------------------|
+| **Listener**             | HTTPS : 443                                            | Standard secure port for HTTPS traffic                                              |
+| **Certificate**          | Request or select from ACM (AWS Certificate Manager)   | Must use a valid SSL/TLS certificate; free public certs available via ACM           |
+| **Certificate source**   | ACM                                                    | Recommended – free, auto-renewing certificates                                      |
+| **Domain name (for ACM request)** | Your domain (e.g., charliecafe.com, *.charliecafe.com) | Required to request certificate; can be:<br>• Real domain you own<br>• Wildcard (*.example.com)<br>• Multiple SANs (Subject Alternative Names) |
+| **Validation method**    | DNS validation (preferred) or Email                    | DNS is faster & automatic if using Route 53                                         |
+| **Default action**       | Forward to target group (e.g., cafe-target-group)      | Routes HTTPS traffic to your EC2 instance(s)                                        |
+| **HTTP → HTTPS redirect** | Add separate HTTP:80 listener with redirect rule       | Recommended: Redirect all HTTP traffic to HTTPS                                     |
+
+### STEP 6️⃣ — GET ALB DNS NAME
+
+Example:
+
+```
+https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
+```
+
+### 2️⃣ — CLOUD FRONT
+
+### 🧱 STEP 1️⃣ — CloudFront Origin (ALB)
+
+#### Go to:
+
+```
+AWS Console → CloudFront → Create Distribution
+```
+
+- **Distribution name:** Charlie-Cafe
+
+- **Next:**
+
+- **Origin type:** Elastic Load Balancer
+
+#### CloudFront Origin Settings (CRITICAL)
+
+>**Go to:** CloudFront → Distributions → Your Distribution → Origins → Edit
+
+> **Set EXACTLY like this:**
+
+| Setting                | Value                                                   |
+| ---------------------- | ------------------------------------------------------- |
+| Origin domain          | charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com |
+| Origin protocol policy | **HTTP only** ✅                                         |
+| HTTP port              | 80                                                      |
+| Origin SSL protocols   | (doesn’t matter now)                                    |
+
+
+✅ This is correct
+
+❌ Do NOT select EC2 IP
+
+❌ Do NOT select S3
+
+### 🌐 STEP 2️⃣ — Default Cache Behavior (VERY IMPORTANT)
+
+>**Go to:** Behaviors → Default → Edit
+
+
+| Setting                | Value                  |
+| ---------------------- | ---------------------- |
+| Viewer protocol policy | Redirect HTTP to HTTPS |
+| Allowed HTTP methods   | GET, HEAD, OPTIONS     |
+| Cache policy           | CachingDisabled        |
+| Origin request policy  | AllViewer              |
+
+
+⚠️ Cognito tokens must NOT be cached
+
+#### This ensures:
+
+Authorization headers
+
+Query strings
+
+Cookies
+are forwarded correctly.
+
+👉 SAVE
+
+⏳ Wait 5–10 minutes for deployment.
+
+```
+Status = Deployed
+```
+
+#### You’ll get:
+
+```
+xxxxx.cloudfront.net
+```
+
+### 🔐 STEP 3️⃣ — CloudFront General Configuration
+
+> **This step finalizes the CloudFront distribution behavior and ensures it works correctly with ALB + Cognito Hosted UI without breaking authentication or routing.**
+
+### 1️⃣ ⚙️ General Configuration
+
+- **Configure the following settings in CloudFront → Distribution → General.**
+
+#### 1️⃣ IPv6
+
+- **Turn OFF IPv6**
+
+✅ Recommended for learning & labs
+
+🔁 Can be enabled later in production
+
+### 2️⃣ Default Root Object (Optional but Recommended)
+
+```
+cafe-admin-dashboard.html
+```
+
+**⚠️ Do NOT add /order-status.html to Origin Path**
+**Origin Path must remain empty.**
+
+### 🧠 Correct CloudFront Path Logic
+
+| Configuration Item   | Value                             |
+| -------------------- | --------------------------------- |
+| Origin Path          | ❌ Empty                           |
+| Default Root Object  | ✅ `cafe-admin-dashboard.html`             |
+| File location on EC2 | `/var/www/html/cafe-admin-dashboard.html` |
+
+
+This ensures:
+
+```
+CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
+```
+
+### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
+
+**👉 Invalidation tells CloudFront to delete cached copies immediately.**
+
+#### 1️⃣ Go to:
+
+```
+CloudFront → Distributions → Your Distribution
+```
+
+#### 2️⃣ Click Invalidations
+
+#### 3️⃣ Click Create invalidation
+
+#### 4️⃣ In Object paths, enter:
+
+invalidation path:
+
+```
+/cafe-admin-dashboard.html
+```
+
+### 5️⃣ Click Create invalidation
+
+⏳ Status will show:
+
+```
+In Progress → Completed
+```
+
+Usually completes in 1–3 minutes.
+
+### How to Confirm Invalidation Worked
+
+After status = Completed:
+
+1️⃣ Open browser
+
+2️⃣ Hard refresh:
+
+- Windows/Linux: Ctrl + F5
+
+- Mac: Cmd + Shift + R
+
+3️⃣ Open:
+
+```
+https://xxxxx.cloudfront.net/cafe-admin-dashboard.html
+```
+
+You should see latest code.
+
+### Common Mistakes (Avoid These)
+
+❌ Invalidating:
+
+```
+cafe-admin-dashboard.html
+```
+
+(missing leading /)
+
+❌ Invalidating wrong file name
+
+❌ Forgetting invalidation after JS changes
+
+### Important Notes:
+
+✔ /order-status.html is the correct invalidation path
+
+✔ Use invalidation after frontend changes
+
+✔ Do not overuse /*
+
+✔ Required when testing Cognito changes
+
+### 🔐 STEP 4️⃣ — CloudFront SSL Certificate (Optional)
+Viewer Certificate
+
+Choose:
+
+```
+Default CloudFront certificate (*.cloudfront.net)
+```
+
+✅ This is fine
+
+✅ HTTPS works automatically
+
+❌ No ACM needed here
+
+
+### 5️⃣ CloudFront Validation (VERY IMPORTANT)
+
+> **After configuration, always validate CloudFront before integrating Cognito.**
+
+### 🔍 Validation Checklist
+
+#### 1️⃣ Distribution Status
+
+Status must be:
+
+```
+Deployed
+```
+
+**⚠️ If status is In Progress, wait 5–10 minutes.**
+
+### 6️⃣ — USE THIS IN COGNITO
+
+```
+d2og2zrs47voou.cloudfront.net
+```
+**This is your Return URL**
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 
 ### ☕ AWS Charlie Café – Test & Verifications
