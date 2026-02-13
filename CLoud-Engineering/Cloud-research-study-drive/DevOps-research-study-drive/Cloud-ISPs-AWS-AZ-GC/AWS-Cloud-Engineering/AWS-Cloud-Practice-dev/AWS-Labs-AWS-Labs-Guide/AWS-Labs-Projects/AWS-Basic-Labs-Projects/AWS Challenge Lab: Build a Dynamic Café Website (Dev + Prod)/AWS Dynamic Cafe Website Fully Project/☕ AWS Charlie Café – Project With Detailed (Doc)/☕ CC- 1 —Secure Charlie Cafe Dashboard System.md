@@ -271,11 +271,11 @@ charlie-cafe-auth.auth.us-east-1.amazoncognito.com
 
 Create:
 
-| Username  | Group    |
-| --------- | -------- |
-| cafeadmin | Admin    |
-| manager1  | Manager  |
-| ali       | Employee |
+| Username  | Group    | Password            |
+|-----------|----------|---------------------|
+| cafeadmin | Admin    | ^MyH%H!A4YjD        |
+| manager1  | Manager  | jfZvm@^3gTVE        |
+| ali       | Employee | *KEXO^C3mjm3        |
 
 - Mark email verified.
 
