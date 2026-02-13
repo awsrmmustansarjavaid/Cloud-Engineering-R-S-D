@@ -257,24 +257,12 @@ charlie-cafe-auth.auth.us-east-1.amazoncognito.com
 
 - Go to: User pool → Groups → Create group
 
-🔹 Group 1
+| Group     | Group Name | Precedence |
+|-----------|------------|------------|
+| Group 1   | Admin      | 1          |
+| Group 2   | Manager    | 5          |
+| Group 3   | Employee   | 10         |
 
-Group name:
-
-```
-Admin
-```
-
-Precedence:
-1
-
-🔹 Group 2
-
-Group name:
-
-```
-Manager
-```
 
 
 
