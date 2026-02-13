@@ -927,10 +927,6 @@ You should use:
 
 ✔ mismatch grant type
 
-## Old Wrong Configurations 
-
-
-
 ### 🎯 FINAL RECOMMENDED CONFIG FOR YOU
 
 - Go to: Cognito → User Pool → App Integration → App Client → Edit
@@ -1155,6 +1151,130 @@ This is modern 2026 best practice.
 ❌ Implicit grant should not be used anymore
 
 ---
+## Charlie Cafe production New Architecture Design 
 
+You’re trying to make Charlie Cafe production-ready, and that means we must:
+
+- Remove configuration conflicts
+
+- Standardize ONE OAuth flow
+
+- Make frontend ↔ Cognito ↔ API Gateway clean
+
+- Ensure backend security is correct
+
+- Eliminate 400 / white screen / curl confusion
+
+And the only way to properly fix this is to look at your actual code.
+
+### ✅ What I Need From You
+
+Please share:
+
+### 1️⃣ central-auth-api.js
+
+This is critical because:
+
+- It probably handles login redirect
+
+- Parses tokens from URL
+
+- Stores tokens
+
+- Attaches Authorization header
+
+- May still be using response_type=token
+
+### 2️⃣ One protected frontend page
+
+Example:
+
+- order-status.html
+
+OR
+
+- cafe-admin-dashboard.html
+
+I need to see:
+
+- How it checks login
+
+- How it loads token
+
+- How it calls API
+
+- How it handles redirect
+
+### 3️⃣ (Optional but helpful)
+
+The login button code or login redirect logic.
+
+### 🎯 What I Will Do After You Share
+
+I will:
+
+- Analyze if you're using Implicit or Authorization Code
+
+- Detect if you're using ID token instead of access token
+
+- Check if token parsing is broken
+
+- Fix header attachment
+
+- Standardize your OAuth flow
+
+- Give you corrected, production-ready version
+
+- Remove all misleading configurations
+
+We will simplify everything.
+
+### 🔥 Important: Before You Paste Code
+
+Tell me:
+
+Currently your Cognito App Client has:
+
+✔ Public client?
+
+✔ Client secret disabled?
+
+✔ Authorization Code grant enabled?
+
+❌ Implicit disabled?
+
+Or are you still on Implicit?
+
+Just answer that quickly first.
+
+### 🏗 Your Goal (And I Agree With It)
+
+You want:
+
+“A real cafe owner could deploy this system professionally.”
+
+That means:
+
+- Secure API
+
+- No exposed secrets
+
+- JWT validated at API Gateway
+
+- Proper OAuth flow
+
+- Refresh tokens working
+
+- Clean architecture
+
+We will get there.
+
+
+
+
+
+
+---
+## Old Wrong Configurations 
 
 
