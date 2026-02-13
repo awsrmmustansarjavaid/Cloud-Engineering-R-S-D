@@ -1595,9 +1595,415 @@ For a real café:
 
 ✔ No PHP for protected routes
 
-## 
+---
 
+### Charlie Cafe Business System Architect 
 
+✅ Customers → NO login → public APIs
+
+🔐 Staff (Admin / Employee / Manager / CEO) → Cognito login → protected APIs
+
+That part is correct.
+
+Now let’s clean the technical conflicts.
+
+### 🚨 PART 1 — ALL CURRENT CONFLICTS IN YOUR PROJECT
+
+Here is your full conflict audit:
+
+### 🔴 1️⃣ Two Different API Gateways
+
+You are using:
+
+#### JS (protected):
+
+```
+https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com
+```
+
+#### PHP (public):
+
+```
+https://q8rq19tfka.execute-api.us-east-1.amazonaws.com
+```
+
+#### ⚠️ Conflict:
+
+- Different API IDs
+
+- Possibly different stages
+
+- Possibly different authorizers
+
+- Impossible to debug consistently
+
+#### ✅ FIX:
+
+Use ONE API Gateway.
+
+Structure it like:
+
+```
+/public/*
+/admin/*
+/employee/*
+/hr/*
+```
+
+Attach Cognito authorizer ONLY to protected routes.
+
+### 🔴 2️⃣ Implicit Flow vs Authorization Code Confusion
+
+#### Your JS uses:
+
+```
+response_type=token
+window.location.hash
+access_token
+```
+
+That means: Implicit flow
+
+If in Cognito you enabled:
+
+    - Authorization Code only
+
+    - Or both
+
+You can create mismatch errors.
+
+#### ✅ FIX:
+
+Since your JS is built for Implicit flow,
+for now:
+
+✔ Enable Implicit grant
+
+✔ Keep response_type=token
+
+✔ Public client (NO secret)
+
+Do NOT switch to Authorization Code until you refactor JS.
+
+### 🔴 3️⃣ PHP Admin Dashboard Bypasses Cognito
+
+Your admin-orders.php:
+
+    - Calls /dev/orders
+
+    - No Authorization header
+
+    - No JWT
+
+If that route is protected → 401
+
+That is expected.
+
+#### ✅ FIX:
+
+Admin dashboard should NOT be PHP anymore.
+
+Move admin pages to:
+
+CloudFront static HTML + central-auth-api.js
+
+Delete admin PHP dashboard.
+
+Keep PHP only for customer public ordering if needed.
+
+### 🔴 4️⃣ Stage Confusion (/dev vs /status vs /admin)
+
+#### You are mixing:
+
+```
+/dev/orders
+/status/order-status
+/admin/dashboard
+```
+
+Without consistency.
+
+#### ✅ FIX:
+
+Use ONE stage:
+
+#### Example:
+
+```
+https://api-id.execute-api.us-east-1.amazonaws.com/prod/
+```
+
+#### Inside it:
+
+```
+/public/orders
+/public/order-status
+/admin/dashboard
+/admin/orders
+/employee/orders
+```
+
+Do NOT mix stage names in path logic.
+
+### 🔴 5️⃣ central-auth-api.js Contains Too Much
+
+#### Right now it handles:
+
+- Auth
+
+- Role control
+
+- Protected fetch
+
+- Public fetch (indirectly)
+
+- Printing
+
+- Asset paths
+
+- API routing
+
+- HR logic
+
+- Dashboard logic
+
+It’s becoming monolithic.
+
+That will create long-term bugs.
+
+### 🧠 PART 2 — Should You Create Two central-auth-api.js Files?
+
+#### You suggested:
+
+One for public
+One for protected
+And a third for shared utilities
+
+That is VERY good thinking.
+
+But we must do it cleanly.
+
+### ✅ PROFESSIONAL STRUCTURE RECOMMENDED
+
+#### Do NOT create:
+
+```
+central-auth-api-public.js
+central-auth-api-protected.js
+```
+
+Instead create:
+
+### 🔹 1️⃣ auth.js (ONLY Cognito logic)
+
+#### Contains:
+
+- login()
+
+- logout()
+
+- handleRedirect()
+
+- protectPage()
+
+- getToken()
+
+- isTokenExpired()
+
+- role checking
+
+- auto logout watcher
+
+ONLY authentication logic.
+
+Nothing about API routes.
+
+### 🔹 2️⃣ api.js (ONLY API logic)
+
+#### Contains:
+
+- publicFetch()
+
+- protectedFetch()
+
+- API_BASE
+
+- all endpoints
+
+#### Example:
+
+```
+function publicFetch(url, options = {}) {
+    return fetch(url, options);
+}
+
+function protectedFetch(url, options = {}) {
+    const token = Auth.getToken();
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            Authorization: "Bearer " + token
+        }
+    });
+}
+```
+
+#### And routes:
+
+```
+const API = {
+    public: {
+        placeOrder: ...
+        trackOrder: ...
+    },
+    admin: {
+        dashboard: ...
+        markPaid: ...
+    }
+}
+```
+
+### 🔹 3️⃣ utils.js (Shared functions)
+
+#### Contains:
+
+- parseJwt()
+
+- date helpers
+
+- print helpers
+
+- DOM helpers
+
+- formatCurrency()
+
+etc.
+
+### 🔹 4️⃣ config.js (VERY IMPORTANT)
+
+#### Move ALL config into:
+
+```
+export const CONFIG = {
+   API_BASE: "...",
+   REGION: "...",
+   CLIENT_ID: "...",
+   COGNITO_DOMAIN: "...",
+   CLOUDFRONT_BASE: "..."
+}
+```
+
+Never hardcode config inside logic file again.
+
+### 🏗 FINAL STRUCTURE
+
+```
+/js/
+   config.js
+   auth.js
+   api.js
+   utils.js
+```
+
+### 🌐 Frontend pages:
+
+#### ✅ Public page:
+
+```
+orders.php
+    → loads api.js only (public section)
+```
+
+#### ✅ Protected page:
+
+```
+admin-dashboard.html
+    → loads config.js
+    → loads auth.js
+    → loads api.js
+    → calls Auth.protectPage()
+```
+
+### 🔐 API Gateway Structure
+
+Single API Gateway:
+
+#### Stage:
+
+```
+prod
+```
+
+#### Routes:
+
+#### Public (NO authorizer):
+
+```
+POST /public/orders
+POST /public/orders/cash-payment
+GET  /public/order-status
+```
+
+#### Protected (Cognito authorizer attached):
+
+```
+GET  /admin/orders
+POST /admin/mark-paid
+GET  /admin/dashboard
+GET  /employee/orders
+POST /employee/order
+```
+
+### 🎯 FINAL ANSWER TO YOUR QUESTIONS
+
+#### Q1: List of conflicts?
+
+✔ Two API gateways
+
+✔ Stage confusion
+
+✔ Mixed auth + no-auth endpoints
+
+✔ Admin PHP bypassing Cognito
+
+✔ Monolithic JS file
+
+✔ Grant type mismatch risk
+
+#### Q2: Two central-auth files?
+
+❌ Not recommended.
+
+Instead:
+
+✔ Separate by responsibility (auth.js, api.js, utils.js, config.js)
+
+That is professional architecture.
+
+### 🧠 Important Strategic Advice
+
+Do NOT try to debug everything at once.
+
+#### First:
+
+- Merge to ONE API Gateway
+
+- Separate public vs protected routes
+
+- Remove admin PHP
+
+- Refactor JS into modules
+
+- Test public endpoints
+
+- Then test protected endpoints
+
+Layer by layer.
+
+---
+
+### 
 
 
 ---
