@@ -943,21 +943,218 @@ You should use:
 | Client secret | ❌ Disabled    |
 If secret exists → DELETE this app client → recreate as Public.
 
-2️⃣ OAuth 2.0 Grant Types
+#### 2️⃣ OAuth 2.0 Grant Types
 
 ✔ Authorization code grant
+
 ❌ DO NOT enable Implicit grant
 
-3️⃣ Scopes
+#### 3️⃣ Scopes
 
 ✔ openid
+
 ✔ email
+
 ✔ profile
 
 Nothing else.
 
-4️⃣ Change Your Login URL
+#### 4️⃣ Change Your Login URL
 
-Instead of:
+##### Instead of:
+
+```
+response_type=token
+```
+
+##### Use:
+
+```
+response_type=code
+```
+
+##### Example:
+
+```
+https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://yourcloudfront/cafe-admin-dashboard.html
+```
+
+### ⚠️ VERY IMPORTANT
+
+#### When using Authorization Code Flow:
+
+##### Cognito will redirect like:
+
+```
+https://yourcloudfront/cafe-admin-dashboard.html?code=abc123
+```
+
+NOT with access_token.
+
+Your frontend must then exchange that code for tokens.
+
+### 💡 SIMPLE OPTION (Best for Your Lab)
+
+Since you’re not using Amplify and not building a complex auth SDK…
+
+#### You have two clean options:
+
+#### OPTION A (Cleanest for Lab – Recommended)
+
+Keep SPA simple.
+Use Authorization Code flow.
+Use JavaScript to exchange code for tokens.
+
+OR
+
+#### OPTION B (Simplest Debugging Mode)
+
+Temporarily remove Cognito authorizer from API Gateway.
+Test Lambda directly.
+Make sure backend works.
+Then re-enable authorizer.
+
+Because right now you don't know if issue is:
+
+- Cognito
+
+- API Gateway
+
+- Lambda
+
+- RDS query
+
+- CORS
+
+- PHP curl
+
+- wrong stage URL
+
+You must isolate layers.
+
+### 🔍 About Your PHP + curl Issue
+
+#### Here is likely what happened:
+
+#### If your API is protected by Cognito Authorizer:
+
+#### API Gateway expects:
+
+```
+Authorization: Bearer ACCESS_TOKEN
+```
+
+#### But:
+
+If you used Authorization Code grant,
+You might accidentally be sending ID token instead of access token.
+
+#### ⚠️ API Gateway authorizer validates ACCESS TOKEN, not ID token.
+
+Very common mistake.
+
+### 🧪 Debug Checklist (Follow Exactly)
+
+#### STEP 1
+
+Disable authorizer temporarily.
+Call API.
+If Lambda works → backend OK.
+
+#### STEP 2
+
+Re-enable authorizer.
+
+Login via browser.
+
+Copy ACCESS TOKEN only.
+
+#### Test:
+
+```
+curl -H "Authorization: Bearer ACCESS_TOKEN" \
+https://api-url/status/order-status
+```
+
+If that works → Cognito is OK.
+
+If not → token mismatch.
+
+### 🚨 Most Common Charlie Cafe Mistakes I See
+
+- Using ID token instead of access token
+
+- Client secret accidentally enabled
+
+- Implicit + Authorization Code both enabled causing confusion
+
+- Callback URL mismatch (http vs https)
+
+- API stage mismatch (/prod vs /status)
+
+- Not redeploying API after authorizer change
+
+- CORS not enabled
+
+- PHP sending header wrong format
+
+#### Correct header must be EXACT:
+
+```
+Authorization: Bearer eyJraWQiOiJr...
+```
+
+Not:
+
+```
+Authorization: eyJraWQiOiJr...
+```
+
+Not:
+
+```
+Bearer: eyJraWQiOiJr...
+```
+
+### 🧠 My Professional Suggestion For You
+
+Since this is a lab but you want production-style architecture:
+
+#### 🔐 Use:
+
+- Public client
+
+- Authorization Code grant
+
+- No Implicit
+
+- PKCE
+
+- Access token for API
+
+- Cognito Authorizer
+
+This is modern 2026 best practice.
+
+### 🎯 Direct Answer To Your Original Question
+
+#### Between:
+
+1️⃣ Implicit grant
+
+2️⃣ Authorization code grant
+
+#### For Charlie Cafe:
+
+✅ Authorization Code Grant is highly recommended
+
+❌ Implicit grant should not be used anymore
+
+---
+
 
 
