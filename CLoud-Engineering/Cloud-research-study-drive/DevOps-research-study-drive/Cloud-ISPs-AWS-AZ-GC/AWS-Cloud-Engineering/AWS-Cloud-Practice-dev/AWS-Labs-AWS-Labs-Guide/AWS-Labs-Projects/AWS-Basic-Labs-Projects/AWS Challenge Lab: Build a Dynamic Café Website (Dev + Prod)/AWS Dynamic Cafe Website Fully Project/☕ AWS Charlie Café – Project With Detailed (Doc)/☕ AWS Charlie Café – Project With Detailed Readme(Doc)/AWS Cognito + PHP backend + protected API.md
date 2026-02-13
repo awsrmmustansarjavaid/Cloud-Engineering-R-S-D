@@ -1277,15 +1277,15 @@ You currently have TWO completely different architectures mixed together:
 
 Used in:
 
-central-auth-api.js
+- central-auth-api.js
 
-CloudFront frontend
+- CloudFront frontend
 
-API_BASE = p4vrr4b60c.execute-api...
+- API_BASE = p4vrr4b60c.execute-api...
 
-Cognito Authorizer attached
+- Cognito Authorizer attached
 
-JWT required
+- JWT required
 
 ### 🔴 Architecture B (Old Public PHP + No Auth)
 
