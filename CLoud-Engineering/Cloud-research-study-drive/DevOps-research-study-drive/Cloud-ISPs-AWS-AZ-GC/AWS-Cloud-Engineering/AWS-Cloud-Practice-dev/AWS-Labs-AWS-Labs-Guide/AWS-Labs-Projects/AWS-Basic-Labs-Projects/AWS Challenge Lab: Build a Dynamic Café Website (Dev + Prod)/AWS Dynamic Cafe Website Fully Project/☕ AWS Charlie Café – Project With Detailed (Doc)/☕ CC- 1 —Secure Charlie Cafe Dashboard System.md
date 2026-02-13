@@ -339,3 +339,29 @@ Then inside Lambda:
 - Validate group
 
 - Enforce authorization
+
+### ❓ IMPORTANT CHANGE FROM YOUR OLD SETUP
+
+OLD:
+
+```
+response_type=token
+Implicit grant
+```
+
+NEW (recommended):
+
+```
+response_type=code
+Authorization code grant
+```
+
+#### ⚠️ You must update your central-auth-api.js accordingly.
+
+
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
