@@ -38,11 +38,11 @@ This will be clean, production-ready, and aligned with your new API structure.
 
 We will rebuild Cognito properly using:
 
-Amazon Cognito
+- Amazon Cognito
 
-Amazon API Gateway
+- Amazon API Gateway
 
-AWS Lambda
+- AWS Lambda
 
 ### 🔐 FINAL COGNITO DESIGN (BASED ON YOUR NEW PLAN)
 
@@ -98,6 +98,189 @@ employee1
 
 - Click Next.
 
+#### 3️⃣ Self Registration
+
+❌ Disable self-registration
+
+(Uncheck enable self-registration)
+
+Production systems never allow public admin registration.
+
+Click Next.
+
+#### 4️⃣ Required Attributes
+
+- Click “Select attributes”
+
+- Choose only: ☑ email
+
+- Do NOT choose anything else.
+
+- Click Save.
+
+- Click Next.
+
+### 🟢 STEP 2 — Security Settings
+
+#### 1️⃣ Password Policy
+
+- Leave default.
+
+- No changes needed.
+
+#### 2️⃣ MFA
+
+- Set: ❌ No MFA (for now)
+
+You can enable later in production.
+
+#### 3️⃣ Account Recovery
+
+- Select: ☑ Email only
+
+- Disable SMS.
+
+- Click Next.
+
+### 🟢 STEP 3 — App Client (CRITICAL)
+
+This is where most mistakes happen.
+
+#### 1️⃣ Client Type
+
+- Choose: ✅ Public client
+
+This disables client secret.
+
+If you accidentally create confidential client → delete and recreate.
+
+#### 2️⃣ App Client Name
+
+Example:
+
+```
+CharlieCafeAdminSPA
+```
+
+- Click Next.
+
+🟢 STEP 4 — OAuth Configuration (IMPORTANT CHANGE)
+
+⚠️ We are NOT using Implicit anymore.
+
+We will use:
+
+✅ Authorization Code Grant (RECOMMENDED)
+❌ Do NOT enable Implicit
+
+Because:
+
+Implicit = older
+
+Authorization Code = more secure
+
+Industry standard now
+
+OAuth 2.0 Grant Types
+
+Select:
+
+☑ Authorization code grant
+
+Do NOT select implicit.
+
+OAuth Scopes
+
+Select ONLY:
+
+☑ openid
+☑ email
+☑ profile
+
+Nothing else.
+
+🟢 STEP 5 — Callback & Logout URLs
+
+Add EXACT URLs:
+
+Callback URL
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/login.html
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/login.html
+```
+
+Sign-out URL
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/logout.html
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/logout.html
+```
+
+Must match EXACTLY.
+
+Save.
+
+Wait 30–60 seconds.
+
+🟢 STEP 6 — Configure Cognito Domain
+
+Go to:
+
+User pool
+→ App integration
+→ Domain
+
+Create domain prefix:
+
+```
+charlie-cafe-auth
+```
+
+You will get:
+
+```
+charlie-cafe-auth.auth.us-east-1.amazoncognito.com
+```
+
+Copy this.
+
+Do NOT include https.
+
+🟢 STEP 7 — Create Groups (FINAL STRUCTURE)
+
+Go to:
+
+User pool → Groups → Create group
+
+🔹 Group 1
+
+Group name:
+
+```
+Admin
+```
+
+Precedence:
+1
+
+🔹 Group 2
+
+Group name:
+
+```
+Manager
+```
 
 
 
