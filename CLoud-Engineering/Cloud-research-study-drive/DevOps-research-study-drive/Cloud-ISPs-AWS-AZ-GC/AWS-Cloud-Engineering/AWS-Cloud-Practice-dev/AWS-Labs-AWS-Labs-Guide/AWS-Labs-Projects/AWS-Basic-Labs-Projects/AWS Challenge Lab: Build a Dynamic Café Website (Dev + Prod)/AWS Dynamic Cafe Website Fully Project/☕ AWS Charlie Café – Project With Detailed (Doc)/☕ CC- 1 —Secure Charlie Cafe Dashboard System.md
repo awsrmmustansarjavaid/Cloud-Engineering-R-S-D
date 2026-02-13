@@ -17,8 +17,7 @@
 ---
 # SECTION 1️⃣ Secure Admin Order Dashboard
 
-
-## 🔐 PHASE 2️⃣ — Cognito Authentication infrastructure 
+## 🔐 PHASE 1️⃣ — Cognito Authentication infrastructure 
 > **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
 ### 1️⃣ Basic Cognito Configuration — DEFINE YOUR APPLICATION
@@ -484,11 +483,11 @@ sudo nano /var/www/html/order-status.html
 sudo systemctl restart httpd
 ```
 
-**✅ PHASE 2️⃣ STATUS**
+**✅ PHASE 1️⃣ STATUS**
 
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 3️⃣ — Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
+## 🔐 PHASE 2️⃣ — Admin Authentication Using Amazon Cognito (Hosted UI + JWT Tokens)
 > **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
 
 ### 1️⃣ — CREATE USER & Groups (MANDATORY)
