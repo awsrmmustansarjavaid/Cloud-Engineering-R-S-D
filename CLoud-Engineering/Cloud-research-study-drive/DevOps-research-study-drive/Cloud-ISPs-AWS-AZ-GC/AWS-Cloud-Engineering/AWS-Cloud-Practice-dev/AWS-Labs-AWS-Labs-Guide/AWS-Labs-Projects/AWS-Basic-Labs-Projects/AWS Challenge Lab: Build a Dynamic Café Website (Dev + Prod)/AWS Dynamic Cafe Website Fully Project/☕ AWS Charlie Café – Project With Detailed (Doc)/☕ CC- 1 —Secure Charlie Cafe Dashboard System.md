@@ -164,34 +164,34 @@ CharlieCafeAdminSPA
 
 - Click Next.
 
-🟢 STEP 4 — OAuth Configuration (IMPORTANT CHANGE)
+### 🟢 STEP 4 — OAuth Configuration (IMPORTANT CHANGE)
 
-⚠️ We are NOT using Implicit anymore.
+
+#### ⚠️ We are NOT using Implicit anymore.
 
 We will use:
 
 ✅ Authorization Code Grant (RECOMMENDED)
+
 ❌ Do NOT enable Implicit
 
 Because:
 
-Implicit = older
+- Implicit = older
 
-Authorization Code = more secure
+- Authorization Code = more secure
 
-Industry standard now
+- Industry standard now
 
-OAuth 2.0 Grant Types
+#### 1️⃣ OAuth 2.0 Grant Types
 
-Select:
+- Select: ☑ Authorization code grant
 
-☑ Authorization code grant
+❌ Do NOT select implicit.
 
-Do NOT select implicit.
+#### 2️⃣ OAuth Scopes
 
-OAuth Scopes
-
-Select ONLY:
+- Select ONLY:
 
 ☑ openid
 ☑ email
@@ -199,11 +199,11 @@ Select ONLY:
 
 Nothing else.
 
-🟢 STEP 5 — Callback & Logout URLs
+### 🟢 STEP 5 — Callback & Logout URLs
 
 Add EXACT URLs:
 
-Callback URL
+#### 1️⃣ Callback URL
 
 ```
 https://YOUR_CLOUDFRONT_DOMAIN/login.html
@@ -215,7 +215,7 @@ Example:
 https://dxxxx.cloudfront.net/login.html
 ```
 
-Sign-out URL
+#### 2️⃣ Sign-out URL
 
 ```
 https://YOUR_CLOUDFRONT_DOMAIN/logout.html
@@ -229,19 +229,15 @@ https://dxxxx.cloudfront.net/logout.html
 
 Must match EXACTLY.
 
-Save.
+- Save.
 
-Wait 30–60 seconds.
+⌛️ Wait 30–60 seconds.
 
-🟢 STEP 6 — Configure Cognito Domain
+### 🟢 STEP 6 — Configure Cognito Domain
 
-Go to:
+- Go to: User pool → App integration → Domain
 
-User pool
-→ App integration
-→ Domain
-
-Create domain prefix:
+- Create domain prefix:
 
 ```
 charlie-cafe-auth
@@ -253,15 +249,13 @@ You will get:
 charlie-cafe-auth.auth.us-east-1.amazoncognito.com
 ```
 
-Copy this.
+- Copy this.
 
-Do NOT include https.
+❌ Do NOT include https.
 
-🟢 STEP 7 — Create Groups (FINAL STRUCTURE)
+### 🟢 STEP 7 — Create Groups (FINAL STRUCTURE)
 
-Go to:
-
-User pool → Groups → Create group
+- Go to: User pool → Groups → Create group
 
 🔹 Group 1
 
