@@ -114,6 +114,397 @@ if (!empty($data['access_token'])) {
 }
 ```
 
+### 1️⃣ Purpose of cognito-callback.php
+
+When you use Cognito Hosted UI:
+
+- User clicks Login → redirects to Cognito Hosted UI
+
+- User enters credentials → Cognito authenticates
+
+- Cognito redirects back to your site using your Callback URL
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/cognito-callback.php#id_token=...&access_token=...&expires_in=3600
+```
+
+- Your callback page must read these tokens (ID token / Access token) and store them safely:
+
+- In PHP session if you want server-side protection
+
+Or in localStorage/sessionStorage if purely frontend-driven
+
+After storing the token, you redirect the user to your protected dashboard page.
+
+### 2️⃣ Why you can’t skip it
+
+Without a callback page:
+
+- Cognito redirects to your site → user lands on a random page
+
+- You don’t have their ID token / access token
+
+- You cannot verify login → pages cannot be protected
+
+- Anyone could access your dashboard → security hole
+
+So for any project that uses Cognito Hosted UI and protected pages, a callback page is mandatory.
+
+### 3️⃣ How simple it can be
+
+You don’t need PHP cURL or API calls on the callback page. Minimal setup:
+
+- Read the URL fragment #id_token=...&access_token=... with JavaScript
+
+- Store tokens in sessionStorage
+
+- Redirect to dashboard.html
+
+OR, if you prefer PHP:
+
+- Parse the token from URL
+
+- Store in PHP session
+
+- Redirect to dashboard
+
+- No cURL, no API calls — totally safe.
+
+### 4️⃣ Example (Frontend JS callback)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Callback</title>
+<script>
+// Read URL hash
+const hash = window.location.hash.substr(1);
+const params = new URLSearchParams(hash);
+
+// Get tokens
+const idToken = params.get("id_token");
+const accessToken = params.get("access_token");
+
+if(idToken && accessToken){
+    // Store tokens safely
+    sessionStorage.setItem("idToken", idToken);
+    sessionStorage.setItem("accessToken", accessToken);
+
+    // Redirect to protected dashboard
+    window.location.href = "dashboard.html";
+} else {
+    // No token → redirect to login
+    window.location.href = "login.html";
+}
+</script>
+</head>
+<body>
+<p>Redirecting...</p>
+</body>
+</html>
+```
+
+### 5️⃣ Key Points
+
+✅ Required if you want protected pages
+
+✅ Can be pure frontend → no PHP, no cURL
+
+✅ Minimal code → safe, easy to deploy
+
+✅ Works with CloudFront + Cognito Hosted UI
+
+✅ Needed only once per login flow
+
+### 6️⃣ Summary
+
+| Feature         | Why Needed                            |
+| --------------- | ------------------------------------- |
+| Callback page   | To receive Cognito tokens after login |
+| PHP / JS        | Optional — you can do it fully in JS  |
+| Session storage | To protect dashboard pages            |
+| Skipping it     | Not secure — tokens won’t be captured |
+
+
+### 💡 Bottom line:
+
+Even in a “no PHP, no bug” setup, you must have a callback page, but it can be pure JS and super simple. You do not need PHP cURL here at all.
+
+### 🔐 Where Do These URLs Go Inside Cognito?
+
+- Go to: Cognito → User Pool → App integration → App client → Hosted UI
+
+There are ONLY TWO important URL sections:
+
+### 1️⃣ Callback URL(s)
+
+This is where Cognito redirects AFTER LOGIN.
+
+You must enter:
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/cognito-callback.php
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/cognito-callback.php
+```
+
+If you use local testing also add:
+
+```
+http://localhost/cognito-callback.php
+```
+
+👉 This is REQUIRED.
+
+### 2️⃣ Sign-out URL(s)
+
+This is where Cognito redirects AFTER LOGOUT.
+
+If you are using the single-file logout.php with ?loggedout=true, then enter:
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+👉 This must match EXACTLY.
+
+### 🚫 What You DO NOT Need to Enter
+
+You DO NOT enter:
+
+❌ login.html
+
+❌ dashboard.html
+
+❌ any other pages
+
+Cognito does NOT need those.
+
+### 🧠 Why? 
+
+#### login.html
+
+This page only redirects TO Cognito.
+Cognito does not redirect back to it after login.
+
+#### cognito-callback.php
+
+Cognito sends tokens here after login.
+So this MUST be registered.
+
+#### logout.php
+
+Cognito sends user here after logout.
+So this MUST be registered (with exact query string if used).
+
+### 🎯 Final Setup Summary
+
+Inside Cognito:
+
+Callback URL(s):
+
+```
+https://dxxxx.cloudfront.net/cognito-callback.php
+```
+
+Sign-out URL(s):
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+That’s it. Nothing more.
+
+### 🏆 Final Architecture (Correct)
+
+| File                 | Register in Cognito? |
+| -------------------- | -------------------- |
+| login.html           | ❌ No                 |
+| cognito-callback.php | ✅ Yes (Callback URL) |
+| logout.php           | ✅ Yes (Sign-out URL) |
+| dashboard.html       | ❌ No                 |
+
+### 🔎 Why Did I First Say login.html as Callback?
+
+That depends on the OAuth flow type you choose inside
+Amazon Cognito.
+
+There are two different patterns:
+
+### 🟢 Pattern A — Callback = login.html (Pure Frontend App)
+
+This works when:
+
+- You use response_type=token
+
+- Tokens are returned in URL hash #id_token=...
+
+- You handle token parsing in JavaScript
+
+In that case:
+
+Cognito redirects to:
+
+```
+https://dxxxx.cloudfront.net/login.html#id_token=...
+```
+
+Then your login.html page:
+
+- Detects tokens in URL
+
+- Stores them in sessionStorage
+
+- Redirects to dashboard
+
+👉 No PHP required
+
+👉 No separate callback file required
+
+This is a Single Page App style approach.
+
+### 🔵 Pattern B — Callback = cognito-callback.php
+
+This works when:
+
+- You want a dedicated page to process tokens
+
+- You want cleaner architecture
+
+- You may use PHP sessions
+
+Cognito redirects to:
+
+```
+https://dxxxx.cloudfront.net/cognito-callback.php#id_token=...
+```
+
+That file:
+
+- Extracts token
+
+- Stores it
+
+- Redirects to dashboard
+
+### 🧠 So Why The Change?
+
+Because earlier we discussed PHP session protection, which requires:
+
+- A server-side session start
+
+- A controlled redirect
+
+That fits better with cognito-callback.php.
+
+### 🎯 Now Based On YOUR Situation
+
+You said:
+
+- You want to avoid PHP bugs
+
+- You had cURL issues before
+
+- You prefer frontend-driven approach
+
+- You don’t want unnecessary backend complexity
+
+👉 Then you should use:
+
+### ✅ Pattern A (Simpler, Cleaner)
+
+Use:
+
+Callback URL inside Cognito:
+
+```
+https://dxxxx.cloudfront.net/login.html
+```
+
+And modify login.html to:
+
+- Detect if URL contains tokens
+
+- If yes → store them → redirect to dashboard
+
+- If no → show login button
+
+No cognito-callback.php needed.
+
+### 🏆 Which One Should You Choose?
+
+| If you want...             | Use                    |
+| -------------------------- | ---------------------- |
+| Fully frontend             | login.html as callback |
+| PHP session protection     | cognito-callback.php   |
+| Simpler deployment         | login.html             |
+| Fewer backend bugs         | login.html             |
+| Enterprise backend control | cognito-callback.php   |
+
+### 💡 My Honest Recommendation For You
+
+Since you are worried about PHP issues:
+
+👉 Use login.html as callback URL
+
+👉 Use JS-only token handling
+
+👉 Use JS logout
+
+👉 Avoid PHP entirely for auth
+
+This will:
+
+- Avoid cURL problems
+
+- Avoid session bugs
+
+- Avoid CloudFront + PHP config issues
+
+Be clean and stable
+
+### ⚠️ Important
+
+If you choose this approach:
+
+Inside Cognito:
+
+Callback URL:
+
+```
+https://dxxxx.cloudfront.net/login.html
+```
+
+Sign-out URL:
+
+```
+https://dxxxx.cloudfront.net/login.html
+```
+
+(No logout.php needed if you use JS logout)
+
+### 🚀 Final Answer
+
+You do NOT need cognito-callback.php
+if you use login.html to handle tokens in JavaScript.
+
+Both approaches are correct.
+The difference is architecture style.
+
 ---
 ### logout.php – Logout User
 
