@@ -119,6 +119,161 @@ if (!empty($data['access_token'])) {
 
 > **Update Version:1.0**
 
+> **☕ Now Let’s Build Your Styled Logout Page**
+
+We’ll create:
+
+```
+logout.php  (does session destroy + redirect)
+logout-success.html  (styled page)
+```
+
+### ✅ OPTION 1 (Best Practice)
+
+User clicks Logout → PHP destroys session →
+Cognito logout → Redirects to styled success page
+
+#### 🌟 Step 1: Styled Logout Success Page
+
+Create:
+
+logout-success.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Logged Out</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.65);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.logout-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 350px;
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+}
+
+.logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.cafe-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.btn-home {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    width: 100%;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.btn-home:hover {
+    transform: scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="logout-card">
+    <div class="logo">☕</div>
+    <div class="cafe-title">Charlie Café</div>
+    <h4 class="mb-3">You’ve been logged out!</h4>
+    <p class="mb-4">We hope to see you again soon ☕</p>
+    <a href="login.html" class="btn btn-home">Back to Login</a>
+</div>
+
+</body>
+</html>
+```
+
+#### 🌟 Step 2: Updated logout.php
+
+```
+<?php
+// ===========================================================
+// CHARLIE CAFÉ ☕ - Secure Logout
+// ===========================================================
+
+session_start();
+session_destroy();
+
+// 🔹 Replace with your real values
+$COGNITO_DOMAIN = "https://your-domain.auth.us-east-1.amazoncognito.com";
+$CLIENT_ID = "YOUR_NEW_CLIENT_ID";
+
+// After Cognito logout, go to styled page
+$LOGOUT_REDIRECT = "http://localhost/logout-success.html";
+
+// Build Cognito logout URL
+$logoutUrl = $COGNITO_DOMAIN . "/logout?client_id=" . $CLIENT_ID . "&logout_uri=" . urlencode($LOGOUT_REDIRECT);
+
+// Redirect to Cognito global logout
+header("Location: $logoutUrl");
+exit;
+?>
+```
+
+### 🔐 What Happens Now
+
+User clicks logout →
+
+PHP destroys session
+
+Redirects to Cognito logout endpoint
+
+Cognito clears tokens
+
+Redirects to styled logout-success page
+
+🔥 Clean. Secure. Professional.
+
+### 🎯 Final Structure
+
+```
+login.html
+cognito-callback.php
+dashboard.php
+logout.php
+logout-success.html
+```
+
 #### 🔵 OPTION A — Global Logout (Recommended for Your Project)
 
 What it does:
