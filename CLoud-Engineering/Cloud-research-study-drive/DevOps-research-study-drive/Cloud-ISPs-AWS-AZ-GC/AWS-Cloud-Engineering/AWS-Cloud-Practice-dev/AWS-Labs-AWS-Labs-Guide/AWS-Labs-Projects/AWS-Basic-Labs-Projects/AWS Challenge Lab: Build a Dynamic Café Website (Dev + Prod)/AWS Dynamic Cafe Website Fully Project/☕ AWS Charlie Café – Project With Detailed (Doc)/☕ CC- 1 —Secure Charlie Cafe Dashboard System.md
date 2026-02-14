@@ -488,7 +488,67 @@ We must redirect to Cognito logout endpoint.
 
 Rename file to: logout.php
 
+### 🔹 OPTION A — Global Logout (Recommended)
+
+This:
+
+Destroys PHP session
+
+Logs user out from Cognito Hosted UI
+
+Shows styled logout page
+
+#### ⚠️ Important: When logging out from Cognito, you must redirect to Cognito first.
+
+So the styled page must appear after Cognito redirects back.
+
+That means:
+
+First request → destroy session + redirect to Cognito
+
+Second request → show styled page
+
+We can handle both in ONE FILE using a condition.
+
+### ✅ Single File: logout.php
+
 [logout.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+### 🧠 Why This Works
+
+- First visit: logout.php → destroys session → redirects to Cognito → Cognito logs user out → redirects back to: 
+
+```
+logout.php?loggedout=true
+```
+
+Now PHP skips redirect and displays styled page.
+
+🔥 Clean. Secure. One file only.
+
+### 🎯 Important Cognito Console Setting
+
+Inside Amazon Cognito:
+
+Set Sign-out URL to:
+
+```
+http://localhost/logout.php?loggedout=true
+```
+
+Otherwise Cognito will reject the redirect.
+
+### 🚀 Recommendation Level
+
+This single-file approach is:
+✔ Professional
+
+✔ Secure
+
+✔ Production-ready
+
+✔ Cleaner file structure
+
 
 
 **✅ PHASE 2️⃣ STATUS**

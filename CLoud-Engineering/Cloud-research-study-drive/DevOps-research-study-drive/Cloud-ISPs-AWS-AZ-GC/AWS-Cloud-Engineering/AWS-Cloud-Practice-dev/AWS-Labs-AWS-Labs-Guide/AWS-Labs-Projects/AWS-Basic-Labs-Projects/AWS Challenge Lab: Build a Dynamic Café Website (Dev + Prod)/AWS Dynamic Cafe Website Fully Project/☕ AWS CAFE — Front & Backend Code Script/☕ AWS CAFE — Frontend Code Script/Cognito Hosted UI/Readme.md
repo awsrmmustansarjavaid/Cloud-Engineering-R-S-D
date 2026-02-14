@@ -119,18 +119,289 @@ if (!empty($data['access_token'])) {
 
 > **Update Version:1.0**
 
+#### 🔵 OPTION A — Global Logout (Recommended for Your Project)
+
+What it does:
+
+- Destroys PHP session
+
+- Logs user out from Cognito Hosted UI
+
+- Clears Cognito cookies
+
+- Prevents automatic re-login
+
+Why this matters:
+
+If user clicks login again, they must enter credentials again.
+
+Best for:
+
+- Real projects
+
+- Secure apps
+
+- Production systems
+
+- Assignments that require full authentication flow
+
+You are building:
+
+Charlie Café with Cognito authentication →
+✅ This is the correct and professional option for you
+
 ```
 <?php
 // ===========================================================
-// CHARLIE CAFÉ ☕ - Logout
+// CHARLIE CAFÉ ☕ - Combined Logout + Styled Page
+// Works with Amazon Cognito Hosted UI
 // ===========================================================
+
 session_start();
-session_destroy();
-header("Location: login.html");
-exit;
+
+/*
+--------------------------------------------------------------
+STEP 1:
+If this is the FIRST time user hits logout.php
+→ Destroy session
+→ Redirect to Cognito logout endpoint
+--------------------------------------------------------------
+*/
+
+if (!isset($_GET['loggedout'])) {
+
+    // Destroy local PHP session
+    session_destroy();
+
+    // 🔹 Replace with your real Cognito values
+    $COGNITO_DOMAIN = "https://your-domain.auth.us-east-1.amazoncognito.com";
+    $CLIENT_ID = "YOUR_NEW_CLIENT_ID";
+
+    // After Cognito logs out, return here with flag
+    $LOGOUT_REDIRECT = "http://localhost/logout.php?loggedout=true";
+
+    // Build Cognito logout URL
+    $logoutUrl = $COGNITO_DOMAIN . "/logout?client_id=" 
+                . $CLIENT_ID 
+                . "&logout_uri=" 
+                . urlencode($LOGOUT_REDIRECT);
+
+    // Redirect to Cognito
+    header("Location: $logoutUrl");
+    exit;
+}
+
+/*
+--------------------------------------------------------------
+STEP 2:
+If Cognito redirected back with ?loggedout=true
+→ Show styled logout page
+--------------------------------------------------------------
+*/
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Logged Out</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.65);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.logout-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 350px;
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+}
+
+.logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.cafe-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    width: 100%;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    transform: scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="logout-card">
+    <div class="logo">☕</div>
+    <div class="cafe-title">Charlie Café</div>
+    <h4 class="mb-3">You’ve been logged out!</h4>
+    <p class="mb-4">Thanks for visiting. See you again soon ☕</p>
+    <a href="login.html" class="btn btn-login">Back to Login</a>
+</div>
+
+</body>
+</html>
 ```
 
----
+#### 🟠 OPTION B — Local Logout Only (Simple Version)
+
+This option:
+
+- Only destroys PHP session
+
+- Does NOT log user out from Cognito
+
+- Cognito cookies remain active
+
+What happens:
+
+User logs out →
+Clicks login again →
+⚠️ Cognito automatically logs them back in (no password asked)
+
+Because Cognito session is still active.
+
+🔶 OPTION B Code (Simple Version)
+
+Single logout.php file:
+
+```
+<?php
+// ===========================================================
+// CHARLIE CAFÉ ☕ - Simple Logout (Local Only)
+// This does NOT log out from Cognito Hosted UI
+// ===========================================================
+
+session_start();
+session_destroy();
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Charlie Café ☕ | Logged Out</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body {
+    background:#1a110b;
+    color:white;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+.card {
+    background:#3a251c;
+    padding:40px;
+    border-radius:20px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>☕ Charlie Café</h2>
+    <p>You have been logged out (locally).</p>
+    <a href="login.html" class="btn btn-warning">Login Again</a>
+</div>
+
+</body>
+</html>
+```
+
+#### ⚠️ Problem With Option B
+
+Since you're using Amazon Cognito, Cognito keeps its own session cookie.
+
+So:
+
+- PHP session = destroyed ✅
+
+- Cognito session = still active ❌
+
+That means user can log back in without credentials.
+
+### 🏆 Which One Is Suitable For Your Project?
+
+Based on your Charlie Café project:
+
+You are:
+
+Using Cognito Hosted UI
+
+Handling callback
+
+Managing sessions
+
+Building a structured auth system
+
+### 👉 You should use OPTION A (Global Logout)
+
+Because:
+
+✔ It demonstrates full Cognito understanding
+✔ It is secure
+✔ It behaves like real production systems
+✔ It avoids auto-login issue
+
+### 🔥 Simple Comparison
+
+| Feature                   | Option A | Option B |
+| ------------------------- | -------- | -------- |
+| Destroys PHP session      | ✅        | ✅        |
+| Logs out from Cognito     | ✅        | ❌        |
+| Prevents auto login       | ✅        | ❌        |
+| Professional practice     | ✅        | ❌        |
+| Suitable for your project | ⭐ YES    | ❌ No     |
+
+### 🎯 Final Recommendation
+
+For Charlie Café + Cognito:
+
+➡ Use Global Logout (Option A)
+
+➡ Single-file version I gave you earlier is perfect
 
 ### ✅ How This Works
 
@@ -151,6 +422,38 @@ exit;
 - Cognito only controls page access.
 
 - Fully working, simple, and compatible with your previous PHP pages.
+
+### 🧠 Why Login is HTML but Logout is PHP?
+
+#### ✅ Login → HTML (Frontend Only)
+
+The login page:
+
+- Just redirects user to Cognito Hosted UI
+
+- No server logic needed
+
+- No session to destroy
+
+- Pure client-side redirect
+
+So HTML + JavaScript is enough.
+
+#### ✅ Logout → PHP (Server Side Required)
+
+Logout must:
+
+- Destroy the PHP session (session_destroy())
+
+- Remove stored user data
+
+- Then redirect to Cognito logout endpoint
+
+Session destruction must happen on the server, not browser.
+
+👉 JavaScript cannot securely destroy server session.
+
+👉 That’s why logout uses PHP.
 
 ---
 
