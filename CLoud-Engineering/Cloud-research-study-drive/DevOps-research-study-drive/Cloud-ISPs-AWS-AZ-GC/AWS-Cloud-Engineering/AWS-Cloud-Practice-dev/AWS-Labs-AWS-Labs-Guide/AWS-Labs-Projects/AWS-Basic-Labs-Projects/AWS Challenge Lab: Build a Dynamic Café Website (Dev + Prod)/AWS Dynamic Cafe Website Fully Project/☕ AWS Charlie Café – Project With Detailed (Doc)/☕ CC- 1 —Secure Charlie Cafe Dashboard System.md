@@ -475,7 +475,7 @@ YOUR_REGION
 
 YOUR_APP_CLIENT_ID
 
-[login.html](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+[login.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/login.html)
 
 ### ✅ 2️⃣ Updated logout.php
 
@@ -488,7 +488,7 @@ We must redirect to Cognito logout endpoint.
 
 Rename file to: logout.php
 
-[logout.php](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+[logout.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
 
 
 **✅ PHASE 2️⃣ STATUS**
