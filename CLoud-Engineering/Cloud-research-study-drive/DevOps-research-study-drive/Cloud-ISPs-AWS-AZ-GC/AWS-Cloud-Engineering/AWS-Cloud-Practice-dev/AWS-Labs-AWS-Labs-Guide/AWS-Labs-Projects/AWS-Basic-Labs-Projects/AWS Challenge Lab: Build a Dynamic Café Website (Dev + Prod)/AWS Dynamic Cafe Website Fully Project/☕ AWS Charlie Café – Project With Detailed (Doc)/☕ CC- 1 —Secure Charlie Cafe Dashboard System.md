@@ -220,13 +220,13 @@ https://dxxxx.cloudfront.net/login.html
 #### 2️⃣ Sign-out URL
 
 ```
-https://YOUR_CLOUDFRONT_DOMAIN/logout.html
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
 ```
 
 Example:
 
 ```
-https://dxxxx.cloudfront.net/logout.html
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
 ```
 
 Must match EXACTLY.

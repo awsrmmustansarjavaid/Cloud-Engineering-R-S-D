@@ -610,7 +610,108 @@ Session destruction must happen on the server, not browser.
 
 👉 That’s why logout uses PHP.
 
----
+
+### ✅ Why This Sign-out URL Is Correct
+
+You configured:
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+This works because:
+
+🔁 Logout Flow (Step-by-step)
+
+1️⃣ User clicks logout
+2️⃣ logout.php destroys session
+3️⃣ Redirects to Cognito:
+
+```
+https://your-domain.auth.us-east-1.amazoncognito.com/logout
+```
+
+4️⃣ Cognito clears its cookies
+5️⃣ Cognito redirects to:
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+6️⃣ logout.php detects ?loggedout=true
+7️⃣ Styled logout page is displayed
+
+✔ Perfect
+✔ Secure
+✔ Production-ready
+
+### 🔐 Why ?loggedout=true Is Important
+
+Without it:
+
+Your file cannot distinguish between:
+
+First request (needs redirect to Cognito)
+
+Return request (needs to display logout page)
+
+That flag prevents infinite redirect loops.
+
+### ⚠️ Important Things To Double-Check
+
+Inside Amazon Cognito console:
+
+App Client → Hosted UI → Sign-out URL must EXACTLY match:
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+✔ Same protocol (https)
+✔ Same domain
+✔ Same path
+✔ Same query parameter
+
+Even a small mismatch = Cognito error.
+
+### 🧠 Common Mistake People Make
+
+They configure:
+
+```
+https://dxxxx.cloudfront.net/logout.php
+```
+
+But in code they redirect to:
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+🚨 Cognito will reject it because it must match exactly.
+
+### 🏆 Final Verdict
+
+Your configuration:
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
+```
+
+✅ YES — Correct
+✅ Secure
+✅ CloudFront compatible
+✅ Recommended for your Charlie Café project
+
+----
+
+
 
 
 
