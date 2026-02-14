@@ -1334,17 +1334,17 @@ sudo nano /var/www/html/analytics.html
 CTRL + O → ENTER
 CTRL + X
 ```
-### 🔟 dashboard-login.html
+### 🔟 login.html
 
 #### 1️⃣ Create File
 
 ```
-sudo nano /var/www/html/dashboard-login.html
+sudo nano /var/www/html/login.html
 ```
 
 #### 2️⃣ code
 
-[dashboard-login.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/dashboard-login.html)
+[login.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/login.html)
 
 #### 3️⃣ Save File
 
@@ -1365,6 +1365,26 @@ sudo nano /var/www/html/price-list.html
 #### 2️⃣ code
 
 [price-list.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/price-list.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+### 1️⃣2️⃣ logout.php
+
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/logout.php
+```
+
+#### 2️⃣ code
+
+[logout.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
 
 #### 3️⃣ Save File
 
@@ -1403,7 +1423,8 @@ FILES=(
 "/var/www/html/payment-status.php"
 "/var/www/html/central-print.html"
 "/var/www/html/analytics.html"
-"/var/www/html/dashboard-login.html"
+"/var/www/html/login.html"
+"/var/www/html/logout.php"
 "/var/www/html/price-list.html"
 "/var/www/html/js/central-auth-api.js"
 "/var/www/html/css/central_cafe_style.css"
