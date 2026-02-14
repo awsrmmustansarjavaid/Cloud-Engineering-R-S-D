@@ -709,6 +709,174 @@ https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
 ✅ CloudFront compatible
 ✅ Recommended for your Charlie Café project
 
+### 🔐 Important Clarification
+
+Logout with Amazon Cognito does NOT require:
+
+- cURL
+
+- Token validation
+
+- Backend API calls
+
+The Cognito logout endpoint is just a browser redirect.
+
+So your previous PHP–cURL issue does NOT apply to logout.
+
+### 🟢 Option C — Pure HTML + JavaScript Logout (No PHP)
+
+This approach:
+
+- Clears tokens from browser (if stored there)
+
+- Redirects directly to Cognito logout endpoint
+
+- No server code
+
+- No session_destroy()
+
+- No cURL
+
+- No backend logic
+
+### 🏗 When Is JS Logout Safe?
+
+It is perfectly fine if:
+
+✔ You are using Hosted UI
+
+✔ You are not storing sensitive server sessions
+
+✔ Your app is mostly frontend-driven
+
+If you are not heavily relying on PHP sessions → JS logout is totally acceptable.
+
+### 🚀 Clean JavaScript Logout Example
+
+Create:
+
+logout.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Logout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background:#1a110b;
+    color:white;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+.card {
+    background:#3a251c;
+    padding:40px;
+    border-radius:20px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>☕ Charlie Café</h2>
+    <p>Logging you out...</p>
+</div>
+
+<script>
+// ===========================================================
+// CHARLIE CAFÉ ☕ - JavaScript Logout
+// No PHP required
+// ===========================================================
+
+// Replace with your Cognito domain
+const COGNITO_DOMAIN = "https://your-domain.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = "YOUR_CLIENT_ID";
+
+// After logout, redirect to login page
+const LOGOUT_REDIRECT = "https://dxxxx.cloudfront.net/login.html";
+
+// Clear any stored tokens (if you used localStorage/sessionStorage)
+localStorage.clear();
+sessionStorage.clear();
+
+// Redirect to Cognito logout endpoint
+window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(LOGOUT_REDIRECT)}`;
+</script>
+
+</body>
+</html>
+```
+
+### 🧠 Comparison: PHP vs JS Logout
+
+| Feature               | PHP Logout | JS Logout |
+| --------------------- | ---------- | --------- |
+| Requires backend      | ✅          | ❌         |
+| Destroys PHP session  | ✅          | ❌         |
+| Works with Hosted UI  | ✅          | ✅         |
+| Risk of cURL issues   | Possible   | ❌ None    |
+| Simpler               | ❌          | ✅         |
+| Good for frontend app | ⚠️         | ✅         |
+
+### 🎯 Which Should YOU Choose?
+
+Based on your situation:
+
+- You had cURL issues before
+
+- You are deploying behind CloudFront
+
+- You don’t want backend bugs
+
+- Your app is not deeply server-driven
+
+#### 👉 I recommend JavaScript logout.
+
+It is:
+✔ Cleaner
+
+✔ Less risky
+
+✔ Easier to debug
+
+✔ Fully compatible with Cognito Hosted UI
+
+### ⚠️ When Should You NOT Use JS Logout?
+
+If:
+
+- You rely heavily on PHP sessions for access control
+
+- You store sensitive data server-side
+
+- You validate tokens server-side
+
+Then PHP logout is better.
+
+### 🏆 My Professional Recommendation For Charlie Café
+
+Use:
+
+- HTML + JS for login redirect
+
+- HTML + JS for logout redirect
+
+- PHP only for protected pages (if needed)
+
+- Keep authentication browser-driven.
+
+It avoids backend token complexity.
+
+
 ----
 
 
