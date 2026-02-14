@@ -477,7 +477,18 @@ YOUR_APP_CLIENT_ID
 
 [login.html](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 
+### ✅ 2️⃣ Updated logout.php
 
+(Proper Cognito global sign-out + styled logout page option)
+
+⚠️ Important: If you only destroy session locally, the user stays logged into Cognito.
+We must redirect to Cognito logout endpoint.
+
+🌟 Recommended Logout (Full Cognito Sign-Out)
+
+Rename file to: logout.php
+
+[logout.php](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
 
 
 **✅ PHASE 2️⃣ STATUS**
