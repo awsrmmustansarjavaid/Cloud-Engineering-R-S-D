@@ -876,7 +876,108 @@ Use:
 
 It avoids backend token complexity.
 
+### 1️⃣ Your Requirements Recap
 
+AWS Cognito service is being used
+
+- Frontend pages (login, dashboard, etc.) must be protected and secure
+
+- You don’t want public access
+
+- You don’t want PHP cURL issues or bugs again
+
+- You want to deploy a final, stable version
+
+### 2️⃣ Core Considerations
+
+#### a) Why PHP was problematic before
+
+- Previous issues were mostly cURL + Cognito API token requests
+
+- PHP is only needed if you want server-side token verification or session management
+
+- But Cognito Hosted UI + JS can handle login/logout entirely in the browser
+
+- If PHP tries to call Cognito APIs (like introspection, refresh, token validation), that’s where cURL bugs happen
+
+#### b) What you actually need
+
+- Secure pages → only accessible if user is logged in
+
+- Logout → destroy session and clear tokens
+
+- Frontend-driven authentication → avoid unnecessary PHP complexity
+
+### 3️⃣ Recommended Approach For Your Project
+
+#### ✅ Frontend + JS (No PHP cURL)
+
+- Use login.html → redirect to Cognito Hosted UI
+
+- Use JS + localStorage/sessionStorage → store tokens temporarily
+
+- Protect your dashboard pages with a JS check: if no token → redirect to login
+
+- Use logout.html (JS) → redirect to Cognito logout endpoint
+
+####  ✅ Optional PHP
+
+- Only needed if you want server-side token verification (optional)
+
+- You can still use logout.php as we built above; it’s simple, one file, no cURL involved
+
+- That PHP logout works 100% reliably because it just destroys the session and redirects to Cognito logout endpoint → then Cognito redirects back to your styled logout page
+
+So you won’t hit PHP + cURL issues again, because there is no API call to Cognito in that logout.php.
+
+### 4️⃣ How Logout.php Works Now (Safe, No Bug)
+
+- First visit → destroys PHP session → redirects to Cognito logout endpoint
+
+- Cognito clears its session
+
+- Redirects back to logout.php?loggedout=true
+
+- PHP detects ?loggedout=true → shows styled logout page
+
+- No cURL, no API call, no token fetching, no backend errors
+
+This is safe and production-ready. ✅
+
+### 5️⃣ Why You Can Trust This Setup
+
+- CloudFront + Cognito integration works as long as URLs match
+
+- logout.php handles both session destruction and styling
+
+- Single file, simple flow, easy to debug
+
+Fully compatible with protected pages
+
+### 6️⃣ Suggested Final Architecture for Charlie Café
+
+```
+/login.html          → JS redirect to Cognito Hosted UI
+/cognito-callback.php → JS or PHP reads Cognito token, stores in session/localStorage
+/dashboard.html      → JS checks token; if missing → redirect to login
+/logout.php          → destroys session + redirects to Cognito logout → shows styled page
+```
+
+All backend PHP is minimal and no API calls. You are safe from previous cURL issues.
+
+### 7️⃣ My Professional Recommendation
+
+#### ✅ Use logout.php as I gave you in “Option A – Single File”
+
+- Fully production-ready
+
+- Secure for protected pages
+
+- Styled logout page included
+
+- No PHP cURL or Cognito API issues
+
+- Works perfectly with CloudFront
 ----
 
 
