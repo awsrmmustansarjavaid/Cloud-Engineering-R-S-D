@@ -358,7 +358,95 @@ Authorization code grant
 
 #### ⚠️ You must update your central-auth-api.js accordingly.
 
+### 🔐 PART 11 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
 
+You asked for easiest method.
+
+Here is the clean method.
+
+### 🟢 STEP 1 — Build Login URL
+
+In browser:
+
+```
+https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://YOUR_CLOUDFRONT/login.html
+```
+
+Press Enter.
+
+### 🟢 STEP 2 — Login
+
+Enter username/password.
+
+You will be redirected to:
+
+```
+https://YOUR_CLOUDFRONT/login.html?code=XYZ123
+```
+
+### 🟢 STEP 3 — Exchange Code for Tokens (Manual Method)
+
+Open browser DevTools → Console
+
+Run:
+
+```
+fetch("https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/oauth2/token", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: new URLSearchParams({
+    grant_type: "authorization_code",
+    client_id: "YOUR_CLIENT_ID",
+    code: "PASTE_CODE_FROM_URL",
+    redirect_uri: "https://YOUR_CLOUDFRONT/login.html"
+  })
+})
+.then(res => res.json())
+.then(console.log);
+```
+
+You will receive:
+
+```
+{
+  access_token: "...",
+  id_token: "...",
+  refresh_token: "...",
+  expires_in: 3600
+}
+```
+
+Copy access_token.
+
+### 🔥 EVEN EASIER METHOD (Old Implicit Way – Testing Only)
+
+If you temporarily enable:
+
+```
+Implicit grant
+```
+
+Then use:
+
+```
+response_type=token
+```
+
+Then after login you will be redirected with:
+
+```
+#access_token=xxxx
+```
+
+This is easiest for quick manual testing.
+
+But production → Authorization Code is correct.
 
 
 **✅ PHASE 1️⃣ STATUS**

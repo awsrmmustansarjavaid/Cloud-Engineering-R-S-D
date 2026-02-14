@@ -6461,3 +6461,130 @@ Do not manually touch token.
 > **This is the industry standard / production-ready approach.**
 
 ---
+## AWS changed the Cognito UI.
+
+The new Cognito layout, and it behaves differently from the old wizard.
+
+We’ll cover:
+
+1️⃣ Where “Client Secret Disabled” is now
+
+2️⃣ Where to find User Pool ID / Client ID
+
+3️⃣ How to get access token easily (correct modern way)
+
+Using:
+
+Amazon Cognito
+
+Amazon API Gateway
+
+### 🔎 PART 1 — Why You Don’t See “Client Secret Disabled”
+
+In the NEW Cognito UI, when it asks:
+
+“App name”
+
+It is creating the App Client automatically inside the user pool.
+
+You will NOT see client secret option during first screen.
+
+It depends on the app type you selected.
+
+### ✅ Where to Verify Client Secret is Disabled (NEW UI)
+
+After creating the User Pool:
+
+- Go to: Cognito → User pools → Click your user pool → Applications (left menu)
+→ Click your app name
+
+- Now scroll down to: 🔐 Client secret
+
+You should see:
+
+```
+Client secret: None
+```
+
+OR
+
+```
+Client secret: Not generated
+```
+
+If it shows an actual secret value → then it is confidential client.
+
+#### 🔥 If Secret Exists (Wrong Setup)
+
+You cannot disable it.
+
+You must:
+
+- Go to Applications
+
+- Click “Create application”
+
+- Choose: ✅ Public client
+
+That automatically disables secret.
+
+### 🔎 PART 2 — Where to Find User Pool ID & Client ID
+
+### ✅ User Pool ID Location
+
+- Go to: Cognito → User pools → Click your pool
+
+Top right section shows:
+
+```
+User pool ID: us-east-1_xxxxxxxx
+```
+
+Copy that.
+
+### ✅ App Client ID Location
+
+### Inside same user pool:
+
+- Applications → Click your app
+
+You will see:
+
+```
+App client ID: 4abc123xyz
+```
+
+Copy that.
+
+You need:
+
+```
+USER_POOL_ID
+CLIENT_ID
+COGNITO_DOMAIN
+```
+
+### 🔎 PART 3 — Where to Find Cognito Domain
+
+- Go to: User pool → Applications → Domain
+
+If no domain exists:
+
+Click “Create domain”
+
+Choose prefix:
+
+```
+charlie-cafe-auth
+```
+
+You will get:
+
+```
+charlie-cafe-auth.auth.us-east-1.amazoncognito.com
+```
+
+Copy that.
+
+Do NOT include https.
+

@@ -162,18 +162,24 @@ If missing → your frontend token exchange is wrong.
 
 ### ✅ TEST 7 — Decode Token
 
+> **Verify Token Is Valid**
+
 - Copy access_token.
 
-- Go to jwt.io
+- Go to [jwt.io](https://jwt.io)
+
+- Paste access_token.
 
 #### ✅ Verify:
 
 - Payload contains:
 
+You see:
+
 ```
-"sub"
-"email"
 "cognito:groups"
+"email"
+"sub"
 "exp"
 ```
 
@@ -187,6 +193,30 @@ If cognito:groups missing → user not assigned to group.
 ## 🔐 PHASE 4 — API Gateway Authorizer Test
 
 ### ✅ TEST 7 — Protected Route Without Token
+
+#### Quick API Test
+
+In browser console:
+
+```
+fetch("https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders", {
+  headers: {
+    Authorization: "Bearer YOUR_ACCESS_TOKEN"
+  }
+})
+.then(res => res.json())
+.then(console.log);
+```
+
+#### ✅ Expected:
+
+```
+200 if allowed
+403 if wrong group
+401 if invalid token
+```
+
+
 
 - Open browser:
 
