@@ -453,3 +453,34 @@ But production → Authorization Code is correct.
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 2️⃣ — Amazon Cognito Hosted UI — Callback + Logout
+
+✅ Updated Login.html (with your Cognito config structure ready)
+
+✅ Proper cognito-callback.php (NEW – required for token handling)
+
+✅ Updated Logout.php (with Cognito global sign-out)
+
+🎨 Café-themed UI (coffee background, icons, logo text, warm styling)
+
+💬 Clear comments inside the code
+
+### ✅ 1️⃣ Updated Login Page (Charlie Café Theme)
+
+Replace with your real values:
+
+YOUR_DOMAIN_PREFIX
+
+YOUR_REGION
+
+YOUR_APP_CLIENT_ID
+
+[login.html](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+
+
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
