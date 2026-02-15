@@ -307,12 +307,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 ### 2️⃣ Create Resource
 
 1. In your API, click **Resources → Actions → Create Resource**.
-2. Create /public Configure:
-   - Click root /
-   - Resource Name: `public`
-   - Resource Path: `/public`
-3. Create /public/orders Configure:
-   - Select /public
+2. Configure:
    - Resource Name: `orders`
    - Resource Path: `/orders`
 3. Click **Create Resource**.
@@ -321,7 +316,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 
 ### 3️⃣ Create POST Method
 
-1. Select `/public/orders` resource.
+1. Select `/orders` resource.
 2. Click **Actions → Create Method → POST**.
 3. Integration type: **Lambda Function**
    - Check **Use Lambda Proxy integration**
@@ -333,7 +328,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 
 ### 4️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
-1. Select `/public/orders` resource.
+1. Select `/orders` resource.
 2. Click **Actions → Enable CORS**.
 3. Configure:
    - Allowed Methods: `POST`
@@ -358,7 +353,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 After deployment, you’ll see an **Invoke URL** at the top of the Stage page, e.g.:
 
 ```
-https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/public/orders
+https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
 ```
 
 > This URL will be used in your EC2 PHP web app `curl` requests.
@@ -1555,7 +1550,7 @@ https://xxxxx.execute-api.us-east-1.amazonaws.com/prod
 #### And inside it you probably have:
 
 ```
-POST /public/orders       → CreateOrderLambda
+POST /orders       → CreateOrderLambda
 ```
 
 #### ✔️ This is CORRECT architecture
@@ -1576,7 +1571,7 @@ Multiple resources/methods inside it
 ```
 CafeOrdersAPI
 │
-├── POST /public/orders
+├── POST /orders
 │     └── CreateOrderLambda
 │
 └── GET /get-order-status
