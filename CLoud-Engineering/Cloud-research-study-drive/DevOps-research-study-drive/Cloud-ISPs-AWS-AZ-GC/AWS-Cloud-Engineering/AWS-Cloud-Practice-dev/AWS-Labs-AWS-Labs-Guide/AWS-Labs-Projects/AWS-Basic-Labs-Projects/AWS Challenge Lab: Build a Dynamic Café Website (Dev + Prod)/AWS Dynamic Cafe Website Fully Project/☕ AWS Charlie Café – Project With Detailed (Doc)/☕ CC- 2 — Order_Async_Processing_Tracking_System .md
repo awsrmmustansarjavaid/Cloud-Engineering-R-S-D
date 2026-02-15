@@ -1579,7 +1579,7 @@ CafeOrdersAPI
 ├── POST /public/orders
 │     └── CreateOrderLambda
 │
-└── GET /order-status
+└── GET /get-order-status
       └── GetOrderStatusLambda
 ```
 
