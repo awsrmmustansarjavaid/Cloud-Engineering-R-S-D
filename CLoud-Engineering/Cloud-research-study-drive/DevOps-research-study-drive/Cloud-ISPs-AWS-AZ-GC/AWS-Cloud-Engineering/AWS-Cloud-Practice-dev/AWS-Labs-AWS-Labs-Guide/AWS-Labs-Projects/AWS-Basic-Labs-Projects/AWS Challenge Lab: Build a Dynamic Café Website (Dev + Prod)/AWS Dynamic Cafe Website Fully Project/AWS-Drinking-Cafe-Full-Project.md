@@ -1459,7 +1459,10 @@ FILES=(
 "/var/www/html/login.html"
 "/var/www/html/logout.php"
 "/var/www/html/price-list.html"
-"/var/www/html/js/central-auth-api.js"
+"/var/www/html/js/onfig.js"
+"/var/www/html/js/utils.js"
+"/var/www/html/js/api.js"
+"/var/www/html/js/central-printing.js"
 "/var/www/html/css/central_cafe_style.css"
 )
 
