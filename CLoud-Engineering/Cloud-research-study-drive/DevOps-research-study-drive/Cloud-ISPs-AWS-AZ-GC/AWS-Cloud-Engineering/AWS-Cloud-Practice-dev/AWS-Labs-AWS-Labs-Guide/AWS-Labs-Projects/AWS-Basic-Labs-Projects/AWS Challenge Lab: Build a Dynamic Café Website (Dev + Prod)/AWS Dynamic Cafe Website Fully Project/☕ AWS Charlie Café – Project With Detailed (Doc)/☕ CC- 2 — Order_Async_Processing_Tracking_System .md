@@ -1,5 +1,6 @@
 
-# ☕ AWS CAFE — Order Async Processing & Tracking System
+# ☕ AWS CAFE — Customer Order Async Processing & Tracking System
+
 
 **Dev → Serverless → Secure → Scalable → Cost-Controlled**
 
