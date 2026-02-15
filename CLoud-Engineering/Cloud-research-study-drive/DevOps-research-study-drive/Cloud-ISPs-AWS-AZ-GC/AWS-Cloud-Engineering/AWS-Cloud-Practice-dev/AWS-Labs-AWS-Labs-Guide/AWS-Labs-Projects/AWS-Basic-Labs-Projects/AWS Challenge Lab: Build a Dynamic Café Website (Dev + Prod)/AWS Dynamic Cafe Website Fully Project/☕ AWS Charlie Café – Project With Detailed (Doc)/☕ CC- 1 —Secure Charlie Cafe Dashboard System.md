@@ -594,3 +594,24 @@ This file handles API logic only.
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 4️⃣ — API Gateway
+
+
+### 1️⃣ Create Authorizer in API Gateway
+
+- Go to: API Gateway → CafeOrdersAPI
+
+- Authorizers → Create Authorizer
+
+- Configure:
+
+  - Type → Cognito
+
+  - Name → CafeCognitoAuthorizer
+
+  - User Pool → select your pool
+
+  - Token source → Authorization header
+
+- Save.
+
