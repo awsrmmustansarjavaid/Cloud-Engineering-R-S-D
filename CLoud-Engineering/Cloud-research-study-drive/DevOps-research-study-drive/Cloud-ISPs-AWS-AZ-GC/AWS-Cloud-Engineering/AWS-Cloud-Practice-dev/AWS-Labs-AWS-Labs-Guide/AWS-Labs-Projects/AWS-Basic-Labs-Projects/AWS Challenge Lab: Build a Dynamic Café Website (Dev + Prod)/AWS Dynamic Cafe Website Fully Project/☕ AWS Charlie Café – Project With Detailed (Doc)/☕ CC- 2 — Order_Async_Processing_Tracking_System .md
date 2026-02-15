@@ -1549,13 +1549,13 @@ Test-GetOrderStatusLambda
 
 ```
 CafeOrdersAPI
-https://xxxxx.execute-api.us-east-1.amazonaws.com/dev
+https://xxxxx.execute-api.us-east-1.amazonaws.com/prod
 ```
 
 #### And inside it you probably have:
 
 ```
-POST /orders        → CreateOrderLambda
+POST /public/orders       → CreateOrderLambda
 ```
 
 #### ✔️ This is CORRECT architecture
@@ -1576,7 +1576,7 @@ Multiple resources/methods inside it
 ```
 CafeOrdersAPI
 │
-├── POST /orders
+├── POST /public/orders
 │     └── CreateOrderLambda
 │
 └── GET /order-status
