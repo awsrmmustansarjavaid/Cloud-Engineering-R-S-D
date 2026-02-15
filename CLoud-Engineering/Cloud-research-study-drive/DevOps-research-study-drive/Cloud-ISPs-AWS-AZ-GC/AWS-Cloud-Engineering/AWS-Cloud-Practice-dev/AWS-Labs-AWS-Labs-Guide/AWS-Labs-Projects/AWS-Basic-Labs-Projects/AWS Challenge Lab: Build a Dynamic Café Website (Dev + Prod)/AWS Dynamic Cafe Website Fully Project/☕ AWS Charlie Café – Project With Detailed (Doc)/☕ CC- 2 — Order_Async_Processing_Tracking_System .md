@@ -333,7 +333,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 
 ### 4️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
-1. Select `/orders` resource.
+1. Select `/public/orders` resource.
 2. Click **Actions → Enable CORS**.
 3. Configure:
    - Allowed Methods: `POST`
@@ -348,7 +348,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 
 1. Click **Actions → Deploy API**.
 2. Configure:
-   - Deployment stage: `dev`
+   - Deployment stage: `prod`
    - Stage description: `Development stage`
    - Deployment description: `Initial deployment`
 3. Click **Deploy**.
@@ -358,7 +358,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 After deployment, you’ll see an **Invoke URL** at the top of the Stage page, e.g.:
 
 ```
-https://abcdef123.execute-api.us-east-1.amazonaws.com/dev/orders
+https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/public/orders
 ```
 
 > This URL will be used in your EC2 PHP web app `curl` requests.
