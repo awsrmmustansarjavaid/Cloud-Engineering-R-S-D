@@ -555,3 +555,39 @@ This single-file approach is:
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
+## 🔐 PHASE 3️⃣ — central-auth-api
+
+### 🔥 STEP 1 — config.js (NO LOGIC HERE)
+
+This replaces hardcoded config from your old file.
+
+[config.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+### 🔥 STEP 2 — utils.js (Shared Helpers)
+
+Move all generic helpers here.
+
+[utils.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+
+### 🔐 STEP 3 — central-auth.js (COGNITO ONLY)
+
+This file contains ONLY authentication logic.
+
+No API routes inside.
+
+[central-auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+### 🌐 STEP 4 — api.js (PUBLIC + PROTECTED FETCH)
+
+This file handles API logic only.
+
+[api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+
+
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
