@@ -646,6 +646,77 @@ No hardcoded logic inside auth.
 ✔ Easy to scale
 ✔ Easy to maintain
 ✔ Clean for real SaaS
+
+### 🖨 What central-printing.js Actually Means (In Plain English)
+
+If someone clicks:
+
+"Download Invoice"
+
+This file handles it.
+
+If someone clicks:
+
+"Export Admin Report"
+
+This file handles it.
+
+If someone clicks:
+
+"Print Today Summary"
+
+This file handles it.
+
+That’s all.
+
+### 🔐 Example (Super Simple)
+
+#### Public page (no login required)
+
+Only load:
+
+```
+import { exportPublicReport } from "./js/central-printing.js";
+```
+
+Done.
+
+No Cognito.
+No auth.
+
+#### Protected admin page
+
+Load:
+
+```
+import { Auth } from "./js/central-auth.js";
+import { exportProtectedReport } from "./js/central-printing.js";
+```
+
+Then:
+
+```
+Auth.protectPage();
+Auth.requireRole(["Admin"]);
+```
+
+That’s it.
+
+### 🎯 The Rule You Must Remember
+
+Every file answers one question:
+
+| File                | Question it answers                |
+| ------------------- | ---------------------------------- |
+| config.js           | What are my settings?              |
+| utils.js            | What small helper tools do I have? |
+| central-auth.js     | Who is the user?                   |
+| api.js              | How do I call backend?             |
+| central-printing.js | How do I print or download files?  |
+
+If a file answers more than one question → wrong design.
+
+
 ---
 
 
