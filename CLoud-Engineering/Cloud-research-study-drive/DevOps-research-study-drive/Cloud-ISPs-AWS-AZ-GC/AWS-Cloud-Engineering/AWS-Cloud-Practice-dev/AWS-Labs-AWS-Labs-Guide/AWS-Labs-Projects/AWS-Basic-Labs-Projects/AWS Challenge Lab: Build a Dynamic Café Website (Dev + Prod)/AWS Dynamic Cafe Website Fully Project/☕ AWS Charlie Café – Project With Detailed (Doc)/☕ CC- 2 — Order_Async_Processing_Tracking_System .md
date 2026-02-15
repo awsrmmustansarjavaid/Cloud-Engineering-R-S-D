@@ -307,7 +307,12 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 ### 2️⃣ Create Resource
 
 1. In your API, click **Resources → Actions → Create Resource**.
-2. Configure:
+2. Create /public Configure:
+   - Click root /
+   - Resource Name: `public`
+   - Resource Path: `/public`
+3. Create /public/orders Configure:
+   - Select /public
    - Resource Name: `orders`
    - Resource Path: `/orders`
 3. Click **Create Resource**.
