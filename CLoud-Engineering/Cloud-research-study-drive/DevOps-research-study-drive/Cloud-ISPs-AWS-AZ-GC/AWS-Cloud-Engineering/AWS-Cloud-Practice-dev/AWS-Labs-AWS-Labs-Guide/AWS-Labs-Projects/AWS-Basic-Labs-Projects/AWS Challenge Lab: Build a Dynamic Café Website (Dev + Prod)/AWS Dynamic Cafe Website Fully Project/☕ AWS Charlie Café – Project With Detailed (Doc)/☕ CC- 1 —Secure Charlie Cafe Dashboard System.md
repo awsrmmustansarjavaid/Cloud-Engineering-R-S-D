@@ -584,6 +584,11 @@ This file handles API logic only.
 
 [api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
 
+### 🌐 STEP 5 — Create central-printing.js
+
+[central-printing.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
+
+
 
 **✅ PHASE 3️⃣ STATUS**
 

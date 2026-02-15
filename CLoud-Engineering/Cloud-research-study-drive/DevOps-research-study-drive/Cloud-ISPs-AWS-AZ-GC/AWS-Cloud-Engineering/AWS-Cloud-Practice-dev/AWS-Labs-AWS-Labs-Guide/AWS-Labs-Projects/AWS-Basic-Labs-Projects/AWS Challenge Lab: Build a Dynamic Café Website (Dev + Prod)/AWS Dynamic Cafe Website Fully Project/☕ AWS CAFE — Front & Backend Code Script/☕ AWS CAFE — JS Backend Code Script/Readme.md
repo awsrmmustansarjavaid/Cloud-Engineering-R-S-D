@@ -18,9 +18,9 @@
 /js
  ├── config.js
  ├── utils.js
- ├── central-auth.js          (Cognito ONLY)
- ├── api.js                   (API calls ONLY)
- ├── central-printing.js
+ ├── central-auth.js
+ ├── api.js
+ ├── central-printing.js   ✅ NEW
 ```
 
 #### Public pages:
@@ -381,6 +381,271 @@ You now have:
 
 - Production-grade structure
 
+### 🌐 STEP 5 — 
+✔ Handles PDF / CSV download
+✔ Works with protectedFetch
+✔ No Cognito logic inside
+✔ No hardcoded config
+
+Clean. Modular. Production-ready.
+
+📁 FINAL FILE STRUCTURE (UPDATED)
+
+```
+/js
+ ├── config.js
+ ├── utils.js
+ ├── central-auth.js
+ ├── api.js
+ ├── central-printing.js   ✅ NEW
+```
+
+### 🖨 central-printing.js (FULL VERSION)
+
+```
+/* =========================================================
+   CENTRAL PRINTING MODULE
+   Handles:
+   ✔ Browser printing
+   ✔ CSV export
+   ✔ PDF export
+   ✔ Protected downloads
+   ✔ Public downloads
+========================================================= */
+
+import { protectedFetch, publicFetch } from "./api.js";
+import { formatCurrency } from "./utils.js";
+
+/* =====================================================
+   1️⃣ BROWSER PRINT FUNCTIONS
+===================================================== */
+
+/**
+ * Print entire current page
+ */
+export function printPage() {
+    window.print();
+}
+
+/**
+ * Print daily summary from table
+ * Table rows must contain:
+ *   data-date
+ *   data-total
+ */
+export function printTodaySummary(tableSelector = "#ordersTable") {
+
+    const table = document.querySelector(`${tableSelector} tbody`);
+    if (!table) {
+        alert("Orders table not found");
+        return;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+    let totalOrders = 0;
+    let totalSales = 0;
+
+    table.querySelectorAll("tr").forEach(row => {
+
+        const orderDate = row.dataset.date;
+        const amount = parseFloat(row.dataset.total || 0);
+
+        if (orderDate === today) {
+            totalOrders++;
+            totalSales += amount;
+        }
+    });
+
+    const summaryHTML = `
+        <div style="padding:20px">
+            <h2>Charlie Cafe — Daily Summary</h2>
+            <hr>
+            <p><strong>Date:</strong> ${today}</p>
+            <p><strong>Total Orders:</strong> ${totalOrders}</p>
+            <p><strong>Total Sales:</strong> ${formatCurrency(totalSales)}</p>
+        </div>
+    `;
+
+    const original = document.body.innerHTML;
+    document.body.innerHTML = summaryHTML;
+    window.print();
+    document.body.innerHTML = original;
+    location.reload();
+}
+
+/* =====================================================
+   2️⃣ FILE DOWNLOAD HELPER
+===================================================== */
+
+async function downloadBlob(response, filename) {
+
+    if (!response || !response.ok) {
+        alert("Download failed");
+        return;
+    }
+
+    const blob = await response.blob();
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+
+    URL.revokeObjectURL(link.href);
+    document.body.removeChild(link);
+}
+
+/* =====================================================
+   3️⃣ PROTECTED EXPORT (Admin / Employee)
+===================================================== */
+
+/**
+ * Export protected report (PDF or CSV)
+ * Example:
+ *   /admin/export?type=pdf
+ */
+export async function exportProtectedReport(path, filename) {
+
+    const response = await protectedFetch(path, {
+        method: "GET"
+    });
+
+    await downloadBlob(response, filename);
+}
+
+/* =====================================================
+   4️⃣ PUBLIC EXPORT (No Cognito)
+===================================================== */
+
+/**
+ * Export public report
+ * Example:
+ *   /public/invoice?order_id=123
+ */
+export async function exportPublicReport(path, filename) {
+
+    const response = await publicFetch(path, {
+        method: "GET"
+    });
+
+    await downloadBlob(response, filename);
+}
+
+/* =====================================================
+   5️⃣ CSV FROM TABLE (Client-Side)
+===================================================== */
+
+export function exportTableToCSV(tableSelector, filename = "export.csv") {
+
+    const table = document.querySelector(tableSelector);
+    if (!table) {
+        alert("Table not found");
+        return;
+    }
+
+    let csv = [];
+
+    const rows = table.querySelectorAll("tr");
+
+    rows.forEach(row => {
+        const cols = row.querySelectorAll("th, td");
+        const rowData = [];
+
+        cols.forEach(col => {
+            rowData.push(`"${col.innerText.replace(/"/g, '""')}"`);
+        });
+
+        csv.push(rowData.join(","));
+    });
+
+    const blob = new Blob([csv.join("\n")], {
+        type: "text/csv"
+    });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+}
+```
+
+### 🔥 HOW TO USE central-printing.js
+
+#### ✅ Protected Admin Export Example
+
+```
+<script type="module">
+import { Auth } from "./js/central-auth.js";
+import { exportProtectedReport } from "./js/central-printing.js";
+
+Auth.protectPage();
+Auth.requireRole(["Admin"]);
+
+document.getElementById("exportPdfBtn")
+    .addEventListener("click", () => {
+
+        exportProtectedReport(
+            "/admin/export?type=pdf",
+            "admin-report.pdf"
+        );
+    });
+</script>
+```
+
+#### ✅ Public Invoice Download Example
+
+```
+<script type="module">
+import { exportPublicReport } from "./js/central-printing.js";
+
+document.getElementById("downloadInvoice")
+    .addEventListener("click", () => {
+
+        exportPublicReport(
+            "/public/invoice?order_id=123",
+            "invoice-123.pdf"
+        );
+    });
+</script>
+```
+
+#### ✅ Client-Side CSV Export
+
+```
+import { exportTableToCSV } from "./js/central-printing.js";
+
+exportTableToCSV("#ordersTable", "orders.csv");
+```
+
+### 🏆 WHY THIS IS CORRECT ARCHITECTURE
+
+| File                | Responsibility         |
+| ------------------- | ---------------------- |
+| config.js           | Config only            |
+| utils.js            | Shared helpers         |
+| central-auth.js     | Cognito only           |
+| api.js              | API calls only         |
+| central-printing.js | Printing + Export only |
+
+
+No mixing.
+No circular dependencies.
+No hardcoded logic inside auth.
+
+### 🚀 PRODUCTION BENEFITS
+
+✔ Public and protected completely separated
+✔ No Cognito loaded on public pages
+✔ Easy to test
+✔ Easy to scale
+✔ Easy to maintain
+✔ Clean for real SaaS
 ---
 
 
