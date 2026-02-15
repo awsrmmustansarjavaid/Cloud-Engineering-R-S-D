@@ -321,7 +321,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 
 ### 3️⃣ Create POST Method
 
-1. Select `/orders` resource.
+1. Select `/public/orders` resource.
 2. Click **Actions → Create Method → POST**.
 3. Integration type: **Lambda Function**
    - Check **Use Lambda Proxy integration**
@@ -342,7 +342,7 @@ Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café 
 4. Click **Enable CORS and replace existing CORS headers**.
 5. Click **Yes, replace existing values** if prompted.
 
-
+**⚠️ DO NOT attach authorizer**
 
 ### 5️⃣ Deploy API
 
