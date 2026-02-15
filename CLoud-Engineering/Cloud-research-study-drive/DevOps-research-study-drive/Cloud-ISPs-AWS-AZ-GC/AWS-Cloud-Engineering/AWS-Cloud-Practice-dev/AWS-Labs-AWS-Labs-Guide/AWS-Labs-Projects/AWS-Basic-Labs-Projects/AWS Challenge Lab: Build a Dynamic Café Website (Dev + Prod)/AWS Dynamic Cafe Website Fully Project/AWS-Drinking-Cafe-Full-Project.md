@@ -1056,10 +1056,12 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 ## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND central FOUNDATION (REUSABLE)
 
-### 1️⃣ Create the shared central-auth.js (IMPORTANT)
+### 1️⃣ Create config.js (NO LOGIC HERE)
 > **This file will be reused across all pages.**
 
-- 📍 Place this in /js/central-auth.js
+This replaces hardcoded config from your old file.
+
+- 📍 Place this in /js/config.js
 
 #### 1️⃣ Command to create the js directory
 
@@ -1070,16 +1072,43 @@ sudo mkdir -p /var/www/html/js
 #### 2️⃣ Command to create the .js file
 
 ```
-sudo nano /var/www/html/js/central-auth-api.js
+sudo nano /var/www/html/js/config.js
 ```
 
 #### 3️⃣ Copy & Paste Script
 
-[central-auth-api.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
+[config.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+
+
+
+### 2️⃣ Create utils.js (Shared Helpers)
+
+Move all generic helpers here.
+
+[utils.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
+
+
+
+### 3️⃣ Create central-auth.js (COGNITO ONLY)
+
+This file contains ONLY authentication logic.
+
+No API routes inside.
+
+[central-auth.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
+
+
+
+### 4️⃣ Create api.js (PUBLIC + PROTECTED FETCH)
+
+This file handles API logic only.
+
+[api.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
+
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
 
-#### 3️⃣ Fix File Permissions
+### 5️⃣ Fix File Permissions
 
 ```
 sudo chown apache:apache /var/www/html/js/*
