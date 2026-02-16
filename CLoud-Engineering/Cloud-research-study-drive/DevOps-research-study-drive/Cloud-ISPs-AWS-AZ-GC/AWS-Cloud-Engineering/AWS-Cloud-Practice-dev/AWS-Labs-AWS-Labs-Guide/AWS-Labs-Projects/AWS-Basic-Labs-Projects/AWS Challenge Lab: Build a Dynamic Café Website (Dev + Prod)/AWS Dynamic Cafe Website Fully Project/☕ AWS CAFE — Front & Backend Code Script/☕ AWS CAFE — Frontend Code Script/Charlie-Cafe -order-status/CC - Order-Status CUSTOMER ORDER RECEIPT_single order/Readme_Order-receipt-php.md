@@ -496,4 +496,117 @@ setInterval(() => {
 </html>
 ```
 
+### 🎯 How It Normally Should Work
+
+There are 2 different flows:
+
+### 🅰️ Flow 1 — After Customer Submits Order
+✔ Recommended Behavior
+
+After order is successfully created (from orders.php):
+
+```
+header("Location: order-receipt.php?order_id=" . $orderId);
+exit;
+```
+
+So:
+
+- Customer submits order
+
+- Backend creates order
+
+- System redirects to:
+
+```
+order-receipt.php?order_id=12345
+```
+
+- Receipt page loads
+
+- Status auto-refreshes every 10 seconds
+
+This is the correct production behavior.
+
+### 🅱️ Flow 2 — When Admin Marks Order as PAID
+
+This depends on your business logic.
+
+Important:
+
+Admin marking as PAID does NOT automatically open the receipt page.
+
+Because:
+
+Admin panel and customer device are separate sessions.
+
+You cannot force-open a page on someone else's browser unless:
+
+- Using WebSockets
+
+- Using push notifications
+
+- Using polling + status detection
+
+### 🏆 What Actually Happens in Your Current Code
+
+If customer is already on:
+
+```
+order-receipt.php?order_id=12345
+```
+
+And admin changes status to:
+
+```
+PAID
+```
+
+Then:
+
+- The page auto-refreshes every 10 seconds
+
+- The badge updates
+
+- It shows PAID
+
+But it does NOT open automatically.
+
+### 🚀 If You Want Auto Redirect After Paid
+
+You can add this inside your script:
+
+```
+/* =========================================================
+   REDIRECT IF STATUS = PAID
+========================================================= */
+const currentStatus = "<?= $status ?>";
+
+if (currentStatus === "PAID") {
+    setTimeout(() => {
+        window.location.href = "thank-you.php";
+    }, 2000);
+}
+```
+
+This means:
+
+- Customer stays on receipt page
+
+- When status becomes PAID
+
+- After refresh detects PAID
+
+- It redirects to thank-you page
+
+### 🔥 Professional Architecture Recommendation
+
+✔ Submit Order → Redirect to Receipt Page
+✔ Receipt Page → Auto-refresh status
+✔ If status = COMPLETED or PAID → Show Success UI
+✔ Optional: Auto redirect to Thank You page
+
+This is clean and production-safe.
+
+---
 
