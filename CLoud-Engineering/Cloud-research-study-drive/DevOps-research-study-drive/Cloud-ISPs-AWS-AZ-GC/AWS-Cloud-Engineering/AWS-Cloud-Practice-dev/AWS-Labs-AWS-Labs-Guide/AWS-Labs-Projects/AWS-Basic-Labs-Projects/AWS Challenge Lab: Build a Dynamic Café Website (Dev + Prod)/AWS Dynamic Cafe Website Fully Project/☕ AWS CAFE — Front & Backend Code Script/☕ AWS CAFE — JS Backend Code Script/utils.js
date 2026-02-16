@@ -1,23 +1,37 @@
 /* =========================================================
-   SHARED UTILITIES
+   CHARLIE CAFE — UTILITIES
+   ---------------------------------------------------------
+   ✔ JWT Parsing
+   ✔ Token Expiry Check
+   ✔ LocalStorage Token Helper
 ========================================================= */
 
-export function parseJwt(token) {
-    try {
-        return JSON.parse(atob(token.split(".")[1]));
-    } catch {
-        return {};
-    }
-}
+window.CHARLIE_UTILS = (() => {
 
-export function isTokenExpired(token) {
-    try {
-        return parseJwt(token).exp * 1000 < Date.now();
-    } catch {
-        return true;
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return {};
+        }
     }
-}
 
-export function formatCurrency(amount) {
-    return "$" + Number(amount).toFixed(2);
-}
+    function isTokenExpired(token) {
+        try {
+            return parseJwt(token).exp * 1000 < Date.now();
+        } catch {
+            return true;
+        }
+    }
+
+    function getToken() {
+        return localStorage.getItem("access_token");
+    }
+
+    return {
+        parseJwt,
+        isTokenExpired,
+        getToken
+    };
+
+})();

@@ -1,168 +1,114 @@
 /* =========================================================
-   API MODULE
-   Handles ALL API requests (Public + Protected)
+   CHARLIE CAFE — API MODULE (PRODUCTION)
 ========================================================= */
 
-import { CONFIG } from "./config.js";
-import { Auth } from "./central-auth.js";
+window.CHARLIE_API = (() => {
 
-/* ========================================================
-   BASE FETCH HELPERS
-======================================================== */
+    const CONFIG = window.CHARLIE_CONFIG;
+    const AUTH = window.CHARLIE_AUTH;
+    const { getToken, isTokenExpired } = window.CHARLIE_UTILS;
 
-/* ---------- PUBLIC FETCH (No token) ---------- */
-async function publicFetch(path, options = {}) {
-    return fetch(`${CONFIG.API_BASE}${path}`, {
-        method: options.method || "GET",
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {})
+    /* =====================================================
+       🔓 1️⃣ PUBLIC API GATEWAY ENDPOINTS (NO COGNITO)
+       --------------------------------------------------
+       Resource Path               Method   Lambda
+       /prod/orders                POST     CafeOrderProcessor
+       /prod/orders/cash-payment   POST     CashPaymentLambda
+       /prod/order-status          GET      OrderStatusLambda
+    ===================================================== */
+
+    const publicAPI = {
+
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
         },
-        ...options
-    });
-}
 
-/* ---------- PROTECTED FETCH (JWT required) ---------- */
-async function protectedFetch(path, options = {}) {
+        cashPayment(payload) {
+            return fetch(`${CONFIG.API_BASE}/orders/cash-payment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
 
-    const token = Auth.getToken();
+        getOrderStatus(orderId) {
+            return fetch(`${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`)
+                .then(res => res.json());
+        }
+    };
 
-    if (!token || Auth.isTokenExpired(token)) {
-        Auth.logout();
-        return;
-    }
+    /* =====================================================
+       🔐 2️⃣ COGNITO PROTECTED API ENDPOINTS (PROD)
+    ===================================================== */
 
-    return fetch(`${CONFIG.API_BASE}${path}`, {
-        method: options.method || "GET",
-        headers: {
+    async function secureFetch(url, options = {}) {
+
+        const token = getToken();
+
+        if (!token || isTokenExpired(token)) {
+            AUTH.logout();
+            return;
+        }
+
+        const headers = {
             Authorization: "Bearer " + token,
-            "Content-Type": "application/json",
             ...(options.headers || {})
+        };
+
+        const response = await fetch(url, {
+            method: options.method || "GET",
+            ...options,
+            headers
+        });
+
+        return response.json();
+    }
+
+    const protectedAPI = {
+
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
         },
-        ...options
-    });
-}
 
-/* ========================================================
-   PUBLIC API ENDPOINTS
-======================================================== */
+        /* 🧑‍🍳 HR — Employee + Admin */
+        recordAttendance(payload) {
+            AUTH.requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
 
-export const PublicAPI = {
+        getAttendance(employeeId) {
+            AUTH.requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`);
+        },
 
-    placeOrder(payload) {
-        return publicFetch("/public/orders", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
+        /* 👨‍💼 Admin Only */
+        getAllEmployees() {
+            AUTH.requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/hr/employees`);
+        },
 
-    cashPayment(payload) {
-        return publicFetch("/public/orders/cash-payment", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
+        /* 📊 Admin Dashboard */
+        adminDashboard(employeeId = "") {
+            AUTH.requireAdmin();
+            let url = `${CONFIG.API_BASE}/admin/dashboard`;
+            if (employeeId) url += `?employee_id=${employeeId}`;
+            return secureFetch(url);
+        }
+    };
 
-    getOrderStatus(orderId) {
-        return publicFetch(
-            `/public/order-status?order_id=${encodeURIComponent(orderId)}`
-        );
-    }
-};
+    return {
+        public: publicAPI,
+        protected: protectedAPI
+    };
 
-/* ========================================================
-   ADMIN API (Cognito Protected)
-======================================================== */
-
-export const AdminAPI = {
-
-    getDashboard() {
-        return protectedFetch("/admin/dashboard");
-    },
-
-    getOrders() {
-        return protectedFetch("/admin/orders");
-    },
-
-    markPaid(orderId) {
-        return protectedFetch("/admin/mark-paid", {
-            method: "POST",
-            body: JSON.stringify({ order_id: orderId })
-        });
-    },
-
-    createUser(payload) {
-        return protectedFetch("/admin/create-user", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-
-    getAnalytics() {
-        return protectedFetch("/admin/analytics");
-    }
-};
-
-/* ========================================================
-   EMPLOYEE API (Cognito Protected)
-======================================================== */
-
-export const EmployeeAPI = {
-
-    getOrders() {
-        return protectedFetch("/employee/orders");
-    },
-
-    createOrder(payload) {
-        return protectedFetch("/employee/order", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-
-    updateOrder(payload) {
-        return protectedFetch("/employee/order-update", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-
-    getOrderStatus(orderId) {
-        return protectedFetch(
-            `/employee/order-status?order_id=${encodeURIComponent(orderId)}`
-        );
-    }
-};
-
-/* ========================================================
-   HR API (Cognito Protected)
-======================================================== */
-
-export const HRAPI = {
-
-    checkIn(payload) {
-        return protectedFetch("/hr/checkin", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-
-    checkOut(payload) {
-        return protectedFetch("/hr/checkout", {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-    },
-
-    getProfile() {
-        return protectedFetch("/hr/employee-profile");
-    },
-
-    getAttendanceHistory() {
-        return protectedFetch("/hr/attendance-history");
-    },
-
-    getLeavesAndHolidays() {
-        return protectedFetch("/hr/leaves-holidays");
-    }
-};
+})();

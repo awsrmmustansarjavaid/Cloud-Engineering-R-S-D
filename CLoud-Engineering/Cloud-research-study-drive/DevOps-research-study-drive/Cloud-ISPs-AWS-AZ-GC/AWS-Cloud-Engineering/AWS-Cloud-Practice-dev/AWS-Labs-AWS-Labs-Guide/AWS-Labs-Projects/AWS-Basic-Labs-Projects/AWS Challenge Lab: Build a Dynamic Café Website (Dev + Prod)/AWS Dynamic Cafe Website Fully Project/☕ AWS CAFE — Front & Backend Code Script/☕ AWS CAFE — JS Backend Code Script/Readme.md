@@ -907,3 +907,464 @@ export const HRAPI = {
 
 ---
 
+This structure keeps everything organized, scalable, and enterprise clean for Charlie Cafe ☕.
+
+We will:
+
+✅ Separate config
+
+✅ Separate authentication
+
+✅ Separate API (Public + Cognito Protected)
+
+✅ Separate utilities
+
+✅ Separate printing
+
+✅ Replace all /dev or mixed stages → /prod
+
+✅ Clearly comment PUBLIC vs PROTECTED endpoints
+
+### ✅ 1️⃣ config.js
+
+```
+/* =========================================================
+   CHARLIE CAFE — GLOBAL CONFIGURATION
+   ---------------------------------------------------------
+   ✔ AWS Region
+   ✔ Cognito Config
+   ✔ API Gateway Base (PROD)
+   ✔ CloudFront Base
+========================================================= */
+
+window.CHARLIE_CONFIG = {
+
+    /* ===============================
+       🌍 AWS REGION
+    =============================== */
+    REGION: "us-east-1",
+
+    /* ===============================
+       🔐 AWS Cognito Configuration
+    =============================== */
+    USER_POOL_ID: "us-east-1_oeMWJar3T",
+    CLIENT_ID: "42haggs0jctmq5rnaajfi3hmqu",
+    COGNITO_DOMAIN: "us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
+
+    /* ===============================
+       🚀 API Gateway (PRODUCTION)
+    =============================== */
+    API_BASE: "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/prod",
+
+    /* ===============================
+       ☁ CloudFront Distribution
+    =============================== */
+    CLOUDFRONT_BASE: "https://d163j9zwndcxgl.cloudfront.net"
+};
+```
+
+### ✅ 2️⃣ utils.js
+
+```
+/* =========================================================
+   CHARLIE CAFE — UTILITIES
+   ---------------------------------------------------------
+   ✔ JWT Parsing
+   ✔ Token Expiry Check
+   ✔ LocalStorage Token Helper
+========================================================= */
+
+window.CHARLIE_UTILS = (() => {
+
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return {};
+        }
+    }
+
+    function isTokenExpired(token) {
+        try {
+            return parseJwt(token).exp * 1000 < Date.now();
+        } catch {
+            return true;
+        }
+    }
+
+    function getToken() {
+        return localStorage.getItem("access_token");
+    }
+
+    return {
+        parseJwt,
+        isTokenExpired,
+        getToken
+    };
+
+})();
+```
+
+### ✅ 3️⃣ central-auth.js
+
+```
+/* =========================================================
+   CHARLIE CAFE — CENTRAL AUTH MODULE
+   ---------------------------------------------------------
+   ✔ Cognito Hosted UI Login
+   ✔ Logout
+   ✔ Token Redirect Handling
+   ✔ Role-Based Access
+   ✔ Auto Logout Watcher
+========================================================= */
+
+window.CHARLIE_AUTH = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG;
+    const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
+
+    /* ===============================
+       🔐 LOGIN
+    =============================== */
+    function login(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`) {
+
+        const url =
+            `https://${CONFIG.COGNITO_DOMAIN}/login` +
+            `?response_type=token` +
+            `&client_id=${CONFIG.CLIENT_ID}` +
+            `&scope=openid+email+profile` +
+            `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+
+        window.location.href = url;
+    }
+
+    /* ===============================
+       🚪 LOGOUT
+    =============================== */
+    function logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`) {
+
+        localStorage.removeItem("access_token");
+
+        const url =
+            `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+            `?client_id=${CONFIG.CLIENT_ID}` +
+            `&logout_uri=${encodeURIComponent(redirectUrl)}`;
+
+        window.location.href = url;
+    }
+
+    /* ===============================
+       🔁 HANDLE REDIRECT
+    =============================== */
+    function handleRedirect() {
+        if (!window.location.hash) return;
+
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const token = params.get("access_token");
+
+        if (token) {
+            localStorage.setItem("access_token", token);
+            window.location.hash = "";
+        }
+    }
+
+    /* ===============================
+       🛡 PROTECT PAGE
+    =============================== */
+    function protectPage() {
+        handleRedirect();
+
+        const token = getToken();
+        if (!token || isTokenExpired(token)) {
+            login();
+            return;
+        }
+
+        document.body.style.display = "block";
+    }
+
+    /* ===============================
+       👤 ROLE CONTROL
+    =============================== */
+    function getUserRoles() {
+        const token = getToken();
+        if (!token) return [];
+
+        const payload = parseJwt(token);
+        const groups = payload["cognito:groups"] || [];
+
+        return Array.isArray(groups)
+            ? groups.map(r => r.toLowerCase())
+            : [String(groups).toLowerCase()];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("employee");
+    }
+
+    function requireAdmin() {
+        if (!isAdmin()) {
+            alert("❌ Admin access only");
+            logout();
+            throw new Error("Admin access required");
+        }
+    }
+
+    function requireEmployee() {
+        if (!isEmployee() && !isAdmin()) {
+            alert("❌ Employee access only");
+            logout();
+            throw new Error("Employee access required");
+        }
+    }
+
+    /* ===============================
+       🔄 AUTO LOGOUT WATCHER
+    =============================== */
+    function startAutoLogoutWatcher() {
+
+        setInterval(() => {
+            const token = getToken();
+            if (!token) return;
+
+            if (isTokenExpired(token)) {
+                alert("🔐 Session expired");
+                logout();
+            }
+        }, 30000);
+    }
+
+    return {
+        login,
+        logout,
+        protectPage,
+        getUserRoles,
+        isAdmin,
+        isEmployee,
+        requireAdmin,
+        requireEmployee,
+        startAutoLogoutWatcher
+    };
+
+})();
+```
+
+### ✅ 4️⃣ api.js
+
+This is where we divide:
+
+1️⃣ PUBLIC API GATEWAY ENDPOINTS (No Cognito)
+
+2️⃣ COGNITO PROTECTED ENDPOINTS
+
+ALL stage names now → /prod
+
+```
+/* =========================================================
+   CHARLIE CAFE — API MODULE (PRODUCTION)
+========================================================= */
+
+window.CHARLIE_API = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG;
+    const AUTH = window.CHARLIE_AUTH;
+    const { getToken, isTokenExpired } = window.CHARLIE_UTILS;
+
+    /* =====================================================
+       🔓 1️⃣ PUBLIC API GATEWAY ENDPOINTS (NO COGNITO)
+       --------------------------------------------------
+       Resource Path               Method   Lambda
+       /prod/orders                POST     CafeOrderProcessor
+       /prod/orders/cash-payment   POST     CashPaymentLambda
+       /prod/order-status          GET      OrderStatusLambda
+    ===================================================== */
+
+    const publicAPI = {
+
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        cashPayment(payload) {
+            return fetch(`${CONFIG.API_BASE}/orders/cash-payment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        getOrderStatus(orderId) {
+            return fetch(`${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`)
+                .then(res => res.json());
+        }
+    };
+
+    /* =====================================================
+       🔐 2️⃣ COGNITO PROTECTED API ENDPOINTS (PROD)
+    ===================================================== */
+
+    async function secureFetch(url, options = {}) {
+
+        const token = getToken();
+
+        if (!token || isTokenExpired(token)) {
+            AUTH.logout();
+            return;
+        }
+
+        const headers = {
+            Authorization: "Bearer " + token,
+            ...(options.headers || {})
+        };
+
+        const response = await fetch(url, {
+            method: options.method || "GET",
+            ...options,
+            headers
+        });
+
+        return response.json();
+    }
+
+    const protectedAPI = {
+
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        /* 🧑‍🍳 HR — Employee + Admin */
+        recordAttendance(payload) {
+            AUTH.requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        getAttendance(employeeId) {
+            AUTH.requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`);
+        },
+
+        /* 👨‍💼 Admin Only */
+        getAllEmployees() {
+            AUTH.requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/hr/employees`);
+        },
+
+        /* 📊 Admin Dashboard */
+        adminDashboard(employeeId = "") {
+            AUTH.requireAdmin();
+            let url = `${CONFIG.API_BASE}/admin/dashboard`;
+            if (employeeId) url += `?employee_id=${employeeId}`;
+            return secureFetch(url);
+        }
+    };
+
+    return {
+        public: publicAPI,
+        protected: protectedAPI
+    };
+
+})();
+```
+
+### ✅ 5️⃣ central-printing.js
+
+```
+/* =========================================================
+   CHARLIE CAFE — PRINTING MODULE
+   ---------------------------------------------------------
+   ✔ Print All Orders
+   ✔ Print Daily Summary
+========================================================= */
+
+window.CHARLIE_PRINT = (() => {
+
+    function printAllOrders() {
+        console.log("🖨️ Printing all orders...");
+        window.print();
+    }
+
+    function printTodaySummary() {
+
+        const table = document.querySelector("#ordersTable tbody");
+        if (!table) return alert("❌ Orders table not found");
+
+        const rows = table.querySelectorAll("tr");
+        const today = new Date().toISOString().split("T")[0];
+
+        let totalOrders = 0;
+        let totalAmount = 0;
+
+        rows.forEach(row => {
+            const orderDate = row.dataset.date;
+            const amount = parseFloat(row.dataset.total || 0);
+
+            if (orderDate === today) {
+                totalOrders++;
+                totalAmount += amount;
+            }
+        });
+
+        const summaryHTML = `
+            <div style="padding:20px">
+                <h3 style="text-align:center">☕ Charlie Cafe — Daily Summary</h3>
+                <hr>
+                <p><strong>Date:</strong> ${today}</p>
+                <p><strong>Total Orders:</strong> ${totalOrders}</p>
+                <p><strong>Total Sales:</strong> $${totalAmount.toFixed(2)}</p>
+            </div>
+        `;
+
+        const originalContent = document.body.innerHTML;
+        document.body.innerHTML = summaryHTML;
+
+        window.print();
+
+        document.body.innerHTML = originalContent;
+        location.reload();
+    }
+
+    return {
+        printAllOrders,
+        printTodaySummary
+    };
+
+})();
+```
+
+### ✅ Final Script Load Order (IMPORTANT)
+
+In your HTML:
+
+```
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+<script src="central-printing.js"></script>
+```
+
+Order matters.
+
+### 🎯 What You Now Have
+
+✔ Clean enterprise separation
+✔ Proper PROD stage usage
+✔ Clear Public vs Cognito Protected APIs
+✔ Scalable architecture
+✔ Maintainable long-term system
+
+---

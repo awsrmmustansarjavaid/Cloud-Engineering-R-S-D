@@ -1,160 +1,143 @@
 /* =========================================================
-   CENTRAL AUTH MODULE
-   Handles ONLY Cognito authentication
+   CHARLIE CAFE — CENTRAL AUTH MODULE
+   ---------------------------------------------------------
+   ✔ Cognito Hosted UI Login
+   ✔ Logout
+   ✔ Token Redirect Handling
+   ✔ Role-Based Access
+   ✔ Auto Logout Watcher
 ========================================================= */
 
-import { CONFIG } from "./config.js";
-import { parseJwt, isTokenExpired } from "./utils.js";
+window.CHARLIE_AUTH = (() => {
 
-const TOKEN_KEY = "access_token";
+    const CONFIG = window.CHARLIE_CONFIG;
+    const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
 
-/* ===============================
-   TOKEN HELPERS
-================================= */
+    /* ===============================
+       🔐 LOGIN
+    =============================== */
+    function login(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`) {
 
-function getToken() {
-    return localStorage.getItem(TOKEN_KEY);
-}
+        const url =
+            `https://${CONFIG.COGNITO_DOMAIN}/login` +
+            `?response_type=token` +
+            `&client_id=${CONFIG.CLIENT_ID}` +
+            `&scope=openid+email+profile` +
+            `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
 
-function saveToken(token) {
-    localStorage.setItem(TOKEN_KEY, token);
-}
-
-function clearToken() {
-    localStorage.removeItem(TOKEN_KEY);
-}
-
-/* ===============================
-   LOGIN
-================================= */
-
-function login() {
-
-    const redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/login.html`;
-
-    const url =
-        `https://${CONFIG.COGNITO_DOMAIN}/login` +
-        `?response_type=token` +
-        `&client_id=${CONFIG.CLIENT_ID}` +
-        `&scope=openid+email+profile` +
-        `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
-
-    window.location.href = url;
-}
-
-/* ===============================
-   LOGOUT
-================================= */
-
-function logout() {
-
-    clearToken();
-
-    const redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/logout.html`;
-
-    const url =
-        `https://${CONFIG.COGNITO_DOMAIN}/logout` +
-        `?client_id=${CONFIG.CLIENT_ID}` +
-        `&logout_uri=${encodeURIComponent(redirectUrl)}`;
-
-    window.location.href = url;
-}
-
-/* ===============================
-   HANDLE REDIRECT
-================================= */
-
-function handleRedirect() {
-
-    if (!window.location.hash) return;
-
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    const token = params.get("access_token");
-
-    if (token) {
-        saveToken(token);
-        window.location.hash = "";
-    }
-}
-
-/* ===============================
-   PAGE PROTECTION
-================================= */
-
-function protectPage() {
-
-    handleRedirect();
-
-    const token = getToken();
-
-    if (!token || isTokenExpired(token)) {
-        login();
-        return;
+        window.location.href = url;
     }
 
-    document.body.style.display = "block";
-}
+    /* ===============================
+       🚪 LOGOUT
+    =============================== */
+    function logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`) {
 
-/* ===============================
-   ROLE HANDLING
-================================= */
+        localStorage.removeItem("access_token");
 
-function getUserRoles() {
+        const url =
+            `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+            `?client_id=${CONFIG.CLIENT_ID}` +
+            `&logout_uri=${encodeURIComponent(redirectUrl)}`;
 
-    const token = getToken();
-    if (!token) return [];
-
-    const payload = parseJwt(token);
-    const groups = payload["cognito:groups"] || [];
-
-    return Array.isArray(groups)
-        ? groups.map(g => g.toLowerCase())
-        : [String(groups).toLowerCase()];
-}
-
-function requireRole(allowedRoles) {
-
-    const roles = getUserRoles();
-
-    const allowed = allowedRoles.some(role =>
-        roles.includes(role.toLowerCase())
-    );
-
-    if (!allowed) {
-        alert("Access denied");
-        logout();
-        throw new Error("Unauthorized role");
+        window.location.href = url;
     }
-}
 
-/* ===============================
-   AUTO LOGOUT WATCHER
-================================= */
+    /* ===============================
+       🔁 HANDLE REDIRECT
+    =============================== */
+    function handleRedirect() {
+        if (!window.location.hash) return;
 
-function startAutoLogoutWatcher() {
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const token = params.get("access_token");
 
-    setInterval(() => {
+        if (token) {
+            localStorage.setItem("access_token", token);
+            window.location.hash = "";
+        }
+    }
+
+    /* ===============================
+       🛡 PROTECT PAGE
+    =============================== */
+    function protectPage() {
+        handleRedirect();
 
         const token = getToken();
-        if (!token) return;
-
-        if (isTokenExpired(token)) {
-            alert("Session expired");
-            logout();
+        if (!token || isTokenExpired(token)) {
+            login();
+            return;
         }
 
-    }, 30000);
-}
+        document.body.style.display = "block";
+    }
 
-/* ===============================
-   EXPORT
-================================= */
+    /* ===============================
+       👤 ROLE CONTROL
+    =============================== */
+    function getUserRoles() {
+        const token = getToken();
+        if (!token) return [];
 
-export const Auth = {
-    login,
-    logout,
-    protectPage,
-    getToken,
-    requireRole,
-    startAutoLogoutWatcher
-};
+        const payload = parseJwt(token);
+        const groups = payload["cognito:groups"] || [];
+
+        return Array.isArray(groups)
+            ? groups.map(r => r.toLowerCase())
+            : [String(groups).toLowerCase()];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("employee");
+    }
+
+    function requireAdmin() {
+        if (!isAdmin()) {
+            alert("❌ Admin access only");
+            logout();
+            throw new Error("Admin access required");
+        }
+    }
+
+    function requireEmployee() {
+        if (!isEmployee() && !isAdmin()) {
+            alert("❌ Employee access only");
+            logout();
+            throw new Error("Employee access required");
+        }
+    }
+
+    /* ===============================
+       🔄 AUTO LOGOUT WATCHER
+    =============================== */
+    function startAutoLogoutWatcher() {
+
+        setInterval(() => {
+            const token = getToken();
+            if (!token) return;
+
+            if (isTokenExpired(token)) {
+                alert("🔐 Session expired");
+                logout();
+            }
+        }, 30000);
+    }
+
+    return {
+        login,
+        logout,
+        protectPage,
+        getUserRoles,
+        isAdmin,
+        isEmployee,
+        requireAdmin,
+        requireEmployee,
+        startAutoLogoutWatcher
+    };
+
+})();
