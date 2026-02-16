@@ -1,22 +1,50 @@
 <?php 
-// ================= CONFIG =================
-$apiBaseUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/order-status";
+// ==========================================================
+// CHARLIE CAFE — ORDER RECEIPT PAGE (PUBLIC)
+// ----------------------------------------------------------
+// ✔ No Cognito Required
+// ✔ Uses Production API Gateway (/prod)
+// ✔ Public Endpoint: /prod/order-status
+// ✔ Live Auto Refresh
+// ✔ QR Code Tracking
+// ==========================================================
 
-// ================= VALIDATE INPUT =================
+
+// ================= VALIDATE ORDER ID =================
 if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
     die("❌ Invalid order reference.");
 }
 
 $orderId = $_GET['order_id'];
 
-// ================= FETCH ORDER =================
+
+// ================= PROD API ENDPOINT =================
+// PUBLIC ENDPOINT (No Authentication Required)
+$apiBaseUrl = "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/prod/order-status";
+
+
+// ================= FETCH ORDER FROM API =================
 function fetchOrder($apiBaseUrl, $orderId) {
+
     $url = $apiBaseUrl . "?order_id=" . urlencode($orderId);
+
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $res = curl_exec($ch);
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 10
+    ]);
+
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        curl_close($ch);
+        return null;
+    }
+
     curl_close($ch);
-    return json_decode($res, true);
+
+    return json_decode($response, true);
 }
 
 $data = fetchOrder($apiBaseUrl, $orderId);
@@ -44,7 +72,7 @@ $order = $data['order'];
 <!-- ================= BOOTSTRAP ICONS ================= -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- ================= QR CODE ================= -->
+<!-- ================= QR CODE LIBRARY ================= -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 
 <style>
@@ -148,7 +176,9 @@ body {
         <div class="receipt-card">
 
             <!-- ================= HEADER ================= -->
-            <h4 class="text-center mb-2"><i class="bi bi-cup-straw-fill"></i> Charlie Cafe</h4>
+            <h4 class="text-center mb-2">
+                <i class="bi bi-cup-straw-fill"></i> Charlie Cafe
+            </h4>
             <p class="text-center text-muted">Order Receipt</p>
             <hr>
 
@@ -179,7 +209,10 @@ body {
             </p>
             <hr>
 
-            <p class="fw-bold"><i class="bi bi-currency-dollar"></i> Total Amount: $<?= number_format($order['total_amount'], 2) ?></p>
+            <p class="fw-bold">
+                <i class="bi bi-currency-dollar"></i>
+                Total Amount: $<?= number_format($order['total_amount'], 2) ?>
+            </p>
 
             <!-- ================= QR CODE ================= -->
             <div id="qrBox" class="my-3">
@@ -187,7 +220,7 @@ body {
                 <small class="text-muted mt-2">Scan to track order</small>
             </div>
 
-            <!-- ================= BUTTONS ================= -->
+            <!-- ================= PRINT BUTTON ================= -->
             <div class="d-grid gap-2 mt-3">
                 <button onclick="window.print()" class="btn btn-transparent">
                     <i class="bi bi-printer-fill"></i> Print Receipt
@@ -201,29 +234,25 @@ body {
 <!-- ================= BOOTSTRAP JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ================= CENTRAL AUTH ================= -->
-<script src="/js/central-auth-api.js"></script>
-
+<!-- =========================================================
+     PUBLIC PAGE SCRIPT (No Authentication Required)
+========================================================= -->
 <script>
-/* =========================================================
-   PROTECT PAGE — redirect to login if not authenticated
-========================================================= */
-CHARLIE.auth.protectPage().then(() => {
-    // Show body after auth passed
-    document.body.style.display = "block";
+// Show page immediately (no auth needed)
+document.body.style.display = "block";
 
-    /* =========================================================
-       QR CODE GENERATION
-    ========================================================= */
-    new QRCode(document.getElementById("qrcode"), {
-        text: window.location.href,
-        width: 140,
-        height: 140
-    });
+/* =========================================================
+   QR CODE GENERATION
+========================================================= */
+new QRCode(document.getElementById("qrcode"), {
+    text: window.location.href,
+    width: 140,
+    height: 140
 });
 
 /* =========================================================
-   AUTO REFRESH (10s)
+   AUTO REFRESH EVERY 10 SECONDS
+   Keeps status live (RECEIVED → PREPARING → READY → COMPLETED)
 ========================================================= */
 setInterval(() => {
     fetch(window.location.href, { cache: "no-store" })
