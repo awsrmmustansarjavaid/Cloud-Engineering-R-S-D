@@ -15,6 +15,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
+/* ✅ DESIGN UNCHANGED */
 body {
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
@@ -37,6 +38,7 @@ body {
     padding-top: 80px;
     z-index: 1000;
 }
+
 .sidebar a {
     display: flex;
     align-items: center;
@@ -45,11 +47,13 @@ body {
     text-decoration: none;
     font-weight: 500;
 }
+
 .sidebar a i {
     margin-right: 10px;
     font-size: 1.2rem;
     color: #ff9800;
 }
+
 .sidebar a.active {
     background: #3b1f0e;
     color: #fff;
@@ -62,6 +66,7 @@ body {
     width: 100%;
     z-index: 1100;
 }
+
 .navbar .navbar-brand {
     font-weight: bold;
     color: #ff9800 !important;
@@ -95,6 +100,7 @@ body {
     display: flex;
     align-items: center;
 }
+
 .btn-transparent i { margin-right: 8px; }
 
 @media (max-width:768px){
@@ -134,13 +140,10 @@ body {
 <!-- ================= ACTION BUTTONS ================= -->
 <div class="d-flex justify-content-end gap-2 mb-4">
 
-    <!-- 🖨️ CENTRAL PRINT -->
-    <button class="btn btn-transparent"
-            onclick="openCentralPrint('#ordersPrintArea')">
-        <i class="bi bi-printer"></i> Print / Export
+    <button class="btn btn-transparent" onclick="window.print()">
+        <i class="bi bi-printer"></i> Print
     </button>
 
-    <!-- 📄 CSV EXPORT -->
     <button class="btn btn-transparent" onclick="exportCSV()">
         <i class="bi bi-download"></i> Export CSV
     </button>
@@ -150,7 +153,7 @@ body {
 <!-- ================= METRICS ================= -->
 <div id="metrics" class="row g-4 mb-5 justify-content-center"></div>
 
-<!-- ================= ORDERS TABLE (PRINTABLE AREA) ================= -->
+<!-- ================= ORDERS TABLE ================= -->
 <div id="ordersPrintArea" class="table-responsive">
     <table class="table table-hover text-white">
         <thead>
@@ -169,55 +172,44 @@ body {
 </div>
 </div>
 </div>
-
 </div>
 
 <!-- ================= BOOTSTRAP JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ================= CENTRAL AUTH ================= -->
-<script src="/js/central-auth-api.js"></script>
+<!-- =========================================================
+     LOAD NEW MODULAR ARCHITECTURE (ORDER MATTERS)
+========================================================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
 
 <script>
-/* =====================================================
-   🖨️ CENTRAL PRINT FUNCTION (SAFE)
-   ===================================================== */
-function openCentralPrint(selector) {
-    const target = document.querySelector(selector);
+/* =========================================================
+   🔐 AUTH PROTECTION (COGNITO REQUIRED PAGE)
+========================================================= */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
 
-    if (!target) {
-        alert("Printable section not found.");
-        return;
-    }
-
-    const printWindow = window.open("/central-print.html", "_blank");
-
-    printWindow.onload = function () {
-        if (printWindow.centralPrint &&
-            typeof printWindow.centralPrint.loadContent === "function") {
-            printWindow.centralPrint.loadContent(target.outerHTML);
-        } else {
-            console.error("centralPrint not available");
-        }
-    };
-}
-
-/* ================= AUTH PROTECTION ================= */
-CHARLIE.auth.protectPage();
-
+/* ================= LOGOUT BUTTON ================= */
 document.querySelector(".logout-btn").onclick = () => {
-    CHARLIE.auth.logout();
+    CHARLIE_AUTH.logout();
 };
 
-/* ================= LOAD DATA ================= */
-document.addEventListener("DOMContentLoaded", () => {
+/* =========================================================
+   📊 LOAD ORDER STATUS DATA (PROTECTED ENDPOINT)
+========================================================= */
+document.addEventListener("DOMContentLoaded", async () => {
 
-    CHARLIE.authFetch(`${CHARLIE.CONFIG.API_BASE}/order-status`)
-    .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch order status");
-        return res.json();
-    })
-    .then(data => {
+    try {
+
+        const data = await CHARLIE_API.protected.getOrderStatus?.() 
+            || await fetch(`${CHARLIE_CONFIG.API_BASE}/order-status`, {
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("access_token")
+                }
+            }).then(res => res.json());
 
         const metricsDiv = document.getElementById("metrics");
         const ordersBody = document.getElementById("orders");
@@ -246,34 +238,41 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${o.created_at}</td>
                 </tr>`;
         });
-    })
-    .catch(err => {
+
+    } catch (err) {
+
         document.getElementById("orders").innerHTML = `
             <tr>
                 <td colspan="5" class="text-center text-danger">
                     ⚠️ ${err.message}
                 </td>
             </tr>`;
-    });
+    }
 });
 
-/* ================= CSV EXPORT ================= */
+/* =========================================================
+   📄 CSV EXPORT (PROTECTED)
+========================================================= */
 function exportCSV() {
-    const url = `${CHARLIE.CONFIG.API_BASE}/order-status?export=true`;
-    CHARLIE.authFetch(url)
-        .then(res => {
-            if (!res.ok) throw new Error("CSV export failed");
-            return res.blob();
-        })
-        .then(blob => {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "orders.csv";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        })
-        .catch(err => alert("❌ " + err.message));
+
+    fetch(`${CHARLIE_CONFIG.API_BASE}/order-status?export=true`, {
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token")
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("CSV export failed");
+        return res.blob();
+    })
+    .then(blob => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "orders.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    })
+    .catch(err => alert("❌ " + err.message));
 }
 </script>
 
