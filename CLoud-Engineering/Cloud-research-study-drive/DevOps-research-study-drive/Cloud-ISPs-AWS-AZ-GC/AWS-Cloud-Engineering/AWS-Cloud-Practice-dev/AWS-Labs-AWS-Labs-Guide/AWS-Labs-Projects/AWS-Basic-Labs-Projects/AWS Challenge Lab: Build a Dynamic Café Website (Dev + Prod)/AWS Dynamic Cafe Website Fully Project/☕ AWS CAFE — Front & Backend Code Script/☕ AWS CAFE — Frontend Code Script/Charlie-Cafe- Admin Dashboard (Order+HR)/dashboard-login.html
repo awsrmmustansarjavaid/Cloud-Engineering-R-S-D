@@ -5,6 +5,7 @@
 <title>Charlie Café ☕ | Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
@@ -33,18 +34,27 @@ body {
     <h3>☕ Charlie Café</h3>
     <p class="text-muted">Admin & Staff Login</p>
 
-    <!-- Cognito Hosted UI -->
+    <!-- Cognito Hosted UI Login Button -->
     <button class="btn btn-warning w-100 mt-3" onclick="login()">
         Login with Cognito
     </button>
 </div>
 
-<script src="js/central-auth-api.js"></script>
+<!-- ================= NEW JS MODULES ================= -->
+<script src="config.js"></script>
+<script src="central-auth.js"></script>
+
 <script>
+// ==========================================================
+// CHARLIE CAFÉ — LOGIN PAGE SCRIPT
+// Uses separated central-auth.js module
+// ==========================================================
 function login() {
-    CHARLIE.auth.login(
-        `${window.location.origin}/cafe-admin-dashboard.html`
-    );
+    // Redirect to dashboard after successful Cognito login
+    const redirectUrl = `${window.location.origin}/cafe-admin-dashboard.html`;
+
+    // Call centralized login function
+    CHARLIE.auth.login(redirectUrl);
 }
 </script>
 
