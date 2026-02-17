@@ -1525,4 +1525,140 @@ This looks like a real biometric terminal:
 ✔ Work session timer
 ✔ Cognito protected
 ✔ Professional dark terminal UI
+
+When you see:
+
+“Tap fingerprint to Check In / Out”
+
+It does NOT mean a real fingerprint scanner.
+
+In your current system, it means:
+
+👉 It is a UI simulation button
+👉 When you tap the fingerprint circle, it runs a JavaScript function
+👉 That function sends the attendance request to your API
+
+So it behaves like a biometric machine — but it's only frontend simulation.
+
+### 🔍 What Actually Happens When You Tap It
+
+This line connects the circle to the function:
+
+```
+<div class="fingerprint" onclick="simulateScan()">
+```
+
+When you click the fingerprint circle:
+
+#### 1️⃣ It calls:
+
+```
+simulateScan()
+```
+
+#### 2️⃣ It checks:
+
+Did you enter Employee ID?
+
+If not → show error
+
+#### 3️⃣ It shows:
+
+```
+🔍 Scanning fingerprint...
+```
+
+#### 4️⃣ After 2 seconds delay (fake scanning):
+
+```
+await CHARLIE_API.protected.recordAttendance({
+    employee_id: employeeId,
+    action: "checkin"
+});
+```
+
+That sends attendance to your backend.
+
+### 🧠 Why It Says “Check In / Out”
+
+Right now, the code always sends:
+
+```
+action: "checkin"
+```
+
+So technically it is only doing Check-In, even though the UI says “Check In / Out”.
+
+If you want it to:
+
+- First tap = Check-In
+
+- Second tap = Check-Out
+
+We need to add toggle logic.
+
+### 🎯 How Real Biometric Machines Work
+
+#### Real fingerprint machine:
+
+- Employee places finger
+
+- Device scans fingerprint
+
+- Device verifies fingerprint in hardware
+
+- Sends verified employee ID to server
+
+#### Your version:
+
+- Employee enters ID
+
+- Clicks fingerprint icon
+
+- JavaScript pretends to scan
+
+- Sends ID to server
+
+So it's a visual professional simulation, not real biometric hardware.
+
+### 🏢 Why This Is Still Professional
+
+Many modern systems do this:
+
+- Web-based attendance terminal
+
+- Employee ID + face scan simulation
+
+- Or badge tap simulation
+
+- Cognito login protection
+
+So this approach is completely acceptable for web attendance systems.
+
+### ⚡ If You Want It To Be Smarter
+
+Right now it's:
+
+### 👉 Always check-in.
+
+We can upgrade it to:
+
+#### Option A — Auto Toggle
+
+- If already checked in → do checkout
+
+- If not checked in → do checkin
+
+#### Option B — Two Modes
+
+Add buttons:
+
+- Mode: Check-In
+
+- Mode: Check-Out
+
+#### Option C — Fully Automatic
+
+Detect based on last attendance record from API.
+
 ---
