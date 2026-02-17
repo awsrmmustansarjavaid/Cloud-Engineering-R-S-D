@@ -244,6 +244,80 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 - Inline comments added for clarity
 
+### comparison between old vs new
 
+section-by-section comparison between your old payment-status.php and the new updated version
+
+#### 1️⃣ API Access / Backend Calls
+
+| Aspect                       | Old Code                                     | New Code                                                     |
+| ---------------------------- | -------------------------------------------- | ------------------------------------------------------------ |
+| **API method**               | PHP `cURL` request to `dev` stage            | JavaScript fetch using `CHARLIE_API.public` (from `api.js`)  |
+| **Stage**                    | `/dev/order-status`                          | `/prod` endpoints (production-ready)                         |
+| **Auth**                     | None needed for frontend, but hardcoded cURL | Still public, no Cognito needed, but uses central modular JS |
+| **Responsiveness to errors** | PHP-level only                               | JS-level with try/catch, dynamically shows alerts            |
+| **Server-side dependency**   | PHP server must call cURL                    | JS handles API calls in-browser, lighter server load         |
+
+✅ Benefit: Centralized, modular API usage, easier maintenance, consistent with your new separated JS files.
+
+#### 2️⃣ Cognito / Auth Handling
+
+| Aspect                   | Old Code                                            | New Code                                                             |
+| ------------------------ | --------------------------------------------------- | -------------------------------------------------------------------- |
+| **Cognito login button** | Calls `cognitoLogin()` (central-auth-api.js)        | Calls `CHARLIE.auth.login()` from separated `central-auth.js` module |
+| **Page protection**      | None, but central-auth-js might try to protect page | Still public; no protection; the page is safe for customers          |
+| **Token handling**       | Not used                                            | Not used; retained login button only for optional admin login        |
+
+✅ Benefit: Clear separation — frontend is public, admin login optional, modular.
+
+#### 3️⃣ Dynamic Payment Status Display
+
+| Aspect                | Old Code                                     | New Code                                                                             |
+| --------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **Display method**    | PHP fills HTML server-side after `cURL` call | JS dynamically fills HTML after calling `CHARLIE_API.public.getOrderStatus(orderId)` |
+| **Page reload**       | Required for updating status (server reload) | Dynamic JS update; no page reload needed                                             |
+| **Button visibility** | Static HTML                                  | Dynamically shown/hidden based on payment status (`Track Order` button)              |
+
+✅ Benefit: Faster, more responsive UX; easier to maintain and extend (e.g., auto-refresh status).
+
+#### 4️⃣ Stage / Environment Changes
+
+| Aspect           | Old Code                      | New Code                                                   |
+| ---------------- | ----------------------------- | ---------------------------------------------------------- |
+| **Stage in URL** | Hardcoded `/dev/order-status` | Uses production `/prod` endpoints via `CHARLIE_API.public` |
+| **Hardcoding**   | API URL written in PHP        | API URL abstracted in `api.js` → centralized config        |
+
+✅ Benefit: Avoids manually changing multiple pages when moving between dev/prod. Cleaner maintenance.
+
+#### 5️⃣ Error Handling
+
+| Aspect                     | Old Code                                      | New Code                                                |
+| -------------------------- | --------------------------------------------- | ------------------------------------------------------- |
+| **Errors on API failure**  | PHP echoes nothing meaningful, page may crash | JS shows alerts in-page with proper icons and messaging |
+| **Unknown payment states** | Default handled implicitly                    | Explicitly handles unknown states with gray info alert  |
+
+✅ Benefit: Better user feedback; robust UX.
+
+#### 6️⃣ Code Maintainability
+
+✅ Benefit: Modular, centralized, easier to maintain as project grows.
+
+### ✅ Summary of Key Differences
+
+- API Calls moved from PHP → JS (modular, centralized)
+
+- Production-ready /prod endpoints instead of hardcoded /dev
+
+- Payment status dynamically updated without page reload
+
+- Optional Cognito login handled cleanly via CHARLIE.auth.login()
+
+- Better error handling and UX
+
+- Fully modular design matching your new config.js / api.js architecture
+
+### 💡 In short:
+
+The old code was server-heavy, hardcoded, and less dynamic, while the new code is frontend-driven, modular, dynamic, and production-ready, but visually identical for the customer.
 
 ---
