@@ -523,6 +523,7 @@ function openCentralPrint(selector) {
 </html>
 ```
 
+
 ### ✅ SYSTEM STATUS NOW
 
 Analytics page:
@@ -535,5 +536,99 @@ Analytics page:
 ✔ Auto logout enabled
 ✔ Clean comments
 ✔ Production-ready
+
+### logout button works
+
+In your page you have:
+
+```
+logoutBtn.addEventListener("click", () => {
+  CHARLIE_AUTH.logout();
+});
+```
+
+That means:
+
+👉 The button simply calls
+CHARLIE_AUTH.logout()
+👉 The real logout logic lives inside central-auth.js
+
+### ✅ What CHARLIE_AUTH.logout() Should Be Doing
+
+Inside central-auth.js, your logout function should:
+
+Clear localStorage/sessionStorage
+
+Clear Cognito tokens
+
+Redirect to login page
+
+Optionally call Cognito hosted logout endpoint
+
+Example correct production logout:
+
+```
+logout() {
+
+  // Clear local storage
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // If using Cognito Hosted UI
+  const logoutUrl =
+    `${CHARLIE_CONFIG.cognito.domain}/logout?` +
+    `client_id=${CHARLIE_CONFIG.cognito.clientId}&` +
+    `logout_uri=${CHARLIE_CONFIG.app.redirectAfterLogout}`;
+
+  window.location.href = logoutUrl;
+}
+```
+
+### 🔎 How You Can Test If It Works
+
+Login as Admin
+
+Open DevTools → Application → Local Storage
+
+Click Logout
+
+Check:
+
+Are tokens removed?
+
+Are you redirected?
+
+Can you go back to protected page?
+
+If protectPage() is working correctly, it should immediately redirect you to login.
+
+### 🛑 If Logout Is NOT Working
+
+Most common issues:
+
+| Problem                          | Cause                       |
+| -------------------------------- | --------------------------- |
+| Page doesn’t redirect            | logout URL incorrect        |
+| You stay logged in               | localStorage not cleared    |
+| Back button returns to dashboard | no `protectPage()` check    |
+| Cognito session still active     | Hosted UI logout not called |
+
+
+###  💡 Important
+
+If you're using Cognito Hosted UI, logout must hit:
+
+```
+https://your-domain.auth.region.amazoncognito.com/logout
+```
+
+Otherwise user remains logged in server-side.
+
+### 🔐 Final Answer
+
+✔ Yes — your logout button works from central-auth.js
+✔ The HTML just calls it
+✔ The real logout logic is centralized
+✔ That is the correct architecture
 
 ---
