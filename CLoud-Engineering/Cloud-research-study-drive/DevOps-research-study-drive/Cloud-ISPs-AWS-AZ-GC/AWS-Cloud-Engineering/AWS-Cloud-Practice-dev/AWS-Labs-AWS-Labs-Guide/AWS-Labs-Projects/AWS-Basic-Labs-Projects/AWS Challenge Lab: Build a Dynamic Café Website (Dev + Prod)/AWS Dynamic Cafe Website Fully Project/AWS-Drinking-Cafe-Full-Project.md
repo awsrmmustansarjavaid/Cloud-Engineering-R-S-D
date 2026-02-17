@@ -1417,7 +1417,83 @@ sudo nano /var/www/html/logout.php
 
 #### 2️⃣ code
 
-[logout.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+[logout.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+### 1️⃣3️⃣ employee-login.html
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/employee-login.html
+```
+
+#### 2️⃣ code
+
+[employee-login.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-login.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+### 1️⃣4️⃣ employee-portal.html
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/employee-portal.html
+```
+
+#### 2️⃣ code
+
+[employee-portal.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-portal.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+### 1️⃣5️⃣ hr-attendance.html
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/hr-attendance.html
+```
+
+#### 2️⃣ code
+
+[hr-attendance.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/hr-attendance.html)
+
+#### 3️⃣ Save File
+
+```
+CTRL + O → ENTER
+CTRL + X
+```
+
+### 1️⃣6️⃣ checkin.html
+
+#### 1️⃣ Create File
+
+```
+sudo nano /var/www/html/checkin.html
+```
+
+#### 2️⃣ code
+
+[checkin.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/checkin.html)
 
 #### 3️⃣ Save File
 
@@ -1459,6 +1535,10 @@ FILES=(
 "/var/www/html/login.html"
 "/var/www/html/logout.php"
 "/var/www/html/price-list.html"
+"/var/www/html/employee-login.html"
+"/var/www/html/employee-portal.html"
+"/var/www/html/hr-attendance.html"
+"/var/www/html/checkin.html"
 "/var/www/html/js/onfig.js"
 "/var/www/html/js/utils.js"
 "/var/www/html/js/api.js"

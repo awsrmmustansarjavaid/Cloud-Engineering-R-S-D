@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ===================================================
+     Bootstrap CSS
+=================================================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ===================================================
+     Google Font
+=================================================== -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===================================================
+   Global Styles
+=================================================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #fff;
+}
+
+/* Dark overlay over background image */
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/* Login card styles */
+.login-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 350px;
+    text-align: center;
+    z-index: 2;
+}
+
+/* Logo and titles */
+.logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.cafe-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+/* Cognito login button */
+.btn-login {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    width: 100%;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    transform: scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================================================
+     Overlay for dark effect
+=================================================== -->
+<div class="overlay"></div>
+
+<!-- ===================================================
+     Employee Login Card
+=================================================== -->
+<div class="login-card">
+    <div class="logo">☕</div>
+    <div class="cafe-title">Charlie Café Employee</div>
+    <p class="mb-4">Welcome back! Please login to access the employee portal.</p>
+    
+    <!-- Cognito Login Button -->
+    <button id="loginBtn" class="btn btn-login">Login with Cognito</button>
+</div>
+
+<!-- ===================================================
+     Modular JS Files
+     - config.js: Contains app settings like Cognito domain, client ID
+     - utils.js: Helper functions
+     - central-auth.js: Login / Logout functions
+     - api.js: Backend API calls
+     - central-printing.js: Printing and downloads
+=================================================== -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+<script src="central-printing.js"></script>
+
+<script>
+/* ============================================================
+   CHARLIE CAFÉ EMPLOYEE LOGIN
+   Using Amazon Cognito Hosted UI
+   Integrated with modular JS files
+============================================================ */
+
+// 🔹 Use config.js variables if you already define them there
+// Example: config.COGNITO_DOMAIN, config.CLIENT_ID
+const DOMAIN = typeof config !== "undefined" ? config.COGNITO_DOMAIN : "https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = typeof config !== "undefined" ? config.CLIENT_ID : "YOUR_CLIENT_ID";
+
+// Redirect URI after successful login (employee portal)
+const REDIRECT_URI = window.location.origin + "/employee-portal.html";
+
+// Build Hosted UI login URL
+const loginUrl = `${DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=email+openid`;
+
+// ============================================================
+// Redirect to Cognito Hosted UI when login button clicked
+// ============================================================
+document.getElementById("loginBtn").addEventListener("click", () => {
+    // Optional: log attempt using utils.js
+    if (typeof utils !== "undefined") {
+        utils.log("Redirecting to Cognito Hosted UI...");
+    }
+
+    window.location.href = loginUrl;
+});
+
+// ============================================================
+// Optional: detect Cognito tokens in URL after login
+// Store them using central-auth.js for session handling
+// ============================================================
+if (window.location.hash) {
+    const hash = window.location.hash.substring(1); // remove #
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+    const idToken = params.get("id_token");
+    
+    if (accessToken && idToken) {
+        if (typeof CHARLIE_AUTH !== "undefined") {
+            CHARLIE_AUTH.storeTokens({ accessToken, idToken }); // Save tokens in local/session storage
+            // Redirect to employee portal after storing tokens
+            window.location.href = "/employee-portal.html";
+        }
+    }
+}
+</script>
+
+</body>
+</html>
