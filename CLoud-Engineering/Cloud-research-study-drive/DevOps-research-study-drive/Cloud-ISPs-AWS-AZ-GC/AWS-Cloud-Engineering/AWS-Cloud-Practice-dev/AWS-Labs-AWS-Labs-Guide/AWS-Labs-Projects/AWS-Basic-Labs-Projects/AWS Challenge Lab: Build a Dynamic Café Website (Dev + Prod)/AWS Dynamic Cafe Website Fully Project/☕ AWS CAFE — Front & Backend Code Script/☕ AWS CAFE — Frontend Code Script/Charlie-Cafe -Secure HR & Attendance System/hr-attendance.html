@@ -67,13 +67,20 @@ body { display:none; background:#f8f9fa; }
 </div>
 
 <!-- =====================================================
-     CENTRAL AUTH (DO NOT MOVE)
+     LOAD SEPARATED JS MODULES
+     Order is important
 ===================================================== -->
-<script src="js/central-auth-api.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/central-auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/central-printing.js"></script>
 
 <script>
 /* =====================================================
    🔐 CENTRALIZED PAGE PROTECTION
+   - Show content only if logged in
+   - Setup logout button
 ===================================================== */
 CHARLIE.initProtectedPage({
     requireAuth: true,
@@ -83,6 +90,8 @@ CHARLIE.initProtectedPage({
 
 /* =====================================================
    📊 LOAD ATTENDANCE FUNCTION
+   - Uses CHARLIE_API.api.recordAttendance()
+   - Optional filters: employee_id, date
 ===================================================== */
 async function loadAttendance() {
     const empId = document.getElementById("employeeId").value;
@@ -93,13 +102,8 @@ async function loadAttendance() {
     if (date) payload.date = date;
 
     try {
-        const data = await CHARLIE.secureFetch(
-            `${CHARLIE.apiBase}/dev/hr/attendance`,
-            {
-                method: "POST",
-                body: JSON.stringify(payload)
-            }
-        );
+        // ✅ Call Cognito-protected API
+        const data = await CHARLIE_API.api.recordAttendance(payload);
 
         const tbody = document.getElementById("attendanceTable");
         tbody.innerHTML = "";
@@ -152,5 +156,6 @@ function openCentralPrint(selector) {
 }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
