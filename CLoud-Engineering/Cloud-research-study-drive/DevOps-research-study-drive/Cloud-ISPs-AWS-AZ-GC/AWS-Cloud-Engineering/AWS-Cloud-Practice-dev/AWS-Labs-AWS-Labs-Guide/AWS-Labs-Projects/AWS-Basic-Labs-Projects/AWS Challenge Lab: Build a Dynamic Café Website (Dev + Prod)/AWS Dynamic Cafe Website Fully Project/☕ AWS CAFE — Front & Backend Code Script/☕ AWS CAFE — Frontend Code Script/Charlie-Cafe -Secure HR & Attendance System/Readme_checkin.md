@@ -451,4 +451,254 @@ Token Expiry Protected
 
 Centralized API Controlled
 
+### Here’s the fully updated and styled checkin.html with comments:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= Bootstrap CSS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================= Google Font ================= -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===================================================
+   Global Body & Background
+=================================================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #fff;
+    overflow: hidden;
+}
+
+/* Dark overlay for readability */
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* ===================================================
+   Attendance Card (Styled Like Login Card)
+=================================================== */
+.attendance-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 400px;
+    text-align: center;
+    z-index: 2;
+}
+
+/* Card Titles */
+.attendance-card .logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.attendance-card h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.attendance-card p {
+    color: #f0e6dc;
+    margin-bottom: 25px;
+}
+
+/* Input Field Styling */
+.attendance-card input.form-control {
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Buttons */
+.btn-checkin {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.btn-checkin:hover {
+    transform: scale(1.05);
+}
+
+.btn-checkout {
+    background: linear-gradient(135deg,#8b0000,#ff4500);
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.btn-checkout:hover {
+    transform: scale(1.05);
+}
+
+/* Status Message */
+#statusMsg {
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Overlay -->
+<div class="overlay"></div>
+
+<!-- ================= Attendance Card ================= -->
+<div class="attendance-card">
+
+    <div class="logo">☕</div>
+    <h2>Charlie Café</h2>
+    <p>Employee Attendance System</p>
+    <hr style="border-top: 1px solid rgba(255,255,255,0.3);">
+
+    <!-- Employee ID Input -->
+    <div class="mb-3 text-start">
+        <label for="employeeId" class="form-label fw-bold">Employee ID</label>
+        <input
+            type="number"
+            id="employeeId"
+            class="form-control"
+            placeholder="Enter your Employee ID"
+            required
+        >
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-grid gap-3 mt-4">
+        <button class="btn btn-checkin btn-lg" onclick="submitCheckin()">✅ Check In</button>
+        <button class="btn btn-checkout btn-lg" onclick="submitCheckout()">⏰ Check Out</button>
+    </div>
+
+    <!-- Status Message -->
+    <div id="statusMsg"></div>
+</div>
+
+<!-- =======================================================
+     LOAD CENTRALIZED MODULES (ORDER MATTERS)
+======================================================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+
+<script>
+/* ==========================================================
+   CHARLIE CAFÉ — ATTENDANCE PAGE (PROTECTED)
+   ----------------------------------------------------------
+   ✔ Requires Cognito Login
+   ✔ Employee or Admin Role Required
+   ✔ Uses /prod HR endpoints
+========================================================== */
+
+// ================= INIT PAGE SECURITY =================
+CHARLIE_AUTH.protectPage();           // Ensure only logged-in users can access
+CHARLIE_AUTH.startAutoLogoutWatcher(); // Auto logout on inactivity
+
+// ================= Utility: Show Status Message =================
+function showMessage(message, success = true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "lightgreen" : "tomato";
+}
+
+// ================= Validate Employee ID =================
+function getEmployeeId() {
+    const empId = document.getElementById("employeeId").value.trim();
+    if (!empId) {
+        showMessage("❌ Please enter Employee ID", false);
+        return null;
+    }
+    return empId;
+}
+
+// ==========================================================
+// 1️⃣ CHECK-IN (Cognito Protected API)
+// ==========================================================
+async function submitCheckin() {
+    const employeeId = getEmployeeId();
+    if (!employeeId) return;
+
+    try {
+        const result = await CHARLIE_API.protected.recordAttendance({
+            employee_id: employeeId,
+            action: "checkin"
+        });
+        showMessage("✅ Check-In successful. Have a great shift!");
+    } catch (error) {
+        console.error(error);
+        showMessage("❌ Check-In failed or unauthorized.", false);
+    }
+}
+
+// ==========================================================
+// 2️⃣ CHECK-OUT (Cognito Protected API)
+// ==========================================================
+async function submitCheckout() {
+    const employeeId = getEmployeeId();
+    if (!employeeId) return;
+
+    try {
+        const result = await CHARLIE_API.protected.recordAttendance({
+            employee_id: employeeId,
+            action: "checkout"
+        });
+        showMessage("⏰ Check-Out successful. Thank you!");
+    } catch (error) {
+        console.error(error);
+        showMessage("❌ Check-Out failed or unauthorized.", false);
+    }
+}
+
+// ==========================================================
+// Show page after JS is loaded to avoid FOUC
+// ==========================================================
+document.body.style.display = "flex";
+</script>
+
+</body>
+</html>
+```
+
+### ✅ What’s updated:
+
+- Modern “Charlie Café” card layout like your employee login page.
+
+- Background + dark overlay for consistency with login page.
+
+- Poppins font + styled buttons with gradient hover effects.
+
+- Attendance card input and buttons now fully match the style of login card.
+
+- Cognito protection and modular JS integration retained (config.js, utils.js, central-auth.js, api.js).
+
+- Status messages styled with green/red colors for success/error.
 ---

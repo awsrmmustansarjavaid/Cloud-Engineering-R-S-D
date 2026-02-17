@@ -1,73 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Charlie Café | Attendance</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- ================= Bootstrap CSS ================= -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- ================= Bootstrap CSS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- ================= Café Theme Styling ================= -->
-    <style>
-        body {
-            min-height: 100vh;
-            background:
-                linear-gradient(rgba(40,25,15,0.85), rgba(40,25,15,0.85)),
-                url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: "Segoe UI", sans-serif;
-        }
+<!-- ================= Google Font ================= -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-        .attendance-card {
-            background-color: rgba(255, 255, 255, 0.96);
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
+<style>
+/* ===================================================
+   Global Body & Background
+=================================================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #fff;
+    overflow: hidden;
+}
 
-        .attendance-card h2 {
-            font-family: Georgia, serif;
-            color: #2b1b12;
-        }
+/* Dark overlay for readability */
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
 
-        .btn-checkin {
-            background-color: #2b1b12;
-            color: #fff;
-        }
+/* ===================================================
+   Attendance Card (Styled Like Login Card)
+=================================================== */
+.attendance-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 400px;
+    text-align: center;
+    z-index: 2;
+}
 
-        .btn-checkin:hover {
-            background-color: #3d261a;
-        }
+/* Card Titles */
+.attendance-card .logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
 
-        .btn-checkout {
-            background-color: #8b0000;
-            color: #fff;
-        }
+.attendance-card h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+}
 
-        .btn-checkout:hover {
-            background-color: #a40000;
-        }
-    </style>
+.attendance-card p {
+    color: #f0e6dc;
+    margin-bottom: 25px;
+}
+
+/* Input Field Styling */
+.attendance-card input.form-control {
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Buttons */
+.btn-checkin {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.btn-checkin:hover {
+    transform: scale(1.05);
+}
+
+.btn-checkout {
+    background: linear-gradient(135deg,#8b0000,#ff4500);
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.btn-checkout:hover {
+    transform: scale(1.05);
+}
+
+/* Status Message */
+#statusMsg {
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 16px;
+}
+</style>
 </head>
 
-<body style="display:none;">
+<body>
+
+<!-- Overlay -->
+<div class="overlay"></div>
 
 <!-- ================= Attendance Card ================= -->
-<div class="attendance-card text-center">
+<div class="attendance-card">
 
-    <h2>☕ Charlie Café</h2>
-    <p class="text-muted">Employee Attendance System</p>
+    <div class="logo">☕</div>
+    <h2>Charlie Café</h2>
+    <p>Employee Attendance System</p>
+    <hr style="border-top: 1px solid rgba(255,255,255,0.3);">
 
-    <hr>
-
-    <!-- ================= Employee ID Input ================= -->
+    <!-- Employee ID Input -->
     <div class="mb-3 text-start">
         <label for="employeeId" class="form-label fw-bold">Employee ID</label>
         <input
@@ -79,22 +136,14 @@
         >
     </div>
 
-    <!-- ================= Action Buttons ================= -->
+    <!-- Action Buttons -->
     <div class="d-grid gap-3 mt-4">
-        <button class="btn btn-checkin btn-lg" onclick="submitCheckin()">
-            ✅ Check In
-        </button>
-
-        <button class="btn btn-checkout btn-lg" onclick="submitCheckout()">
-            ⏰ Check Out
-        </button>
+        <button class="btn btn-checkin btn-lg" onclick="submitCheckin()">✅ Check In</button>
+        <button class="btn btn-checkout btn-lg" onclick="submitCheckout()">⏰ Check Out</button>
     </div>
 
-    <!-- ================= Status Message ================= -->
-    <div class="mt-4">
-        <div id="statusMsg" class="fw-bold"></div>
-    </div>
-
+    <!-- Status Message -->
+    <div id="statusMsg"></div>
 </div>
 
 <!-- =======================================================
@@ -107,7 +156,7 @@
 
 <script>
 /* ==========================================================
-   CHARLIE CAFE — ATTENDANCE PAGE (PROTECTED)
+   CHARLIE CAFÉ — ATTENDANCE PAGE (PROTECTED)
    ----------------------------------------------------------
    ✔ Requires Cognito Login
    ✔ Employee or Admin Role Required
@@ -115,14 +164,14 @@
 ========================================================== */
 
 // ================= INIT PAGE SECURITY =================
-CHARLIE_AUTH.protectPage();
-CHARLIE_AUTH.startAutoLogoutWatcher();
+CHARLIE_AUTH.protectPage();           // Ensure only logged-in users can access
+CHARLIE_AUTH.startAutoLogoutWatcher(); // Auto logout on inactivity
 
 // ================= Utility: Show Status Message =================
 function showMessage(message, success = true) {
     const msg = document.getElementById("statusMsg");
     msg.innerText = message;
-    msg.style.color = success ? "green" : "red";
+    msg.style.color = success ? "lightgreen" : "tomato";
 }
 
 // ================= Validate Employee ID =================
@@ -139,19 +188,15 @@ function getEmployeeId() {
 // 1️⃣ CHECK-IN (Cognito Protected API)
 // ==========================================================
 async function submitCheckin() {
-
     const employeeId = getEmployeeId();
     if (!employeeId) return;
 
     try {
-
         const result = await CHARLIE_API.protected.recordAttendance({
             employee_id: employeeId,
             action: "checkin"
         });
-
         showMessage("✅ Check-In successful. Have a great shift!");
-
     } catch (error) {
         console.error(error);
         showMessage("❌ Check-In failed or unauthorized.", false);
@@ -162,24 +207,25 @@ async function submitCheckin() {
 // 2️⃣ CHECK-OUT (Cognito Protected API)
 // ==========================================================
 async function submitCheckout() {
-
     const employeeId = getEmployeeId();
     if (!employeeId) return;
 
     try {
-
         const result = await CHARLIE_API.protected.recordAttendance({
             employee_id: employeeId,
             action: "checkout"
         });
-
         showMessage("⏰ Check-Out successful. Thank you!");
-
     } catch (error) {
         console.error(error);
         showMessage("❌ Check-Out failed or unauthorized.", false);
     }
 }
+
+// ==========================================================
+// Show page after JS is loaded to avoid FOUC
+// ==========================================================
+document.body.style.display = "flex";
 </script>
 
 </body>
