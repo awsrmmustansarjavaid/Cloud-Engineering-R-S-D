@@ -10,7 +10,6 @@
 
     <!-- ================= Café Theme Styling ================= -->
     <style>
-        /* ===== Full Page Café Background ===== */
         body {
             min-height: 100vh;
             background:
@@ -24,7 +23,6 @@
             font-family: "Segoe UI", sans-serif;
         }
 
-        /* ===== Main Card ===== */
         .attendance-card {
             background-color: rgba(255, 255, 255, 0.96);
             border-radius: 15px;
@@ -34,13 +32,11 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        /* ===== Café Heading ===== */
         .attendance-card h2 {
             font-family: Georgia, serif;
             color: #2b1b12;
         }
 
-        /* ===== Buttons ===== */
         .btn-checkin {
             background-color: #2b1b12;
             color: #fff;
@@ -61,19 +57,17 @@
     </style>
 </head>
 
-<body>
+<body style="display:none;">
 
 <!-- ================= Attendance Card ================= -->
 <div class="attendance-card text-center">
 
-    <!-- Café Title -->
     <h2>☕ Charlie Café</h2>
     <p class="text-muted">Employee Attendance System</p>
 
     <hr>
 
     <!-- ================= Employee ID Input ================= -->
-    <!-- Employee must enter ID before check-in/out -->
     <div class="mb-3 text-start">
         <label for="employeeId" class="form-label fw-bold">Employee ID</label>
         <input
@@ -103,75 +97,89 @@
 
 </div>
 
-<!-- ================= JavaScript Logic ================= -->
+<!-- =======================================================
+     LOAD CENTRALIZED MODULES (ORDER MATTERS)
+======================================================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+
 <script>
-    /* ========= API Gateway Base URL ========= */
-    const apiBase = "https://<API-ID>.execute-api.us-east-1.amazonaws.com/dev";
+/* ==========================================================
+   CHARLIE CAFE — ATTENDANCE PAGE (PROTECTED)
+   ----------------------------------------------------------
+   ✔ Requires Cognito Login
+   ✔ Employee or Admin Role Required
+   ✔ Uses /prod HR endpoints
+========================================================== */
 
-    /* ========= Utility: Show Status Messages ========= */
-    function showMessage(message, success = true) {
-        const msg = document.getElementById("statusMsg");
-        msg.innerText = message;
-        msg.style.color = success ? "green" : "red";
+// ================= INIT PAGE SECURITY =================
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+// ================= Utility: Show Status Message =================
+function showMessage(message, success = true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "green" : "red";
+}
+
+// ================= Validate Employee ID =================
+function getEmployeeId() {
+    const empId = document.getElementById("employeeId").value.trim();
+    if (!empId) {
+        showMessage("❌ Please enter Employee ID", false);
+        return null;
     }
+    return empId;
+}
 
-    /* ========= Validate Employee ID ========= */
-    function getEmployeeId() {
-        const empId = document.getElementById("employeeId").value.trim();
-        if (!empId) {
-            showMessage("❌ Please enter Employee ID", false);
-            return null;
-        }
-        return empId;
+// ==========================================================
+// 1️⃣ CHECK-IN (Cognito Protected API)
+// ==========================================================
+async function submitCheckin() {
+
+    const employeeId = getEmployeeId();
+    if (!employeeId) return;
+
+    try {
+
+        const result = await CHARLIE_API.protected.recordAttendance({
+            employee_id: employeeId,
+            action: "checkin"
+        });
+
+        showMessage("✅ Check-In successful. Have a great shift!");
+
+    } catch (error) {
+        console.error(error);
+        showMessage("❌ Check-In failed or unauthorized.", false);
     }
+}
 
-    /* ========= Submit Check-In ========= */
-    async function submitCheckin() {
-        const employeeId = getEmployeeId();
-        if (!employeeId) return;
+// ==========================================================
+// 2️⃣ CHECK-OUT (Cognito Protected API)
+// ==========================================================
+async function submitCheckout() {
 
-        try {
-            const response = await fetch(`${apiBase}/attendance/checkin`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ employee_id: employeeId })
-            });
+    const employeeId = getEmployeeId();
+    if (!employeeId) return;
 
-            const result = await response.json();
+    try {
 
-            if (response.ok) {
-                showMessage("✅ Check-In successful. Have a great shift!");
-            } else {
-                showMessage(result.message || "❌ Check-In failed", false);
-            }
-        } catch (error) {
-            showMessage("❌ Server error. Please contact admin.", false);
-        }
+        const result = await CHARLIE_API.protected.recordAttendance({
+            employee_id: employeeId,
+            action: "checkout"
+        });
+
+        showMessage("⏰ Check-Out successful. Thank you!");
+
+    } catch (error) {
+        console.error(error);
+        showMessage("❌ Check-Out failed or unauthorized.", false);
     }
-
-    /* ========= Submit Check-Out ========= */
-    async function submitCheckout() {
-        const employeeId = getEmployeeId();
-        if (!employeeId) return;
-
-        try {
-            const response = await fetch(`${apiBase}/attendance/checkout`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ employee_id: employeeId })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                showMessage("⏰ Check-Out successful. Thank you!");
-            } else {
-                showMessage(result.message || "❌ Check-Out failed", false);
-            }
-        } catch (error) {
-            showMessage("❌ Server error. Please contact admin.", false);
-        }
-    }
+}
 </script>
 
 </body>
