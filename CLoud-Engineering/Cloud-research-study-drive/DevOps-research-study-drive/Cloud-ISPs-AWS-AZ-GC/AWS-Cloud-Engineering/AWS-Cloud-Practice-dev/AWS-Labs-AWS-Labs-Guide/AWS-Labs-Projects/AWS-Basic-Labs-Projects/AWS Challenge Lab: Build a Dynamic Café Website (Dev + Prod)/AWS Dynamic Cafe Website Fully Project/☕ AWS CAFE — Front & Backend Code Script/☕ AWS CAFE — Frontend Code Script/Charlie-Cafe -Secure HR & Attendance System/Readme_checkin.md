@@ -2555,4 +2555,70 @@ When user switches:
 🔴 Check-Out → Red glow
 Fingerprint tap → Records selected mode
 
+### 🧐 an important point
+
+let’s clarify carefully. 🧐
+
+#### 1️⃣ Your old checkin.html
+
+Your old file was calling this function:
+
+```
+await CHARLIE_API.protected.recordAttendance({
+    employee_id: employeeId,
+    action: action
+});
+```
+
+- This function is defined in your api.js and sends data to your Lambda backend or Cognito-protected API.
+
+- The rest of the UI (clock, timer) was frontend only.
+
+- Everything worked without changing Lambda, because the API endpoint expected { employee_id, action }.
+
+#### 2️⃣ This new checkin.html
+
+Backend logic is unchanged:
+
+```
+await CHARLIE_API.protected.recordAttendance({
+    employee_id: employeeId,
+    action: action
+});
+```
+
+✅ Same CHARLIE_API object is called
+
+✅ Same Lambda backend receives the same payload: employee_id + action
+
+✅ Check-In / Check-Out now sends "checkin" or "checkout" based on toggle
+
+#### 3️⃣ What you DO NOT need to change
+
+- api.js functions that handle recordAttendance()
+
+- Your Lambda backend itself (it still expects employee_id and action)
+
+- Cognito protection code (central-auth.js)
+
+#### 4️⃣ What is different in this new UI
+
+- Toggle input lets you select Check-In or Check-Out
+
+- Fingerprint button calls same API but sends correct action
+
+- Session timer starts on Check-In and stops on Check-Out
+
+- Late detection shows warning if check-in is after 10 AM
+
+- UI is upgraded (professional animated toggle + fingerprint + clock)
+
+### ✅ Summary
+
+- This new checkin.html will work exactly the same with your old Lambda backend.
+
+- No backend modification is required.
+
+- Only difference is frontend now has Check-In / Check-Out toggle.
+
 ---
