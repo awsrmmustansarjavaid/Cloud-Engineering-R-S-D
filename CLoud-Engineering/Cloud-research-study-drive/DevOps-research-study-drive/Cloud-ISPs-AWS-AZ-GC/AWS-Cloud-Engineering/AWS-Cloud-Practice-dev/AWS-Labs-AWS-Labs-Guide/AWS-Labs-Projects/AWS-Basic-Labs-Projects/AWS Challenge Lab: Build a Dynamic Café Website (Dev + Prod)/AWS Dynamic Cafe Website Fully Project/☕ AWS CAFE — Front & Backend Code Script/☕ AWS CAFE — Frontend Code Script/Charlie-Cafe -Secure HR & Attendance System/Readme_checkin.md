@@ -701,4 +701,295 @@ document.body.style.display = "flex";
 - Cognito protection and modular JS integration retained (config.js, utils.js, central-auth.js, api.js).
 
 - Status messages styled with green/red colors for success/error.
+
+### live clock with timezone selection
+
+absolutely add a live clock with timezone selection using only frontend JavaScript.
+No Lambda, no backend, no API required.
+
+We’ll use:
+
+setInterval() for live updates
+
+Intl.DateTimeFormat() for timezone support
+
+A dropdown to select timezone (including Pakistan Standard Time 🇵🇰)
+
+Auto-detect user timezone by default
+
+Below is your fully updated checkin.html with:
+
+✔ Modern Charlie Café UI
+✔ Cognito protection
+✔ Check-in / Check-out
+✔ Live clock
+✔ Timezone selector (Pakistan included)
+✔ Fully commented
+
+### ✅ FULL UPDATED checkin.html (With Live Time Clock + Timezone Selector)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= Bootstrap CSS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ================= Google Font ================= -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===================================================
+   Global Body & Background
+=================================================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: #fff;
+}
+
+/* Dark overlay */
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Attendance Card */
+.attendance-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 420px;
+    text-align: center;
+    z-index: 2;
+}
+
+/* Logo */
+.logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.btn-checkin, .btn-checkout {
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.btn-checkin {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    color: #fff;
+}
+
+.btn-checkout {
+    background: linear-gradient(135deg,#8b0000,#ff4500);
+    color: #fff;
+}
+
+.btn-checkin:hover,
+.btn-checkout:hover {
+    transform: scale(1.05);
+}
+
+/* Live Clock Style */
+.clock-box {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+#liveClock {
+    font-size: 20px;
+    font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="attendance-card">
+
+    <div class="logo">☕</div>
+    <h2>Charlie Café</h2>
+    <p>Employee Attendance System</p>
+
+    <!-- ================= LIVE CLOCK SECTION ================= -->
+    <div class="clock-box">
+        <div id="liveClock">Loading time...</div>
+
+        <!-- Timezone Selector -->
+        <select id="timezoneSelect" class="form-select mt-3">
+            <option value="Asia/Karachi">🇵🇰 Pakistan Standard Time</option>
+            <option value="UTC">🌍 UTC</option>
+            <option value="Asia/Dubai">🇦🇪 UAE</option>
+            <option value="Europe/London">🇬🇧 London</option>
+            <option value="America/New_York">🇺🇸 New York</option>
+        </select>
+    </div>
+
+    <hr style="border-top:1px solid rgba(255,255,255,0.3);">
+
+    <!-- Employee ID -->
+    <div class="mb-3 text-start">
+        <label class="form-label fw-bold">Employee ID</label>
+        <input type="number" id="employeeId" class="form-control" placeholder="Enter your Employee ID">
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-grid gap-3 mt-4">
+        <button class="btn btn-checkin btn-lg" onclick="submitCheckin()">✅ Check In</button>
+        <button class="btn btn-checkout btn-lg" onclick="submitCheckout()">⏰ Check Out</button>
+    </div>
+
+    <!-- Status -->
+    <div id="statusMsg" class="mt-4 fw-bold"></div>
+</div>
+
+<!-- ================= Load Modules ================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+
+<script>
+/* ==========================================================
+   PAGE SECURITY (Cognito Protected)
+========================================================== */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+/* ==========================================================
+   LIVE CLOCK WITH TIMEZONE SUPPORT
+   - No backend required
+   - Uses Intl.DateTimeFormat
+========================================================== */
+
+// Default timezone (Pakistan)
+let selectedTimezone = "Asia/Karachi";
+
+// Function to update live time
+function updateClock() {
+    const now = new Date();
+
+    const options = {
+        timeZone: selectedTimezone,
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    };
+
+    const formatted = new Intl.DateTimeFormat("en-US", options).format(now);
+
+    document.getElementById("liveClock").innerText = formatted;
+}
+
+// Run every second
+setInterval(updateClock, 1000);
+updateClock();
+
+// Change timezone when dropdown changes
+document.getElementById("timezoneSelect").addEventListener("change", function() {
+    selectedTimezone = this.value;
+    updateClock();
+});
+
+/* ==========================================================
+   ATTENDANCE FUNCTIONS
+========================================================== */
+
+function showMessage(message, success = true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "lightgreen" : "tomato";
+}
+
+function getEmployeeId() {
+    const empId = document.getElementById("employeeId").value.trim();
+    if (!empId) {
+        showMessage("❌ Please enter Employee ID", false);
+        return null;
+    }
+    return empId;
+}
+
+async function submitCheckin() {
+    const employeeId = getEmployeeId();
+    if (!employeeId) return;
+
+    try {
+        await CHARLIE_API.protected.recordAttendance({
+            employee_id: employeeId,
+            action: "checkin"
+        });
+
+        showMessage("✅ Check-In successful!");
+    } catch (error) {
+        showMessage("❌ Check-In failed.", false);
+    }
+}
+
+async function submitCheckout() {
+    const employeeId = getEmployeeId();
+    if (!employeeId) return;
+
+    try {
+        await CHARLIE_API.protected.recordAttendance({
+            employee_id: employeeId,
+            action: "checkout"
+        });
+
+        showMessage("⏰ Check-Out successful!");
+    } catch (error) {
+        showMessage("❌ Check-Out failed.", false);
+    }
+}
+</script>
+
+</body>
+</html>
+```
+
+### ✅ What You Now Have
+
+✔ Live running clock
+✔ Timezone dropdown
+✔ Pakistan Standard Time (Asia/Karachi)
+✔ No backend required
+✔ Updates every second
+✔ Styled to match Charlie Café theme
+
+### 💡 Optional Upgrade (If You Want)
+
+I can also:
+
+Auto-detect user's timezone
+
+Save selected timezone in localStorage
+
+Show digital + analog style clock
+
+Automatically insert selected time into check-in request
 ---

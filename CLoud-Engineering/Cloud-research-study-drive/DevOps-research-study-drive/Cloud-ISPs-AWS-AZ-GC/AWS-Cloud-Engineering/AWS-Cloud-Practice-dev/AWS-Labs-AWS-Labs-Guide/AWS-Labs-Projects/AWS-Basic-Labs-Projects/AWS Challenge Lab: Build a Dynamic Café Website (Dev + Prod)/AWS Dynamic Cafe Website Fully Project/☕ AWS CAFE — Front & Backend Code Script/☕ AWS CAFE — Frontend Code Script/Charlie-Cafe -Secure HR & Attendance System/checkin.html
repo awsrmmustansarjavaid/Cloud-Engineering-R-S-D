@@ -24,10 +24,9 @@ body {
     align-items: center;
     position: relative;
     color: #fff;
-    overflow: hidden;
 }
 
-/* Dark overlay for readability */
+/* Dark overlay */
 .overlay {
     background: rgba(0,0,0,0.6);
     position: absolute;
@@ -36,119 +35,105 @@ body {
     z-index: 0;
 }
 
-/* ===================================================
-   Attendance Card (Styled Like Login Card)
-=================================================== */
+/* Attendance Card */
 .attendance-card {
     position: relative;
     background: rgba(58,37,28,0.95);
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-    width: 400px;
+    width: 420px;
     text-align: center;
     z-index: 2;
 }
 
-/* Card Titles */
-.attendance-card .logo {
+/* Logo */
+.logo {
     font-size: 40px;
     margin-bottom: 10px;
 }
 
-.attendance-card h2 {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #fff;
-}
-
-.attendance-card p {
-    color: #f0e6dc;
-    margin-bottom: 25px;
-}
-
-/* Input Field Styling */
-.attendance-card input.form-control {
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 16px;
-}
-
 /* Buttons */
-.btn-checkin {
-    background: linear-gradient(135deg,#ff5722,#ff9800);
-    color: #fff;
+.btn-checkin, .btn-checkout {
     border-radius: 50px;
     font-weight: 600;
     padding: 12px;
     transition: 0.3s;
 }
 
-.btn-checkin:hover {
-    transform: scale(1.05);
+.btn-checkin {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    color: #fff;
 }
 
 .btn-checkout {
     background: linear-gradient(135deg,#8b0000,#ff4500);
     color: #fff;
-    border-radius: 50px;
-    font-weight: 600;
-    padding: 12px;
-    transition: 0.3s;
 }
 
+.btn-checkin:hover,
 .btn-checkout:hover {
     transform: scale(1.05);
 }
 
-/* Status Message */
-#statusMsg {
-    margin-top: 20px;
+/* Live Clock Style */
+.clock-box {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+#liveClock {
+    font-size: 20px;
     font-weight: 600;
-    font-size: 16px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Overlay -->
 <div class="overlay"></div>
 
-<!-- ================= Attendance Card ================= -->
 <div class="attendance-card">
 
     <div class="logo">☕</div>
     <h2>Charlie Café</h2>
     <p>Employee Attendance System</p>
-    <hr style="border-top: 1px solid rgba(255,255,255,0.3);">
 
-    <!-- Employee ID Input -->
-    <div class="mb-3 text-start">
-        <label for="employeeId" class="form-label fw-bold">Employee ID</label>
-        <input
-            type="number"
-            id="employeeId"
-            class="form-control"
-            placeholder="Enter your Employee ID"
-            required
-        >
+    <!-- ================= LIVE CLOCK SECTION ================= -->
+    <div class="clock-box">
+        <div id="liveClock">Loading time...</div>
+
+        <!-- Timezone Selector -->
+        <select id="timezoneSelect" class="form-select mt-3">
+            <option value="Asia/Karachi">🇵🇰 Pakistan Standard Time</option>
+            <option value="UTC">🌍 UTC</option>
+            <option value="Asia/Dubai">🇦🇪 UAE</option>
+            <option value="Europe/London">🇬🇧 London</option>
+            <option value="America/New_York">🇺🇸 New York</option>
+        </select>
     </div>
 
-    <!-- Action Buttons -->
+    <hr style="border-top:1px solid rgba(255,255,255,0.3);">
+
+    <!-- Employee ID -->
+    <div class="mb-3 text-start">
+        <label class="form-label fw-bold">Employee ID</label>
+        <input type="number" id="employeeId" class="form-control" placeholder="Enter your Employee ID">
+    </div>
+
+    <!-- Buttons -->
     <div class="d-grid gap-3 mt-4">
         <button class="btn btn-checkin btn-lg" onclick="submitCheckin()">✅ Check In</button>
         <button class="btn btn-checkout btn-lg" onclick="submitCheckout()">⏰ Check Out</button>
     </div>
 
-    <!-- Status Message -->
-    <div id="statusMsg"></div>
+    <!-- Status -->
+    <div id="statusMsg" class="mt-4 fw-bold"></div>
 </div>
 
-<!-- =======================================================
-     LOAD CENTRALIZED MODULES (ORDER MATTERS)
-======================================================= -->
+<!-- ================= Load Modules ================= -->
 <script src="config.js"></script>
 <script src="utils.js"></script>
 <script src="central-auth.js"></script>
@@ -156,25 +141,60 @@ body {
 
 <script>
 /* ==========================================================
-   CHARLIE CAFÉ — ATTENDANCE PAGE (PROTECTED)
-   ----------------------------------------------------------
-   ✔ Requires Cognito Login
-   ✔ Employee or Admin Role Required
-   ✔ Uses /prod HR endpoints
+   PAGE SECURITY (Cognito Protected)
+========================================================== */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+/* ==========================================================
+   LIVE CLOCK WITH TIMEZONE SUPPORT
+   - No backend required
+   - Uses Intl.DateTimeFormat
 ========================================================== */
 
-// ================= INIT PAGE SECURITY =================
-CHARLIE_AUTH.protectPage();           // Ensure only logged-in users can access
-CHARLIE_AUTH.startAutoLogoutWatcher(); // Auto logout on inactivity
+// Default timezone (Pakistan)
+let selectedTimezone = "Asia/Karachi";
 
-// ================= Utility: Show Status Message =================
+// Function to update live time
+function updateClock() {
+    const now = new Date();
+
+    const options = {
+        timeZone: selectedTimezone,
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    };
+
+    const formatted = new Intl.DateTimeFormat("en-US", options).format(now);
+
+    document.getElementById("liveClock").innerText = formatted;
+}
+
+// Run every second
+setInterval(updateClock, 1000);
+updateClock();
+
+// Change timezone when dropdown changes
+document.getElementById("timezoneSelect").addEventListener("change", function() {
+    selectedTimezone = this.value;
+    updateClock();
+});
+
+/* ==========================================================
+   ATTENDANCE FUNCTIONS
+========================================================== */
+
 function showMessage(message, success = true) {
     const msg = document.getElementById("statusMsg");
     msg.innerText = message;
     msg.style.color = success ? "lightgreen" : "tomato";
 }
 
-// ================= Validate Employee ID =================
 function getEmployeeId() {
     const empId = document.getElementById("employeeId").value.trim();
     if (!empId) {
@@ -184,48 +204,37 @@ function getEmployeeId() {
     return empId;
 }
 
-// ==========================================================
-// 1️⃣ CHECK-IN (Cognito Protected API)
-// ==========================================================
 async function submitCheckin() {
     const employeeId = getEmployeeId();
     if (!employeeId) return;
 
     try {
-        const result = await CHARLIE_API.protected.recordAttendance({
+        await CHARLIE_API.protected.recordAttendance({
             employee_id: employeeId,
             action: "checkin"
         });
-        showMessage("✅ Check-In successful. Have a great shift!");
+
+        showMessage("✅ Check-In successful!");
     } catch (error) {
-        console.error(error);
-        showMessage("❌ Check-In failed or unauthorized.", false);
+        showMessage("❌ Check-In failed.", false);
     }
 }
 
-// ==========================================================
-// 2️⃣ CHECK-OUT (Cognito Protected API)
-// ==========================================================
 async function submitCheckout() {
     const employeeId = getEmployeeId();
     if (!employeeId) return;
 
     try {
-        const result = await CHARLIE_API.protected.recordAttendance({
+        await CHARLIE_API.protected.recordAttendance({
             employee_id: employeeId,
             action: "checkout"
         });
-        showMessage("⏰ Check-Out successful. Thank you!");
+
+        showMessage("⏰ Check-Out successful!");
     } catch (error) {
-        console.error(error);
-        showMessage("❌ Check-Out failed or unauthorized.", false);
+        showMessage("❌ Check-Out failed.", false);
     }
 }
-
-// ==========================================================
-// Show page after JS is loaded to avoid FOUC
-// ==========================================================
-document.body.style.display = "flex";
 </script>
 
 </body>
