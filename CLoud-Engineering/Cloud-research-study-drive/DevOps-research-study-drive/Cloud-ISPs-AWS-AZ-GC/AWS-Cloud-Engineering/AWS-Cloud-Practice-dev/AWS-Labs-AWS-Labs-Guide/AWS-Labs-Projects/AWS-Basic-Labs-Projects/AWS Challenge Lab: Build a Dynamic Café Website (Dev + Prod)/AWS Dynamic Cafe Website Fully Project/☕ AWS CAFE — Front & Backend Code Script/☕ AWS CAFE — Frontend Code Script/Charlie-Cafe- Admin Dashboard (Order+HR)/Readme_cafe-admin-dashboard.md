@@ -1,3 +1,23 @@
+# Charlie Cafe - cafe-admin-dashboard
+
+### cafe-admin-dashboard.html
+
+> **Update Version:1.0**
+
+### ✅ Key updates:
+
+- Connected to CHARLIE.initProtectedPage() from central-auth.js
+
+- Uses CHARLIE_API modular calls for Admin Dashboard and HR
+
+- Logout button hooked via central-auth.js
+
+- Clean comments for all sections
+
+- No styling or layout changes
+
+
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -341,3 +361,24 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+```
+
+### ✅ Summary of Changes
+
+- Replaced old central-auth-api.js with separated:
+
+    - central-auth.js
+
+    - api.js
+
+    - central-printing.js
+
+    - CHARLIE_API.adminDashboard and CHARLIE_API.adminAttendance used instead of old calls.
+
+    - Logout hooked to central-auth.js.
+
+- Page remains hidden until Cognito auth passes.
+
+- Clean, production-ready comments for every section.
+
+---
