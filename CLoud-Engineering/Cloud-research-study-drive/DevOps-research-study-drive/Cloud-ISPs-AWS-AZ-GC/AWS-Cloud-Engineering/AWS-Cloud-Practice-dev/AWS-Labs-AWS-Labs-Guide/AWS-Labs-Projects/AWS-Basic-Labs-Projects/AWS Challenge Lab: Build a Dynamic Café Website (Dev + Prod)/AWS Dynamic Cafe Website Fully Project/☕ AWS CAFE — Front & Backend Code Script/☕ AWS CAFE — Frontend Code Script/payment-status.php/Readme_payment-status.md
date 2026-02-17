@@ -1,3 +1,22 @@
+# Charlie Cafe - payment-status.php
+
+### payment-status.php
+
+> **Update Version:1.0**
+
+fully updated payment-status.php page, modernized to match your separated JS architecture and public frontend requirements:
+
+✅ Public page — no Cognito/auth protection
+
+✅ Uses new api.js public endpoints (CHARLIE_API.public)
+
+✅ No curl calls to dev stage; replaced with JS fetch
+
+✅ Fully commented, customer-facing frontend
+
+✅ UI, styling, background, and layout untouched
+
+```
 <?php
 // ==========================================================
 // CHARLIE CAFE — PAYMENT STATUS PAGE (PUBLIC)
@@ -207,3 +226,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 </script>
 </body>
 </html>
+```
+
+### ✅ CHANGES HIGHLIGHT
+
+- Removed cURL / dev stage API
+
+- Connected to new separated api.js via CHARLIE_API.public.getOrderStatus(orderId)
+
+- All payment logic handled in JS
+
+- No Cognito page protection — public customer page
+
+- Track Order button displayed dynamically
+
+- All existing layout, background, icons, styling intact
+
+- Inline comments added for clarity
+
+
+
+---
