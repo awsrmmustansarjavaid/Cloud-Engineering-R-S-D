@@ -632,4 +632,151 @@ loadLeaves();
 ✔ Role-based access
 ✔ Production stage enforced
 
+### Cognito login/logout
+
+Yes — Cognito login/logout already exists in your system,
+but NOT with username/password form inside this page.
+
+Right now your system uses:
+
+✅ Cognito Hosted UI login
+
+✅ CHARLIE_AUTH.login()
+
+✅ CHARLIE_AUTH.logout()
+
+✅ Token stored in localStorage
+
+✅ Page protected using CHARLIE_AUTH.protectPage()
+
+So employees already authenticate with username + password — but through the Cognito Hosted UI page, not a custom form inside employee-portal.html.
+
+### 🧠 How Your Current Login Works
+
+When an employee tries to access:
+
+```
+employee-portal.html
+```
+
+This runs:
+
+```
+CHARLIE_AUTH.protectPage();
+```
+
+If no token exists → it automatically redirects to:
+
+```
+https://your-domain.auth.us-east-1.amazoncognito.com/login
+```
+
+That is the Cognito Hosted UI.
+
+#### Employee enters:
+
+- Username
+
+- Password
+
+- Cognito authenticates → redirects back → page loads.
+
+So login already exists, just not embedded in this page.
+
+### 🚨 Important Question
+
+You now have 2 options:
+
+### ✅ OPTION 1 (RECOMMENDED – More Secure)
+
+Use Cognito Hosted UI (current system)
+
+✔ More secure
+✔ OAuth compliant
+✔ No password handled by your frontend
+✔ Best practice
+✔ Production-grade
+
+Nothing more needed — it already exists.
+
+### ⚠ OPTION 2 (Custom Username/Password Form Inside Page)
+
+You can create a login form inside employee-portal.html and authenticate using:
+
+```
+AmazonCognitoIdentity.CognitoUser.authenticateUser()
+```
+
+BUT:
+
+❌ Less secure
+❌ You handle passwords in frontend
+❌ Harder to maintain
+❌ Not recommended for production
+
+### 🎯 What You Currently Have
+
+Your current employee-portal.html:
+
+```
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.requireEmployee();
+```
+
+#### That means:
+
+- If not logged in → redirect to Hosted UI
+
+- If logged in but not employee → logout
+
+So login/logout is already working correctly.
+
+### 🧪 How to Test If It Works
+
+- Open employee portal in incognito
+
+- You should be redirected to Cognito login page
+
+- Login with employee credentials
+
+- Redirect back automatically
+
+If that happens → your login system is already complete.
+
+### 💡 If You Want a Login Button on This Page
+
+You can add this above everything:
+
+```
+<button onclick="CHARLIE_AUTH.login()">
+   Login
+</button>
+```
+
+But usually you create a separate page:
+
+```
+employee-login.html
+```
+
+and just call:
+
+```
+CHARLIE_AUTH.login("employee-portal.html");
+```
+
+### 🏆 Professional Recommendation
+
+#### Keep:
+
+- Hosted UI login
+
+- Token-based protection
+
+- Role-based restriction
+
+- Do NOT embed password forms inside employee portal.
+
+That’s enterprise best practice.
+
 ---
