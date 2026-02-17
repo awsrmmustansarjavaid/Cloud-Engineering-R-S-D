@@ -211,9 +211,31 @@ async function loadOrders() {
 // 3️⃣ Logout Function
 // ============================================
 async function logoutUser() {
-    await CHARLIE_AUTH.logout();
-    window.location.href = "login.html";
+
+    try {
+        // 🔐 Step 1: Call centralized Cognito logout function
+        // This will:
+        //   - Clear local storage/session storage
+        //   - Remove JWT tokens
+        //   - Invalidate Cognito session (if configured)
+        await CHARLIE_AUTH.logout();
+
+        // 🔁 Step 2: Redirect user to logout.html page
+        // This page can display a "Logged out successfully" message
+        // and optionally provide a button to login again.
+        window.location.href = "logout.html";
+
+    } catch (error) {
+
+        // ❌ If logout fails for any reason,
+        // log the error for debugging
+        console.error("Logout failed:", error);
+
+        // Still redirect to logout page for safety
+        window.location.href = "logout.html";
+    }
 }
+
 </script>
 
 </body>
