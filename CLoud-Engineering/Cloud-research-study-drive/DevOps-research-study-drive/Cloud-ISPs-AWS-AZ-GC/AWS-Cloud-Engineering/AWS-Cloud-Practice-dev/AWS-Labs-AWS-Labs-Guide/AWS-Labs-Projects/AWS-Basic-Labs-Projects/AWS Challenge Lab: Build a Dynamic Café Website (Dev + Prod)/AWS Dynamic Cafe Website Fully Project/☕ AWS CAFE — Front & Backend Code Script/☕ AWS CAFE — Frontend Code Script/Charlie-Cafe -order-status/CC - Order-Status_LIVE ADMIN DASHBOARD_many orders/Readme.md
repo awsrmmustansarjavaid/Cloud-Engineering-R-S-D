@@ -769,7 +769,7 @@ async function logoutUser() {
 
     // 🔁 Redirect user to logout.html instead of login.html
     // This page can show "You have been logged out successfully"
-    window.location.href = "logout.html";
+    window.location.href = "logout.php";
 }
 ```
 
@@ -802,7 +802,7 @@ async function logoutUser() {
         // 🔁 Step 2: Redirect user to logout.html page
         // This page can display a "Logged out successfully" message
         // and optionally provide a button to login again.
-        window.location.href = "logout.html";
+        window.location.href = "logout.php";
 
     } catch (error) {
 
@@ -811,7 +811,7 @@ async function logoutUser() {
         console.error("Logout failed:", error);
 
         // Still redirect to logout page for safety
-        window.location.href = "logout.html";
+        window.location.href = "logout.php";
     }
 }
 ```
@@ -1044,7 +1044,7 @@ async function logoutUser() {
         // 🔁 Step 2: Redirect user to logout.html page
         // This page can display a "Logged out successfully" message
         // and optionally provide a button to login again.
-        window.location.href = "logout.html";
+        window.location.href = "logout.php";
 
     } catch (error) {
 
@@ -1053,7 +1053,7 @@ async function logoutUser() {
         console.error("Logout failed:", error);
 
         // Still redirect to logout page for safety
-        window.location.href = "logout.html";
+        window.location.href = "logout.php";
     }
 }
 

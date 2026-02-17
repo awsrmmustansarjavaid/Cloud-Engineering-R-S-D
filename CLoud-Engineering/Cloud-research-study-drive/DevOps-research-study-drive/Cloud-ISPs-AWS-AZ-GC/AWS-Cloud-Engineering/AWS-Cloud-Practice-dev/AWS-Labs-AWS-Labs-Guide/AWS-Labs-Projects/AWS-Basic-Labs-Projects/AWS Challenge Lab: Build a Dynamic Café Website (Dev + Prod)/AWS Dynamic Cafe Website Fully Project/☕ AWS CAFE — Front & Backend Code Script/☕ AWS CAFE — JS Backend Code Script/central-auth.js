@@ -31,7 +31,7 @@ window.CHARLIE_AUTH = (() => {
     /* ===============================
        🚪 LOGOUT
     =============================== */
-    function logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`) {
+    function logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/logout.php`) {
 
         localStorage.removeItem("access_token");
 

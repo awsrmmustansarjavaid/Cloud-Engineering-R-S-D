@@ -119,7 +119,7 @@ body {
   <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
 </div>
 
-<!-- ===================== MAIN ===================== -->
+<!-- ===================== MAIN CONTENT ===================== -->
 <div class="main-content">
   <div class="container-box">
 
@@ -149,7 +149,7 @@ body {
     <!-- CHART -->
     <canvas id="chart" class="mt-4" height="120"></canvas>
 
-    <!-- PDF -->
+    <!-- DOWNLOAD PDF -->
     <button class="btn btn-success" onclick="downloadPDF()">
       <i class="bi bi-file-earmark-pdf-fill"></i> Download PDF
     </button>
@@ -178,70 +178,110 @@ body {
   </div>
 </div>
 
-<!-- ===================== CENTRAL AUTH ===================== -->
-<script src="central-auth-api.js"></script>
+<!-- =========================================================
+     LOAD NEW MODULAR ARCHITECTURE (ORDER MATTERS)
+========================================================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+<script src="central-printing.js"></script>
 
-<!-- ===================== BOOTSTRAP JS (FIXED ORDER) ===================== -->
+<!-- ===================== BOOTSTRAP JS ===================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* ===================== CONFIG ===================== */
-const ANALYTICS_API = `${API_BASE_URL}/analytics`; // API_BASE_URL comes from central-auth-api.js
+/* =========================================================
+   CHARLIE CAFE — ANALYTICS (ADMIN PROTECTED PAGE)
+   ---------------------------------------------------------
+   ✔ Requires Cognito Login
+   ✔ Requires Admin Role
+   ✔ Uses /prod stage
+   ✔ Uses CHARLIE_API.protected
+   ✔ Auto logout enabled
+========================================================= */
 
-/* ===================== INIT ===================== */
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Protect page
-  CHARLIE.initProtectedPage({
-    requireAuth: true,
-    enableLogout: true,
-    logoutButtonId: "logoutBtn"
-  });
+  // 🔐 Protect page
+  CHARLIE_AUTH.protectPage();
+  CHARLIE_AUTH.startAutoLogoutWatcher();
 
-  // Safe toast
+  // 🚪 Logout button
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      CHARLIE_AUTH.logout();
+    });
+  }
+
+  // 👋 Welcome toast
   const toastEl = document.getElementById("welcomeToast");
   if (toastEl) new bootstrap.Toast(toastEl).show();
 });
 
-/* ===================== LOAD DATA ===================== */
+/* =========================================================
+   LOAD ANALYTICS DATA (ADMIN ONLY)
+   Endpoint: /prod/admin/analytics?period=
+========================================================= */
 async function loadData() {
+
   try {
+
+    // Ensure Admin Role
+    CHARLIE_AUTH.requireAdmin();
+
     const period = document.getElementById("period").value;
-    const res = await CHARLIE.secureFetch(`${ANALYTICS_API}?period=${period}`);
-    const data = await res.json();
 
-    sales.textContent = data.total_sales ?? 0;
-    cost.textContent = data.total_cost ?? 0;
-    profit.textContent = data.profit ?? 0;
+    // Call protected API
+    const data = await CHARLIE_API.protected.adminDashboard(period);
 
+    // Update metrics
+    document.getElementById("sales").textContent  = data.total_sales ?? 0;
+    document.getElementById("cost").textContent   = data.total_cost ?? 0;
+    document.getElementById("profit").textContent = data.profit ?? 0;
+
+    // Destroy old chart if exists
     if (window.salesChart) window.salesChart.destroy();
 
-    window.salesChart = new Chart(chart, {
+    // Create new chart
+    window.salesChart = new Chart(document.getElementById("chart"), {
       type: "bar",
       data: {
         labels: ["Sales", "Cost", "Profit"],
         datasets: [{
-          data: [data.total_sales, data.total_cost, data.profit],
+          data: [
+            data.total_sales ?? 0,
+            data.total_cost ?? 0,
+            data.profit ?? 0
+          ],
           backgroundColor: ["#ffcc80","#ffab91","#c5e1a5"]
         }]
       },
-      options: { plugins: { legend: { display: false } } }
+      options: {
+        plugins: { legend: { display: false } }
+      }
     });
 
     new bootstrap.Toast(document.getElementById("dataToast")).show();
 
-  } catch (e) {
-    console.error(e);
-    alert("Failed to load analytics");
+  } catch (error) {
+    console.error("Analytics load error:", error);
+    alert("Failed to load analytics data");
   }
 }
 
-/* ===================== PDF ===================== */
+/* =========================================================
+   DOWNLOAD PDF (CONNECT TO PROTECTED REPORT LATER)
+========================================================= */
 function downloadPDF() {
-  CHARLIE.downloadReport("pdf", "daily");
+  CHARLIE_AUTH.requireAdmin();
+  alert("Connect this to protected PDF export endpoint.");
 }
 
-/* ===================== PRINT ===================== */
+/* =========================================================
+   CENTRAL PRINT
+========================================================= */
 function openCentralPrint(selector) {
   const target = document.querySelector(selector);
   if (!target) return;
