@@ -1,14 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "☕ Cafe RDS Complete Setup & Verification Script"
+echo "☕ Charlie Cafe — Complete RDS Setup & Verification"
 echo "=============================================================="
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
+# AWS region where your RDS and Secret exist
 AWS_REGION="us-east-1"
-SECRET_ARN="arn:aws:secretsmanager:us-east-1:910599465397:secret:CafeDevDBSM-NSiXdV"
+
+# Use Secret NAME (not ARN)
+SECRET_ID="CafeDevDBSM"
+
+# Database name to create/use
 DB_NAME="cafe_db"
 
 # ============================================================
@@ -26,22 +31,21 @@ if ! command -v jq >/dev/null 2>&1; then
     sudo dnf install -y jq
 fi
 
-# Verify AWS CLI exists
 if ! command -v aws >/dev/null 2>&1; then
-    echo "❌ AWS CLI not found. Install AWS CLI v2 first."
+    echo "❌ AWS CLI not installed. Please install AWS CLI v2."
     exit 1
 fi
 
-echo "✅ All required tools available"
+echo "✅ All required tools are installed"
 echo ""
 
 # ============================================================
-# FETCH RDS CREDENTIALS FROM SECRETS MANAGER
+# FETCH DATABASE CREDENTIALS FROM AWS SECRETS MANAGER
 # ============================================================
-echo "🔐 Fetching database credentials..."
+echo "🔐 Fetching RDS credentials from Secrets Manager..."
 
 SECRET_JSON=$(aws secretsmanager get-secret-value \
-    --secret-id "$SECRET_ARN" \
+    --secret-id "$SECRET_ID" \
     --region "$AWS_REGION" \
     --query SecretString \
     --output text)
@@ -52,16 +56,18 @@ DB_PASS=$(echo "$SECRET_JSON" | jq -r '.password // empty')
 DB_PORT=$(echo "$SECRET_JSON" | jq -r '.port // "3306"')
 
 if [[ -z "$DB_HOST" || -z "$DB_USER" || -z "$DB_PASS" ]]; then
-    echo "❌ Secret is missing required fields"
+    echo "❌ ERROR: Missing required fields in secret"
     exit 1
 fi
 
-echo "✅ Secret loaded"
-echo "RDS Endpoint: $DB_HOST"
+echo "✅ Credentials loaded"
+echo "   • Host: $DB_HOST"
+echo "   • User: $DB_USER"
+echo "   • Database: $DB_NAME"
 echo ""
 
 # ============================================================
-# CREATE TEMP MYSQL CREDENTIAL FILE (SECURE)
+# CREATE TEMP MYSQL CONFIG FILE (SECURE CONNECTION)
 # ============================================================
 CREDENTIALS_FILE=$(mktemp /tmp/cafe-rds-cred.XXXXXX)
 chmod 600 "$CREDENTIALS_FILE"
@@ -78,7 +84,7 @@ EOF
 trap 'rm -f "$CREDENTIALS_FILE"' EXIT
 
 # ============================================================
-# TEST RDS CONNECTION
+# TEST CONNECTION TO RDS
 # ============================================================
 echo "🔌 Testing RDS connection..."
 mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "SELECT 1" >/dev/null
@@ -86,26 +92,26 @@ echo "✅ RDS connection successful"
 echo ""
 
 # ============================================================
-# CREATE DATABASE
+# CREATE DATABASE (IF NOT EXISTS)
 # ============================================================
-echo "🗄 Creating database if not exists..."
+echo "🗄 Ensuring database exists..."
 mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "
 CREATE DATABASE IF NOT EXISTS $DB_NAME
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 "
-echo "✅ Database ensured"
+echo "✅ Database ready"
 echo ""
 
 # ============================================================
 # CREATE TABLES (FINAL STRUCTURE)
 # ============================================================
-echo "📋 Creating tables..."
+echo "📋 Creating tables (Orders + HR)..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
 -- =====================================================
--- ORDERS TABLE (WITH PAYMENT + STATUS + TRACKING)
+-- ORDERS TABLE (Full Production Version)
 -- =====================================================
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -116,13 +122,16 @@ CREATE TABLE IF NOT EXISTS orders (
     item           VARCHAR(100),
     quantity       INT NOT NULL,
 
+    -- Pricing
     item_cost      DECIMAL(6,2),
     total_cost     DECIMAL(6,2),
     total_amount   DECIMAL(10,2),
 
+    -- Payment
     payment_method VARCHAR(20),
     payment_status VARCHAR(20),
 
+    -- Order Status
     status         VARCHAR(20) DEFAULT 'RECEIVED',
 
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -157,7 +166,9 @@ CREATE TABLE IF NOT EXISTS attendance (
     checkin_time TIME,
     checkout_time TIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     UNIQUE KEY uk_day (employee_id, attendance_date),
+
     FOREIGN KEY (employee_id)
         REFERENCES employees(employee_id)
         ON DELETE CASCADE
@@ -172,6 +183,7 @@ CREATE TABLE IF NOT EXISTS leaves (
     leave_date DATE NOT NULL,
     leave_type VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (employee_id)
         REFERENCES employees(employee_id)
         ON DELETE CASCADE
@@ -189,13 +201,34 @@ CREATE TABLE IF NOT EXISTS holidays (
 
 EOF
 
-echo "✅ Tables created/verified"
+echo "✅ Tables created or verified"
+echo ""
+
+# ============================================================
+# SAFE INDEX CHECK (MySQL 5.7 Compatible)
+# ============================================================
+echo "📈 Ensuring attendance indexes exist..."
+
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
+SET @i1 := (SELECT COUNT(*) FROM information_schema.statistics
+            WHERE table_schema=DATABASE()
+            AND table_name='attendance'
+            AND index_name='idx_attendance_date');
+
+SET @sql := IF(@i1=0,
+    'ALTER TABLE attendance ADD INDEX idx_attendance_date (attendance_date)',
+    'SELECT "idx_attendance_date exists"');
+
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
+EOF
+
+echo "✅ Index check complete"
 echo ""
 
 # ============================================================
 # INSERT SAMPLE DATA (SAFE TO RE-RUN)
 # ============================================================
-echo "🌱 Inserting test data..."
+echo "🌱 Inserting sample data..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 INSERT IGNORE INTO orders (table_number, customer_name, item, quantity, status)
@@ -204,18 +237,21 @@ VALUES
 (2, 'Sara Ahmed', 'Latte', 1, 'PREPARING');
 
 INSERT IGNORE INTO holidays (holiday_date, description)
-VALUES ('2026-01-01', 'New Year');
+VALUES
+('2026-01-01', 'New Year'),
+('2026-03-23', 'Pakistan Day');
 
 INSERT IGNORE INTO employees
 (cognito_user_id, name, job_title, salary, start_date)
-VALUES ('TEMP-ID-001', 'Alice', 'Barista', 40000, '2025-12-01');
+VALUES
+('TEMP-ID-001', 'Alice', 'Barista', 40000, '2025-12-01');
 EOF
 
-echo "✅ Sample data ensured"
+echo "✅ Sample data inserted"
 echo ""
 
 # ============================================================
-# FINAL VERIFICATION SECTION
+# FINAL VERIFICATION
 # ============================================================
 echo "🔎 FINAL VERIFICATION"
 echo "=============================================================="
@@ -225,13 +261,7 @@ mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 -- Show all tables
 SHOW TABLES;
 
--- Show structure of orders table
-DESCRIBE orders;
-
--- Show indexes
-SHOW INDEX FROM orders;
-
--- Row counts
+-- Show row counts
 SELECT 'orders' AS table_name, COUNT(*) FROM orders
 UNION ALL
 SELECT 'employees', COUNT(*) FROM employees
@@ -242,13 +272,19 @@ SELECT 'leaves', COUNT(*) FROM leaves
 UNION ALL
 SELECT 'holidays', COUNT(*) FROM holidays;
 
--- Sample data preview
+-- Show structure of orders table
+DESCRIBE orders;
+
+-- Show indexes
+SHOW INDEX FROM attendance;
+
+-- Preview data
 SELECT * FROM orders LIMIT 5;
 
-SELECT 'RDS Setup Verification Successful ✅' AS STATUS;
+SELECT 'Charlie Cafe DB setup verified successfully ✅' AS status;
 
 EOF
 
 echo ""
-echo "🎉 COMPLETE: RDS, Database, Tables & Data Verified Successfully"
+echo "🎉 ALL TASKS COMPLETED SUCCESSFULLY ☕"
 echo "=============================================================="
