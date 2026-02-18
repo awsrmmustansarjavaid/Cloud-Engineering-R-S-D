@@ -796,7 +796,7 @@ GET /order-status
 
 - Integration: OrderStatusLambda
 
-- Authorization: cafe-cognito-authorizer
+- Authorization: no need because its public
 
 - Click Create
 
