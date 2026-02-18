@@ -453,19 +453,19 @@ Open browser and paste (replace values):
 ```
 https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
 ?client_id=YOUR_CLIENT_ID
-&response_type=token
-&scope=email+openid
-&redirect_uri=https://example.com
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://yourdomain.com/login.html
 ```
 
 #### 📌 Example:
 
 ```
 https://charlie-cafe.auth.us-east-1.amazoncognito.com/login
-?client_id=4abc123xyz
-&response_type=token
-&scope=email+openid
-&redirect_uri=https://example.com
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://yourdomain.com/login.html
 ```
 
 - 👉 Press Enter
