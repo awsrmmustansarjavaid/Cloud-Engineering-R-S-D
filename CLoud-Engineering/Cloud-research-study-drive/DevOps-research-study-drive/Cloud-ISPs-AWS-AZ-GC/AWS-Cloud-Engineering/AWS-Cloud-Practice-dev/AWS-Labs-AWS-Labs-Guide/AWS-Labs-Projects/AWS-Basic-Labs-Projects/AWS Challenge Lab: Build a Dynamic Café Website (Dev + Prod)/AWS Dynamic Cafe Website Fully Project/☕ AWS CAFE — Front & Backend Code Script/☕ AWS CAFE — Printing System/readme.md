@@ -337,6 +337,82 @@ if(!CHARLIE.isAdmin()) {
 - Styling for print: you can add a @media print { ... } CSS block to make it look professional on paper.
 
 ---
+### central-print.html
 
+> **Updated Version:1.1**
 
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Cafe — Printing Center</title>
+    <!-- Central Auth + API JS -->
+    <script src="path/to/charlie-central-auth.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; display: none; }
+        button { margin: 5px; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
 
+    <h1>☕ Charlie Cafe — Printing Center</h1>
+
+    <!-- =========================
+         5️⃣ BUTTONS / ACTIONS
+         - Print all orders
+         - Print today summary
+         - Download PDF or CSV reports
+         - Logout
+       ========================= -->
+    <div id="buttons">
+
+        <!-- Print all orders currently visible on page -->
+        <button onclick="CHARLIE.printAllOrders()">🖨️ Print All Orders</button>
+
+        <!-- Print today’s summary from the table -->
+        <button onclick="CHARLIE.printTodaySummary()">📊 Print Today's Summary</button>
+
+        <!-- Download daily PDF report -->
+        <button class="btn btn-danger" 
+                onclick="CHARLIE.downloadReport('pdf','daily')">
+            📄 Daily PDF
+        </button>
+
+        <!-- Download analytics CSV report -->
+        <button class="btn btn-success"
+                onclick="CHARLIE.downloadReport('csv','analytics')">
+            🗂 Analytics CSV
+        </button>
+
+        <!-- Logout button (centralized) -->
+        <button id="logoutBtn">🔒 Logout</button>
+    </div>
+
+</body>
+
+<script>
+    /* =====================================================
+       Initialize protected page
+       - requireAuth: true → user must be logged in
+       - enableLogout: true → sets up central logout button
+       - logoutButtonId: "logoutBtn"
+       - starts auto logout watcher
+    ===================================================== */
+    CHARLIE.initProtectedPage({ 
+        requireAuth: true, 
+        enableLogout: true, 
+        logoutButtonId: "logoutBtn" 
+    });
+
+    /* =====================================================
+       Optional: Role-based button visibility
+       Example: only admins see analytics CSV
+    ===================================================== */
+    if (!CHARLIE.isAdmin()) {
+        document.querySelector(".btn-success").style.display = "none";
+    }
+</script>
+
+</html>
+```
