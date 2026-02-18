@@ -1,9 +1,8 @@
 /* =========================================================
-   CHARLIE CAFE — CENTRAL AUTH MODULE
+   CHARLIE CAFE — CENTRAL AUTH MODULE (FINAL PRODUCTION)
    ---------------------------------------------------------
-   ✔ Cognito Hosted UI Login
-   ✔ Logout
-   ✔ Token Redirect Handling
+   ✔ Authorization Code Flow
+   ✔ Secure Token Exchange
    ✔ Role-Based Access
    ✔ Auto Logout Watcher
 ========================================================= */
@@ -13,14 +12,16 @@ window.CHARLIE_AUTH = (() => {
     const CONFIG = window.CHARLIE_CONFIG;
     const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
 
-    /* ===============================
-       🔐 LOGIN
-    =============================== */
-    function login(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`) {
+    /* =====================================================
+       🔐 LOGIN (Authorization Code Grant)
+    ===================================================== */
+    function login() {
+
+        const redirectUrl = window.location.origin + window.location.pathname;
 
         const url =
             `https://${CONFIG.COGNITO_DOMAIN}/login` +
-            `?response_type=token` +
+            `?response_type=code` +
             `&client_id=${CONFIG.CLIENT_ID}` +
             `&scope=openid+email+profile` +
             `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
@@ -28,43 +29,86 @@ window.CHARLIE_AUTH = (() => {
         window.location.href = url;
     }
 
-    /* ===============================
+    /* =====================================================
        🚪 LOGOUT
-    =============================== */
-    function logout(redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/logout.php`) {
+    ===================================================== */
+    function logout() {
 
         localStorage.removeItem("access_token");
+
+        const logoutRedirect = window.location.origin;
 
         const url =
             `https://${CONFIG.COGNITO_DOMAIN}/logout` +
             `?client_id=${CONFIG.CLIENT_ID}` +
-            `&logout_uri=${encodeURIComponent(redirectUrl)}`;
+            `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
 
         window.location.href = url;
     }
 
-    /* ===============================
-       🔁 HANDLE REDIRECT
-    =============================== */
-    function handleRedirect() {
-        if (!window.location.hash) return;
+    /* =====================================================
+       🔁 HANDLE REDIRECT (Exchange code → access_token)
+    ===================================================== */
+    async function handleRedirect() {
 
-        const params = new URLSearchParams(window.location.hash.substring(1));
-        const token = params.get("access_token");
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
 
-        if (token) {
-            localStorage.setItem("access_token", token);
-            window.location.hash = "";
+        if (!code) return;
+
+        try {
+
+            const redirectUrl = window.location.origin + window.location.pathname;
+
+            const response = await fetch(
+                `https://${CONFIG.COGNITO_DOMAIN}/oauth2/token`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        grant_type: "authorization_code",
+                        client_id: CONFIG.CLIENT_ID,
+                        code: code,
+                        redirect_uri: redirectUrl
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Token exchange failed");
+            }
+
+            const data = await response.json();
+
+            if (data.access_token) {
+                localStorage.setItem("access_token", data.access_token);
+
+                // Clean URL (remove ?code=...)
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    window.location.pathname
+                );
+            }
+
+        } catch (error) {
+            console.error("Auth error:", error);
+            logout();
         }
     }
 
-    /* ===============================
+    /* =====================================================
        🛡 PROTECT PAGE
-    =============================== */
-    function protectPage() {
-        handleRedirect();
+    ===================================================== */
+    async function protectPage() {
+
+        // First handle redirect (if returning from Cognito)
+        await handleRedirect();
 
         const token = getToken();
+
         if (!token || isTokenExpired(token)) {
             login();
             return;
@@ -73,10 +117,11 @@ window.CHARLIE_AUTH = (() => {
         document.body.style.display = "block";
     }
 
-    /* ===============================
-       👤 ROLE CONTROL
-    =============================== */
+    /* =====================================================
+       👤 ROLE MANAGEMENT
+    ===================================================== */
     function getUserRoles() {
+
         const token = getToken();
         if (!token) return [];
 
@@ -112,12 +157,13 @@ window.CHARLIE_AUTH = (() => {
         }
     }
 
-    /* ===============================
+    /* =====================================================
        🔄 AUTO LOGOUT WATCHER
-    =============================== */
+    ===================================================== */
     function startAutoLogoutWatcher() {
 
         setInterval(() => {
+
             const token = getToken();
             if (!token) return;
 
@@ -125,6 +171,7 @@ window.CHARLIE_AUTH = (() => {
                 alert("🔐 Session expired");
                 logout();
             }
+
         }, 30000);
     }
 
