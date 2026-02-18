@@ -1,3 +1,25 @@
+# Charlie Cafe  - admin-orders.php
+
+### admin-orders.php
+
+> **Update Version:1.0**
+
+
+### Main changes:
+
+- Remove old hardcoded API URLs (q8rq19tfka.../dev/...)
+
+- Use CHARLIE_API.public.getOrders() and CHARLIE_API.public.markCashPaid() from api.js
+
+- Keep all PHP layout and design untouched
+
+- Add comments showing which parts are now modular JS
+
+- Retain auto-refresh and print functionality
+
+### ✅ UPDATED admin-orders.php
+
+```
 <?php
 // ===================================================
 // CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (PUBLIC)
@@ -213,3 +235,22 @@ setInterval(loadOrders, 30000);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+```
+
+### ✅ WHAT THIS UPDATE DOES
+
+- Removes old cURL / PHP API fetch — all done via JS now
+
+- Uses CHARLIE_API.public.getOrders() for orders
+
+- Uses CHARLIE_API.public.markCashPaid() for marking cash payments
+
+- Table auto-refreshes every 30 seconds
+
+- Central print button uses central-printing.js
+
+- All design, layout, styling untouched
+
+- Fully commented for clarity
+
+---
