@@ -774,7 +774,7 @@ or
 sudo nano connect-rds.sh
 ```
 
-[RDS Credentials to Secrets Manager ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/AWS%20RDS%20Bash%20Scripts/☕%20AWS%20CAFE%20—%20Bash%20Script/connect-rds.sh)
+[RDS Credentials to Secrets Manager ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/AWS%20RDS%20Bash%20Scripts/connect-rds.sh)
 
 #### ▶️ How to Run
 
