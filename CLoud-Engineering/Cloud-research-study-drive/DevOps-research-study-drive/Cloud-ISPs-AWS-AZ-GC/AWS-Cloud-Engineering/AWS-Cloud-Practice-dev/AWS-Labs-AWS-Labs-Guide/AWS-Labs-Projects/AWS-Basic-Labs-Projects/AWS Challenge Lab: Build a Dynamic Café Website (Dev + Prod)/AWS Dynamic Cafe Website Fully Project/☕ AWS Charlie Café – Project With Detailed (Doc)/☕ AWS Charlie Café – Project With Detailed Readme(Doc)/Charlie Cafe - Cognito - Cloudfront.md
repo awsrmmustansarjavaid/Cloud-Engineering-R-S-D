@@ -636,11 +636,11 @@ or
 This is 🔥 gold for authorization.
 
 
-**✅ PHASE 3️⃣ STATUS**
+**✅ PHASE 1️⃣ STATUS**
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 4️⃣ — Backend - Cognito Role Base Access and Permission 
+## 🔐 PHASE 2️⃣ — Backend - Cognito Role Base Access and Permission 
 
 ### 1️⃣ Central UNIVERSAL Backend RBAC
 
@@ -897,8 +897,6 @@ DB_NAME = cafe_db
 [EmployeeOrderLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrderLambda.js)
 
 ---
-
-
 ### 5️⃣ 🟢 METHOD 1 — BROWSER (EASIEST, REAL-WORLD)
 
 #### STEP 1️⃣ Open Cognito Hosted UI Login
@@ -1146,7 +1144,7 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 **✔ Everything works → Phase Complete**
 
-### ✅ PHASE 4️⃣ COMPLETION CHECKLIST
+### ✅ PHASE 2️⃣ COMPLETION CHECKLIST
 
 ✔️ Lambda created/updated
 
@@ -1165,11 +1163,11 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 ✔️ Tested manually via API & frontend
 
 
-**✅ PHASE 4️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 5️⃣ — BACKEND DATE FILTER (LAMBDA)
+## 🔐 PHASE 3️⃣ — BACKEND DATE FILTER (LAMBDA)
 
 ### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
 
