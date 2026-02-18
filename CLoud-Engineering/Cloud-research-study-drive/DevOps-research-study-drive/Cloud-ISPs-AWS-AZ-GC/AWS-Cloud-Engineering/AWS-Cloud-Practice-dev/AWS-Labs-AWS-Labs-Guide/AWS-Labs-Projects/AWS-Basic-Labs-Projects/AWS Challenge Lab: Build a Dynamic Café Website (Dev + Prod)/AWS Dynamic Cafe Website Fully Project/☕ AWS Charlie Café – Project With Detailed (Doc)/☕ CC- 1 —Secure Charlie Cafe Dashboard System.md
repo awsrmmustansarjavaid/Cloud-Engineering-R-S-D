@@ -375,7 +375,7 @@ Inside Amazon Cognito:
 Set Sign-out URL to:
 
 ```
-http://localhost/logout.php?loggedout=true
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
 ```
 
 Otherwise Cognito will reject the redirect.
@@ -479,7 +479,13 @@ https://charlie-cafe.auth.us-east-1.amazoncognito.com/login
 If login is successful → browser redirects to:
 
 ```
-https://example.com/#access_token=eyJraWQiOiJr...
+https://yourdomain.com/login.html?code=AUTH_CODE
+```
+
+Access token will only appear after your frontend exchanges the code via:
+
+```
+POST https://YOUR_DOMAIN/oauth2/token
 ```
 
 #### STEP 4️⃣ COPY THE ACCESS TOKEN
@@ -487,7 +493,7 @@ https://example.com/#access_token=eyJraWQiOiJr...
 From the URL bar, copy ONLY this part:
 
 ```
-access_token=eyJraWQiOiJr...
+?code=...
 ```
 
 #### ⚠️ Do NOT copy:
@@ -722,7 +728,7 @@ GET /order-status
 
 | Resource               | Method | Auth    |
 | -------------------- | ------ | ------- |
-| `/order-status`      | GET    | Cognito |
+| `/order-status`      | GET    | No Cognito |
 | `/admin/dashboard`   | GET    | Cognito |
 | `/admin/create-user` | POST   | Cognito |
 | `/employee/orders`   | GET    | Cognito |
@@ -900,7 +906,7 @@ Authorization code grant
 
 - **Click Actions → Deploy API**
 
-- **Stage: status (or admin if you created a new stage)**
+- **Stage: prod**
 
 - **Save Invoke URL**
 
