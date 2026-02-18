@@ -430,89 +430,252 @@ You asked for easiest method.
 
 Here is the clean method.
 
-### 🟢 STEP 1 — Build Login URL
+#### STEP 1️⃣ Open Cognito Hosted UI Login
 
-In browser:
+- Go to AWS Console → Cognito → User Pools → Your pool
+
+- Click App integration → App client settings
+
+#### You will see:
+
+- Domain
+
+- Client ID
+
+- Callback URL
+
+- Allowed OAuth flows
+
+#### STEP 2️⃣ Construct the LOGIN URL
+
+Open browser and paste (replace values):
 
 ```
 https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
 ?client_id=YOUR_CLIENT_ID
-&response_type=code
-&scope=openid+email+profile
-&redirect_uri=https://YOUR_CLOUDFRONT/login.html
+&response_type=token
+&scope=email+openid
+&redirect_uri=https://example.com
 ```
 
-Press Enter.
-
-### 🟢 STEP 2 — Login
-
-Enter username/password.
-
-You will be redirected to:
+#### 📌 Example:
 
 ```
-https://YOUR_CLOUDFRONT/login.html?code=XYZ123
+https://charlie-cafe.auth.us-east-1.amazoncognito.com/login
+?client_id=4abc123xyz
+&response_type=token
+&scope=email+openid
+&redirect_uri=https://example.com
 ```
 
-### 🟢 STEP 3 — Exchange Code for Tokens (Manual Method)
+- 👉 Press Enter
 
-Open browser DevTools → Console
+#### STEP 3️⃣ Login Screen Appears
 
-Run:
+- Enter username & password
+
+- Click Sign in
+
+If login is successful → browser redirects to:
 
 ```
-fetch("https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/oauth2/token", {
-  method: "POST",
+https://example.com/#access_token=eyJraWQiOiJr...
+```
+
+#### STEP 4️⃣ COPY THE ACCESS TOKEN
+
+From the URL bar, copy ONLY this part:
+
+```
+access_token=eyJraWQiOiJr...
+```
+
+#### ⚠️ Do NOT copy:
+
+- id_token
+
+- expires_in
+
+- token_type
+
+👉 You need access_token
+
+#### STEP 5️⃣ Use Token in API Call (Browser DevTools)
+
+Open Chrome DevTools → Console
+
+Paste:
+
+```
+fetch("https://API_ID.execute-api.REGION.amazonaws.com/status/order-status", {
   headers: {
-    "Content-Type": "application/x-www-form-urlencoded"
-  },
-  body: new URLSearchParams({
-    grant_type: "authorization_code",
-    client_id: "YOUR_CLIENT_ID",
-    code: "PASTE_CODE_FROM_URL",
-    redirect_uri: "https://YOUR_CLOUDFRONT/login.html"
-  })
+    "Authorization": "Bearer YOUR_ACCESS_TOKEN"
+  }
 })
 .then(res => res.json())
-.then(console.log);
+.then(data => console.log(data));
 ```
 
-You will receive:
+#### ✅ EXPECTED RESULT
 
 ```
 {
-  access_token: "...",
-  id_token: "...",
-  refresh_token: "...",
-  expires_in: 3600
+  "orders": [...],
+  "metrics": {...}
 }
 ```
 
-Copy access_token.
+🎉 DONE — frontend token works.
 
-### 🔥 EVEN EASIER METHOD (Old Implicit Way – Testing Only)
+### 🧪 METHOD 2 — curl (CLI / AWS TESTING)
 
-If you temporarily enable:
+Use this after you already have the token.
 
-```
-Implicit grant
-```
+#### STEP 1️⃣ Open Terminal / CMD
 
-Then use:
+#### STEP 2️⃣ Run curl Command
 
-```
-response_type=token
-```
-
-Then after login you will be redirected with:
+- Make GET request with header:
 
 ```
-#access_token=xxxx
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
 ```
 
-This is easiest for quick manual testing.
+#### 📌 Example:
 
-But production → Authorization Code is correct.
+```
+curl -H "Authorization: Bearer eyJraWQiOiJr..." \
+https://abcd123.execute-api.us-east-1.amazonaws.com/status/order-status
+```
+
+#### ✅ EXPECTED RESPONSES
+
+```
+JSON response with metrics + recent orders
+```
+
+#### ✅ SUCCESS (200)
+
+```
+{
+  "orders": [...],
+  "metrics": {...}
+}
+```
+
+#### ❌ NO TOKEN
+
+```
+{"message":"Unauthorized"}
+```
+
+#### ❌ INVALID TOKEN
+
+```
+401 Unauthorized
+```
+
+#### 3️⃣ Date Filter Test
+
+```
+curl -H "Authorization: Bearer <access_token>" \
+"https://API_ID.execute-api.REGION.amazonaws.com/status/order-status?date=2026-01-17"
+```
+
+#### ✅ Expected: 
+
+```
+Only orders for 2026-01-17 returned
+```
+
+**✅ Metrics counts match filtered orders**
+
+#### 4️⃣ Verify Auto Refresh / Chart in Frontend
+
+- Open order-status.html
+
+- Enter date in filter box
+
+- Click Filter
+
+- Metrics + table + chart should update correctly
+
+- Spinner shows loading
+
+### 📣 Simple & Easy way test 
+
+#### 1️⃣ Login & Token Issued
+
+- Open your Cafe Dashboard frontend (order-status.html).
+
+- Click Login.
+
+- You should be redirected to Cognito Hosted UI.
+
+- Enter Admin credentials.
+
+- After login, you are redirected back to the dashboard.
+
+- Open browser DevTools → Application → Local Storage.
+
+  - **✅ access_token should exist.**
+
+**If no token → STOP, check Cognito setup.**
+
+#### 2️⃣ Dashboard Loads
+
+- After login, the dashboard content should appear (metrics + table).
+
+- Metrics should show Total Orders, Total Items Sold, Customers.
+
+- Orders table should populate with recent orders.
+
+- Spinner should appear while loading, then hide.
+
+- **✅ If dashboard is blank → STOP, check Lambda/API response.**
+
+#### 3️⃣ Auto Refresh Works
+
+- Wait ~10 seconds (or the interval set in frontend).
+
+- Dashboard metrics and table should update automatically.
+
+- Open DevTools → Network tab
+
+  - You should see GET requests to /order-status fired every 10 seconds.
+
+- **✅ If auto refresh doesn’t work → check setInterval(loadData, 10000) in frontend JS.**
+
+#### 4️⃣ Date Filter Works
+
+- On dashboard, select a date in the date picker.
+
+- Click Filter.
+
+- Dashboard metrics + table should update only for that date.
+
+- Network tab → Confirm request URL:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-DD
+```
+
+- **✅ If metrics or table show wrong data → check Lambda filter code.**
+
+#### 5️⃣ Chart Works
+
+- Chart below metrics should update matching the filtered data.
+
+- Check bars/lines correspond to orders/items counts.
+
+- Change date → chart updates accordingly.
+
+- **✅ If chart does not update → check frontend chart destroy/create logic.**
+
+**✔ Everything works → Phase Complete**
+
+
 
 
 **✅ PHASE 1️⃣ STATUS**
@@ -608,7 +771,80 @@ Authorization code grant
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 3️⃣ 
+## 🔐 PHASE 3️⃣ Lambda Functions 
+
+### 1️⃣ CREATE New Lambda Functions 
+
+### 1️⃣ CREATE OrderStatusLambda
+
+- **AWS Console → Lambda → Create Function → Author from scratch**
+
+- **Function name:** OrderStatusLambda
+
+- **Runtime:** Python 3.12
+
+- **Permissions:** Create new role with basic Lambda permissions
+
+#### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
+
+> 🔁 This is a drop-in replacement
+> Nothing else needs to change
+
+[OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
+
+#### 3️⃣ 🔐 Add Environment Variables
+
+```
+DB_HOST = <your-rds-endpoint>
+DB_USER = cafe_user
+DB_PASS = <your-db-password>
+DB_NAME = cafe_db
+```
+
+#### 4️⃣ 🔐 Attach Lambda Layer
+
+- Same 
+
+#### 5️⃣ 🔐 Edit VPC
+
+- Same 
+
+> **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
+
+### 2️⃣ CREATE AdminDashboardLambda
+
+- **Function name:** AdminDashboardLambda
+
+- **Runtime:** Node.js 18.x
+
+[AdminDashboardLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminDashboardLambda.js)
+
+### 3️⃣ CREATE AdminCreateUserLambda
+
+- **Function name:** AdminCreateUserLambda
+
+- **Runtime:** Node.js 18.x
+
+[AdminCreateUserLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminCreateUserLambda.js)
+
+### 4️⃣ CREATE EmployeeOrdersLambda
+
+- **Function name:** EmployeeOrdersLambda
+
+- **Runtime:** Node.js 18.x
+
+[EmployeeOrdersLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrdersLambda.js)
+
+
+### 5️⃣ CREATE EmployeeOrderLambda
+
+- **Function name:** EmployeeOrderLambda
+
+- **Runtime:** Node.js 18.x
+
+[EmployeeOrderLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrderLambda.js)
+
+
 
 **✅ PHASE 3️⃣ STATUS**
 
