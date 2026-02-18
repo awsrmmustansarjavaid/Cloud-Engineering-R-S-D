@@ -424,6 +424,26 @@ This file handles API logic only.
 
 [central-printing.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
 
+#### ✅ After This, You Must Verify
+
+- Login
+
+- Check localStorage
+
+- Confirm access_token exists
+
+- Paste token in jwt.io
+
+- Confirm:
+
+- email
+
+- cognito:groups
+
+- exp
+
+If groups are missing → your Lambda 403 will happen again.
+
 ### 🔐 PART 12 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
 
 You asked for easiest method.
