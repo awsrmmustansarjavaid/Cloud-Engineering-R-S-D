@@ -185,83 +185,11 @@ You see:
 
 If cognito:groups missing → user not assigned to group.
 
-
-**✅ PHASE 1️⃣ STATUS**
-
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-## 🔐 PHASE 4 — API Gateway Authorizer Test
-
-### ✅ TEST 7 — Protected Route Without Token
-
-#### Quick API Test
-
-In browser console:
-
-```
-fetch("https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders", {
-  headers: {
-    Authorization: "Bearer YOUR_ACCESS_TOKEN"
-  }
-})
-.then(res => res.json())
-.then(console.log);
-```
-
-#### ✅ Expected:
-
-```
-200 if allowed
-403 if wrong group
-401 if invalid token
-```
-
-
-
-- Open browser:
-
-```
-https://API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders
-```
-
-#### ✅ Expected:
-
-```
-401 Unauthorized
-```
-
-If it returns data → authorizer NOT attached correctly.
-
-### ✅ TEST 8 — Protected Route With Token (Browser Console)
-
-In DevTools:
-
-```
-fetch("https://API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders", {
-  headers: {
-    Authorization: "Bearer YOUR_ACCESS_TOKEN"
-  }
-})
-.then(res => res.json())
-.then(console.log)
-```
-
-#### ✅ Expected:
-
-```
-200 OK
-JSON data
-```
-
-If 401 → token invalid
-
-If 403 → Lambda group check blocked
-
-## 🔐 PHASE 5 — Role Enforcement Tests
+### ✅ Role Enforcement Tests
 
 VERY IMPORTANT.
 
-### ✅ TEST 9 — Admin Access Test
+### ✅ TEST 8 — Admin Access Test
 
 - Login as: cafeadmin
 
@@ -274,7 +202,7 @@ VERY IMPORTANT.
 JSON data
 ``` 
 
-### ✅ TEST 10 — Employee Access to Admin Route
+### ✅ TEST 9 — Employee Access to Admin Route
 
 - Login as: ali
 
@@ -288,7 +216,7 @@ JSON data
 
 If employee can access → Lambda group check broken.
 
-### ✅ TEST 11 — Employee Route Access
+### ✅ TEST 10 — Employee Route Access
 
 - Login as: ali
 
@@ -301,7 +229,7 @@ If employee can access → Lambda group check broken.
 JSON data
 ``` 
 
-### ✅ TEST 12 — Manager Mixed Access
+### ✅ TEST 11 — Manager Mixed Access
 
 - Login as: manager1
 
@@ -315,35 +243,7 @@ JSON data
 
 If behavior wrong → fix allowed_groups in Lambda.
 
-## 🔐 PHASE 6 — Public Routes Verification
-
-### ✅ TEST 13 — Public Route Without Token
-
-Test:
-
-```
-/public/orders
-```
-
-#### ✅ Expected:
-
-```
-200 OK
-JSON data
-``` 
-No token required.
-
-### ✅ TEST 14 — Public Route With Invalid Token
-
-Even if header sent:
-
-```
-Authorization: Bearer fake
-```
-
-Should still work (since no authorizer attached).
-
-## 🔐 PHASE 7 — Token Expiry Test
+## 🔐 TEST 12 — Token Expiry Test
 
 - Wait for token expiry (or manually modify exp).
 
@@ -361,7 +261,7 @@ Should still work (since no authorizer attached).
 
 - redirect to login
 
-## 🔐 PHASE 8 — Refresh Token Test
+## 🔐 TEST 13 — Refresh Token Test
 
 After 1 hour:
 
@@ -379,7 +279,7 @@ After 1 hour:
 
 - ALLOW_REFRESH_TOKEN_AUTH enabled.
 
-## 🔐 PHASE 9 — Security Negative Testing (Professional Level)
+## 🔐 TEST 14 — Security Negative Testing (Professional Level)
 
 ### 🧪 Test A — Modify JWT Payload
 
@@ -402,7 +302,7 @@ If 200 → serious security problem.
 This proves API Gateway authorizer works.
 
 
-### 🔐 PART 12 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
+### 🔐 TEST 15 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
 
 You asked for easiest method.
 
@@ -492,6 +392,111 @@ Then after login you will be redirected with:
 This is easiest for quick manual testing.
 
 But production → Authorization Code is correct.
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 2️⃣ — API Gateway Authorizer Test
+
+### ✅ TEST 1 — Protected Route Without Token
+
+#### Quick API Test
+
+In browser console:
+
+```
+fetch("https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders", {
+  headers: {
+    Authorization: "Bearer YOUR_ACCESS_TOKEN"
+  }
+})
+.then(res => res.json())
+.then(console.log);
+```
+
+#### ✅ Expected:
+
+```
+200 if allowed
+403 if wrong group
+401 if invalid token
+```
+
+- Open browser:
+
+```
+https://API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders
+```
+
+#### ✅ Expected:
+
+```
+401 Unauthorized
+```
+
+If it returns data → authorizer NOT attached correctly.
+
+### ✅ TEST 2 — Protected Route With Token (Browser Console)
+
+In DevTools:
+
+```
+fetch("https://API_ID.execute-api.us-east-1.amazonaws.com/prod/admin/orders", {
+  headers: {
+    Authorization: "Bearer YOUR_ACCESS_TOKEN"
+  }
+})
+.then(res => res.json())
+.then(console.log)
+```
+
+#### ✅ Expected:
+
+```
+200 OK
+JSON data
+```
+
+If 401 → token invalid
+
+If 403 → Lambda group check blocked
+
+### ✅ TEST 3 — Public Route Without Token
+
+Test:
+
+```
+/public/orders
+```
+
+#### ✅ Expected:
+
+```
+200 OK
+JSON data
+``` 
+No token required.
+
+### ✅ TEST 4 — Public Route With Invalid Token
+
+Even if header sent:
+
+```
+Authorization: Bearer fake
+```
+
+Should still work (since no authorizer attached).
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+
+
+
+
+
 
 
 ### 🏁 FINAL VERIFICATION CHECKLIST
