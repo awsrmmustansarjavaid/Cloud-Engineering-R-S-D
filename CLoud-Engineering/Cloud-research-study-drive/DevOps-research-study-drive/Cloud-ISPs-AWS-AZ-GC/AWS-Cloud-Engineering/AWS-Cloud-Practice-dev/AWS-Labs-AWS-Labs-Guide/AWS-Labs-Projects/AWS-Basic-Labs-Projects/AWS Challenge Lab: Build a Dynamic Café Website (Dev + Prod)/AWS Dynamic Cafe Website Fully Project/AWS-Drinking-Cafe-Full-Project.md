@@ -1286,18 +1286,18 @@ CTRL + X
 
 ---
 
-### 6️⃣ Charlie Cafe admin-orders.php  (IMPORTANT)
-> **File Name: admin-orders.php**
+### 6️⃣ Charlie Cafe admin-orders.html  (IMPORTANT)
+> **File Name: admin-orders.html**
 
 #### 1️⃣ Create File
 
 ```
-sudo nano /var/www/html/admin-orders.php
+sudo nano /var/www/html/admin-orders.html
 ```
 
 #### 2️⃣ code
 
-[admin-orders.php](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+[admin-orders.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders/admin-orders.html)
 
 #### 3️⃣ Save File
 
@@ -1528,7 +1528,7 @@ FILES=(
 "/var/www/html/orders.php"
 "/var/www/html/order-status.html"
 "/var/www/html/order-receipt.php"
-"/var/www/html/admin-orders.php"
+"/var/www/html/admin-orders.html"
 "/var/www/html/payment-status.php"
 "/var/www/html/central-print.html"
 "/var/www/html/analytics.html"
