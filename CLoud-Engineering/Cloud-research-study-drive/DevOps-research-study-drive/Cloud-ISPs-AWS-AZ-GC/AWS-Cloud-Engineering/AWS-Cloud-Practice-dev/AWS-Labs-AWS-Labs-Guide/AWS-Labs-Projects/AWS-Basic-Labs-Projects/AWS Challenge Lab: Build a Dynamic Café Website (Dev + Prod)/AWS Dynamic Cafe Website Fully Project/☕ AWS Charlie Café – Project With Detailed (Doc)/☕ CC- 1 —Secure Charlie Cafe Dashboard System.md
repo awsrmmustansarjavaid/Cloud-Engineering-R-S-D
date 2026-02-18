@@ -916,19 +916,14 @@ Authorization code grant
 
 ✔ Deploy after every change
 
-✔ Stage can be status or admin
+✔ Stage can be prod
 
 ✔ Frontend URL must match stage
 
 #### 📌 Copy new endpoint API URL:
 
 ```
-https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
-```
-> **OR**
-
-```
-https://xxx.execute-api.region.amazonaws.com/admin/order-status
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
 ```
 
 #### 👉 Paste this into frontend once
@@ -936,13 +931,7 @@ https://xxx.execute-api.region.amazonaws.com/admin/order-status
 #### 🔁 Update frontend:
 
 ```
-API_URL = ".../status/order-status"
-```
-
-> **OR**
-
-```
-API_URL = ".../admin/order-status"
+API_URL = ".../prod/order-status"
 ```
 
 #### ✅ Result:
