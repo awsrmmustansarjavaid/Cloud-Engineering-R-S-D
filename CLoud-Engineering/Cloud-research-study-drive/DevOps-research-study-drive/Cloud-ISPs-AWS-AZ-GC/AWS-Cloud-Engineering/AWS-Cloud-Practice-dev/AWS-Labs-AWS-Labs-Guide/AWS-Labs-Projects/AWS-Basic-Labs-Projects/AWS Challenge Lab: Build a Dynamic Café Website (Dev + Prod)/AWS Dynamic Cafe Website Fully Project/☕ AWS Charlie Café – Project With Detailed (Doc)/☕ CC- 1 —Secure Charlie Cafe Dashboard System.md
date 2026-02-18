@@ -825,16 +825,6 @@ or /api/*
 
 ### 4️⃣ Attach Cognito Authorizer in API Gateway
 
-- Go to: API Gateway → Authorizers → Create new
-
-- Type: Cognito
-
-- Select your User Pool.
-
-- Token source: Authorization
-
-- Save.
-
 - Now attach this authorizer ONLY to:
 
 ```
