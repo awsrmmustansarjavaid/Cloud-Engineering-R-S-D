@@ -295,165 +295,7 @@ Create:
 
 - ❌ Do NOT enable other unnecessary flows.
 
-### 🟢 STEP 10 — Attach Cognito Authorizer in API Gateway
-
-- Go to: API Gateway → Authorizers → Create new
-
-- Type: Cognito
-
-- Select your User Pool.
-
-- Token source: Authorization
-
-- Save.
-
-- Now attach this authorizer ONLY to:
-
-```
-/admin/*
-/employee/*
-```
-
-- ❌ Do NOT attach to:
-
-```
-/public/*
-```
-
-### 🔥 FINAL ARCHITECTURE RESULT
-
-```
-/public/orders                → No authorizer
-/public/order-status          → No authorizer
-
-/admin/dashboard              → Cognito authorizer
-/admin/orders                 → Cognito authorizer
-/admin/mark-paid              → Cognito authorizer
-
-/employee/orders              → Cognito authorizer
-/employee/order               → Cognito authorizer
-```
-
-Then inside Lambda:
-
-- Validate group
-
-- Enforce authorization
-
-### ❓ IMPORTANT CHANGE FROM YOUR OLD SETUP
-
-OLD:
-
-```
-response_type=token
-Implicit grant
-```
-
-NEW (recommended):
-
-```
-response_type=code
-Authorization code grant
-```
-
-#### ⚠️ You must update your central-auth-api.js accordingly.
-
-### 🔐 PART 11 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
-
-You asked for easiest method.
-
-Here is the clean method.
-
-### 🟢 STEP 1 — Build Login URL
-
-In browser:
-
-```
-https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
-?client_id=YOUR_CLIENT_ID
-&response_type=code
-&scope=openid+email+profile
-&redirect_uri=https://YOUR_CLOUDFRONT/login.html
-```
-
-Press Enter.
-
-### 🟢 STEP 2 — Login
-
-Enter username/password.
-
-You will be redirected to:
-
-```
-https://YOUR_CLOUDFRONT/login.html?code=XYZ123
-```
-
-### 🟢 STEP 3 — Exchange Code for Tokens (Manual Method)
-
-Open browser DevTools → Console
-
-Run:
-
-```
-fetch("https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/oauth2/token", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/x-www-form-urlencoded"
-  },
-  body: new URLSearchParams({
-    grant_type: "authorization_code",
-    client_id: "YOUR_CLIENT_ID",
-    code: "PASTE_CODE_FROM_URL",
-    redirect_uri: "https://YOUR_CLOUDFRONT/login.html"
-  })
-})
-.then(res => res.json())
-.then(console.log);
-```
-
-You will receive:
-
-```
-{
-  access_token: "...",
-  id_token: "...",
-  refresh_token: "...",
-  expires_in: 3600
-}
-```
-
-Copy access_token.
-
-### 🔥 EVEN EASIER METHOD (Old Implicit Way – Testing Only)
-
-If you temporarily enable:
-
-```
-Implicit grant
-```
-
-Then use:
-
-```
-response_type=token
-```
-
-Then after login you will be redirected with:
-
-```
-#access_token=xxxx
-```
-
-This is easiest for quick manual testing.
-
-But production → Authorization Code is correct.
-
-
-**✅ PHASE 1️⃣ STATUS**
-
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-## 🔐 PHASE 2️⃣ — Amazon Cognito Hosted UI — Callback + Logout
+### 🟢 STEP 10 — Amazon Cognito Hosted UI — Callback + Logout
 
 ✅ Updated Login.html (with your Cognito config structure ready)
 
@@ -549,13 +391,7 @@ This single-file approach is:
 
 ✔ Cleaner file structure
 
-
-
-**✅ PHASE 2️⃣ STATUS**
-
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
----
-## 🔐 PHASE 3️⃣ — central-auth-api
+### 🟢 STEP 11 — — central-auth-api
 
 ### 🔥 STEP 1 — config.js (NO LOGIC HERE)
 
@@ -588,14 +424,102 @@ This file handles API logic only.
 
 [central-printing.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
 
+### 🔐 PART 12 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
+
+You asked for easiest method.
+
+Here is the clean method.
+
+### 🟢 STEP 1 — Build Login URL
+
+In browser:
+
+```
+https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://YOUR_CLOUDFRONT/login.html
+```
+
+Press Enter.
+
+### 🟢 STEP 2 — Login
+
+Enter username/password.
+
+You will be redirected to:
+
+```
+https://YOUR_CLOUDFRONT/login.html?code=XYZ123
+```
+
+### 🟢 STEP 3 — Exchange Code for Tokens (Manual Method)
+
+Open browser DevTools → Console
+
+Run:
+
+```
+fetch("https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/oauth2/token", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: new URLSearchParams({
+    grant_type: "authorization_code",
+    client_id: "YOUR_CLIENT_ID",
+    code: "PASTE_CODE_FROM_URL",
+    redirect_uri: "https://YOUR_CLOUDFRONT/login.html"
+  })
+})
+.then(res => res.json())
+.then(console.log);
+```
+
+You will receive:
+
+```
+{
+  access_token: "...",
+  id_token: "...",
+  refresh_token: "...",
+  expires_in: 3600
+}
+```
+
+Copy access_token.
+
+### 🔥 EVEN EASIER METHOD (Old Implicit Way – Testing Only)
+
+If you temporarily enable:
+
+```
+Implicit grant
+```
+
+Then use:
+
+```
+response_type=token
+```
+
+Then after login you will be redirected with:
+
+```
+#access_token=xxxx
+```
+
+This is easiest for quick manual testing.
+
+But production → Authorization Code is correct.
 
 
-**✅ PHASE 3️⃣ STATUS**
+**✅ PHASE 1️⃣ STATUS**
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 4️⃣ — API Gateway
-
+## 🔐 PHASE 2️⃣ — API Gateway
 
 ### 1️⃣ Create Authorizer in API Gateway
 
@@ -615,3 +539,79 @@ This file handles API logic only.
 
 - Save.
 
+### 2️⃣  Attach Cognito Authorizer in API Gateway
+
+- Go to: API Gateway → Authorizers → Create new
+
+- Type: Cognito
+
+- Select your User Pool.
+
+- Token source: Authorization
+
+- Save.
+
+- Now attach this authorizer ONLY to:
+
+```
+/admin/*
+/employee/*
+```
+
+- ❌ Do NOT attach to:
+
+```
+/public/*
+```
+
+### 🔥 FINAL ARCHITECTURE RESULT
+
+```
+/public/orders                → No authorizer
+/public/order-status          → No authorizer
+
+/admin/dashboard              → Cognito authorizer
+/admin/orders                 → Cognito authorizer
+/admin/mark-paid              → Cognito authorizer
+
+/employee/orders              → Cognito authorizer
+/employee/order               → Cognito authorizer
+```
+
+Then inside Lambda:
+
+- Validate group
+
+- Enforce authorization
+
+### ❓ IMPORTANT CHANGE FROM YOUR OLD SETUP
+
+OLD:
+
+```
+response_type=token
+Implicit grant
+```
+
+NEW (recommended):
+
+```
+response_type=code
+Authorization code grant
+```
+
+#### ⚠️ You must update your central-auth-api.js accordingly.
+
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 3️⃣ 
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 4️⃣ 
