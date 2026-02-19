@@ -8,7 +8,7 @@ set -uo pipefail
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
-API_URL="https://d9c4cvq7w9.execute-api.us-east-1.amazonaws.com/dev/orders"
+API_URL="https://4njilbv5oj.execute-api.us-east-1.amazonaws.com/prod/orders"
 
 # Unique test marker so you can identify this run in logs / database
 TEST_CUSTOMER="TestUser_$(date +%Y%m%d_%H%M%S)"
