@@ -1904,7 +1904,7 @@ Enable Lambda Proxy Integration
 #### Stage name:
 
 ```
-status
+prod
 ```
 
 **Copy Invoke URL**
@@ -1912,7 +1912,7 @@ status
 #### Example:
 
 ```
-https://xxxx.execute-api.us-east-1.amazonaws.com/status/cafe-order-status
+https://xxxx.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status
 ```
 
 ### 🧪 STEP 8 — TEST API (CRITICAL)
@@ -1930,7 +1930,7 @@ This file is frontend-only and SAFE
 Inside the PHP file, ONLY replace this line:
 
 ```
-$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=$orderId";
+$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status?order_id=$orderId";
 ```
 
 **🔁 Replace with your real API Gateway URL**
