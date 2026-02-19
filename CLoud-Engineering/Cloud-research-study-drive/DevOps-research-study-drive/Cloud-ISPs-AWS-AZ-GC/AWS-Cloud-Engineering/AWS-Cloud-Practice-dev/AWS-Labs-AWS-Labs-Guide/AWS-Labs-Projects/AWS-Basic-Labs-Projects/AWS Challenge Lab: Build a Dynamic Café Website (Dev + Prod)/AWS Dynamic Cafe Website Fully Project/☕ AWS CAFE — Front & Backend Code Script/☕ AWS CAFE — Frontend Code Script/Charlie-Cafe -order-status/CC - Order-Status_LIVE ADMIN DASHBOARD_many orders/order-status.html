@@ -6,11 +6,10 @@
 
 <!-- =========================================================
      CHARLIE CAFE - ADMIN ORDER STATUS PAGE
-     Protected page (Requires Cognito login)
-     Uses:
+     - Standalone version (No Cognito login)
+     - Uses:
         - config.js
         - utils.js
-        - central-auth.js
         - api.js
         - central-printing.js
 ========================================================= -->
@@ -116,49 +115,28 @@ body {
 </div>
 
 <!-- =========================================================
-     REQUIRED SCRIPTS (Order Matters)
+     REQUIRED SCRIPTS
 ========================================================= -->
 
 <script src="/js/config.js"></script>
 <script src="/js/utils.js"></script>
-<script src="/js/central-auth.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/central-printing.js"></script>
 
 <script>
 /* ==========================================================
    CHARLIE CAFE - ORDER STATUS PAGE LOGIC
-   - Ensures user is authenticated
-   - Fetches protected orders
-   - Displays in table
+   - Standalone version (No authentication)
+   - Fetches orders and displays in table
 ========================================================== */
 
-// ============================================
-// 1️⃣ Ensure user is authenticated
-// ============================================
-document.addEventListener("DOMContentLoaded", async function() {
-
-    try {
-        // Check if user is logged in via Cognito
-        const user = await CHARLIE_AUTH.getCurrentUser();
-
-        if (!user) {
-            window.location.href = "login.html";
-            return;
-        }
-
-        // If logged in, load orders
-        loadOrders();
-
-    } catch (error) {
-        console.error("Auth error:", error);
-        window.location.href = "login.html";
-    }
+document.addEventListener("DOMContentLoaded", function() {
+    // Directly load orders on page load (no login check)
+    loadOrders();
 });
 
-
 // ============================================
-// 2️⃣ Fetch Orders from Protected API
+// 1️⃣ Fetch Orders from API
 // ============================================
 async function loadOrders() {
 
@@ -167,9 +145,8 @@ async function loadOrders() {
     const errorMessage = document.getElementById("error-message");
 
     try {
-
-        // Call protected endpoint
-        const response = await CHARLIE_API.protected.getOrders();
+        // Call API (replace CHARLIE_API.protected.getOrders() with your normal API call)
+        const response = await CHARLIE_API.getOrders(); // Use public/non-auth API
 
         loading.style.display = "none";
 
@@ -181,9 +158,7 @@ async function loadOrders() {
 
         // Populate table
         response.orders.forEach(order => {
-
             const row = document.createElement("tr");
-
             row.innerHTML = `
                 <td>${order.order_id}</td>
                 <td>${order.table_number}</td>
@@ -194,46 +169,23 @@ async function loadOrders() {
                 <td>${order.status || "Pending"}</td>
                 <td>${order.payment_method || "-"}</td>
             `;
-
             tableBody.appendChild(row);
         });
 
     } catch (error) {
-
         console.error("Error loading orders:", error);
         loading.style.display = "none";
         errorMessage.style.display = "block";
     }
 }
 
-
 // ============================================
-// 3️⃣ Logout Function
+// 2️⃣ Logout Function (Simple redirect)
 // ============================================
-async function logoutUser() {
-
-    try {
-        // 🔐 Step 1: Call centralized Cognito logout function
-        // This will:
-        //   - Clear local storage/session storage
-        //   - Remove JWT tokens
-        //   - Invalidate Cognito session (if configured)
-        await CHARLIE_AUTH.logout();
-
-        // 🔁 Step 2: Redirect user to logout.html page
-        // This page can display a "Logged out successfully" message
-        // and optionally provide a button to login again.
-        window.location.href = "logout.php";
-
-    } catch (error) {
-
-        // ❌ If logout fails for any reason,
-        // log the error for debugging
-        console.error("Logout failed:", error);
-
-        // Still redirect to logout page for safety
-        window.location.href = "logout.php";
-    }
+function logoutUser() {
+    // Clear any client-side data if needed
+    // Redirect to a static logout page or home page
+    window.location.href = "logout.html"; // simple logout page
 }
 
 </script>
