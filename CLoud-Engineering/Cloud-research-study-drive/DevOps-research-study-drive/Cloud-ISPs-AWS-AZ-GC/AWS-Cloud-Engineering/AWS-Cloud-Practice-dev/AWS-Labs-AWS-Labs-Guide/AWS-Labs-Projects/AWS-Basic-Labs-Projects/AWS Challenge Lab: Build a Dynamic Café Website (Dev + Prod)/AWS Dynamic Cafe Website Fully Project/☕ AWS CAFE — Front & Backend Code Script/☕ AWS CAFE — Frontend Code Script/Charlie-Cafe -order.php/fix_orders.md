@@ -1985,3 +1985,204 @@ window.CHARLIE_API = (() => {
 ```
 
 ---
+### order-status.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café - Order Status</title>
+
+<!-- =========================================================
+     CHARLIE CAFE - ADMIN ORDER STATUS PAGE
+     - Standalone version (No Cognito login)
+     - Uses:
+        - config.js
+        - utils.js
+        - api.js
+        - central-printing.js
+========================================================= -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap CSS (UI Styling Only) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body {
+    background: linear-gradient(to right, #1e1e2f, #252542);
+    color: white;
+    min-height: 100vh;
+}
+
+.card {
+    background-color: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.table {
+    color: white;
+}
+
+.btn-transparent {
+    background: transparent;
+    border: 1px solid #ffffff33;
+    color: white;
+}
+
+.btn-transparent:hover {
+    background: #ffffff22;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <!-- ===========================================
+         PAGE HEADER
+    ============================================ -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cup-hot"></i> Charlie Café - Orders</h2>
+
+        <div>
+            <!-- Print Button (Uses central-printing.js) -->
+            <button class="btn btn-transparent me-2"
+                onclick="CHARLIE_PRINT.printAllOrders()">
+                <i class="bi bi-printer"></i> Print
+            </button>
+
+            <!-- Logout Button -->
+            <button class="btn btn-danger"
+                onclick="logoutUser()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- ===========================================
+         ORDERS TABLE CARD
+    ============================================ -->
+    <div class="card p-4">
+        <h4 class="mb-3">All Orders</h4>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Table</th>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Total ($)</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table-body">
+                    <!-- Orders will be inserted dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Loading message -->
+        <div id="loading" class="text-center mt-3">
+            <i class="bi bi-hourglass-split"></i> Loading orders...
+        </div>
+
+        <!-- Error message -->
+        <div id="error-message" class="text-danger text-center mt-3" style="display:none;">
+            Failed to load orders.
+        </div>
+
+    </div>
+</div>
+
+<!-- =========================================================
+     REQUIRED SCRIPTS
+========================================================= -->
+
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+/* ==========================================================
+   CHARLIE CAFE - ORDER STATUS PAGE LOGIC
+   - Standalone version (No authentication)
+   - Fetches orders and displays in table
+========================================================== */
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Load all orders on page load
+    loadOrders();
+});
+
+// ============================================
+// 1️⃣ Fetch Orders from Public API
+// ============================================
+async function loadOrders() {
+
+    const tableBody = document.getElementById("orders-table-body");
+    const loading = document.getElementById("loading");
+    const errorMessage = document.getElementById("error-message");
+
+    try {
+        // ✅ Use public API to fetch all orders (no Cognito needed)
+        const orders = await CHARLIE_API.public.getAllOrders();
+
+        loading.style.display = "none";
+
+        if (!orders || orders.length === 0) {
+            tableBody.innerHTML =
+                `<tr><td colspan="8">No orders found.</td></tr>`;
+            return;
+        }
+
+        // Populate table
+        tableBody.innerHTML = ""; // clear any existing rows
+        orders.forEach(order => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${order.order_id || "-"}</td>
+                <td>${order.table_number || "-"}</td>
+                <td>${order.customer_name || "-"}</td>
+                <td>${order.item || "-"}</td>
+                <td>${order.quantity || "-"}</td>
+                <td>${order.total || "-"}</td>
+                <td>${order.status || "Pending"}</td>
+                <td>${order.payment_method || "-"}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error loading orders:", error);
+        loading.style.display = "none";
+        errorMessage.style.display = "block";
+    }
+}
+
+// ============================================
+// 2️⃣ Logout Function (Simple redirect)
+// ============================================
+function logoutUser() {
+    // Clear any client-side data if needed
+    // Redirect to a static logout page or home page
+    window.location.href = "logout.html"; // simple logout page
+}
+
+</script>
+
+</body>
+</html>
+```
+
+---
