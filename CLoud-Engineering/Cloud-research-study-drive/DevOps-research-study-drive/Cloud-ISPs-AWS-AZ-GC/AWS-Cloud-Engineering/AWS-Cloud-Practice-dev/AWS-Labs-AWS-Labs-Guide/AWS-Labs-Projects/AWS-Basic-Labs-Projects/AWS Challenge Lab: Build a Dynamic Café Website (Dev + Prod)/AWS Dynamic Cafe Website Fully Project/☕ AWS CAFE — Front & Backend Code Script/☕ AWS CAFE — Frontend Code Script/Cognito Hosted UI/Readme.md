@@ -1371,7 +1371,251 @@ All backend PHP is minimal and no API calls. You are safe from previous cURL iss
 - Works perfectly with CloudFront
 ----
 
+### login.html
 
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.login-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 350px;
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+}
+
+.logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.cafe-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    width: 100%;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    transform: scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="login-card">
+    <div class="logo">☕</div>
+    <div class="cafe-title">Charlie Café</div>
+    <p class="mb-4">Welcome back! Enjoy your coffee break.</p>
+    <button id="loginBtn" class="btn btn-login">Login with Cognito</button>
+</div>
+
+<script>
+// ===========================================================
+// CHARLIE CAFÉ ☕ - Cognito Login
+// Using Amazon Cognito Hosted UI
+// ===========================================================
+
+// 🔹 Replace with your actual values
+const COGNITO_DOMAIN = "https://your-domain.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = "YOUR_NEW_CLIENT_ID";
+
+// Redirect URI must match the one configured in Cognito
+const REDIRECT_URI = window.location.origin + "/cognito-callback.php";
+
+// Build Hosted UI login URL
+const loginUrl = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=token&scope=email+openid&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+
+// Redirect to Cognito Hosted UI when button clicked
+document.getElementById("loginBtn").addEventListener("click", () => {
+    window.location.href = loginUrl;
+});
+</script>
+
+</body>
+</html>
+```
+
+#### New 
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- =========================================================
+     CHARLIE CAFÉ — LOGIN PAGE
+     ---------------------------------------------------------
+     ✔ Uses config.js for Cognito settings
+     ✔ Uses central-auth.js for login logic
+     ✔ Authorization Code Flow
+     ✔ No hardcoded secrets
+========================================================= -->
+
+<!-- ===================== BOOTSTRAP ===================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ===================== GOOGLE FONT ===================== -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93')
+                no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.login-card {
+    position: relative;
+    background: rgba(58,37,28,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    width: 350px;
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+}
+
+.logo {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.cafe-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    border: none;
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    width: 100%;
+    color: #fff;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    transform: scale(1.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="login-card">
+    <div class="logo">☕</div>
+    <div class="cafe-title">Charlie Café</div>
+    <p class="mb-4">Admin & Employee Login</p>
+
+    <button id="loginBtn" class="btn btn-login">
+        Login with Cognito
+    </button>
+</div>
+
+<!-- =========================================================
+     LOAD CENTRAL JS MODULES (ORDER MATTERS)
+========================================================= -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/central-auth.js"></script>
+
+<script>
+/* =========================================================
+   CHARLIE CAFÉ — LOGIN LOGIC
+   ---------------------------------------------------------
+   ✔ Uses config.js automatically
+   ✔ Uses central-auth.js login()
+   ✔ Authorization Code Flow
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const loginBtn = document.getElementById("loginBtn");
+
+    if (!loginBtn) return;
+
+    loginBtn.addEventListener("click", () => {
+
+        // Redirect user to Cognito Hosted UI
+        // After login, user returns to admin dashboard
+        CHARLIE_AUTH.login(
+            window.location.origin + "/cafe-admin-dashboard.html"
+        );
+
+    });
+
+});
+</script>
+
+</body>
+</html>
+```
 
 
 
