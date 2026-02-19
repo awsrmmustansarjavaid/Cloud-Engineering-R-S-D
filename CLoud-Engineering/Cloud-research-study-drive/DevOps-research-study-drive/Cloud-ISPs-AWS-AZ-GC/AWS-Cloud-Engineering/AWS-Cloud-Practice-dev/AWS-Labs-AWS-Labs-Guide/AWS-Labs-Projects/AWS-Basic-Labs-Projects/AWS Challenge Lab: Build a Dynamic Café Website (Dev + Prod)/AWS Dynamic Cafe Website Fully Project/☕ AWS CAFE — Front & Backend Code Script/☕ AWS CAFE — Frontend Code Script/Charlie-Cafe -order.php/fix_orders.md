@@ -1837,3 +1837,151 @@ function payWithCash(){
 </body>
 </html>
 ```
+---
+
+### api.js
+
+```
+/* =========================================================
+   CHARLIE CAFE — API MODULE (PRODUCTION, UPDATED)
+========================================================= */
+
+window.CHARLIE_API = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG;
+    const AUTH = window.CHARLIE_AUTH;
+    const { getToken, isTokenExpired } = window.CHARLIE_UTILS;
+
+    /* =====================================================
+       🔓 1️⃣ PUBLIC API GATEWAY ENDPOINTS (NO COGNITO)
+       --------------------------------------------------
+       Resource Path               Method   Lambda
+       /prod/orders                POST     CafeOrderProcessor
+       /prod/orders/cash-payment   POST     CashPaymentLambda
+       /prod/order-status          GET      OrderStatusLambda
+    ===================================================== */
+
+    const publicAPI = {
+
+        // Place a new order
+        placeOrder(payload) {
+            return fetch(`${CONFIG.API_BASE}/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        // Pay as cash
+        cashPayment(payload) {
+            return fetch(`${CONFIG.API_BASE}/orders/cash-payment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        },
+
+        // Get status of a single order
+        getOrderStatus(orderId) {
+            return fetch(`${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`)
+                .then(res => res.json());
+        },
+
+        // ✅ NEW — Fetch all orders (for admin-orders.html or dashboard table)
+        getAllOrders() {
+            // Calls same endpoint as admin dashboard but without Cognito
+            return fetch(`${CONFIG.API_BASE}/orders`) // your backend /orders returns array of all orders
+                .then(res => res.json());
+        }
+    };
+
+    /* =====================================================
+       🔐 2️⃣ COGNITO PROTECTED API ENDPOINTS (PROD)
+    ===================================================== */
+
+    async function secureFetch(url, options = {}) {
+
+        const token = getToken();
+
+        // If token invalid or expired, force logout
+        if (!token || isTokenExpired(token)) {
+            AUTH.logout();
+            return;
+        }
+
+        const headers = {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        };
+
+        const response = await fetch(url, {
+            method: options.method || "GET",
+            ...options,
+            headers
+        });
+
+        return response.json();
+    }
+
+    const protectedAPI = {
+
+        // Update order info
+        updateOrder(payload) {
+            return secureFetch(`${CONFIG.API_BASE}/order-update`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        /* 🧑‍🍳 HR — Employee + Admin */
+        recordAttendance(payload) {
+            AUTH.requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/hr/attendance`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        },
+
+        getAttendance(employeeId) {
+            AUTH.requireEmployee();
+            return secureFetch(`${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`);
+        },
+
+        /* 👨‍💼 Admin Only */
+        getAllEmployees() {
+            AUTH.requireAdmin();
+            return secureFetch(`${CONFIG.API_BASE}/hr/employees`);
+        },
+
+        /* 📊 Admin Dashboard — returns latest orders + stats */
+        adminDashboard(employeeId = "") {
+            AUTH.requireAdmin();
+            let url = `${CONFIG.API_BASE}/admin/dashboard`;
+            if (employeeId) url += `?employee_id=${employeeId}`;
+            return secureFetch(url).then(res => {
+                // Ensure always returns array for table rendering
+                if (res.latest_orders) {
+                    return res.latest_orders;
+                } else if (Array.isArray(res)) {
+                    return res; // fallback if backend returns array directly
+                } else {
+                    return []; // empty array to prevent frontend crash
+                }
+            });
+        }
+    };
+
+    /* =====================================================
+       🔹 RETURN API OBJECT
+    ===================================================== */
+
+    return {
+        public: publicAPI,
+        protected: protectedAPI
+    };
+
+})();
+```
+
+---
