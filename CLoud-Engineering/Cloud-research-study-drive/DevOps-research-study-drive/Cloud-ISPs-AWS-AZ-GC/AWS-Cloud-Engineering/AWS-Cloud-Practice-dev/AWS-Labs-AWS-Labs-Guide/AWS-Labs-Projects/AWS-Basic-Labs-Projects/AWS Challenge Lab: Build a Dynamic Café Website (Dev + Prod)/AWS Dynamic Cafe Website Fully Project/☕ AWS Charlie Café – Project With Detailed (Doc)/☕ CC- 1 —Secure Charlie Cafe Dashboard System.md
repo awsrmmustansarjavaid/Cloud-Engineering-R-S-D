@@ -845,7 +845,7 @@ or /api/*
 
   - User Pool → select your pool
 
-  - Token source → Authorization header
+  - Token source → Authorization
 
 - Save.
 
