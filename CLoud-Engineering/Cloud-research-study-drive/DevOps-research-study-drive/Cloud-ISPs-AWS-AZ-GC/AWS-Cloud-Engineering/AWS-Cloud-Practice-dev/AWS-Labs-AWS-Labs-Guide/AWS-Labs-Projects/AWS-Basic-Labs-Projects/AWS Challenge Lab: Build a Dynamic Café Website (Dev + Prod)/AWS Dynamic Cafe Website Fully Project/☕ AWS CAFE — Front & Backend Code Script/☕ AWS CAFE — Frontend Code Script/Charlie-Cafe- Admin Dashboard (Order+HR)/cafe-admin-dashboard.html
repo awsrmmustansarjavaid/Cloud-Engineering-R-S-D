@@ -10,11 +10,12 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
+/* ================= BODY & LAYOUT ================= */
 body {
     background-color: #0f0f10;
     color: #fff;
     font-family: 'Segoe UI', sans-serif;
-    display: none; /* hide until auth validated */
+    display: none; /* hidden until auth validated */
 }
 .sidebar {
     width: 250px;
@@ -50,16 +51,25 @@ body {
 </style>
 </head>
 <body>
+
+<!-- ================= SIDEBAR ================= -->
 <div class="sidebar">
     <h4>☕ Charlie Café</h4>
     <p class="text-muted">Admin Dashboard</p>
+
+    <!-- Sidebar Links -->
     <a class="active" onclick="showSection(event,'orders')"><i class="bi bi-bag-check"></i> Orders</a>
     <a onclick="showSection(event,'hr')"><i class="bi bi-people"></i> HR / Attendance</a>
     <hr>
+
+    <!-- Logout Button (Redirects to Cognito Logout PHP page) -->
     <a id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</a>
 </div>
 
+<!-- ================= MAIN CONTENT ================= -->
 <div class="main">
+
+    <!-- ORDERS SECTION -->
     <div id="orders" class="section active">
         <h4>Orders Dashboard</h4>
         <div class="row g-4 mb-4">
@@ -72,12 +82,17 @@ body {
             <h5>Latest Orders</h5>
             <button class="btn btn-outline-dark print-btn" onclick="openCentralPrint('#ordersTable')">🖨️ Print / Export</button>
             <table class="table table-hover text-white">
-                <thead><tr><th>Customer</th><th>Item</th><th>Qty</th><th>Table</th><th>Date</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Customer</th><th>Item</th><th>Qty</th><th>Table</th><th>Date</th>
+                    </tr>
+                </thead>
                 <tbody id="ordersTable"></tbody>
             </table>
         </div>
     </div>
 
+    <!-- HR SECTION -->
     <div id="hr" class="section">
         <h4>HR & Attendance Dashboard</h4>
         <div class="row mb-4">
@@ -89,9 +104,10 @@ body {
         <button class="btn btn-outline-primary" onclick="loadHR('weekly')">Weekly</button>
         <button class="btn btn-outline-primary" onclick="loadHR('monthly')">Monthly</button>
     </div>
+
 </div>
 
-<!-- JS -->
+<!-- ================= SCRIPTS ================= -->
 <script src="/js/config.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/central-auth.js"></script>
@@ -99,6 +115,7 @@ body {
 <script src="/js/central-printing.js"></script>
 
 <script>
+/* ================= SECTION SWITCHING ================= */
 function showSection(e,id){
     document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
@@ -106,12 +123,13 @@ function showSection(e,id){
     e.currentTarget.classList.add("active");
 }
 
+/* ================= CENTRAL PRINT ================= */
 function openCentralPrint(selector){
-    const target = document.querySelector(selector);
-    if(!target) return alert('Print section not found!');
-    const content = target.outerHTML;
-    const printWindow = window.open('/central-print.html','_blank');
-    const timer = setInterval(()=>{
+    const target=document.querySelector(selector);
+    if(!target){ alert('Print section not found!'); return; }
+    const content=target.outerHTML;
+    const printWindow=window.open('/central-print.html','_blank');
+    const timer=setInterval(()=>{
         if(printWindow && printWindow.centralPrint){
             printWindow.centralPrint.loadContent(content);
             clearInterval(timer);
@@ -119,10 +137,10 @@ function openCentralPrint(selector){
     },100);
 }
 
-/* ====== DASHBOARD LOADING ====== */
+/* ================= LOAD DASHBOARDS ================= */
 async function loadOrdersDashboard(){
     try{
-        const data = await CHARLIE_API.adminDashboard.fetchData();
+        const data=await CHARLIE_API.adminDashboard.fetchData();
         document.getElementById("sales").innerText=`$${data.sales||0}`;
         document.getElementById("ordersCount").innerText=data.orders||0;
         document.getElementById("drinksCount").innerText=data.drinks||0;
@@ -138,7 +156,7 @@ async function loadOrdersDashboard(){
                 <td>${o.date}</td>
             </tr>`;
         });
-    }catch(e){ console.error(e); }
+    }catch(e){ console.error("Orders Dashboard Error:",e); }
 }
 
 async function loadHR(type){
@@ -148,22 +166,30 @@ async function loadHR(type){
         document.getElementById("cardPresent").innerText=data.summary.total_present;
         document.getElementById("cardAbsent").innerText=data.summary.total_absent;
         document.getElementById("cardLeaves").innerText=data.summary.total_leaves;
-    }catch(e){ console.error(e); }
+    }catch(e){ console.error("HR Dashboard Error:",e); }
 }
 
-/* ====== AUTH CHECK ====== */
+/* ================= AUTHENTICATION ================= */
 function showDashboard(){
-    document.body.style.display='block';
+    document.body.style.display='block'; // show dashboard
     loadOrdersDashboard();
     loadHR('daily');
+
+    // Attach logout button to redirect to your PHP logout page
+    const btn=document.getElementById('logoutBtn');
+    if(btn){
+        btn.addEventListener('click',e=>{
+            e.preventDefault();
+            window.location.href='/logout.php?loggedout=true'; // Cognito logout
+        });
+    }
 }
 
+/* ================= INITIALIZE PROTECTED PAGE ================= */
 try{
     if(typeof CHARLIE!=='undefined'){
         CHARLIE.initProtectedPage({
             requireAuth:true,
-            enableLogout:true,
-            logoutButtonId:'logoutBtn',
             onAuthSuccess:showDashboard,
             onAuthFail:()=>window.location.href='/login.html'
         });
