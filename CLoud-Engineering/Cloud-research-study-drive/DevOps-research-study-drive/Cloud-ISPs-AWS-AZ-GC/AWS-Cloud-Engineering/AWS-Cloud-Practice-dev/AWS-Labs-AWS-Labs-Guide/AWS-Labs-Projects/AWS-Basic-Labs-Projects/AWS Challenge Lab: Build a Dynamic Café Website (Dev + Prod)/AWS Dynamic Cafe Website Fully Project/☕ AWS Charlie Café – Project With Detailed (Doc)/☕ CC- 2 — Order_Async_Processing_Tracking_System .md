@@ -1636,8 +1636,8 @@ API Gateway → Actions → Deploy API
 
 | Field            | Value                 |
 | ---------------- | --------------------- |
-| Deployment stage | New stage             |
-| Stage name       | status                |
+| Deployment stage | Exist stage             |
+| Stage name       | Prod               |
 | Description      | Order status endpoint |
 
 Click Deploy
@@ -1647,13 +1647,13 @@ Click Deploy
 #### 🌐 FINAL API URL
 
 ```
-GET https://xxxxx.execute-api.us-east-1.amazonaws.com/status/get-order-status
+GET https://xxxxx.execute-api.us-east-1.amazonaws.com/prod/get-order-status
 ```
 
 #### 🧪 TEST IT (MUST WORK)
 
 ```
-curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/get-order-status
+curl https://xxxxx.execute-api.us-east-1.amazonaws.com/prod/get-order-status
 ```
 
 #### ✅ You MUST see JSON like:
@@ -1679,13 +1679,13 @@ curl https://xxxxx.execute-api.us-east-1.amazonaws.com/status/get-order-status
 #### Open browser:
 
 ```
-https://API_ID.execute-api.region.amazonaws.com/status/get-order-status
+https://API_ID.execute-api.region.amazonaws.com/prod/get-order-status
 ```
 
 #### Example;
 
 ```
-https://a1053skr51.execute-api.us-east-1.amazonaws.com/status/get-order-status
+https://a1053skr51.execute-api.us-east-1.amazonaws.com/prod/get-order-status
 ```
 
 ✔ JSON visible
