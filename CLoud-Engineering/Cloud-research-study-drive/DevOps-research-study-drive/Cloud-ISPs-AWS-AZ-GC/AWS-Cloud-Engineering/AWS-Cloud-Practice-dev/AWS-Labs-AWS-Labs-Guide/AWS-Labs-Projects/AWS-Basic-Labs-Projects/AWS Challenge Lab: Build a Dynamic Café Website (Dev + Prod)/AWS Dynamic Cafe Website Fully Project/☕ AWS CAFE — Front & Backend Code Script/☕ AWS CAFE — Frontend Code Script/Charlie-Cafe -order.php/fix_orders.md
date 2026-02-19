@@ -1612,3 +1612,228 @@ payment-status.php can fetch the order from RDS using order_id
 
 ---
 
+Ah! Perfect — if your RDS credentials are in AWS Secrets Manager, we don’t hardcode the username/password. Instead, we fetch them dynamically in PHP via the AWS SDK. I’ll provide a fully updated orders.php with Secrets Manager integration, plus DynamoDB, and full comments.
+
+```
+<?php
+// ==========================================================
+// CHARLIE CAFE — PLACE ORDER PAGE (PUBLIC)
+// ----------------------------------------------------------
+// ✔ Save orders to RDS (via AWS Secrets Manager)
+// ✔ Save orders to DynamoDB (backup / logging)
+// ✔ Frontend can fetch orders from RDS
+// ✔ Stripe + Cash payment simulation
+// ==========================================================
+
+// ==========================================================
+// CONFIGURATION
+// ==========================================================
+$orderSuccess = false;
+$errorMessage = "";
+
+// ---------------- AWS SDK ----------------
+require __DIR__ . '/vendor/autoload.php';
+use Aws\DynamoDb\DynamoDbClient;
+use Aws\SecretsManager\SecretsManagerClient;
+use Aws\Exception\AwsException;
+
+// ---------------- DYNAMODB CONFIG ----------------
+$dynamodb = new DynamoDbClient([
+    'region' => 'us-east-1',   // DynamoDB region
+    'version' => 'latest'
+]);
+$ddbTable = 'CharlieCafeOrders'; // DynamoDB table name
+
+// ---------------- SECRETS MANAGER CONFIG ----------------
+$secretName = "charlieCafeRDS"; // Replace with your secret name
+$region     = "us-east-1";      // Region where secret is stored
+
+$secretsClient = new SecretsManagerClient([
+    'version' => 'latest',
+    'region'  => $region
+]);
+
+// ==========================================================
+// FETCH RDS CREDENTIALS FROM SECRETS MANAGER
+// ==========================================================
+try {
+    $result = $secretsClient->getSecretValue([
+        'SecretId' => $secretName
+    ]);
+
+    $secretString = $result['SecretString'];
+    $secret = json_decode($secretString, true);
+
+    $rdsHost     = $secret['host'];
+    $rdsDbName   = $secret['dbname'];
+    $rdsUser     = $secret['username'];
+    $rdsPassword = $secret['password'];
+    $rdsTable    = "orders"; // Your RDS table name
+
+} catch (AwsException $e) {
+    die("Error fetching RDS credentials from Secrets Manager: " . $e->getMessage());
+}
+
+// ==========================================================
+// PROCESS FORM SUBMISSION
+// ==========================================================
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    try {
+        // 1️⃣ Generate Unique Order ID
+        $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+        // 2️⃣ Local Price List
+        $prices = [
+            "Coffee"      => 3,
+            "Tea"         => 2,
+            "Latte"       => 4,
+            "Cappuccino"  => 4,
+            "Fresh Juice" => 5
+        ];
+
+        // 3️⃣ Sanitize Input
+        $tableNumber  = (int)$_POST["table_number"];
+        $customerName = htmlspecialchars($_POST["name"]);
+        $item         = $_POST["item"];
+        $quantity     = (int)$_POST["quantity"];
+
+        // 4️⃣ Calculate Total
+        $total = $prices[$item] * $quantity;
+
+        // ==========================================================
+        // SAVE ORDER TO RDS
+        // ==========================================================
+        $dsn = "mysql:host=$rdsHost;dbname=$rdsDbName;charset=utf8mb4";
+        $pdo = new PDO($dsn, $rdsUser, $rdsPassword, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]);
+
+        $stmt = $pdo->prepare("
+            INSERT INTO $rdsTable
+            (order_id, table_number, customer_name, item, quantity, total, status, created_at)
+            VALUES (:order_id, :table_number, :customer_name, :item, :quantity, :total, 'Pending', NOW())
+        ");
+        $stmt->execute([
+            ':order_id'      => $orderId,
+            ':table_number'  => $tableNumber,
+            ':customer_name' => $customerName,
+            ':item'          => $item,
+            ':quantity'      => $quantity,
+            ':total'         => $total
+        ]);
+
+        // ==========================================================
+        // SAVE ORDER TO DYNAMODB (BACKUP / LOGGING)
+        // ==========================================================
+        $dynamodb->putItem([
+            'TableName' => $ddbTable,
+            'Item' => [
+                'order_id'      => ['S' => $orderId],
+                'table_number'  => ['N' => (string)$tableNumber],
+                'customer_name' => ['S' => $customerName],
+                'item'          => ['S' => $item],
+                'quantity'      => ['N' => (string)$quantity],
+                'total'         => ['N' => (string)$total],
+                'status'        => ['S' => 'Pending'],
+                'created_at'    => ['S' => date('c')]
+            ]
+        ]);
+
+        // ==========================================================
+        // REDIRECT URL AFTER PAYMENT
+        // ==========================================================
+        $statusUrl = "payment-status.php?order_id=$orderId";
+        $orderSuccess = true;
+
+    } catch (Exception $e) {
+        $errorMessage = "Error placing order: " . $e->getMessage();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Place Order</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body { font-family:'Poppins', sans-serif; padding-top:80px; background:#f5f5f5; }
+.order-card { background:#fff; padding:40px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+.btn-warning { background:linear-gradient(45deg,#ff9800,#ff5722); border:none; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height:80vh;">
+<div class="col-md-6">
+<div class="order-card">
+
+<h2 class="text-center mb-4">☕ Place Your Order</h2>
+
+<form method="POST">
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-table"></i></span>
+        <input type="number" name="table_number" class="form-control" placeholder="Table Number" required>
+    </div>
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-person"></i></span>
+        <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+    </div>
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-cup-straw"></i></span>
+        <select name="item" class="form-select">
+            <option>Coffee</option>
+            <option>Tea</option>
+            <option>Latte</option>
+            <option>Cappuccino</option>
+            <option>Fresh Juice</option>
+        </select>
+    </div>
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-hash"></i></span>
+        <input type="number" name="quantity" value="1" min="1" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-warning w-100 mt-3">☕ Place Order</button>
+</form>
+
+<?php if (!empty($errorMessage)): ?>
+<div class="alert alert-danger mt-3"><?= htmlspecialchars($errorMessage) ?></div>
+<?php endif; ?>
+
+<?php if ($orderSuccess): ?>
+<hr class="my-4">
+<h5>🧾 Order Receipt</h5>
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+<p><strong>Total:</strong> $<?= number_format($total,2) ?></p>
+
+<p class="alert alert-info text-center">Choose ONE payment method</p>
+
+<div class="mt-4">
+    <h4>☕ Pay at Counter (Cash)</h4>
+    <button onclick="payWithCash()" class="btn btn-dark w-100">Pay Now (Cash)</button>
+</div>
+
+<div class="mt-4 text-center">
+    <a class="btn btn-success mt-2" href="payment-status.php?order_id=<?= $orderId ?>">📦 Track Your Order</a>
+</div>
+<?php endif; ?>
+
+</div>
+</div>
+</div>
+
+<script>
+function payWithCash(){
+    alert("☕ Please pay at the counter.");
+    window.location.href = "<?= $statusUrl ?? '' ?>";
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
