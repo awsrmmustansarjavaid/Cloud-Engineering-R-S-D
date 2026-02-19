@@ -84,7 +84,7 @@ sudo ./api-gw-rds-secret-test.sh
 
 ```
 curl -X POST \
-  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  https://4njilbv5oj.execute-api.us-east-1.amazonaws.com/prod/orders \
   -H "Content-Type: application/json" \
   -d '{"customer_name":"TestUser","item":"Latte","quantity":1}'
 ```
@@ -101,7 +101,7 @@ curl -X POST \
 
 ```
 curl -X POST \
-  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  https://4njilbv5oj.execute-api.us-east-1.amazonaws.com/prod/orders \
   -H "Content-Type: application/json" \
   -d '{
     "table_number": 3,
