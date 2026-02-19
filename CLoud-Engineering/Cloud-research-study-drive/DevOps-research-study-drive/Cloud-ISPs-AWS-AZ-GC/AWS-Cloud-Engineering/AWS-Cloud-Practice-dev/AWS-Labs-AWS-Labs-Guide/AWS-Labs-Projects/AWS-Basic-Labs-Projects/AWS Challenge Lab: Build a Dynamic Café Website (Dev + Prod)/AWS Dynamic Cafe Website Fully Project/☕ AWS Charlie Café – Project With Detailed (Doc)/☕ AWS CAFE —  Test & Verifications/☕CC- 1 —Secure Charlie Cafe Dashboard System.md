@@ -488,13 +488,300 @@ Authorization: Bearer fake
 
 Should still work (since no authorizer attached).
 
+### 1️⃣ Test Cognito Authorizer
+
+#### Call Admin Route
+
+```
+curl https://<api-id>.execute-api.<region>.amazonaws.com/admin/dashboard \
+  -H "Authorization: <ACCESS_TOKEN>"
+```
+
+#### Results
+
+| User group | Result |
+| ---------- | ------ |
+| admin      | ✅ 200  |
+| employee   | ❌ 403  |
+| no token   | ❌ 401  |
+
+### 2️⃣ Test Lambda
+
+- #### Inside Lambda:
+
+```
+event["requestContext"]["authorizer"]["claims"]["cognito:groups"]
+```
+
+#### Example:
+
+```
+["admin"]
+```
+
+or
+
+```
+["employee"]
+```
+
+#### Summary
+
+| Question                 | Answer               |
+| ------------------------ | -------------------- |
+| Do I need REST API?      | ❌ NO                 |
+| Should I use HTTP API?   | ✅ YES                |
+| Where are routes?        | API Gateway → Routes |
+| Are routes auto-created? | ❌ NO                 |
+| Attach authorizer where? | On EACH route        |
+| One Lambda or many?      | ✅ ONE                |
+
+### 3️⃣ FINAL TEST TEST LAMBDA & API (MATCHES YOUR GUIDE)
+
+#### 1️⃣ ❌ Without token
+
+```
+curl https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
+
+#### ✅ Expected:
+
+```
+401 Unauthorized
+```
+
+#### 2️⃣ ✅ With Frontend Token
+
+- Login via Cognito Hosted UI
+
+- Get a JWT access token
+
+- Call API Gateway with
+
+```
+Authorization: Bearer <access_token>
+```
+
+- ✅ Receive JSON response
+
+### 4️⃣ GET /admin/dashboard
+
+```
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/status/admin/dashboard
+Authorization: Bearer <token>
+```
+
+### 5️⃣ POST /admin/create-user
+
+```
+POST https://<api-id>.execute-api.us-east-1.amazonaws.com/status/admin/create-user
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "role": "employee"
+}
+```
+
+### 6️⃣ GET /employee/orders
+
+```
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/status/employee/orders?employee_id=alice
+Authorization: Bearer <token>
+```
+
+### 7️⃣ POST /employee/order
+
+```
+POST https://<api-id>.execute-api.us-east-1.amazonaws.com/status/employee/order
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "order_id": "O-103",
+  "employee": "alice",
+  "items": [
+    { "name": "Latte", "quantity": 2, "price": 5 },
+    { "name": "Bagel", "quantity": 1, "price": 3 }
+  ],
+  "total": 13
+}
+```
+
+### 8️⃣ Test each endpoint
+
+Test each endpoint using Postman or browser:
+
+```
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/employee/orders
+GET https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/order-status?order_id=123
+```
+
+**✅ You should get responses from respective Lambda functions.**
+
+
+**✅ After this, your API Gateway + Lambda + front-end integration is fully professional, secure, and working.**
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
 ## 🔐 PHASE 3️⃣ Lambda Functions 
 
+### 4️⃣ Lambda Code Test
 
+- Name:
+
+```
+Test_OrderStatusLambda
+```
+
+#### JSON
+
+```
+{}
+```
+#### Expected Result
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Authorization",
+    "Access-Control-Allow-Methods": "GET"
+  },
+```
+
+#### ✅ Result:
+
+```
+/order-status?date=YYYY-MM-DD
+```
+
+✅ returns filtered orders
+
+### 5️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_AdminDashboardLambda
+```
+
+#### JSON
+
+```
+{}
+```
+
+#### ✅ Expected Result
+
+```
+  "statusCode": 200,
+```
+
+### 6️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_AdminCreateUserLambda
+```
+
+#### JSON
+
+```
+{
+  "body": "{\"username\": \"john.doe\", \"role\": \"employee\"}"
+}
+```
+
+#### ✅ Expected Result
+
+```
+  "statusCode": 200,
+```
+
+### 7️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_EmployeeOrdersLambda
+```
+
+#### JSON
+
+```
+{
+  "queryStringParameters": {
+    "employee_id": "alice"
+  }
+}
+```
+
+#### ✅ Expected Result
+
+```
+  "statusCode": 200,
+```
+
+### 8️⃣ Lambda Code Test
+
+- Name:
+
+```
+Test_EmployeeOrderLambda
+```
+
+#### JSON
+
+```
+{
+  "order_id": "O-103",
+  "employee": "alice",
+  "items": [
+    { "name": "Latte", "quantity": 2, "price": 5 },
+    { "name": "Bagel", "quantity": 1, "price": 3 }
+  ],
+  "total": 13
+}
+```
+
+#### ✅ Expected Result
+
+```
+  "statusCode": 200,
+```
+
+### 9️⃣ Verification
+
+- Go to Lambda → Monitoring → View Logs
+
+- Check CloudWatch Logs for each Lambda
+
+#### Confirm:
+
+- /admin/dashboard → AdminDashboardLambda response
+
+- /admin/create-user → AdminCreateUserLambda response
+
+- /employee/orders → EmployeeOrdersLambda response
+
+- /employee/order → EmployeeOrderLambda response
+
+#### Test JWT Authorization:
+
+- Access without token → should fail
+
+- Access with token → should succeed
+
+**✅ After this, your API Gateway + Lambda + front-end integration is fully professional, secure, and working.**
 
 **✅ PHASE 3️⃣ STATUS**
 
