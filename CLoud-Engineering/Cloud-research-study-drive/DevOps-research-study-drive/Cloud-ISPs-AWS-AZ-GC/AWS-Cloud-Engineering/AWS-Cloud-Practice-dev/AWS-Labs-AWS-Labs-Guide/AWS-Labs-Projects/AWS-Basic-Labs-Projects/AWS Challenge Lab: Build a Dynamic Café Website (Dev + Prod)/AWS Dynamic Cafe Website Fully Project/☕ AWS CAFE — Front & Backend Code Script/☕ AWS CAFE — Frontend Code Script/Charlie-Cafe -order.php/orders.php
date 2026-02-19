@@ -204,7 +204,7 @@ body {
                 <a class="nav-link" href="order-status.php">📦 Track Order</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="menu.php">📋 Menu</a>
+                <a class="nav-link" href="price-list.html">📋 Menu</a>
             </li>
         </ul>
     </div>
