@@ -2276,7 +2276,7 @@ def lambda_handler(event, context):
 #### 📌 Requirement: Your backend must expose a GET order status API like:
 
 ```
-GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/status/cafe-order-status?order_id=ORD-XXXX
+GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status?order_id=ORD-XXXX
 ```
 
 #### 📁 WHERE THIS FILE BELONGS
@@ -2635,14 +2635,14 @@ DESCRIBE orders;
 
 - Deploy API
 
-- Stage: dev
+- Stage: Prod
 
 - Click Deploy
 
 Your endpoint becomes:
 
 ```
-POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/prod/orders/cash-payment
 ```
 
 ### 4️⃣ — FRONTEND CALL (ALREADY MATCHES)
@@ -2650,7 +2650,7 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment
 Your frontend correctly calls:
 
 ```
-fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment", {
+fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/prod/orders/cash-payment", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
