@@ -1359,3 +1359,6 @@ async function payWithCash(){
 </body>
 </html>
 ```
+
+----
+
