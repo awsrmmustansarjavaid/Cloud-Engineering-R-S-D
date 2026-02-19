@@ -298,9 +298,9 @@ body {
 <!-- =======================================================
      JAVASCRIPT
 ======================================================= -->
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="api.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
 
 <script>
 // ==========================================================
