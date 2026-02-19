@@ -2184,5 +2184,21 @@ function logoutUser() {
 </body>
 </html>
 ```
+✅ Key Changes
 
+Replaced the broken call:
+
+const response = await CHARLIE_API.getOrders();
+
+
+with:
+
+const orders = await CHARLIE_API.public.getAllOrders();
+
+
+Adjusted table population to handle direct array of orders returned by getAllOrders().
+
+Added fallback values (|| "-") to prevent undefined table cells.
+
+Kept page fully standalone (no Cognito login required).
 ---
