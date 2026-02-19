@@ -1073,10 +1073,7 @@ async function logoutUser() {
 
 - No other part of your file needs modification.
 
-
----
-
-old
+### ✅ Fully final Code
 
 ```
 <!DOCTYPE html>
@@ -1322,8 +1319,14 @@ async function logoutUser() {
 </body>
 </html>
 ```
+---
 
-new
+### order-status.html
+
+> **Update Version:1.2**
+
+
+
 
 ```
 <!DOCTYPE html>
@@ -1521,3 +1524,21 @@ function logoutUser() {
 </body>
 </html>
 ```
+
+### ✅ Key Changes / Notes:
+
+- Removed Cognito login checks:
+
+    - No CHARLIE_AUTH.getCurrentUser().
+
+    - No redirect to login.html.
+
+- Removed central-auth.js from <script> includes.
+
+- Logout now simply redirects to logout.html (can be a static page).
+
+- CHARLIE_API.protected.getOrders() changed to CHARLIE_API.getOrders() assuming your API is public or no longer needs Cognito tokens.
+
+    - If your current API still requires tokens, you’ll need to modify your backend or pass some static key.
+
+---
