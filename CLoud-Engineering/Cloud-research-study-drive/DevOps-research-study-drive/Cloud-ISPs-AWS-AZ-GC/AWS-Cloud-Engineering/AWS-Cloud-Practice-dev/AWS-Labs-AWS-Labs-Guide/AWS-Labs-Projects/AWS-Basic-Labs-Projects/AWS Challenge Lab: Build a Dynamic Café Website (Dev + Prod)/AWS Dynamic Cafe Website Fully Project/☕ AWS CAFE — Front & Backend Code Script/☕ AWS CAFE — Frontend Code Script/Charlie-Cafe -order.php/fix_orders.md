@@ -894,3 +894,97 @@ AWS SDK is installed
 orders.php can now use DynamoDB without 500 errors
 
 ---
+Perfect — now we know the orders are reaching DynamoDB, so the backend PHP + AWS SDK is working. ✅
+
+The remaining issues are:
+
+Orders not showing on RDS — that’s expected if your current orders.php only writes to DynamoDB. You would need to add RDS insertion code if you want it in MySQL/PostgreSQL.
+
+Frontend pages not showing orders — this is likely because your order-status.html / admin-orders.html are making an XHR/fetch request to the old API or RDS, not DynamoDB.
+
+Let me break down what’s happening:
+
+Why payment-status.php shows “⏳ Order created, awaiting payment”
+
+That page only reads the order ID and maybe some static payload in PHP.
+
+It doesn’t query DynamoDB in your current setup.
+
+You need payment-status.php to fetch the order from DynamoDB using the AWS SDK:
+
+```
+$result = $dynamodb->getItem([
+    'TableName' => 'CharlieCafeOrders',
+    'Key' => [
+        'order_id' => ['S' => $orderId]
+    ]
+]);
+```
+
+Why admin-orders.html / order-status.html are blank
+
+These pages likely fetch from /api/get-orders.php (or similar)
+
+If that API still expects RDS or is not updated to DynamoDB, the response is empty → frontend shows nothing.
+
+You need:
+
+A PHP API endpoint that queries DynamoDB:
+Example: /api/get-orders.php
+
+```
+<?php
+require __DIR__ . '/../vendor/autoload.php';
+use Aws\DynamoDb\DynamoDbClient;
+
+$dynamodb = new DynamoDbClient([
+    'region' => 'us-east-1',
+    'version' => 'latest',
+]);
+
+try {
+    $result = $dynamodb->scan([
+        'TableName' => 'CharlieCafeOrders'
+    ]);
+    $orders = array_map(function($item){
+        return [
+            'order_id'     => $item['order_id']['S'],
+            'table_number' => $item['table_number']['N'],
+            'customer_name'=> $item['customer_name']['S'],
+            'item'         => $item['item']['S'],
+            'quantity'     => $item['quantity']['N'],
+            'status'       => $item['status']['S'] ?? 'Pending'
+        ];
+    }, $result['Items']);
+
+    header('Content-Type: application/json');
+    echo json_encode($orders);
+
+} catch (Exception $e) {
+    echo json_encode(['error'=>$e->getMessage()]);
+}
+```
+
+Update your frontend JS in order-status.html / admin-orders.html to fetch from this new endpoint, not RDS.
+
+```
+fetch('/api/get-orders.php')
+  .then(res => res.json())
+  .then(data => {
+      console.log(data); // populate table
+  });
+```
+
+✅ Next Steps
+
+Decide if you still want RDS to have orders.
+
+If yes → we need to add RDS insert code in orders.php.
+
+If no → just update your frontend pages to read from DynamoDB.
+
+Update payment-status.php to read DynamoDB for order info.
+
+Update admin-orders.html / order-status.html JS to fetch from the new DynamoDB API.
+
+----
