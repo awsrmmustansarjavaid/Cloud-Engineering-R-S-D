@@ -158,7 +158,7 @@
         <a class="navbar-brand" href="#"><i class="bi bi-cup-fill"></i> Charlie Cafe</a>
 
         <div class="ms-auto">
-            <a href="login.html" class="btn btn-dashboard">
+            <a href="https://dgexi85ya6bx7.cloudfront.net/login.html" class="btn btn-dashboard">
                 <i class="bi bi-box-arrow-in-right"></i> Login
             </a>
         </div>
