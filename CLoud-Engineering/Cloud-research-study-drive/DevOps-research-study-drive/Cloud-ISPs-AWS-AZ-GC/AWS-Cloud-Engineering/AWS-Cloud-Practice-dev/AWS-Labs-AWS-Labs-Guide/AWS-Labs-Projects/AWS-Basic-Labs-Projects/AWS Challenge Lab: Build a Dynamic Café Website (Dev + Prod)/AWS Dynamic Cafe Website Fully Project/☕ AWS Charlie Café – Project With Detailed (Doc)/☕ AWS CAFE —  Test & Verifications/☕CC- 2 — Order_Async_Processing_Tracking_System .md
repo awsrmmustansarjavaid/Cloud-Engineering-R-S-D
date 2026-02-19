@@ -376,7 +376,7 @@ Ensure payload includes:
 
 ```
 curl -X POST \
-  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/dev/orders \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/prod/orders \
   -H "Content-Type: application/json" \
   -d '{"table_number":3,"customer_name":"CurlTest","item":"Tea","quantity":2}'
 ```
@@ -861,7 +861,7 @@ Only do this AFTER Method 1 works
 
 ```
 curl -X POST \
-https://<api-id>.execute-api.us-east-1.amazonaws.com/dev/orders \
+https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/orders \
 -H "Content-Type: application/json" \
 -d '{
   "table_number": 2,
@@ -1152,6 +1152,75 @@ Coffee → orders increases
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 5️⃣ — API GATEWAY ENDPOINT
+
+### 1️⃣ TEST in API Gateway Console
+
+- Open AWS Console → API Gateway → select your API (prod).
+
+- On the left panel, go to Resources → click /get-order-status.
+
+- You will see Methods (GET, OPTIONS, etc.). Click GET.
+
+- Click Test (top right in Method Execution page).
+
+- Leave Request Body empty (GET does not need body).
+
+- Click Test.
+
+- You will see Response Body, Response Headers, Execution Logs, and Latency.
+
+This replicates what your curl request does.
+
+#### ✅ Expected Response body
+
+```
+{"metrics": [{"metric": "TODAY_ORDERS", "count": "6"}, {"metric": "TOTAL_ORDERS", "count": "6"}], "recent_orders": [{"table_number": 1, "customer_name": "ConsoleTest", "item": "Latte", "quantity": 2, "created_at": "2026-02-19 11:15:24"}, {"table_number": 2, "customer_name": "WorkerTest", "item": "Latte", "quantity": 2, "created_at": "2026-02-19 11:15:21"}, {"table_number": 1, "customer_name": "WorkerTest", "item": "Coffee", "quantity": 2, "created_at": "2026-02-19 11:15:05"}, {"table_number": 3, "customer_name": "TestUser", "item": "Latte", "quantity": 1, "created_at": "2026-02-19 11:14:48"}, {"table_number": 5, "customer_name": "Charlie-mj", "item": "Coffee", "quantity": 2, "created_at": "2026-02-19 11:14:38"}, {"table_number": 5, "customer_name": "Charlie", "item": "Coffee", "quantity": 2, "created_at": "2026-02-19 11:14:36"}, {"table_number": 5, "customer_name": "Charlie-mj", "item": "Coffee", "quantity": 2, "created_at": "2026-02-19 11:04:38"}, {"table_number": 5, "customer_name": "Charlie", "item": "Coffee", "quantity": 2, "created_at": "2026-02-19 11:02:35"}, {"table_number": 3, "customer_name": "TestUser", "item": "Latte", "quantity": 1, "created_at": "2026-02-19 10:57:47"}, {"table_number": 1, "customer_name": "Ali Khan", "item": "Espresso", "quantity": 2, "created_at": "2026-02-19 07:10:48"}, {"table_number": 2, "customer_name": "Sara Ahmed", "item": "Latte", "quantity": 1, "created_at": "2026-02-19 07:10:48"}]}
+```
+
+#### ✅ Expected Response headers
+
+```
+{
+  "Access-Control-Allow-Origin": "*",
+  "Content-Type": "application/json",
+  "X-Amzn-Trace-Id": "Root=1-6996f47f-abc5f8e36c038577d3703c22;Parent=75ab38d9ffc2bbf9;Sampled=0;Lineage=1:1466d6d1:0"
+}
+```
+
+### 2️⃣ Testing with curl 
+
+
+```
+curl https://4njilbv5oj.execute-api.us-east-1.amazonaws.com/prod/get-order-status
+```
+
+- Optional: add -v to see headers.
+
+- Optional: add query parameters:
+
+```
+curl "https://4njilbv5oj.execute-api.us-east-1.amazonaws.com/prod/get-order-status?table_number=5"
+```
+
+#### Notes: 
+
+- GET requests do not require JSON body. That’s why your earlier Lambda 500 errors were with /orders POST — that one expected JSON in the body.
+
+- OPTIONS method (for CORS) is automatically handled; GET works fine in browsers too.
+
+#### 💡 Summary:
+
+- /get-order-status is working ✅
+
+- /orders POST is still failing because the Lambda that updates DynamoDB cannot find the table.
+
+- To fully test /orders, you need to fix DynamoDB table or table name first.
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
 ## PHASE 7️⃣ — FEATURE VERIFICATION (IMPORTANT)
 
