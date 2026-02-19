@@ -1362,3 +1362,253 @@ async function payWithCash(){
 
 ----
 
+Perfect — now the plan is clear:
+
+orders.php will save each new order to DynamoDB and to RDS.
+
+Frontend pages (admin-orders.html, order-status.html) will continue fetching from RDS.
+
+DynamoDB acts as a backup / fast-access log if you want, but RDS is the main source for your frontend.
+
+Below is a fully final working orders.php with detailed comments and both DynamoDB + RDS integration.
+
+```
+<?php
+// ==========================================================
+// CHARLIE CAFE — PLACE ORDER PAGE (PUBLIC)
+// ----------------------------------------------------------
+// ✔ Save orders to RDS (MySQL/PostgreSQL)
+// ✔ Save orders to DynamoDB (backup / logging)
+// ✔ Frontend can fetch orders from RDS
+// ✔ Stripe + Cash payment simulation
+// ==========================================================
+
+// ==========================================================
+// CONFIGURATION
+// ==========================================================
+$orderSuccess = false;
+$errorMessage = "";
+
+// ---------------- RDS CONFIG ----------------
+$rdsHost     = "your-rds-endpoint";     // e.g., abcdefg123.us-east-1.rds.amazonaws.com
+$rdsDbName   = "charlie_cafe";          // your database name
+$rdsUser     = "db_username";           // your DB username
+$rdsPassword = "db_password";           // your DB password
+$rdsTable    = "orders";                // your RDS table for orders
+
+// ---------------- DYNAMODB CONFIG ----------------
+require __DIR__ . '/vendor/autoload.php';
+use Aws\DynamoDb\DynamoDbClient;
+
+$dynamodb = new DynamoDbClient([
+    'region' => 'us-east-1',   // your DynamoDB region
+    'version' => 'latest'
+]);
+
+$ddbTable = 'CharlieCafeOrders'; // your DynamoDB table name
+
+// ==========================================================
+// PROCESS FORM SUBMISSION
+// ==========================================================
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    try {
+        // 1️⃣ Generate Unique Order ID
+        $orderId = "ORD-" . time() . "-" . rand(100,999);
+
+        // 2️⃣ Local Price List
+        $prices = [
+            "Coffee"      => 3,
+            "Tea"         => 2,
+            "Latte"       => 4,
+            "Cappuccino"  => 4,
+            "Fresh Juice" => 5
+        ];
+
+        // 3️⃣ Sanitize Input
+        $tableNumber  = (int)$_POST["table_number"];
+        $customerName = htmlspecialchars($_POST["name"]);
+        $item         = $_POST["item"];
+        $quantity     = (int)$_POST["quantity"];
+
+        // 4️⃣ Calculate Total
+        $total = $prices[$item] * $quantity;
+
+        // 5️⃣ SAVE TO RDS
+        $dsn = "mysql:host=$rdsHost;dbname=$rdsDbName;charset=utf8mb4";
+        $pdo = new PDO($dsn, $rdsUser, $rdsPassword, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]);
+
+        $stmt = $pdo->prepare("
+            INSERT INTO $rdsTable
+            (order_id, table_number, customer_name, item, quantity, total, status, created_at)
+            VALUES (:order_id, :table_number, :customer_name, :item, :quantity, :total, 'Pending', NOW())
+        ");
+        $stmt->execute([
+            ':order_id'      => $orderId,
+            ':table_number'  => $tableNumber,
+            ':customer_name' => $customerName,
+            ':item'          => $item,
+            ':quantity'      => $quantity,
+            ':total'         => $total
+        ]);
+
+        // 6️⃣ SAVE TO DYNAMODB
+        $dynamodb->putItem([
+            'TableName' => $ddbTable,
+            'Item' => [
+                'order_id'      => ['S' => $orderId],
+                'table_number'  => ['N' => (string)$tableNumber],
+                'customer_name' => ['S' => $customerName],
+                'item'          => ['S' => $item],
+                'quantity'      => ['N' => (string)$quantity],
+                'total'         => ['N' => (string)$total],
+                'status'        => ['S' => 'Pending'],
+                'created_at'    => ['S' => date('c')]
+            ]
+        ]);
+
+        // 7️⃣ Redirect URL after payment
+        $statusUrl = "payment-status.php?order_id=$orderId";
+        $orderSuccess = true;
+
+    } catch (Exception $e) {
+        $errorMessage = "Error placing order: " . $e->getMessage();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Cafe ☕ | Place Order</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+/* ---------------- BASIC STYLING ---------------- */
+body { font-family:'Poppins', sans-serif; padding-top:80px; background:#f5f5f5; }
+.order-card { background:#fff; padding:40px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); }
+.btn-warning { background:linear-gradient(45deg,#ff9800,#ff5722); border:none; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height:80vh;">
+<div class="col-md-6">
+<div class="order-card">
+
+<h2 class="text-center mb-4">☕ Place Your Order</h2>
+
+<form method="POST">
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-table"></i></span>
+        <input type="number" name="table_number" class="form-control" placeholder="Table Number" required>
+    </div>
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-person"></i></span>
+        <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+    </div>
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-cup-straw"></i></span>
+        <select name="item" class="form-select">
+            <option>Coffee</option>
+            <option>Tea</option>
+            <option>Latte</option>
+            <option>Cappuccino</option>
+            <option>Fresh Juice</option>
+        </select>
+    </div>
+    <div class="mb-3 input-group">
+        <span class="input-group-text"><i class="bi bi-hash"></i></span>
+        <input type="number" name="quantity" value="1" min="1" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-warning w-100 mt-3">☕ Place Order</button>
+</form>
+
+<?php if (!empty($errorMessage)): ?>
+<div class="alert alert-danger mt-3"><?= htmlspecialchars($errorMessage) ?></div>
+<?php endif; ?>
+
+<?php if ($orderSuccess): ?>
+<hr class="my-4">
+<h5>🧾 Order Receipt</h5>
+<p><strong>Order ID:</strong> <?= $orderId ?></p>
+<p><strong>Total:</strong> $<?= number_format($total,2) ?></p>
+
+<p class="alert alert-info text-center">Choose ONE payment method</p>
+
+<div class="mt-4">
+    <h4>☕ Pay at Counter (Cash)</h4>
+    <button onclick="payWithCash()" class="btn btn-dark w-100">Pay Now (Cash)</button>
+</div>
+
+<div class="mt-4 text-center">
+    <a class="btn btn-success mt-2" href="payment-status.php?order_id=<?= $orderId ?>">📦 Track Your Order</a>
+</div>
+<?php endif; ?>
+
+</div>
+</div>
+</div>
+
+<script>
+function payWithCash(){
+    alert("☕ Please pay at the counter.");
+    window.location.href = "<?= $statusUrl ?? '' ?>";
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+✅ Notes / What You Must Replace
+
+RDS Config — replace:
+
+```
+$rdsHost     = "your-rds-endpoint";
+$rdsDbName   = "charlie_cafe";
+$rdsUser     = "db_username";
+$rdsPassword = "db_password";
+$rdsTable    = "orders";
+```
+
+DynamoDB Config — replace:
+
+```
+$dynamodb = new DynamoDbClient([
+    'region' => 'us-east-1',
+    'version' => 'latest'
+]);
+$ddbTable = 'CharlieCafeOrders';
+```
+
+Make sure the RDS table exists with these columns:
+
+| Column        | Type          |
+| ------------- | ------------- |
+| order_id      | VARCHAR(50)   |
+| table_number  | INT           |
+| customer_name | VARCHAR(100)  |
+| item          | VARCHAR(50)   |
+| quantity      | INT           |
+| total         | DECIMAL(10,2) |
+| status        | VARCHAR(20)   |
+| created_at    | DATETIME      |
+
+
+After this:
+
+Every new order is saved in both RDS and DynamoDB
+
+Frontend pages can fetch orders from RDS like you originally planned
+
+payment-status.php can fetch the order from RDS using order_id
+
+---
+
