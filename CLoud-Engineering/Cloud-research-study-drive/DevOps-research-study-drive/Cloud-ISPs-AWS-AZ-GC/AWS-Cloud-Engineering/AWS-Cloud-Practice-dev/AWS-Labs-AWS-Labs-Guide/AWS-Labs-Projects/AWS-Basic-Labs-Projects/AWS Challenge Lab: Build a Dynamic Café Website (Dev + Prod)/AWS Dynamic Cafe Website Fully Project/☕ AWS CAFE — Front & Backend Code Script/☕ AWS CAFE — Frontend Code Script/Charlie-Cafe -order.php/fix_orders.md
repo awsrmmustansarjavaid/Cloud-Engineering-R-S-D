@@ -1,6 +1,122 @@
 
 ## Orders.php
 
+Perfect — now everything is clear. Thanks for pasting your orders.php. I can see exactly why orders are never saved.
+
+Here’s the core problem:
+
+🔹 What’s happening now
+
+You generate an order ID:
+
+```
+$orderId = "ORD-" . time() . "-" . rand(100,999);
+```
+
+You calculate total and prepare $payload:
+
+```
+$payload = [
+    "order_id" => $orderId,
+    "table_number" => $tableNumber,
+    "customer_name" => $customerName,
+    "item" => $item,
+    "quantity" => $quantity
+];
+```
+
+You never insert this into any database (DynamoDB or RDS).
+
+Then you redirect or show payment-status.php?order_id=...
+
+Result: Frontend shows “Order created”, but backend has nothing.
+
+🔹 Why you don’t see orders in admin
+
+Your admin-orders.html or order-status.html fetches orders from the backend (API or Lambda).
+
+But the order doesn’t exist in any database.
+
+So admin page shows empty / fails to fetch anything.
+
+🔹 How to fix — saving orders
+
+You need one real insert when the order is placed.
+
+Option 1 — DynamoDB
+
+Add at top of orders.php:
+
+```
+require 'vendor/autoload.php'; // AWS SDK for PHP
+
+use Aws\DynamoDb\DynamoDbClient;
+
+$dynamodb = new DynamoDbClient([
+    'region'  => 'us-east-1',
+    'version' => 'latest',
+]);
+
+$tableName = 'Orders'; // replace with your table name
+
+try {
+    $dynamodb->putItem([
+        'TableName' => $tableName,
+        'Item' => [
+            'order_id'      => ['S' => $orderId],
+            'table_number'  => ['N' => (string)$tableNumber],
+            'customer_name' => ['S' => $customerName],
+            'item'          => ['S' => $item],
+            'quantity'      => ['N' => (string)$quantity],
+            'total'         => ['N' => (string)$total],
+            'status'        => ['S' => 'pending'],
+            'created_at'    => ['S' => date('Y-m-d H:i:s')],
+        ]
+    ]);
+} catch (\Exception $e) {
+    $errorMessage = "Error saving order: " . $e->getMessage();
+    $orderSuccess = false;
+}
+```
+
+✅ This will save the order into DynamoDB immediately after customer submits.
+
+Option 2 — MySQL / RDS
+
+If you prefer RDS:
+
+```
+$conn = new mysqli("hostname","username","password","database");
+if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+
+$stmt = $conn->prepare("INSERT INTO orders (order_id, table_number, customer_name, item, quantity, total, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+$stmt->bind_param("sissids", $orderId, $tableNumber, $customerName, $item, $quantity, $total, $status);
+$status = "pending";
+$stmt->execute();
+$stmt->close();
+$conn->close();
+```
+
+🔹 After saving
+
+You will immediately see the order in DynamoDB or RDS.
+
+Admin page order-status.html or admin-orders.html can fetch it using your existing Lambda/API.
+
+Your cash / stripe payment can still redirect to payment-status.php?order_id=...
+
+Now the order is real, not just a dummy ID.
+
+🔹 Extra notes
+
+The $payload array in your current code is not used. You can either:
+
+Send it to a Lambda via fetch() / API call (JavaScript)
+
+Or insert directly in PHP (simpler for now)
+
+The order status “awaiting payment” can also be saved in the DB as status = "pending".
+
 Perfect — I’ve rewritten your orders.php so that it:
 
 ✅ Saves orders into DynamoDB
