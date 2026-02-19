@@ -74,8 +74,8 @@ const CHARLIE = (() => {
         logout(redirectUrl) {
             localStorage.removeItem("access_token");
 
-            // If redirectUrl not provided, use CloudFront dashboard-login.html
-            redirectUrl = redirectUrl || `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`;
+            // If redirectUrl not provided, use CloudFront login.html
+            redirectUrl = redirectUrl || `${CONFIG.CLOUDFRONT_BASE}/login.html`;
 
             // Construct Cognito logout URL
             const url =
@@ -115,7 +115,7 @@ const CHARLIE = (() => {
             if (!btn) return;
 
             // Always use absolute URL for Cognito logout (required by Cognito)
-            const redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/dashboard-login.html`;
+            const redirectUrl = `${CONFIG.CLOUDFRONT_BASE}/login.html`;
 
             btn.addEventListener("click", () => this.logout(redirectUrl));
         }
