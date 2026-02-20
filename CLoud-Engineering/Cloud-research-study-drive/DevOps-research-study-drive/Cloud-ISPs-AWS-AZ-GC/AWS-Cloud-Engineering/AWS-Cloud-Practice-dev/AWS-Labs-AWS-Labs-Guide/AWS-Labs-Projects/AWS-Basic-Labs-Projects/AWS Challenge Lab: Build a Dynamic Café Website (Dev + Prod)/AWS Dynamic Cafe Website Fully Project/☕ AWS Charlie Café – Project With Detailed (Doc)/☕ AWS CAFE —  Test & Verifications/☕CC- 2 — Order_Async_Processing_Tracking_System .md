@@ -27,36 +27,23 @@
 
 - **Event name:** Test_CafeOrderProcessor
 
-#### Test Event JSON:
+#### Use this in Lambda Test:
 
 ```
 {
-  "body": "{\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
+  "body": "{\"table_number\": 5, \"customer_name\": \"John\", \"item\": \"Coffee\", \"quantity\": 2}"
 }
 ```
 
-#### Expected result:
+#### ✅ Expected:
 
-```
-{
-  "statusCode": 200,
-  "body": "{\"message\":\"Order saved successfully\"}"
-}
-```
-#### Test Updated Event JSON:
+Order inserted in RDS
 
-```
-{
-  "body": "{\"table_number\":1,\"customer_name\":\"LambdaTest\",\"item\":\"Coffee\",\"quantity\":2}"
-}
-```
+DynamoDB updated
 
-#### Expected result:
+SQS message sent
 
-```
-1 | LambdaTest | Coffee | 2 | 2026-01-10 10:32:11
-```
----
+StatusCode 200
 
 ### Method 1️⃣ Cafe Order API + RDS Tests
 
