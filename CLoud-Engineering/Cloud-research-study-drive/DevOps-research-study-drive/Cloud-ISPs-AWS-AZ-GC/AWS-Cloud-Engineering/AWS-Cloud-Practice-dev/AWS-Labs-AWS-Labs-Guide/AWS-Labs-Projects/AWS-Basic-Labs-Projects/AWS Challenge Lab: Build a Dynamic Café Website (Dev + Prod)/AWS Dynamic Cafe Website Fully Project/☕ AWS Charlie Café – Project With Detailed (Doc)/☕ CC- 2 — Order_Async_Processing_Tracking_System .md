@@ -1456,7 +1456,7 @@ You now have:
 
 [CafeOrderProcessor.py](..//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Charlie%20Cafe%20-%20Order%20Backend%20Code/CafeOrderProcessor/CafeOrderProcessor.py)
 
-**⚠️ Already Updated, Sp skip this step**
+**⚠️ Already Updated, So skip this step**
 
 ✔️ RDS remains main source
 
