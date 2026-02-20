@@ -309,7 +309,7 @@ Click Deploy (top right)
 
 | Setting | Value          |
 | ------- | -------------- |
-| Timeout | **30 seconds** |
+| Timeout | **15 seconds** |
 | Memory  | **512 MB**     |
 
 
@@ -324,32 +324,6 @@ Click Deploy (top right)
 - Memory also improves network performance.
 
 Click Save
-
-#### 8️⃣ Lambda Environment Variables
-
-- AWS Console → Lambda → CreateOrderLambda
-
-- Go to Configuration tab
-
-- Click Environment variables
-
-- Click Edit
-
-- Add EXACT variables
-
-| Key       | Value                             |
-| --------- | --------------------------------- |
-| `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
-| `DB_USER` | `cafe_user`                           |
-| `DB_PASS` | `your-db-password`                |
-| `DB_NAME` | `cafe_db`                    |
-
-
-⚠️ NO quotes
-
-⚠️ NO spaces
-
-- Click Save
 
 **✅ PHASE 2️⃣ STATUS**
 
