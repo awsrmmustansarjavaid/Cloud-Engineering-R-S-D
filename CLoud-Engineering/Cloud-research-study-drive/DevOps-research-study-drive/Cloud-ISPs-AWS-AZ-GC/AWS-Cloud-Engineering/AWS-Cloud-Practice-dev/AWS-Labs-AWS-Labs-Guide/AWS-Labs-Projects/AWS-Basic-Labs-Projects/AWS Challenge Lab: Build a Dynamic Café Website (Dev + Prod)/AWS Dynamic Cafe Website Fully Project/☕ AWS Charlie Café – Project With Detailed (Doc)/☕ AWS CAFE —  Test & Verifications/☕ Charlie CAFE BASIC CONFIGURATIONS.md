@@ -746,9 +746,9 @@ sudo chmod -R 644 /var/www/html
 
 > **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 
-# 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
-# 📢 SECTION 4️⃣ Secure Admin Order Dashboard
+## 📢 SECTION 4️⃣ Secure Admin Order Dashboard
 
 This is exactly how a real production deployment is validated.
 
@@ -949,9 +949,9 @@ If cognito:groups missing → user not assigned to group.
 ✔ JWT contains groups
 
 
-# 📢 SECTION 4️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+## 📢 SECTION 4️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
-# 📢 SECTION 4️⃣ Charlie Cafe Verification 
+## 📢 SECTION 4️⃣ Charlie Cafe Verification 
 
 ## PHASE 1️⃣ Charlie Cafe Basic Lab Configuration Test and Verification
 
