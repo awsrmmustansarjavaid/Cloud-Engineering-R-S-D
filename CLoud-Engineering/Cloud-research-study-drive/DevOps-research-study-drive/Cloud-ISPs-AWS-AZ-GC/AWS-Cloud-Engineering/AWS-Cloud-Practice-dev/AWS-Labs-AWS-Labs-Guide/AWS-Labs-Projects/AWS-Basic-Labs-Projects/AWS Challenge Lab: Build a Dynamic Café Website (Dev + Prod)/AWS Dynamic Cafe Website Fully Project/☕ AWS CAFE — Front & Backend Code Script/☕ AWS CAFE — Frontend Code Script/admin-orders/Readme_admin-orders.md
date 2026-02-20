@@ -1,518 +1,28 @@
-# Charlie Cafe  - admin-orders.php
+# Charlie Cafe  - admin-orders.html
 
-### admin-orders.php
-
-> **Update Version:1.0**
-
-
-### Main changes:
-
-- Remove old hardcoded API URLs (q8rq19tfka.../dev/...)
-
-- Use CHARLIE_API.public.getOrders() and CHARLIE_API.public.markCashPaid() from api.js
-
-- Keep all PHP layout and design untouched
-
-- Add comments showing which parts are now modular JS
-
-- Retain auto-refresh and print functionality
-
-### ✅ UPDATED admin-orders.php
-
-```
-<?php
-// ===================================================
-// CHARLIE CAFÉ ☕ - ADMIN ORDERS DASHBOARD (PUBLIC)
-// ---------------------------------------------------
-// Uses new modular API (api.js) for public endpoints
-// No Cognito / Auth required
-// ===================================================
-
-// No initial cURL fetch needed anymore; we will fetch orders via JS
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Charlie Café ☕ | Orders Dashboard</title>
-
-<!-- ===================== BOOTSTRAP CSS ===================== -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-    --cafe-bg:#1a110b; --cafe-surface:#2c1b12; --cafe-card:#3a251c;
-    --cafe-cream:#f5e9d4; --cafe-text:#e8d9c0; --cafe-accent:#c97b44;
-    --cafe-accent-dark:#a15f32; --cafe-success:#6b9e78;
-    --cafe-pending:#d9a66d; --cafe-shadow:0 12px 40px rgba(0,0,0,0.55);
-}
-body {
-    font-family:'Poppins',sans-serif; color:var(--cafe-text);
-    min-height:100vh; background:var(--cafe-bg)
-    url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920')
-    center/cover fixed no-repeat;
-}
-body::before {
-    content:""; position:fixed; inset:0;
-    background:rgba(26,17,11,.68); backdrop-filter:blur(3.5px); z-index:-1;
-}
-.container { max-width:1400px; padding:3rem 1rem; }
-h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
-.dashboard-card {
-    background:rgba(58,37,28,.82); border-radius:24px; padding:2.2rem;
-    box-shadow:var(--cafe-shadow);
-}
-.badge-paid { background:var(--cafe-success); color:#fff; }
-.badge-pending { background:var(--cafe-pending); color:#1a110b; }
-.badge-card { background:#6b829e; color:#fff; }
-.btn-paid {
-    background:linear-gradient(135deg,var(--cafe-accent),var(--cafe-accent-dark));
-    border:none; border-radius:50px; color:#fff; display:flex; align-items:center; gap:6px;
-}
-.btn-paid:disabled { opacity:0.6; cursor:not-allowed; }
-.btn-print { margin-bottom: 15px; }
-.table-hover tbody tr:hover { background: rgba(255,221,170,0.1); }
-@media(max-width:768px){
-    .container { padding:2rem 0.5rem; }
-    .dashboard-card { padding:1.5rem; }
-    .btn-paid { width:100%; justify-content:center; }
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h3><i class="bi bi-speedometer2"></i> Charlie Café – Orders Dashboard</h3>
-        <span class="text-muted">Cashier Panel • Auto-refresh 30s</span>
-    </div>
-
-    <div class="dashboard-card">
-        <div class="table-responsive">
-
-            <!-- ===================== CENTRAL PRINT BUTTON ===================== -->
-            <button class="btn btn-outline-dark btn-print" onclick="openCentralPrint('#ordersTable')">
-                🖨️ Print / Export
-            </button>
-
-            <!-- ===================== ORDERS TABLE ===================== -->
-            <table class="table table-hover align-middle text-white" id="ordersTable">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Table</th>
-                        <th>Item</th>
-                        <th>Qty</th>
-                        <th>Payment</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Orders will be loaded via JS -->
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-</div>
-
-<!-- ===================== LOAD CENTRAL MODULES ===================== -->
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="api.js"></script>
-<script src="central-printing.js"></script>
-
-<script>
-// ==========================================================
-// CHARLIE CAFÉ — ADMIN ORDERS DASHBOARD (PUBLIC API)
-// ----------------------------------------------------------
-// Fetch orders every page load & auto-refresh
-// ==========================================================
-
-async function loadOrders() {
-    const tbody = document.querySelector('#ordersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Loading orders...</td></tr>';
-
-    try {
-        const orders = await CHARLIE_API.public.getOrders(); // PUBLIC endpoint from api.js
-
-        if (!orders || orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No orders found yet ☕</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = orders.map(order => {
-            const method = order.payment_method ?? 'UNKNOWN';
-            const status = order.payment_status ?? 'UNKNOWN';
-            const markPaidBtn = (method==='CASH' && status==='PENDING') 
-                ? `<button class="btn btn-paid btn-sm mark-paid-btn" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
-                    <i class="bi bi-check2-circle"></i> Mark Paid
-                  </button>`
-                : (status==='PAID' ? `<a href="print-order.php?order_id=${encodeURIComponent(order.order_id)}" class="btn btn-outline-light btn-sm">
-                    <i class="bi bi-printer-fill"></i> Print
-                  </a>` : '—');
-
-            const paymentBadge = method==='CARD' ? `<span class="badge badge-card"><i class="bi bi-credit-card-2-front-fill"></i> CARD</span>`
-                              : (method==='CASH' ? `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>` : `<span class="badge bg-dark">${method}</span>`);
-
-            const statusBadge = status==='PAID' ? `<span class="badge badge-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
-                               : `<span class="badge badge-pending"><i class="bi bi-clock-fill"></i> PENDING</span>`;
-
-            return `<tr>
-                <td>${order.order_id ?? '—'}</td>
-                <td>${order.table_number ?? 0}</td>
-                <td>${order.item ?? '—'}</td>
-                <td>${order.quantity ?? 0}</td>
-                <td>${paymentBadge}</td>
-                <td>${statusBadge}</td>
-                <td>${markPaidBtn}</td>
-            </tr>`;
-        }).join('');
-
-    } catch (err) {
-        console.error('Failed to fetch orders:', err);
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-danger">⚠️ Failed to load orders. Check API.</td></tr>';
-    }
-}
-
-// ==========================================================
-// MARK CASH ORDERS AS PAID (PUBLIC API)
-// ==========================================================
-async function markAsPaid(button) {
-    const orderId = button.getAttribute('data-order-id');
-    if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
-
-    button.disabled = true;
-    button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
-
-    try {
-        const result = await CHARLIE_API.public.markCashPaid({ order_id: orderId });
-
-        if (result.success) {
-            alert("☕ Payment marked as PAID successfully!");
-            loadOrders(); // refresh table
-        } else {
-            alert("❌ Failed: " + (result.error || result.message || "Unknown error"));
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Server error, try again.");
-    } finally {
-        button.disabled = false;
-        button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
-    }
-}
-
-// ==========================================================
-// CENTRAL PRINT FUNCTION
-// ==========================================================
-function openCentralPrint(selector) {
-    const target = document.querySelector(selector);
-    if (!target) { alert('Print section not found!'); return; }
-    const content = target.outerHTML;
-    const printWindow = window.open('/central-print.html', '_blank');
-    const timer = setInterval(() => {
-        if(printWindow && printWindow.centralPrint){
-            printWindow.centralPrint.loadContent(content);
-            clearInterval(timer);
-        }
-    }, 100);
-}
-
-// ==========================================================
-// INITIAL LOAD & AUTO REFRESH EVERY 30s
-// ==========================================================
-loadOrders();
-setInterval(loadOrders, 30000);
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-### ✅ WHAT THIS UPDATE DOES
-
-- Removes old cURL / PHP API fetch — all done via JS now
-
-- Uses CHARLIE_API.public.getOrders() for orders
-
-- Uses CHARLIE_API.public.markCashPaid() for marking cash payments
-
-- Table auto-refreshes every 30 seconds
-
-- Central print button uses central-printing.js
-
-- All design, layout, styling untouched
-
-- Fully commented for clarity
-
----
 ### admin-orders.html
 
 > **Update Version:1.0**
 
+We are going to build a full-featured Café Admin Orders Dashboard with:
 
-Perfect! Since this is now going to be protected (Admin only) with Cognito Authorization Code Flow, we need to fully convert your .php page into a .html page that:
+☕ Café-style order table layout (modern, coffee-themed colors/icons)
 
-- Requires login via central-auth.js.
+🖨 Print button for individual orders
 
-- Uses protected API endpoints for fetching orders and marking them paid.
+📄 Print page popup for single order
 
-- Keeps your existing design, table, print functionality, etc.
+🖱 Collapsible sidebar with mobile responsiveness
 
-- Fully comments everything for clarity.
+🎨 Professional layout with café icons & badges
 
-Here’s the final production-ready version:
+💻 Fully commented, production-ready HTML + JS
 
-```
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Charlie Café ☕ | Admin Orders Dashboard</title>
+Everything will still use public APIs, and Cognito protects page access (central-auth.js, CHARLIE_AUTH.protectPage(), requireAdmin()).
 
-<!-- ===================== BOOTSTRAP CSS ===================== -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+### ✅ FULL FINAL CODE: Café Admin Dashboard
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-    --cafe-bg:#1a110b; --cafe-surface:#2c1b12; --cafe-card:#3a251c;
-    --cafe-cream:#f5e9d4; --cafe-text:#e8d9c0; --cafe-accent:#c97b44;
-    --cafe-accent-dark:#a15f32; --cafe-success:#6b9e78;
-    --cafe-pending:#d9a66d; --cafe-shadow:0 12px 40px rgba(0,0,0,0.55);
-}
-body {
-    font-family:'Poppins',sans-serif; color:var(--cafe-text);
-    min-height:100vh; background:var(--cafe-bg)
-    url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920')
-    center/cover fixed no-repeat;
-}
-body::before {
-    content:""; position:fixed; inset:0;
-    background:rgba(26,17,11,.68); backdrop-filter:blur(3.5px); z-index:-1;
-}
-.container { max-width:1400px; padding:3rem 1rem; }
-h3 { font-family:'Playfair Display',serif; color:var(--cafe-cream); }
-.dashboard-card {
-    background:rgba(58,37,28,.82); border-radius:24px; padding:2.2rem;
-    box-shadow:var(--cafe-shadow);
-}
-.badge-paid { background:var(--cafe-success); color:#fff; }
-.badge-pending { background:var(--cafe-pending); color:#1a110b; }
-.badge-card { background:#6b829e; color:#fff; }
-.btn-paid {
-    background:linear-gradient(135deg,var(--cafe-accent),var(--cafe-accent-dark));
-    border:none; border-radius:50px; color:#fff; display:flex; align-items:center; gap:6px;
-}
-.btn-paid:disabled { opacity:0.6; cursor:not-allowed; }
-.btn-print { margin-bottom: 15px; }
-.table-hover tbody tr:hover { background: rgba(255,221,170,0.1); }
-@media(max-width:768px){
-    .container { padding:2rem 0.5rem; }
-    .dashboard-card { padding:1.5rem; }
-    .btn-paid { width:100%; justify-content:center; }
-}
-</style>
-</head>
-<body style="display:none"> <!-- Hide until authentication -->
-
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h3><i class="bi bi-speedometer2"></i> Charlie Café – Admin Orders Dashboard</h3>
-        <span class="text-muted">Admin Panel • Auto-refresh 30s</span>
-    </div>
-
-    <div class="dashboard-card">
-        <div class="table-responsive">
-
-            <!-- ===================== CENTRAL PRINT BUTTON ===================== -->
-            <button class="btn btn-outline-dark btn-print" onclick="openCentralPrint('#ordersTable')">
-                🖨️ Print / Export
-            </button>
-
-            <!-- ===================== ORDERS TABLE ===================== -->
-            <table class="table table-hover align-middle text-white" id="ordersTable">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Table</th>
-                        <th>Item</th>
-                        <th>Qty</th>
-                        <th>Payment</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Orders will be loaded via JS -->
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-</div>
-
-<!-- ===================== LOAD CENTRAL MODULES ===================== -->
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="central-auth.js"></script> <!-- Now included for auth -->
-<script src="api.js"></script>
-<script src="central-printing.js"></script>
-
-<script>
-// ==========================================================
-// CHARLIE CAFÉ — ADMIN ORDERS DASHBOARD (PROTECTED)
-// ----------------------------------------------------------
-// This page is Admin-only. Requires Cognito login.
-// ==========================================================
-
-// Protect page immediately
-CHARLIE_AUTH.protectPage();
-
-// Optionally, start auto-logout watcher
-CHARLIE_AUTH.startAutoLogoutWatcher();
-
-// ==========================================================
-// FETCH ORDERS (PROTECTED API)
-// ==========================================================
-async function loadOrders() {
-    const tbody = document.querySelector('#ordersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Loading orders...</td></tr>';
-
-    try {
-        // Use protected API endpoint (requires JWT)
-        const orders = await CHARLIE_API.protected.adminDashboard();
-
-        if (!orders || orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No orders found yet ☕</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = orders.map(order => {
-            const method = order.payment_method ?? 'UNKNOWN';
-            const status = order.payment_status ?? 'UNKNOWN';
-
-            // Only show "Mark Paid" button if payment is CASH and PENDING
-            const markPaidBtn =
-                (method==='CASH' && status==='PENDING') ?
-                `<button class="btn btn-paid btn-sm mark-paid-btn" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
-                    <i class="bi bi-check2-circle"></i> Mark Paid
-                 </button>` : '—';
-
-            const paymentBadge = method==='CARD'
-                ? `<span class="badge badge-card"><i class="bi bi-credit-card-2-front-fill"></i> CARD</span>`
-                : (method==='CASH' ? `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>` : `<span class="badge bg-dark">${method}</span>`);
-
-            const statusBadge = status==='PAID'
-                ? `<span class="badge badge-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
-                : `<span class="badge badge-pending"><i class="bi bi-clock-fill"></i> PENDING</span>`;
-
-            return `<tr>
-                <td>${order.order_id ?? '—'}</td>
-                <td>${order.table_number ?? 0}</td>
-                <td>${order.item ?? '—'}</td>
-                <td>${order.quantity ?? 0}</td>
-                <td>${paymentBadge}</td>
-                <td>${statusBadge}</td>
-                <td>${markPaidBtn}</td>
-            </tr>`;
-        }).join('');
-
-    } catch (err) {
-        console.error('Failed to fetch orders:', err);
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-danger">⚠️ Failed to load orders. Check API.</td></tr>';
-    }
-}
-
-// ==========================================================
-// MARK CASH ORDERS AS PAID (PROTECTED API)
-// ==========================================================
-async function markAsPaid(button) {
-    const orderId = button.getAttribute('data-order-id');
-    if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
-
-    button.disabled = true;
-    button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
-
-    try {
-        const result = await CHARLIE_API.protected.updateOrder({
-            order_id: orderId,
-            payment_status: "PAID"
-        });
-
-        if (result.success) {
-            alert("☕ Payment marked as PAID successfully!");
-            loadOrders();
-        } else {
-            alert("❌ Failed: " + (result.error || result.message || "Unknown error"));
-        }
-
-    } catch (err) {
-        console.error(err);
-        alert("Server error, try again.");
-    } finally {
-        button.disabled = false;
-        button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
-    }
-}
-
-// ==========================================================
-// CENTRAL PRINT FUNCTION
-// ==========================================================
-function openCentralPrint(selector) {
-    const target = document.querySelector(selector);
-    if (!target) { alert('Print section not found!'); return; }
-    const content = target.outerHTML;
-    const printWindow = window.open('/central-print.html', '_blank');
-    const timer = setInterval(() => {
-        if(printWindow && printWindow.centralPrint){
-            printWindow.centralPrint.loadContent(content);
-            clearInterval(timer);
-        }
-    }, 100);
-}
-
-// ==========================================================
-// INITIAL LOAD & AUTO REFRESH EVERY 30s
-// ==========================================================
-loadOrders();
-setInterval(loadOrders, 30000);
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-```
-
-### ✅ Key Changes for Protected Admin Version:
-
-- body starts as display:none → only shown after successful login.
-
-- central-auth.js is loaded and CHARLIE_AUTH.protectPage() is called.
-
-- All API calls use protected endpoints via CHARLIE_API.protected.
-
-- Removed PHP entirely — now pure HTML + JS.
-
-- Auto logout watcher is included (startAutoLogoutWatcher()).
-
-### Logout button
-
-Perfect! I’ve updated your admin-orders dashboard HTML to include a working Logout button that uses your central-auth.js logic, with fully commented code and clean, readable CSS for easier maintenance. I also kept your Cognito-protected flow intact.
-
-Here’s the fully final .html code:
+#### 🔁 Replace https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/ with your CloudFront URLs
 
 ```
 <!DOCTYPE html>
@@ -531,127 +41,182 @@ Here’s the fully final .html code:
 
 <style>
 /* =========================================================
-   CHARLIE CAFE — CSS VARIABLES (EASY TO READ)
-========================================================= */
-:root {
-    --cafe-bg: #1a110b;                /* Page background */
-    --cafe-surface: #2c1b12;           /* Card / surface */
-    --cafe-card: #3a251c;              /* Darker card tone */
-    --cafe-cream: #f5e9d4;             /* Header / text highlights */
-    --cafe-text: #e8d9c0;              /* Default text color */
-    --cafe-accent: #c97b44;            /* Primary buttons */
-    --cafe-accent-dark: #a15f32;       /* Button gradient end */
-    --cafe-success: #6b9e78;           /* Paid badge */
-    --cafe-pending: #d9a66d;           /* Pending badge */
-    --cafe-shadow: 0 12px 40px rgba(0,0,0,0.55);
-}
-
-/* =========================================================
-   BODY / CONTAINER
+   GLOBAL STYLES
 ========================================================= */
 body {
     font-family: 'Poppins', sans-serif;
-    color: var(--cafe-text);
-    min-height: 100vh;
-    background: var(--cafe-bg) url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920') center/cover fixed no-repeat;
+    background: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920') no-repeat center center fixed;
+    background-size: cover;
+    color: #f5e9d4;
+    margin: 0;
 }
+
 body::before {
     content:"";
     position: fixed; inset: 0;
-    background: rgba(26,17,11,.68);
+    background: rgba(26,17,11,.7);
     backdrop-filter: blur(3.5px);
     z-index: -1;
 }
-.container {
-    max-width: 1400px;
-    padding: 2rem 1rem;
-}
 
 /* =========================================================
-   HEADER & CARDS
+   SIDEBAR
 ========================================================= */
-h3 {
-    font-family: 'Playfair Display', serif;
-    color: var(--cafe-cream);
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    background: #2c1b12;
+    padding: 2rem 1rem;
+    transition: 0.3s;
+    overflow-y: auto;
 }
-.dashboard-card {
-    background: rgba(58,37,28,.82);
-    border-radius: 24px;
-    padding: 2rem;
-    box-shadow: var(--cafe-shadow);
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar h4 {
+    color: #f5e9d4;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
     margin-bottom: 2rem;
 }
 
-/* =========================================================
-   BADGES
-========================================================= */
-.badge-paid { background: var(--cafe-success); color: #fff; }
-.badge-pending { background: var(--cafe-pending); color: #1a110b; }
-.badge-card { background: #6b829e; color: #fff; }
-
-/* =========================================================
-   BUTTONS
-========================================================= */
-.btn-paid {
-    background: linear-gradient(135deg, var(--cafe-accent), var(--cafe-accent-dark));
-    border: none; border-radius: 50px;
-    color: #fff; display: flex; align-items: center; gap: 6px;
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #e8d9c0;
+    transition: 0.3s;
 }
-.btn-paid:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.btn-print { margin-bottom: 15px; }
-.btn-logout {
-    background: #c97b44; color: #fff; border: none;
-    padding: 6px 16px; border-radius: 50px;
-    display: flex; align-items: center; gap: 6px;
+.sidebar a i {
+    margin-right: 10px;
+    font-size: 1.2rem;
 }
-.btn-logout:hover { opacity: 0.85; cursor: pointer; }
+
+.sidebar.collapsed a span { display: none; }
+.sidebar a:hover { background: #c97b44; color: white; }
+
+/* Collapse toggle button */
+#sidebarToggle {
+    background: transparent;
+    border: none;
+    color: #f5e9d4;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
 
 /* =========================================================
-   TABLE
+   MAIN CONTENT
 ========================================================= */
-.table-hover tbody tr:hover { background: rgba(255,221,170,0.1); }
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    transition: margin-left 0.3s;
+}
+
+.sidebar.collapsed ~ .main-content {
+    margin-left: 70px;
+}
+
+.dashboard-card {
+    background: rgba(58,37,28,.85);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+}
+
+/* =========================================================
+   TABLE STYLE - Café themed
+========================================================= */
+.table thead th {
+    background: #3a251c;
+    color: #f5e9d4;
+}
+
+.table tbody tr {
+    background: rgba(58,37,28,0.6);
+    transition: 0.3s;
+}
+
+.table tbody tr:hover {
+    background: rgba(201,123,68,0.4);
+}
+
+.badge-paid { background: #6b9e78; }
+.badge-pending { background: #d9a66d; color: #1a110b; }
+.badge-card { background: #6b829e; }
+
+/* Buttons */
+.btn-paid, .btn-print {
+    border-radius: 50px;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+}
+.btn-paid { background: #c97b44; }
+.btn-print { background: #6b829e; }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 @media(max-width:768px){
-    .container { padding:2rem 0.5rem; }
-    .dashboard-card { padding:1.5rem; }
-    .btn-paid { width: 100%; justify-content: center; }
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .sidebar.collapsed { width: 100%; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .table-responsive { overflow-x: auto; }
 }
 </style>
 </head>
-<body style="display:none;"> <!-- Hidden until Cognito auth verified -->
 
-<div class="container">
+<body style="display:none;">
 
-    <!-- =========================================================
-       HEADER
-    ========================================================== -->
+<!-- =========================================================
+   SIDEBAR NAVIGATION
+========================================================= -->
+<div class="sidebar" id="sidebar">
+    <button id="sidebarToggle"><i class="bi bi-list"></i></button>
+    <h4>☕ Charlie Café</h4>
+
+    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/cafe-admindashboard.html">
+        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+    </a>
+
+    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/order-status.html">
+        <i class="bi bi-list-check"></i> <span>Order Status</span>
+    </a>
+
+    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/orderanatltics.html">
+        <i class="bi bi-bar-chart-line"></i> <span>Analytics</span>
+    </a>
+</div>
+
+<!-- =========================================================
+   MAIN CONTENT
+========================================================= -->
+<div class="main-content">
+
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h3><i class="bi bi-speedometer2"></i> Charlie Café – Orders Dashboard</h3>
-        <div class="d-flex gap-3 align-items-center">
-            <span class="text-muted">Admin Panel • Auto-refresh 30s</span>
-            <button class="btn btn-logout" onclick="CHARLIE_AUTH.logout()">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
-        </div>
+        <h3><i class="bi bi-receipt"></i> Orders Dashboard</h3>
+        <button class="btn btn-paid" onclick="CHARLIE_AUTH.logout()">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
     </div>
 
-    <!-- =========================================================
-       ORDERS CARD
-    ========================================================== -->
     <div class="dashboard-card">
         <div class="table-responsive">
-
-            <!-- PRINT BUTTON -->
-            <button class="btn btn-outline-dark btn-print" onclick="openCentralPrint('#ordersTable')">
-                🖨️ Print / Export
+            <!-- PRINT ALL ORDERS BUTTON -->
+            <button class="btn btn-print mb-3" onclick="printAllOrders()">
+                <i class="bi bi-printer-fill"></i> Print All Orders
             </button>
 
-            <!-- ORDERS TABLE -->
-            <table class="table table-hover align-middle text-white" id="ordersTable">
+            <table class="table table-hover text-white" id="ordersTable">
                 <thead>
                     <tr>
                         <th>Order ID</th>
@@ -664,133 +229,567 @@ h3 {
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Orders will load here via JS -->
+                    <!-- Orders will be dynamically loaded -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- ===================== LOAD MODULES ===================== -->
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="central-auth.js"></script> <!-- Cognito login/logout -->
-<script src="api.js"></script>
-<script src="central-printing.js"></script>
+<!-- ===================== LOAD JS FILES ===================== -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script> <!-- Cognito auth -->
+<script src="/js/api.js"></script>
 
 <script>
 // ==========================================================
-// CHARLIE CAFÉ — PROTECTED ADMIN ORDERS DASHBOARD
-// ----------------------------------------------------------
-
-// Ensure page is only visible for logged-in admins
+// PAGE PROTECTION: Only Admin users can access
+// ==========================================================
 CHARLIE_AUTH.protectPage();
 CHARLIE_AUTH.requireAdmin();
+document.body.style.display = "block";
 
 // ==========================================================
-// LOAD ORDERS
+// COLLAPSIBLE SIDEBAR TOGGLE
+// ==========================================================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+
+// ==========================================================
+// LOAD ORDERS USING PUBLIC API
 // ==========================================================
 async function loadOrders() {
     const tbody = document.querySelector('#ordersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Loading orders...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">Loading orders...</td></tr>';
 
     try {
-        // Fetch orders from protected API
-        const orders = await CHARLIE_API.protected.adminDashboard();
+        const orders = await CHARLIE_API.public.adminDashboard();
 
         if (!orders || orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">No orders found yet ☕</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">No orders found ☕</td></tr>';
             return;
         }
 
-        // Build table rows dynamically
+        tbody.innerHTML = orders.map(order => {
+
+            const method = order.payment_method ?? 'UNKNOWN';
+            const status = order.payment_status ?? 'UNKNOWN';
+
+            // MARK PAID BUTTON
+            const actionBtn = (method === 'CASH' && status === 'PENDING')
+                ? `<button class="btn btn-paid btn-sm" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
+                    <i class="bi bi-check2-circle"></i> Mark Paid
+                  </button>`
+                : `<button class="btn btn-print btn-sm" onclick="printOrder('${order.order_id}')">
+                    <i class="bi bi-printer-fill"></i> Print
+                  </button>`;
+
+            const paymentBadge = method === 'CARD'
+                ? `<span class="badge badge-card">CARD</span>`
+                : `<span class="badge bg-secondary">${method}</span>`;
+
+            const statusBadge = status === 'PAID'
+                ? `<span class="badge badge-paid">PAID</span>`
+                : `<span class="badge badge-pending">PENDING</span>`;
+
+            return `<tr>
+                <td>${order.order_id}</td>
+                <td>${order.table_number}</td>
+                <td>${order.item}</td>
+                <td>${order.quantity}</td>
+                <td>${paymentBadge}</td>
+                <td>${statusBadge}</td>
+                <td>${actionBtn}</td>
+            </tr>`;
+
+        }).join('');
+
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load orders</td></tr>';
+    }
+}
+
+// ==========================================================
+// MARK CASH ORDER AS PAID
+// ==========================================================
+async function markAsPaid(button) {
+    const orderId = button.getAttribute('data-order-id');
+    if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
+
+    button.disabled = true;
+    button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
+
+    try {
+        const result = await CHARLIE_API.public.updateOrder({ order_id: orderId });
+        if (result.success) {
+            alert("Payment marked as PAID ☕");
+            loadOrders();
+        } else {
+            alert(result.message || "Failed to update");
+        }
+    } catch (err) {
+        alert("Server error");
+        console.error(err);
+    }
+
+    button.disabled = false;
+    button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
+}
+
+// ==========================================================
+// PRINT SINGLE ORDER FUNCTION
+// ==========================================================
+function printOrder(orderId) {
+    const orderRow = Array.from(document.querySelectorAll('#ordersTable tbody tr'))
+        .find(row => row.cells[0].innerText === orderId);
+
+    if (!orderRow) return alert("Order not found!");
+
+    const printContent = `<html>
+        <head><title>Order ${orderId}</title></head>
+        <body>
+        <h2>☕ Charlie Café</h2>
+        <h3>Order #${orderId}</h3>
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Table</th><td>${orderRow.cells[1].innerText}</td>
+            </tr>
+            <tr>
+                <th>Item</th><td>${orderRow.cells[2].innerText}</td>
+            </tr>
+            <tr>
+                <th>Quantity</th><td>${orderRow.cells[3].innerText}</td>
+            </tr>
+            <tr>
+                <th>Payment</th><td>${orderRow.cells[4].innerText}</td>
+            </tr>
+            <tr>
+                <th>Status</th><td>${orderRow.cells[5].innerText}</td>
+            </tr>
+        </table>
+        </body></html>`;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// ==========================================================
+// PRINT ALL ORDERS FUNCTION
+// ==========================================================
+function printAllOrders() {
+    const tableHtml = document.querySelector('#ordersTable').outerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`<html><head><title>All Orders</title></head><body>${tableHtml}</body></html>`);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// ==========================================================
+// INITIAL LOAD + AUTO REFRESH EVERY 30s
+// ==========================================================
+loadOrders();
+setInterval(loadOrders, 30000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+### ✅ Features Added in This Version
+
+☕ Café-style table layout with coffee theme colors
+
+🖨 Individual Print button for every order
+
+🖨 “Print All Orders” button
+
+🎨 Professional Admin Template layout
+
+📱 Collapsible Sidebar & Mobile Responsive
+
+🔐 Cognito still protects page access (Admin only)
+
+✅ Uses public APIs (CHARLIE_API.public.*)
+
+🌟 Modern café-themed badges, icons, and table hover effects
+
+Perfect! ☕ Let’s design the ultimate Café Admin Orders Dashboard with everything you requested:
+
+✅ Real café icons for tables, orders, payments
+
+✅ Collapsible & expandable sidebar with submenus
+
+✅ Individual Mark as Paid functionality per order
+
+✅ Public APIs for data
+
+✅ Cognito protecting admin page access only
+
+✅ Full comments for clarity
+
+I’ll explain Mark as Paid per order first so you fully understand:
+
+### 📝 How “Mark as Paid” works per individual order
+
+Each order row in the table has a button:
+
+```
+<button class="btn btn-paid btn-sm" data-order-id="ORD-1234" onclick="markAsPaid(this)">
+    <i class="bi bi-check2-circle"></i> Mark Paid
+</button>
+```
+
+- The button has data-order-id of that specific order.
+
+- When you click it, the function:
+
+```
+async function markAsPaid(button) {
+    const orderId = button.getAttribute('data-order-id');
+    ...
+    const result = await CHARLIE_API.public.updateOrder({ order_id: orderId });
+    ...
+}
+```
+
+- Reads the order ID from that row
+
+- Calls the public API to update status
+
+- Refreshes the table
+
+So each button is tied to its own order — that’s why you can mark them individually.
+
+### ✅ FULL FINAL CODE: Café Admin Dashboard with Icons & Expandable Sidebar
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charlie Café ☕ | Admin Orders Dashboard</title>
+
+<!-- BOOTSTRAP CSS + ICONS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ================== GLOBAL STYLES ================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920') center/cover fixed;
+    background-size: cover;
+    color: #f5e9d4;
+    margin: 0;
+}
+body::before {
+    content:"";
+    position: fixed; inset: 0;
+    background: rgba(26,17,11,0.7);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+}
+
+/* ================== SIDEBAR ================== */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    background: #2c1b12;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    transition: 0.3s;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar h4 {
+    color: #f5e9d4;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #e8d9c0;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.sidebar a i { margin-right: 10px; font-size: 1.2rem; }
+.sidebar.collapsed a span { display: none; }
+
+.sidebar a:hover { background: #c97b44; color: white; }
+
+/* Expandable submenu */
+.submenu {
+    display: none;
+    flex-direction: column;
+    margin-left: 1.5rem;
+}
+.submenu a { padding: 5px 15px; font-size: 0.95rem; }
+
+#sidebarToggle {
+    background: transparent;
+    border: none;
+    color: #f5e9d4;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+/* ================== MAIN CONTENT ================== */
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    transition: margin-left 0.3s;
+}
+.sidebar.collapsed ~ .main-content {
+    margin-left: 70px;
+}
+
+.dashboard-card {
+    background: rgba(58,37,28,.85);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+}
+
+/* ================== TABLE ================== */
+.table thead th {
+    background: #3a251c;
+    color: #f5e9d4;
+}
+
+.table tbody tr {
+    background: rgba(58,37,28,0.6);
+    transition: 0.3s;
+}
+.table tbody tr:hover {
+    background: rgba(201,123,68,0.4);
+}
+
+.badge-paid { background: #6b9e78; }
+.badge-pending { background: #d9a66d; color: #1a110b; }
+.badge-card { background: #6b829e; }
+
+.btn-paid, .btn-print { border-radius: 50px; border: none; color: white; padding: 6px 12px; }
+.btn-paid { background: #c97b44; }
+.btn-print { background: #6b829e; }
+
+/* ================== RESPONSIVE ================== */
+@media(max-width:768px){
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .sidebar.collapsed { width: 100%; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .table-responsive { overflow-x: auto; }
+}
+</style>
+</head>
+
+<body style="display:none;">
+
+<!-- ================== SIDEBAR ================== -->
+<div class="sidebar" id="sidebar">
+    <button id="sidebarToggle"><i class="bi bi-list"></i></button>
+    <h4>☕ Charlie Café</h4>
+
+    <!-- Dashboard -->
+    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/cafe-admindashboard.html">
+        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+    </a>
+
+    <!-- Orders with submenu -->
+    <a onclick="toggleSubmenu('ordersSub')">
+        <i class="bi bi-list-check"></i> <span>Orders</span> <i class="bi bi-caret-down-fill ms-auto"></i>
+    </a>
+    <div class="submenu" id="ordersSub">
+        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/order-status.html"><i class="bi bi-clock-history"></i> Status</a>
+        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/orderanatltics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+    </div>
+
+    <!-- Admin Logout -->
+    <a onclick="CHARLIE_AUTH.logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
+</div>
+
+<!-- ================== MAIN CONTENT ================== -->
+<div class="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h3><i class="bi bi-receipt"></i> Orders Dashboard</h3>
+        <button class="btn btn-paid" onclick="CHARLIE_AUTH.logout()">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="table-responsive">
+
+            <!-- Print All Orders -->
+            <button class="btn btn-print mb-3" onclick="printAllOrders()">
+                <i class="bi bi-printer-fill"></i> Print All Orders
+            </button>
+
+            <!-- Orders Table -->
+            <table class="table table-hover text-white" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-upc-scan"></i> Order ID</th>
+                        <th><i class="bi bi-people-fill"></i> Table</th>
+                        <th><i class="bi bi-basket-fill"></i> Item</th>
+                        <th><i class="bi bi-stack"></i> Qty</th>
+                        <th><i class="bi bi-credit-card-2-front-fill"></i> Payment</th>
+                        <th><i class="bi bi-clock-fill"></i> Status</th>
+                        <th><i class="bi bi-tools"></i> Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Orders dynamically loaded -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ================== JS FILES ================== -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+// ================== Cognito Admin Protection ==================
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.requireAdmin();
+document.body.style.display = "block";
+
+// ================== Sidebar Collapsible ==================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+
+// ================== Expandable Submenu ==================
+function toggleSubmenu(id) {
+    const menu = document.getElementById(id);
+    menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+}
+
+// ================== Load Orders (Public API) ==================
+async function loadOrders() {
+    const tbody = document.querySelector('#ordersTable tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">Loading orders...</td></tr>';
+    try {
+        const orders = await CHARLIE_API.public.adminDashboard();
+        if (!orders || orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">No orders found ☕</td></tr>';
+            return;
+        }
         tbody.innerHTML = orders.map(order => {
             const method = order.payment_method ?? 'UNKNOWN';
             const status = order.payment_status ?? 'UNKNOWN';
 
-            const markPaidBtn = (method === 'CASH' && status === 'PENDING')
-                ? `<button class="btn btn-paid btn-sm mark-paid-btn" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
+            // Individual Mark Paid button or Print button
+            const actionBtn = (method === 'CASH' && status === 'PENDING')
+                ? `<button class="btn btn-paid btn-sm" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
                     <i class="bi bi-check2-circle"></i> Mark Paid
                   </button>`
-                : (status === 'PAID' ? `<a href="print-order.html?order_id=${encodeURIComponent(order.order_id)}" class="btn btn-outline-light btn-sm">
+                : `<button class="btn btn-print btn-sm" onclick="printOrder('${order.order_id}')">
                     <i class="bi bi-printer-fill"></i> Print
-                  </a>` : '—');
+                  </button>`;
 
             const paymentBadge = method === 'CARD'
                 ? `<span class="badge badge-card"><i class="bi bi-credit-card-2-front-fill"></i> CARD</span>`
-                : (method === 'CASH' ? `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>` : `<span class="badge bg-dark">${method}</span>`);
+                : `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>`;
 
             const statusBadge = status === 'PAID'
                 ? `<span class="badge badge-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
                 : `<span class="badge badge-pending"><i class="bi bi-clock-fill"></i> PENDING</span>`;
 
             return `<tr>
-                <td>${order.order_id ?? '—'}</td>
-                <td>${order.table_number ?? 0}</td>
-                <td>${order.item ?? '—'}</td>
-                <td>${order.quantity ?? 0}</td>
+                <td>${order.order_id}</td>
+                <td>${order.table_number}</td>
+                <td>${order.item}</td>
+                <td>${order.quantity}</td>
                 <td>${paymentBadge}</td>
                 <td>${statusBadge}</td>
-                <td>${markPaidBtn}</td>
+                <td>${actionBtn}</td>
             </tr>`;
         }).join('');
-
     } catch (err) {
-        console.error('Failed to fetch orders:', err);
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-danger">⚠️ Failed to load orders. Check API.</td></tr>';
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load orders</td></tr>';
     }
 }
 
-// ==========================================================
-// MARK CASH ORDERS AS PAID
-// ==========================================================
+// ================== Mark Individual Order Paid ==================
 async function markAsPaid(button) {
     const orderId = button.getAttribute('data-order-id');
     if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
-
     button.disabled = true;
     button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
-
     try {
-        const result = await CHARLIE_API.protected.updateOrder({ order_id: orderId });
-
+        const result = await CHARLIE_API.public.updateOrder({ order_id: orderId });
         if (result.success) {
-            alert("☕ Payment marked as PAID successfully!");
-            loadOrders(); // refresh table
-        } else {
-            alert("❌ Failed: " + (result.error || result.message || "Unknown error"));
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Server error, try again.");
-    } finally {
-        button.disabled = false;
-        button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
-    }
+            alert("Payment marked as PAID ☕");
+            loadOrders();
+        } else alert(result.message || "Update failed");
+    } catch (err) { alert("Server error"); console.error(err); }
+    button.disabled = false;
+    button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
 }
 
-// ==========================================================
-// CENTRAL PRINT FUNCTION
-// ==========================================================
-function openCentralPrint(selector) {
-    const target = document.querySelector(selector);
-    if (!target) { alert('Print section not found!'); return; }
-    const content = target.outerHTML;
-    const printWindow = window.open('/central-print.html', '_blank');
-    const timer = setInterval(() => {
-        if (printWindow && printWindow.centralPrint) {
-            printWindow.centralPrint.loadContent(content);
-            clearInterval(timer);
-        }
-    }, 100);
+// ================== Print Single Order ==================
+function printOrder(orderId) {
+    const row = Array.from(document.querySelectorAll('#ordersTable tbody tr'))
+        .find(r => r.cells[0].innerText === orderId);
+    if (!row) return alert("Order not found!");
+    const content = `<html><head><title>Order ${orderId}</title></head><body>
+        <h2>☕ Charlie Café</h2>
+        <h3>Order #${orderId}</h3>
+        <table border="1" cellpadding="10">
+            <tr><th>Table</th><td>${row.cells[1].innerText}</td></tr>
+            <tr><th>Item</th><td>${row.cells[2].innerText}</td></tr>
+            <tr><th>Qty</th><td>${row.cells[3].innerText}</td></tr>
+            <tr><th>Payment</th><td>${row.cells[4].innerText}</td></tr>
+            <tr><th>Status</th><td>${row.cells[5].innerText}</td></tr>
+        </table>
+        </body></html>`;
+    const win = window.open('', '_blank');
+    win.document.write(content);
+    win.document.close();
+    win.print();
 }
 
-// ==========================================================
-// INITIAL LOAD & AUTO REFRESH EVERY 30s
-// ==========================================================
+// ================== Print All Orders ==================
+function printAllOrders() {
+    const tableHtml = document.querySelector('#ordersTable').outerHTML;
+    const win = window.open('', '_blank');
+    win.document.write(`<html><head><title>All Orders</title></head><body>${tableHtml}</body></html>`);
+    win.document.close();
+    win.print();
+}
+
+// ================== INITIAL LOAD + AUTO REFRESH ==================
 loadOrders();
 setInterval(loadOrders, 30000);
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -798,32 +797,23 @@ setInterval(loadOrders, 30000);
 </html>
 ```
 
-### ✅ Key Changes & Notes:
+### ✅ Features in this version
 
-Logout Button:
+☕ Café-themed icons for tables, orders, payment, status, actions
 
-```
-<button class="btn btn-logout" onclick="CHARLIE_AUTH.logout()">
-    <i class="bi bi-box-arrow-right"></i> Logout
-</button>
-```
+🖱 Individual Mark as Paid button for each order
 
-- Uses your central-auth.js logout function.
+🖨 Print button for single order + all orders
 
-- Clears token & redirects to logout page.
+📊 Expandable sidebar submenus for Orders → Status / Analytics
 
-Protected Page:
+💻 Collapsible sidebar (mobile responsive)
 
-```
-CHARLIE_AUTH.protectPage();
-CHARLIE_AUTH.requireAdmin();
-```
+🔐 Cognito admin protection
 
-- Page is hidden until Cognito access token is validated.
+🧾 Clear comments explaining every section
 
-- Only Admins can see the table.
-
-- CSS is now commented, readable, and maintainable.
-
-- Admin Actions (Mark Paid / Print) work via protected API, no PHP required.
 ---
+
+
+
