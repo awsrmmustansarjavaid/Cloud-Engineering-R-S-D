@@ -18,3 +18,23 @@
 [Secure Charlie Cafe Dashboard System](./☕%20AWS%20CAFE%20—%20%20Test%20%26%20Verifications/☕CC-%202%20—%20Order_Async_Processing_Tracking_System%20.md)
 
 ---
+### ARCHITECTURE DECISION
+
+Right now you have:
+
+```
+orders.php
+   ↓
+API Gateway
+   ↓
+CafeOrderApiLambda  → SQS
+                      ↓
+                 CafeOrderWorker → RDS + DynamoDB
+```
+
+And also another Lambda inserting into RDS directly.
+
+That’s duplication.
+
+---
+
