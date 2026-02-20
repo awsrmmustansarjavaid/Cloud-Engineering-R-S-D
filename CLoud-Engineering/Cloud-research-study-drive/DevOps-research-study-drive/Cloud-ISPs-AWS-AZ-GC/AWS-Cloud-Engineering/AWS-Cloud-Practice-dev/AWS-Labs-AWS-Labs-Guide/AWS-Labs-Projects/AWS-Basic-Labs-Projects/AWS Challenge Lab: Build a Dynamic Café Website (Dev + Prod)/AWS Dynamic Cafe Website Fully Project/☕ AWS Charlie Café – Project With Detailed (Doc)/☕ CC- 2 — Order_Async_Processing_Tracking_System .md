@@ -23,27 +23,9 @@
 
 # SECTION 1️⃣ Cafe Order Processor
 
-## PHASE 1️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+## PHASE 1️⃣ — Lambda Layer (pymysql)
 
-### 1️⃣ Create Lambda Role
-
-* Name: `Lambda-Cafe-Order-Role`
-* Policies:
-
-  * AWSLambdaBasicExecutionRole
-  * Secrets Manager custom policy
-
----
-
-### 2️⃣ Create Lambda Function
-
-* Name: `CafeOrderProcessor`
-* Runtime: Python 3.12
-* Role: `Lambda-Cafe-Order-Role`
-
----
-
-### 3️⃣ Lambda Layer (pymysql)
+### 1️⃣ - PyMySQL Lambda Layer
 
 ### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)
 
@@ -158,14 +140,9 @@ pymysql-layer.zip   (few MB)
 [PyMySQL Lambda Layer via AWS CLI](./☕%20CC-%206%20—pymysql-layer.md)
 
 
-**✅ PHASE 1️⃣ STATUS**
+### 2️⃣ — S3 Bucket - Upload ZIP
 
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-
-## PHASE 2️⃣ — S3 Bucket - Upload ZIP
-
-### ### ✅ METHOD 2 — PyMySQL Lambda Layer via S3
+### ✅ METHOD 2 — PyMySQL Lambda Layer via S3
 
 ## 1️⃣ S3 Bucket - Upload ZIP to Lambda
 
@@ -232,22 +209,36 @@ upload: ./pymysql-layer.zip to s3://charlie-cafe-s3-bucket/layers/pymysql-layer.
 * Click **Upload**
 
 
-**✅ PHASE 2️⃣ STATUS**
+**✅ PHASE 1️⃣ STATUS**
 
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
+## PHASE 2️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
 
-## PHASE 3️⃣ — Lambda Layer
+### 1️⃣ Create Lambda Role
 
-### 1️⃣ Create Lambda Layer Using S3
+* Name: `Lambda-Cafe-Order-Role`
+* Policies:
 
-### 1️⃣  Lambda Console
+  * AWSLambdaBasicExecutionRole
+  * Secrets Manager custom policy
+
+
+### 2️⃣ Create Lambda Function
+
+* Name: `CafeOrderProcessor`
+* Runtime: Python 3.12
+* Role: `Lambda-Cafe-Order-Role`
+
+### 3️⃣ Create Lambda Layer Using S3
+
+#### 1️⃣  Lambda Console
 
 * AWS Console → **Lambda**
 * Click **Layers**
 * Click **Create layer**
 
-### 2️⃣  Layer Settings
+#### 2️⃣  Layer Settings
 
 | Field              | Value                                                          |
 | ------------------ | -------------------------------------------------------------- |
@@ -261,7 +252,7 @@ Click **Create**
 
 ✅ Lambda Layer created from S3
 
-### 2️⃣ Attach Layer to Lambda Function
+### 4️⃣ Attach Layer to Lambda Function
 
 ####  1️⃣ Open Lambda Function
 
@@ -279,12 +270,70 @@ Click **Create**
 
 Click **Add**
 
-**✅ PHASE 3️⃣ STATUS**
+### 5️⃣ Lambda Payload Code (INSERT INTO MariaDB)
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+Paste THIS EXACT CODE ⬇️
+
+[CafeOrderProcessor.py](..//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderProcessor/CafeOrderProcessor.py)
+
+Save Lambda
+
+Click Deploy (top right)
+---- 
+
+### 6️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
+
+### 7️⃣ Create VPC Endpoint
+
+- **AWS Console → VPC → Endpoints → Create endpoint**
+
+- **Endpoint Name:** secretsmanager-INT-EP
+
+- **Service category:** AWS services
+
+- **Service name:** com.amazonaws.us-east-1.secretsmanager
+
+- **Type:** Interface
+
+- **VPC:** Select VPC 
+
+- **Subnets:**
+
+**✔ Select the SAME private subnets used by Lambda**
+
+- **Security Group:**
+
+**Allow HTTPS (443) inbound from Lambda SG**
+
+Create endpoint ✅
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-
-## PHASE 4️⃣ — API Gateway
+## PHASE 3️⃣ — API Gateway
 
 
 ## Objective:
@@ -358,12 +407,13 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
 
 > This URL will be used in your EC2 PHP web app `curl` requests.
 
-**✅ PHASE 4️⃣ STATUS**
 
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 5️⃣ — Frontend Development Code
+## PHASE 4️⃣ — Frontend Development Code
 
 ### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
@@ -378,63 +428,7 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
 
 ## PHASE 6️⃣ — Backend Development Code
 
-### 1️⃣ Lambda Payload Code (INSERT INTO MariaDB)
 
-Paste THIS EXACT CODE ⬇️
-
-[CafeOrderProcessor.py](..//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderProcessor/CafeOrderProcessor.py)
-
-Save Lambda
-
-Click Deploy (top right)
----- 
-
-### 2️⃣ Move Lambda Into VPC
-
-- AWS Console → Lambda → Your Function
-
-- Go to Configuration
-
-- Open VPC
-
-- Click Edit
-
-- Select:
-
-    - **VPC → same as EC2**
-
-    - **Subnets → PRIVATE subnets (important)**
-
-    - **Security Group → Lambda SG**
-
-    - Save
-
-**⏳ Wait until Lambda status = Active**
-
-
-### 3️⃣ Create VPC Endpoint
-
-- **AWS Console → VPC → Endpoints → Create endpoint**
-
-- **Endpoint Name:** secretsmanager-INT-EP
-
-- **Service category:** AWS services
-
-- **Service name:** com.amazonaws.us-east-1.secretsmanager
-
-- **Type:** Interface
-
-- **VPC:** Select VPC 
-
-- **Subnets:**
-
-**✔ Select the SAME private subnets used by Lambda**
-
-- **Security Group:**
-
-**Allow HTTPS (443) inbound from Lambda SG**
-
-Create endpoint ✅
 
 **✅ PHASE 6️⃣ STATUS**
 
