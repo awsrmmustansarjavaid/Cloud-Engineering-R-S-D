@@ -932,7 +932,21 @@ You see:
 If cognito:groups missing → user not assigned to group.
 
 
+### 🏁 FINAL VERIFICATION CHECKLIST
 
+✔ User pool correct
+
+✔ Public client
+
+✔ Authorization code flow
+
+✔ Groups assigned
+
+✔ Hosted UI works
+
+✔ Token stored
+
+✔ JWT contains groups
 
 
 # 📢 SECTION 4️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅

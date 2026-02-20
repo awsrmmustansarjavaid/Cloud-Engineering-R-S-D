@@ -612,19 +612,7 @@ Test_EmployeeOrderLambda
 
 ### 🏁 FINAL VERIFICATION CHECKLIST
 
-✔ User pool correct
 
-✔ Public client
-
-✔ Authorization code flow
-
-✔ Groups assigned
-
-✔ Hosted UI works
-
-✔ Token stored
-
-✔ JWT contains groups
 
 ✔ API Gateway blocks unauthorized
 
