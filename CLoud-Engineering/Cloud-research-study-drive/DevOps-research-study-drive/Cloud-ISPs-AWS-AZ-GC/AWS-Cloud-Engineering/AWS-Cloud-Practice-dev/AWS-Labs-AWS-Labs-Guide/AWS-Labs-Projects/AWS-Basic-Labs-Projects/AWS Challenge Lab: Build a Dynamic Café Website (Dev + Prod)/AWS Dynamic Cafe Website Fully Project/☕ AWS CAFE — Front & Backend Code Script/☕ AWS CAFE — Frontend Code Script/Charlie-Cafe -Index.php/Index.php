@@ -169,7 +169,7 @@
     <div class="container">
         <h1 class="display-5 fw-bold"><i class="bi bi-mug-hot-fill"></i> Fresh Drinks & Perfect Coffee</h1>
         <p class="lead">Coffee • Tea • Fresh Fruit Juices</p>
-        <a href="orders.php" class="btn btn-order mt-3">
+        <a href="https://dgexi85ya6bx7.cloudfront.net/orders.php" class="btn btn-order mt-3">
             <i class="bi bi-cart-fill"></i> Order Now
         </a>
     </div>
