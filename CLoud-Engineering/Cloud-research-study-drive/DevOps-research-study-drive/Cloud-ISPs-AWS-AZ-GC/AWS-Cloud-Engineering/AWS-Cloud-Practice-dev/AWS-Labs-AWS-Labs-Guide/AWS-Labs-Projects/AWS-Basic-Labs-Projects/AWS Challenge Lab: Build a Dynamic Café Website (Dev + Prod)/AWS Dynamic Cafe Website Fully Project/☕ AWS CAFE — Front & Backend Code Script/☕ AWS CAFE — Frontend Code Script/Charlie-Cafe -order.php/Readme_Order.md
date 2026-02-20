@@ -527,5 +527,185 @@ This is actually closer to real café POS logic.
 
 - The redirect to payment-receipt.php happens after the order is successfully saved.
 
+### 🔎 1️⃣ What JSON Should Look Like (Correct Structure)
+
+For everything to work smoothly, your backend (CafeOrderProcessor) should return something like this when creating an order:
+
+```
+{
+  "order_id": "ORD-1708422333-123",
+  "table_number": 5,
+  "customer_name": "John",
+  "item": "Coffee",
+  "quantity": 2,
+  "total": 6,
+  "status": "PENDING",
+  "created_at": "2026-02-20T10:30:00Z"
+}
+```
+
+This structure must be consistent across:
+
+✅ order creation response
+
+✅ order-status.html (GET order by ID)
+
+✅ admin-order.html (GET all orders)
+
+### 🧾 2️⃣ What order-status.html Usually Expects
+
+Most tracking pages fetch like this:
+
+```
+GET /orders?order_id=ORD-xxxxx
+```
+
+And expect response like:
+
+```
+{
+  "order_id": "...",
+  "status": "PREPARING",
+  "table_number": 5,
+  "item": "Coffee",
+  "quantity": 2
+}
+```
+
+If your Lambda returns:
+
+```
+{
+  "message": "Order created successfully"
+}
+```
+
+❌ It will NOT work
+Because order-status.html expects real order fields.
+
+### 👨‍💼 3️⃣ What admin-order.html Usually Expects
+
+Admin page typically calls:
+
+```
+GET /orders
+```
+
+And expects:
+
+```
+[
+  {
+    "order_id": "ORD-1",
+    "table_number": 3,
+    "item": "Tea",
+    "quantity": 1,
+    "status": "READY"
+  },
+  {
+    "order_id": "ORD-2",
+    "table_number": 4,
+    "item": "Coffee",
+    "quantity": 2,
+    "status": "PENDING"
+  }
+]
+```
+
+If your Lambda returns wrapped structure like:
+
+```
+{
+  "body": "[{...}]"
+}
+```
+
+❌ Frontend must parse twice.
+Otherwise it won’t display.
+
+### 🚨 4️⃣ Most Common Mismatch Problem
+
+Your Lambda might return:
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"order_id\":\"ORD-123\"}"
+}
+```
+
+But frontend expects:
+
+```
+{
+  "order_id": "ORD-123"
+}
+```
+
+That mismatch breaks admin & status pages.
+
+### ✅ 5️⃣ Correct Lambda Response Format
+
+Inside CafeOrderProcessor return:
+
+```
+return {
+    "statusCode": 200,
+    "headers": {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+    },
+    "body": json.dumps(order_data)
+}
+```
+
+Where order_data contains full order object.
+
+### 🎯 6️⃣ FINAL ANSWER TO YOUR QUESTION
+
+If your Lambda:
+
+✔ returns full order object
+
+✔ uses consistent field names
+
+✔ returns array for admin page
+
+✔ returns single object for status page
+
+Then:
+
+| Component         | Will Work? |
+| ----------------- | ---------- |
+| orders.php        | ✅ Yes      |
+| order-status.html | ✅ Yes      |
+| admin-order.html  | ✅ Yes      |
+| SQS               | ✅ Yes      |
+| RDS               | ✅ Yes      |
+
+### 🧠 IMPORTANT: Field Name Must Match Exactly
+
+These must match everywhere:
+
+```
+order_id
+table_number
+customer_name
+item
+quantity
+total
+status
+created_at
+```
+
+Even small differences like:
+
+```
+orderId  ❌
+orderID  ❌
+order_id ✅
+```
+
+Will break frontend JS.
 ---
 
