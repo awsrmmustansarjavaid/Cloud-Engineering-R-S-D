@@ -3,7 +3,144 @@
 
 ## 🛠 SECTION 1️⃣ Cafe Order Processor
 
-## PHASE 5️⃣ — Test & Verification
+## PHASE 2️⃣ — Verification SQS/LAMBDA (Producer)
+
+#### 1️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
+
+- Click Test
+
+- Select Create new test event
+
+- Event name:
+
+```
+CafeOrderProcessor
+```
+
+Event JSON:
+
+
+```
+{
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2}"
+}
+```
+
+Click Save
+
+Click Test
+
+#### Expected Result (SUCCESS)
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"order_id\":\"ORD-20260220-1234\",\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"total\":6.0,\"status\":\"RECEIVED\",\"created_at\":\"2026-02-20 10:30:00\"}"
+}
+```
+
+#### CloudWatch Logs:
+
+```
+Order accepted
+```
+
+#### SQS:
+
+- Message appears briefly
+
+- Then disappears (worker consumes it)
+
+#### RDS:
+
+```
+SELECT * FROM orders ORDER BY id DESC;
+```
+
+#### Result:
+
+```
+id | table_number | customer_name | item  | quantity | created_at
+---------------------------------------------------------------
+12 | 1            | ConsoleTest   | Latte | 2        | 2026-01-xx
+```
+
+#### 2️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
+
+- AWS Console → SQS
+
+- Click CafeOrdersQueue
+
+- Click Send and receive messages
+
+- Click Poll for messages
+
+#### Expected Output:
+
+You should see message like:
+
+```
+{
+  "customer_name": "ConsoleTest",
+  "item": "Latte",
+  "quantity": 2
+}
+```
+
+✅ If message exists → Producer Lambda WORKS
+
+#### SQS Message Body (Manual Test)
+
+```
+{
+  "table_number": 2,
+  "customer_name": "WorkerTest",
+  "item": "Latte",
+  "quantity": 2
+}
+```
+---
+
+### 3️⃣ Frontend (orders.php)
+
+You already fixed it ✔
+Ensure payload includes:
+
+```
+{
+  "table_number": 1,
+  "customer_name": "Charlie",
+  "item": "Tea",
+  "quantity": 2
+}
+```
+
+### 4️⃣ Test with API Gateway or Lambda test
+
+#### Update test body
+
+```
+{
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1
+}
+```
+#### curl Test
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/prod/orders \
+  -H "Content-Type: application/json" \
+  -d '{"table_number":3,"customer_name":"CurlTest","item":"Tea","quantity":2}'
+```
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+## PHASE 7️⃣ — Test & Verification
 
 ### 1️⃣  FRONTEND → BACKEND VERIFICATION
 
@@ -234,150 +371,15 @@ Your system is now schema-consistent from browser → DB.
 🚀 Production-safe change
 
 
-**✅ PHASE 5️⃣ STATUS**
+**✅ PHASE 7️⃣ STATUS**
 
-> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
 ## 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
 ## 🛠 SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
 
-## PHASE 3️⃣ — Verification SQS/LAMBDA (Producer)
 
-#### 1️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
-
-- Click Test
-
-- Select Create new test event
-
-- Event name:
-
-```
-CafeOrderProcessor
-```
-
-Event JSON:
-
-
-```
-{
-  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2}"
-}
-```
-
-Click Save
-
-Click Test
-
-#### Expected Result (SUCCESS)
-
-```
-{
-  "statusCode": 200,
-  "body": "{\"order_id\":\"ORD-20260220-1234\",\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"total\":6.0,\"status\":\"RECEIVED\",\"created_at\":\"2026-02-20 10:30:00\"}"
-}
-```
-
-#### CloudWatch Logs:
-
-```
-Order accepted
-```
-
-#### SQS:
-
-- Message appears briefly
-
-- Then disappears (worker consumes it)
-
-#### RDS:
-
-```
-SELECT * FROM orders ORDER BY id DESC;
-```
-
-#### Result:
-
-```
-id | table_number | customer_name | item  | quantity | created_at
----------------------------------------------------------------
-12 | 1            | ConsoleTest   | Latte | 2        | 2026-01-xx
-```
-
-#### 2️⃣ VERIFY MESSAGE IN SQS (CRITICAL)
-
-- AWS Console → SQS
-
-- Click CafeOrdersQueue
-
-- Click Send and receive messages
-
-- Click Poll for messages
-
-#### Expected Output:
-
-You should see message like:
-
-```
-{
-  "customer_name": "ConsoleTest",
-  "item": "Latte",
-  "quantity": 2
-}
-```
-
-✅ If message exists → Producer Lambda WORKS
-
-#### SQS Message Body (Manual Test)
-
-```
-{
-  "table_number": 2,
-  "customer_name": "WorkerTest",
-  "item": "Latte",
-  "quantity": 2
-}
-```
----
-
-### 3️⃣ Frontend (orders.php)
-
-You already fixed it ✔
-Ensure payload includes:
-
-```
-{
-  "table_number": 1,
-  "customer_name": "Charlie",
-  "item": "Tea",
-  "quantity": 2
-}
-```
-
-### 4️⃣ Test with API Gateway or Lambda test
-
-#### Update test body
-
-```
-{
-  "table_number": 3,
-  "customer_name": "ApiTest",
-  "item": "Coffee",
-  "quantity": 1
-}
-```
-#### curl Test
-
-```
-curl -X POST \
-  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/prod/orders \
-  -H "Content-Type: application/json" \
-  -d '{"table_number":3,"customer_name":"CurlTest","item":"Tea","quantity":2}'
-```
-
-**✅ PHASE 3️⃣ STATUS**
-
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 
 ## 🟢 SECTION 3️⃣ COMPLETE & VERIFIED
 ---

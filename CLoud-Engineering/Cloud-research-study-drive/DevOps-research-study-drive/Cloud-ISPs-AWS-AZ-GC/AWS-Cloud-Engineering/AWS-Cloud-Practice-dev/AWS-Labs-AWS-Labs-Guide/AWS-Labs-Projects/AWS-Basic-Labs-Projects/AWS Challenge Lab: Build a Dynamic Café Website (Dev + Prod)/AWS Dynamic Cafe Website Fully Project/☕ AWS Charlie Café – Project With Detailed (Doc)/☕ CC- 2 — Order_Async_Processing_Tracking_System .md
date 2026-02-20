@@ -213,7 +213,54 @@ upload: ./pymysql-layer.zip to s3://charlie-cafe-s3-bucket/layers/pymysql-layer.
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 2️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+## PHASE 2️⃣ — SQS/LAMBDA (Producer)
+
+### 1️⃣ Create SQS Queue
+
+- **SQS → Create queue**
+
+- **Queue Type:** Standard
+
+    ⚠️ Do NOT select FIFO
+
+- **Name:** CafeOrdersQueue
+
+**Configuration:**
+
+- **Visibility timeout:** 60
+
+> **💡 Why: Worker Lambda must finish DB insert within this time**
+
+- **Message retention:** 4 days **(Leave default)**
+
+- **Maximum message size:** 256 KB **(Leave default)**
+
+- **Delivery delay:** 0 seconds **(Leave default)**
+
+- **Receive message wait time:** 0 seconds **(Leave default)**
+
+- **Dead-letter queue:** ❌ Disable for now **(we’ll add later)**
+
+- **Encryption:** Select: Disabled **(Free tier friendly)**
+
+- **Access Policy:** Leave Basic **(Do NOT change)**
+
+**✔️ Click Create queue**
+
+### ✅ Verify
+
+- Queue status should be Available
+
+- Copy Queue ARN
+
+- Copy Queue URL (IMPORTANT — save it)
+
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 3️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
 
 ### 1️⃣ Create Lambda Role
 
@@ -325,11 +372,61 @@ Click Deploy (top right)
 
 Click Save
 
-**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+#### 8️⃣ Add Environment Variable:
+
+- Configuration → Environment variables
+
+```
+SQS_QUEUE_URL = https://sqs.us-east-1.amazonaws.com/xxxxxxxx/CafeOrdersQueue
+```
+
+- Click Edit
+
+- Add:
+
+| Key           | Value                  |
+| ------------- | ---------------------- |
+| SQS_QUEUE_URL | (paste your Queue URL) |
+
+
+#### 📍 How to get Queue URL:
+
+- Open SQS
+
+- Click CafeOrdersQueue
+
+- Copy Queue URL
+
+**✔️ Click Save**
+
+**✔️ Everything else remains same.**
+
+### 🧪 LAMBDA TEST EVENT JSON
+
+Use this in Lambda Test:
+
+```
+{
+  "body": "{\"table_number\": 5, \"customer_name\": \"John\", \"item\": \"Coffee\", \"quantity\": 2}"
+}
+```
+
+#### ✅ Expected:
+
+- Order inserted in RDS
+
+- DynamoDB updated
+
+- SQS message sent
+
+- StatusCode 200
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 3️⃣ — API Gateway
+## PHASE 4️⃣ — API Gateway
 
 ### Objective:
 
@@ -641,12 +738,12 @@ The difference is:
 | API Gateway integration method | Structured & production-ready |
 
 
-**✅ PHASE 3️⃣ STATUS**
+**✅ PHASE 4️⃣ STATUS**
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 4️⃣ — Frontend Development Code
+## PHASE 5️⃣ — Frontend Development Code
 
 ### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
@@ -654,17 +751,165 @@ The difference is:
 
 **🔁 Replace with your real API Gateway URL**
 
-**✅ PHASE 4️⃣ STATUS**
-
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
----
-## PHASE 5️⃣ — Test & Verification ( Must)
-
-_ **Please refer to the Test & Verification documentation for detailed procedures.**
-
 **✅ PHASE 5️⃣ STATUS**
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 6️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
+
+### 1️⃣ Fix Security Groups (MANDATORY)
+
+**A) RDS Security Group**
+
+#### Inbound rule:
+
+| Type         | Port | Source        |
+| ------------ | ---- | ------------- |
+| MySQL/Aurora | 3306 | **Lambda-SG** |
+
+
+❌ NOT 0.0.0.0/0
+
+✅ MUST be Lambda SG
+
+**B) Lambda Security Group**
+
+#### Outbound rule (default usually OK):
+
+| Type        | Destination |
+| ----------- | ----------- |
+| All traffic | 0.0.0.0/0   |
+
+
+### 2️⃣ Create Secrets Manager Endpoint
+
+- **AWS Console → VPC → Endpoints → Create endpoint**
+
+- **Endpoint Name:** secretsmanager-INT-EP
+
+- **Service category:** AWS services
+
+- **Service name:** com.amazonaws.us-east-1.secretsmanager
+
+- **Type:** Interface
+
+- **VPC:** Select VPC 
+
+- **Subnets:**
+
+**✔ Select the SAME private subnets used by Lambda**
+
+- **Security Group:**
+
+**Allow HTTPS (443) inbound from Lambda SG**
+
+Create endpoint ✅
+
+### 3️⃣ Create SQS Interface Endpoint
+
+**VPC → Endpoints → Create endpoint**
+
+| Field          | Value                         |
+| -------------- | ----------------------------- |
+| Name           | sqs-INT-EP                    |
+| Service        | `com.amazonaws.us-east-1.sqs` |
+| Type           | Interface                     |
+| VPC            | Same VPC                      |
+| Subnets        | Same private subnets          |
+| Security group | Lambda-SG                     |
+| Private DNS    | ✅ ENABLE                      |
+
+### 4️⃣ Create CloudWatch Logs Interface Endpoint
+
+- **Name:**
+
+```
+cloudwatch-INT-EP 
+```
+
+- **Service:**
+
+```
+com.amazonaws.us-east-1.logs
+```
+
+Same settings as above
+
+Private DNS ✅
+
+### 5️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
+
+- **Name:**
+
+```
+dynamodb-GW-EP 
+```
+
+
+- **Service:**
+
+```
+com.amazonaws.us-east-1.dynamodb
+```
+
+- **Type:** Gateway
+
+- **Attach to:**
+
+  - ALL private route tables
+
+Click Create
+
+### 6️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
+
+Your secret must contain EXACT keys:
+
+```
+{
+  "host": "your-rds-endpoint",
+  "username": "cafe_user",
+  "password": "********",
+  "dbname": "cafe_db"
+}
+```
+
+❌ If even ONE key name differs → connection fails silently
+
+### 7️⃣ Add DEBUG LOGS (TEMPORARY - Optional)
+
+Update your Lambda code temporarily:
+
+```
+print("DEBUG: Lambda invoked")
+print("DEBUG: Event =", event)
+
+secret = get_db_secret()
+print("DEBUG: Secret fetched")
+
+connection = pymysql.connect(
+    host=secret["host"],
+    user=secret["username"],
+    password=secret["password"],
+    database=secret["dbname"],
+    connect_timeout=5
+)
+
+print("DEBUG: RDS connected")
+```
+
+This lets us see exactly where it stops.
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 7️⃣ — Test & Verification ( Must)
+
+_ **Please refer to the Test & Verification documentation for detailed procedures.**
+
+**✅ PHASE 7️⃣ STATUS**
+
+> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
 
 ## 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
@@ -1012,275 +1257,8 @@ Use boto3 to fetch menu/prices before processing orders.
 
 # 🟢 SECTION 2️⃣ COMPLETE & VERIFIED
 ---
-## SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
+## SECTION 3️⃣ 
 
-## PHASE 1️⃣ — SQS/LAMBDA (Producer)
-
-### 1️⃣ Create SQS Queue
-
-- **SQS → Create queue**
-
-- **Queue Type:** Standard
-
-    ⚠️ Do NOT select FIFO
-
-- **Name:** CafeOrdersQueue
-
-**Configuration:**
-
-- **Visibility timeout:** 60
-
-> **💡 Why: Worker Lambda must finish DB insert within this time**
-
-- **Message retention:** 4 days **(Leave default)**
-
-- **Maximum message size:** 256 KB **(Leave default)**
-
-- **Delivery delay:** 0 seconds **(Leave default)**
-
-- **Receive message wait time:** 0 seconds **(Leave default)**
-
-- **Dead-letter queue:** ❌ Disable for now **(we’ll add later)**
-
-- **Encryption:** Select: Disabled **(Free tier friendly)**
-
-- **Access Policy:** Leave Basic **(Do NOT change)**
-
-**✔️ Click Create queue**
-
-### ✅ Verify
-
-- Queue status should be Available
-
-- Copy Queue ARN
-
-- Copy Queue URL (IMPORTANT — save it)
-
-
-**✅ PHASE 1️⃣ STATUS**
-
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-## PHASE 2️⃣ Update CafeOrderProcessor
-> **(ORDER CafeOrderProcessor → SQS)**
-
-### 1️⃣ Update API Lambda (Producer)
-
-#### 1️⃣ Open Order API Lambda
-
-- AWS Console → Lambda
-
-- Click CafeOrderProcessor
-
-#### 2️⃣ Add Environment Variable:
-
-- Configuration → Environment variables
-
-```
-SQS_QUEUE_URL = https://sqs.us-east-1.amazonaws.com/xxxxxxxx/CafeOrdersQueue
-```
-
-- Click Edit
-
-- Add:
-
-| Key           | Value                  |
-| ------------- | ---------------------- |
-| SQS_QUEUE_URL | (paste your Queue URL) |
-
-
-#### 📍 How to get Queue URL:
-
-- Open SQS
-
-- Click CafeOrdersQueue
-
-- Copy Queue URL
-
-**✔️ Click Save**
-
-**✔️ Everything else remains same.**
-
-### 🧪 LAMBDA TEST EVENT JSON
-
-Use this in Lambda Test:
-
-```
-{
-  "body": "{\"table_number\": 5, \"customer_name\": \"John\", \"item\": \"Coffee\", \"quantity\": 2}"
-}
-```
-
-#### ✅ Expected:
-
-- Order inserted in RDS
-
-- DynamoDB updated
-
-- SQS message sent
-
-- StatusCode 200
-
-
-**✅ PHASE 2️⃣ STATUS**
-
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
-
----
-## PHASE 3️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
-
-### 1️⃣ Fix Security Groups (MANDATORY)
-
-**A) RDS Security Group**
-
-#### Inbound rule:
-
-| Type         | Port | Source        |
-| ------------ | ---- | ------------- |
-| MySQL/Aurora | 3306 | **Lambda-SG** |
-
-
-❌ NOT 0.0.0.0/0
-
-✅ MUST be Lambda SG
-
-**B) Lambda Security Group**
-
-#### Outbound rule (default usually OK):
-
-| Type        | Destination |
-| ----------- | ----------- |
-| All traffic | 0.0.0.0/0   |
-
-
-### 2️⃣ Create Secrets Manager Endpoint
-
-- **AWS Console → VPC → Endpoints → Create endpoint**
-
-- **Endpoint Name:** secretsmanager-INT-EP
-
-- **Service category:** AWS services
-
-- **Service name:** com.amazonaws.us-east-1.secretsmanager
-
-- **Type:** Interface
-
-- **VPC:** Select VPC 
-
-- **Subnets:**
-
-**✔ Select the SAME private subnets used by Lambda**
-
-- **Security Group:**
-
-**Allow HTTPS (443) inbound from Lambda SG**
-
-Create endpoint ✅
-
-### 3️⃣ Create SQS Interface Endpoint
-
-**VPC → Endpoints → Create endpoint**
-
-| Field          | Value                         |
-| -------------- | ----------------------------- |
-| Name           | sqs-INT-EP                    |
-| Service        | `com.amazonaws.us-east-1.sqs` |
-| Type           | Interface                     |
-| VPC            | Same VPC                      |
-| Subnets        | Same private subnets          |
-| Security group | Lambda-SG                     |
-| Private DNS    | ✅ ENABLE                      |
-
-### 4️⃣ Create CloudWatch Logs Interface Endpoint
-
-- **Name:**
-
-```
-cloudwatch-INT-EP 
-```
-
-- **Service:**
-
-```
-com.amazonaws.us-east-1.logs
-```
-
-Same settings as above
-
-Private DNS ✅
-
-### 5️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
-
-- **Name:**
-
-```
-dynamodb-GW-EP 
-```
-
-
-- **Service:**
-
-```
-com.amazonaws.us-east-1.dynamodb
-```
-
-- **Type:** Gateway
-
-- **Attach to:**
-
-  - ALL private route tables
-
-Click Create
-
-### 6️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
-
-Your secret must contain EXACT keys:
-
-```
-{
-  "host": "your-rds-endpoint",
-  "username": "cafe_user",
-  "password": "********",
-  "dbname": "cafe_db"
-}
-```
-
-❌ If even ONE key name differs → connection fails silently
-
-### 7️⃣ Add DEBUG LOGS (TEMPORARY - Optional)
-
-Update your Lambda code temporarily:
-
-```
-print("DEBUG: Lambda invoked")
-print("DEBUG: Event =", event)
-
-secret = get_db_secret()
-print("DEBUG: Secret fetched")
-
-connection = pymysql.connect(
-    host=secret["host"],
-    user=secret["username"],
-    password=secret["password"],
-    database=secret["dbname"],
-    connect_timeout=5
-)
-
-print("DEBUG: RDS connected")
-```
-
-This lets us see exactly where it stops.
-
-**✅ PHASE 3️⃣ STATUS**
-
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
----
-## PHASE 4️⃣ — Verification SQS/Worker LAMBDA (Consumer - Must)
-
-- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
-
-# 🟢 SECTION 3️⃣ COMPLETE & VERIFIED
----
 # SECTION 4️⃣ — ORDER STATUS DASHBOARD
 
 ## PHASE 1️⃣ — DYNAMODB METRICS TABLE (FULL)
