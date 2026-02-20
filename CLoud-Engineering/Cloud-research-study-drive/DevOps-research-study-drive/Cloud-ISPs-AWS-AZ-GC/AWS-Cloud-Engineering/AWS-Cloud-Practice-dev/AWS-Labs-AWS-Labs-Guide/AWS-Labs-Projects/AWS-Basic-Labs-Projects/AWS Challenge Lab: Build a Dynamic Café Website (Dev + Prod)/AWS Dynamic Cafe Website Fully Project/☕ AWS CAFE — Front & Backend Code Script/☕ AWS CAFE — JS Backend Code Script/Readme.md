@@ -1368,3 +1368,345 @@ Order matters.
 ✔ Maintainable long-term system
 
 ---
+## Public API 
+
+✅ All backend APIs are public
+
+✅ Cognito is used ONLY for login (UI access control)
+
+❌ No more Authorization headers
+
+❌ No more secureFetch
+
+❌ No Cognito protection on API Gateway
+
+Below are your clean, production-ready FINAL versions of:
+
+central-auth.js
+
+api.js
+
+Fully updated and simplified.
+
+✅ FINAL — central-auth.js
+
+Cognito used ONLY for login & role-based UI control
+No API protection logic
+
+```
+/* =========================================================
+   CHARLIE CAFE — CENTRAL AUTH MODULE (FINAL - PUBLIC APIs)
+   ---------------------------------------------------------
+   ✔ Cognito Login (Authorization Code Flow)
+   ✔ Secure Token Exchange
+   ✔ Role-Based UI Access Only
+   ✔ Auto Logout Watcher
+   ❌ No API protection logic (APIs are public now)
+========================================================= */
+
+window.CHARLIE_AUTH = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG;
+    const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
+
+    /* =====================================================
+       🔐 LOGIN (Authorization Code Grant Flow)
+       - Redirects user to Cognito Hosted UI
+    ===================================================== */
+    function login() {
+
+        const redirectUrl = window.location.origin + window.location.pathname;
+
+        const url =
+            `https://${CONFIG.COGNITO_DOMAIN}/login` +
+            `?response_type=code` +
+            `&client_id=${CONFIG.CLIENT_ID}` +
+            `&scope=openid+email+profile` +
+            `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+
+        window.location.href = url;
+    }
+
+    /* =====================================================
+       🚪 LOGOUT
+       - Clears token locally
+       - Redirects to Cognito logout
+    ===================================================== */
+    function logout() {
+
+        localStorage.removeItem("access_token");
+
+        const logoutRedirect = window.location.origin;
+
+        const url =
+            `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+            `?client_id=${CONFIG.CLIENT_ID}` +
+            `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
+
+        window.location.href = url;
+    }
+
+    /* =====================================================
+       🔁 HANDLE REDIRECT
+       - Exchanges authorization code for access_token
+    ===================================================== */
+    async function handleRedirect() {
+
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+
+        if (!code) return;
+
+        try {
+
+            const redirectUrl = window.location.origin + window.location.pathname;
+
+            const response = await fetch(
+                `https://${CONFIG.COGNITO_DOMAIN}/oauth2/token`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        grant_type: "authorization_code",
+                        client_id: CONFIG.CLIENT_ID,
+                        code: code,
+                        redirect_uri: redirectUrl
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Token exchange failed");
+            }
+
+            const data = await response.json();
+
+            if (data.access_token) {
+                localStorage.setItem("access_token", data.access_token);
+
+                // Clean URL (remove ?code=...)
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    window.location.pathname
+                );
+            }
+
+        } catch (error) {
+            console.error("Authentication error:", error);
+            logout();
+        }
+    }
+
+    /* =====================================================
+       🛡 PROTECT PAGE (UI Protection Only)
+       - Ensures user is logged in
+       - Does NOT protect APIs
+    ===================================================== */
+    async function protectPage() {
+
+        await handleRedirect();
+
+        const token = getToken();
+
+        if (!token || isTokenExpired(token)) {
+            login();
+            return;
+        }
+
+        // Show page after successful validation
+        document.body.style.display = "block";
+    }
+
+    /* =====================================================
+       👤 ROLE MANAGEMENT (UI LEVEL ONLY)
+    ===================================================== */
+    function getUserRoles() {
+
+        const token = getToken();
+        if (!token) return [];
+
+        const payload = parseJwt(token);
+        const groups = payload["cognito:groups"] || [];
+
+        return Array.isArray(groups)
+            ? groups.map(r => r.toLowerCase())
+            : [String(groups).toLowerCase()];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("employee");
+    }
+
+    function requireAdmin() {
+        if (!isAdmin()) {
+            alert("❌ Admin access only");
+            logout();
+            throw new Error("Admin access required");
+        }
+    }
+
+    function requireEmployee() {
+        if (!isEmployee() && !isAdmin()) {
+            alert("❌ Employee access only");
+            logout();
+            throw new Error("Employee access required");
+        }
+    }
+
+    /* =====================================================
+       🔄 AUTO LOGOUT WATCHER
+       - Logs user out when token expires
+    ===================================================== */
+    function startAutoLogoutWatcher() {
+
+        setInterval(() => {
+
+            const token = getToken();
+            if (!token) return;
+
+            if (isTokenExpired(token)) {
+                alert("🔐 Session expired");
+                logout();
+            }
+
+        }, 30000);
+    }
+
+    return {
+        login,
+        logout,
+        protectPage,
+        getUserRoles,
+        isAdmin,
+        isEmployee,
+        requireAdmin,
+        requireEmployee,
+        startAutoLogoutWatcher
+    };
+
+})();
+```
+
+### ✅ FINAL — api.js
+
+ALL APIs are now public
+No Cognito token usage
+No Authorization header
+No secureFetch
+
+```
+/* =========================================================
+   CHARLIE CAFE — API MODULE (FINAL - ALL PUBLIC)
+   ---------------------------------------------------------
+   ✔ All APIs are public
+   ✔ No Authorization headers
+   ✔ No Cognito token usage
+   ✔ Clean & production ready
+========================================================= */
+
+window.CHARLIE_API = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG;
+
+    /* =====================================================
+       🛒 ORDERS
+    ===================================================== */
+
+    function placeOrder(payload) {
+        return fetch(`${CONFIG.API_BASE}/orders`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
+
+    function updateOrder(payload) {
+        return fetch(`${CONFIG.API_BASE}/order-update`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
+
+    function cashPayment(payload) {
+        return fetch(`${CONFIG.API_BASE}/orders/cash-payment`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
+
+    function getOrderStatus(orderId) {
+        return fetch(
+            `${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`
+        ).then(res => res.json());
+    }
+
+    /* =====================================================
+       👨‍🍳 HR
+    ===================================================== */
+
+    function recordAttendance(payload) {
+        return fetch(`${CONFIG.API_BASE}/hr/attendance`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
+
+    function getAttendance(employeeId) {
+        return fetch(
+            `${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+        ).then(res => res.json());
+    }
+
+    function getAllEmployees() {
+        return fetch(`${CONFIG.API_BASE}/hr/employees`)
+            .then(res => res.json());
+    }
+
+    /* =====================================================
+       📊 ADMIN DASHBOARD
+    ===================================================== */
+
+    function adminDashboard(employeeId = "") {
+        let url = `${CONFIG.API_BASE}/admin/dashboard`;
+        if (employeeId) {
+            url += `?employee_id=${encodeURIComponent(employeeId)}`;
+        }
+
+        return fetch(url).then(res => res.json());
+    }
+
+    /* =====================================================
+       EXPORTS
+    ===================================================== */
+
+    return {
+        placeOrder,
+        updateOrder,
+        cashPayment,
+        getOrderStatus,
+        recordAttendance,
+        getAttendance,
+        getAllEmployees,
+        adminDashboard
+    };
+
+})();
+```

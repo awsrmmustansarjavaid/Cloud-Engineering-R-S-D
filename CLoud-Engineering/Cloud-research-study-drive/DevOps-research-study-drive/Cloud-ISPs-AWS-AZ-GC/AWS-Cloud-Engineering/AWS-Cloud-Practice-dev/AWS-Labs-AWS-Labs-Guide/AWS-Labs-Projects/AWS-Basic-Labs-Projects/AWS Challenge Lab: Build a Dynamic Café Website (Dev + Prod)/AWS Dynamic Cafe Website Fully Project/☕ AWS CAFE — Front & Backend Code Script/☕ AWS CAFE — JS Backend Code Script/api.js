@@ -1,114 +1,107 @@
 /* =========================================================
-   CHARLIE CAFE — API MODULE (PRODUCTION)
+   CHARLIE CAFE — API MODULE (FINAL - ALL PUBLIC)
+   ---------------------------------------------------------
+   ✔ All APIs are public
+   ✔ No Authorization headers
+   ✔ No Cognito token usage
+   ✔ Clean & production ready
 ========================================================= */
 
 window.CHARLIE_API = (() => {
 
     const CONFIG = window.CHARLIE_CONFIG;
-    const AUTH = window.CHARLIE_AUTH;
-    const { getToken, isTokenExpired } = window.CHARLIE_UTILS;
 
     /* =====================================================
-       🔓 1️⃣ PUBLIC API GATEWAY ENDPOINTS (NO COGNITO)
-       --------------------------------------------------
-       Resource Path               Method   Lambda
-       /prod/orders                POST     CafeOrderProcessor
-       /prod/orders/cash-payment   POST     CashPaymentLambda
-       /prod/order-status          GET      OrderStatusLambda
+       🛒 ORDERS
     ===================================================== */
 
-    const publicAPI = {
-
-        placeOrder(payload) {
-            return fetch(`${CONFIG.API_BASE}/orders`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(res => res.json());
-        },
-
-        cashPayment(payload) {
-            return fetch(`${CONFIG.API_BASE}/orders/cash-payment`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(res => res.json());
-        },
-
-        getOrderStatus(orderId) {
-            return fetch(`${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`)
-                .then(res => res.json());
-        }
-    };
-
-    /* =====================================================
-       🔐 2️⃣ COGNITO PROTECTED API ENDPOINTS (PROD)
-    ===================================================== */
-
-    async function secureFetch(url, options = {}) {
-
-        const token = getToken();
-
-        if (!token || isTokenExpired(token)) {
-            AUTH.logout();
-            return;
-        }
-
-        const headers = {
-            Authorization: "Bearer " + token,
-            ...(options.headers || {})
-        };
-
-        const response = await fetch(url, {
-            method: options.method || "GET",
-            ...options,
-            headers
-        });
-
-        return response.json();
+    function placeOrder(payload) {
+        return fetch(`${CONFIG.API_BASE}/orders`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
     }
 
-    const protectedAPI = {
+    function updateOrder(payload) {
+        return fetch(`${CONFIG.API_BASE}/order-update`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
 
-        updateOrder(payload) {
-            return secureFetch(`${CONFIG.API_BASE}/order-update`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-        },
+    function cashPayment(payload) {
+        return fetch(`${CONFIG.API_BASE}/orders/cash-payment`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
 
-        /* 🧑‍🍳 HR — Employee + Admin */
-        recordAttendance(payload) {
-            AUTH.requireEmployee();
-            return secureFetch(`${CONFIG.API_BASE}/hr/attendance`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-        },
+    function getOrderStatus(orderId) {
+        return fetch(
+            `${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`
+        ).then(res => res.json());
+    }
 
-        getAttendance(employeeId) {
-            AUTH.requireEmployee();
-            return secureFetch(`${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`);
-        },
+    /* =====================================================
+       👨‍🍳 HR
+    ===================================================== */
 
-        /* 👨‍💼 Admin Only */
-        getAllEmployees() {
-            AUTH.requireAdmin();
-            return secureFetch(`${CONFIG.API_BASE}/hr/employees`);
-        },
+    function recordAttendance(payload) {
+        return fetch(`${CONFIG.API_BASE}/hr/attendance`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload)
+        }).then(res => res.json());
+    }
 
-        /* 📊 Admin Dashboard */
-        adminDashboard(employeeId = "") {
-            AUTH.requireAdmin();
-            let url = `${CONFIG.API_BASE}/admin/dashboard`;
-            if (employeeId) url += `?employee_id=${employeeId}`;
-            return secureFetch(url);
+    function getAttendance(employeeId) {
+        return fetch(
+            `${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+        ).then(res => res.json());
+    }
+
+    function getAllEmployees() {
+        return fetch(`${CONFIG.API_BASE}/hr/employees`)
+            .then(res => res.json());
+    }
+
+    /* =====================================================
+       📊 ADMIN DASHBOARD
+    ===================================================== */
+
+    function adminDashboard(employeeId = "") {
+        let url = `${CONFIG.API_BASE}/admin/dashboard`;
+        if (employeeId) {
+            url += `?employee_id=${encodeURIComponent(employeeId)}`;
         }
-    };
+
+        return fetch(url).then(res => res.json());
+    }
+
+    /* =====================================================
+       EXPORTS
+    ===================================================== */
 
     return {
-        public: publicAPI,
-        protected: protectedAPI
+        placeOrder,
+        updateOrder,
+        cashPayment,
+        getOrderStatus,
+        recordAttendance,
+        getAttendance,
+        getAllEmployees,
+        adminDashboard
     };
 
 })();
