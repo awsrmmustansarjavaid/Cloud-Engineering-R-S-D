@@ -335,8 +335,7 @@ Create endpoint ✅
 ---
 ## PHASE 3️⃣ — API Gateway
 
-
-## Objective:
+### Objective:
 
 Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café web app can send orders to it.
 
