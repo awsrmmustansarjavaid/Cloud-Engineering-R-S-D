@@ -2452,3 +2452,99 @@ Add status column
 
 Add serving-orders API
 
+### 🔥 PART 2 — UPDATED orders.php (FIXED STRUCTURE)
+
+Now the most important fix.
+
+You must remove fake local simulation.
+
+Here is corrected structure:
+
+#### Replace your payWithCash() with:
+
+```
+async function payWithCash(){
+
+    const orderData = {
+        table_number: <?= $tableNumber ?>,
+        customer_name: "<?= $customerName ?>",
+        item: "<?= $item ?>",
+        quantity: <?= $quantity ?>
+    };
+
+    try {
+
+        const response = await fetch(
+            "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(orderData)
+            }
+        );
+
+        const result = await response.json();
+
+        if(response.ok){
+            alert("Order placed successfully!");
+            window.location.href = "<?= $statusUrl ?>";
+        } else {
+            alert("Order failed: " + result.error);
+        }
+
+    } catch(error){
+        console.error(error);
+        alert("Network error!");
+    }
+}
+```
+
+### Also update payWithCard()
+
+Just call same function after payment success:
+
+```
+async function payWithCard(){
+
+    alert("Stripe payment success (simulation).");
+
+    await payWithCash();
+}
+```
+
+Now:
+
+Payment triggers API
+
+API triggers Lambda
+
+Lambda inserts into RDS
+
+Admin will see order
+
+### 🎯 RESULT
+
+You now have:
+
+✔ One Lambda
+✔ No duplication
+✔ SQS still included
+✔ RDS insertion
+✔ DynamoDB metrics
+✔ Clean architecture
+✔ No redesign
+
+### 🧠 FINAL RECOMMENDATION
+
+Add this column to RDS if not exists:
+
+```
+ALTER TABLE orders
+ADD status VARCHAR(20) DEFAULT 'PENDING',
+ADD created_at DATETIME;
+```
+
+This will help your admin-order.html and serving system later.
+
