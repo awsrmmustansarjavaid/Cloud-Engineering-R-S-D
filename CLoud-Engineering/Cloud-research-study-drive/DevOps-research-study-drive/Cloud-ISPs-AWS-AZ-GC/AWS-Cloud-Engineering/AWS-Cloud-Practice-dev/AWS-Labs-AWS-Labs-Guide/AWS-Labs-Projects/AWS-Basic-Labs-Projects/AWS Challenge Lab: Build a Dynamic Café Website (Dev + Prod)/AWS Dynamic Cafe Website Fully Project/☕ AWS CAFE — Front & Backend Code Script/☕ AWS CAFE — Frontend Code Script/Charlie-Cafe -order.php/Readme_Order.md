@@ -376,3 +376,156 @@ function payWithCash(){
 </html>
 ```
 
+Yes ✅ — the orders.php code I gave you above already includes exactly this fix. Let me break it down clearly so you can be 100% sure:
+
+### 1️⃣ How the API is called now
+
+Both payWithCash() and payWithCard() send the order data to your CafeOrderProcessor API using fetch().
+
+Example from the code:
+
+```
+async function sendOrderToBackend(){
+    const API_URL = "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders";
+
+    const orderData = {
+        table_number: <?= $tableNumber ?? 0 ?>,
+        customer_name: "<?= $customerName ?? '' ?>",
+        item: "<?= $item ?? '' ?>",
+        quantity: <?= $quantity ?? 0 ?>
+    };
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await res.json();
+        if(res.ok){
+            window.location.href = "<?= $statusUrl ?? '' ?>";
+        } else {
+            alert("Error: " + result.error);
+        }
+    } catch(e){
+        alert("Network error. Please try again.");
+        console.error(e);
+    }
+}
+```
+
+- Then payWithCash() and payWithCard() just call sendOrderToBackend():
+
+```
+function payWithCard(){
+    alert("Stripe payment successful (simulation).");
+    sendOrderToBackend();
+}
+
+function payWithCash(){
+    alert("☕ Please pay at the counter.");
+    sendOrderToBackend();
+}
+```
+
+### ✅ This ensures every order hits your backend API, which then triggers:
+
+- CafeOrderProcessor Lambda
+
+- SQS (if configured inside Lambda)
+
+- RDS / DynamoDB storage
+
+So orders will be saved properly and visible in admin dashboards.
+
+### 2️⃣ Other fixes included
+
+The fake local simulation redirect is gone. Now the flow is:
+
+```
+Customer clicks Pay → JS calls API → Lambda inserts order → Redirect to payment-status.php
+```
+
+- Navbar, glass card, dark/light mode, coffee steam, Stripe simulation are all retained.
+
+- Error handling added in fetch() in case of network or API failure.
+
+### ✅ 3️⃣ Key notes before testing
+
+Make sure the API URL is correct:
+
+```
+const API_URL = "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders";
+```
+
+- Make sure CafeOrderProcessor Lambda is properly configured with:
+
+- SQS trigger (if using SQS for processing)
+
+- RDS / DynamoDB insert logic
+
+- Avoid duplication of CafeOrderApiLambda + CafeOrderWorker logic (merge inside)
+
+- Once orders.php calls the API, you can verify:
+
+- Lambda logs (CloudWatch) for order processing
+
+- RDS for saved order
+
+- Admin dashboard (admin-orders.html) for order visibility
+
+### 💡 Conclusion: The code I shared already implements the fix you outlined. You just need to deploy it and make sure CafeOrderProcessor API is live and properly integrated. After that, orders will save and show in admin like you expect.
+
+### 1️⃣ When the order actually saves to the backend
+
+#### Before fix (old code):
+Clicking “Submit” just calculated total, generated order ID, and immediately redirected to payment-status.php without sending anything to your API → nothing was saved in RDS/DynamoDB.
+
+#### After fix (updated code with fetch API call):
+Clicking “Submit Order” + selecting payment (Cash or Card) triggers the sendOrderToBackend() function.
+
+#### Sequence:
+
+- User fills form → clicks Submit Order
+
+- JS shows receipt + payment options
+
+- User clicks Pay Now (Cash) or Pay with Card
+
+- JS fetch() sends the order data to your CafeOrderProcessor API
+
+- Lambda processes the order → inserts into RDS / DynamoDB (via SQS if configured)
+
+- Only after API call succeeds, the JS redirects to payment-receipt.php or payment-status.php
+
+#### ✅ So the order is saved before the redirect.
+
+### 2️⃣ Why it’s designed this way
+
+- You want to make sure the backend has the order before showing the receipt.
+
+- If network or Lambda fails → JS will alert “Order failed”, and the user stays on the page.
+
+- This prevents lost orders that would happen if you redirected first.
+
+### 3️⃣ Optional improvement
+
+If you want, you can also save the order immediately when the user clicks “Submit Order” (before selecting payment type), then just update the payment status after cash/card is confirmed.
+
+Flow would be:
+
+```
+Submit Order → API saves order as "PENDING" → Show payment options → On payment success → Update order status → Redirect to receipt
+```
+
+This is actually closer to real café POS logic.
+
+### 💡 Summary:
+
+- With the current updated orders.php, orders are saved when the user clicks Pay (Cash or Card) — before redirect.
+
+- The redirect to payment-receipt.php happens after the order is successfully saved.
+
+---
+
