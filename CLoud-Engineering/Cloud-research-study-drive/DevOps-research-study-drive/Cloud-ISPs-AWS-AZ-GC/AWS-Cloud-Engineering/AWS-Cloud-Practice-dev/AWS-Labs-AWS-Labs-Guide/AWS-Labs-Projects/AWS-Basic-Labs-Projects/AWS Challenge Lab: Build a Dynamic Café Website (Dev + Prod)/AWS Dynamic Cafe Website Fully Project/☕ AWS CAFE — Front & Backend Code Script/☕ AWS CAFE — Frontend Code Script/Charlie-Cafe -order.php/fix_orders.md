@@ -2202,3 +2202,7 @@ Added fallback values (|| "-") to prevent undefined table cells.
 
 Kept page fully standalone (no Cognito login required).
 ---
+
+### admin-orders.html
+
+```
