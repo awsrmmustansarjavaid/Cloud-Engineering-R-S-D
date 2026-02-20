@@ -942,6 +942,8 @@ echo "=============================================================="
 
 > **Update Version:1.2**
 
+Below is your fully final, production-ready Bash script with detailed comments. I placed the ALTER TABLE statement after table creation so it safely updates existing tables.
+
 ```
 #!/bin/bash
 # =============================================================
@@ -1225,5 +1227,26 @@ echo ""
 echo "🎉 ALL TASKS COMPLETED SUCCESSFULLY ☕"
 echo "=============================================================="
 ```
+
+### ✅ What’s New in This Version
+
+ALTER TABLE orders added:
+
+```
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'PENDING',
+    ADD COLUMN IF NOT EXISTS created_at DATETIME;
+```
+
+- Ensures status column is 'PENDING' by default if missing.
+
+- Ensures created_at column exists for legacy tables.
+
+- All previous table creation, sample data, index checks, and verification remain intact.
+
+- Script is fully idempotent, safe to re-run multiple times.
+---
+
+
 
 
