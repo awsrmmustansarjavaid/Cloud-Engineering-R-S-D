@@ -325,6 +325,32 @@ Click Deploy (top right)
 
 Click Save
 
+#### 8️⃣ Lambda Environment Variables
+
+- AWS Console → Lambda → CreateOrderLambda
+
+- Go to Configuration tab
+
+- Click Environment variables
+
+- Click Edit
+
+- Add EXACT variables
+
+| Key       | Value                             |
+| --------- | --------------------------------- |
+| `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
+| `DB_USER` | `cafe_user`                           |
+| `DB_PASS` | `your-db-password`                |
+| `DB_NAME` | `cafe_db`                    |
+
+
+⚠️ NO quotes
+
+⚠️ NO spaces
+
+- Click Save
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
@@ -2042,79 +2068,11 @@ ORD-YYYYMMDD-XXXX
 ORD-20260114-8392
 ```
 
-### 🧑‍💻 STEP 2 — UPDATE CREATE ORDER LAMBDA
-
-⚠️ This does not break existing flow
-
-#### 1️⃣ Open Lambda
-
-- Function: CreateOrderLambda
-
-#### 2️⃣ Replace Code (100% COPY)
-
-[CreateOrderLambda.py](..//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CreateOrderLambda.py)
-
-#### 3️⃣ Deploy Lambda
-
-- Click Deploy
-
-#### 4️⃣ Attach Lambda Layer
-
-- same steps 
-
-#### 5️⃣ Lambda Environment Variables
-
-- AWS Console → Lambda → CreateOrderLambda
-
-- Go to Configuration tab
-
-- Click Environment variables
-
-- Click Edit
-
-- Add EXACT variables
-
-| Key       | Value                             |
-| --------- | --------------------------------- |
-| `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
-| `DB_USER` | `cafe_user`                           |
-| `DB_PASS` | `your-db-password`                |
-| `DB_NAME` | `cafe_db`                    |
-
-
-⚠️ NO quotes
-
-⚠️ NO spaces
-
-- Click Save
-
-#### 6️⃣ Move Lambda Into VPC
-
-- AWS Console → Lambda → Your Function
-
-- Go to Configuration
-
-- Open VPC
-
-- Click Edit
-
-- Select:
-
-    - **VPC → same as EC2**
-
-    - **Subnets → PRIVATE subnets (important)**
-
-    - **Security Group → Lambda SG**
-
-    - Save
-
-**⏳ Wait until Lambda status = Active**
-
-### 🧪 STEP 3 — TEST ORDER CREATION
+### 🧑‍💻 STEP 2 — TEST ORDER CREATION
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
-### 🧑‍💻 STEP 4 — CREATE WORKER (KITCHEN) LAMBDA
+### 🧑‍💻 STEP 3 — CREATE WORKER (KITCHEN) LAMBDA
 
 #### This simulates:
 
