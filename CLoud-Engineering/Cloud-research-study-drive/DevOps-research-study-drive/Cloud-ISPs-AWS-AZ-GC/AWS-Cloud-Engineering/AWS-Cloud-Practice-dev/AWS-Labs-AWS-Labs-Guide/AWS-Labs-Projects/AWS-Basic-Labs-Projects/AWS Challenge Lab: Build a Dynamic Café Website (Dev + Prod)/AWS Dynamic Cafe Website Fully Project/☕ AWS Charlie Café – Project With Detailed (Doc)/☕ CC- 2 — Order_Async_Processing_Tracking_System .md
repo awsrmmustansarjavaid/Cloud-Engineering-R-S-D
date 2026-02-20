@@ -425,7 +425,6 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-
 ## PHASE 5️⃣ — Test & Verification ( Must)
 
 _ **Please refer to the Test & Verification documentation for detailed procedures.**
