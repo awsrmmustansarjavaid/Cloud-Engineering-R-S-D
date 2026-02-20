@@ -1181,7 +1181,6 @@ This lets us see exactly where it stops.
 
 # 🟢 SECTION 3️⃣ COMPLETE & VERIFIED
 ---
-
 # SECTION 4️⃣ — ORDER STATUS DASHBOARD
 
 ## PHASE 1️⃣ — DYNAMODB METRICS TABLE (FULL)
@@ -1257,14 +1256,14 @@ Click Create item
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
-## PHASE 3️⃣ — UPDATE WORKER LAMBDA (SAFE & EXACT)
+## PHASE 3️⃣ — Update CafeOrderProcessor
 > **⚠️ This step is inside existing Worker Lambda, NOT API Lambda.**
 
 ###  1️⃣ Open Worker Lambda
 
 ### AWS Console → Lambda → CafeOrderWorker
 
-###  2️⃣ UPDATE WORKER LAMBDA (SAFE ADDITION)
+###  2️⃣ UPDATE Update CafeOrderProcessor
 
 ### 1️⃣ Add this code at the TOP
 
@@ -1276,7 +1275,7 @@ metrics_table = dynamodb.Table("CafeOrderMetrics")
 
 ⚠️ Place it AFTER cursor.execute(...) and commit()
 
-#### Inside your SQS Worker Lambda, after DB insert:
+#### Inside your SQS CafeOrderProcessor, after DB insert:
 
 ```
 metrics_table.update_item(
@@ -1355,9 +1354,9 @@ You now have:
 
 #### Below is the FINAL, READY-TO-DEPLOY Worker Lambda code with:
 
-[CafeOrderWorker.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorker.py)
+[CafeOrderProcessor.py](..//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Charlie%20Cafe%20-%20Order%20Backend%20Code/CafeOrderProcessor/CafeOrderProcessor.py)
 
-**Click Deploy**
+**⚠️ Already Updated, Sp skip this step**
 
 ✔️ RDS remains main source
 
