@@ -21,7 +21,7 @@
 
 ---
 
-# SECTION 1️⃣ Cafe Order Processor
+## SECTION 1️⃣ Cafe Order Processor
 
 ## PHASE 1️⃣ — Lambda Layer (pymysql)
 
@@ -432,9 +432,9 @@ _ **Please refer to the Test & Verification documentation for detailed procedure
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 
-# 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
+## 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
-# SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
+## SECTION 2️⃣ — AWS Cafe Menu + Cache Layer
 
 ## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
 
@@ -778,12 +778,11 @@ Use boto3 to fetch menu/prices before processing orders.
 
 # 🟢 SECTION 2️⃣ COMPLETE & VERIFIED
 ---
-# SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
+## SECTION 3️⃣ — AWS CAFE SQS (Async Order Processing)
 
 ## PHASE 1️⃣ — SQS/LAMBDA (Producer)
 
-
-## 1️⃣ Create SQS Queue
+### 1️⃣ Create SQS Queue
 
 - **SQS → Create queue**
 
@@ -828,38 +827,16 @@ Use boto3 to fetch menu/prices before processing orders.
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 2️⃣ CREATE API Lambda Function (Producer)
-> **(ORDER API → SQS)**
+## PHASE 2️⃣ Update CafeOrderProcessor
+> **(ORDER CafeOrderProcessor → SQS)**
 
-### 1️⃣ Create Lambda Function
-
-- Open Lambda Console
-
-- Click Functions
-
-- Click Create function
-
-#### 1️⃣ Basic Information:
-
-| Field         | Value                          |
-| ------------- | --------------------           |
-| Function name | `CafeOrderApiLambda`           |
-| Runtime        | Python 3.12                   |
-| Architecture   | x86_64                        |
-| Execution role | Use existing role             |
-| Role           | Same role with RDS + DynamoDB |
-
-Click Create function
-
-⏳ Wait until status shows Active
-
-### 2️⃣ Update API Lambda (Producer)
+### 1️⃣ Update API Lambda (Producer)
 
 #### 1️⃣ Open Order API Lambda
 
 - AWS Console → Lambda
 
-- Click your Order API Lambda
+- Click CafeOrderProcessor
 
 #### 2️⃣ Add Environment Variable:
 
@@ -883,18 +860,26 @@ Click Create function
 
 **✔️ Click Save**
 
-### 3️⃣ Update Lambda Code (FULL)
+### 🧪 LAMBDA TEST EVENT JSON
 
-#### 1️⃣ Replace your order insert logic with this:
+Use this in Lambda Test:
 
-#### 📣 CafeOrderApiLambda  — Production-Ready (Recommended for This Lab)
+```
+{
+  "body": "{\"table_number\": 5, \"customer_name\": \"John\", \"item\": \"Coffee\", \"quantity\": 2}"
+}
+```
 
-#### 💻 Code (Recommended for This Lab)
+#### ✅ Expected:
 
-[CafeOrderApiLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderApiLambda.py)
+- Order inserted in RDS
 
-**✔️ Click Deploy**
----
+- DynamoDB updated
+
+- SQS message sent
+
+- StatusCode 200
+
 
 **✅ PHASE 2️⃣ STATUS**
 
