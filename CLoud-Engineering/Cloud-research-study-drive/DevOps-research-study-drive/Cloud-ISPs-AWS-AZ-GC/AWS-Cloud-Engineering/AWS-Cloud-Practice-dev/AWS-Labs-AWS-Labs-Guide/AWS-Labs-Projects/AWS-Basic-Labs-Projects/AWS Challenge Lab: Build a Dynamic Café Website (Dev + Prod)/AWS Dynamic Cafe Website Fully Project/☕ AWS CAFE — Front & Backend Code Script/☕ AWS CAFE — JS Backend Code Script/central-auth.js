@@ -1,11 +1,11 @@
 /* =========================================================
-   CHARLIE CAFE — CENTRAL AUTH MODULE (FINAL - PUBLIC APIs)
+   CHARLIE CAFE — CENTRAL AUTH MODULE
    ---------------------------------------------------------
-   ✔ Cognito Login (Authorization Code Flow)
-   ✔ Secure Token Exchange
-   ✔ Role-Based UI Access Only
-   ✔ Auto Logout Watcher
-   ❌ No API protection logic (APIs are public now)
+   ✔ Cognito Hosted UI Login (No login.html needed)
+   ✔ Authorization Code Flow
+   ✔ Auto Token Exchange
+   ✔ Role-Based UI Control
+   ✔ Auto Logout on Expiry
 ========================================================= */
 
 window.CHARLIE_AUTH = (() => {
@@ -14,27 +14,24 @@ window.CHARLIE_AUTH = (() => {
     const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
 
     /* =====================================================
-       🔐 LOGIN (Authorization Code Grant Flow)
-       - Redirects user to Cognito Hosted UI
+       🔐 REDIRECT TO COGNITO HOSTED UI
     ===================================================== */
-    function login() {
+    function redirectToHostedLogin() {
 
         const redirectUrl = window.location.origin + window.location.pathname;
 
-        const url =
+        const loginUrl =
             `https://${CONFIG.COGNITO_DOMAIN}/login` +
             `?response_type=code` +
             `&client_id=${CONFIG.CLIENT_ID}` +
             `&scope=openid+email+profile` +
             `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
 
-        window.location.href = url;
+        window.location.replace(loginUrl);
     }
 
     /* =====================================================
        🚪 LOGOUT
-       - Clears token locally
-       - Redirects to Cognito logout
     ===================================================== */
     function logout() {
 
@@ -42,17 +39,16 @@ window.CHARLIE_AUTH = (() => {
 
         const logoutRedirect = window.location.origin;
 
-        const url =
+        const logoutUrl =
             `https://${CONFIG.COGNITO_DOMAIN}/logout` +
             `?client_id=${CONFIG.CLIENT_ID}` +
             `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
 
-        window.location.href = url;
+        window.location.replace(logoutUrl);
     }
 
     /* =====================================================
-       🔁 HANDLE REDIRECT
-       - Exchanges authorization code for access_token
+       🔁 HANDLE AUTHORIZATION CODE → TOKEN
     ===================================================== */
     async function handleRedirect() {
 
@@ -90,7 +86,7 @@ window.CHARLIE_AUTH = (() => {
             if (data.access_token) {
                 localStorage.setItem("access_token", data.access_token);
 
-                // Clean URL (remove ?code=...)
+                // Clean URL
                 window.history.replaceState(
                     {},
                     document.title,
@@ -98,34 +94,37 @@ window.CHARLIE_AUTH = (() => {
                 );
             }
 
-        } catch (error) {
-            console.error("Authentication error:", error);
+        } catch (err) {
+            console.error("Authentication error:", err);
             logout();
         }
     }
 
     /* =====================================================
-       🛡 PROTECT PAGE (UI Protection Only)
-       - Ensures user is logged in
-       - Does NOT protect APIs
+       🛡 PROTECT PAGE (AUTO LOGIN MODE)
+       - No login.html required
+       - Automatically redirects to Hosted UI
     ===================================================== */
     async function protectPage() {
+
+        // Hide page until auth completes
+        document.body.style.display = "none";
 
         await handleRedirect();
 
         const token = getToken();
 
         if (!token || isTokenExpired(token)) {
-            login();
+            redirectToHostedLogin();
             return;
         }
 
-        // Show page after successful validation
+        // Token valid → show page
         document.body.style.display = "block";
     }
 
     /* =====================================================
-       👤 ROLE MANAGEMENT (UI LEVEL ONLY)
+       👤 ROLE MANAGEMENT (UI ONLY)
     ===================================================== */
     function getUserRoles() {
 
@@ -150,23 +149,20 @@ window.CHARLIE_AUTH = (() => {
 
     function requireAdmin() {
         if (!isAdmin()) {
-            alert("❌ Admin access only");
+            alert("Admin access only");
             logout();
-            throw new Error("Admin access required");
         }
     }
 
     function requireEmployee() {
         if (!isEmployee() && !isAdmin()) {
-            alert("❌ Employee access only");
+            alert("Employee access only");
             logout();
-            throw new Error("Employee access required");
         }
     }
 
     /* =====================================================
        🔄 AUTO LOGOUT WATCHER
-       - Logs user out when token expires
     ===================================================== */
     function startAutoLogoutWatcher() {
 
@@ -176,7 +172,7 @@ window.CHARLIE_AUTH = (() => {
             if (!token) return;
 
             if (isTokenExpired(token)) {
-                alert("🔐 Session expired");
+                alert("Session expired");
                 logout();
             }
 
@@ -184,9 +180,8 @@ window.CHARLIE_AUTH = (() => {
     }
 
     return {
-        login,
-        logout,
         protectPage,
+        logout,
         getUserRoles,
         isAdmin,
         isEmployee,

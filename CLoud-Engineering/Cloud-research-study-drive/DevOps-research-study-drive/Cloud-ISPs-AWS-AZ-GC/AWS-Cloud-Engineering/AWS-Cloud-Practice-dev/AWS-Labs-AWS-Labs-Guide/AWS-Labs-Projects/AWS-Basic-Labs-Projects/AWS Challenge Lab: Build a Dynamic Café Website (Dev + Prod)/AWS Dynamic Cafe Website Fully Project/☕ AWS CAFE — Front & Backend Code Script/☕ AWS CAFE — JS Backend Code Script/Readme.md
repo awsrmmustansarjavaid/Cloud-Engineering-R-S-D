@@ -1594,6 +1594,312 @@ window.CHARLIE_AUTH = (() => {
 })();
 ```
 
+Basically:
+
+No custom login page
+
+No login.html
+
+Always redirect to Cognito Hosted UI if user not logged in
+
+You actually already have 90% of this implemented.
+We just need to make the behavior automatic and clean.
+
+🎯 What You Want Behavior To Be
+
+For any protected page:
+
+Page loads
+
+If no token → redirect to Cognito Hosted UI
+
+After login → redirect back to same page
+
+Exchange code → store token
+
+Show page
+
+No login.html required anywhere.
+
+### ✅ Clean Production Version With Hosted UI Auto-Login
+
+Below is your updated central-auth.js with:
+
+Automatic Hosted UI login
+
+No dependency on login.html
+
+Clean fallback handling
+
+Safe page reveal
+
+### ✅ FINAL central-auth.js (Hosted UI Only Mode)
+
+```
+/* =========================================================
+   CHARLIE CAFE — CENTRAL AUTH MODULE
+   ---------------------------------------------------------
+   ✔ Cognito Hosted UI Login (No login.html needed)
+   ✔ Authorization Code Flow
+   ✔ Auto Token Exchange
+   ✔ Role-Based UI Control
+   ✔ Auto Logout on Expiry
+========================================================= */
+
+window.CHARLIE_AUTH = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG;
+    const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
+
+    /* =====================================================
+       🔐 REDIRECT TO COGNITO HOSTED UI
+    ===================================================== */
+    function redirectToHostedLogin() {
+
+        const redirectUrl = window.location.origin + window.location.pathname;
+
+        const loginUrl =
+            `https://${CONFIG.COGNITO_DOMAIN}/login` +
+            `?response_type=code` +
+            `&client_id=${CONFIG.CLIENT_ID}` +
+            `&scope=openid+email+profile` +
+            `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+
+        window.location.replace(loginUrl);
+    }
+
+    /* =====================================================
+       🚪 LOGOUT
+    ===================================================== */
+    function logout() {
+
+        localStorage.removeItem("access_token");
+
+        const logoutRedirect = window.location.origin;
+
+        const logoutUrl =
+            `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+            `?client_id=${CONFIG.CLIENT_ID}` +
+            `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
+
+        window.location.replace(logoutUrl);
+    }
+
+    /* =====================================================
+       🔁 HANDLE AUTHORIZATION CODE → TOKEN
+    ===================================================== */
+    async function handleRedirect() {
+
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+
+        if (!code) return;
+
+        try {
+
+            const redirectUrl = window.location.origin + window.location.pathname;
+
+            const response = await fetch(
+                `https://${CONFIG.COGNITO_DOMAIN}/oauth2/token`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        grant_type: "authorization_code",
+                        client_id: CONFIG.CLIENT_ID,
+                        code: code,
+                        redirect_uri: redirectUrl
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Token exchange failed");
+            }
+
+            const data = await response.json();
+
+            if (data.access_token) {
+                localStorage.setItem("access_token", data.access_token);
+
+                // Clean URL
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    window.location.pathname
+                );
+            }
+
+        } catch (err) {
+            console.error("Authentication error:", err);
+            logout();
+        }
+    }
+
+    /* =====================================================
+       🛡 PROTECT PAGE (AUTO LOGIN MODE)
+       - No login.html required
+       - Automatically redirects to Hosted UI
+    ===================================================== */
+    async function protectPage() {
+
+        // Hide page until auth completes
+        document.body.style.display = "none";
+
+        await handleRedirect();
+
+        const token = getToken();
+
+        if (!token || isTokenExpired(token)) {
+            redirectToHostedLogin();
+            return;
+        }
+
+        // Token valid → show page
+        document.body.style.display = "block";
+    }
+
+    /* =====================================================
+       👤 ROLE MANAGEMENT (UI ONLY)
+    ===================================================== */
+    function getUserRoles() {
+
+        const token = getToken();
+        if (!token) return [];
+
+        const payload = parseJwt(token);
+        const groups = payload["cognito:groups"] || [];
+
+        return Array.isArray(groups)
+            ? groups.map(r => r.toLowerCase())
+            : [String(groups).toLowerCase()];
+    }
+
+    function isAdmin() {
+        return getUserRoles().includes("admin");
+    }
+
+    function isEmployee() {
+        return getUserRoles().includes("employee");
+    }
+
+    function requireAdmin() {
+        if (!isAdmin()) {
+            alert("Admin access only");
+            logout();
+        }
+    }
+
+    function requireEmployee() {
+        if (!isEmployee() && !isAdmin()) {
+            alert("Employee access only");
+            logout();
+        }
+    }
+
+    /* =====================================================
+       🔄 AUTO LOGOUT WATCHER
+    ===================================================== */
+    function startAutoLogoutWatcher() {
+
+        setInterval(() => {
+
+            const token = getToken();
+            if (!token) return;
+
+            if (isTokenExpired(token)) {
+                alert("Session expired");
+                logout();
+            }
+
+        }, 30000);
+    }
+
+    return {
+        protectPage,
+        logout,
+        getUserRoles,
+        isAdmin,
+        isEmployee,
+        requireAdmin,
+        requireEmployee,
+        startAutoLogoutWatcher
+    };
+
+})();
+```
+### 🚀 How To Use It In Any Page
+
+At top of your HTML:
+
+```
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    CHARLIE_AUTH.protectPage();
+    CHARLIE_AUTH.startAutoLogoutWatcher();
+});
+</script>
+```
+
+That’s it.
+
+No login.html needed anywhere.
+
+🔥 What Happens Now
+
+If user visits:
+
+```
+/admin.html
+```
+
+Flow:
+
+Page loads
+
+protectPage() runs
+
+No token → auto redirect to Cognito Hosted UI
+
+User logs in
+
+Cognito redirects back to /admin.html?code=...
+
+Token exchanged
+
+Page displays
+
+Fully automatic.
+
+🧠 Optional Improvement (Recommended)
+
+If you want:
+
+Public pages (like index.html) to not require login
+
+But admin.html requires login
+
+You can do:
+
+```
+if (window.location.pathname.includes("admin")) {
+    CHARLIE_AUTH.protectPage();
+}
+```
+
+### 🎯 Final Result
+
+You now have:
+
+✔ No login.html
+✔ Fully automatic Hosted UI login
+✔ Clean OAuth2 flow
+✔ UI role enforcement
+✔ Public APIs
+✔ No mismatch with config
+---
 ### ✅ FINAL — api.js
 
 ✅ Only one stage → prod
