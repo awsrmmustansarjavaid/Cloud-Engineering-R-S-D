@@ -396,14 +396,27 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
 
 > This URL will be used in your EC2 PHP web app `curl` requests.
 
-### 2nd Method - API Gateway Trigger Method
+### 2nd Method - ADD API GATEWAY TRIGGER Method
+
+#### 1️⃣ ADD API GATEWAY TRIGGER
+
 
 When you go to:
 
-- Lambda → Add Trigger → API Gateway
+- CafeOrderProcessor Lambda → Add Trigger → API Gateway
 
-AWS automatically:
+- Choose: Create an API
 
+| Setting  | Value              |
+| -------- | ------------------ |
+| API Type | REST API           |
+| Security | Open (for testing) |
+
+- Click Add
+
+##### ➡️ AWS automatically:
+
+```
 - Creates an API
 
 - Creates a resource
@@ -417,6 +430,93 @@ AWS automatically:
 - This is the Lambda-centric way.
 
 You start from Lambda and let AWS build the API for you.
+```
+
+#### 2️⃣ Get Your Endpoint
+
+- Go to API Gateway → Open your new API
+
+- Click: Stages → Prod
+
+#### ✅ You will see:
+
+```
+Invoke URL:
+https://abc123.execute-api.us-east-1.amazonaws.com/Prod
+```
+
+Your final endpoint will be:
+
+```
+https://abc123.execute-api.us-east-1.amazonaws.com/Prod
+```
+
+If resource path is /orders:
+
+```
+https://abc123.execute-api.us-east-1.amazonaws.com/Prod/orders
+```
+
+#### 3️⃣ — ENABLE CORS
+
+- Inside API Gateway:
+
+- Click Resources
+
+- Select /orders
+
+- Click Actions
+
+- Choose: Enable CORS
+
+- Confirm
+
+- Deploy API again
+
+This prevents browser blocking.
+
+#### 4️⃣ — Deploy API
+
+- After any change:
+
+- Click Actions
+
+- Click Deploy API
+
+- Choose: Prod
+
+- Deploy
+
+Without deploy → it will NOT work.
+
+#### 5️⃣ — TEST WITH CURL (Important)
+
+Test outside PHP first.
+
+- Open terminal:
+
+```
+curl -X POST https://abc123.execute-api.us-east-1.amazonaws.com/Prod/orders \
+-H "Content-Type: application/json" \
+-d '{"table_number":5,"customer_name":"John","item":"Coffee","quantity":2}'
+```
+
+If correct, you get:
+
+```
+{
+  "message": "Order created successfully",
+  "table_number": 5
+}
+```
+
+#### Then check:
+
+- RDS → new row
+
+- DynamoDB → updated
+
+- SQS → message sent
 
 ### 🔹 2️⃣ “Lambda integrated inside API Gateway”
 
