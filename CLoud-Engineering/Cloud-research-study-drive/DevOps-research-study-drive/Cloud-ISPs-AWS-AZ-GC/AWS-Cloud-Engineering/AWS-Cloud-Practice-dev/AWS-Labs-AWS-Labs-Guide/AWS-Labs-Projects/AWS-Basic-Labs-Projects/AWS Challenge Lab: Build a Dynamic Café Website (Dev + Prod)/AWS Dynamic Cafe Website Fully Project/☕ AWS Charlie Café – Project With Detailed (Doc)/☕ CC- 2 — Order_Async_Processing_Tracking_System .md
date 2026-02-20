@@ -2071,7 +2071,7 @@ ORD-20260114-8392
 
 #### 3️⃣ Lambda Environment Variables
 
-- AWS Console → Lambda → CreateOrderLambda
+- AWS Console → Lambda → CafeOrderWorkerLambda
 
 - Go to Configuration tab
 
