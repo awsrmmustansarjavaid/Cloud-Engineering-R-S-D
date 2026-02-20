@@ -6,7 +6,7 @@
 // ✔ Premium UI: glass card, background image
 // ✔ Dark/Light Mode
 // ✔ Animated coffee steam
-// ✔ Stripe + Cash payment simulation
+// ✔ Stripe + Cash payment integration (API call)
 // ==========================================================
 
 $orderSuccess = false;
@@ -17,10 +17,10 @@ $errorMessage = "";
 // ==========================================================
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // 1️⃣ Generate Unique Order ID
+    // 1️⃣ Generate Temporary Order ID (for UI tracking)
     $orderId = "ORD-" . time() . "-" . rand(100,999);
 
-    // 2️⃣ Local Price List
+    // 2️⃣ Local Price List (for receipt)
     $prices = [
         "Coffee"      => 3,
         "Tea"         => 2,
@@ -35,22 +35,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $item         = $_POST["item"];
     $quantity     = (int)$_POST["quantity"];
 
-    // 4️⃣ Calculate Total
-    $total = $prices[$item] * $quantity;
+    if ($tableNumber <= 0 || $quantity <= 0) {
+        $errorMessage = "Invalid table number or quantity.";
+    } else {
+        $total = $prices[$item] * $quantity;
+        $orderSuccess = true;
 
-    // 5️⃣ Prepare API Payload (for future JS API call)
-    $payload = [
-        "order_id"      => $orderId,
-        "table_number"  => $tableNumber,
-        "customer_name" => $customerName,
-        "item"          => $item,
-        "quantity"      => $quantity
-    ];
-
-    // 6️⃣ Redirect URL after payment
-    $statusUrl = "payment-status.php?order_id=$orderId";
-
-    $orderSuccess = true;
+        // 4️⃣ Prepare Redirect URL after payment
+        $statusUrl = "payment-status.php?order_id=$orderId";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -60,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <title>Charlie Cafe ☕ | Place Order</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Bootstrap + Icons -->
+<!-- ===================== BOOTSTRAP + ICONS ===================== -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -329,14 +322,43 @@ card.mount("#card-element");
 // ==========================================================
 // PAYMENT FUNCTIONS
 // ==========================================================
-function payWithCard(){
-    alert("Stripe payment successful (simulation).");
-    window.location.href = "<?= $statusUrl ?? '' ?>";
+async function sendOrderToBackend(){
+    const API_URL = "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders";
+
+    const orderData = {
+        table_number: <?= $tableNumber ?? 0 ?>,
+        customer_name: "<?= $customerName ?? '' ?>",
+        item: "<?= $item ?? '' ?>",
+        quantity: <?= $quantity ?? 0 ?>
+    };
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await res.json();
+        if(res.ok){
+            window.location.href = "<?= $statusUrl ?? '' ?>";
+        } else {
+            alert("Error: " + result.error);
+        }
+    } catch(e){
+        alert("Network error. Please try again.");
+        console.error(e);
+    }
 }
 
-async function payWithCash(){
+function payWithCard(){
+    alert("Stripe payment successful (simulation).");
+    sendOrderToBackend();
+}
+
+function payWithCash(){
     alert("☕ Please pay at the counter.");
-    window.location.href = "<?= $statusUrl ?? '' ?>";
+    sendOrderToBackend();
 }
 </script>
 
