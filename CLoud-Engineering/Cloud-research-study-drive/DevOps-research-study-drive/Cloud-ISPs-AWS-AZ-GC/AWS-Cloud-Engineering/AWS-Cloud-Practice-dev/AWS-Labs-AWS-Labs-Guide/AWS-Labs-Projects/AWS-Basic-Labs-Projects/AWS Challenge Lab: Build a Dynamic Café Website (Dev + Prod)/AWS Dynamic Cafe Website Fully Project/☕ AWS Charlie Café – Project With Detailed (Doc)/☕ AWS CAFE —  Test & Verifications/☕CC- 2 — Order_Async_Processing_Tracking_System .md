@@ -31,7 +31,7 @@
 
 ```
 {
-  "body": "{\"table_number\": 5, \"customer_name\": \"John\", \"item\": \"Coffee\", \"quantity\": 2}"
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2}"
 }
 ```
 
@@ -44,6 +44,13 @@ DynamoDB updated
 SQS message sent
 
 StatusCode 200
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"order_id\":\"ORD-20260220-1234\",\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"total\":6.0,\"status\":\"RECEIVED\",\"created_at\":\"2026-02-20 10:30:00\"}"
+}
+```
 
 ### Method 1️⃣ Cafe Order API + RDS Tests
 
