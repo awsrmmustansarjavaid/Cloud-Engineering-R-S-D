@@ -2688,17 +2688,15 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ## 📢 ☕ Charlie CAFE - Advance System Development & Deployment 
 
-1️⃣ [AWS ☕ Charlie Cafe — Secure Charlie Cafe Dashboard System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+1️⃣ [☕ AWS CAFE — Order_Async_Processing_Tracking_System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—%20Order_Async_Processing_Tracking_System%20.md)
 
-2️⃣ [☕ AWS CAFE — Order_Async_Processing_Tracking_System ](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%202%20—%20Order_Async_Processing_Tracking_System%20.md)
+2️⃣ [☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
 
-3️⃣ [☕ CAFE LAB – ADVANCED SALES ANALYTICS & REPORTING SYSTEM](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%203%20—SALES%20ANALYTICS%20%26%20REPORTING%20SYSTEM.md)
+3️⃣ [☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%204%20—Secure%20HR%20%26%20Attendance%20System.md)
 
-4️⃣ [☕ AWS Charlie Café – Secure HR & Attendance & Employee Management System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%204%20—Secure%20HR%20%26%20Attendance%20System.md)
+4️⃣ [☕ AWS Charlie Café – Charile Cafe Printing System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%205%20—%20Charile%20Cafe%20Printing%20System.md)
 
-5️⃣ [☕ AWS Charlie Café – Charile Cafe Printing System](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%205%20—%20Charile%20Cafe%20Printing%20System.md)
-
-6️⃣ [☕ AWS Charlie Café – Prod & DevOps](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%205%20—%20Prod%20%26%20DevOps.md)
+5️⃣ [☕ AWS Charlie Café – Prod & DevOps](.//☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20CC-%205%20—%20Prod%20%26%20DevOps.md)
 
 ---
 
