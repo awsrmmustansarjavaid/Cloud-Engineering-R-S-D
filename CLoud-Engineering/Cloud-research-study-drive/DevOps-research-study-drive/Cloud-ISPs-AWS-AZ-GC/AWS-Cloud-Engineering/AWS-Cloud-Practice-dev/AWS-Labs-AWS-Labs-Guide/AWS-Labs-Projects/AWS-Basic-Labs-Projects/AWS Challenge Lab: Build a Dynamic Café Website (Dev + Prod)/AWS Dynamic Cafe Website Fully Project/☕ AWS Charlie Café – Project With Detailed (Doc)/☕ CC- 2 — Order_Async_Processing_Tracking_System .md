@@ -842,6 +842,10 @@ Use boto3 to fetch menu/prices before processing orders.
 
 - Configuration → Environment variables
 
+```
+SQS_QUEUE_URL = https://sqs.us-east-1.amazonaws.com/xxxxxxxx/CafeOrdersQueue
+```
+
 - Click Edit
 
 - Add:
@@ -849,6 +853,8 @@ Use boto3 to fetch menu/prices before processing orders.
 | Key           | Value                  |
 | ------------- | ---------------------- |
 | SQS_QUEUE_URL | (paste your Queue URL) |
+
+
 
 #### 📍 How to get Queue URL:
 
@@ -859,6 +865,8 @@ Use boto3 to fetch menu/prices before processing orders.
 - Copy Queue URL
 
 **✔️ Click Save**
+
+**✔️ Everything else remains same.**
 
 ### 🧪 LAMBDA TEST EVENT JSON
 
