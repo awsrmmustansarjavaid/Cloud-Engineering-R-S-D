@@ -2203,6 +2203,252 @@ Added fallback values (|| "-") to prevent undefined table cells.
 Kept page fully standalone (no Cognito login required).
 ---
 
-### admin-orders.html
+# Charlie Cafe - Orders.php
+
+
+### 🎯 3️⃣ EXACT FIX (No redesign, small modification)
+
+Inside orders.php, after form submission,
+you must call your API.
+
+Replace your PHP-only logic with JS fetch call.
+
+Add inside payWithCash() before redirect:
 
 ```
+async function payWithCash() {
+
+    const orderData = {
+        table_number: <?= $tableNumber ?>,
+        customer_name: "<?= $customerName ?>",
+        item: "<?= $item ?>",
+        quantity: <?= $quantity ?>
+    };
+
+    try {
+        const response = await fetch(
+            "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(orderData)
+            }
+        );
+
+        const result = await response.json();
+        console.log(result);
+
+        alert("Order submitted successfully!");
+        window.location.href = "<?= $statusUrl ?>";
+
+    } catch (error) {
+        alert("Order failed!");
+        console.error(error);
+    }
+}
+```
+
+Now flow becomes:
+
+```
+orders.php
+   ↓
+API Gateway
+   ↓
+CafeOrderApiLambda
+   ↓
+SQS
+   ↓
+Worker
+   ↓
+RDS + DynamoDB
+```
+
+r admin page will now see orders in RDS.
+
+### ⚠ 4️⃣ ANOTHER BIG PROBLEM
+
+Your Worker writes into:
+
+```
+orders table (RDS)
+DynamoDB table: CafeMenu
+```
+
+But your DynamoDB table is called:
+
+```
+CafeMenu
+```
+
+⚠ That sounds like a MENU table, not an ORDER table.
+
+You are using:
+
+```
+DynamoDB_TABLE = "CafeMenu"
+```
+
+That means:
+You are mixing:
+
+Menu Items
+
+Order counts
+
+Metrics
+
+This is dangerous design.
+
+But since you don't want redesign,
+we keep it for now.
+
+### 🧠 5️⃣ WHY admin-order.html MAY STILL SHOW NOTHING
+
+Your admin-order.html probably:
+
+Fetches from DynamoDB
+
+OR fetches from a GET API
+
+OR fetches from wrong table
+
+Since Worker inserts into RDS orders table,
+your admin page must read from RDS.
+
+If it reads from DynamoDB → mismatch.
+
+When you share admin-order.html,
+I will confirm this.
+
+### ➕ 6️⃣ NEW FEATURE: "Current Serving Orders" TAB
+
+You want:
+
+Customer sees currently serving table numbers.
+
+Here is correct way:
+
+Step 1: Add column in RDS
+
+Add status column:
+
+```
+ALTER TABLE orders ADD status VARCHAR(20) DEFAULT 'PENDING';
+```
+
+Possible statuses:
+
+PENDING
+
+PAID
+
+PREPARING
+
+SERVING
+
+COMPLETED
+
+Step 2: Admin updates status
+
+In admin-order.html,
+when admin marks as paid:
+
+```
+UPDATE orders SET status='PAID'
+```
+
+When employee starts:
+
+```
+UPDATE orders SET status='PREPARING'
+```
+
+When serving:
+
+```
+UPDATE orders SET status='SERVING'
+```
+
+Step 3: Create new API
+
+Create:
+
+```
+GET /serving-orders
+```
+
+Lambda:
+
+```
+SELECT table_number 
+FROM orders 
+WHERE status='SERVING'
+ORDER BY id DESC
+```
+
+Return JSON list.
+
+Step 4: Add New Tab in orders.php
+
+Add navbar item:
+
+```
+<li class="nav-item">
+    <a class="nav-link" href="#" onclick="loadServingOrders()">🔔 Now Serving</a>
+</li>
+```
+
+Add JS:
+
+```
+async function loadServingOrders() {
+
+    const response = await fetch(
+        "https://your-api/serving-orders"
+    );
+
+    const data = await response.json();
+
+    let html = "<h4>Currently Serving</h4><ul>";
+    data.forEach(order => {
+        html += `<li>Table ${order.table_number}</li>`;
+    });
+    html += "</ul>";
+
+    document.querySelector(".order-card").innerHTML += html;
+}
+```
+
+erving numbers.
+
+### 🔎 SUMMARY OF YOUR PROBLEM
+
+Your system is NOT broken.
+
+Your backend is correct.
+
+Your issue is:
+
+❌ orders.php never calls your API.
+
+That’s it.
+
+No big redesign needed.
+
+### ✅ WHAT YOU SHOULD DO NEXT
+
+Remove CafeOrderProcessor (avoid duplicate logic)
+
+Use CafeOrderApiLambda only
+
+Connect orders.php to API
+
+Confirm admin-order.html reads from RDS
+
+Add status column
+
+Add serving-orders API
+
