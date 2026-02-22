@@ -1812,7 +1812,40 @@ AWS Console → CloudFront → Create Distribution
 | Origin request policy  | AllViewer              |
 
 
-⚠️ Cognito tokens must NOT be cached
+**⚠️ Cognito tokens must NOT be cached**
+
+### 🚨 GET, HEAD, OPTIONS is NOT enough
+
+You MUST change it to:
+
+```
+GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+```
+
+**⚠️ (or at minimum include POST)**
+
+### ✅ Correct Setting for Your Case
+
+- Go to: CloudFront → Behaviors → Default → Edit
+
+- Change:
+
+| Setting                | Correct Value                                    |
+| ---------------------- | ------------------------------------------------ |
+| Viewer protocol policy | Redirect HTTP to HTTPS                           |
+| Allowed HTTP methods   | **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE** |
+| Cache policy           | CachingDisabled                                  |
+| Origin request policy  | AllViewer                                        |
+
+**👉 This ensures:**
+
+- POST requests pass through
+
+- Authorization headers pass
+
+- Cognito tokens are not cached
+
+- No 403 / 405 errors
 
 #### This ensures:
 
