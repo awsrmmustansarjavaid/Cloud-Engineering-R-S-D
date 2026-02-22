@@ -768,6 +768,12 @@ You now have:
 #### Create test event:
 > **Lambda name: CafeOrderStatusLambda**
 
+#### Simple Test 
+
+```
+{}
+```
+#### Test with Order ID
 
 ```
 {
