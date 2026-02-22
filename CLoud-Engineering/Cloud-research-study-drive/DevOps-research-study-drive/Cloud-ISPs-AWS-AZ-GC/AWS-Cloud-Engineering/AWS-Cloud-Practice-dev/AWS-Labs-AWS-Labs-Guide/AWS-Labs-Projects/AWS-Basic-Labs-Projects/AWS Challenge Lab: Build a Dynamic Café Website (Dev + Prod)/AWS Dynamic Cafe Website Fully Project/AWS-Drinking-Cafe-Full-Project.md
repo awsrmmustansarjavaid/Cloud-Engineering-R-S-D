@@ -2670,6 +2670,12 @@ https://charlie-cafe.auth.us-east-1.amazoncognito.com/login
 
 - 👉 Press Enter
 
+#### 🌐 Cognito Access Auth Code
+
+```
+https://yourdomain.com/login.html?code=ebec6a0a-54e8-49c0-a093-d68150c182b1
+```
+
 #### STEP 3️⃣ Login Screen Appears
 
 - Enter username & password
