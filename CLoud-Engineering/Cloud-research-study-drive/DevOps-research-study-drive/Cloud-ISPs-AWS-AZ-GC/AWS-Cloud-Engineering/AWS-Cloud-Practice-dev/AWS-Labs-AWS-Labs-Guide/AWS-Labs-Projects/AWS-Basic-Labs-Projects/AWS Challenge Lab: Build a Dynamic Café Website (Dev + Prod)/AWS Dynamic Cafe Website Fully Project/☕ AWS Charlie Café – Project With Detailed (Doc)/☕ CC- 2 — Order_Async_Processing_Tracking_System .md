@@ -3067,7 +3067,7 @@ POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
 
 ### 5️⃣ — admin-orders.php
 
-[admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders.php/admin-orders.php)
+[admin-orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders/admin-orders.html)
 
 **🔁 Replace with your real API Gateway URL**
 
