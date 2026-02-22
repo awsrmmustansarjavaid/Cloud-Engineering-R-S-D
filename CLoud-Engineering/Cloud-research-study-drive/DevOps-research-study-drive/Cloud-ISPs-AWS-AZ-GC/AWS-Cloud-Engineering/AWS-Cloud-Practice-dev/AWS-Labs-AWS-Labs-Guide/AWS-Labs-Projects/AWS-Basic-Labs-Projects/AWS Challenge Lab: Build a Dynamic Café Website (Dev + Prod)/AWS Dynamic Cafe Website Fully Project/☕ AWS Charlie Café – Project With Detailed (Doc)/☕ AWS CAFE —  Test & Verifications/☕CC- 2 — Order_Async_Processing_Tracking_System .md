@@ -1044,7 +1044,7 @@ curl -X POST \
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-123\", \"status\": \"PREPARING\"}"
+  "body": "{\"order_id\":\"ORD-20260222-1234\",\"status\":\"PREPARING\"}"
 }
 ```
 
@@ -1076,7 +1076,7 @@ curl -X POST \
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-123\", \"status\": \"READY\"}"
+  "body": "{\"order_id\":\"ORD-20260222-1234\",\"status\":\"READY\"}"
 }
 ```
 
@@ -1108,7 +1108,7 @@ curl -X POST \
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-123\", \"status\": \"COMPLETED\"}"
+  "body": "{\"order_id\":\"ORD-20260222-1234\",\"status\":\"COMPLETED\"}"
 }
 ```
 
@@ -1142,7 +1142,7 @@ curl -X POST \
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-123\", \"status\": \"PREPARING\"}"
+  "body": "{\"order_id\":\"ORD-20260222-1234\",\"status\":\"COMPLETED\"}"
 }
 ```
 
@@ -1169,13 +1169,13 @@ Invalid status transition
 ✅ should 400 – "Invalid status transition"
 ```
 
-#### Test 5: Negative Test: Non-existent order
+#### Test 5: Missing Fields Test
 
 - Name: CafeOrderWorkerLambda_Negative-Non-existent
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-FAKE-9999\", \"status\": \"PREPARING\"}"
+  "body": "{}"
 }
 ```
 
@@ -1200,6 +1200,47 @@ Order not found
 ```
 ✅ should 404 – "Order not found"
 ```
+
+#### Test 6: Order Not Found Test
+
+- Name: CafeOrderWorkerLambda_ONFT
+
+```
+{
+  "body": "{\"order_id\":\"ORD-00000000-9999\",\"status\":\"PREPARING\"}"
+}
+```
+
+#### Expected:
+
+```
+404
+Order not found
+```
+
+### 🚀 Important
+
+Replace:
+
+```
+ORD-20260222-1234
+```
+
+with a real order_id that exists in your database.
+
+### 🔥 Pro Tip (API Gateway Users)
+
+If you are testing through API Gateway, this is the raw request body:
+
+```
+{
+  "order_id": "ORD-20260222-1234",
+  "status": "PREPARING"
+}
+```
+
+Lambda console requires the wrapped "body" format.
+API Gateway does NOT.
 
 ### 🧑‍💻 STEP 9 — 🧪 FINAL TEST
 
