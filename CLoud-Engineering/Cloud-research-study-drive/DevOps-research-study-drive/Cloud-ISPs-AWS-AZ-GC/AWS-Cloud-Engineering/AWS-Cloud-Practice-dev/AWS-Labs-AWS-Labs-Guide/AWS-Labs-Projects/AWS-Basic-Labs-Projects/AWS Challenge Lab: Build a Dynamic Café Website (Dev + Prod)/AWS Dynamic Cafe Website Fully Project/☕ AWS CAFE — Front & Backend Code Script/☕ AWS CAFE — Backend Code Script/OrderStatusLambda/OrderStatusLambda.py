@@ -1,36 +1,69 @@
 import json
-import os
+import boto3
 import pymysql
 
-# ================= CONFIG =================
-DB_HOST = os.environ['DB_HOST']
-DB_USER = os.environ['DB_USER']
-DB_PASS = os.environ['DB_PASS']
-DB_NAME = os.environ['DB_NAME']
+# ==========================================================
+# AWS CLIENT
+# ==========================================================
+secrets_client = boto3.client('secretsmanager')
 
-# ================= DB CONNECTION =================
+# ==========================================================
+# SECRET CONFIGURATION
+# ==========================================================
+SECRET_NAME = "CafeDevDBSM"  # Same secret used in CafeOrderProcessor
+
+# ==========================================================
+# GET DB CREDENTIALS FROM SECRETS MANAGER
+# ==========================================================
+def get_db_secret():
+    """
+    Retrieve RDS credentials securely from AWS Secrets Manager
+    """
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+# ==========================================================
+# CREATE DATABASE CONNECTION
+# ==========================================================
 def get_connection():
+    """
+    Create secure MySQL connection using secret credentials
+    """
+    secret = get_db_secret()
+
     return pymysql.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASS,
-        db=DB_NAME,
-        cursorclass=pymysql.cursors.DictCursor
+        host=secret["host"],
+        user=secret["username"],
+        password=secret["password"],
+        database=secret["dbname"],
+        cursorclass=pymysql.cursors.DictCursor,
+        connect_timeout=10
     )
 
-# ================= LAMBDA HANDLER =================
+# ==========================================================
+# LAMBDA HANDLER
+# ==========================================================
 def lambda_handler(event, context):
+
     conn = None
     cursor = None
 
     try:
+        # --------------------------------------------------
+        # 1️⃣ Read Query Parameters
+        # --------------------------------------------------
         params = event.get("queryStringParameters") or {}
-        filter_date = params.get("date")
+        filter_date = params.get("date")  # Format: YYYY-MM-DD
 
+        # --------------------------------------------------
+        # 2️⃣ Connect to Database
+        # --------------------------------------------------
         conn = get_connection()
         cursor = conn.cursor()
 
-        # ---------- RECENT ORDERS ----------
+        # --------------------------------------------------
+        # 3️⃣ Fetch Recent Orders (Optional Date Filter)
+        # --------------------------------------------------
         sql = "SELECT customer_name, item, quantity, created_at FROM orders"
         values = []
 
@@ -39,12 +72,13 @@ def lambda_handler(event, context):
             values.append(filter_date)
 
         sql += " ORDER BY created_at DESC LIMIT 20"
+
         cursor.execute(sql, values)
         recent_orders = cursor.fetchall()
 
-        # ---------- METRICS (DATE-AWARE) ----------
-        metrics = []
-
+        # --------------------------------------------------
+        # 4️⃣ Build Date-Aware Metrics
+        # --------------------------------------------------
         where_clause = ""
         metric_values = []
 
@@ -52,34 +86,41 @@ def lambda_handler(event, context):
             where_clause = " WHERE DATE(created_at) = %s"
             metric_values.append(filter_date)
 
+        metrics = []
+
+        # ---- Total Orders
         cursor.execute(
             f"SELECT COUNT(*) AS count FROM orders{where_clause}",
             metric_values
         )
         metrics.append({
             "metric": "Total Orders",
-            "count": cursor.fetchone()['count']
+            "count": cursor.fetchone()["count"]
         })
 
+        # ---- Total Items Sold
         cursor.execute(
             f"SELECT SUM(quantity) AS count FROM orders{where_clause}",
             metric_values
         )
         metrics.append({
             "metric": "Total Items Sold",
-            "count": cursor.fetchone()['count'] or 0
+            "count": cursor.fetchone()["count"] or 0
         })
 
+        # ---- Unique Customers
         cursor.execute(
             f"SELECT COUNT(DISTINCT customer_name) AS count FROM orders{where_clause}",
             metric_values
         )
         metrics.append({
             "metric": "Customers",
-            "count": cursor.fetchone()['count']
+            "count": cursor.fetchone()["count"]
         })
 
-        # ---------- RESPONSE ----------
+        # --------------------------------------------------
+        # 5️⃣ Success Response
+        # --------------------------------------------------
         return {
             "statusCode": 200,
             "headers": {
@@ -89,12 +130,14 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Methods": "GET"
             },
             "body": json.dumps({
+                "filter_date": filter_date,
                 "metrics": metrics,
                 "recent_orders": recent_orders
             }, default=str)
         }
 
     except Exception as e:
+        print("❌ ERROR:", str(e))
         return {
             "statusCode": 500,
             "headers": {
