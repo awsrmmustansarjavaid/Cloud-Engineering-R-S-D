@@ -2475,17 +2475,21 @@ Create:
 
 💬 Clear comments inside the code
 
-### ✅ 1️⃣ Updated Login Page (Charlie Café Theme)
+### 1️⃣ Updated Login Page (Charlie Café Theme)
 
-Replace with your real values:
+#### ✅ Replace with your real values:
 
-YOUR_DOMAIN_PREFIX
+- YOUR_DOMAIN_PREFIX
 
-YOUR_REGION
+- YOUR_REGION
 
-YOUR_APP_CLIENT_ID
+- YOUR_APP_CLIENT_ID
+
+- Cloudfront
 
 [login.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/login.html)
+
+
 
 ### ✅ 2️⃣ Updated logout.php
 
