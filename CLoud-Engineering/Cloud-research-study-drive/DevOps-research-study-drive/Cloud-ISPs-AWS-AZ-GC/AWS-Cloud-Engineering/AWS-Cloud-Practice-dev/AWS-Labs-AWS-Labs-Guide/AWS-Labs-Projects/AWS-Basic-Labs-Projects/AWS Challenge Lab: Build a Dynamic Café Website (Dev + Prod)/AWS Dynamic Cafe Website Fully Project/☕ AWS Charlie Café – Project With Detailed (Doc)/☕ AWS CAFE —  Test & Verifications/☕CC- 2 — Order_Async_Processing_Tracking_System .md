@@ -1498,7 +1498,7 @@ API Gateway does NOT.
 
 ### API Test
 
-#### 1️⃣ API Gateway 
+### 1️⃣ API Gateway 
 
 inside API Gateway:
 
@@ -1509,7 +1509,7 @@ inside API Gateway:
 }
 ```
 
-#### 2️⃣ Expected JSON
+#### ✅ Expected JSON
 
 ```
 {"error": "Order not found"}
@@ -1527,7 +1527,32 @@ inside API Gateway:
 
 So this part is GOOD.
 
-#### 2️⃣ Web Browser
+### 2️⃣ Test with curl
+
+You MUST send a POST request with JSON body:
+
+```
+curl -X POST https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-update \
+-H "Content-Type: application/json" \
+-d '{
+  "order_id": "ORD-20260222-4821",
+  "status": "PREPARING"
+}'
+```
+
+### 3️⃣ Test in Browser
+
+Browsers cannot easily send POST with JSON directly via URL.
+
+You need:
+
+Postman
+
+curl
+
+Or a small HTML/JS fetch request
+
+Example JavaScript:
 
 
 
