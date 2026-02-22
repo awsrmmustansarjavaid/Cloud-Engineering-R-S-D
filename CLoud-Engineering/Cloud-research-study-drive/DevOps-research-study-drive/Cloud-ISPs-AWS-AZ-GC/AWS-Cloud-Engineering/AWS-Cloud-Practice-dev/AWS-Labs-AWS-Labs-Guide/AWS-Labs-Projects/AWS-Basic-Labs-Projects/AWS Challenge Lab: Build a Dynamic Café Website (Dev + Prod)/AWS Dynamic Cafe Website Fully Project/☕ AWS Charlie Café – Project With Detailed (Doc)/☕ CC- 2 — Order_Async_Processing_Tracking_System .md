@@ -2640,20 +2640,18 @@ API_URL = ".../prod/order-status"
 
 - **Permissions:** Create new role with basic Lambda permissions
 
-#### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
+### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
 
 > 🔁 This is a drop-in replacement
 > Nothing else needs to change
 
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda/CafeOrderStatusLambda.py)
 
-#### 3️⃣ 
-
-#### 4️⃣ 🔐 Attach Lambda Layer
+### 2️⃣ 🔐 Attach Lambda Layer
 
 - Same 
 
-#### 5️⃣ 🔐 Edit VPC
+### 3️⃣ 🔐 Edit VPC
 
 - Same 
 
