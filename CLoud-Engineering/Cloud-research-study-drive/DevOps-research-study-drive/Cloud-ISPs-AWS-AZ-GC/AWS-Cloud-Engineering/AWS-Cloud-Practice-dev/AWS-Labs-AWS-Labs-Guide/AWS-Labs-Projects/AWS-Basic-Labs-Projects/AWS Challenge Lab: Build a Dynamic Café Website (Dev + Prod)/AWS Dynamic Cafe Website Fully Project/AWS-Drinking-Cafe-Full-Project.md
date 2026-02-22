@@ -2195,6 +2195,13 @@ We will configure:
 
 - Go to: AWS Console → Cognito → User pools → Create user pool
 
+- Name:
+
+```
+CharlieCafeAdminSPA
+```
+
+
 #### 1️⃣ Application Type
 
 - Choose: ✅ Single-page application (SPA)
