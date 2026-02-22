@@ -437,7 +437,7 @@ EC2-Cafe-Secrets-Role
 sudo nano verify_charlie_cafe_rds.sh
 ```
 
-[Charlie Cafe Lab RDS Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/verify_charlie_cafe_rds.sh)
+[Charlie Cafe Lab RDS Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/AWS%20RDS%20Bash%20Scripts/verify_charlie_cafe_rds.sh)
 
 #### ▶️ How to Run
 
