@@ -1914,25 +1914,21 @@ CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
 
 **👉 Invalidation tells CloudFront to delete cached copies immediately.**
 
-#### 1️⃣ Go to:
+- Go to: CloudFront → Distributions → Your Distribution
 
-```
-CloudFront → Distributions → Your Distribution
-```
+- Click Invalidations
 
-#### 2️⃣ Click Invalidations
+- Click Create invalidation
 
-#### 3️⃣ Click Create invalidation
+- In Object paths, enter:
 
-#### 4️⃣ In Object paths, enter:
-
-#### ✅ invalidation path:
+#### 1️⃣ ✅ invalidation path:
 
 ```
 /cafe-admin-dashboard.html
 ```
 
-#### ✅ /var/www/html/js/
+#### 2️⃣ ✅ /var/www/html/js/
 
 Example:
 
@@ -1943,8 +1939,9 @@ Example:
 /var/www/html/js/api.js
 /var/www/html/js/central-printing.js
 ```
-
 #### ✅ From CloudFront perspective, the paths are:
+
+#### Option 1 — Invalidate One-by-One (Best Practice)
 
 ```
 /js/config.js
@@ -1954,7 +1951,84 @@ Example:
 /js/central-printing.js
 ```
 
+### ✅ BEST PRACTICE (Better Than Invalidation)
 
+Instead of invalidating every time, use versioning:
+
+Change:
+
+```
+/js/config.js
+/js/central-auth.js
+/js/utils.js
+/js/api.js
+/js/central-printing.js
+```
+
+To:
+
+```
+/js/config.v2.js
+/js/central-auth.v2.js
+/js/utils.v2.js
+/js/api.v2.js
+/js/central-printing.v2.js
+```
+
+Or:
+
+```
+<script src="/js/config.js?v=2"></script>
+<script src="/js/central-auth.js?v=2"></script>
+<script src="/js/utils.js?v=2"></script>
+<script src="/js/app.js?v=2"></script>
+<script src="/js/central-printing.js?v=2"></script>
+```
+
+#### Option 2 — Invalidate Entire JS Folder
+
+```
+/js/*
+```
+
+✔ This deletes cache for all JS files
+
+⚠ Use only when necessary
+
+#### Option 3 — Invalidate Everything (Heavy)
+
+```
+/*
+```
+
+⚠ Not recommended often
+
+⚠ Counts toward invalidation limits
+
+**✅ CloudFront treats it as new object → no invalidation needed.**
+
+#### 3️⃣ Very Important — If Using API Gateway
+
+If your JS calls:
+
+```
+https://api-id.execute-api.us-east-1.amazonaws.com/prod
+```
+
+And that is not routed through ALB,
+
+CloudFront settings won’t affect it.
+
+CloudFront only affects traffic going through:
+
+```
+cloudfront.net → ALB → EC2
+```
+
+So confirm:
+
+Are you calling API Gateway directly?
+Or through ALB reverse proxy?
 
 ### 5️⃣ Click Create invalidation
 
