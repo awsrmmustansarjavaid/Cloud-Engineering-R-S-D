@@ -26,6 +26,12 @@ Event JSON:
 }
 ```
 
+```
+{
+  "body": "{ \"table_number\": 3, \"customer_name\": \"Alice\", \"item\": \"Coffee\", \"quantity\": 2 }"
+}
+```
+
 Click Save
 
 Click Test

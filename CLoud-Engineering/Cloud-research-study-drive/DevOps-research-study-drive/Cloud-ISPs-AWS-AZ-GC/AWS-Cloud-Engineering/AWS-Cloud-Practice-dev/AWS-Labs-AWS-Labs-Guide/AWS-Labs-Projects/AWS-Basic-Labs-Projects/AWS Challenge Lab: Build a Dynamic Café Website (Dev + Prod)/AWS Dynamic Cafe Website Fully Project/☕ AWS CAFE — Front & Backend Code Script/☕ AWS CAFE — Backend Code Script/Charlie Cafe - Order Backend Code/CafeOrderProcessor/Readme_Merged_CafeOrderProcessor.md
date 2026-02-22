@@ -1056,3 +1056,20 @@ def lambda_handler(event, context):
         return response(500, {"error": str(e)})
 ```
 
+### ✅ What Changed / Added
+
+- Added ORDERS_TABLE = "CafeOrders" and orders_table = dynamodb.Table(ORDERS_TABLE).
+
+- After RDS insert, added orders_table.put_item to save the order in DynamoDB.
+
+- Added default payment fields:
+
+- payment_method = "NONE"
+
+- payment_status = "PENDING"
+
+- Comments added for every major step.
+
+---
+
+
