@@ -2647,14 +2647,7 @@ API_URL = ".../prod/order-status"
 
 [OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/OrderStatusLambda.py)
 
-#### 3️⃣ 🔐 Add Environment Variables
-
-```
-DB_HOST = <your-rds-endpoint>
-DB_USER = cafe_user
-DB_PASS = <your-db-password>
-DB_NAME = cafe_db
-```
+#### 3️⃣ 
 
 #### 4️⃣ 🔐 Attach Lambda Layer
 
