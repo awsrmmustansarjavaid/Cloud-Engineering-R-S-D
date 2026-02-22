@@ -1873,7 +1873,7 @@ Wait until status = Active
 
 > **⚠️ COPY EXACTLY — do NOT modify**
 
-[CafeOrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda.py)
+[CafeOrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda/CafeOrderStatusLambda.py)
 
 Click Deploy
 
