@@ -931,6 +931,14 @@ DESCRIBE orders;
 SELECT * FROM orders;
 ```
 
+```
+DESCRIBE employees;
+```
+
+```
+SELECT * FROM employees;
+```
+
 ###### ✅ If you see the row → DB is READY
 
 #### Exit MySQL:
