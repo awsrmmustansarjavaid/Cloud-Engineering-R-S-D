@@ -1038,7 +1038,7 @@ curl -X POST \
 
 > **Lambda Name: CafeOrderWorkerLambda**
 
-#### Test 1: RECEIVED → PREPARING
+### 1️⃣ RECEIVED → PREPARING
 
 - Name: CafeOrderWorkerLambda_RECEIVED-PREPARING
 
@@ -1076,7 +1076,7 @@ curl -X POST \
 { "statusCode": 404, "headers": { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" }, "body": "{\"error\": \"Order not found\"}" } START RequestId: 8542c381-aaea-405e-990d-87778b56056d Version: $LATEST END RequestId: 8542c381-aaea-405e-990d-87778b56056d REPORT RequestId: 8542c381-aaea-405e-990d-87778b56056d Duration: 346.34 ms Billed Duration: 1643 ms Memory Size: 128 MB Max Memory Used: 90 MB Init Duration: 1296.64 ms
 ```
 
-👍 — this result means your Lambda is working correctly.
+#### 👍 — this result means your Lambda is working correctly.
 
 The error:
 
@@ -1096,9 +1096,235 @@ ORD-20260222-1234
 So the problem is NOT your Lambda code.
 It’s one of these 4 common issues:
 
+### ✅ 1️⃣ The order_id does not exist in RDS
 
+Your CafeOrderProcessor generates order IDs like:
 
-#### Test 2: PREPARING → READY
+```
+ORD-YYYYMMDD-XXXX
+```
+
+But 1234 was just an example.
+
+👉 Go to your database and check:
+
+```
+SELECT order_id, status FROM orders;
+```
+
+Then copy a REAL order_id and test again.
+
+### ✅ 2️⃣ You're Connected to a Different Database
+
+Since you're using Secrets Manager, confirm:
+
+- SECRET_NAME = "CafeDevDBSM"
+
+- That secret contains the correct:
+
+ - host
+
+ - username
+
+ - password
+
+ - dbname
+
+Sometimes:
+
+- Processor Lambda inserts into dev DB
+
+- Worker Lambda connects to another DB
+
+Very common issue.
+
+### ✅ 3️⃣ Order Was Never Created
+
+Did you successfully run CafeOrderProcessor first?
+
+Test flow should be:
+
+1️⃣ Call CafeOrderProcessor → creates order
+
+2️⃣ Copy returned order_id
+
+3️⃣ Call CafeOrderWorkerLambda
+
+If you manually typed the order_id without creating it first, it will fail.
+
+### ✅ 4️⃣ Case Sensitivity Issue
+
+MySQL string comparison is usually case-sensitive depending on collation.
+
+Make sure:
+
+```
+ORD-20260222-1234
+```
+
+is exactly the same case in the database.
+
+### 🔎 How To Debug Quickly
+
+Temporarily add this inside your Worker Lambda before the SELECT:
+
+```
+print("DEBUG - order_id received:", order_id)
+```
+
+And after connecting:
+
+```
+print("DEBUG - Connected to DB:", secret["host"], secret["dbname"])
+```
+
+#### This will confirm:
+
+- You're sending correct ID
+
+- You're connected to expected DB
+
+### 🚀 What You Should Do Now
+
+- Open RDS query editor
+
+- Run:
+
+```
+SELECT * FROM orders ORDER BY created_at DESC;
+```
+
+- Copy a real order_id
+
+- Use it in your test JSON
+
+Example:
+
+```
+{
+  "body": "{\"order_id\":\"ORD-20260222-4821\",\"status\":\"PREPARING\"}"
+}
+```
+
+### 💡 Most Likely Cause
+
+99% of the time it's simply:
+
+- You used a sample order_id that doesn’t exist.
+
+- Your Lambda is behaving correctly 👍
+
+#### ✅ 1️⃣ Test Debug Test – Normal Event (Pretty Format)
+
+Use this in Lambda Test:
+
+```
+{
+  "body": "{\"order_id\":\"ORD-TEST-DEBUG\",\"status\":\"PREPARING\"}"
+}
+```
+
+#### This helps confirm:
+
+- Lambda parses body correctly
+
+- order_id is read correctly
+
+- If it returns 404 → DB truly doesn’t contain it
+
+#### ✅ 2️⃣ Debug Test – Missing Body (Should Return 400)
+
+```
+{
+}
+```
+
+#### ✅ Expected result:
+
+```
+{
+  "statusCode": 400,
+  "body": "{\"error\":\"order_id and status are required\"}"
+}
+```
+
+If this works, your parsing logic is correct.
+
+#### ✅ 3️⃣ Debug Test – Invalid JSON Body
+
+```
+{
+  "body": "invalid-json"
+}
+```
+
+#### ✅ Expected result:
+
+- Should trigger 500 error
+
+- Confirms JSON parsing path
+
+#### ⚠️ IMPORTANT (Very Important)
+
+Test JSON cannot debug database connection issues.
+
+If you are getting:
+
+```
+Order not found
+```
+
+#### That means:
+
+✔ Lambda executed
+
+✔ Connected to DB
+
+✔ Query executed
+
+❌ No matching order_id
+
+#### It is NOT:
+
+- Secrets Manager issue
+
+- DB connection issue
+
+- IAM issue
+
+- If DB connection was failing, you'd get 500 error, not 404.
+
+### 🚀 Real Debug Method Without Code Changes
+
+- Go to RDS and run:
+
+```
+SELECT order_id, status FROM orders;
+```
+
+Copy EXACT order_id returned.
+
+Then test:
+
+```
+{
+  "body": "{\"order_id\":\"<REAL_ORDER_ID>\",\"status\":\"PREPARING\"}"
+}
+```
+
+Replace <REAL_ORDER_ID>.
+
+### 🔥 Why You're Getting 404
+
+Because:
+
+```
+ORD-20260222-1234
+```
+
+Most likely does NOT exist in your table.
+
+### 2️⃣ Test PREPARING → READY
 
 - Name: CafeOrderWorkerLambda_PREPARING-READY
 
@@ -1130,7 +1356,7 @@ It’s one of these 4 common issues:
 ✅ should succeed after Test 1
 ```
 
-#### Test 3: READY → COMPLETED
+### 3️⃣ Test READY → COMPLETED
 
 - Name: CafeOrderWorkerLambda_READY-COMPLETED
 
@@ -1162,7 +1388,7 @@ It’s one of these 4 common issues:
 ✅ should succeed
 ```
 
-#### Test 4: Negative Test: Invalid Transition
+### 4️⃣ Test Negative Test: Invalid Transition
 
 > **⚠️ e.g. try to go back to PREPARING after COMPLETED**
 
@@ -1197,7 +1423,7 @@ Invalid status transition
 ✅ should 400 – "Invalid status transition"
 ```
 
-#### Test 5: Missing Fields Test
+### 5️⃣ Test Missing Fields Test
 
 - Name: CafeOrderWorkerLambda_Negative-Non-existent
 
@@ -1229,7 +1455,7 @@ Order not found
 ✅ should 404 – "Order not found"
 ```
 
-#### Test 6: Order Not Found Test
+### 6️⃣ Test Order Not Found Test
 
 - Name: CafeOrderWorkerLambda_ONFT
 
