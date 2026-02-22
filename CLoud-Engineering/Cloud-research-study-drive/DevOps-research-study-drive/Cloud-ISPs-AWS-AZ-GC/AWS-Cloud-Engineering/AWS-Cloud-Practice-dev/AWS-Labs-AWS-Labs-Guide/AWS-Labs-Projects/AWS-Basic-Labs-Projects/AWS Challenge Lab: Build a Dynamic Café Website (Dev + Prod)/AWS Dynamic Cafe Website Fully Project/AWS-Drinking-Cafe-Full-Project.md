@@ -2335,7 +2335,9 @@ Nothing else.
 
 Add EXACT URLs:
 
-#### 1️⃣ Callback URL
+### 1️⃣ Callback URL
+
+#### 1️⃣ Callback Login Page 
 
 ```
 https://YOUR_CLOUDFRONT_DOMAIN/login.html
@@ -2347,7 +2349,43 @@ Example:
 https://dxxxx.cloudfront.net/login.html
 ```
 
-#### 2️⃣ Sign-out URL
+#### 2️⃣ Callback Admin Dashboard Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/cafe-admin-dashboard.html
+```
+
+#### 3️⃣ Callback Order Status Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/order-status.html
+```
+
+#### 4️⃣ Callback Admin Order Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/admin-orders.html
+```
+
+#### 5️⃣ Callback Analytics Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/analytics.html
+```
+
+#### 6️⃣ Callback Employee-portal Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/employee-portal.html
+```
+
+#### 7️⃣ Callback hr-attendance Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/hr-attendance.html
+```
+
+### 2️⃣ Sign-out URL
 
 ```
 https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
