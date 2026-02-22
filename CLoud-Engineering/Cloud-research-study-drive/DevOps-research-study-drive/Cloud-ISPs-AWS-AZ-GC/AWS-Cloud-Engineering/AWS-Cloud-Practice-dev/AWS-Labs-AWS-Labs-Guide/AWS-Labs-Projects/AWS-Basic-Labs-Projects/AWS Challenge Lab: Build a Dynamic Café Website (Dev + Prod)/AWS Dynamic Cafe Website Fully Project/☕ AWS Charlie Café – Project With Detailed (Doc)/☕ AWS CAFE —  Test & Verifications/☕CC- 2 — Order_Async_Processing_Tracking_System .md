@@ -768,7 +768,7 @@ You now have:
 #### Create test event:
 > **Lambda name: CafeOrderStatusLambda**
 
-#### Simple Test 
+#### Simple Test (Recommanded)
 
 ```
 {}
