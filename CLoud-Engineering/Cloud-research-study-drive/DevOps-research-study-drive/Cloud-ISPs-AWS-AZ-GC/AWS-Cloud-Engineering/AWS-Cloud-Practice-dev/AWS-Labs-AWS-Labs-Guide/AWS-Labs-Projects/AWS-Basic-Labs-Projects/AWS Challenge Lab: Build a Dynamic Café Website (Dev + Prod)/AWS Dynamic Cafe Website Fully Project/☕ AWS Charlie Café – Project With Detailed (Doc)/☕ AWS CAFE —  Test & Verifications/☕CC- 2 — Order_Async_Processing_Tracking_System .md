@@ -2694,6 +2694,82 @@ POST /admin/mark-paid
 payment_status = PAID
 ```
 
+### 3️⃣ Test — Test via API Gateway Console
+
+- Go to your API Gateway → REST API → /admin/mark-paid → POST method.
+
+- Click “Test”.
+
+- In Request Body, paste the test JSON:
+
+```
+{
+  "body": "{\"order_id\": \"ORD-123456\"}"
+}
+```
+
+- Click “Test”.
+
+You should see a response like:
+
+```
+{
+  "statusCode": 200,
+  "headers": {"Access-Control-Allow-Origin": "*"},
+  "body": "{\"success\": true, \"message\": \"Order marked as PAID\"}"
+}
+```
+
+### 4️⃣ Test from Browser (using fetch)
+
+Since your Lambda sets CORS headers, you can call it from a browser console on any page:
+
+```
+fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ "order_id": "ORD-123456" })
+})
+.then(res => res.json())
+.then(console.log)
+.catch(console.error);
+```
+
+#### Note: 
+
+- Browser will not allow body to be a string inside JSON if you are calling directly with fetch.
+
+- So in this case, change Lambda to accept event['order_id'] directly instead of event['body'] JSON parse if calling from browser.
+
+### 5️⃣ Test via EC2 CLI (cURL)
+
+If you have EC2 CLI or any Linux terminal, you can use curl:
+
+```
+curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid" \
+-H "Content-Type: application/json" \
+-d '{"body": "{\"order_id\": \"ORD-123456\"}"}'
+```
+
+#### ✅ Expected Output:
+
+```
+{
+  "statusCode": 200,
+  "headers": {"Access-Control-Allow-Origin": "*"},
+  "body": "{\"success\": true, \"message\": \"Order marked as PAID\"}"
+}
+```
+
+#### ✅ Tip: 
+
+- Make sure the API is deployed to the correct stage (dev) before testing.
+Also, if your Lambda requires IAM authorizations, you may need to add AWS Signature v4 in CLI calls.
+
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
