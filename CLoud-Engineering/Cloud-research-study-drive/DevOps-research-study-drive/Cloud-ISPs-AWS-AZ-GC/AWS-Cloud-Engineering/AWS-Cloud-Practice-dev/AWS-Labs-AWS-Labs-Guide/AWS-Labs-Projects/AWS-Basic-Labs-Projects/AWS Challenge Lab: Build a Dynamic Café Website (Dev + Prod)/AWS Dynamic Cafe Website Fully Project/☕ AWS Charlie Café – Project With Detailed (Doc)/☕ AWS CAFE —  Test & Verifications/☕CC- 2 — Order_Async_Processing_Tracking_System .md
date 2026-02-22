@@ -2704,7 +2704,7 @@ payment_status = PAID
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-123456\"}"
+  "order_id": "ORD-123456"
 }
 ```
 
