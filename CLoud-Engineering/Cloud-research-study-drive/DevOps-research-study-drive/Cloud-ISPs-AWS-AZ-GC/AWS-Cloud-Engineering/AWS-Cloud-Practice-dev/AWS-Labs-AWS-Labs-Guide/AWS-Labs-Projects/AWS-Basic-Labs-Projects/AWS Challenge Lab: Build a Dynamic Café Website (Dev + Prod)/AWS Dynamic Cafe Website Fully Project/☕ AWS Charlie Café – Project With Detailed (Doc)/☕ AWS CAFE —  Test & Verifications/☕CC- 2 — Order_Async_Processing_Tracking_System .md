@@ -2623,7 +2623,7 @@ curl -X POST \
 
 ## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
 
-### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
+### 🧪 TEST SCENARIOS (DO THESE)
 
 - Customer places CASH order → order.php → payment-status.php shows Pay at Counter
 
@@ -2633,7 +2633,7 @@ curl -X POST \
 
 - Optional: Auto-redirect → print-order.php to print receipt
 
-#### ✅ Test 1 — Manual Lambda Test
+### 1️⃣ Test — Manual Lambda Test
 
 - Go to your Lambda function → Test tab
 
@@ -2645,47 +2645,17 @@ curl -X POST \
 
 - Click Test
 
-#### Test Event JSON (for Lambda Console)
-Copy-paste this exact JSON into the Test tab in your Lambda function:
+### 1️⃣ Simple (Recommanded)
 
 ```
 {
-  "body": "{\"order_id\": \"ORD-1738333333-456\"}",
-  "httpMethod": "POST",
-  "path": "/orders/cash-payment",
-  "resource": "/orders/cash-payment",
-  "requestContext": {
-    "resourceId": "abc123",
-    "resourcePath": "/orders/cash-payment",
-    "httpMethod": "POST",
-    "stage": "dev",
-    "requestId": "test-request-id-1234",
-    "identity": {
-      "sourceIp": "127.0.0.1"
-    }
-  },
-  "headers": {
-    "Content-Type": "application/json"
-  },
-  "queryStringParameters": null,
-  "pathParameters": null,
-  "stageVariables": null,
-  "isBase64Encoded": false
+  "body": "{\"order_id\": \"ORD-123456\"}"
 }
 ```
 
-#### Minimal Test Event (if you just want to simulate body)
-> **(Shorter version — good for quick tests)**
+#### ⚠️ Note: The body must be a string, because in your Lambda you are doing json.loads(event['body']).
 
-This also works fine for your code:
-
-```
-{
-  "body": "{\"order_id\": \"ORD-999999999-999\"}"
-}
-```
-
-#### Expected successful output (if order exists in DynamoDB):
+#### ✅ Expected Lambda Response
 
 ```
 {
@@ -2697,7 +2667,19 @@ This also works fine for your code:
 }
 ```
 
-#### ✅ Test 2 — Use Postman / curl:
+#### ⚠️ If the order does NOT exist (DynamoDB raises an error):
+
+```
+{
+  "statusCode": 500,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"success\": false, \"error\": \"An error message from DynamoDB\"}"
+}
+```
+
+### 2️⃣ Test — Use Postman / curl:
 
 ```
 POST /admin/mark-paid
