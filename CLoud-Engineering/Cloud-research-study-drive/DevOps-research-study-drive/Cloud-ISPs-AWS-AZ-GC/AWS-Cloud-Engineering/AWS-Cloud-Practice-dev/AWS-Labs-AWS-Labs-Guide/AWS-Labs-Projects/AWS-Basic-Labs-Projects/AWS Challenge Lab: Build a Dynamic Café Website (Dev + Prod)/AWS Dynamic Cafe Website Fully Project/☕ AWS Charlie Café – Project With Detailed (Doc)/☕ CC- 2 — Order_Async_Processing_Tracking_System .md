@@ -2043,7 +2043,7 @@ ORD-20260114-8392
 
 - Admin panel
 
-#### 1️⃣ Create Lambda
+### 1️⃣ Create Lambda
 
 | Setting | Value                   |
 | ------- | ----------------------- |
@@ -2056,7 +2056,7 @@ ORD-20260114-8392
 
 [CafeOrderWorkerLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda/CafeOrderWorkerLambda.py)
 
-#### 3️⃣ Move Lambda Into VPC
+### 3️⃣ Move Lambda Into VPC
 
 - AWS Console → Lambda → Your Function
 
@@ -2078,7 +2078,7 @@ ORD-20260114-8392
 
 **⏳ Wait until Lambda status = Active**    
 
-#### 4️⃣ Attach Lambda Layer
+### 4️⃣ Attach Lambda Layer
 
 - same steps 
 
