@@ -1739,7 +1739,33 @@ API Gateway → Actions → Deploy API
 
 Click Deploy
 
-### 6️⃣ VERIFY API
+### 6️⃣ Test with API Gateway
+
+#### 1️⃣ Test API Gateway Endpoint (Console Method)
+
+- Go to AWS Console
+
+- Click API Gateway
+
+- Open your API
+
+- Click Resources
+
+- Click /orders
+
+- Click POST
+
+- On the POST method page
+
+- Click the Test button (top right)
+
+- Update Request Body
+
+In Request Body, paste:
+
+```
+{}
+```
 
 #### 🌐 FINAL API URL
 
