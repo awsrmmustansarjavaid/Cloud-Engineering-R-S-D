@@ -1779,9 +1779,67 @@ curl "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-status?d
 }
 ```
 
+### 2️⃣ Admin dashboard (GET):
 
+```
+curl -X GET "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard"
+```
 
+### 3️⃣ Create user (POST):
 
+```
+curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/create-user" \
+-H "Content-Type: application/json" \
+-d '{"username": "charlie", "role": "employee"}'
+```
+
+### 4️⃣ Get employee orders (GET):
+
+```
+curl -X GET "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employee/orders?employee_id=alice"
+```
+
+### 5️⃣ Create employee order (POST):
+
+```
+curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employee/order" \
+-H "Content-Type: application/json" \
+-d '{"order_id": "O-103", "employee": "charlie", "items": ["coffee"], "total": 10.5}'
+```
+
+### 6️⃣ Using Postman (GUI - Optional)
+
+- Open Postman → New request
+
+- Select GET or POST according to endpoint
+
+- Paste URL: https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+
+- If POST, go to Body → raw → JSON and enter the JSON payload
+
+- Send request and check response
+
+### 7️⃣ Cognito Authentication
+
+Since all endpoints are protected by Cognito:
+
+- You will need a valid Cognito access token in the header:
+
+```
+Authorization: Bearer <ACCESS_TOKEN>
+```
+
+#### To get the token:
+
+- Go to Cognito Hosted UI login
+
+- Log in as an admin or employee
+
+- Get the id_token or access_token
+
+- Use it in Postman or cURL
+
+Without the token, the API will return 401 Unauthorized.
 
 
 **✅ PHASE 5️⃣ STATUS**
