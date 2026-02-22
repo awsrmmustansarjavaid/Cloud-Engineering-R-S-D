@@ -1093,6 +1093,10 @@ sudo nano /var/www/html/js/config.js
 
 Move all generic helpers here.
 
+```
+sudo nano /var/www/html/js/utils.js
+```
+
 [utils.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
 
 
@@ -1103,6 +1107,10 @@ This file contains ONLY authentication logic.
 
 No API routes inside.
 
+```
+sudo nano /var/www/html/js/central-auth.js
+```
+
 [central-auth.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
 
 
@@ -1111,9 +1119,17 @@ No API routes inside.
 
 This file handles API logic only.
 
+```
+sudo nano /var/www/html/js/api.js
+```
+
 [api.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
 
 ### 5️⃣ Create central-printing.js
+
+```
+sudo nano /var/www/html/js/central-printing.js
+```
 
 [central-printing.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
 
