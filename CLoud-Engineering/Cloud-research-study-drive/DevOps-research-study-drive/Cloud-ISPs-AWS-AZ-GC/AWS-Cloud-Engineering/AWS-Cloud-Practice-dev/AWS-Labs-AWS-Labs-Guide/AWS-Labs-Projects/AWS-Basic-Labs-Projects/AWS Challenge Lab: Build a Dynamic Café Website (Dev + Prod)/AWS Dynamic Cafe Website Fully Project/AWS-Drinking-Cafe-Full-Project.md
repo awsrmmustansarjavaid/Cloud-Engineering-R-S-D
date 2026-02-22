@@ -2569,6 +2569,16 @@ This replaces hardcoded config from your old file.
 
 [config.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
 
+#### ✅ Replace with your real values:
+
+- YOUR_DOMAIN_PREFIX
+
+- YOUR_REGION
+
+- YOUR_APP_CLIENT_ID
+
+- Cloudfront
+
 ### 🔥 STEP 2 — utils.js (Shared Helpers)
 
 Move all generic helpers here.
