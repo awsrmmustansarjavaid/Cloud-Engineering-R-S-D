@@ -1940,6 +1940,17 @@ curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employ
 
 - POST endpoints require employee/admin access token. Without it → Unauthorized.
 
+### ✅ Summary of your results
+
+| Endpoint                  | Result         | Status       | Notes                                 |
+| ------------------------- | -------------- | ------------ | ------------------------------------- |
+| `/admin/dashboard` GET    | Success        | OK           | Working, returned expected data       |
+| `/admin/create-user` POST | `Unauthorized` | Not OK       | Requires admin Cognito token          |
+| `/employee/orders` GET    | Success        | OK (partial) | Returned data for `alice`             |
+| `/employee/order` POST    | `Unauthorized` | Not OK       | Requires employee/admin Cognito token |
+
+
+
 ### 6️⃣ Using Postman (GUI - Optional)
 
 - Open Postman → New request
