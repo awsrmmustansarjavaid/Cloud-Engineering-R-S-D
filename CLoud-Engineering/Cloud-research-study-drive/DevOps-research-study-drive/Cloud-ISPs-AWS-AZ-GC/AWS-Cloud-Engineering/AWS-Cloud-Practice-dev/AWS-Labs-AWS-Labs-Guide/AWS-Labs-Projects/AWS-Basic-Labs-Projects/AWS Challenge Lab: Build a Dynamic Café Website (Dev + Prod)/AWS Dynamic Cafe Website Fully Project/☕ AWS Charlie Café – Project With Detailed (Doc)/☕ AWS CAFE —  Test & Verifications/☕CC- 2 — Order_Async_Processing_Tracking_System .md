@@ -1696,7 +1696,11 @@ order-status.php?order_id=ORD-XXXX
 ---
 ## 🔐 PHASE 6️⃣ Lambda Functions 
 
-### 4️⃣ Lambda Code Test
+### ✅ Lambda Test JSON
+
+Since this Lambda uses queryStringParameters, here are proper test events.
+
+### 1️⃣ Lambda Code Test
 
 - Name:
 
@@ -1709,7 +1713,7 @@ Test_OrderStatusLambda
 ```
 {}
 ```
-#### Expected Result
+#### ✅ Expected Result
 
 ```
 {
@@ -1729,6 +1733,81 @@ Test_OrderStatusLambda
 ```
 
 ✅ returns filtered orders
+
+### 2️⃣ Test Without Date Filter (Get All Recent)
+
+```
+{
+  "queryStringParameters": null
+}
+```
+
+#### ✅ Expected Result
+
+```
+{
+  "metrics": [
+    { "metric": "Total Orders", "count": 15 },
+    { "metric": "Total Items Sold", "count": 42 },
+    { "metric": "Customers", "count": 8 }
+  ],
+  "recent_orders": [
+    {
+      "customer_name": "John",
+      "item": "Coffee",
+      "quantity": 2,
+      "created_at": "2026-02-22 10:22:11"
+    }
+  ]
+}
+```
+(Numbers depend on your DB)
+
+### 3️⃣ Test With Date Filter
+
+#### Example date: 2026-02-22
+
+```
+{
+  "queryStringParameters": {
+    "date": "2026-02-22"
+  }
+}
+```
+
+#### ✅ Expected Result
+
+Only orders from that specific date will be returned.
+
+### 4️⃣ Invalid Date Format (Still Works But Returns 0 Data)
+
+```
+{
+  "queryStringParameters": {
+    "date": "2026/02/22"
+  }
+}
+```
+
+#### ✅ Expected Result
+
+- Likely empty results
+
+- No crash
+
+### 🚀 Important IAM Requirement
+
+Make sure your Lambda role has permission:
+
+```
+{
+  "Effect": "Allow",
+  "Action": "secretsmanager:GetSecretValue",
+  "Resource": "*"
+}
+```
+
+**⚠️ Otherwise, you’ll get 500 error.**
 
 ### 5️⃣ Lambda Code Test
 
