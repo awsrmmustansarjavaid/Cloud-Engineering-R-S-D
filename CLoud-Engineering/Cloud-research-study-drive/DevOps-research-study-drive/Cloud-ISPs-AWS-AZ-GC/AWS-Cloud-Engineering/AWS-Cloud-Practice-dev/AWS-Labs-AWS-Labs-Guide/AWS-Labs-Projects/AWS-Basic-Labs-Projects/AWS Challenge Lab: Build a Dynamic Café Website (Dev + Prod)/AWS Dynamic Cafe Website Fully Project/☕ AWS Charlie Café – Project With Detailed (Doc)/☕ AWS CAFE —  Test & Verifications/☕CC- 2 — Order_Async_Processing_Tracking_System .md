@@ -136,6 +136,23 @@ curl -X POST \
   -d '{"table_number":3,"customer_name":"CurlTest","item":"Tea","quantity":2}'
 ```
 
+### NEW API Curl Test
+
+```
+curl -X POST \
+  https://svirhyw5a3.execute-api.us-east-1.amazonaws.com/prod/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "table_number": 5,
+    "customer_name": "John",
+    "item": "Coffee",
+    "quantity": 2
+  }'
+```
+
+
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
