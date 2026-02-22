@@ -1926,11 +1926,25 @@ CloudFront → Distributions → Your Distribution
 
 #### 4️⃣ In Object paths, enter:
 
-invalidation path:
+#### ✅ invalidation path:
 
 ```
 /cafe-admin-dashboard.html
 ```
+
+#### ✅ /var/www/html/js/
+
+Example:
+
+```
+/var/www/html/js/config.js
+/var/www/html/js/central-auth.js
+/var/www/html/js/utils.js
+/var/www/html/js/api.js
+/var/www/html/js/central-printing.js
+```
+
+#### ✅ From CloudFront perspective, the paths are:
 
 ```
 /js/config.js
@@ -1939,6 +1953,8 @@ invalidation path:
 /js/api.js
 /js/central-printing.js
 ```
+
+
 
 ### 5️⃣ Click Create invalidation
 
