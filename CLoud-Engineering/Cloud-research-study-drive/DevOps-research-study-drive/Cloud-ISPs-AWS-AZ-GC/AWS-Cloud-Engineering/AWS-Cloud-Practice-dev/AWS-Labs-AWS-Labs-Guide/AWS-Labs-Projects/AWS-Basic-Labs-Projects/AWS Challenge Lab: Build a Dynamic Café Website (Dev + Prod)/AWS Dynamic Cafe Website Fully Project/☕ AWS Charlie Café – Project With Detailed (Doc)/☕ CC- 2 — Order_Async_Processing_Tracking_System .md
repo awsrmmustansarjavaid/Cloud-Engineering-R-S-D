@@ -1857,22 +1857,7 @@ Click Create function
 
 Wait until status = Active
 
-### 🧑‍💻 STEP 2 — ADD DB ENV VARIABLES
-
-Lambda → Configuration → Environment variables → Edit
-
-#### Add:
-
-```
-DB_HOST = your-rds-endpoint
-DB_USER = cafe_user
-DB_PASS = password
-DB_NAME = cafe_db
-```
-
-Click Save
-
-### 🧑‍💻 STEP 3 — ADD PyMySQL LAYER
+### 🧑‍💻 STEP 2 — ADD PyMySQL LAYER
 
 - Lambda → Layers → Add layer
 
