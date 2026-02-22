@@ -1924,6 +1924,26 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 Without the token, the API will return 401 Unauthorized.
 
+#### 📣 Cognito Authentication Notes
+
+- All endpoints are protected by Cognito.
+
+- Without a valid token: 401 Unauthorized.
+
+- To test quickly:
+
+  - Log in via Cognito Hosted UI
+
+  - Copy the access_token
+
+  - Add header in cURL/Postman:
+
+```
+Authorization: Bearer <ACCESS_TOKEN>
+```
+
+
+
 
 **✅ PHASE 5️⃣ STATUS**
 
