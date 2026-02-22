@@ -9,36 +9,25 @@ from datetime import datetime
 # ==========================================================
 # AWS CLIENTS
 # ==========================================================
-secrets_client = boto3.client('secretsmanager')
-dynamodb = boto3.resource('dynamodb')
-sqs = boto3.client('sqs')
+secrets_client = boto3.client('secretsmanager')  # For RDS credentials
+dynamodb = boto3.resource('dynamodb')           # For CafeMenu, CafeOrderMetrics, CafeOrders
+sqs = boto3.client('sqs')                        # For order notifications
 
 # ==========================================================
 # ENV VARIABLES
 # ==========================================================
-SECRET_NAME = "CafeDevDBSM"
-SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']
-MENU_TABLE = "CafeMenu"
-METRICS_TABLE = "CafeOrderMetrics"
+SECRET_NAME = "CafeDevDBSM"                      # Secret for RDS credentials
+SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']     # SQS queue for order messages
+MENU_TABLE = "CafeMenu"                          # DynamoDB table for per-item metrics
+METRICS_TABLE = "CafeOrderMetrics"              # DynamoDB table for global metrics
+ORDERS_TABLE = "CafeOrders"                      # DynamoDB table to save orders
 
 menu_table = dynamodb.Table(MENU_TABLE)
 metrics_table = dynamodb.Table(METRICS_TABLE)
+orders_table = dynamodb.Table(ORDERS_TABLE)
 
 # ==========================================================
-# GENERATE UNIQUE ORDER ID
-# ==========================================================
-def generate_order_id():
-    return f"ORD-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000,9999)}"
-
-# ==========================================================
-# GET DB CREDENTIALS FROM SECRETS MANAGER
-# ==========================================================
-def get_db_secret():
-    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
-    return json.loads(response["SecretString"])
-
-# ==========================================================
-# PRICE LIST
+# PRICE LIST (can be replaced with DynamoDB fetch later)
 # ==========================================================
 PRICE_LIST = {
     "Coffee": 3.00,
@@ -49,30 +38,52 @@ PRICE_LIST = {
 }
 
 # ==========================================================
+# HELPER: Generate Unique Order ID
+# ==========================================================
+def generate_order_id():
+    return f"ORD-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000,9999)}"
+
+# ==========================================================
+# HELPER: Get RDS Credentials from Secrets Manager
+# ==========================================================
+def get_db_secret():
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+# ==========================================================
+# HELPER: Standard Lambda Response
+# ==========================================================
+def response(status_code, body):
+    return {
+        "statusCode": status_code,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(body)
+    }
+
+# ==========================================================
 # LAMBDA HANDLER
 # ==========================================================
 def lambda_handler(event, context):
-
     try:
         # --------------------------------------------------
         # 1️⃣ Parse Request Body
         # --------------------------------------------------
         body = json.loads(event.get("body", "{}"))
-
         required_fields = ["table_number", "item", "quantity"]
 
         for field in required_fields:
             if field not in body:
                 return response(400, {"error": f"Missing field: {field}"})
 
+        # Extract fields
         table_number = int(body["table_number"])
         customer_name = body.get("customer_name", "Guest")
         item = body["item"]
         quantity = int(body["quantity"])
 
+        # Validate item & numeric values
         if item not in PRICE_LIST:
             return response(400, {"error": "Invalid menu item"})
-
         if table_number <= 0 or quantity <= 0:
             return response(400, {"error": "Invalid table number or quantity"})
 
@@ -85,10 +96,9 @@ def lambda_handler(event, context):
         created_at = datetime.now()
 
         # --------------------------------------------------
-        # 3️⃣ Connect to RDS
+        # 3️⃣ Insert Order into RDS
         # --------------------------------------------------
         secret = get_db_secret()
-
         connection = pymysql.connect(
             host=secret["host"],
             user=secret["username"],
@@ -99,7 +109,6 @@ def lambda_handler(event, context):
         )
 
         with connection.cursor() as cursor:
-
             cursor.execute("""
                 INSERT INTO orders
                 (order_id, table_number, customer_name, item,
@@ -120,30 +129,44 @@ def lambda_handler(event, context):
         connection.close()
 
         # --------------------------------------------------
-        # 4️⃣ Update DynamoDB - Item Metrics
+        # 4️⃣ Save Order to DynamoDB (CafeOrders)
         # --------------------------------------------------
-        menu_table.update_item(
-            Key={"item": item},
-            UpdateExpression="ADD orders :inc",
-            ExpressionAttributeValues={
-                ":inc": Decimal(quantity)
+        orders_table.put_item(
+            Item={
+                "order_id": order_id,
+                "table_number": table_number,
+                "customer_name": customer_name,
+                "item": item,
+                "quantity": quantity,
+                "total_amount": total_amount,
+                "status": status,
+                "payment_method": "NONE",   # default
+                "payment_status": "PENDING", # default
+                "created_at": str(created_at)
             }
         )
 
         # --------------------------------------------------
-        # 5️⃣ Update Global Metrics
+        # 5️⃣ Update DynamoDB - Item Metrics
+        # --------------------------------------------------
+        menu_table.update_item(
+            Key={"item": item},
+            UpdateExpression="ADD orders :inc",
+            ExpressionAttributeValues={":inc": Decimal(quantity)}
+        )
+
+        # --------------------------------------------------
+        # 6️⃣ Update Global Metrics
         # --------------------------------------------------
         metrics_table.update_item(
             Key={"metric": "TOTAL_ORDERS"},
             UpdateExpression="ADD #c :inc",
             ExpressionAttributeNames={"#c": "count"},
-            ExpressionAttributeValues={
-                ":inc": Decimal(1)
-            }
+            ExpressionAttributeValues={":inc": Decimal(1)}
         )
 
         # --------------------------------------------------
-        # 6️⃣ Send Message to SQS
+        # 7️⃣ Send Order Message to SQS
         # --------------------------------------------------
         sqs.send_message(
             QueueUrl=SQS_QUEUE_URL,
@@ -159,7 +182,7 @@ def lambda_handler(event, context):
         )
 
         # --------------------------------------------------
-        # 7️⃣ Success Response (FULL ORDER JSON)
+        # 8️⃣ Return Success Response
         # --------------------------------------------------
         return response(200, {
             "order_id": order_id,
@@ -175,13 +198,3 @@ def lambda_handler(event, context):
     except Exception as e:
         print("❌ ERROR:", str(e))
         return response(500, {"error": str(e)})
-
-# ==========================================================
-# STANDARD RESPONSE FORMAT
-# ==========================================================
-def response(status_code, body):
-    return {
-        "statusCode": status_code,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps(body)
-    }
