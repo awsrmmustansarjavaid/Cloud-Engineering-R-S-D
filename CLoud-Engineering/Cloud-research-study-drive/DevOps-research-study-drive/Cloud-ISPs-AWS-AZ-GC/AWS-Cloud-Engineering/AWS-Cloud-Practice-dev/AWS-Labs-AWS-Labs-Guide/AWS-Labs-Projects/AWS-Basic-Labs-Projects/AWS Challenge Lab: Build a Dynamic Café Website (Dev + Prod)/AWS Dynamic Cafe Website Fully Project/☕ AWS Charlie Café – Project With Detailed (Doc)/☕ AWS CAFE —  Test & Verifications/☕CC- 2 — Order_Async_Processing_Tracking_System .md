@@ -1803,6 +1803,18 @@ curl -X GET "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/d
 
   - Requires admin Cognito token. Without it → 401 Unauthorized.
 
+#### ✅ Result:  
+
+```
+{"totalEmployees":25,"totalOrdersToday":42,"revenueToday":1234.56}
+```
+
+#### ✅ Interpretation:
+
+- ✅ Success! This endpoint returned exactly what we expected.
+
+- Conclusion: Your GET /admin/dashboard is working fine.
+
 ### 3️⃣ Create user (POST):
 
 ```
@@ -1828,6 +1840,20 @@ curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/
   - Currently does not create a real user, only returns confirmation message.
 
   - Requires admin Cognito token. Without it → 401 Unauthorized.
+
+#### ✅ Result:  
+
+```
+{"message":"Unauthorized"}
+```
+
+#### ⚠️ Interpretation:
+
+- This means you are not authenticated with Cognito, or your request did not include a valid admin access token.
+
+- This endpoint requires an admin Cognito token, otherwise API Gateway returns Unauthorized.
+
+- This is expected if you didn’t provide Authorization: Bearer <TOKEN> in your cURL request.
 
 ### 4️⃣ Get employee orders (GET):
 
@@ -1857,6 +1883,18 @@ curl -X GET "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employe
 ```
 
 - Requires employee or admin Cognito token. Without it → 401 Unauthorized.
+
+#### ✅ Result:  
+
+```
+[{"order_id":"O-101","employee":"alice", ... }]
+```
+
+#### ✅ Interpretation:
+
+- Looks like this one worked partially — it returned orders for alice.
+
+- If you didn’t supply a Cognito token, some setups allow GET for employees/admin if the API Gateway is set for public GET access, but usually you need a token.
 
 ### 5️⃣ Create employee order (POST):
 
@@ -1889,6 +1927,18 @@ curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employ
   - Requires employee or admin Cognito token. Without it → 401 Unauthorized.
 
   - If JSON body is malformed → 400 Invalid JSON input.
+
+#### ✅ Result:  
+
+```
+{"message":"Unauthorized"}
+```
+
+#### ⚠️ Interpretation:
+
+- Same as the Create User endpoint — you did not include a valid Cognito token.
+
+- POST endpoints require employee/admin access token. Without it → Unauthorized.
 
 ### 6️⃣ Using Postman (GUI - Optional)
 
