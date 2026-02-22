@@ -2056,33 +2056,7 @@ ORD-20260114-8392
 
 [CafeOrderWorkerLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda/CafeOrderWorkerLambda.py)
 
-#### 3️⃣ Lambda Environment Variables
-
-- AWS Console → Lambda → CafeOrderWorkerLambda
-
-- Go to Configuration tab
-
-- Click Environment variables
-
-- Click Edit
-
-- Add EXACT variables
-
-| Key       | Value                             |
-| --------- | --------------------------------- |
-| `DB_HOST` | `your-rds-endpoint.amazonaws.com` |
-| `DB_USER` | `cafe_user`                           |
-| `DB_PASS` | `your-db-password`                |
-| `DB_NAME` | `cafe_db`                    |
-
-
-⚠️ NO quotes
-
-⚠️ NO spaces
-
-- Click Save
-
-#### 4️⃣ Move Lambda Into VPC
+#### 3️⃣ Move Lambda Into VPC
 
 - AWS Console → Lambda → Your Function
 
@@ -2102,9 +2076,9 @@ ORD-20260114-8392
 
     - Save
 
-**⏳ Wait until Lambda status = Active**
+**⏳ Wait until Lambda status = Active**    
 
-#### 5️⃣ Attach Lambda Layer
+#### 4️⃣ Attach Lambda Layer
 
 - same steps 
 
