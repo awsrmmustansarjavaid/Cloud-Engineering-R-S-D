@@ -1932,6 +1932,14 @@ invalidation path:
 /cafe-admin-dashboard.html
 ```
 
+```
+/js/config.js
+/js/central-auth.js
+/js/utils.js
+/js/api.js
+/js/central-printing.js
+```
+
 ### 5️⃣ Click Create invalidation
 
 ⏳ Status will show:
