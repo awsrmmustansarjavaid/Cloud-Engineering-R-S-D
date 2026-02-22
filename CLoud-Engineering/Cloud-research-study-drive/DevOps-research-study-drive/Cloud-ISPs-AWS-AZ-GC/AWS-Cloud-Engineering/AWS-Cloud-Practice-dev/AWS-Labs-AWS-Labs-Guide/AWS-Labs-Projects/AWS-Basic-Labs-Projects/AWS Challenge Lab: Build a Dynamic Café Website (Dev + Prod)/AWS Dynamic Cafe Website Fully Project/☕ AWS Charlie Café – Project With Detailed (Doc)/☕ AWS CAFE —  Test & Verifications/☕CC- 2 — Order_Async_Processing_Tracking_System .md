@@ -1070,6 +1070,34 @@ curl -X POST \
 ✅ should succeed
 ```
 
+### Result
+
+```
+{ "statusCode": 404, "headers": { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" }, "body": "{\"error\": \"Order not found\"}" } START RequestId: 8542c381-aaea-405e-990d-87778b56056d Version: $LATEST END RequestId: 8542c381-aaea-405e-990d-87778b56056d REPORT RequestId: 8542c381-aaea-405e-990d-87778b56056d Duration: 346.34 ms Billed Duration: 1643 ms Memory Size: 128 MB Max Memory Used: 90 MB Init Duration: 1296.64 ms
+```
+
+👍 — this result means your Lambda is working correctly.
+
+The error:
+
+```
+{
+  "statusCode": 404,
+  "body": "{\"error\": \"Order not found\"}"
+}
+```
+
+means the database did not find this order_id:
+
+```
+ORD-20260222-1234
+```
+
+So the problem is NOT your Lambda code.
+It’s one of these 4 common issues:
+
+
+
 #### Test 2: PREPARING → READY
 
 - Name: CafeOrderWorkerLambda_PREPARING-READY
@@ -1241,6 +1269,9 @@ If you are testing through API Gateway, this is the raw request body:
 
 Lambda console requires the wrapped "body" format.
 API Gateway does NOT.
+
+
+
 
 ### 🧑‍💻 STEP 9 — 🧪 FINAL TEST
 
