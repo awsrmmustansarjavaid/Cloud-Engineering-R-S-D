@@ -1686,6 +1686,100 @@ order-status.php?order_id=ORD-XXXX
 ---
 ## 🔐 PHASE 5️⃣ — API Gateway Authorizer Test
 
+### 1️⃣ GET /order-status
+
+### 1️⃣ Test Inside API Gateway Console
+
+- Go to: API Gateway → Resources → /order-status → GET → Test
+
+#### 1️⃣ Test Without Date Filter
+
+- **Leave Query String empty.**
+
+#### 2️⃣ Test With Date Filter
+
+- Add:
+
+```
+Name: date
+Value: 2026-02-22
+```
+
+- Click Test
+
+**✅ If working → you’ll see metrics + recent_orders.**
+
+### ✅ 2️⃣ Test in Browser (Direct URL)
+
+Because it is a GET request, browser works.
+
+#### 1️⃣ Without Date Filter
+
+- Open in browser:
+
+```
+https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-status
+```
+
+You should see JSON response.
+
+#### 2️⃣ With Date Filter
+
+- Add query parameter:
+
+```
+https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-status?date=2026-02-22
+```
+
+This filters orders by that date.
+
+### ✅ 3️⃣ Test from EC2 (curl)
+
+- SSH into EC2 and run:
+
+#### 1️⃣ Without Date Filter
+
+```
+curl https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-status
+```
+
+#### 2️⃣ With Date Filter
+
+```
+curl "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-status?date=2026-02-22"
+```
+
+#### ✅ Expected Successful Response Example
+
+```
+{
+  "filter_date": "2026-02-22",
+  "metrics": [
+    {
+      "metric": "Total Orders",
+      "count": 5
+    },
+    {
+      "metric": "Total Items Sold",
+      "count": 12
+    },
+    {
+      "metric": "Customers",
+      "count": 3
+    }
+  ],
+  "recent_orders": [
+    {
+      "customer_name": "John",
+      "item": "Coffee",
+      "quantity": 2,
+      "created_at": "2026-02-22 10:22:11"
+    }
+  ]
+}
+```
+
+
 
 
 
