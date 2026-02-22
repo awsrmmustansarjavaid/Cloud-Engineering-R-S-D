@@ -1785,6 +1785,24 @@ curl "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-status?d
 curl -X GET "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard"
 ```
 
+#### ✅ Expected Result (Success, Admin with Cognito token):
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+- Status code: 200 OK
+
+- Notes:
+
+  - Returns static dashboard summary.
+
+  - Requires admin Cognito token. Without it → 401 Unauthorized.
+
 ### 3️⃣ Create user (POST):
 
 ```
@@ -1793,11 +1811,52 @@ curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/admin/
 -d '{"username": "charlie", "role": "employee"}'
 ```
 
+#### ✅ Expected Result (Success, Admin with Cognito token):
+
+```
+{
+  "message": "User charlie created with role employee",
+  "username": "charlie",
+  "role": "employee"
+}
+```
+
+- Status code: 200 OK
+
+- Notes:
+
+  - Currently does not create a real user, only returns confirmation message.
+
+  - Requires admin Cognito token. Without it → 401 Unauthorized.
+
 ### 4️⃣ Get employee orders (GET):
 
 ```
 curl -X GET "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employee/orders?employee_id=alice"
 ```
+
+#### ✅ Expected Result (Success, Admin with Cognito token):
+
+```
+[
+  { "order_id": "O-101", "employee": "alice", "total": 23.5 }
+]
+```
+
+- Status code: 200 OK
+
+- Notes:
+
+  - If you use employee_id=all → returns all orders:
+
+```
+[
+  { "order_id": "O-101", "employee": "alice", "total": 23.5 },
+  { "order_id": "O-102", "employee": "bob", "total": 12.0 }
+]
+```
+
+- Requires employee or admin Cognito token. Without it → 401 Unauthorized.
 
 ### 5️⃣ Create employee order (POST):
 
@@ -1806,6 +1865,30 @@ curl -X POST "https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/employ
 -H "Content-Type: application/json" \
 -d '{"order_id": "O-103", "employee": "charlie", "items": ["coffee"], "total": 10.5}'
 ```
+
+#### ✅ Expected Result (Success, Admin with Cognito token):
+
+```
+{
+  "message": "Order O-103 created successfully",
+  "order": {
+    "order_id": "O-103",
+    "employee": "charlie",
+    "items": ["coffee"],
+    "total": 10.5
+  }
+}
+```
+
+- Status code: 200 OK
+
+- Notes:
+
+  - Currently does not store the order, just echoes it.
+
+  - Requires employee or admin Cognito token. Without it → 401 Unauthorized.
+
+  - If JSON body is malformed → 400 Invalid JSON input.
 
 ### 6️⃣ Using Postman (GUI - Optional)
 
