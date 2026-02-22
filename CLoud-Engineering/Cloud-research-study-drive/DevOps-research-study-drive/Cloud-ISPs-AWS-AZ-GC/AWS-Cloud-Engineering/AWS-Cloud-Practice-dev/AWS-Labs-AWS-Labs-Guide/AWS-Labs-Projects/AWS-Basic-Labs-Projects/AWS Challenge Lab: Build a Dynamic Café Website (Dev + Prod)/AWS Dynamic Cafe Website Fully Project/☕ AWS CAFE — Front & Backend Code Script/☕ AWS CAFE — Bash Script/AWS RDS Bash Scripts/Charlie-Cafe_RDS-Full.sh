@@ -1,32 +1,35 @@
 #!/bin/bash
 # =============================================================
-# ☕ Charlie Cafe — Complete RDS Setup & Verification Script
-# Version: 2.0 (Production Safe)
-# Includes:
-#   ✔ Create Database
-#   ✔ Create Tables
-#   ✔ Safe ALTER TABLE (status column)
-#   ✔ Safe Index Creation
-#   ✔ Sample Data Insert
-#   ✔ Full Verification
+# ☕ Charlie Cafe — Master RDS Setup & Verification Script
+# Version: 3.0 (Fully Merged & Production Safe)
+#
+# Features:
+#   ✔ Auto-install required tools
+#   ✔ Secure Secrets Manager integration
+#   ✔ Create DB if not exists
+#   ✔ Create ALL tables (Orders + HR)
+#   ✔ Safe ALTER for status column
+#   ✔ Safe index creation (MySQL 5.7 compatible)
+#   ✔ Insert sample data (idempotent)
+#   ✔ Full per-table verification
 # =============================================================
 
 set -euo pipefail
 
-echo "☕ Charlie Cafe — Complete RDS Setup & Verification"
+echo "☕ Charlie Cafe — Complete Database Setup"
 echo "=============================================================="
 
 # =============================================================
-# CONFIGURATION (EDIT ONLY IF NEEDED)
+# CONFIGURATION (EDIT ONLY HERE)
 # =============================================================
 AWS_REGION="us-east-1"
 SECRET_ID="CafeDevDBSM"
 DB_NAME="cafe_db"
 
 # =============================================================
-# CHECK & INSTALL REQUIRED TOOLS
+# CHECK REQUIRED TOOLS
 # =============================================================
-echo "📦 Checking required packages..."
+echo "📦 Checking required tools..."
 
 command -v mysql >/dev/null 2>&1 || {
     echo "Installing MariaDB client..."
@@ -43,13 +46,13 @@ command -v aws >/dev/null 2>&1 || {
     exit 1
 }
 
-echo "✅ All required tools are installed"
+echo "✅ All required tools installed"
 echo ""
 
 # =============================================================
-# FETCH DATABASE CREDENTIALS FROM AWS SECRETS MANAGER
+# FETCH DATABASE CREDENTIALS
 # =============================================================
-echo "🔐 Fetching RDS credentials from Secrets Manager..."
+echo "🔐 Fetching RDS credentials..."
 
 SECRET_JSON=$(aws secretsmanager get-secret-value \
     --secret-id "$SECRET_ID" \
@@ -71,9 +74,9 @@ echo "✅ Credentials loaded: $DB_USER@$DB_HOST:$DB_PORT"
 echo ""
 
 # =============================================================
-# CREATE TEMP MYSQL CONFIG FILE (SECURE CONNECTION)
+# CREATE SECURE TEMP MYSQL CONFIG
 # =============================================================
-CREDENTIALS_FILE=$(mktemp /tmp/cafe-rds-cred.XXXXXX)
+CREDENTIALS_FILE=$(mktemp /tmp/cafe-db.XXXXXX)
 chmod 600 "$CREDENTIALS_FILE"
 
 cat > "$CREDENTIALS_FILE" <<EOF
@@ -85,19 +88,18 @@ password=$DB_PASS
 connect-timeout=10
 EOF
 
-# Auto-clean credentials file when script exits
 trap 'rm -f "$CREDENTIALS_FILE"' EXIT
 
 # =============================================================
 # TEST CONNECTION
 # =============================================================
-echo "🔌 Testing RDS connection..."
+echo "🔌 Testing database connection..."
 mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "SELECT 1" >/dev/null
-echo "✅ RDS connection successful"
+echo "✅ Connection successful"
 echo ""
 
 # =============================================================
-# CREATE DATABASE IF NOT EXISTS
+# CREATE DATABASE
 # =============================================================
 echo "🗄 Ensuring database exists..."
 
@@ -117,37 +119,32 @@ echo "📋 Creating tables..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
--- =====================================================
+-- =========================
 -- ORDERS TABLE
--- =====================================================
+-- =========================
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id       VARCHAR(50),
-    table_number   INT NOT NULL,
-    customer_name  VARCHAR(100),
-    item           VARCHAR(100),
-    quantity       INT NOT NULL,
-
-    item_cost      DECIMAL(6,2),
-    total_cost     DECIMAL(6,2),
-    total_amount   DECIMAL(10,2),
-
+    order_id VARCHAR(50),
+    table_number INT NOT NULL,
+    customer_name VARCHAR(100),
+    item VARCHAR(100),
+    quantity INT NOT NULL,
+    item_cost DECIMAL(6,2),
+    total_cost DECIMAL(6,2),
+    total_amount DECIMAL(10,2),
     payment_method VARCHAR(20),
     payment_status VARCHAR(20),
-
-    status         VARCHAR(20) DEFAULT 'RECEIVED',
-
-    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                   ON UPDATE CURRENT_TIMESTAMP,
-
+    status VARCHAR(20) DEFAULT 'RECEIVED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_table_number (table_number),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB;
 
--- =====================================================
--- EMPLOYEES TABLE
--- =====================================================
+-- =========================
+-- EMPLOYEES
+-- =========================
 CREATE TABLE IF NOT EXISTS employees (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
     cognito_user_id VARCHAR(100) NOT NULL,
@@ -159,16 +156,55 @@ CREATE TABLE IF NOT EXISTS employees (
     UNIQUE KEY uk_cognito (cognito_user_id)
 ) ENGINE=InnoDB;
 
+-- =========================
+-- ATTENDANCE
+-- =========================
+CREATE TABLE IF NOT EXISTS attendance (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT NOT NULL,
+    attendance_date DATE NOT NULL,
+    checkin_time TIME,
+    checkout_time TIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_day (employee_id, attendance_date),
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- =========================
+-- LEAVES
+-- =========================
+CREATE TABLE IF NOT EXISTS leaves (
+    leave_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT NOT NULL,
+    leave_date DATE NOT NULL,
+    leave_type VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- =========================
+-- HOLIDAYS
+-- =========================
+CREATE TABLE IF NOT EXISTS holidays (
+    holiday_id INT AUTO_INCREMENT PRIMARY KEY,
+    holiday_date DATE NOT NULL UNIQUE,
+    description VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
 EOF
 
-echo "✅ Tables created or verified"
+echo "✅ Tables created"
 echo ""
 
 # =============================================================
-# SAFE ALTER TABLE (ADD STATUS COLUMN IF MISSING)
-# MySQL 5.7 Compatible Method
+# SAFE ALTER: ENSURE STATUS COLUMN EXISTS (5.7 SAFE)
 # =============================================================
-echo "🔄 Ensuring 'status' column exists in orders table..."
+echo "🔄 Verifying status column..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
@@ -192,11 +228,34 @@ DEALLOCATE PREPARE stmt;
 
 EOF
 
-echo "✅ Orders table verified (status column ensured)"
+echo "✅ Status column verified"
 echo ""
 
 # =============================================================
-# INSERT SAMPLE DATA (SAFE TO RE-RUN)
+# SAFE INDEX CREATION (ATTENDANCE)
+# =============================================================
+echo "📈 Verifying attendance indexes..."
+
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
+
+SET @i1 := (SELECT COUNT(*) FROM information_schema.statistics
+WHERE table_schema=DATABASE()
+AND table_name='attendance'
+AND index_name='idx_attendance_date');
+
+SET @sql := IF(@i1=0,
+'ALTER TABLE attendance ADD INDEX idx_attendance_date (attendance_date)',
+'SELECT "idx_attendance_date exists"');
+
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
+
+EOF
+
+echo "✅ Index verification complete"
+echo ""
+
+# =============================================================
+# INSERT SAMPLE DATA (SAFE)
 # =============================================================
 echo "🌱 Inserting sample data..."
 
@@ -205,7 +264,17 @@ mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 INSERT IGNORE INTO orders (table_number, customer_name, item, quantity, status)
 VALUES
 (1, 'Ali Khan', 'Espresso', 2, 'RECEIVED'),
-(2, 'Sara Ahmed', 'Latte', 1, 'PREPARING');
+(2, 'Sara Ahmed', 'Cappuccino', 1, 'PREPARING');
+
+INSERT IGNORE INTO employees
+(cognito_user_id, name, job_title, salary, start_date)
+VALUES
+('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
+
+INSERT IGNORE INTO holidays (holiday_date, description)
+VALUES
+('2026-01-01', 'New Year'),
+('2026-03-23', 'Pakistan Day');
 
 EOF
 
@@ -213,20 +282,38 @@ echo "✅ Sample data inserted"
 echo ""
 
 # =============================================================
-# FINAL VERIFICATION
+# FULL TABLE VERIFICATION (EACH TABLE SEPARATELY)
 # =============================================================
 echo "🔎 FINAL VERIFICATION"
 echo "=============================================================="
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
-SHOW TABLES;
-
-SELECT 'orders' AS table_name, COUNT(*) FROM orders;
-
+-- ORDERS
+SELECT 'ORDERS TABLE' AS section;
 DESCRIBE orders;
-
+SELECT COUNT(*) AS total_orders FROM orders;
 SELECT * FROM orders LIMIT 5;
+
+-- EMPLOYEES
+SELECT 'EMPLOYEES TABLE' AS section;
+DESCRIBE employees;
+SELECT COUNT(*) AS total_employees FROM employees;
+
+-- ATTENDANCE
+SELECT 'ATTENDANCE TABLE' AS section;
+DESCRIBE attendance;
+SELECT COUNT(*) AS total_attendance FROM attendance;
+
+-- LEAVES
+SELECT 'LEAVES TABLE' AS section;
+DESCRIBE leaves;
+SELECT COUNT(*) AS total_leaves FROM leaves;
+
+-- HOLIDAYS
+SELECT 'HOLIDAYS TABLE' AS section;
+DESCRIBE holidays;
+SELECT COUNT(*) AS total_holidays FROM holidays;
 
 SELECT 'Charlie Cafe DB setup verified successfully ✅' AS status;
 
