@@ -1838,7 +1838,7 @@ https://a1053skr51.execute-api.us-east-1.amazonaws.com/prod/get-order-status
 
 ## 🔔 PHASE 1️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)
 
-### 🧑‍💻 STEP 1 — CREATE NEW LAMBDA (READ-ONLY)
+### 1️⃣ — CREATE NEW LAMBDA (READ-ONLY)
 
 #### 1️⃣ Open AWS Lambda
 
@@ -1857,7 +1857,7 @@ Click Create function
 
 Wait until status = Active
 
-### 🧑‍💻 STEP 2 — ADD PyMySQL LAYER
+### 2️⃣ — ADD PyMySQL LAYER
 
 - Lambda → Layers → Add layer
 
@@ -1869,7 +1869,7 @@ Wait until status = Active
 
 - Click Add
 
-### 🧑‍💻 STEP 4 — FINAL LAMBDA CODE (READ-ONLY)
+### 3️⃣ — FINAL LAMBDA CODE (READ-ONLY)
 
 > **⚠️ COPY EXACTLY — do NOT modify**
 
@@ -1877,7 +1877,7 @@ Wait until status = Active
 
 Click Deploy
 
-### 🧪 STEP 5 — Move Lambda Into VPC
+### 4️⃣ — Move Lambda Into VPC
 
 - AWS Console → Lambda → Your Function
 
@@ -1899,11 +1899,11 @@ Click Deploy
 
 **⏳ Wait until Lambda status = Active**
 
-### 🧪 STEP 6 — TEST LAMBDA (MANDATORY)
+### 5️⃣ — TEST LAMBDA (MANDATORY)
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
-### 🌐 STEP 7 — CREATE API GATEWAY (READ-ONLY)
+### 6️⃣ — CREATE API GATEWAY (READ-ONLY)
 
 #### 1️⃣ Open API Gateway 
 
@@ -1949,11 +1949,11 @@ prod
 https://xxxx.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status
 ```
 
-### 🧪 STEP 8 — TEST API (CRITICAL)
+### 7️⃣ — TEST API (CRITICAL)
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
-### 🧑‍💻 STEP 9 — CREATE order-status.php
+### 8️⃣ — CREATE order-status.php
 
 This file is frontend-only and SAFE
 
@@ -1969,7 +1969,7 @@ $apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/cafe-ord
 
 **🔁 Replace with your real API Gateway URL**
 
-### 🧪 STEP 10 — END-TO-END TEST
+### 9️⃣ — END-TO-END TEST
 
 - **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
 
