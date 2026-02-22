@@ -1496,6 +1496,41 @@ If you are testing through API Gateway, this is the raw request body:
 Lambda console requires the wrapped "body" format.
 API Gateway does NOT.
 
+### API Test
+
+#### 1️⃣ API Gateway 
+
+inside API Gateway:
+
+```
+{
+  "order_id": "ORD-XXXX",
+  "status": "PREPARING"
+}
+```
+
+#### 2️⃣ Expected JSON
+
+```
+{"error": "Order not found"}
+```
+
+#### That means:
+
+✔ API Gateway → Lambda integration is correct
+
+✔ Lambda executed
+
+✔ DB connection worked
+
+✔ It just didn’t find that order
+
+So this part is GOOD.
+
+#### 2️⃣ Web Browser
+
+
+
 
 
 
