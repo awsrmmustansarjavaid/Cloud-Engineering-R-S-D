@@ -2003,9 +2003,6 @@ Without the token, the API will return 401 Unauthorized.
 Authorization: Bearer <ACCESS_TOKEN>
 ```
 
-
-
-
 **✅ PHASE 5️⃣ STATUS**
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
@@ -2271,9 +2268,9 @@ Test_EmployeeOrderLambda
 
 ## ☕ CHARLIE CAFÉ PHASE 1️⃣ Cach Payment System 
 
-### 5️⃣ 🧪 TEST SCENARIOS (DO THESE)
+### 🧪 TEST SCENARIOS (DO THESE)
 
-#### ✅ Test 1 — Manual API Test
+### 1️⃣ Test — Manual API Test
 
 Use Postman / curl:
 
@@ -2291,6 +2288,8 @@ POST /orders/cash-payment
   "success": true
 }
 ```
+### 2️⃣ Test — Curl Test
+
 
 curl is usually pre-installed on EC2 instances. For your API:
 
@@ -2311,7 +2310,7 @@ curl -X POST \
 {"success": true, "message": "Order marked for cash payment"}
 ```
 
-Explanation:
+#### ✅ Explanation:
 
 -X POST → specifies POST request
 
@@ -2333,19 +2332,16 @@ You should get a JSON response from your Lambda/API Gateway, e.g.:
 }
 ```
 
+### 3️⃣ Test — DynamoDB Check Test
 
-
-
-#### ✅ Test 2 — DynamoDB Check
-
-Open DynamoDB item:
+- Open DynamoDB item:
 
 ```
 payment_method = CASH
 payment_status = PENDING
 ```
 
-#### ✅ Test 3 — UI Test
+### 4️⃣ Test — UI Test
 
 - Place order
 
@@ -2357,7 +2353,7 @@ payment_status = PENDING
 
 - Order shows pending payment
 
-#### ✅ Test 4 — Test Event JSON (for Lambda Console)
+### 5️⃣ Test — Test Event JSON (for Lambda Console)
 
 - Go to your Lambda → CashPaymentLambda → Test tab
 
@@ -2369,7 +2365,7 @@ payment_status = PENDING
 
 - Paste one of these into the editor:
 
-Basic successful test (most common)
+#### 1️⃣ Basic successful test (most common)
 
 ```
 {
@@ -2387,7 +2383,8 @@ Basic successful test (most common)
 }
 ```
 
-#### Minimal version 
+#### 2️⃣ Minimal version 
+
 > **(just the required body – works if your integration is proxy)**
 
 ```
@@ -2396,7 +2393,8 @@ Basic successful test (most common)
 }
 ```
 
-#### With more realistic API Gateway fields
+#### 3️⃣ With more realistic API Gateway fields
+
 > **(best match for proxy integration)**
 
 ```
@@ -2440,6 +2438,183 @@ Basic successful test (most common)
   "body": "{\"success\": true, \"message\": \"Order marked for cash payment\"}"
 }
 ```
+
+### 6️⃣ Test - API Gateway Endpoint
+
+- Open API Gateway → your API → Dev stage → Resources → /orders/cash-payment → POST
+
+- Click “Test” button (top-right)
+
+- Enter request body (JSON):
+
+```
+{
+  "order_id": "12345",
+  "amount": 50,
+  "customer": "John Doe"
+}
+```
+
+- Click “Test”
+
+- API Gateway will invoke your Lambda → you will see response and logs
+
+
+#### ✅ Expected success :
+
+```
+{"success": true, "message": "Order marked for cash payment"}
+```
+
+#### 1️⃣ Your cURL command
+
+```
+curl -X POST \
+  https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment \
+  -H "Content-Type: application/json" \
+  -d '{
+        "order_id": "12345",
+        "amount": 50,
+        "customer": "John Doe"
+      }'
+```
+
+#### What this does:
+
+- Sends a POST request to /orders/cash-payment
+
+- Content-Type: application/json → API Gateway will parse the body as a string in event.body
+
+- Payload is:
+
+```
+{
+  "order_id": "12345",
+  "amount": 50,
+  "customer": "John Doe"
+}
+```
+
+#### 2️⃣ How API Gateway passes data to Lambda
+
+From your example Lambda event:
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260131-1234\"}",
+  "httpMethod": "POST",
+  "path": "/orders/cash-payment",
+  "requestContext": {
+    "stage": "dev",
+    "requestId": "test-1234-abcd"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "isBase64Encoded": false
+}
+```
+
+#### Key points:
+
+- event.body is a string — you need to parse it in Lambda:
+
+```
+const request = JSON.parse(event.body);
+console.log(request.order_id); // will print "12345"
+```
+
+- httpMethod → POST (useful if your Lambda handles multiple methods)
+
+- path → The API path called
+
+- headers → Content-Type and other headers
+
+- isBase64Encoded → false (body is not base64)
+
+#### 3️⃣ How to test in API Gateway console (without cURL)
+
+- Open API Gateway → your API → Dev stage → Resources → /orders/cash-payment → POST
+
+- Click “Test” button (top-right)
+
+- Enter request body (JSON):
+
+```
+{
+  "order_id": "12345",
+  "amount": 50,
+  "customer": "John Doe"
+}
+```
+
+- Click “Test”
+
+- API Gateway will invoke your Lambda → you will see response and logs
+
+#### 4️⃣ How to test with cURL
+
+- Make sure Content-Type is application/json
+
+- The Lambda will receive event.body as a string, so parse it inside your Lambda:
+
+```
+export const handler = async (event) => {
+  let request;
+  try {
+    request = JSON.parse(event.body); // parse string
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid JSON" }),
+    };
+  }
+
+  console.log("Received order:", request);
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: `Order ${request.order_id} processed`,
+      order: request,
+    }),
+  };
+};
+```
+
+- Then call cURL:
+
+```
+curl -X POST \
+  https://q8rq19tfka.execute-api.us-east-1.amazonaws.com/dev/orders/cash-payment \
+  -H "Content-Type: application/json" \
+  -d '{
+        "order_id": "12345",
+        "amount": 50,
+        "customer": "John Doe"
+      }'
+```
+
+#### ✅ Expected Response:
+
+```
+{
+  "message": "Order 12345 processed",
+  "order": {
+    "order_id": "12345",
+    "amount": 50,
+    "customer": "John Doe"
+  }
+}
+```
+
+#### ✅ Tips
+
+- Always parse event.body — API Gateway passes JSON as string.
+
+- For quick testing, use API Gateway console “Test” feature.
+
+- Use Postman or cURL for external testing.
 
 **✅ PHASE 1️⃣ STATUS**
 
