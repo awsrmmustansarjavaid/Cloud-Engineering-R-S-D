@@ -1546,18 +1546,44 @@ Browsers cannot easily send POST with JSON directly via URL.
 
 You need:
 
-Postman
+- Postman
 
-curl
+- curl
 
-Or a small HTML/JS fetch request
+- Or a small HTML/JS fetch request
 
 Example JavaScript:
 
+```
+fetch("https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-update", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    order_id: "ORD-20260222-4821",
+    status: "PREPARING"
+  })
+})
+.then(res => res.json())
+.then(data => console.log(data));
+```
 
+### 🔥 Quick Checklist for You
 
+- Redeploy API to stage prod
 
+- Confirm stage name
 
+- Use this exact curl:
+
+```
+curl -X POST https://zyqkbyrdy3.execute-api.us-east-1.amazonaws.com/prod/order-update \
+-H "Content-Type: application/json" \
+-d '{"order_id":"REAL_ORDER_ID","status":"PREPARING"}'
+```
+
+- Replace REAL_ORDER_ID with actual one from DB.
 
 ### 🧑‍💻 STEP 9 — 🧪 FINAL TEST
 
