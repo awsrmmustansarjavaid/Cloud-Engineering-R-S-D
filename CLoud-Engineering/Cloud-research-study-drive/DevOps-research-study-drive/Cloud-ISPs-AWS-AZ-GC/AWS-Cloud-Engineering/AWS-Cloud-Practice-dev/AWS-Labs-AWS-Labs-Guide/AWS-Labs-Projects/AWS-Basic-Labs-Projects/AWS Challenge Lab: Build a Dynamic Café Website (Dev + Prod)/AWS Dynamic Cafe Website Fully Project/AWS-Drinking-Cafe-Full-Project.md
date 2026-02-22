@@ -1930,7 +1930,7 @@ CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
 
 #### 2️⃣ ✅ /var/www/html/js/
 
-Example:
+#### Example:
 
 ```
 /var/www/html/js/config.js
@@ -1955,7 +1955,7 @@ Example:
 
 Instead of invalidating every time, use versioning:
 
-Change:
+#### Change:
 
 ```
 /js/config.js
@@ -1965,7 +1965,7 @@ Change:
 /js/central-printing.js
 ```
 
-To:
+#### To:
 
 ```
 /js/config.v2.js
@@ -1975,7 +1975,7 @@ To:
 /js/central-printing.v2.js
 ```
 
-Or:
+#### Or:
 
 ```
 <script src="/js/config.js?v=2"></script>
