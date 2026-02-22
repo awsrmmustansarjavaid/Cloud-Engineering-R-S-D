@@ -117,7 +117,27 @@ Ensure payload includes:
 
 ### 4️⃣ Test with API Gateway or Lambda test
 
-#### Update test body
+#### 1️⃣ Test API Gateway Endpoint (Console Method)
+
+- Go to AWS Console
+
+- Click API Gateway
+
+- Open your API
+
+- Click Resources
+
+- Click /orders
+
+- Click POST
+
+- On the POST method page
+
+- Click the Test button (top right)
+
+- Update Request Body
+
+In Request Body, paste:
 
 ```
 {
@@ -127,7 +147,75 @@ Ensure payload includes:
   "quantity": 1
 }
 ```
-#### curl Test
+
+- Leave:
+
+  - Headers empty (unless using auth)
+
+  - Query params empty
+
+- Click “Test” (Blue Button)
+
+- Scroll down to see:
+
+  - Request
+
+  - Response Body
+
+  - Response Headers
+
+  - Logs
+
+#### ✅ Expected Success Response
+
+You should see:
+
+```
+{
+  "order_id": "...",
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1,
+  "total": 3.0,
+  "status": "RECEIVED",
+  "created_at": "..."
+}
+```
+
+#### ❌ If You See "Internal server error"
+
+Immediately:
+
+- Open CloudWatch
+
+- Go to /aws/lambda/YourLambdaName
+
+- Open latest log stream
+
+- Check the exact Python error
+
+#### ⚠️ Important
+
+If console test works but curl fails:
+
+→ CORS issue
+
+→ Missing deploy
+
+→ Wrong stage URL
+
+#### 🔁 After Any Change
+
+- Always:
+
+- Click Deploy API
+
+- Select prod
+
+- Deploy
+
+#### 2️⃣ TEST WITH CURL (Important)
 
 ```
 curl -X POST \

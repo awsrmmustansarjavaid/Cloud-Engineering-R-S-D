@@ -502,7 +502,7 @@ https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
 
 ### 2nd Method - ADD API GATEWAY TRIGGER Method
 
-#### 1️⃣ ADD API GATEWAY TRIGGER
+### 1️⃣ ADD API GATEWAY TRIGGER
 
 
 When you go to:
@@ -518,7 +518,7 @@ When you go to:
 
 - Click Add
 
-##### ➡️ AWS automatically:
+#### ➡️ AWS automatically:
 
 ```
 - Creates an API
@@ -536,7 +536,7 @@ When you go to:
 You start from Lambda and let AWS build the API for you.
 ```
 
-#### 2️⃣ Get Your Endpoint
+### 2️⃣ Get Your Endpoint
 
 - Go to API Gateway → Open your new API
 
@@ -561,7 +561,7 @@ If resource path is /orders:
 https://abc123.execute-api.us-east-1.amazonaws.com/Prod/orders
 ```
 
-#### 3️⃣ — ENABLE CORS
+### 3️⃣ — ENABLE CORS
 
 - Inside API Gateway:
 
@@ -579,7 +579,7 @@ https://abc123.execute-api.us-east-1.amazonaws.com/Prod/orders
 
 This prevents browser blocking.
 
-#### 4️⃣ — Deploy API
+### 4️⃣ — Deploy API
 
 - After any change:
 
@@ -593,7 +593,74 @@ This prevents browser blocking.
 
 Without deploy → it will NOT work.
 
-#### 5️⃣ — TEST WITH CURL (Important)
+### 5️⃣ — TEST 
+
+#### 1️⃣ Test API Gateway Endpoint (Console Method)
+
+- Go to AWS Console
+
+- Click API Gateway
+
+- Open your API
+
+- Click Resources
+
+- Click /orders
+
+- Click POST
+
+- On the POST method page
+
+- Click the Test button (top right)
+
+- Update Request Body
+
+In Request Body, paste:
+
+```
+{
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1
+}
+```
+
+- Leave:
+
+  - Headers empty (unless using auth)
+
+  - Query params empty
+
+- Click “Test” (Blue Button)
+
+- Scroll down to see:
+
+  - Request
+
+  - Response Body
+
+  - Response Headers
+
+  - Logs
+
+#### ✅ Expected Success Response
+
+You should see:
+
+```
+{
+  "order_id": "...",
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1,
+  "total": 3.0,
+  "status": "RECEIVED",
+  "created_at": "..."
+}
+```
+#### 2️⃣ TEST WITH CURL (Important)
 
 Test outside PHP first.
 
