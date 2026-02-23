@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $total = $prices[$item] * $quantity;
         $orderSuccess = true;
 
-        // 4️⃣ Prepare Redirect URL after payment
+        // 4️⃣ Prepare Redirect URL after payment (temporary, will use Lambda order_id later)
         $statusUrl = "payment-status.php?order_id=$orderId";
     }
 }
@@ -194,10 +194,10 @@ body {
                 <a class="nav-link active" href="orders.php">🛒 Place Order</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="order-status.html">📦 Track Order</a>
+                <a class="nav-link" href="https://d1e3k1a40fw7la.cloudfront.net/order-status.html">📦 Track Order</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="price-list.html">📋 Menu</a>
+                <a class="nav-link" href="https://d1e3k1a40fw7la.cloudfront.net/price-list.html">📋 Menu</a>
             </li>
         </ul>
     </div>
@@ -295,41 +295,51 @@ body {
 <script src="/js/utils.js"></script>
 <script src="/js/api.js"></script>
 
+<!-- =======================================================
+     FINAL JS INTEGRATION
+     ✅ Updated with CHARLIE_CONFIG.API_BASE
+     ✅ Includes Stripe + Card Mount
+     ✅ Sends payment_method to Lambda
+======================================================= -->
 <script>
-// ==========================================================
-// DARK / LIGHT MODE TOGGLE
-// ==========================================================
+// ------------------------
+// THEME TOGGLE
+// ------------------------
 function toggleTheme(){
     document.body.classList.toggle("dark-mode");
-    localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark":"light");
+    localStorage.setItem("theme",
+        document.body.classList.contains("dark-mode") ? "dark":"light");
 }
 
-// Load saved theme
+// Apply saved theme on load
 window.onload = function(){
     if(localStorage.getItem("theme")==="dark"){
         document.body.classList.add("dark-mode");
     }
 }
 
-// ==========================================================
-// STRIPE SIMULATION
-// ==========================================================
-const stripe = Stripe("pk_test_xxxxxxxxx");
+// ------------------------
+// STRIPE SETUP
+// ------------------------
+const stripe = Stripe("pk_test_xxxxxxxxx"); // Replace with real Stripe key
 const elements = stripe.elements();
 const card = elements.create("card",{style:{base:{color:"#fff"}}});
 card.mount("#card-element");
 
-// ==========================================================
-// PAYMENT FUNCTIONS
-// ==========================================================
-async function sendOrderToBackend(){
-    const API_URL = "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders";
+// ------------------------
+// SEND ORDER TO BACKEND
+// ------------------------
+async function sendOrderToBackend(paymentMethod){
+    // Use API_BASE from config.js
+    const API_URL = window.CHARLIE_CONFIG.API_BASE + "/orders";
 
+    // Prepare JSON body matching Lambda
     const orderData = {
         table_number: <?= $tableNumber ?? 0 ?>,
         customer_name: "<?= $customerName ?? '' ?>",
         item: "<?= $item ?? '' ?>",
-        quantity: <?= $quantity ?? 0 ?>
+        quantity: <?= $quantity ?? 0 ?>,
+        payment_method: paymentMethod
     };
 
     try {
@@ -340,25 +350,33 @@ async function sendOrderToBackend(){
         });
 
         const result = await res.json();
+
         if(res.ok){
-            window.location.href = "<?= $statusUrl ?? '' ?>";
+            // Redirect to order-status with real Lambda order_id
+            alert("Order placed successfully!");
+            window.location.href =
+                "order-status.php?order_id=" + result.order_id;
         } else {
             alert("Error: " + result.error);
         }
+
     } catch(e){
         alert("Network error. Please try again.");
         console.error(e);
     }
 }
 
+// ------------------------
+// PAYMENT BUTTONS
+// ------------------------
 function payWithCard(){
     alert("Stripe payment successful (simulation).");
-    sendOrderToBackend();
+    sendOrderToBackend("CARD"); // Send CARD as payment method
 }
 
 function payWithCash(){
     alert("☕ Please pay at the counter.");
-    sendOrderToBackend();
+    sendOrderToBackend("CASH"); // Send CASH as payment method
 }
 </script>
 
