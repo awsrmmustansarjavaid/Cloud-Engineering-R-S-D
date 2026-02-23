@@ -32,9 +32,9 @@ orders_table = dynamodb.Table(ORDERS_TABLE)
 # ==========================================================
 PRICE_LIST = {
     "Coffee": 3.00,
-    "Tea": 2.50,
+    "Tea": 2.00,
     "Latte": 4.00,
-    "Cappuccino": 4.50,
+    "Cappuccino": 4.00,
     "Fresh Juice": 5.00
 }
 
