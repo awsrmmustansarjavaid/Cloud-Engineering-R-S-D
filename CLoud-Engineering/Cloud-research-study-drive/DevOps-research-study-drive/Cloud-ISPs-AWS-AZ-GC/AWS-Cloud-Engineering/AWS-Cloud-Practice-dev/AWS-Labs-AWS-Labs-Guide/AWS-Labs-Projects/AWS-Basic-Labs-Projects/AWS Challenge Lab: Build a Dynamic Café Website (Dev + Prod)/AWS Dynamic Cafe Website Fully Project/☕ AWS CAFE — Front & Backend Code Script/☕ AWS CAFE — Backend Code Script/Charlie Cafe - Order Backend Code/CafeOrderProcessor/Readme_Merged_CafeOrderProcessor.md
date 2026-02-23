@@ -1314,5 +1314,242 @@ def lambda_handler(event, context):
 - Returns full JSON to frontend including payment_method and payment_status.
 
 - Eliminates the need for a separate CashPaymentLambda.
+
+### upgrade this Lambda to support multi-item orders (array of items in a single order)
+
+Supporting multi-item orders is the next big improvement — instead of sending one item per order, the frontend can send an array of items with quantity and the Lambda will calculate totals, insert all items in RDS, update metrics, and save a single consolidated order in DynamoDB. This is much more professional and avoids multiple API calls per table.
+
+Here’s how we can upgrade your Lambda:
+
+### 1️⃣ Frontend Request Format
+
+Instead of single item + quantity, send an array of items:
+
+```
+{
+  "table_number": 3,
+  "customer_name": "Alice",
+  "payment_method": "CASH",
+  "items": [
+    {"item": "Coffee", "quantity": 2},
+    {"item": "Latte", "quantity": 1},
+    {"item": "Fresh Juice", "quantity": 3}
+  ]
+}
+```
+
+- items is an array of objects with item and quantity.
+
+- payment_method is optional (default "NONE").
+
+### 2️⃣ Lambda Logic Changes
+
+- Validate array of items.
+
+- Calculate total_amount = sum of (price × quantity) for all items.
+
+- Insert each item as separate rows in RDS (optional: could also store JSON in one row).
+
+- Update DynamoDB metrics for each item.
+
+- Save single consolidated order in DynamoDB (CafeOrders) with all items in an array.
+
+- Send SQS message with the full order.
+
+### 3️⃣ Updated Lambda Skeleton for Multi-Item Orders
+
+#### Here’s a production-ready version:
+
+```
+import json
+import boto3
+import pymysql
+import os
+import random
+from decimal import Decimal
+from datetime import datetime
+
+# AWS clients
+secrets_client = boto3.client('secretsmanager')
+dynamodb = boto3.resource('dynamodb')
+sqs = boto3.client('sqs')
+
+# ENV
+SECRET_NAME = "CafeDevDBSM"
+SQS_QUEUE_URL = os.environ['SQS_QUEUE_URL']
+MENU_TABLE = "CafeMenu"
+METRICS_TABLE = "CafeOrderMetrics"
+ORDERS_TABLE = "CafeOrders"
+
+menu_table = dynamodb.Table(MENU_TABLE)
+metrics_table = dynamodb.Table(METRICS_TABLE)
+orders_table = dynamodb.Table(ORDERS_TABLE)
+
+# Price list
+PRICE_LIST = {
+    "Coffee": 3.00,
+    "Tea": 2.50,
+    "Latte": 4.00,
+    "Cappuccino": 4.50,
+    "Fresh Juice": 5.00
+}
+
+def generate_order_id():
+    return f"ORD-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000,9999)}"
+
+def get_db_secret():
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+def response(status_code, body):
+    return {
+        "statusCode": status_code,
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(body)
+    }
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event.get("body", "{}"))
+        table_number = int(body.get("table_number", 0))
+        customer_name = body.get("customer_name", "Guest")
+        payment_method = body.get("payment_method", "NONE").upper()
+        items = body.get("items", [])
+
+        # Validations
+        if table_number <= 0:
+            return response(400, {"error": "Invalid table number"})
+        if payment_method not in ["NONE", "CASH", "CARD"]:
+            return response(400, {"error": "Invalid payment method"})
+        if not items or not isinstance(items, list):
+            return response(400, {"error": "Items must be a non-empty array"})
+
+        # Validate items & calculate total
+        total_amount = 0
+        for entry in items:
+            item_name = entry.get("item")
+            quantity = int(entry.get("quantity", 0))
+            if item_name not in PRICE_LIST or quantity <= 0:
+                return response(400, {"error": f"Invalid item or quantity: {entry}"})
+            total_amount += PRICE_LIST[item_name] * quantity
+
+        order_id = generate_order_id()
+        status = "RECEIVED"
+        payment_status = "PENDING" if payment_method != "NONE" else "NONE"
+        created_at = datetime.now()
+
+        # Insert into RDS (one row per item)
+        secret = get_db_secret()
+        connection = pymysql.connect(
+            host=secret["host"],
+            user=secret["username"],
+            password=secret["password"],
+            database=secret["dbname"],
+            connect_timeout=10,
+            autocommit=False
+        )
+
+        with connection.cursor() as cursor:
+            for entry in items:
+                cursor.execute("""
+                    INSERT INTO orders
+                    (order_id, table_number, customer_name, item,
+                     quantity, total_amount, status, created_at,
+                     payment_method, payment_status)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """, (
+                    order_id,
+                    table_number,
+                    customer_name,
+                    entry["item"],
+                    entry["quantity"],
+                    PRICE_LIST[entry["item"]] * entry["quantity"],
+                    status,
+                    created_at,
+                    payment_method,
+                    payment_status
+                ))
+        connection.commit()
+        connection.close()
+
+        # Save consolidated order in DynamoDB
+        orders_table.put_item(
+            Item={
+                "order_id": order_id,
+                "table_number": table_number,
+                "customer_name": customer_name,
+                "items": items,  # Array of items
+                "total_amount": total_amount,
+                "status": status,
+                "payment_method": payment_method,
+                "payment_status": payment_status,
+                "created_at": str(created_at)
+            }
+        )
+
+        # Update metrics for each item
+        for entry in items:
+            menu_table.update_item(
+                Key={"item": entry["item"]},
+                UpdateExpression="ADD orders :inc",
+                ExpressionAttributeValues={":inc": Decimal(entry["quantity"])}
+            )
+
+        # Update global metrics
+        metrics_table.update_item(
+            Key={"metric": "TOTAL_ORDERS"},
+            UpdateExpression="ADD #c :inc",
+            ExpressionAttributeNames={"#c": "count"},
+            ExpressionAttributeValues={":inc": Decimal(1)}
+        )
+
+        # Send SQS message
+        sqs.send_message(
+            QueueUrl=SQS_QUEUE_URL,
+            MessageBody=json.dumps({
+                "order_id": order_id,
+                "table_number": table_number,
+                "customer_name": customer_name,
+                "items": items,
+                "total_amount": total_amount,
+                "status": status,
+                "payment_method": payment_method,
+                "payment_status": payment_status,
+                "timestamp": str(created_at)
+            })
+        )
+
+        return response(200, {
+            "order_id": order_id,
+            "table_number": table_number,
+            "customer_name": customer_name,
+            "items": items,
+            "total_amount": total_amount,
+            "status": status,
+            "payment_method": payment_method,
+            "payment_status": payment_status,
+            "created_at": str(created_at)
+        })
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        return response(500, {"error": str(e)})
+```
+
+### ✅ Features of Multi-Item Lambda
+
+- Accepts array of items per order.
+
+- Saves one consolidated order in DynamoDB (items field is an array).
+
+- Inserts one row per item in RDS for detailed analytics.
+
+- Updates item-level metrics and global metrics.
+
+- Supports payment methods (CASH, CARD, NONE) in the same request.
+
+- Sends SQS message with all order items.
+
+- Returns full JSON with all items and totals.
 ---
 
