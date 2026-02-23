@@ -5,7 +5,7 @@
 
 ## PHASE 2️⃣ — Verification SQS/LAMBDA (Producer)
 
-#### 1️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
+### 1️⃣ CREATE LAMBDA TEST (CONSOLE TEST)
 
 - Click Test
 
@@ -17,8 +17,7 @@
 CafeOrderProcessor
 ```
 
-Event JSON:
-
+Since this Lambda currently handles one item per order, a sample test JSON for AWS Lambda console would look like this Event JSON:
 
 ```
 {
@@ -26,15 +25,9 @@ Event JSON:
 }
 ```
 
-```
-{
-  "body": "{ \"table_number\": 3, \"customer_name\": \"Alice\", \"item\": \"Coffee\", \"quantity\": 2 }"
-}
-```
+- Click Save
 
-Click Save
-
-Click Test
+- Click Test
 
 #### Expected Result (SUCCESS)
 
@@ -44,6 +37,122 @@ Click Test
   "body": "{\"order_id\":\"ORD-20260220-1234\",\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"total\":6.0,\"status\":\"RECEIVED\",\"created_at\":\"2026-02-20 10:30:00\"}"
 }
 ```
+
+#### Notes:
+
+- The Lambda expects event["body"] as a string (JSON-encoded), because in API Gateway POST requests, the body comes as a string.
+
+- If you are testing in Lambda console, you must wrap it as above (string inside "body").
+
+#### ✅ Example with missing optional field (customer_name)
+
+```
+{
+  "body": "{ \"table_number\": 5, \"item\": \"Latte\", \"quantity\": 1 }"
+}
+```
+
+- Here, customer_name defaults to "Guest".
+
+#### ✅ Expected Result
+
+If everything works, the Lambda will return status 200 with JSON including the order details:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": "{\"order_id\": \"ORD-20260223-1234\", \"table_number\": 3, \"customer_name\": \"Alice\", \"item\": \"Coffee\", \"quantity\": 2, \"total\": 6.0, \"status\": \"RECEIVED\", \"created_at\": \"2026-02-23 04:00:00\"}"
+}
+```
+
+#### Notes:
+
+- order_id will be dynamically generated like ORD-YYYYMMDD-XXXX.
+
+- total is automatically calculated (PRICE_LIST[item] * quantity).
+
+- status is always "RECEIVED" initially.
+
+- created_at is the timestamp of the order.
+
+### DynamoDB Result (CafeOrders)
+
+After Lambda runs, DynamoDB table CafeOrders will have a record like:
+
+| Attribute      | Value               |
+| -------------- | ------------------- |
+| order_id       | ORD-20260223-1234   |
+| table_number   | 3                   |
+| customer_name  | Alice               |
+| item           | Coffee              |
+| quantity       | 2                   |
+| total_amount   | 6.0                 |
+| status         | RECEIVED            |
+| payment_method | NONE                |
+| payment_status | PENDING             |
+| created_at     | 2026-02-23 04:00:00 |
+
+### Menu Metrics / Global Metrics
+
+Your Lambda currently updates these explicitly with:
+
+```
+# Per-item metric
+menu_table.update_item(
+    Key={"item": item},
+    UpdateExpression="ADD orders :inc",
+    ExpressionAttributeValues={":inc": Decimal(quantity)}
+)
+
+# Global metric
+metrics_table.update_item(
+    Key={"metric": "TOTAL_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+```
+
+#### Important points:
+
+- They are NOT automatic. You must keep these updates if you want CafeMenu and CafeOrderMetrics to reflect actual orders.
+
+- DynamoDB does atomic updates, so concurrent orders are handled safely (no lost counts).
+
+- If you remove these lines, metrics will not be updated, and dashboards / reports will be inaccurate.
+
+✅ So yes, keep these steps if you want metrics updated automatically whenever an order is created.
+
+### SQS Message
+
+- A message is sent to your SQS_QUEUE_URL with the same order data.
+
+- Other Lambdas (like kitchen workers or printers) can consume it asynchronously.
+
+Example SQS message body:
+
+```
+{
+  "order_id": "ORD-20260223-1234",
+  "table_number": 3,
+  "customer_name": "Alice",
+  "item": "Coffee",
+  "quantity": 2,
+  "status": "RECEIVED",
+  "timestamp": "2026-02-23 04:00:00"
+}
+```
+
+#### ✅ Summary
+
+- Lambda Test JSON: Must have "body" string with table_number, item, quantity (optional customer_name).
+
+- Expected Response: statusCode: 200, JSON body with order details.
+
+- Metrics Updates: They are explicit in Lambda; not automatic. Keep them if you want real-time dashboards.
 
 #### CloudWatch Logs:
 
