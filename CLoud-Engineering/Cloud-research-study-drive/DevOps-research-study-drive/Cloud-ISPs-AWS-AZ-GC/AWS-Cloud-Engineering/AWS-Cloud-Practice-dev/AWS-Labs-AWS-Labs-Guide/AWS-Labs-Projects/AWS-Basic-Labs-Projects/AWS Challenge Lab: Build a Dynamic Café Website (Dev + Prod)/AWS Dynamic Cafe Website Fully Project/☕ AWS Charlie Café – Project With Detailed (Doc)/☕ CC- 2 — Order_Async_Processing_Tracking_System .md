@@ -1751,11 +1751,11 @@ Click Deploy
 
 - Click Resources
 
-- Click /orders
+- Click /get-order-status
 
-- Click POST
+- Click GET
 
-- On the POST method page
+- On the GET method page
 
 - Click the Test button (top right)
 
