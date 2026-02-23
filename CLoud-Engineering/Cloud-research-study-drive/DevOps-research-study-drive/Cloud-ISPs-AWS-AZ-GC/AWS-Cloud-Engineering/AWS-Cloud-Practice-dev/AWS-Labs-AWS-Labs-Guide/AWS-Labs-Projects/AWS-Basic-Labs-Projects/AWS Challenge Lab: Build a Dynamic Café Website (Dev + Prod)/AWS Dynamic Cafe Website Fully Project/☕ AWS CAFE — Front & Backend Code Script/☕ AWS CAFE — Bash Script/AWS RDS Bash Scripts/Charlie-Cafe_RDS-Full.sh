@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================
 # ☕ Charlie Cafe — Master RDS Setup & Verification Script
-# Version: 3.0 (Fully Merged & Production Safe)
+# Version: 4.0 (Production Safe + created_at Migration)
 #
 # Features:
 #   ✔ Auto-install required tools
@@ -9,6 +9,7 @@
 #   ✔ Create DB if not exists
 #   ✔ Create ALL tables (Orders + HR)
 #   ✔ Safe ALTER for status column
+#   ✔ Safe MODIFY for created_at column
 #   ✔ Safe index creation (MySQL 5.7 compatible)
 #   ✔ Insert sample data (idempotent)
 #   ✔ Full per-table verification
@@ -20,7 +21,7 @@ echo "☕ Charlie Cafe — Complete Database Setup"
 echo "=============================================================="
 
 # =============================================================
-# CONFIGURATION (EDIT ONLY HERE)
+# CONFIGURATION
 # =============================================================
 AWS_REGION="us-east-1"
 SECRET_ID="CafeDevDBSM"
@@ -119,9 +120,6 @@ echo "📋 Creating tables..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
--- =========================
--- ORDERS TABLE
--- =========================
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id VARCHAR(50),
@@ -142,9 +140,6 @@ CREATE TABLE IF NOT EXISTS orders (
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB;
 
--- =========================
--- EMPLOYEES
--- =========================
 CREATE TABLE IF NOT EXISTS employees (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
     cognito_user_id VARCHAR(100) NOT NULL,
@@ -156,9 +151,6 @@ CREATE TABLE IF NOT EXISTS employees (
     UNIQUE KEY uk_cognito (cognito_user_id)
 ) ENGINE=InnoDB;
 
--- =========================
--- ATTENDANCE
--- =========================
 CREATE TABLE IF NOT EXISTS attendance (
     attendance_id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT NOT NULL,
@@ -172,9 +164,6 @@ CREATE TABLE IF NOT EXISTS attendance (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- =========================
--- LEAVES
--- =========================
 CREATE TABLE IF NOT EXISTS leaves (
     leave_id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT NOT NULL,
@@ -186,9 +175,6 @@ CREATE TABLE IF NOT EXISTS leaves (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- =========================
--- HOLIDAYS
--- =========================
 CREATE TABLE IF NOT EXISTS holidays (
     holiday_id INT AUTO_INCREMENT PRIMARY KEY,
     holiday_date DATE NOT NULL UNIQUE,
@@ -202,7 +188,7 @@ echo "✅ Tables created"
 echo ""
 
 # =============================================================
-# SAFE ALTER: ENSURE STATUS COLUMN EXISTS (5.7 SAFE)
+# SAFE ALTER — ENSURE STATUS COLUMN EXISTS
 # =============================================================
 echo "🔄 Verifying status column..."
 
@@ -232,30 +218,37 @@ echo "✅ Status column verified"
 echo ""
 
 # =============================================================
-# SAFE INDEX CREATION (ATTENDANCE)
+# SAFE MODIFY — CONVERT created_at TO DATETIME
 # =============================================================
-echo "📈 Verifying attendance indexes..."
+echo "🔄 Ensuring created_at is DATETIME DEFAULT CURRENT_TIMESTAMP..."
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
-SET @i1 := (SELECT COUNT(*) FROM information_schema.statistics
-WHERE table_schema=DATABASE()
-AND table_name='attendance'
-AND index_name='idx_attendance_date');
+SET @col_type := (
+    SELECT DATA_TYPE
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'orders'
+      AND COLUMN_NAME = 'created_at'
+);
 
-SET @sql := IF(@i1=0,
-'ALTER TABLE attendance ADD INDEX idx_attendance_date (attendance_date)',
-'SELECT "idx_attendance_date exists"');
+SET @sql := IF(
+    @col_type != 'datetime',
+    "ALTER TABLE orders MODIFY created_at DATETIME DEFAULT CURRENT_TIMESTAMP",
+    "SELECT 'created_at already DATETIME'"
+);
 
-PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 EOF
 
-echo "✅ Index verification complete"
+echo "✅ created_at column verified"
 echo ""
 
 # =============================================================
-# INSERT SAMPLE DATA (SAFE)
+# INSERT SAMPLE DATA
 # =============================================================
 echo "🌱 Inserting sample data..."
 
@@ -266,54 +259,38 @@ VALUES
 (1, 'Ali Khan', 'Espresso', 2, 'RECEIVED'),
 (2, 'Sara Ahmed', 'Cappuccino', 1, 'PREPARING');
 
-INSERT IGNORE INTO employees
-(cognito_user_id, name, job_title, salary, start_date)
-VALUES
-('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
-
-INSERT IGNORE INTO holidays (holiday_date, description)
-VALUES
-('2026-01-01', 'New Year'),
-('2026-03-23', 'Pakistan Day');
-
 EOF
 
 echo "✅ Sample data inserted"
 echo ""
 
 # =============================================================
-# FULL TABLE VERIFICATION (EACH TABLE SEPARATELY)
+# FINAL VERIFICATION
 # =============================================================
 echo "🔎 FINAL VERIFICATION"
 echo "=============================================================="
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
--- ORDERS
 SELECT 'ORDERS TABLE' AS section;
 DESCRIBE orders;
-SELECT COUNT(*) AS total_orders FROM orders;
-SELECT * FROM orders LIMIT 5;
+SELECT COUNT(*) FROM orders;
 
--- EMPLOYEES
 SELECT 'EMPLOYEES TABLE' AS section;
 DESCRIBE employees;
-SELECT COUNT(*) AS total_employees FROM employees;
+SELECT COUNT(*) FROM employees;
 
--- ATTENDANCE
 SELECT 'ATTENDANCE TABLE' AS section;
 DESCRIBE attendance;
-SELECT COUNT(*) AS total_attendance FROM attendance;
+SELECT COUNT(*) FROM attendance;
 
--- LEAVES
 SELECT 'LEAVES TABLE' AS section;
 DESCRIBE leaves;
-SELECT COUNT(*) AS total_leaves FROM leaves;
+SELECT COUNT(*) FROM leaves;
 
--- HOLIDAYS
 SELECT 'HOLIDAYS TABLE' AS section;
 DESCRIBE holidays;
-SELECT COUNT(*) AS total_holidays FROM holidays;
+SELECT COUNT(*) FROM holidays;
 
 SELECT 'Charlie Cafe DB setup verified successfully ✅' AS status;
 
