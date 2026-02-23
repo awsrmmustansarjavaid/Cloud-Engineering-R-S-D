@@ -4,6 +4,7 @@ $errorMessage = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
+    // Keep price list ONLY for validation (not for calculation)
     $prices = [
         "Coffee"      => 3,
         "Tea"         => 2,
@@ -17,10 +18,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $item         = $_POST["item"];
     $quantity     = (int)$_POST["quantity"];
 
-    if ($tableNumber <= 0 || $quantity <= 0) {
+    // ✅ Issue 2 Fix: Validate item exists
+    if (!array_key_exists($item, $prices)) {
+        $errorMessage = "Invalid item selected.";
+    }
+    // Validate numbers
+    elseif ($tableNumber <= 0 || $quantity <= 0) {
         $errorMessage = "Invalid table number or quantity.";
     } else {
-        $total = $prices[$item] * $quantity;
+        // ✅ Issue 1 Fix: DO NOT calculate total here
         $orderSuccess = true;
     }
 }
@@ -34,7 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<script src="https://js.stripe.com/v3/"></script>
+
+<!-- ✅ Issue 3 Fix: Removed unused Stripe script -->
 
 <style>
 /* ==== YOUR ORIGINAL STYLES UNTOUCHED ==== */
@@ -107,7 +114,6 @@ body {
 </head>
 <body>
 
-<!-- ===== NAVBAR UNTOUCHED ===== -->
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
   <div class="container">
     <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
@@ -154,13 +160,19 @@ body {
     <button type="submit" class="btn btn-warning w-100">☕ Place Order</button>
 </form>
 
+<?php if ($errorMessage): ?>
+<hr>
+<div class="alert alert-danger"><?= $errorMessage ?></div>
+<?php endif; ?>
+
 <?php if ($orderSuccess): ?>
 <hr>
 <h5>🧾 Order Receipt</h5>
 
-<!-- UPDATED: Order ID will come from Lambda -->
 <p><strong>Order ID:</strong> <span id="lambda-order-id">Processing...</span></p>
-<p><strong>Total:</strong> $<?= number_format($total,2) ?></p>
+
+<!-- ✅ Issue 1 Fix: Total now comes from Lambda -->
+<p><strong>Total:</strong> <span id="lambda-total">Calculating...</span></p>
 
 <div class="mt-3">
     <button onclick="payWithCard()" class="btn btn-success w-100">Pay with Card</button>
@@ -183,13 +195,12 @@ body {
 async function sendOrderToBackend(paymentMethod){
     const API_URL = window.CHARLIE_CONFIG.API_BASE + "/orders";
 
-    // Updated JSON to include payment_method
     const orderData = {
         table_number: <?= $tableNumber ?? 0 ?>,
         customer_name: "<?= $customerName ?? '' ?>",
         item: "<?= $item ?? '' ?>",
         quantity: <?= $quantity ?? 0 ?>,
-        payment_method: paymentMethod   // ✅ REQUIRED by Lambda
+        payment_method: paymentMethod
     };
 
     try {
@@ -203,10 +214,11 @@ async function sendOrderToBackend(paymentMethod){
 
         if(res.ok){
 
-            // ✅ Immediately show REAL Lambda order_id
             document.getElementById("lambda-order-id").innerText = result.order_id;
 
-            // Optional redirect after short delay
+            // ✅ Show official backend total
+            document.getElementById("lambda-total").innerText = "$" + result.total;
+
             setTimeout(()=>{
                 window.location.href = "order-status.php?order_id=" + result.order_id;
             },1500);
@@ -221,7 +233,6 @@ async function sendOrderToBackend(paymentMethod){
     }
 }
 
-// Payment buttons now correctly pass method
 function payWithCard(){
     sendOrderToBackend("CARD");
 }
