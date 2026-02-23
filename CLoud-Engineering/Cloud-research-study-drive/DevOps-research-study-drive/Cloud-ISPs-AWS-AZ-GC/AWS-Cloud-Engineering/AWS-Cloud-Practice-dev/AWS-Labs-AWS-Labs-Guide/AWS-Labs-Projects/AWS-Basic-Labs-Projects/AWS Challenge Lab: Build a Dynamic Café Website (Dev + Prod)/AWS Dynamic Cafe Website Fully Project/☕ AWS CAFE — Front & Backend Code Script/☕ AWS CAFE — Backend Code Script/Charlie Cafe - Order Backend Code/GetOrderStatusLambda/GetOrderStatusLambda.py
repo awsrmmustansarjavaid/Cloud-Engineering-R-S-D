@@ -13,20 +13,16 @@ import pymysql
 # 5. Returns combined response to API Gateway
 # ============================================================
 
-
 # ---------------- AWS CLIENTS ----------------
 secrets_client = boto3.client('secretsmanager')
 dynamodb = boto3.resource('dynamodb')
-
 
 # ---------------- CONSTANTS ----------------
 SECRET_NAME = "CafeDevDBSM"          # Name of secret in AWS Secrets Manager
 METRICS_TABLE = "CafeOrderMetrics"  # DynamoDB table name
 
-
 # DynamoDB table reference
 metrics_table = dynamodb.Table(METRICS_TABLE)
-
 
 # ============================================================
 # FUNCTION: Get Database Credentials from Secrets Manager
@@ -52,14 +48,10 @@ def lambda_handler(event, context):
     connection = None
 
     try:
-        # ------------------------------------------------------
-        # 1️⃣ Get Database Credentials
-        # ------------------------------------------------------
+        # ---------------- 1️⃣ Get DB Credentials ----------------
         secret = get_db_secret()
 
-        # ------------------------------------------------------
-        # 2️⃣ Connect to RDS MySQL
-        # ------------------------------------------------------
+        # ---------------- 2️⃣ Connect to RDS ----------------
         connection = pymysql.connect(
             host=secret["host"],
             user=secret["username"],
@@ -69,14 +61,10 @@ def lambda_handler(event, context):
             cursorclass=pymysql.cursors.DictCursor
         )
 
-        # ------------------------------------------------------
-        # 3️⃣ Fetch Order Metrics from DynamoDB
-        # ------------------------------------------------------
+        # ---------------- 3️⃣ Fetch Metrics from DynamoDB ----------------
         metrics = metrics_table.scan().get("Items", [])
 
-        # ------------------------------------------------------
-        # 4️⃣ Fetch Recent Orders from RDS
-        # ------------------------------------------------------
+        # ---------------- 4️⃣ Fetch Last 20 Orders from RDS ----------------
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT
@@ -85,7 +73,7 @@ def lambda_handler(event, context):
                     customer_name,
                     item,
                     quantity,
-                    total,
+                    total_amount,
                     status,
                     payment_method,
                     created_at
@@ -93,12 +81,9 @@ def lambda_handler(event, context):
                 ORDER BY created_at DESC
                 LIMIT 20
             """)
-
             orders = cursor.fetchall()
 
-        # ------------------------------------------------------
-        # 5️⃣ Return Success Response (Lambda Proxy Format)
-        # ------------------------------------------------------
+        # ---------------- 5️⃣ Return Success Response ----------------
         return {
             "statusCode": 200,
             "headers": {
@@ -113,21 +98,13 @@ def lambda_handler(event, context):
 
     except Exception as e:
         print("❌ ERROR:", str(e))
-
         return {
             "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type": "application/json"
-            },
-            "body": json.dumps({
-                "error": str(e)
-            })
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
         }
 
     finally:
-        # ------------------------------------------------------
-        # 6️⃣ Always Close DB Connection Safely
-        # ------------------------------------------------------
+        # ---------------- 6️⃣ Close DB Connection Safely ----------------
         if connection:
             connection.close()

@@ -1542,3 +1542,235 @@ function logoutUser() {
     - If your current API still requires tokens, you’ll need to modify your backend or pass some static key.
 
 ---
+### order-status.html
+
+> **Update Version:1.3**
+
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café - Order Status</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap CSS & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* ============================
+   BODY & BACKGROUND
+   ============================ */
+body {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); /* Warm café gradient */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+/* ============================
+   CONTAINER & CARD LAYOUT
+   ============================ */
+.container {
+    max-width: 1200px;
+}
+.card {
+    background-color: rgba(255, 255, 255, 0.9); /* Soft translucent white */
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 30px;
+}
+
+/* ============================
+   HEADER & BUTTONS
+   ============================ */
+h2 {
+    font-weight: 600;
+    color: #4a2f2f; /* Deep coffee tone */
+}
+
+.btn-transparent {
+    background: transparent;
+    border: 1px solid rgba(74, 47, 47, 0.5);
+    color: #4a2f2f;
+    transition: all 0.3s ease;
+}
+.btn-transparent:hover {
+    background: rgba(74, 47, 47, 0.1);
+    color: #3e2424;
+}
+
+.btn-danger {
+    background-color: #b33a3a;
+    border: none;
+}
+.btn-danger:hover {
+    background-color: #922e2e;
+}
+
+/* ============================
+   TABLE STYLING
+   ============================ */
+.table {
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff8f0;
+}
+
+.table th {
+    background-color: #d98c67;
+    color: #fff;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+    color: #4a2f2f;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #ffe3d6;
+}
+
+/* ============================
+   LOADING & ERROR
+   ============================ */
+#loading {
+    font-size: 1.1rem;
+    color: #4a2f2f;
+}
+
+#error-message {
+    font-size: 1.1rem;
+}
+
+/* ============================
+   RESPONSIVE IMPROVEMENTS
+   ============================ */
+@media (max-width: 768px) {
+    .card {
+        padding: 20px;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    .table th, .table td {
+        font-size: 0.9rem;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="container py-5">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cup-hot"></i> Charlie Café - Orders</h2>
+
+        <div class="mt-3 mt-md-0">
+            <button class="btn btn-transparent me-2"
+                onclick="CHARLIE_PRINT.printAllOrders()">
+                <i class="bi bi-printer"></i> Print
+            </button>
+            <button class="btn btn-danger" onclick="logoutUser()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= ORDERS CARD ================= -->
+    <div class="card">
+        <h4 class="mb-3">All Orders</h4>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Table</th>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Total ($)</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table-body"></tbody>
+            </table>
+        </div>
+
+        <div id="loading" class="text-center mt-3">
+            <i class="bi bi-hourglass-split"></i> Loading orders...
+        </div>
+        <div id="error-message" class="text-danger text-center mt-3" style="display:none;">
+            Failed to load orders.
+        </div>
+    </div>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    loadOrders();
+});
+
+// ---------------- 1️⃣ Load Orders ----------------
+async function loadOrders() {
+    const tableBody = document.getElementById("orders-table-body");
+    const loading = document.getElementById("loading");
+    const errorMessage = document.getElementById("error-message");
+
+    try {
+        const response = await CHARLIE_API.getOrders();
+        loading.style.display = "none";
+
+        if (!response || !response.orders || response.orders.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8">No orders found.</td></tr>`;
+            return;
+        }
+
+        response.orders.forEach(order => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${order.order_id}</td>
+                <td>${order.table_number}</td>
+                <td>${order.customer_name}</td>
+                <td>${order.item}</td>
+                <td>${order.quantity}</td>
+                <td>${order.total_amount || "-"}</td>
+                <td>${order.status || "Pending"}</td>
+                <td>${order.payment_method || "-"}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error loading orders:", error);
+        loading.style.display = "none";
+        errorMessage.style.display = "block";
+    }
+}
+
+// ---------------- 2️⃣ Logout Function ----------------
+function logoutUser() {
+    window.location.href = "logout.html";
+}
+</script>
+
+</body>
+</html>
+```
+
