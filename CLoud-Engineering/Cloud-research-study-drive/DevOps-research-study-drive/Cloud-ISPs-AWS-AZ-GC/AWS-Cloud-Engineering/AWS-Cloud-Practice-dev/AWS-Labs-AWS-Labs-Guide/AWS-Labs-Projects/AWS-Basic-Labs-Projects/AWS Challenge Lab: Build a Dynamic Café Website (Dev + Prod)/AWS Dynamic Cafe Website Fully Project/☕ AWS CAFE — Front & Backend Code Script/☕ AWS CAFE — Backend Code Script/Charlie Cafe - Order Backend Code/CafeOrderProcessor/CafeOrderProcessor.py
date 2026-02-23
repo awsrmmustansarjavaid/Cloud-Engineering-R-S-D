@@ -61,7 +61,7 @@ def response(status_code, body):
     }
 
 # ==========================================================
-# LAMBDA HANDLER
+# LAMBDA HANDLER - MERGED ORDER + PAYMENT
 # ==========================================================
 def lambda_handler(event, context):
     try:
@@ -80,12 +80,15 @@ def lambda_handler(event, context):
         customer_name = body.get("customer_name", "Guest")
         item = body["item"]
         quantity = int(body["quantity"])
+        payment_method = body.get("payment_method", "NONE").upper()  # optional: CASH, CARD, NONE
 
         # Validate item & numeric values
         if item not in PRICE_LIST:
             return response(400, {"error": "Invalid menu item"})
         if table_number <= 0 or quantity <= 0:
             return response(400, {"error": "Invalid table number or quantity"})
+        if payment_method not in ["NONE", "CASH", "CARD"]:
+            return response(400, {"error": "Invalid payment method"})
 
         # --------------------------------------------------
         # 2️⃣ Generate Order Details
@@ -93,6 +96,7 @@ def lambda_handler(event, context):
         order_id = generate_order_id()
         total_amount = PRICE_LIST[item] * quantity
         status = "RECEIVED"
+        payment_status = "PENDING" if payment_method != "NONE" else "NONE"
         created_at = datetime.now()
 
         # --------------------------------------------------
@@ -112,8 +116,9 @@ def lambda_handler(event, context):
             cursor.execute("""
                 INSERT INTO orders
                 (order_id, table_number, customer_name, item,
-                 quantity, total_amount, status, created_at)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                 quantity, total_amount, status, created_at,
+                 payment_method, payment_status)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (
                 order_id,
                 table_number,
@@ -122,7 +127,9 @@ def lambda_handler(event, context):
                 quantity,
                 total_amount,
                 status,
-                created_at
+                created_at,
+                payment_method,
+                payment_status
             ))
 
         connection.commit()
@@ -140,8 +147,8 @@ def lambda_handler(event, context):
                 "quantity": quantity,
                 "total_amount": total_amount,
                 "status": status,
-                "payment_method": "NONE",   # default
-                "payment_status": "PENDING", # default
+                "payment_method": payment_method,
+                "payment_status": payment_status,
                 "created_at": str(created_at)
             }
         )
@@ -177,6 +184,8 @@ def lambda_handler(event, context):
                 "item": item,
                 "quantity": quantity,
                 "status": status,
+                "payment_method": payment_method,
+                "payment_status": payment_status,
                 "timestamp": str(created_at)
             })
         )
@@ -192,6 +201,8 @@ def lambda_handler(event, context):
             "quantity": quantity,
             "total": total_amount,
             "status": status,
+            "payment_method": payment_method,
+            "payment_status": payment_status,
             "created_at": str(created_at)
         })
 
