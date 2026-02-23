@@ -1550,7 +1550,7 @@ Make sure Worker Lambda Role has:
 
 ### 2️⃣ Lambda Status Order Code
 
-[GetOrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/GetOrderStatusLambda.py)
+[GetOrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Charlie%20Cafe%20-%20Order%20Backend%20Code/GetOrderStatusLambda)
 
 ### 3️⃣ Attach Layer to Lambda Function
 

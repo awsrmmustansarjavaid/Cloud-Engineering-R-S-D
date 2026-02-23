@@ -672,7 +672,7 @@ Coffee → orders increases
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 5️⃣ — API GATEWAY ENDPOINT
+## PHASE 1️⃣ — API GATEWAY ENDPOINT
 
 ### 1️⃣ TEST in API Gateway Console
 
@@ -691,6 +691,8 @@ Coffee → orders increases
 - You will see Response Body, Response Headers, Execution Logs, and Latency.
 
 This replicates what your curl request does.
+
+
 
 #### ✅ Expected Response body
 
@@ -736,6 +738,67 @@ curl "https://4njilbv5oj.execute-api.us-east-1.amazonaws.com/prod/get-order-stat
 - /orders POST is still failing because the Lambda that updates DynamoDB cannot find the table.
 
 - To fully test /orders, you need to fix DynamoDB table or table name first.
+
+### 3️⃣ Lambda Test JSON (For AWS Console)
+
+Because you enabled:
+
+✔ Lambda Proxy Integration
+✔ GET method
+
+Your Lambda does not require a body.
+
+Use this test event inside Lambda console:
+
+####  ✅ Basic Test Event
+
+```
+{}
+```
+
+#### ✅ Expected Result
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "{\"orders\": [...], \"metrics\": [...]}"
+}
+```
+
+### 4️⃣ More Realistic API Gateway Test Event
+
+If you want a more accurate test (recommended):
+
+```
+{
+  "resource": "/get-order-status",
+  "path": "/get-order-status",
+  "httpMethod": "GET",
+  "headers": {},
+  "queryStringParameters": null,
+  "body": null,
+  "isBase64Encoded": false
+}
+```
+
+#### ✅ Expected Result
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "{\"orders\": [...], \"metrics\": [...]}"
+}
+```
+
+
 
 **✅ PHASE 5️⃣ STATUS**
 
