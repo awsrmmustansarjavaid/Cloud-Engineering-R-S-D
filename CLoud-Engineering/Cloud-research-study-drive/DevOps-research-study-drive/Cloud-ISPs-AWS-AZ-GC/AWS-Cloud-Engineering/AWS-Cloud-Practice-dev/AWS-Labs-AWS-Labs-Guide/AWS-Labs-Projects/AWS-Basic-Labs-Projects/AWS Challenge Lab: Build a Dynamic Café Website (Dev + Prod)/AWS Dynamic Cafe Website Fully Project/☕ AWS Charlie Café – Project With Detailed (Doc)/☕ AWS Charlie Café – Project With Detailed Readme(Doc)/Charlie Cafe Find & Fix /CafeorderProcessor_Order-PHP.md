@@ -518,7 +518,7 @@ Tracking page will fail if it uses $orderId instead of Lambda’s order_id
 
 You need to stop generating the order ID in PHP entirely.
 
-Step 1 — Remove PHP $orderId
+#### Step 1 — Remove PHP $orderId
 
 Delete this line:
 
@@ -543,7 +543,7 @@ if(res.ok){
 }
 ```
 
-Step 2 — Optional: Show receipt with Lambda order_id
+#### Step 2 — Optional: Show receipt with Lambda order_id
 
 Since PHP no longer knows the order ID, you can:
 
@@ -562,17 +562,22 @@ sendOrderToBackend("CARD").then(res => {
 </script>
 ```
 
-Step 3 — Lambda side
+#### Step 3 — Lambda side
 
 No change needed in Lambda — it already generates the canonical order_id. ✅
 
 ### Summary
-Change	File	What to do
-Remove PHP-generated order ID	orders.php	Delete $orderId and all references (<p> and <a> using it)
-Use Lambda order ID for tracking/receipt	JS in orders.php	Already handled in sendOrderToBackend() function
-Lambda	None	Already generates order_id
 
-💡 Key point: The authoritative order ID must come from the backend, never from PHP.
+| Change                                   | File               | What to do                                                      |
+| ---------------------------------------- | ------------------ | --------------------------------------------------------------- |
+| Remove PHP-generated order ID            | `orders.php`       | Delete `$orderId` and all references (`<p>` and `<a>` using it) |
+| Use Lambda order ID for tracking/receipt | JS in `orders.php` | Already handled in `sendOrderToBackend()` function              |
+| Lambda                                   | None               | Already generates `order_id`                                    |
+
+
+### 💡 Key point: 
+
+- The authoritative order ID must come from the backend, never from PHP.
 
 
 ```
