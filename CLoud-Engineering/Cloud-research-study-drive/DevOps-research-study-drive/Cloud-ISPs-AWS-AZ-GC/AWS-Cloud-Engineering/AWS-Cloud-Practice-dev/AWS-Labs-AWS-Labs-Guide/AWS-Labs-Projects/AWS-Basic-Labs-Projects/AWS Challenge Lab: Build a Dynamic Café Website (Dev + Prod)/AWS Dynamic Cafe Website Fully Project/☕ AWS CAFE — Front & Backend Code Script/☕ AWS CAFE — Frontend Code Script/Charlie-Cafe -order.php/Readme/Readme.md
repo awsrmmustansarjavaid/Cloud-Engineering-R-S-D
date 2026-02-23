@@ -1301,6 +1301,197 @@ async function payWithCash(){
 ```
 
 ---
+### Orders.php
+
+> **Update Version:1.1**
+
+### ✅ FINAL UPDATED orders.php
+
+Now we fix frontend properly.
+
+#### 🔴 IMPORTANT CHANGES:
+
+❌ Removed PHP order_id generation
+
+❌ Removed PHP tracking link
+
+✅ Use backend order_id
+
+✅ Send payment_method
+
+✅ Redirect using backend response
+
+### ✅ Replace ONLY the JavaScript section with this:
+
+```
+<script>
+function toggleTheme(){
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme",
+        document.body.classList.contains("dark-mode") ? "dark":"light");
+}
+
+window.onload = function(){
+    if(localStorage.getItem("theme")==="dark"){
+        document.body.classList.add("dark-mode");
+    }
+}
+
+const stripe = Stripe("pk_test_xxxxxxxxx");
+const elements = stripe.elements();
+const card = elements.create("card",{style:{base:{color:"#fff"}}});
+card.mount("#card-element");
+
+async function sendOrderToBackend(paymentMethod){
+
+    const API_URL = "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders";
+
+    const orderData = {
+        table_number: <?= $tableNumber ?? 0 ?>,
+        customer_name: "<?= $customerName ?? '' ?>",
+        item: "<?= $item ?? '' ?>",
+        quantity: <?= $quantity ?? 0 ?>,
+        payment_method: paymentMethod
+    };
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await res.json();
+
+        if(res.ok){
+            alert("Order placed successfully!");
+            window.location.href =
+                "order-status.php?order_id=" + result.order_id;
+        } else {
+            alert("Error: " + result.error);
+        }
+
+    } catch(e){
+        alert("Network error. Please try again.");
+        console.error(e);
+    }
+}
+
+function payWithCard(){
+    alert("Stripe payment successful (simulation).");
+    sendOrderToBackend("CARD");
+}
+
+function payWithCash(){
+    alert("☕ Please pay at the counter.");
+    sendOrderToBackend("CASH");
+}
+</script>
+```
+
+### 1️⃣ Ensure config.js is included
+
+At the top of your <head> or before your script in orders.php:
+
+```
+<script src="/js/config.js"></script>
+```
+
+Since you already have it, perfect.
+
+### 2️⃣ Update your JavaScript to use the config
+
+Replace:
+
+```
+const API_URL = "https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders";
+```
+
+With:
+
+```
+const API_URL = window.CHARLIE_CONFIG.API_BASE + "/orders";
+```
+
+### 3️⃣ Full Updated JS (snippet)
+
+```
+<script>
+function toggleTheme(){
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme",
+        document.body.classList.contains("dark-mode") ? "dark":"light");
+}
+
+window.onload = function(){
+    if(localStorage.getItem("theme")==="dark"){
+        document.body.classList.add("dark-mode");
+    }
+}
+
+const stripe = Stripe("pk_test_xxxxxxxxx");
+const elements = stripe.elements();
+const card = elements.create("card",{style:{base:{color:"#fff"}}});
+card.mount("#card-element");
+
+async function sendOrderToBackend(paymentMethod){
+
+    // ✅ Use config.js API_BASE
+    const API_URL = window.CHARLIE_CONFIG.API_BASE + "/orders";
+
+    const orderData = {
+        table_number: <?= $tableNumber ?? 0 ?>,
+        customer_name: "<?= $customerName ?? '' ?>",
+        item: "<?= $item ?? '' ?>",
+        quantity: <?= $quantity ?? 0 ?>,
+        payment_method: paymentMethod
+    };
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await res.json();
+
+        if(res.ok){
+            alert("Order placed successfully!");
+            window.location.href =
+                "order-status.php?order_id=" + result.order_id;
+        } else {
+            alert("Error: " + result.error);
+        }
+
+    } catch(e){
+        alert("Network error. Please try again.");
+        console.error(e);
+    }
+}
+
+function payWithCard(){
+    alert("Stripe payment successful (simulation).");
+    sendOrderToBackend("CARD");
+}
+
+function payWithCash(){
+    alert("☕ Please pay at the counter.");
+    sendOrderToBackend("CASH");
+}
+</script>
+```
+
+### ✅ Benefits
+
+- Switching environments (dev, prod, staging) is just one change in config.js.
+
+- No more hardcoded endpoints in multiple places.
+
+- Cleaner, maintainable frontend.
+
+
+
 
 
 
