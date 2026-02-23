@@ -17,10 +17,7 @@ $errorMessage = "";
 // ==========================================================
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // 1️⃣ Generate Temporary Order ID (for UI tracking)
-    $orderId = "ORD-" . time() . "-" . rand(100,999);
-
-    // 2️⃣ Local Price List (for receipt)
+    // 1️⃣ Local Price List (for receipt)
     $prices = [
         "Coffee"      => 3,
         "Tea"         => 2,
@@ -29,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "Fresh Juice" => 5
     ];
 
-    // 3️⃣ Sanitize Input
+    // 2️⃣ Sanitize Input
     $tableNumber  = (int)$_POST["table_number"];
     $customerName = htmlspecialchars($_POST["name"]);
     $item         = $_POST["item"];
@@ -41,8 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $total = $prices[$item] * $quantity;
         $orderSuccess = true;
 
-        // 4️⃣ Prepare Redirect URL after payment (temporary, will use Lambda order_id later)
-        $statusUrl = "payment-status.php?order_id=$orderId";
+        // ❌ Removed PHP-generated order ID entirely
+        // $statusUrl = "payment-status.php?order_id=$orderId"; // Not needed anymore
     }
 }
 ?>
@@ -62,143 +59,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <style>
 /* ==========================================================
-   THEME VARIABLES
+   THEME VARIABLES, BACKGROUND, NAVBAR, GLASS CARD, STEAM
+   (UNCHANGED — YOUR ORIGINAL STYLES)
 ========================================================== */
-:root {
-    --overlay: rgba(0,0,0,0.65);
-    --card-bg: rgba(255,255,255,0.95);
-    --text-color: #222;
-    --primary: #ff9800;
-}
-
-body.dark-mode {
-    --overlay: rgba(0,0,0,0.85);
-    --card-bg: rgba(25,25,25,0.95);
-    --text-color: #fff;
-}
-
-/* ==========================================================
-   BACKGROUND IMAGE + OVERLAY
-========================================================== */
-body {
-    font-family:'Poppins', sans-serif;
-    background:
-        linear-gradient(var(--overlay), var(--overlay)),
-        url("https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    transition: 0.4s ease;
-    padding-top: 80px; /* Space for fixed navbar */
-}
-
-/* ==========================================================
-   NAVBAR STYLING
-========================================================== */
-.navbar-custom {
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(8px);
-}
-
-.navbar-custom .navbar-brand {
-    font-weight: bold;
-    font-size: 1.3rem;
-    color: var(--primary) !important;
-}
-
-.navbar-custom .nav-link {
-    color: #fff !important;
-    transition: 0.3s;
-}
-
-.navbar-custom .nav-link:hover {
-    color: #ff9800 !important;
-}
-
-.navbar-custom .nav-link.active {
-    color: #ff5722 !important;
-    font-weight: bold;
-}
-
-/* ==========================================================
-   GLASSMORPHISM CARD
-========================================================== */
-.order-card {
-    background: var(--card-bg);
-    color: var(--text-color);
-    padding: 40px;
-    border-radius: 25px;
-    box-shadow: 0 15px 45px rgba(0,0,0,0.6);
-    backdrop-filter: blur(12px);
-    transition: 0.4s ease;
-}
-
-/* Premium Buttons */
-.btn-warning {
-    background: linear-gradient(45deg,#ff9800,#ff5722);
-    border:none;
-    font-weight:bold;
-    transition:0.3s;
-}
-.btn-warning:hover {
-    transform: scale(1.05);
-}
-
-/* Stripe Card Element */
-#card-element {
-    padding:12px;
-    border-radius:10px;
-    border:1px solid #ccc;
-    background:#000;
-    color:#fff;
-}
-
-/* ==========================================================
-   COFFEE STEAM ANIMATION
-========================================================== */
-.steam {
-    width:8px;
-    height:40px;
-    background:rgba(255,255,255,0.7);
-    position:absolute;
-    top:-40px;
-    left:50%;
-    border-radius:50%;
-    animation: steam 3s infinite ease-in-out;
-}
-@keyframes steam {
-    0% { transform:translateX(-50%) translateY(0); opacity:0; }
-    50% { opacity:1; }
-    100% { transform:translateX(-50%) translateY(-60px); opacity:0; }
-}
+:root { --overlay: rgba(0,0,0,0.65); --card-bg: rgba(255,255,255,0.95); --text-color:#222; --primary:#ff9800; }
+body.dark-mode { --overlay: rgba(0,0,0,0.85); --card-bg: rgba(25,25,25,0.95); --text-color:#fff; }
+body { font-family:'Poppins', sans-serif; background: linear-gradient(var(--overlay),var(--overlay)), url("https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb"); background-size: cover; background-position: center; background-attachment: fixed; transition: 0.4s ease; padding-top:80px; }
+.navbar-custom { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+.navbar-custom .navbar-brand { font-weight:bold; font-size:1.3rem; color: var(--primary)!important; }
+.navbar-custom .nav-link { color:#fff!important; transition:0.3s; }
+.navbar-custom .nav-link:hover { color:#ff9800!important; }
+.navbar-custom .nav-link.active { color:#ff5722!important; font-weight:bold; }
+.order-card { background: var(--card-bg); color: var(--text-color); padding:40px; border-radius:25px; box-shadow:0 15px 45px rgba(0,0,0,0.6); backdrop-filter:blur(12px); transition:0.4s ease; }
+.btn-warning { background: linear-gradient(45deg,#ff9800,#ff5722); border:none; font-weight:bold; transition:0.3s; }
+.btn-warning:hover { transform:scale(1.05); }
+#card-element { padding:12px; border-radius:10px; border:1px solid #ccc; background:#000; color:#fff; }
+.steam { width:8px; height:40px; background:rgba(255,255,255,0.7); position:absolute; top:-40px; left:50%; border-radius:50%; animation: steam 3s infinite ease-in-out; }
+@keyframes steam { 0% { transform:translateX(-50%) translateY(0); opacity:0; } 50% { opacity:1; } 100% { transform:translateX(-50%) translateY(-60px); opacity:0; } }
 </style>
 </head>
 <body>
 
 <!-- =======================================================
-     NAVBAR
+     NAVBAR (KEPT EXACTLY AS ORIGINAL)
 ======================================================= -->
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
   <div class="container">
     <a class="navbar-brand" href="index.php">☕ Charlie Cafe</a>
-    <button class="navbar-toggler bg-light" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navbarContent">
+    <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="index.php">🏠 Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="orders.php">🛒 Place Order</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="https://d1e3k1a40fw7la.cloudfront.net/order-status.html">📦 Track Order</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="https://d1e3k1a40fw7la.cloudfront.net/price-list.html">📋 Menu</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="index.php">🏠 Home</a></li>
+            <li class="nav-item"><a class="nav-link active" href="orders.php">🛒 Place Order</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://d1e3k1a40fw7la.cloudfront.net/order-status.html">📦 Track Order</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://d1e3k1a40fw7la.cloudfront.net/price-list.html">📋 Menu</a></li>
         </ul>
     </div>
   </div>
@@ -258,7 +154,10 @@ body {
 <?php if ($orderSuccess): ?>
 <hr class="my-4">
 <h5>🧾 Order Receipt</h5>
-<p><strong>Order ID:</strong> <?= $orderId ?></p>
+
+<!-- ❌ PHP-generated order ID removed, replaced with JS placeholder -->
+<p id="order-id-display" class="fw-bold text-primary">Processing order...</p>
+
 <p><strong>Total:</strong> $<?= number_format($total,2) ?></p>
 
 <p class="alert alert-info text-center">Choose ONE payment method</p>
@@ -280,7 +179,7 @@ body {
 
 <!-- TRACK ORDER -->
 <div class="mt-4 text-center">
-    <a class="btn btn-success mt-2" href="order-status.php?order_id=<?= $orderId ?>">📦 Track Your Order</a>
+    <a id="track-order-btn" class="btn btn-success mt-2" href="#">📦 Track Your Order</a>
 </div>
 <?php endif; ?>
 
@@ -295,12 +194,6 @@ body {
 <script src="/js/utils.js"></script>
 <script src="/js/api.js"></script>
 
-<!-- =======================================================
-     FINAL JS INTEGRATION
-     ✅ Updated with CHARLIE_CONFIG.API_BASE
-     ✅ Includes Stripe + Card Mount
-     ✅ Sends payment_method to Lambda
-======================================================= -->
 <script>
 // ------------------------
 // THEME TOGGLE
@@ -310,8 +203,6 @@ function toggleTheme(){
     localStorage.setItem("theme",
         document.body.classList.contains("dark-mode") ? "dark":"light");
 }
-
-// Apply saved theme on load
 window.onload = function(){
     if(localStorage.getItem("theme")==="dark"){
         document.body.classList.add("dark-mode");
@@ -321,7 +212,7 @@ window.onload = function(){
 // ------------------------
 // STRIPE SETUP
 // ------------------------
-const stripe = Stripe("pk_test_xxxxxxxxx"); // Replace with real Stripe key
+const stripe = Stripe("pk_test_xxxxxxxxx");
 const elements = stripe.elements();
 const card = elements.create("card",{style:{base:{color:"#fff"}}});
 card.mount("#card-element");
@@ -330,10 +221,8 @@ card.mount("#card-element");
 // SEND ORDER TO BACKEND
 // ------------------------
 async function sendOrderToBackend(paymentMethod){
-    // Use API_BASE from config.js
     const API_URL = window.CHARLIE_CONFIG.API_BASE + "/orders";
 
-    // Prepare JSON body matching Lambda
     const orderData = {
         table_number: <?= $tableNumber ?? 0 ?>,
         customer_name: "<?= $customerName ?? '' ?>",
@@ -352,10 +241,9 @@ async function sendOrderToBackend(paymentMethod){
         const result = await res.json();
 
         if(res.ok){
-            // Redirect to order-status with real Lambda order_id
-            alert("Order placed successfully!");
-            window.location.href =
-                "order-status.php?order_id=" + result.order_id;
+            // ✅ Display Lambda-generated order_id
+            document.getElementById("order-id-display").innerText = "Order ID: " + result.order_id;
+            document.getElementById("track-order-btn").href = "order-status.php?order_id=" + result.order_id;
         } else {
             alert("Error: " + result.error);
         }
@@ -369,15 +257,8 @@ async function sendOrderToBackend(paymentMethod){
 // ------------------------
 // PAYMENT BUTTONS
 // ------------------------
-function payWithCard(){
-    alert("Stripe payment successful (simulation).");
-    sendOrderToBackend("CARD"); // Send CARD as payment method
-}
-
-function payWithCash(){
-    alert("☕ Please pay at the counter.");
-    sendOrderToBackend("CASH"); // Send CASH as payment method
-}
+function payWithCard(){ alert("Stripe payment successful (simulation)."); sendOrderToBackend("CARD"); }
+function payWithCash(){ alert("☕ Please pay at the counter."); sendOrderToBackend("CASH"); }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
