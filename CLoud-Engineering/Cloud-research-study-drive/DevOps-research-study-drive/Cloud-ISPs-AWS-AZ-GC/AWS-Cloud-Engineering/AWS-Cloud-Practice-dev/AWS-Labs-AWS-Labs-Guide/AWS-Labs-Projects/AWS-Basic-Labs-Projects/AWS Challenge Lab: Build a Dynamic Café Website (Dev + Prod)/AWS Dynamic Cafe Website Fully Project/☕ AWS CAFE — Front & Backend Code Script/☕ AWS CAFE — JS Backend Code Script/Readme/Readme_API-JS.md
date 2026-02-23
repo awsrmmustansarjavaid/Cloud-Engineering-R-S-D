@@ -439,3 +439,21 @@ window.CHARLIE_API = (() => {
 })();
 ```
 
+### ✅ What Was Done
+
+- Added proper getOrders()
+
+- Uses CONFIG.API_BASE
+
+- Handles errors
+
+- Parses data.body
+
+- Clean and production ready
+
+- No duplicated base URLs
+
+- Fully aligned with your architecture
+
+---
+
