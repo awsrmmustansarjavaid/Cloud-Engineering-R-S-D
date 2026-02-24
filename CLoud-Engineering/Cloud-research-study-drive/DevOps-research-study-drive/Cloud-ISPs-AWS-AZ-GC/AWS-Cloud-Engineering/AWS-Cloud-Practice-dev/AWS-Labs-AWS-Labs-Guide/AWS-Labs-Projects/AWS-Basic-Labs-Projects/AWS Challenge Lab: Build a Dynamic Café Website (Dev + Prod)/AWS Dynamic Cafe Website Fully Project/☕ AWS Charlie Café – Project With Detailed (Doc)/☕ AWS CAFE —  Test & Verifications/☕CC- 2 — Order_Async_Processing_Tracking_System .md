@@ -1864,12 +1864,211 @@ order-status.php?order_id=ORD-XXXX
 ---
 ## 🔐 PHASE 5️⃣ — API Gateway Authorizer Test
 
-### 1️⃣ GET /order-status
-
-### 1️⃣ Test Inside API Gateway Console
+### 🟡 Test Inside API Gateway Console
 
 - Go to: API Gateway → Resources → /order-status → GET → Test
 
+### 1️⃣ : GET /admin/dashboard
+
+### ✅ Test API
+
+- Method: GET
+
+- Path: /admin/dashboard
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+- Click Test
+
+#### ✅ Expected Result:
+
+- Status: 200
+
+### 🌐 Browser Test
+
+- Open browser and enter:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+### ✅ EC2 Test
+
+```
+curl https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+```
+
+#### ✅ Expected Result:
+
+```
+{"totalEmployees":25,"totalOrdersToday":42,"revenueToday":1234.56}
+```
+
+
+### 2️⃣ : POST /admin/create-user
+
+### ✅ Test API
+
+Method: POST
+
+Body:
+
+```
+{
+  "username": "john",
+  "role": "admin"
+}
+```
+
+- Click Test
+
+#### ✅ Expected Result:
+
+```
+{
+  "message": "User john created with role admin",
+  "username": "john",
+  "role": "admin"
+}
+```
+
+### 🌐 Browser Test
+
+- Open browser and enter:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee/orders?employee_id=alice
+```
+
+#### ✅ Expected Result:
+
+```
+[
+  {
+    "order_id": "O-101",
+    "employee": "alice",
+    "total": 23.5
+  }
+]
+```
+
+### ✅ EC2 Test
+
+```
+curl -X POST https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/create-user \
+-H "Content-Type: application/json" \
+-d '{"username":"john","role":"admin"}'
+```
+
+#### ✅ Expected Result:
+
+```
+{"message":"User john created with role admin","username":"john","role":"admin"}
+```
+
+### ✅ Test 3️⃣ : GET Employee Orders
+
+Method: GET
+
+Request Body: leave blank (GET request does not have a body)
+
+- Click Test
+
+#### ✅ Expected Result:
+
+```
+[
+  {
+    "order_id": "O-101",
+    "employee": "alice",
+    "total": 23.5
+  }
+]
+```
+
+If employee_id=all:
+
+```
+[
+  { "order_id": "O-101", "employee": "alice", "total": 23.5 },
+  { "order_id": "O-102", "employee": "bob", "total": 12.0 }
+]
+```
+
+- Status Code: 200 OK
+
+- Headers: "Content-Type": "application/json"
+
+### ✅ EC2 Test
+
+```
+curl "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee/orders?employee_id=alice"
+```
+
+#### ✅ Expected Result:
+
+```
+[{"order_id":"O-101","employee":"alice","total":23.5}]
+```
+
+### ✅ Test 4️⃣ : POST Employee Create Order
+
+Method: POST
+
+Body:
+
+```
+{
+  "order_id": "O-999",
+  "employee": "alice",
+  "total": 45.5
+}
+```
+
+- Click Test
+
+#### ✅ Expected Result:
+
+```
+{
+  "message": "Order O-999 created successfully",
+  "order": {
+    "order_id": "O-999",
+    "employee": "alice",
+    "total": 45.5
+  }
+}
+```
+
+### ✅ EC2 Test
+
+```
+curl -X POST https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee/order \
+-H "Content-Type: application/json" \
+-d '{"order_id":"O-999","employee":"alice","total":45.5}'
+```
+
+#### ✅ Expected Result:
+
+```
+{"message":"Order O-999 created successfully","order":{"order_id":"O-999","employee":"alice","total":45.5}}
+```
 
 
 **✅ PHASE 5️⃣ STATUS**

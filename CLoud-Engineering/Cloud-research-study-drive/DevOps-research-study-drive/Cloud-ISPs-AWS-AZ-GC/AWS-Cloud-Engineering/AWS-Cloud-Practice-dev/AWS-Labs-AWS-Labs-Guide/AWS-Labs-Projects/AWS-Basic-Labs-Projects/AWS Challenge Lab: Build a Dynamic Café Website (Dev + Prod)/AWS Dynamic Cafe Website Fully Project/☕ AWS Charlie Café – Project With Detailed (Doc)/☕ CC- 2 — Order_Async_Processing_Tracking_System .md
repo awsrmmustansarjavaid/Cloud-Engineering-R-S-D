@@ -2530,6 +2530,16 @@ or /api/*
 /public/*
 ```
 
+### 5️⃣ Get Your API Gateway Invoke URL
+
+- Go to: AWS Console → API Gateway → Your API → Stages → prod (or your stage name)
+
+You will see something like:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod
+```
+
 ### 🔥 FINAL ARCHITECTURE RESULT
 
 ```
