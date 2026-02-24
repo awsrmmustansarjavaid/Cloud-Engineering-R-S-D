@@ -8,6 +8,7 @@
    ✔ Fully aligned with config.js
    ✔ Includes ALL API Gateway resources
    ✔ Supports Lambda Proxy Integration parsing
+   ✔ Ultra-safe response handling for GET /get-order-status
 ========================================================= */
 
 window.CHARLIE_API = (() => {
@@ -18,6 +19,7 @@ window.CHARLIE_API = (() => {
        🔧 HELPER — STANDARD FETCH WRAPPER
        - Ensures consistent JSON handling
        - Handles non-200 responses
+       - Used for normal endpoints (POST + standard GET)
     ===================================================== */
     async function apiFetch(url, options = {}) {
 
@@ -41,7 +43,7 @@ window.CHARLIE_API = (() => {
        🛒 CUSTOMER ORDERS
     ===================================================== */
 
-    // Place new customer order
+    // Place new customer order (POST returns direct JSON)
     function placeOrder(payload) {
         return apiFetch(`${CONFIG.API_BASE}/orders`, {
             method: "POST",
@@ -49,7 +51,7 @@ window.CHARLIE_API = (() => {
         });
     }
 
-    // Update existing order
+    // Update existing order (POST returns direct JSON)
     function updateOrder(payload) {
         return apiFetch(`${CONFIG.API_BASE}/order-update`, {
             method: "POST",
@@ -61,14 +63,14 @@ window.CHARLIE_API = (() => {
        📦 ORDER STATUS
     ===================================================== */
 
-    // Get single order status (customer-facing)
+    // Get single order status (standard JSON response)
     function getOrderStatus(orderId) {
         return apiFetch(
             `${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`
         );
     }
 
-    // Get cafe-facing order status
+    // Get cafe-facing order status (standard JSON response)
     function getCafeOrderStatus(orderId) {
         return apiFetch(
             `${CONFIG.API_BASE}/cafe-order-status?order_id=${encodeURIComponent(orderId)}`
@@ -86,13 +88,15 @@ window.CHARLIE_API = (() => {
        📋 GET ALL ORDERS
        -----------------------------------------------------
        ✔ Calls: GET /get-order-status
-       ✔ Required for Lambda Proxy Integration
-       ✔ MUST parse data.body (stringified JSON)
+       ✔ Lambda Proxy may return:
+           { statusCode: 200, body: "STRINGIFIED_JSON" }
+       ✔ Future version may return:
+           { orders: [...] }
+       ✔ This function safely handles BOTH cases
     ===================================================== */
 
     async function getOrders() {
 
-        // ⚠ Points to: GET /get-order-status
         const res = await fetch(
             `${CONFIG.API_BASE}/get-order-status`
         );
@@ -104,11 +108,20 @@ window.CHARLIE_API = (() => {
 
         const data = await res.json();
 
-        // ⚡ IMPORTANT:
-        // Lambda Proxy returns:
-        // { statusCode: 200, body: "STRINGIFIED_JSON" }
-        // So we MUST parse body manually
-        return JSON.parse(data.body);
+        /* =================================================
+           ULTRA-SAFE HANDLING
+
+           If Lambda Proxy:
+               data.body is a STRING → parse it
+
+           If Direct JSON:
+               data.body is undefined → return data
+
+           Prevents future crashes if backend changes.
+        ================================================= */
+        return typeof data.body === "string"
+            ? JSON.parse(data.body)
+            : data;
     }
 
     /* =====================================================
@@ -202,7 +215,7 @@ window.CHARLIE_API = (() => {
         getOrderStatus,
         getCafeOrderStatus,
         getGetOrderStatus,
-        getOrders,   // ✅ ADDED
+        getOrders,   // ✅ Ultra-safe version included
 
         getEmployeeOrders,
         createEmployeeOrder,
