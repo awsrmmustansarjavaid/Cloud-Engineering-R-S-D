@@ -5,7 +5,7 @@
 <title>Charlie Café - Order Status</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Bootstrap CSS & Icons -->
+<!-- ================= BOOTSTRAP CSS & ICONS ================= -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -14,9 +14,13 @@
    BODY & BACKGROUND DESIGN
    ============================ */
 body {
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    /* Café-themed background image with semi-transparent dark overlay for better text visibility */
+    background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+                url("https://images.unsplash.com/photo-1509042239860-f550ce710b93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=Mnw0MTA3NzZ8MHwxfGFsbHwxfHxjYWZlfGVufDB8fHx8MTY5NzA5OTgxOQ&ixlib=rb-4.0.3&q=80&w=1920");
+    background-size: cover;
+    background-position: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    color: #fff; /* White text for better contrast */
     min-height: 100vh;
     padding-bottom: 50px;
     position: relative;
@@ -51,21 +55,44 @@ body {
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 15px auto;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 2;
 }
 .cafe-badge i { font-size: 30px; color: white; }
 
 /* ============================
    HEADER & BUTTONS
    ============================ */
-h2 { font-weight: 600; color: #4a2f2f; }
+.header-container {
+    z-index: 2;
+    width: 100%;
+    background-color: rgba(0,0,0,0.35); /* semi-transparent dark overlay for readability */
+    padding: 10px 20px;
+    border-radius: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header-container h2 {
+    font-weight: 600;
+    color: #fff; /* Ensure title is visible */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.6rem;
+}
 
 .btn-transparent {
-    background: transparent; border: 1px solid rgba(74, 47, 47, 0.5);
-    color: #4a2f2f; transition: all 0.3s ease;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #fff;
+    transition: all 0.3s ease;
 }
-.btn-transparent:hover { background: rgba(74, 47, 47, 0.1); }
+.btn-transparent:hover { background: rgba(255,255,255,0.35); }
 
-.btn-danger { background-color: #b33a3a; border: none; }
+.btn-danger { background-color: #b33a3a; border: none; color: #fff; }
 .btn-danger:hover { background-color: #922e2e; }
 
 /* ============================
@@ -90,14 +117,16 @@ h2 { font-weight: 600; color: #4a2f2f; }
 /* ============================
    METRICS CARDS
    ============================ */
-#metrics-container .bg-light {
-    background-color: #fff3e0;
-    color: #4a2f2f;
+.metric-card {
+    padding: 15px;
+    border-radius: 12px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
-#metrics-container h5 {
-    font-weight: 600;
-    font-size: 1.5rem;
-}
+.metric-title { font-size: 0.9rem; font-weight: 600; }
+.metric-value { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
 
 /* ============================
    RESPONSIVE
@@ -120,11 +149,13 @@ h2 { font-weight: 600; color: #4a2f2f; }
 <div class="container py-5">
 
     <!-- ================= HEADER ================= -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+    <div class="header-container">
+        <!-- Title & Café Icon -->
         <h2><i class="bi bi-cup-hot-fill"></i> Charlie Café - Orders</h2>
 
-        <div class="mt-3 mt-md-0">
-            <button class="btn btn-transparent me-2" onclick="CHARLIE_PRINT.printAllOrders()">
+        <!-- Buttons -->
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-transparent" onclick="CHARLIE_PRINT.printAllOrders()">
                 <i class="bi bi-printer"></i> Print
             </button>
             <button class="btn btn-danger" onclick="logoutUser()">
@@ -216,7 +247,7 @@ async function loadOrders() {
             });
         }
 
-        // ---------------- 3️⃣ Render Metrics ----------------
+        // ---------------- 2️⃣ Render Metrics ----------------
         renderMetrics(response.metrics);
 
     } catch (error) {
@@ -236,21 +267,32 @@ function renderMetrics(metrics) {
         return;
     }
 
+    // Sort metrics alphabetically
+    metrics.sort((a, b) => a.metric_name.localeCompare(b.metric_name));
+
     metrics.forEach(metric => {
         const card = document.createElement("div");
         card.className = "col-md-4 mb-2";
 
+        // Color-code based on metric type
+        let bgColor = "#6c757d"; // Default gray
+        const name = metric.metric_name.toLowerCase();
+        if (name.includes("total")) bgColor = "#0d6efd"; // Blue
+        if (name.includes("completed")) bgColor = "#198754"; // Green
+        if (name.includes("pending")) bgColor = "#fd7e14"; // Orange
+        if (name.includes("failed")) bgColor = "#dc3545"; // Red
+
         card.innerHTML = `
-            <div class="p-3 bg-light rounded shadow-sm text-center">
-                <h5 class="mb-1">${metric.value}</h5>
-                <small class="text-muted">${metric.metric_name.replace(/_/g, ' ')}</small>
+            <div class="metric-card" style="background-color: ${bgColor};">
+                <div class="metric-value">${metric.value}</div>
+                <div class="metric-title">${metric.metric_name.replace(/_/g, ' ')}</div>
             </div>
         `;
         container.appendChild(card);
     });
 }
 
-// ---------------- 4️⃣ Logout Function ----------------
+// ---------------- 3️⃣ Logout Function ----------------
 function logoutUser() {
     window.location.href = "logout.html";
 }
