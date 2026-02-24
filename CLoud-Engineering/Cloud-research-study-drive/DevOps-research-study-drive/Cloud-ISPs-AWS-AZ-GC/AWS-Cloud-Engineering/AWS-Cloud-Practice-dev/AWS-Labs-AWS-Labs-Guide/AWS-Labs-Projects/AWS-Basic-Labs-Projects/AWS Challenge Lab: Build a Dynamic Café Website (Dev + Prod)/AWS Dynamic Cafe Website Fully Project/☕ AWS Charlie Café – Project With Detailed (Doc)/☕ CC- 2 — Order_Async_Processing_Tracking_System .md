@@ -2380,17 +2380,11 @@ order-receipt.php
 
 ### 1️⃣ Resource & Method
 
-- Go to Resources → /order-status
+- Go to Resources 
 
 - If GET method does not exist → click Actions → Create Method → GET
 
-```
-GET /order-status
-```
-
 - Select Lambda Proxy Integration
-
-- Lambda function → OrderStatusLambda
 
 ### 2️⃣ Create Resource
 > **You MUST manually create routes.
@@ -2471,19 +2465,6 @@ GET /order-status
 - Authorization: cafe-cognito-authorizer
 
 - Click Create
-
-#### order-status Resource 1
-
-- Method: GET
-
-- Path: /order-status
-
-- Integration: OrderStatusLambda
-
-- Authorization: no need because its public
-
-- Click Create
-
 
 #### Attach this authorizer to your Resource
 
@@ -2634,30 +2615,11 @@ API_URL = ".../prod/order-status"
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
-- **Function name:** OrderStatusLambda
-
 - **Runtime:** Python 3.12
 
 - **Permissions:** Create new role with basic Lambda permissions
 
-### 1️⃣ ✅ FINAL LAMBDA CODE (Python 3.12)
-
-> 🔁 This is a drop-in replacement
-> Nothing else needs to change
-
-[OrderStatusLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda/CafeOrderStatusLambda.py)
-
-### 2️⃣ 🔐 Attach Lambda Layer
-
-- Same 
-
-### 3️⃣ 🔐 Edit VPC
-
-- Same 
-
-> **⚠️ Make sure DB_HOST points to your RDS MySQL/MariaDB instance.**
-
-### 2️⃣ CREATE AdminDashboardLambda
+### 1️⃣ CREATE AdminDashboardLambda
 
 - **Function name:** AdminDashboardLambda
 
@@ -2665,7 +2627,7 @@ API_URL = ".../prod/order-status"
 
 [AdminDashboardLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminDashboardLambda.js)
 
-### 3️⃣ CREATE AdminCreateUserLambda
+### 2️⃣ CREATE AdminCreateUserLambda
 
 - **Function name:** AdminCreateUserLambda
 
@@ -2673,7 +2635,7 @@ API_URL = ".../prod/order-status"
 
 [AdminCreateUserLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminCreateUserLambda.js)
 
-### 4️⃣ CREATE EmployeeOrdersLambda
+### 3️⃣ CREATE EmployeeOrdersLambda
 
 - **Function name:** EmployeeOrdersLambda
 
@@ -2682,7 +2644,7 @@ API_URL = ".../prod/order-status"
 [EmployeeOrdersLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrdersLambda.js)
 
 
-### 5️⃣ CREATE EmployeeOrderLambda
+### 4️⃣ CREATE EmployeeOrderLambda
 
 - **Function name:** EmployeeOrderLambda
 
