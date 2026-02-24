@@ -1576,6 +1576,7 @@ FILES=(
 "/var/www/html/js/utils.js"
 "/var/www/html/js/api.js"
 "/var/www/html/js/central-printing.js"
+"/var/www/html/js/role-guard.js"
 "/var/www/html/css/central_cafe_style.css"
 )
 
@@ -1946,6 +1947,7 @@ CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
 /var/www/html/js/utils.js
 /var/www/html/js/api.js
 /var/www/html/js/central-printing.js
+/var/www/html/js/role-guard.js
 ```
 #### ✅ From CloudFront perspective, the paths are:
 
@@ -1957,6 +1959,7 @@ CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
 /js/utils.js
 /js/api.js
 /js/central-printing.js
+/js/role-guard.js
 ```
 
 ### ✅ BEST PRACTICE (Better Than Invalidation)
@@ -1971,6 +1974,7 @@ Instead of invalidating every time, use versioning:
 /js/utils.js
 /js/api.js
 /js/central-printing.js
+/js/role-guard.js
 ```
 
 #### To:
@@ -1981,6 +1985,7 @@ Instead of invalidating every time, use versioning:
 /js/utils.v2.js
 /js/api.v2.js
 /js/central-printing.v2.js
+/var/www/html/js/role-guard.v2.js
 ```
 
 #### Or:
@@ -1991,6 +1996,7 @@ Instead of invalidating every time, use versioning:
 <script src="/js/utils.js?v=2"></script>
 <script src="/js/app.js?v=2"></script>
 <script src="/js/central-printing.js?v=2"></script>
+<script src="/js/role-guard.js?v=2"></script>
 ```
 
 #### Option 2 — Invalidate Entire JS Folder
