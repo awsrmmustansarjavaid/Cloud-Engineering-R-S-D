@@ -1851,6 +1851,288 @@ function logoutUser() {
 - Fully commented structure
 
 - No JS logic changed
+
+### Added Metrics container
+
+Perfect! I’ve integrated the metrics display into your order-status.html, added rendering logic, called it in the loadOrders() function, and included optional styling. I also added clear comments to guide future maintenance.
+
+#### Here’s the fully final, production-ready code:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café - Order Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap CSS & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* ============================
+   BODY & BACKGROUND DESIGN
+   ============================ */
+body {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    min-height: 100vh;
+    padding-bottom: 50px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Decorative floating café icons (background) */
+.bg-icon { position: absolute; font-size: 120px; color: rgba(74, 47, 47, 0.05); z-index: 0; }
+.icon-1 { top: 5%; left: 5%; }
+.icon-2 { bottom: 10%; right: 8%; }
+.icon-3 { top: 40%; right: 15%; }
+
+/* ============================
+   MAIN CONTAINER
+   ============================ */
+.container { max-width: 1200px; position: relative; z-index: 2; }
+
+/* ============================
+   CARD DESIGN
+   ============================ */
+.card {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 30px;
+}
+
+/* Café badge */
+.cafe-badge {
+    width: 70px; height: 70px; background: #d98c67; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 15px auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.cafe-badge i { font-size: 30px; color: white; }
+
+/* ============================
+   HEADER & BUTTONS
+   ============================ */
+h2 { font-weight: 600; color: #4a2f2f; }
+
+.btn-transparent {
+    background: transparent; border: 1px solid rgba(74, 47, 47, 0.5);
+    color: #4a2f2f; transition: all 0.3s ease;
+}
+.btn-transparent:hover { background: rgba(74, 47, 47, 0.1); }
+
+.btn-danger { background-color: #b33a3a; border: none; }
+.btn-danger:hover { background-color: #922e2e; }
+
+/* ============================
+   TABLE DESIGN
+   ============================ */
+.table {
+    margin-top: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff8f0;
+}
+.table th { background-color: #d98c67; color: #fff; font-weight: 600; font-size: 14px; }
+.table td { vertical-align: middle; color: #4a2f2f; font-weight: 500; }
+.table-hover tbody tr:hover { background-color: #ffe3d6; transition: 0.3s ease; }
+
+/* ============================
+   LOADING & ERROR
+   ============================ */
+#loading { font-size: 1.1rem; color: #4a2f2f; }
+#error-message { display: none; }
+
+/* ============================
+   METRICS CARDS
+   ============================ */
+#metrics-container .bg-light {
+    background-color: #fff3e0;
+    color: #4a2f2f;
+}
+#metrics-container h5 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 768px) {
+    .card { padding: 20px; }
+    h2 { font-size: 1.4rem; }
+    .table th, .table td { font-size: 12px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Decorative Café Background Icons -->
+<i class="bi bi-cup-hot bg-icon icon-1"></i>
+<i class="bi bi-cup-straw bg-icon icon-2"></i>
+<i class="bi bi-egg-fried bg-icon icon-3"></i>
+
+<div class="container py-5">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-cup-hot-fill"></i> Charlie Café - Orders</h2>
+
+        <div class="mt-3 mt-md-0">
+            <button class="btn btn-transparent me-2" onclick="CHARLIE_PRINT.printAllOrders()">
+                <i class="bi bi-printer"></i> Print
+            </button>
+            <button class="btn btn-danger" onclick="logoutUser()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= ORDERS CARD ================= -->
+    <div class="card">
+
+        <!-- Café Icon Badge -->
+        <div class="cafe-badge">
+            <i class="bi bi-shop"></i>
+        </div>
+
+        <h4 class="text-center mb-3"><i class="bi bi-receipt"></i> All Orders</h4>
+
+        <!-- ================= METRICS SECTION ================= -->
+        <div class="row mb-4" id="metrics-container">
+            <!-- Metrics cards inserted dynamically -->
+        </div>
+
+        <!-- ================= ORDERS TABLE ================= -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-hash"></i> Order ID</th>
+                        <th><i class="bi bi-table"></i> Table</th>
+                        <th><i class="bi bi-person"></i> Customer</th>
+                        <th><i class="bi bi-cup-hot"></i> Item</th>
+                        <th><i class="bi bi-123"></i> Quantity</th>
+                        <th><i class="bi bi-currency-dollar"></i> Total ($)</th>
+                        <th><i class="bi bi-clock-history"></i> Status</th>
+                        <th><i class="bi bi-credit-card"></i> Payment</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table-body"></tbody>
+            </table>
+        </div>
+
+        <div id="loading" class="text-center mt-3">
+            <i class="bi bi-hourglass-split"></i> Loading orders...
+        </div>
+        <div id="error-message" class="text-danger text-center mt-3">
+            Failed to load orders.
+        </div>
+    </div>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    loadOrders();
+});
+
+// ---------------- 1️⃣ Load Orders ----------------
+async function loadOrders() {
+    const tableBody = document.getElementById("orders-table-body");
+    const loading = document.getElementById("loading");
+    const errorMessage = document.getElementById("error-message");
+
+    try {
+        const response = await CHARLIE_API.getOrders();
+        loading.style.display = "none";
+
+        if (!response || !response.orders || response.orders.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8">No orders found.</td></tr>`;
+        } else {
+            response.orders.forEach(order => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.order_id}</td>
+                    <td>${order.table_number}</td>
+                    <td>${order.customer_name}</td>
+                    <td>${order.item}</td>
+                    <td>${order.quantity}</td>
+                    <td>${order.total_amount || "-"}</td>
+                    <td>${order.status || "Pending"}</td>
+                    <td>${order.payment_method || "-"}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // ---------------- 3️⃣ Render Metrics ----------------
+        renderMetrics(response.metrics);
+
+    } catch (error) {
+        console.error("Error loading orders:", error);
+        loading.style.display = "none";
+        errorMessage.style.display = "block";
+    }
+}
+
+// ---------------- 2️⃣ Render Metrics Function ----------------
+function renderMetrics(metrics) {
+    const container = document.getElementById("metrics-container");
+    container.innerHTML = ""; // Clear previous
+
+    if (!metrics || metrics.length === 0) {
+        container.innerHTML = `<p class="text-center text-muted">No metrics available.</p>`;
+        return;
+    }
+
+    metrics.forEach(metric => {
+        const card = document.createElement("div");
+        card.className = "col-md-4 mb-2";
+
+        card.innerHTML = `
+            <div class="p-3 bg-light rounded shadow-sm text-center">
+                <h5 class="mb-1">${metric.value}</h5>
+                <small class="text-muted">${metric.metric_name.replace(/_/g, ' ')}</small>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// ---------------- 4️⃣ Logout Function ----------------
+function logoutUser() {
+    window.location.href = "logout.html";
+}
+</script>
+
+</body>
+</html>
+```
+
+### ✅ What’s Fixed / Added
+
+- Metrics container added above orders table.
+
+- renderMetrics() JS function dynamically creates cards for each metric.
+
+- Called renderMetrics() inside loadOrders() after fetching API data.
+
+- CSS styling added for metrics cards.
+
+- Comments added for clarity.
 ---
+
 
 
