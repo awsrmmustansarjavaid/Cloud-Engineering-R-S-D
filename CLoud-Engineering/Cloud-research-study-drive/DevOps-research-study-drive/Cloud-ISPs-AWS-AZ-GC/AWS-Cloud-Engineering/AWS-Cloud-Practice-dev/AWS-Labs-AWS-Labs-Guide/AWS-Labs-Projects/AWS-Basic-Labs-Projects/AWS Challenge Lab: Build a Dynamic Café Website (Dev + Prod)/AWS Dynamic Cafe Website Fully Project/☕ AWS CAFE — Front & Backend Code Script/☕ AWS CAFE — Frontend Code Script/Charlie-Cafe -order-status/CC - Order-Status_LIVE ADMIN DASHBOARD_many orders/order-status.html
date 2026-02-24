@@ -12,38 +12,79 @@
 
 <style>
 /* ============================
-   BODY & BACKGROUND
+   BODY & BACKGROUND DESIGN
    ============================ */
 body {
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); /* Warm café gradient */
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
     min-height: 100vh;
     padding-bottom: 50px;
+    position: relative;
+    overflow-x: hidden;
 }
 
+/* Decorative floating café icons (background design) */
+.bg-icon {
+    position: absolute;
+    font-size: 120px;
+    color: rgba(74, 47, 47, 0.05);
+    z-index: 0;
+}
+
+.icon-1 { top: 5%; left: 5%; }
+.icon-2 { bottom: 10%; right: 8%; }
+.icon-3 { top: 40%; right: 15%; }
+
 /* ============================
-   CONTAINER & CARD LAYOUT
+   MAIN CONTAINER
    ============================ */
 .container {
     max-width: 1200px;
-}
-.card {
-    background-color: rgba(255, 255, 255, 0.9); /* Soft translucent white */
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    padding: 30px;
+    position: relative;
+    z-index: 2;
 }
 
 /* ============================
-   HEADER & BUTTONS
+   CARD DESIGN
+   ============================ */
+.card {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 30px;
+}
+
+/* Café badge icon above table */
+.cafe-badge {
+    width: 70px;
+    height: 70px;
+    background: #d98c67;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.cafe-badge i {
+    font-size: 30px;
+    color: white;
+}
+
+/* ============================
+   HEADER STYLING
    ============================ */
 h2 {
     font-weight: 600;
-    color: #4a2f2f; /* Deep coffee tone */
+    color: #4a2f2f;
 }
 
+/* ============================
+   BUTTONS
+   ============================ */
 .btn-transparent {
     background: transparent;
     border: 1px solid rgba(74, 47, 47, 0.5);
@@ -52,7 +93,6 @@ h2 {
 }
 .btn-transparent:hover {
     background: rgba(74, 47, 47, 0.1);
-    color: #3e2424;
 }
 
 .btn-danger {
@@ -64,11 +104,11 @@ h2 {
 }
 
 /* ============================
-   TABLE STYLING
+   TABLE DESIGN
    ============================ */
 .table {
     margin-top: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     background: #fff8f0;
 }
@@ -77,15 +117,18 @@ h2 {
     background-color: #d98c67;
     color: #fff;
     font-weight: 600;
+    font-size: 14px;
 }
 
 .table td {
     vertical-align: middle;
     color: #4a2f2f;
+    font-weight: 500;
 }
 
 .table-hover tbody tr:hover {
     background-color: #ffe3d6;
+    transition: 0.3s ease;
 }
 
 /* ============================
@@ -96,33 +139,35 @@ h2 {
     color: #4a2f2f;
 }
 
-#error-message {
-    font-size: 1.1rem;
-}
-
 /* ============================
-   RESPONSIVE IMPROVEMENTS
+   RESPONSIVE
    ============================ */
 @media (max-width: 768px) {
     .card {
         padding: 20px;
     }
     h2 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
     .table th, .table td {
-        font-size: 0.9rem;
+        font-size: 12px;
     }
 }
 </style>
 </head>
 
 <body>
+
+<!-- Decorative Café Background Icons -->
+<i class="bi bi-cup-hot bg-icon icon-1"></i>
+<i class="bi bi-cup-straw bg-icon icon-2"></i>
+<i class="bi bi-egg-fried bg-icon icon-3"></i>
+
 <div class="container py-5">
 
     <!-- ================= HEADER ================= -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-cup-hot"></i> Charlie Café - Orders</h2>
+        <h2><i class="bi bi-cup-hot-fill"></i> Charlie Café - Orders</h2>
 
         <div class="mt-3 mt-md-0">
             <button class="btn btn-transparent me-2"
@@ -137,20 +182,28 @@ h2 {
 
     <!-- ================= ORDERS CARD ================= -->
     <div class="card">
-        <h4 class="mb-3">All Orders</h4>
+
+        <!-- Café Icon Badge -->
+        <div class="cafe-badge">
+            <i class="bi bi-shop"></i>
+        </div>
+
+        <h4 class="text-center mb-3">
+            <i class="bi bi-receipt"></i> All Orders
+        </h4>
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle text-center">
                 <thead>
                     <tr>
-                        <th>Order ID</th>
-                        <th>Table</th>
-                        <th>Customer</th>
-                        <th>Item</th>
-                        <th>Quantity</th>
-                        <th>Total ($)</th>
-                        <th>Status</th>
-                        <th>Payment</th>
+                        <th><i class="bi bi-hash"></i> Order ID</th>
+                        <th><i class="bi bi-table"></i> Table</th>
+                        <th><i class="bi bi-person"></i> Customer</th>
+                        <th><i class="bi bi-cup-hot"></i> Item</th>
+                        <th><i class="bi bi-123"></i> Quantity</th>
+                        <th><i class="bi bi-currency-dollar"></i> Total ($)</th>
+                        <th><i class="bi bi-clock-history"></i> Status</th>
+                        <th><i class="bi bi-credit-card"></i> Payment</th>
                     </tr>
                 </thead>
                 <tbody id="orders-table-body"></tbody>
