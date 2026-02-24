@@ -226,5 +226,153 @@ Now your system has:
 
 - Fully frontend-controlled page protection
 
+### Indirectly Connect with Config.js
+
+Your role-guard.js is connected to config.js, but through central-auth.js, not directly.
+
+### 🧠 How the Connection Actually Works
+
+Here is the real flow:
+
+```
+config.js
+    ↓
+central-auth.js
+    ↓
+role-guard.js
+```
+
+### 🔹 1️⃣ config.js (Your Configuration Source)
+
+This file stores:
+
+- Cognito domain
+
+- Client ID
+
+- API base URL
+
+- Other environment settings
+
+Example:
+
+```
+window.CHARLIE_CONFIG = {
+    COGNITO_DOMAIN: "your-domain.auth.us-east-1.amazoncognito.com",
+    CLIENT_ID: "xxxxxxxxxxxx",
+    API_BASE: "https://api-id.execute-api.us-east-1.amazonaws.com/prod"
+};
+```
+
+### 🔹 2️⃣ central-auth.js Uses config.js
+
+Inside central-auth.js:
+
+```
+const CONFIG = window.CHARLIE_CONFIG;
+```
+
+It uses:
+
+- CONFIG.COGNITO_DOMAIN
+
+- CONFIG.CLIENT_ID
+
+For:
+
+- Login redirect
+
+- Token exchange
+
+- Logout redirect
+
+So central-auth depends on config.js directly.
+
+### 🔹 3️⃣ role-guard.js Uses central-auth.js
+
+Inside your role guard:
+
+```
+const AUTH = window.CHARLIE_AUTH;
+```
+
+And it calls:
+
+```
+AUTH.protectPage();
+AUTH.getUserRoles();
+AUTH.logout();
+```
+
+Those functions internally use config.js.
+
+### ✅ So Final Answer:
+
+Does role-guard.js connect with config.js?
+
+✔ Yes — but indirectly.
+
+It does NOT read config.js itself.
+
+It depends on central-auth.js,
+and central-auth.js depends on config.js.
+
+### 🔗 Full Dependency Chain
+
+```
+config.js
+   ↓
+utils.js
+   ↓
+central-auth.js
+   ↓
+role-guard.js
+   ↓
+Your HTML page
+```
+
+### ⚠️ VERY IMPORTANT
+
+The script loading order in HTML must be:
+
+```
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="role-guard.js"></script>
+```
+
+If you change order, it will break.
+
+Because:
+
+- role-guard needs central-auth
+
+- central-auth needs config
+
+- central-auth needs utils
+
+### 🚀 How to Make It EVEN Cleaner (Optional Improvement)
+
+If you want stronger integration, you could modify role-guard.js like this:
+
+```
+const CONFIG = window.CHARLIE_CONFIG;
+const AUTH = window.CHARLIE_AUTH;
+```
+
+Even if you don’t use CONFIG now, it makes the dependency explicit.
+
+### 🏁 Final Conclusion
+
+✔ Yes — your configuration in config.js is being used
+
+✔ No Lambda needed
+
+✔ No API Gateway needed
+
+✔ Fully frontend-based role control
+
+✔ Clean modular structure
 ---
 
