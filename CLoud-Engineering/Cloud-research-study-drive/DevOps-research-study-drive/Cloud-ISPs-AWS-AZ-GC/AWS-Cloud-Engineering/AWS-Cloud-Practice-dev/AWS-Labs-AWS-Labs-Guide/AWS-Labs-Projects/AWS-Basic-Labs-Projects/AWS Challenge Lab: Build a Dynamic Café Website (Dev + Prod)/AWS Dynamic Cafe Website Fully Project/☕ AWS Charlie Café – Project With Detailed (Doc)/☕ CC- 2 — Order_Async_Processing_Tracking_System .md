@@ -2636,7 +2636,7 @@ API_URL = ".../prod/order-status"
 
 - CloudWatch logs access
 
-[CompanyManagementLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CompanyManagementLambda.js)
+[CompanyManagementLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CompanyManagementLambda/CompanyManagementLambda.py)
 
 **✅ PHASE 6️⃣ STATUS**
 
