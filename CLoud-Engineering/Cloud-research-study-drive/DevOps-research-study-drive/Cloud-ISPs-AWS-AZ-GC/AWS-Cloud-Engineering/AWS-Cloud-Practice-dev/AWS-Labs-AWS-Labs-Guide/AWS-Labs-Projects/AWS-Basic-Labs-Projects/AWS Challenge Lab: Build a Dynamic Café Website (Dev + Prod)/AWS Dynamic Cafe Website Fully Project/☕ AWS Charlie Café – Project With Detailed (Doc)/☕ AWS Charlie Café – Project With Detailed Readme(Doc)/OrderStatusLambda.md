@@ -1176,3 +1176,811 @@ Test_EmployeeOrderLambda
 
 # 🟢 SECTION 4️⃣ COMPLETE & VERIFIED
 ---
+
+# 📢 New Configurations 
+
+## 🔐 PHASE 5️⃣ — API Gateway
+
+### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
+
+### 🎯 FINAL ARCHITECTURE
+
+```
+API Gateway
+     ↓
+CompanyManagementLambda
+     ↓
+Route handling inside code
+```
+
+This is called: “Lambda Monolith Pattern” Good for small/medium systems.
+
+### ✅ NEW API Gateway Configuration (RECOMMENDED)
+
+Even with one Lambda, use 4 routes:
+
+| Resource Path      | Method | Integration             |
+| ------------------ | ------ | ----------------------- |
+| /admin/dashboard   | GET    | CompanyManagementLambda |
+| /admin/create-user | POST   | CompanyManagementLambda |
+| /employee/orders   | GET    | CompanyManagementLambda |
+| /employee/order    | POST   | CompanyManagementLambda |
+
+This keeps:
+
+- Clean REST structure
+
+- Easy role-based authorization
+
+- Clean documentation
+
+- Future scalability
+
+- **AWS Console → API Gateway → REST API**
+
+### 1️⃣ Resource & Method
+
+- Go to Resources 
+
+- If GET method does not exist → click Actions → Create Method → GET
+
+- Select Lambda Proxy Integration
+
+### 2️⃣ Create Resource
+> **You MUST manually create routes.
+> **API Gateway does NOT auto-create /admin/*.**
+
+- Go to: API Gateway → Resource → Click Create
+
+| Resource               | Method | Auth    |
+| -------------------- | ------ | ------- |
+| `/order-status`      | GET    | No Cognito |
+| `/admin/dashboard`   | GET    | Cognito |
+| `/admin/create-user` | POST   | Cognito |
+| `/employee/orders`   | GET    | Cognito |
+| `/employee/order`    | POST   | Cognito |
+
+> **✔ Attach CafeCognitoAuthorizer to ALL protected Resource**
+
+#### Admin Resource 1
+
+- Method: GET
+
+- Path: /admin/dashboard
+
+- Integration: CompanyManagementLambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Admin Resource 2
+
+- Method: POST
+
+- Path: /admin/create-user
+
+- Integration: CompanyManagementLambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+> **💡 This is how /admin/* works**
+
+**📢 You manually create Resource that start with /admin/**
+
+#### Employee Resource 1
+
+- Method: GET
+
+- Path: /employee/orders
+
+- Integration: CompanyManagementLambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Employee Resource 2
+
+- Method: POST
+
+- Path: /employee/order
+
+- Integration: CompanyManagementLambda
+
+- Authorization: cafe-cognito-authorizer
+
+- Click Create
+
+#### Attach this authorizer to your Resource
+
+/admin/*
+
+/employee/*
+
+or /api/*
+
+**✔ Now API Gateway blocks unauthenticated users**
+
+### 3️⃣ Create Authorizer in API Gateway
+
+- Go to: API Gateway → CafeOrdersAPI
+
+- Authorizers → Create Authorizer
+
+- Configure:
+
+  - Type → Cognito
+
+  - Name → CafeCognitoAuthorizer
+
+  - User Pool → select your pool
+
+  - Token source → Authorization
+
+- Save.
+
+### 4️⃣ Attach Cognito Authorizer in API Gateway
+
+- Now attach this authorizer ONLY to:
+
+```
+/admin/*
+/employee/*
+```
+
+- ❌ Do NOT attach to:
+
+```
+/public/*
+```
+
+### 5️⃣ Get Your API Gateway Invoke URL
+
+- Go to: AWS Console → API Gateway → Your API → Stages → prod (or your stage name)
+
+You will see something like:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod
+```
+
+### 🔥 FINAL ARCHITECTURE RESULT
+
+```
+/public/orders                → No authorizer
+/public/order-status          → No authorizer
+
+/admin/dashboard              → Cognito authorizer
+/admin/orders                 → Cognito authorizer
+/admin/mark-paid              → Cognito authorizer
+
+/employee/orders              → Cognito authorizer
+/employee/order               → Cognito authorizer
+```
+
+Then inside Lambda:
+
+- Validate group
+
+- Enforce authorization
+
+### ❓ IMPORTANT CHANGE FROM YOUR OLD SETUP
+
+OLD:
+
+```
+response_type=token
+Implicit grant
+```
+
+NEW (recommended):
+
+```
+response_type=code
+Authorization code grant
+```
+
+#### ⚠️ You must update your central-auth-api.js accordingly.
+
+### 5️⃣ Enable CORS (Cross-Origin Resource Sharing)
+
+> **These are two separate things — enabling CORS is for frontend browser calls.**
+
+- Click GET → Actions → Enable CORS
+
+- A popup appears:
+
+  - Check “Replace existing CORS headers” ✅
+
+- Click Enable CORS
+
+- Confirm popup: “Yes, replace existing headers” ✅
+
+> **This allows your frontend JS (from CloudFront) to call API Gateway without CORS errors.**
+
+✔ Enable CORS on each method
+
+✔ Especially for GET /order-status
+
+### 6️⃣ Deploy API
+
+- **Click Actions → Deploy API**
+
+- **Stage: prod**
+
+- **Save Invoke URL**
+
+✔ Deploy after every change
+
+✔ Stage can be prod
+
+✔ Frontend URL must match stage
+
+#### 📌 Copy new endpoint API URL:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status
+```
+
+#### 👉 Paste this into frontend once
+
+#### 🔁 Update frontend:
+
+```
+API_URL = ".../prod/order-status"
+```
+
+#### ✅ Result:
+
+- ❌ No login → 401
+
+
+- ✅ Login → data loads
+
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 6️⃣ Lambda Functions 
+
+### 1️⃣ CREATE New Lambda Functions 
+
+### 1️⃣ CREATE OrderStatusLambda
+
+- **AWS Console → Lambda → Create Function → Author from scratch**
+
+- **Function name:** CompanyManagementLambda
+
+- **Permissions:** Create new role with basic Lambda permissions
+
+#### ✅ Lambda Configuration
+
+| Setting      | Value                           |
+| ------------ | ------------------------------- |
+| Runtime      | Node.js 18.x                    |
+| Architecture | x86_64                          |
+| Memory       | 128 MB (or 256 MB recommended)  |
+| Timeout      | 10 seconds                      |
+| Handler      | `index.handler`                 |
+| Enable CORS  | Yes (if using browser frontend) |
+
+#### ✅ IAM Role:
+
+- Basic Lambda execution role
+
+- CloudWatch logs access
+
+[CompanyManagementLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CompanyManagementLambda/CompanyManagementLambda.py)
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+
+# 📢 Verfication
+
+## 🔐 PHASE 5️⃣ — API Gateway Authorizer Test
+
+### 🟡 Test Inside API Gateway Console
+
+- Go to: API Gateway → Resources → /order-status → GET → Test
+
+### 1️⃣ : GET /admin/dashboard
+
+### ✅ Test API
+
+- Method: GET
+
+- Path: /admin/dashboard
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+- Click Test
+
+#### ✅ Expected Result:
+
+- Status: 200
+
+### 🌐 Browser Test
+
+- Open browser and enter:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+### ✅ EC2 Test
+
+```
+curl https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/dashboard
+```
+
+#### ✅ Expected Result:
+
+```
+{"totalEmployees":25,"totalOrdersToday":42,"revenueToday":1234.56}
+```
+
+
+### 2️⃣ : POST /admin/create-user
+
+### ✅ Test API
+
+Method: POST
+
+Body:
+
+```
+{
+  "username": "john",
+  "role": "admin"
+}
+```
+
+- Click Test
+
+#### ✅ Expected Result:
+
+```
+{
+  "message": "User john created with role admin",
+  "username": "john",
+  "role": "admin"
+}
+```
+
+### 🌐 Browser Test
+
+- Open browser and enter:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee/orders?employee_id=alice
+```
+
+#### ✅ Expected Result:
+
+```
+[
+  {
+    "order_id": "O-101",
+    "employee": "alice",
+    "total": 23.5
+  }
+]
+```
+
+### ✅ EC2 Test
+
+```
+curl -X POST https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/create-user \
+-H "Content-Type: application/json" \
+-d '{"username":"john","role":"admin"}'
+```
+
+#### ✅ Expected Result:
+
+```
+{"message":"User john created with role admin","username":"john","role":"admin"}
+```
+
+### ✅ Test 3️⃣ : GET Employee Orders
+
+Method: GET
+
+Request Body: leave blank (GET request does not have a body)
+
+- Click Test
+
+#### ✅ Expected Result:
+
+```
+[
+  {
+    "order_id": "O-101",
+    "employee": "alice",
+    "total": 23.5
+  }
+]
+```
+
+If employee_id=all:
+
+```
+[
+  { "order_id": "O-101", "employee": "alice", "total": 23.5 },
+  { "order_id": "O-102", "employee": "bob", "total": 12.0 }
+]
+```
+
+- Status Code: 200 OK
+
+- Headers: "Content-Type": "application/json"
+
+### ✅ EC2 Test
+
+```
+curl "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee/orders?employee_id=alice"
+```
+
+#### ✅ Expected Result:
+
+```
+[{"order_id":"O-101","employee":"alice","total":23.5}]
+```
+
+### ✅ Test 4️⃣ : POST Employee Create Order
+
+Method: POST
+
+Body:
+
+```
+{
+  "order_id": "O-999",
+  "employee": "alice",
+  "total": 45.5
+}
+```
+
+- Click Test
+
+#### ✅ Expected Result:
+
+```
+{
+  "message": "Order O-999 created successfully",
+  "order": {
+    "order_id": "O-999",
+    "employee": "alice",
+    "total": 45.5
+  }
+}
+```
+
+### ✅ EC2 Test
+
+```
+curl -X POST https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee/order \
+-H "Content-Type: application/json" \
+-d '{"order_id":"O-999","employee":"alice","total":45.5}'
+```
+
+#### ✅ Expected Result:
+
+```
+{"message":"Order O-999 created successfully","order":{"order_id":"O-999","employee":"alice","total":45.5}}
+```
+
+### 🔹 If You Get Errors
+
+#### ❌ 403 Forbidden
+
+→ API not deployed
+
+→ IAM authorization enabled
+
+→ Missing API key
+
+#### ❌ 500 Internal Server Error
+
+→ Check CloudWatch Logs
+
+- Go to: AWS Console → CloudWatch → Log Groups → /aws/lambda/CompanyManagementLambda
+
+#### ❌ 404 Not Found
+
+→ Wrong route
+
+→ Stage name missing
+
+→ Forgot to deploy API
+
+### 🔹 Quick Notes for API Gateway Console Testing
+
+#### GET requests:
+
+- Use Query String Parameters for filtering (employee_id)
+
+- Body is ignored
+
+#### POST requests:
+
+- Body must be valid JSON
+
+- Set Content-Type: application/json
+
+#### Errors you may see:
+
+- 400 Bad Request → invalid JSON in body
+
+- 404 Not Found → wrong resource path
+
+- 500 Internal Server Error → check Lambda logs in CloudWatch
+
+### 🔹 IMPORTANT — After Creating Routes
+
+After adding routes, you MUST:
+
+```
+Deploy API → Select Stage → Deploy
+````
+
+Otherwise changes won’t work.
+
+### 🔹 Final Expected Behavior Summary
+
+| Endpoint           | Method | Browser | EC2 Curl | Expected              |
+| ------------------ | ------ | ------- | -------- | --------------------- |
+| /admin/dashboard   | GET    | ✅       | ✅        | Dashboard JSON        |
+| /admin/create-user | POST   | ❌       | ✅        | User created message  |
+| /employee/orders   | GET    | ✅       | ✅        | Orders list           |
+| /employee/order    | POST   | ❌       | ✅        | Order created message |
+
+
+
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 6️⃣ Lambda Functions 
+
+### ✅ Lambda Test JSON
+
+Since this Lambda uses queryStringParameters, here are proper test events.
+
+### 1️⃣ Admin Dashboard (GET)
+
+- Name: Admin_Dashboard
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "GET",
+  "resource": "/admin/dashboard"
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"totalEmployees\":25,\"totalOrdersToday\":42,\"revenueToday\":1234.56}"
+}
+```
+
+#### ✅ If you parse the body JSON, actual data is:
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+### 2️⃣ Admin Create User (POST)
+
+- Name: Admin_Create_User
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/admin/create-user",
+  "body": "{\"username\":\"john\",\"role\":\"admin\"}"
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"message\":\"User john created with role admin\",\"username\":\"john\",\"role\":\"admin\"}"
+}
+```
+
+#### ✅ Parsed body:
+
+```
+{
+  "message": "User john created with role admin",
+  "username": "john",
+  "role": "admin"
+}
+```
+
+
+
+### 3️⃣ Employee Orders (GET)
+
+- Name: Employee_Orders
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "GET",
+  "resource": "/employee/orders",
+  "queryStringParameters": {
+    "employee_id": "alice"
+  }
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "[{\"order_id\":\"O-101\",\"employee\":\"alice\",\"total\":23.5}]"
+}
+```
+
+#### ✅ Parsed body:
+
+```
+[
+  {
+    "order_id": "O-101",
+    "employee": "alice",
+    "total": 23.5
+  }
+]
+```
+
+If you remove employee_id, it will return both orders.
+
+### 4️⃣ Create Employee Order (POST)
+
+- Name: Employee_Order
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/employee/order",
+  "body": "{\"order_id\":\"O-999\",\"employee\":\"alice\",\"total\":45.5}"
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"message\":\"Order O-999 created successfully\",\"order\":{\"order_id\":\"O-999\",\"employee\":\"alice\",\"total\":45.5}}"
+}
+```
+
+#### ✅ Parsed body:
+
+```
+{
+  "message": "Order O-999 created successfully",
+  "order": {
+    "order_id": "O-999",
+    "employee": "alice",
+    "total": 45.5
+  }
+}
+```
+
+### 🚨 Important Notes
+
+#### 1️⃣ Why body is a STRING?
+
+Because API Gateway requires Lambda proxy integration response format:
+
+```
+{
+  "statusCode": 200,
+  "body": "string"
+}
+```
+
+That’s why we use:
+
+```
+JSON.stringify(body)
+```
+
+#### 2️⃣ These test events work for:
+
+- API Gateway REST API
+
+- Lambda Console Testing
+
+If using HTTP API (v2) the event shape is slightly different (rawPath, requestContext.http.method).
+
+### 🔎 What Happens If Route Doesn't Match?
+
+Example test:
+
+```
+{
+  "httpMethod": "GET",
+  "resource": "/unknown"
+}
+```
+
+#### Result:
+
+```
+{
+  "statusCode": 404,
+  "body": "{\"error\":\"Route not found\"}"
+}
+```
+
+### 🎯 Final Confirmation
+
+Yes — all 4 test events are:
+
+✔ Valid
+
+✔ Correct format
+
+✔ Will work with the merged Lambda
+
+✔ Return the responses shown above
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
