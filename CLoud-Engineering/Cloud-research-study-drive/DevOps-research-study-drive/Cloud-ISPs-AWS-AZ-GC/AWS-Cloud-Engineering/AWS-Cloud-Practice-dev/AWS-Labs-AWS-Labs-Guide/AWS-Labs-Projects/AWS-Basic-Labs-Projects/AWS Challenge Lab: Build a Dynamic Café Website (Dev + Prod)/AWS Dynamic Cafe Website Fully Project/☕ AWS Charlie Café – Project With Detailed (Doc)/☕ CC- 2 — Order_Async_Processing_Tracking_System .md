@@ -2376,7 +2376,28 @@ order-receipt.php
 
 ### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
 
-- **AWS Console → API Gateway → REST API → /order-status**
+### ✅ NEW API Gateway Configuration (RECOMMENDED)
+
+Even with one Lambda, use 4 routes:
+
+| Resource Path      | Method | Integration             |
+| ------------------ | ------ | ----------------------- |
+| /admin/dashboard   | GET    | CompanyManagementLambda |
+| /admin/create-user | POST   | CompanyManagementLambda |
+| /employee/orders   | GET    | CompanyManagementLambda |
+| /employee/order    | POST   | CompanyManagementLambda |
+
+This keeps:
+
+- Clean REST structure
+
+- Easy role-based authorization
+
+- Clean documentation
+
+- Future scalability
+
+- **AWS Console → API Gateway → REST API**
 
 ### 1️⃣ Resource & Method
 
@@ -2389,18 +2410,6 @@ order-receipt.php
 ### 2️⃣ Create Resource
 > **You MUST manually create routes.
 > **API Gateway does NOT auto-create /admin/*.**
-
-#### Overview of your resources and Lambda mapping
-
-| Resource Path        | Method | Lambda Function        | Notes               |
-| -------------------- | ------ | ---------------------- | ------------------- |
-| `/admin/dashboard`   | GET    | AdminDashboardLambda*  | Admin only          |
-| `/admin/create-user` | POST   | AdminCreateUserLambda* | Admin only          |
-| `/employee/orders`   | GET    | EmployeeOrdersLambda*  | Employee + Admin    |
-| `/employee/order`    | POST   | EmployeeOrderLambda*   | Employee + Admin    |
-| `/order-status`      | GET    | OrderStatusLambda      | Order status checks |
-
-**You’ll need to create separate Lambdas for admin/employee if not already done.**
 
 - Go to: API Gateway → Resource → Click Create
 
@@ -2420,7 +2429,7 @@ order-receipt.php
 
 - Path: /admin/dashboard
 
-- Integration: AdminDashboardLambda
+- Integration: CompanyManagementLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -2432,7 +2441,7 @@ order-receipt.php
 
 - Path: /admin/create-user
 
-- Integration: AdminCreateUserLambda
+- Integration: CompanyManagementLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -2448,7 +2457,7 @@ order-receipt.php
 
 - Path: /employee/orders
 
-- Integration: EmployeeOrdersLambda
+- Integration: CompanyManagementLambda
 
 - Authorization: cafe-cognito-authorizer
 
@@ -2460,7 +2469,7 @@ order-receipt.php
 
 - Path: /employee/order
 
-- Integration: EmployeeOrderLambda
+- Integration: CompanyManagementLambda
 
 - Authorization: cafe-cognito-authorizer
 
