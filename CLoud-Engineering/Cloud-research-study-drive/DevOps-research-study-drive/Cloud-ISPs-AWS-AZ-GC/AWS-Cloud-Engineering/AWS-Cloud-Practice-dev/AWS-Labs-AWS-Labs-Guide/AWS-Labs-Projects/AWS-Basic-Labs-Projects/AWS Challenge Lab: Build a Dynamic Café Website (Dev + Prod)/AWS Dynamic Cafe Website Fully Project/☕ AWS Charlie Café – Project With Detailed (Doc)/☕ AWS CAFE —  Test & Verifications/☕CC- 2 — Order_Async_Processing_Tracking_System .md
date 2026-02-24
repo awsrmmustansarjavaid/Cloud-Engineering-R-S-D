@@ -1882,15 +1882,218 @@ order-status.php?order_id=ORD-XXXX
 
 Since this Lambda uses queryStringParameters, here are proper test events.
 
-### 1️⃣ Lambda Code Test
+### 1️⃣ Admin Dashboard (GET)
 
-- Name:
+- Name: Admin_Dashboard
+
+#### ✅ Test JSON :
 
 ```
-Test_OrderStatusLambda
+{
+  "httpMethod": "GET",
+  "resource": "/admin/dashboard"
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"totalEmployees\":25,\"totalOrdersToday\":42,\"revenueToday\":1234.56}"
+}
+```
+
+#### ✅ If you parse the body JSON, actual data is:
+
+```
+{
+  "totalEmployees": 25,
+  "totalOrdersToday": 42,
+  "revenueToday": 1234.56
+}
+```
+
+### 2️⃣ Admin Create User (POST)
+
+- Name: Admin_Create_User
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/admin/create-user",
+  "body": "{\"username\":\"john\",\"role\":\"admin\"}"
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"message\":\"User john created with role admin\",\"username\":\"john\",\"role\":\"admin\"}"
+}
+```
+
+#### ✅ Parsed body:
+
+```
+{
+  "message": "User john created with role admin",
+  "username": "john",
+  "role": "admin"
+}
 ```
 
 
+
+### 3️⃣ Employee Orders (GET)
+
+- Name: Employee_Orders
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "GET",
+  "resource": "/employee/orders",
+  "queryStringParameters": {
+    "employee_id": "alice"
+  }
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "[{\"order_id\":\"O-101\",\"employee\":\"alice\",\"total\":23.5}]"
+}
+```
+
+#### ✅ Parsed body:
+
+```
+[
+  {
+    "order_id": "O-101",
+    "employee": "alice",
+    "total": 23.5
+  }
+]
+```
+
+If you remove employee_id, it will return both orders.
+
+### 4️⃣ Create Employee Order (POST)
+
+- Name: Employee_Order
+
+#### ✅ Test JSON :
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/employee/order",
+  "body": "{\"order_id\":\"O-999\",\"employee\":\"alice\",\"total\":45.5}"
+}
+```
+
+#### ✅ Expected Result:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"message\":\"Order O-999 created successfully\",\"order\":{\"order_id\":\"O-999\",\"employee\":\"alice\",\"total\":45.5}}"
+}
+```
+
+#### ✅ Parsed body:
+
+```
+{
+  "message": "Order O-999 created successfully",
+  "order": {
+    "order_id": "O-999",
+    "employee": "alice",
+    "total": 45.5
+  }
+}
+```
+
+### 🚨 Important Notes
+
+#### 1️⃣ Why body is a STRING?
+
+Because API Gateway requires Lambda proxy integration response format:
+
+```
+{
+  "statusCode": 200,
+  "body": "string"
+}
+```
+
+That’s why we use:
+
+```
+JSON.stringify(body)
+```
+
+#### 2️⃣ These test events work for:
+
+- API Gateway REST API
+
+- Lambda Console Testing
+
+If using HTTP API (v2) the event shape is slightly different (rawPath, requestContext.http.method).
+
+### 🔎 What Happens If Route Doesn't Match?
+
+Example test:
+
+```
+{
+  "httpMethod": "GET",
+  "resource": "/unknown"
+}
+```
+
+#### Result:
+
+```
+{
+  "statusCode": 404,
+  "body": "{\"error\":\"Route not found\"}"
+}
+```
+
+### 🎯 Final Confirmation
+
+Yes — all 4 test events are:
+
+✔ Valid
+
+✔ Correct format
+
+✔ Will work with the merged Lambda
+
+✔ Return the responses shown above
 
 **✅ PHASE 6️⃣ STATUS**
 
