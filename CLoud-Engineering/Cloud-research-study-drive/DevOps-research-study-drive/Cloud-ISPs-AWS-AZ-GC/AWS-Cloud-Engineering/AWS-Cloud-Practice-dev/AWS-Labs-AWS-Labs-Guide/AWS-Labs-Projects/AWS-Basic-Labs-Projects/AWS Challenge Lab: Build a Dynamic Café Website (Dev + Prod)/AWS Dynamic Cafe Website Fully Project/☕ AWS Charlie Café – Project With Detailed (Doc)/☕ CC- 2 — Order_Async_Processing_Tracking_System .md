@@ -2376,6 +2376,18 @@ order-receipt.php
 
 ### 1️⃣ API Gateway – SECURE Cognito AUTH Authorizer (MOST IMPORTANT) 
 
+### 🎯 FINAL ARCHITECTURE
+
+```
+API Gateway
+     ↓
+CompanyManagementLambda
+     ↓
+Route handling inside code
+```
+
+This is called: “Lambda Monolith Pattern” Good for small/medium systems.
+
 ### ✅ NEW API Gateway Configuration (RECOMMENDED)
 
 Even with one Lambda, use 4 routes:
