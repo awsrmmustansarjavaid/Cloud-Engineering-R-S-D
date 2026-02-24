@@ -2070,6 +2070,73 @@ curl -X POST https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/employee
 {"message":"Order O-999 created successfully","order":{"order_id":"O-999","employee":"alice","total":45.5}}
 ```
 
+### 🔹 If You Get Errors
+
+#### ❌ 403 Forbidden
+
+→ API not deployed
+
+→ IAM authorization enabled
+
+→ Missing API key
+
+#### ❌ 500 Internal Server Error
+
+→ Check CloudWatch Logs
+
+- Go to: AWS Console → CloudWatch → Log Groups → /aws/lambda/CompanyManagementLambda
+
+#### ❌ 404 Not Found
+
+→ Wrong route
+
+→ Stage name missing
+
+→ Forgot to deploy API
+
+### 🔹 Quick Notes for API Gateway Console Testing
+
+#### GET requests:
+
+- Use Query String Parameters for filtering (employee_id)
+
+- Body is ignored
+
+#### POST requests:
+
+- Body must be valid JSON
+
+- Set Content-Type: application/json
+
+#### Errors you may see:
+
+- 400 Bad Request → invalid JSON in body
+
+- 404 Not Found → wrong resource path
+
+- 500 Internal Server Error → check Lambda logs in CloudWatch
+
+### 🔹 IMPORTANT — After Creating Routes
+
+After adding routes, you MUST:
+
+```
+Deploy API → Select Stage → Deploy
+````
+
+Otherwise changes won’t work.
+
+### 🔹 Final Expected Behavior Summary
+
+| Endpoint           | Method | Browser | EC2 Curl | Expected              |
+| ------------------ | ------ | ------- | -------- | --------------------- |
+| /admin/dashboard   | GET    | ✅       | ✅        | Dashboard JSON        |
+| /admin/create-user | POST   | ❌       | ✅        | User created message  |
+| /employee/orders   | GET    | ✅       | ✅        | Orders list           |
+| /employee/order    | POST   | ❌       | ✅        | Order created message |
+
+
+
 
 **✅ PHASE 5️⃣ STATUS**
 
