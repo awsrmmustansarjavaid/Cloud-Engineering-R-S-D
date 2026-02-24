@@ -2615,44 +2615,28 @@ API_URL = ".../prod/order-status"
 
 - **AWS Console → Lambda → Create Function → Author from scratch**
 
-- **Runtime:** Python 3.12
+- **Function name:** CompanyManagementLambda
 
 - **Permissions:** Create new role with basic Lambda permissions
 
-### 1️⃣ CREATE AdminDashboardLambda
+#### ✅ Lambda Configuration
 
-- **Function name:** AdminDashboardLambda
+| Setting      | Value                           |
+| ------------ | ------------------------------- |
+| Runtime      | Node.js 18.x                    |
+| Architecture | x86_64                          |
+| Memory       | 128 MB (or 256 MB recommended)  |
+| Timeout      | 10 seconds                      |
+| Handler      | `index.handler`                 |
+| Enable CORS  | Yes (if using browser frontend) |
 
-- **Runtime:** Node.js 18.x
+#### ✅ IAM Role:
 
-[AdminDashboardLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminDashboardLambda.js)
+- Basic Lambda execution role
 
-### 2️⃣ CREATE AdminCreateUserLambda
+- CloudWatch logs access
 
-- **Function name:** AdminCreateUserLambda
-
-- **Runtime:** Node.js 18.x
-
-[AdminCreateUserLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminCreateUserLambda.js)
-
-### 3️⃣ CREATE EmployeeOrdersLambda
-
-- **Function name:** EmployeeOrdersLambda
-
-- **Runtime:** Node.js 18.x
-
-[EmployeeOrdersLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrdersLambda.js)
-
-
-### 4️⃣ CREATE EmployeeOrderLambda
-
-- **Function name:** EmployeeOrderLambda
-
-- **Runtime:** Node.js 18.x
-
-[EmployeeOrderLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/EmployeeOrderLambda.js)
-
-
+[CompanyManagementLambda.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CompanyManagementLambda.js)
 
 **✅ PHASE 6️⃣ STATUS**
 
