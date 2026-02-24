@@ -1133,6 +1133,14 @@ sudo nano /var/www/html/js/central-printing.js
 
 [central-printing.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
 
+### 6️⃣ Create role-guard.js
+
+```
+sudo nano /var/www/html/js/role-guard.js
+```
+
+[role-guard.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/role-guard.js)
+
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
 
@@ -2603,6 +2611,10 @@ This file handles API logic only.
 ### 🌐 STEP 5 — Create central-printing.js
 
 [central-printing.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
+
+### 🌐 STEP 6 — Create role-guard.js
+
+[role-guard.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/role-guard.js)
 
 #### ✅ After This, You Must Verify
 
