@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================
 # Charlie Cafe - Ultimate Lab Test & Verification Script
-# Version: 2.0
+# Version: 2.1
 # Combines Dev / Prod LAMP, RDS, API, Lambda, S3, SQS, RBAC
 # =============================================================
 
@@ -11,8 +11,8 @@ set -euo pipefail
 # CONFIGURATION
 # =============================================================
 AWS_REGION="us-east-1"
-SECRET_ID="CafeDevDBSM"   # RDS secret
-PROD_SECRET_ID="cafe-rds-secret"
+SECRET_ID="CafeDevDBSM"           # RDS secret (Dev)
+PROD_SECRET_ID="cafe-rds-secret"  # RDS secret (Prod)
 DB_NAME="cafe_db"
 WEB_ROOT="/var/www/html"
 S3_BUCKET="charlie-cafe-s3-bucket"
@@ -20,8 +20,11 @@ S3_PREFIX="Charlie Cafe Test and Verification"
 
 RBAC_ACCESS_TOKEN="PASTE_VALID_ACCESS_TOKEN_HERE"
 
+# AWS Services
 ACCOUNT_ID="910599465397"
 QUEUE_NAME="CafeOrdersQueue"
+SQS_URL="https://sqs.us-east-1.amazonaws.com/910599465397/CafeOrdersQueue"  # ✅ Replace with your SQS URL
+
 ALB_DOMAIN="charlie-cafe-alb-1179524333.us-east-1.elb.amazonaws.com"
 CLOUDFRONT_DOMAIN="dc65q9cmuuula.cloudfront.net"
 API_PROD="https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/prod"
@@ -232,7 +235,7 @@ done
 echo
 echo "📥 Checking SQS Queue: $QUEUE_NAME"
 aws sqs get-queue-attributes \
-  --queue-url https://sqs.${AWS_REGION}.amazonaws.com/${ACCOUNT_ID}/${QUEUE_NAME} \
+  --queue-url "$SQS_URL" \
   --attribute-names ApproximateNumberOfMessages || warn "SQS check failed"
 
 # =============================================================
