@@ -1971,7 +1971,7 @@ You should see a response like:
 Since your Lambda sets CORS headers, you can call it from a browser console on any page:
 
 ```
-fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid", {
+fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/prod/admin/mark-paid", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -1994,7 +1994,7 @@ fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid", {
 If you have EC2 CLI or any Linux terminal, you can use curl:
 
 ```
-curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid" \
+curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/admin/mark-paid" \
 -H "Content-Type: application/json" \
 -d '{"body": "{\"order_id\": \"ORD-123456\"}"}'
 ```

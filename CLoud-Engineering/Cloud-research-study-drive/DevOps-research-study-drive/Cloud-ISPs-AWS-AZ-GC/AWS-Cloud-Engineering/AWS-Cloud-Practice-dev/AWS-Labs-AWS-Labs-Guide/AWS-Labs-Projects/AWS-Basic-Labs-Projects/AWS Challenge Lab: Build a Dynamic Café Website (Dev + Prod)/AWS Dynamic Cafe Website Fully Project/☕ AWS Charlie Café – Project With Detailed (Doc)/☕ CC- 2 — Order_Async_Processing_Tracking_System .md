@@ -2614,14 +2614,14 @@ This creates endpoint /admin/mark-paid
 
 - Actions → Deploy API
 
-- Stage: dev
+- Stage: prod
 
 - Deploy
 
 📌 Endpoint URL:
 
 ```
-POST https://xxxx.execute-api.us-east-1.amazonaws.com/dev/admin/mark-paid
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/prod/admin/mark-paid
 ```
 
 ### 5️⃣ — admin-orders.html

@@ -330,14 +330,14 @@ hr-leaves-holidays
 
 ### 1️⃣ Open API Gateway
 
-- Go to AWS Console → API Gateway → Create API
+- Go to AWS Console → API Gateway → Open API
 
 - Choose REST API (not HTTP API)
 
 - API Name:
 
 ```
-cafe-hr-api
+CafeOrderAPI
 ```
 
 - Description:
