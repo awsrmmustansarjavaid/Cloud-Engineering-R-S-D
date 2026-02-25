@@ -653,22 +653,6 @@ sudo chmod +x lamp-verify.sh
 sudo ./lamp-verify.sh
 ```
 
-#### 2️⃣ ✅ CHARLIE CAFE — VERIFICATION BASH SCRIPT
-
-```
-sudo nano charlie-cafe-verify.sh
-```
-
-[CHARLIE CAFE — VERIFICATION BASH SCRIPT](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Charile%20Cafe%20Mega%20Bash-Script/charlie-cafe-verify.sh)
-
-```
-sudo chmod +x charlie-cafe-verify.sh
-```
-
-```
-sudo ./charlie-cafe-verify.sh
-```
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
