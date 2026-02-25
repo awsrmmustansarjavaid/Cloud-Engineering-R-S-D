@@ -1061,7 +1061,7 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 #### 1️⃣ 📄 Lambda Name : attendance_summary
 
-[attendance_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/attendance_summary.py)
+[attendance_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/attendance_summary.py)
 
 #### 2️⃣ ✅ Lambda Environment Variables
 
