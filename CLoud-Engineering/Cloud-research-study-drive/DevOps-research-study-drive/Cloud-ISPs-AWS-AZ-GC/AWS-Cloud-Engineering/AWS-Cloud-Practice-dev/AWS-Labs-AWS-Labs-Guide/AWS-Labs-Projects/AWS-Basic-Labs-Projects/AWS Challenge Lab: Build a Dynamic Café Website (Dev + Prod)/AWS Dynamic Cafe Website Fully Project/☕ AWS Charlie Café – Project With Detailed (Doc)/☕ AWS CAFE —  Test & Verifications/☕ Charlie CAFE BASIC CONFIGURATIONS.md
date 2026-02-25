@@ -993,26 +993,6 @@ Perfect, this is a serious lab-grade requirement, so I’ll give you a clean, sa
 
 #### S3 folder: Charlie Cafe Test and Verification/
 
-### 1️⃣ Create a file
-
-```
-sudo nano charlie_cafe_lab_test_verify.sh
-```
-
-### 2️⃣ Paset Script
-
-[Charlie Cafe Lab Basic Tests](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie_cafe_lab_test_verify.sh)
-
-### 3️⃣ How to Run
-
-```
-sudo chmod +x charlie_cafe_lab_test_verify.sh
-```
-
-```
-sudo ./charlie_cafe_lab_test_verify.sh
-```
-
 ### 📂 Final Output in S3
 
 ```
@@ -1021,7 +1001,7 @@ charlie-cafe-s3-bucket/
     ├── Basic_Config_Test_Result_2026-02-03_10-41-22.txt
     └── Basic_Config_Test_Result_2026-02-03_10-41-22.csv
 ```
-### 4️⃣ Final & Last Charlie Cafe Test
+### 1️⃣ Final & Last Charlie Cafe Test
 
 ```
 sudo nano Charlie-Cafe-Final-Verify-Test.sh
