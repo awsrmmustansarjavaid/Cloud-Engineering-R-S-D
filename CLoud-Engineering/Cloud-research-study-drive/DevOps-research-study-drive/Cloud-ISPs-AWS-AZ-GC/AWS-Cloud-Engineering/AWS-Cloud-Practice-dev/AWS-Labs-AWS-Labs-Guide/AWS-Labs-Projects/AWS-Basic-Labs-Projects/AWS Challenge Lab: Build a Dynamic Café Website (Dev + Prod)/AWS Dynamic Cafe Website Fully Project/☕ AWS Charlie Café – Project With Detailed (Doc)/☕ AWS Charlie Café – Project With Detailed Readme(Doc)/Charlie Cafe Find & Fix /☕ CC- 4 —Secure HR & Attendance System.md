@@ -1408,9 +1408,466 @@ Example item inserted later:
 
 -  Required group: Admin
 
+### 3️⃣ 🔐 HOW LOGOUT WORKS ON ALL PAGES (CLEAR & SIMPLE)
+
+### 🟢 OPTION 1 (RECOMMENDED But Already Added & Code Updated) 
+
+**👉 Keep EVERYTHING inside central-auth-api.js**
+
+**⚠️ All already added and code Updated.. Skip this step**
+
+This is what large production apps do.
+
+#### 🔹 STEP 1 — ADD A NEW INIT FUNCTION (CENTRALIZED)
+
+Open central-auth-api.js
+
+Add this near the bottom, before return {}:
+
+```
+/* =====================================================
+   GLOBAL PAGE INITIALIZER (ONE-LINE SETUP)
+===================================================== */
+function initProtectedPage(options = {}) {
+    const {
+        requireAuth = true,
+        enableLogout = true,
+        logoutButtonId = "logoutBtn"
+    } = options;
+
+    // Step 1: Protect page (login required)
+    if (requireAuth) {
+        auth.protectPage();
+    }
+
+    // Step 2: Setup logout button
+    if (enableLogout) {
+        auth.setupLogoutButton(logoutButtonId);
+    }
+}
+```
+
+#### 🔹 STEP 2 — EXPORT IT
+
+Inside return {} add:
+
+```
+initProtectedPage
+```
+
+Now this function becomes usable on ALL pages.
+
+#### 🔹 STEP 3 — USE IT ON ANY PAGE (VERY SIMPLE)
+
+Now your pages become EXTREMELY CLEAN:
+
+```
+<script src="js/central-auth-api.js"></script>
+
+<script>
+  CHARLIE.initProtectedPage();
+</script>
+```
+
+That’s it.
+No Cognito logic.
+No duplication.
+No confusion.
+
+#### 🔹 STEP 4 — LOGOUT BUTTON (UI ONLY)
+
+Wherever you want logout:
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+No JS code here.
+Everything handled centrally.
+
+#### 🔹 STEP 5 — API CALLS (SECURE)
+
+Replace ALL fetch calls with:
+
+```
+CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
+    method: "POST",
+    body: JSON.stringify({ employee_id: employeeId })
+});
+```
+
+Security, token, expiration, auto-logout — all handled centrally.
+
+[central-auth-api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth-api.js)
+
+#### ✅ HOW TO USE THIS (Skip this step)
+
+#### 🔹 Any protected page (Admin / HR / Employee):
+
+```
+<button id="logoutBtn">Logout</button>
+
+<script src="js/central-auth-api.js"></script>
+<script>
+  CHARLIE.initProtectedPage();
+</script>
+```
+
+#### 🔹 API call example:
+
+```
+CHARLIE.api.recordAttendance({
+  employee_id: "E101"
+});
+```
+
+**⚠️ All already added and code Updated.. Skip this step**
+
+### 🟢 OPTION 2
+
+#### Step 1 — Add central auth
+
+- Open ANY page (check-in, dashboard, HR page, admin page)
+
+- At the BOTTOM of <body>, add:
+
+```
+<script src="js/central-auth-api.js"></script>
+```
+
+#### Step 2 — Protect page
+
+- Immediately AFTER loading the script, add:
+
+```
+<script>
+  CHARLIE.auth.protectPage();
+</script>
+```
+
+#### Step 3 — ADD LOGOUT BUTTON (UI)
+
+- On the page where you want logout (navbar, dashboard, etc):
+
+```
+<button id="logoutBtn">Logout</button>
+```
+
+#### Step 4 — CONNECT LOGOUT BUTTON TO CENTRAL LOGIC
+
+Below protectPage() add:
+
+```
+<script>
+  CHARLIE.auth.setupLogoutButton();
+</script>
+```
+
+#### Step 5 — Replace fetch with secureFetch
+
+```
+CHARLIE.secureFetch(`${CHARLIE.apiBase}/dev/hr/attendance`, {
+    method: "POST",
+    body: JSON.stringify({ employee_id: employeeId })
+});
+```
+
+👉 UI stays same
+
+👉 Security added
+
+
+
 **✅ PHASE 8️⃣ STATUS**
 
 > **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
 ---
+## ☕ Charlie Café PHASE 9️⃣ — Update Cafe Security Configuration
 
+### 1️⃣ — EC2 Frontend Security Group
+
+#### 1️⃣ Identify your EC2 SG
+
+- Go to EC2 → Instances → Select your frontend EC2.
+
+- Scroll to Security → Security groups → Click on SG name.
+
+- Note Inbound and Outbound rules.
+
+#### 2️⃣  EC2 Inbound Rules
+
+- SSH (optional, admin only)
+
+    - Type: SSH
+
+    - Protocol: TCP
+
+    - Port: 22
+
+    - Source: Your IP only (example: 203.0.113.25/32)
+
+- HTTP / HTTPS (frontend access)
+
+    - Type: HTTP → Port 80 → Source: 0.0.0.0/0
+
+    - Type: HTTPS → Port 443 → Source: 0.0.0.0/0
+
+#### Document in a table like this:
+
+| Port | Protocol | Source    | Purpose      |
+| ---- | -------- | --------- | ------------ |
+| 22   | TCP      | Your IP   | SSH Admin    |
+| 80   | TCP      | 0.0.0.0/0 | Frontend Web |
+| 443  | TCP      | 0.0.0.0/0 | Frontend Web |
+
+#### 3️⃣  EC2 Outbound Rules
+
+- Usually default is All traffic → 0.0.0.0/0.
+
+- If restrictive, ensure outbound allows Lambda to connect to EC2 if needed, e.g., API calls.
+
+### 2️⃣  Lambda Security Group
+
+#### 1️⃣ Identify Lambda SG
+
+- Go to Lambda → Functions → Your Lambda → Configuration → VPC.
+
+- Check VPC / Subnets / Security Groups.
+
+- Lambda must have an SG that allows outbound to RDS SG on the database port (default MySQL 3306 or Postgres 5432).
+
+#### 2️⃣  Lambda Outbound Rule
+
+- Type: MySQL/Aurora (or Postgres)
+
+- Protocol: TCP
+
+- Port: 3306 (or 5432)
+
+- Destination: RDS SG ID
+
+> **Lambda should not allow 0.0.0.0/0 outbound to database — security best practice.**
+
+### 3️⃣ RDS Security Group
+
+#### 1️⃣ Identify RDS SG
+
+- Go to RDS → Databases → Select your DB → Connectivity & security → VPC security groups.
+
+#### 2️⃣ RDS Inbound Rules
+
+- Allow access only from Lambda SG:
+
+    - Type: MySQL/Aurora (or Postgres)
+
+    - Protocol: TCP
+
+    - Port: 3306 (or 5432)
+
+    - Source: Lambda SG ID
+
+#### Example Table:
+
+| Port | Protocol | Source    | Purpose               |
+| ---- | -------- | --------- | --------------------- |
+| 3306 | TCP      | Lambda SG | Lambda DB Access Only |
+
+#### 3️⃣ RDS Outbound Rules
+
+- Usually default “All traffic → 0.0.0.0/0” is fine.
+
+- No need to modify if DB is only accessed by Lambda.
+
+**✅ PHASE 9️⃣ STATUS**
+
+> **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
+---
+## ☕ Charlie Café PHASE 🔟 — Minor UX / UI Polish
+> **🌐 (Optional but Professional)**
+
+### Step 5.1 — Choose Toast Notification Method
+
+#### ✅ Recommended (No Library)
+
+- Pure HTML + CSS + JavaScript
+
+- Lightweight
+
+- Works everywhere
+
+- Perfect for labs & production
+
+(We will use this)
+
+### Step 5.2 — Add Toast HTML (ONE TIME ONLY)
+
+Add this once near the end of your HTML body (Admin / Check-in / Checkout pages):
+
+```
+<!-- Toast Container -->
+<div id="toast-container"></div>
+```
+
+### Step 5.3 — Add Toast CSS (GLOBAL)
+
+Add this inside your main CSS file or <style> tag:
+
+```
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    min-width: 250px;
+    margin-bottom: 10px;
+    padding: 15px 20px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    animation: slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+}
+
+.toast-success { background-color: #28a745; }
+.toast-error { background-color: #dc3545; }
+.toast-info { background-color: #007bff; }
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateX(100%); }
+}
+```
+
+### Step 5.4 — Add Toast JavaScript (GLOBAL FUNCTION)
+
+Add this once in your main JS file:
+
+```
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerText = message;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3500);
+}
+```
+
+### Step 5.5 — Replace alert() in Your Code
+❌ Old (Bad UX)
+
+```
+alert("Check-in successful");
+```
+
+#### ✅ New (Professional UX)
+
+```
+showToast("Check-in successful", "success");
+```
+
+### Step 5.6 — Apply to Holiday Admin Page
+Add Success Message
+
+```
+await fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ holidayId, name, date })
+});
+
+showToast("Holiday saved successfully", "success");
+fetchHolidays();
+```
+
+Add Error Handling
+
+```
+try {
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error("Failed to fetch holidays");
+    const data = await res.json();
+} catch (err) {
+    showToast(err.message, "error");
+}
+```
+
+### Step 5.7 — Apply to Check-In / Check-Out Pages
+Check-In Example
+
+```
+try {
+    const response = await fetch(checkInApi, { method: 'POST' });
+
+    if (!response.ok) throw new Error("Check-in failed");
+
+    showToast("Checked in successfully", "success");
+} catch (error) {
+    showToast(error.message, "error");
+}
+```
+
+Check-Out Example
+
+```
+showToast("Checked out successfully", "success");
+```
+
+#### Step 5.8 — Add Loading State (Professional Touch)
+HTML Button
+
+```
+<button id="checkInBtn">Check In</button>
+```
+
+JS
+
+```
+const btn = document.getElementById('checkInBtn');
+btn.disabled = true;
+btn.innerText = "Processing...";
+
+await fetch(checkInApi);
+
+btn.disabled = false;
+btn.innerText = "Check In";
+```
+
+#### Step 5.9 — Improve Error Messages (Human Friendly)
+
+❌ Bad:
+
+```
+Error 500
+```
+
+✅ Good:
+
+```
+Unable to process request. Please try again.
+```
+
+Example:
+
+```
+catch {
+    showToast("Something went wrong. Please try again.", "error");
+}
+```
+
+**✅ PHASE 🔟 STATUS**
+
+> **🟢 PHASE 🔟 COMPLETE & VERIFIED**
+---
 
