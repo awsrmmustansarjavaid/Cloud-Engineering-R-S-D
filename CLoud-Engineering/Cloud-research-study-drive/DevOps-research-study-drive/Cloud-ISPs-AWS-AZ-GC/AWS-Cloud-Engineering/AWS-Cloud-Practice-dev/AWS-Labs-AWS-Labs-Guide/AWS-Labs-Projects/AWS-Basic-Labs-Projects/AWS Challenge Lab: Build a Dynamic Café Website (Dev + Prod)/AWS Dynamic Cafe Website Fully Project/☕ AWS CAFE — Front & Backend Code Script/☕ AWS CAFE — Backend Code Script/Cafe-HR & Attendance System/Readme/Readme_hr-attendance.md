@@ -142,22 +142,15 @@ def lambda_handler(event, context):
 
 > **Update Version:1.1**
 
+❌ Remove DB_HOST, DB_USER, DB_PASS, DB_NAME from environment variables
 
-Below is your fully updated, production-ready Lambda code that:
+✅ Fetch credentials from Secrets Manager (CafeDevDBSM)
 
-✅ Uses AWS Secrets Manager
+✅ Reuse DB connection across invocations (best practice for Lambda)
 
-✅ Fetches secret CafeDevDBSM
+✅ Keep clean structure + comments
 
-✅ Connects to Amazon RDS
-
-✅ Reuses DB connection properly
-
-✅ Includes comments for every section
-
-✅ Keeps your Cognito role validation
-
-### ✅ FINAL VERSION — Attendance Check-Out Lambda (Using Secrets Manager)
+### ✅ FINAL Attendance Lambda (Using Secrets Manager)
 
 ```
 import json
@@ -167,27 +160,21 @@ import pymysql
 from datetime import date, datetime
 
 # ==========================================================
-# AWS CLIENTS
+# AWS SECRETS MANAGER CONFIG
 # ==========================================================
-# Client for AWS Secrets Manager
-secrets_client = boto3.client("secretsmanager")
+
+SECRET_NAME = "CafeDevDBSM"   # Name of secret in AWS Secrets Manager
+REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
+
+secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 # ==========================================================
-# CONFIGURATION
+# FETCH DATABASE SECRET
 # ==========================================================
-# Name of the secret stored in AWS Secrets Manager
-SECRET_NAME = "CafeDevDBSM"
 
-# Global connection variable (reused across Lambda invocations)
-connection = None
-
-
-# ==========================================================
-# FETCH DATABASE SECRET FROM SECRETS MANAGER
-# ==========================================================
 def get_db_secret():
     """
-    Retrieves RDS credentials from AWS Secrets Manager.
+    Fetch database credentials from AWS Secrets Manager.
     Expected secret JSON format:
     {
         "host": "...",
@@ -197,44 +184,46 @@ def get_db_secret():
     }
     """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
-    return json.loads(response["SecretString"])
+    secret = json.loads(response["SecretString"])
+    return secret
 
 
 # ==========================================================
-# CREATE DATABASE CONNECTION (REUSED)
+# CREATE / REUSE DATABASE CONNECTION
 # ==========================================================
-def get_db_connection():
+
+connection = None  # Global connection (reused across Lambda invocations)
+
+def get_connection():
     """
-    Creates and returns a MySQL connection using credentials
-    from AWS Secrets Manager.
-    Reuses existing connection if still valid.
+    Reuse existing DB connection if available.
+    Otherwise create new connection using Secrets Manager.
     """
     global connection
 
-    if connection and connection.open:
-        return connection
+    if connection is None or not connection.open:
+        secret = get_db_secret()
 
-    secret = get_db_secret()
-
-    connection = pymysql.connect(
-        host=secret["host"],
-        user=secret["username"],
-        password=secret["password"],
-        database=secret["dbname"],
-        cursorclass=pymysql.cursors.DictCursor,
-        connect_timeout=5,
-        autocommit=False
-    )
+        connection = pymysql.connect(
+            host=secret["host"],
+            user=secret["username"],
+            password=secret["password"],
+            database=secret["dbname"],
+            cursorclass=pymysql.cursors.DictCursor,
+            autocommit=False,
+            connect_timeout=10
+        )
 
     return connection
 
 
 # ==========================================================
-# ROLE VALIDATION FUNCTION
+# ROLE CHECK (RBAC USING COGNITO GROUP)
 # ==========================================================
+
 def check_role(event, allowed_role):
     """
-    Checks if authenticated Cognito user belongs to required group.
+    Allow only users in required Cognito group
     """
     claims = event["requestContext"]["authorizer"]["claims"]
     groups = claims.get("cognito:groups", [])
@@ -246,18 +235,19 @@ def check_role(event, allowed_role):
 
 
 # ==========================================================
-# STANDARDIZED HTTP RESPONSE
+# STANDARD API RESPONSE
 # ==========================================================
+
 def response(status, message):
     """
-    Returns API Gateway compatible response with CORS.
+    Standardized API Gateway response with CORS
     """
     return {
         "statusCode": status,
         "headers": {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "OPTIONS,POST"
+            "Access-Control-Allow-Headers": "Authorization,Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
         },
         "body": json.dumps({"message": message})
     }
@@ -266,60 +256,93 @@ def response(status, message):
 # ==========================================================
 # LAMBDA HANDLER
 # ==========================================================
+
 def lambda_handler(event, context):
     """
-    Employee Check-Out Lambda Function
-
-    - Validates user role (Employee only)
-    - Updates checkout time in attendance table
-    - Uses RDS credentials from AWS Secrets Manager
+    Handles employee check-in and check-out.
+    Requires user to belong to 'Employee' Cognito group.
     """
 
     try:
-        # ----------------------------------------
+        # --------------------------------------------------
         # AUTHORIZATION — EMPLOYEE ONLY
-        # ----------------------------------------
-        ALLOWED_ROLE = "Employee"
+        # --------------------------------------------------
+        if not check_role(event, "Employee"):
+            return response(403, "Forbidden")
 
-        if not check_role(event, ALLOWED_ROLE):
-            return response(403, "Forbidden - Employee access required")
-
-        # ----------------------------------------
-        # GET USER INFO FROM COGNITO TOKEN
-        # ----------------------------------------
         claims = event["requestContext"]["authorizer"]["claims"]
         cognito_user_id = claims["sub"]
 
         today = date.today()
         now = datetime.now().time()
 
-        # ----------------------------------------
-        # CONNECT TO DATABASE
-        # ----------------------------------------
-        connection = get_db_connection()
+        # Identify route (checkin / checkout)
+        path = event.get("resource") or event.get("path", "")
+
+        # Get DB connection from Secrets Manager
+        connection = get_connection()
 
         with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE attendance a
-                JOIN employees e ON a.employee_id = e.employee_id
-                SET a.checkout_time = %s
-                WHERE e.cognito_user_id = %s
-                AND a.attendance_date = %s
-            """, (now, cognito_user_id, today))
 
-            # If no rows updated → user didn't check in
-            if cursor.rowcount == 0:
-                return response(400, "Check-in required before checkout")
+            # --------------------------------------------------
+            # FETCH EMPLOYEE ID
+            # --------------------------------------------------
+            cursor.execute(
+                "SELECT employee_id FROM employees WHERE cognito_user_id=%s",
+                (cognito_user_id,)
+            )
 
-            connection.commit()
+            employee = cursor.fetchone()
 
-        # ----------------------------------------
-        # SUCCESS RESPONSE
-        # ----------------------------------------
-        return response(200, "Check-out successful")
+            if not employee:
+                return response(404, "Employee not found")
+
+            employee_id = employee["employee_id"]
+
+            # ==================================================
+            # ✅ CHECK-IN LOGIC
+            # ==================================================
+            if "checkin" in path:
+
+                try:
+                    cursor.execute("""
+                        INSERT INTO attendance
+                        (employee_id, attendance_date, checkin_time)
+                        VALUES (%s, %s, %s)
+                    """, (employee_id, today, now))
+
+                    connection.commit()
+                    return response(200, "Check-in successful")
+
+                except pymysql.err.IntegrityError:
+                    return response(400, "Already checked in today")
+
+            # ==================================================
+            # ✅ CHECK-OUT LOGIC
+            # ==================================================
+            elif "checkout" in path:
+
+                cursor.execute("""
+                    UPDATE attendance
+                    SET checkout_time=%s
+                    WHERE employee_id=%s
+                    AND attendance_date=%s
+                """, (now, employee_id, today))
+
+                if cursor.rowcount == 0:
+                    return response(400, "Check-in required before checkout")
+
+                connection.commit()
+                return response(200, "Check-out successful")
+
+            # --------------------------------------------------
+            # UNKNOWN ROUTE
+            # --------------------------------------------------
+            else:
+                return response(404, "Invalid attendance action")
 
     except Exception as e:
-        return response(500, f"Internal Server Error: {str(e)}")
+        return response(500, str(e))
 ```
 
 ### 🔐 IMPORTANT — IAM Permission Required
