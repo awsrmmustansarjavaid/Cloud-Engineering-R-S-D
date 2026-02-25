@@ -345,17 +345,17 @@ def lambda_handler(event, context):
         return response(500, str(e))
 ```
 
-### 🔐 IMPORTANT — IAM Permission Required
+### 🔐 Important: IAM Permission Required
 
-Your Lambda execution role MUST have permission:
-
+Your Lambda role must have permission to access:
 ```
 {
   "Effect": "Allow",
   "Action": "secretsmanager:GetSecretValue",
-  "Resource": "arn:aws:secretsmanager:YOUR-REGION:YOUR-ACCOUNT-ID:secret:CafeDevDBSM*"
+  "Resource": "*"
 }
 ```
+(Preferably restrict to the specific secret ARN.)
 
 ### ✅ What You Can Now Remove
 
@@ -371,5 +371,17 @@ DB_PASS
 Now everything is securely pulled from:
 
 👉 AWS Secrets Manager → CafeDevDBSM
+
+### ✅ What You Achieved
+
+- No more hardcoded DB credentials
+
+- No environment variables for DB
+
+- Centralized credential management
+
+- Secure rotation support
+
+- Production-ready architecture
 ---
 
