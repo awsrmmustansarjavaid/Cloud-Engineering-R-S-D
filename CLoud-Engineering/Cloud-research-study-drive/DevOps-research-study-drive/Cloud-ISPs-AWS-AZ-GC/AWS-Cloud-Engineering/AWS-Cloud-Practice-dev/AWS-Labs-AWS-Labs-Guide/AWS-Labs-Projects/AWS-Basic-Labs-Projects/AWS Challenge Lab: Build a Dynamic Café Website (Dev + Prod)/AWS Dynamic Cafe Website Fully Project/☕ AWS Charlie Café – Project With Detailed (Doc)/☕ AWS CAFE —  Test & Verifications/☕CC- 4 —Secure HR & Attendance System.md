@@ -698,7 +698,7 @@ But since you’re building a real HR system, I do NOT recommend this.
 > **Test Each API Endpoint**
 > **We will test using Postman or Lambda Test Console.**
 
-#### 1️⃣ Test /checkin (POST)
+### 1️⃣ Test /checkin (POST)
 
 #### Request:
 
@@ -728,6 +728,16 @@ Content-Type: application/json
 }
 ```
 
+### ✅ EC2 - POST /checkin
+
+```
+curl -X POST "https://<API_ID>.execute-api.us-east-1.amazonaws.com/prod/checkin" \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <TOKEN>" \
+-d '{}'
+```
+
+
 #### Verify in RDS:
 
 ```
@@ -751,6 +761,15 @@ SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
   "statusCode": 200,
   "body": "{\"message\": \"Check-out successful\"}"
 }
+```
+
+### ✅ EC2 - POST /checkout
+
+```
+curl -X POST "https://<API_ID>.execute-api.us-east-1.amazonaws.com/prod/checkout" \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <TOKEN>" \
+-d '{}'
 ```
 
 #### Verify in RDS: 
