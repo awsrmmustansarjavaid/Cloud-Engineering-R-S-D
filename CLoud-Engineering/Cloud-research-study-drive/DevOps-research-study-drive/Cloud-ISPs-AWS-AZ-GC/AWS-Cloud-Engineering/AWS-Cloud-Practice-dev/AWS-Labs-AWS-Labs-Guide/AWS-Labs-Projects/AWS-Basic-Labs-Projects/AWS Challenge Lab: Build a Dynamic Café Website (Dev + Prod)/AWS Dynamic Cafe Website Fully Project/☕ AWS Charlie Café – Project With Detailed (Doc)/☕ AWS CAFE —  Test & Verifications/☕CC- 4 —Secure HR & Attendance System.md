@@ -837,13 +837,6 @@ fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/prod/checkin", {
 | **EC2 CLI**             | Use `curl` with **Authorization header** + correct JSON (-d '{}')         |
 | **Browser / Frontend**  | Use `fetch()` with `Authorization` header → GET/POST → parse JSON         |
 
-
-
-
-
-
-
-
 ### 🌐 Verification Checklist
 
 ✅ All endpoints secured by Cognito JWT
