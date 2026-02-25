@@ -698,129 +698,151 @@ But since you’re building a real HR system, I do NOT recommend this.
 > **Test Each API Endpoint**
 > **We will test using Postman or Lambda Test Console.**
 
-### 1️⃣ Test /checkin (POST)
+### 1️⃣ Testing on API Gateway Console
 
-#### Request:
+- Go to API Gateway → Your API → Resources.
 
-    - URL:
+- Click the method you want to test (e.g., POST /checkin).
+
+- Click Test.
+
+#### For POST methods (/checkin and /checkout):
+
+  - Enter the JSON body exactly as your Lambda expects. For your attendance Lambda, the body may be empty, but you still need proper JSON:
+
+{}
+
+- Select the stage: prod
+
+- Click Test → see response code (200, 400, 403, 500) and body.
+
+#### For GET methods (/employee-profile, /attendance-history, /leaves-holidays):
+
+- No body needed, just click Test.
+
+- Make sure your Cognito Authorizer token is applied (if using API console test, there’s a field to enter it).
+
+#### ✅ API Gateway console is the fastest for functional verification.
+
+### 2️⃣ Testing from EC2 CLI using curl
+
+Important: Your endpoints are protected with Cognito Authorizer, so Authorization header is required.
+
+#### Step A — Get Cognito JWT token
+
+- Use AWS Cognito Hosted UI or a test user with username/password.
+
+- Use aws cognito-idp initiate-auth or a simple Postman login to get ID Token (JWT).
+
+Example using AWS CLI (replace PoolId & ClientId):
 
 ```
-https://<API-ID>.execute-api.<region>.amazonaws.com/dev/checkin
+aws cognito-idp initiate-auth \
+  --auth-flow USER_PASSWORD_AUTH \
+  --client-id YOUR_CLIENT_ID \
+  --auth-parameters USERNAME=testuser,PASSWORD=YourPassword
 ```
 
-    - Method: POST
+- Copy IdToken from response → this will be your Authorization header.
 
-    - Headers:
+#### Step B — curl Examples
 
-```
-Authorization: <Cognito JWT token>
-Content-Type: application/json
-```
-
-    - Body: Empty JSON {}
-
-#### Expected Response:
+### 1️⃣ POST /checkin
 
 ```
-{
-  "statusCode": 200,
-  "body": "{\"message\": \"Check-in successful\"}"
-}
-```
-
-### ✅ EC2 - POST /checkin
-
-```
-curl -X POST "https://<API_ID>.execute-api.us-east-1.amazonaws.com/prod/checkin" \
+curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/checkin" \
 -H "Content-Type: application/json" \
--H "Authorization: Bearer <TOKEN>" \
+-H "Authorization: <YOUR_ID_TOKEN>" \
 -d '{}'
 ```
 
-
-#### Verify in RDS:
-
-```
-SELECT * FROM attendance WHERE employee_id=1 AND attendance_date=CURDATE();
-```
-
-#### 2️⃣ Test /checkout (POST)
-
-#### Request:
-
-    - URL: /checkout
-
-    - Headers same as above
-
-    - Body: {}
-
-#### Expected Response:
+### 2️⃣ POST /checkout
 
 ```
-{
-  "statusCode": 200,
-  "body": "{\"message\": \"Check-out successful\"}"
-}
-```
-
-### ✅ EC2 - POST /checkout
-
-```
-curl -X POST "https://<API_ID>.execute-api.us-east-1.amazonaws.com/prod/checkout" \
+curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/checkout" \
 -H "Content-Type: application/json" \
--H "Authorization: Bearer <TOKEN>" \
+-H "Authorization: <YOUR_ID_TOKEN>" \
 -d '{}'
 ```
 
-#### Verify in RDS: 
-- checkout_time populated for today
-
-#### 3️⃣ Test /employee-profile (GET)
-
-- URL: /employee-profile
-
-- Method: GET
-
-- Headers: Authorization: <Cognito JWT>
-
-#### Expected Response:
+### 3️⃣ GET /employee-profile
 
 ```
-{
-  "statusCode": 200,
-  "body": "{\"name\": \"Alice\",\"job_title\": \"Barista\",\"salary\": 40000.0,\"start_date\": \"2025-12-01\"}"
-}
+curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/employee-profile" \
+-H "Authorization: <YOUR_ID_TOKEN>"
 ```
 
-#### 4️⃣ Test /attendance-history (GET)
-
-- URL: /attendance-history
-
-- Headers: Authorization: <Cognito JWT>
-
-#### Expected Response:
+### 4️⃣ GET /attendance-history
 
 ```
-{
-  "statusCode": 200,
-  "body": "[{\"attendance_date\": \"2026-01-19\",\"checkin_time\": \"09:00:00\",\"checkout_time\": \"17:00:00\"}]"
-}
+curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/attendance-history" \
+-H "Authorization: <YOUR_ID_TOKEN>"
 ```
 
-#### 5️⃣ Test /leaves-holidays (GET)
-
-- URL: /leaves-holidays
-
-- Headers: Authorization: <Cognito JWT>
-
-#### Expected Response:
+### 5️⃣ GET /leaves-holidays
 
 ```
-{
-  "statusCode": 200,
-  "body": "{\"leaves\": [{\"leave_date\": \"2026-01-15\", \"leave_type\": \"Sick Leave\"}], \"holidays\": [{\"holiday_date\": \"2026-01-01\", \"description\": \"New Year\"}]}"
-}
+curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/leaves-holidays" \
+-H "Authorization: <YOUR_ID_TOKEN>"
 ```
+
+### ⚠️ Notes:
+
+- The -d '{"body":"{}"}' you were using is wrong. Lambda Proxy expects the JSON body directly, not wrapped in "body" unless your Lambda specifically parses it that way.
+✅ Correct: -d '{}' or any fields your Lambda expects.
+
+- Cognito token required: Without it, you get 403 Forbidden.
+
+#### POST vs GET:
+
+  - /checkin & /checkout → POST
+
+  - /employee-profile, /attendance-history, /leaves-holidays → GET
+
+- CORS (Browser Testing):
+
+  - For GET requests, simply open your browser and fetch via frontend JS using:
+
+```
+fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/prod/employee-profile", {
+  method: "GET",
+  headers: {
+    "Authorization": "<YOUR_ID_TOKEN>"
+  }
+})
+.then(res => res.json())
+.then(console.log)
+```
+
+- POST requests must also include headers:
+
+```
+fetch("https://xxxx.execute-api.us-east-1.amazonaws.com/prod/checkin", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "<YOUR_ID_TOKEN>"
+  },
+  body: JSON.stringify({})
+})
+.then(res => res.json())
+.then(console.log)
+```
+
+### ✅ Summary: How to Test All 3 Ways
+
+| Method                  | Steps                                                                     |
+| ----------------------- | ------------------------------------------------------------------------- |
+| **API Gateway Console** | Select method → click **Test** → input JSON → click **Test** → see output |
+| **EC2 CLI**             | Use `curl` with **Authorization header** + correct JSON (-d '{}')         |
+| **Browser / Frontend**  | Use `fetch()` with `Authorization` header → GET/POST → parse JSON         |
+
+
+
+
+
+
+
 
 ### 🌐 Verification Checklist
 
