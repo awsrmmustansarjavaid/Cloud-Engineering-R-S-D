@@ -612,23 +612,40 @@ If ANY answer is NO, STOP and fix it.
 
 Here is your ✅ FULLY FINAL merged Lambda function with:
 
-✅ RDS (attendance + summary)
+✅ Secrets Manager (RDS credentials)
 
-✅ DynamoDB attendance lookup
-
-✅ Secrets Manager (no environment DB credentials)
+✅ DynamoDB table from Environment Variable
 
 ✅ Cognito Admin authorization
 
-✅ Clean unified response
+✅ RDS attendance (daily / weekly / monthly)
 
-✅ Proper API Gateway design
+✅ Summary cards (present / absent / leaves)
 
-✅ Console test events
+✅ DynamoDB employee lookup
 
-✅ Expected outputs
+✅ Clean comments
 
-✅ Deployment guide
+✅ Proper CORS
+
+✅ Connection reuse (best practice)
+
+### ✅ REQUIRED LAMBDA CONFIGURATION (IMPORTANT)
+
+In Lambda → Configuration → Environment Variables:
+
+```
+DYNAMODB_TABLE = CafeAttendance
+```
+
+Nothing else is required for DB because we use:
+
+```
+SECRET_NAME = "CafeDevDBSM"
+```
+
+Stored inside AWS Secrets Manager.
+
 
 ### ✅ FINAL MERGED LAMBDA CODE
 
@@ -644,7 +661,10 @@ from datetime import date
 from boto3.dynamodb.conditions import Key
 
 # ==========================================================
-# 🔐 SECRETS MANAGER CONFIG
+# 🔐 AWS SECRETS MANAGER CONFIGURATION
+# ----------------------------------------------------------
+# We do NOT store DB credentials in environment variables.
+# Instead, we securely fetch them from Secrets Manager.
 # ==========================================================
 
 SECRET_NAME = "CafeDevDBSM"
@@ -653,11 +673,22 @@ REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 def get_db_secret():
+    """
+    Expected Secret JSON format:
+    {
+        "host": "...",
+        "username": "...",
+        "password": "...",
+        "dbname": "..."
+    }
+    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
 # ==========================================================
-# 🔌 RDS CONNECTION (REUSE)
+# 🔌 RDS CONNECTION (REUSED BETWEEN INVOCATIONS)
+# ----------------------------------------------------------
+# Improves performance by avoiding reconnect each time.
 # ==========================================================
 
 connection = None
@@ -681,15 +712,22 @@ def get_rds_connection():
     return connection
 
 # ==========================================================
-# 📦 DYNAMODB CONFIG
+# 📦 DYNAMODB CONFIGURATION
+# ----------------------------------------------------------
+# Table name comes from Lambda Environment Variable:
+#
+#   DYNAMODB_TABLE = CafeAttendance
 # ==========================================================
 
-DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE", "CafeAttendance")
+DYNAMODB_TABLE = os.environ["DYNAMODB_TABLE"]
+
 dynamodb = boto3.resource("dynamodb")
 dynamo_table = dynamodb.Table(DYNAMODB_TABLE)
 
 # ==========================================================
-# 🔐 ADMIN ROLE CHECK
+# 🔐 ADMIN ROLE CHECK (COGNITO GROUP VALIDATION)
+# ----------------------------------------------------------
+# Only users in the "Admin" group can access this Lambda.
 # ==========================================================
 
 def check_admin(event):
@@ -702,12 +740,12 @@ def check_admin(event):
     return "Admin" in groups
 
 # ==========================================================
-# 🌍 STANDARD RESPONSE
+# 🌍 STANDARD RESPONSE FORMAT (CORS ENABLED)
 # ==========================================================
 
-def make_response(status, body):
+def make_response(status_code, body):
     return {
-        "statusCode": status,
+        "statusCode": status_code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "Authorization,Content-Type",
@@ -717,20 +755,25 @@ def make_response(status, body):
     }
 
 # ==========================================================
-# 🚀 MAIN HANDLER
+# 🚀 MAIN LAMBDA HANDLER
 # ==========================================================
 
 def lambda_handler(event, context):
 
-    # 🔐 ADMIN AUTHORIZATION
+    # ------------------------------------------------------
+    # 1️⃣ ADMIN AUTHORIZATION CHECK
+    # ------------------------------------------------------
     if not check_admin(event):
         return make_response(403, {"message": "Forbidden - Admin only"})
 
+    # ------------------------------------------------------
+    # 2️⃣ READ QUERY PARAMETERS
+    # ------------------------------------------------------
     params = event.get("queryStringParameters") or {}
 
     query_type = params.get("type", "daily")  # daily | weekly | monthly
-    employee_id = params.get("employee_id")
-    lookup_date = params.get("date")
+    employee_id = params.get("employee_id")   # Optional
+    lookup_date = params.get("date")          # Optional (DynamoDB filter)
     include_summary = params.get("summary", "false").lower() == "true"
 
     result = {
@@ -740,13 +783,16 @@ def lambda_handler(event, context):
     }
 
     # =====================================================
-    # 1️⃣ RDS ATTENDANCE QUERY
+    # 3️⃣ RDS ATTENDANCE QUERY (MySQL)
     # =====================================================
 
     try:
         conn = get_rds_connection()
         cursor = conn.cursor()
 
+        # -------------------------
+        # Date filtering logic
+        # -------------------------
         if query_type == "daily":
             sql = """
                 SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
@@ -772,6 +818,9 @@ def lambda_handler(event, context):
         else:
             return make_response(400, {"message": "Invalid type parameter"})
 
+        # -------------------------
+        # Optional employee filter
+        # -------------------------
         if employee_id:
             sql += " AND e.employee_id = %s"
             cursor.execute(sql, (employee_id,))
@@ -781,7 +830,7 @@ def lambda_handler(event, context):
         result["attendance_rds"] = cursor.fetchall()
 
         # =====================================================
-        # 2️⃣ SUMMARY (OPTIONAL)
+        # 4️⃣ SUMMARY CARDS (OPTIONAL)
         # =====================================================
 
         if include_summary:
@@ -800,58 +849,35 @@ def lambda_handler(event, context):
         return make_response(500, {"error": f"RDS error: {str(e)}"})
 
     # =====================================================
-    # 3️⃣ DYNAMODB LOOKUP (OPTIONAL)
+    # 5️⃣ DYNAMODB LOOKUP (OPTIONAL)
+    # -----------------------------------------------------
+    # If employee_id is provided, query DynamoDB table.
     # =====================================================
 
     if employee_id:
         try:
             if lookup_date:
-                dynamo_response = dynamo_table.query(
-                    KeyConditionExpression=Key("employee_id").eq(employee_id) &
-                                           Key("date").eq(lookup_date)
+                response = dynamo_table.query(
+                    KeyConditionExpression=
+                        Key("employee_id").eq(employee_id) &
+                        Key("date").eq(lookup_date)
                 )
             else:
-                dynamo_response = dynamo_table.query(
-                    KeyConditionExpression=Key("employee_id").eq(employee_id)
+                response = dynamo_table.query(
+                    KeyConditionExpression=
+                        Key("employee_id").eq(employee_id)
                 )
 
-            result["attendance_dynamo"] = dynamo_response.get("Items", [])
+            result["attendance_dynamo"] = response.get("Items", [])
 
         except Exception as e:
             return make_response(500, {"error": f"DynamoDB error: {str(e)}"})
 
+    # =====================================================
+    # 6️⃣ FINAL RESPONSE
+    # =====================================================
+
     return make_response(200, result)
-```
-
-### ✅ FINAL RESPONSE JSON FORMAT
-
-Example:
-
-```
-{
-  "attendance_rds": [
-    {
-      "employee_id": "101",
-      "name": "Ali Khan",
-      "date": "2026-02-26",
-      "checkin_time": "09:05:00",
-      "checkout_time": "17:30:00"
-    }
-  ],
-  "attendance_dynamo": [
-    {
-      "employee_id": "101",
-      "date": "2026-02-26",
-      "check_in": "09:05",
-      "check_out": "17:30"
-    }
-  ],
-  "summary": {
-    "total_present": 12,
-    "total_absent": 3,
-    "total_leaves": 1
-  }
-}
 ```
 
 ### 🔐 REQUIRED IAM PERMISSIONS
