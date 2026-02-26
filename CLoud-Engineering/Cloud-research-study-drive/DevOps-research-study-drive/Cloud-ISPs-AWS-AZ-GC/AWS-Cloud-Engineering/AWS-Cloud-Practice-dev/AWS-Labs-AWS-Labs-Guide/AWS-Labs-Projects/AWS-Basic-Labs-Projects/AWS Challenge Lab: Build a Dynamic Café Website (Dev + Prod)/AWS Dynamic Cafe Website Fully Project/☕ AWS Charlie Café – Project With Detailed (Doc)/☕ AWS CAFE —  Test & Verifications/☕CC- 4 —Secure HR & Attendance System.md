@@ -910,6 +910,57 @@ SELECT * FROM attendance ORDER BY attendance_date DESC;
 ---
 ## ☕ Charlie Café PHASE 5️⃣ — Cafe Attendance Admin Service
 
+### ✅ Lambda Console Test Events
+
+### 🧪 1️⃣ Daily Attendance
+
+```
+{
+  "queryStringParameters": {
+    "type": "daily"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  }
+}
+```
+
+### 🧪 2️⃣ Weekly + Summary
+
+```
+{
+  "queryStringParameters": {
+    "type": "weekly",
+    "summary": "true"
+  },
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:groups": "Admin"
+      }
+    }
+  }
+}
+```
+
+### 🧪 3️⃣ Employee Dynamo Lookup
+
+```
+{
+  "attendance_rds": [...],
+  "attendance_dynamo": [...],
+  "summary": {
+    "total_present": 4,
+    "total_absent": 2,
+    "total_leaves": 1
+  }
+}
+```
+
 
 
 

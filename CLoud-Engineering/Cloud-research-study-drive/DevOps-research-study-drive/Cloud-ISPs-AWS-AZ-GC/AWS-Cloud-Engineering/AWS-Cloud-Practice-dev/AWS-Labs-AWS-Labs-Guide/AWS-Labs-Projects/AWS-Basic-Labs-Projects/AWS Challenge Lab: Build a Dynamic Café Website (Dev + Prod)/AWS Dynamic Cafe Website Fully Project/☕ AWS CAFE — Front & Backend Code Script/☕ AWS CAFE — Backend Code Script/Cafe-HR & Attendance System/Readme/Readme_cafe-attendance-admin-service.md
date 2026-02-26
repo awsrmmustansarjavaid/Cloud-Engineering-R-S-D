@@ -612,23 +612,28 @@ If ANY answer is NO, STOP and fix it.
 
 Here is your ✅ FULLY FINAL merged Lambda function with:
 
-✅ AWS Secrets Manager (for RDS credentials)
-
 ✅ RDS (attendance + summary)
 
-✅ DynamoDB (CafeAttendance table)
+✅ DynamoDB attendance lookup
 
-✅ Cognito Role Check (Admin only — change if needed)
+✅ Secrets Manager (no environment DB credentials)
 
-✅ Proper CORS
+✅ Cognito Admin authorization
 
-✅ Reusable DB connection
+✅ Clean unified response
 
-✅ Clean structured JSON response
+✅ Proper API Gateway design
 
-✅ Fully commented production-ready code
+✅ Console test events
 
-### ✅ FINAL MERGED LAMBDA (Secrets Manager + RDS + DynamoDB)
+✅ Expected outputs
+
+✅ Deployment guide
+
+### ✅ FINAL MERGED LAMBDA CODE
+
+(Secrets Manager + RDS + DynamoDB + Admin-only)
+
 
 ```
 import json
@@ -639,41 +644,20 @@ from datetime import date
 from boto3.dynamodb.conditions import Key
 
 # ==========================================================
-# 🔐 AWS SECRETS MANAGER CONFIG
+# 🔐 SECRETS MANAGER CONFIG
 # ==========================================================
 
-SECRET_NAME = "CafeDevDBSM"  # Your Secrets Manager name
+SECRET_NAME = "CafeDevDBSM"
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
-# ==========================================================
-# 📦 DYNAMODB CONFIG
-# ==========================================================
-
-DYNAMODB_TABLE_NAME = os.environ.get("DYNAMODB_TABLE", "CafeAttendance")
-dynamodb = boto3.resource("dynamodb")
-dynamo_table = dynamodb.Table(DYNAMODB_TABLE_NAME)
-
-# ==========================================================
-# 🔑 FETCH DATABASE SECRET
-# ==========================================================
-
 def get_db_secret():
-    """
-    Expected Secret JSON format:
-    {
-        "host": "...",
-        "username": "...",
-        "password": "...",
-        "dbname": "..."
-    }
-    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
 # ==========================================================
-# 🔌 CREATE / REUSE RDS CONNECTION
+# 🔌 RDS CONNECTION (REUSE)
 # ==========================================================
 
 connection = None
@@ -697,25 +681,33 @@ def get_rds_connection():
     return connection
 
 # ==========================================================
-# 🔐 ROLE CHECK (COGNITO GROUP)
+# 📦 DYNAMODB CONFIG
 # ==========================================================
 
-def check_role(event, allowed_role):
+DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE", "CafeAttendance")
+dynamodb = boto3.resource("dynamodb")
+dynamo_table = dynamodb.Table(DYNAMODB_TABLE)
+
+# ==========================================================
+# 🔐 ADMIN ROLE CHECK
+# ==========================================================
+
+def check_admin(event):
     claims = event["requestContext"]["authorizer"]["claims"]
     groups = claims.get("cognito:groups", [])
 
     if isinstance(groups, str):
         groups = [groups]
 
-    return allowed_role in groups
+    return "Admin" in groups
 
 # ==========================================================
-# 🌍 STANDARD API RESPONSE (CORS ENABLED)
+# 🌍 STANDARD RESPONSE
 # ==========================================================
 
-def make_response(status_code, body):
+def make_response(status, body):
     return {
-        "statusCode": status_code,
+        "statusCode": status,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "Authorization,Content-Type",
@@ -725,31 +717,23 @@ def make_response(status_code, body):
     }
 
 # ==========================================================
-# 🚀 MAIN LAMBDA HANDLER
+# 🚀 MAIN HANDLER
 # ==========================================================
 
 def lambda_handler(event, context):
-    """
-    Merged Admin Attendance Lambda
-
-    Query Parameters:
-      type: daily | weekly | monthly
-      employee_id: optional filter
-      date: DynamoDB date filter
-      summary: true/false
-    """
 
     # 🔐 ADMIN AUTHORIZATION
-    if not check_role(event, "Admin"):
-        return make_response(403, {"message": "Forbidden"})
+    if not check_admin(event):
+        return make_response(403, {"message": "Forbidden - Admin only"})
 
     params = event.get("queryStringParameters") or {}
-    query_type = params.get("type", "daily")
+
+    query_type = params.get("type", "daily")  # daily | weekly | monthly
     employee_id = params.get("employee_id")
     lookup_date = params.get("date")
-    summary_flag = params.get("summary", "false").lower() == "true"
+    include_summary = params.get("summary", "false").lower() == "true"
 
-    response_data = {
+    result = {
         "attendance_rds": [],
         "attendance_dynamo": [],
         "summary": {}
@@ -794,12 +778,13 @@ def lambda_handler(event, context):
         else:
             cursor.execute(sql)
 
-        response_data["attendance_rds"] = cursor.fetchall()
+        result["attendance_rds"] = cursor.fetchall()
 
         # =====================================================
-        # 2️⃣ RDS SUMMARY (OPTIONAL)
+        # 2️⃣ SUMMARY (OPTIONAL)
         # =====================================================
-        if summary_flag:
+
+        if include_summary:
             summary_sql = """
                 SELECT
                     COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL AND a.date = CURDATE() THEN e.employee_id END) AS total_present,
@@ -809,13 +794,13 @@ def lambda_handler(event, context):
                 LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.date = CURDATE()
             """
             cursor.execute(summary_sql)
-            response_data["summary"] = cursor.fetchone()
+            result["summary"] = cursor.fetchone()
 
     except Exception as e:
-        return make_response(500, {"message": f"RDS error: {str(e)}"})
+        return make_response(500, {"error": f"RDS error: {str(e)}"})
 
     # =====================================================
-    # 3️⃣ DYNAMODB QUERY (OPTIONAL)
+    # 3️⃣ DYNAMODB LOOKUP (OPTIONAL)
     # =====================================================
 
     if employee_id:
@@ -830,16 +815,12 @@ def lambda_handler(event, context):
                     KeyConditionExpression=Key("employee_id").eq(employee_id)
                 )
 
-            response_data["attendance_dynamo"] = dynamo_response.get("Items", [])
+            result["attendance_dynamo"] = dynamo_response.get("Items", [])
 
         except Exception as e:
-            return make_response(500, {"message": f"DynamoDB error: {str(e)}"})
+            return make_response(500, {"error": f"DynamoDB error: {str(e)}"})
 
-    # =====================================================
-    # 4️⃣ RETURN FINAL UNIFIED RESPONSE
-    # =====================================================
-
-    return make_response(200, response_data)
+    return make_response(200, result)
 ```
 
 ### ✅ FINAL RESPONSE JSON FORMAT
