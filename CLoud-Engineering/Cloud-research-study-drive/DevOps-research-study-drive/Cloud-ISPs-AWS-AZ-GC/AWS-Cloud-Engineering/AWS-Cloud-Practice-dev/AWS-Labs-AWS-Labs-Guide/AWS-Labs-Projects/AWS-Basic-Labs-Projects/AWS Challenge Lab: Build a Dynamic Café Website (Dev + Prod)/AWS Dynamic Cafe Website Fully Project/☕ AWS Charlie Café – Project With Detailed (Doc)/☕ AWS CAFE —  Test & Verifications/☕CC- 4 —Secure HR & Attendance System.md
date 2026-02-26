@@ -961,6 +961,184 @@ SELECT * FROM attendance ORDER BY attendance_date DESC;
 }
 ```
 
+### ✅ API Test Events
+
+IMPORTANT:
+
+Since this API uses Cognito Authorizer, you MUST include:
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+You get JWT token from:
+
+- Cognito Hosted UI login
+
+- Browser DevTools → Application → Local Storage
+
+- Copy idToken
+
+### ✅ TEST 1 — API Gateway Console
+
+- Go to /admin/analytics
+
+- Click GET
+
+- Click Test
+
+- Add Query String:
+
+  - Key: type
+
+  - Value: daily
+
+- Add Header: Authorization: Bearer eyJraWQiOiJ....
+
+- Click Test
+
+- Body: {}
+
+#### ✅ Expected Result (Example)
+
+```
+{
+  "attendance_rds": [
+    {
+      "employee_id": "EMP001",
+      "name": "Ali",
+      "date": "2026-02-26",
+      "checkin_time": "09:01:00",
+      "checkout_time": null
+    }
+  ],
+  "attendance_dynamo": [],
+  "summary": {}
+}
+```
+
+### ✅ TEST 2 — BROWSER TEST
+
+Paste:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?type=daily
+```
+
+⚠ Browser will return:
+
+```
+401 Unauthorized
+```
+
+Because browser does NOT automatically send JWT token.
+
+That is normal.
+
+### ✅ TEST 3 — EC2 CLI (CORRECT WAY)
+
+Run:
+
+```
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?type=daily" \
+-H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Example with Summary
+
+```
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?type=weekly&summary=true" \
+-H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Example With Employee Filter
+
+```
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?employee_id=EMP001" \
+-H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Example With DynamoDB Date Filter
+
+```
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?employee_id=EMP001&date=2026-02-25" \
+-H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### ✅ EXPECTED RESPONSES
+
+#### 1️⃣ Daily
+
+Returns today attendance from RDS
+
+#### 2️⃣ Weekly + summary=true
+
+Returns:
+
+```
+{
+  "attendance_rds": [...],
+  "attendance_dynamo": [],
+  "summary": {
+    "total_present": 8,
+    "total_absent": 2,
+    "total_leaves": 1
+  }
+}
+```
+
+#### 3️⃣ employee_id only
+
+Returns:
+
+```
+attendance_rds → filtered from MySQL
+attendance_dynamo → all Dynamo records for that employee
+```
+
+#### 4️⃣ employee_id + date
+
+Returns:
+
+```
+attendance_dynamo → only that specific date record
+```
+
+### 🚨 COMMON ERRORS & WHY
+
+| Error            | Reason                  |
+| ---------------- | ----------------------- |
+| 401 Unauthorized | Missing or invalid JWT  |
+| 403 Forbidden    | User not in Admin group |
+| 500 RDS error    | DB security group issue |
+| 500 Dynamo error | IAM permission missing  |
+| 502 Bad Gateway  | Lambda crashed          |
+
+### 🔐 REQUIRED IAM PERMISSIONS
+
+Lambda Role must have:
+
+```
+secretsmanager:GetSecretValue
+dynamodb:Query
+```
+
+### 🎯 FINAL ARCHITECTURE
+
+```
+Cognito (Admin login)
+↓
+API Gateway (Cognito Authorizer)
+↓
+Lambda (hr-admin-attendance-analytics)
+↓
+Secrets Manager (DB credentials)
+↓
+RDS (MySQL)
+↓
+DynamoDB (CafeAttendance)
+```
+
 
 
 

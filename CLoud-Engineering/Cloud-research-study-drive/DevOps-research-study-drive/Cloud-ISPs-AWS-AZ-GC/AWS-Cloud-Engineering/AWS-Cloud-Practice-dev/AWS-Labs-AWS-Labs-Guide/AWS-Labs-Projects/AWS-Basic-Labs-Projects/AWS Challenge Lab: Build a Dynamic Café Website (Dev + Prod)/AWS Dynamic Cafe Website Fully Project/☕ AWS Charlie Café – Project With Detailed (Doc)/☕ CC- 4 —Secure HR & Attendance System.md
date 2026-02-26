@@ -444,7 +444,7 @@ HR Secure Attendance & Employee Management API
 
 - Cognito User Pool: Select your café User Pool
 
-- Token Source: Authorization (Header)
+- Token Source: Authorization
 
 - Click Create
 
@@ -596,7 +596,7 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 ### 3️⃣ —API Gateway Configuration
 
-- Resource Structure:
+- Resource Structure: /admin/analytics
 
 ```
 /admin
@@ -613,15 +613,47 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
     - Enable Lambda Proxy Integration ✅
 
-- Authorizer:
+### 4️⃣ Attach Authorizer to GET Method
 
-    - Cognito User Pool
+- Go to /admin/analytics
 
-    - Required Group: Admin
+- Click GET
+
+- Click Method Request
+
+- Authorization → Select: HR-Cognito-Authorizer
+
+- Click Save
+
+### 5️⃣ ENABLE CORS
+
+Still inside /admin/analytics:
+
+- Click Actions → Enable CORS
+
+- Headers: Authorization,Content-Type
+
+- Methods: GET,OPTIONS
+
+- Origin: *
+
+- Click Enable CORS and replace
 
 - Deploy
 
 - Stage: prod
+
+You will get something like:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod
+```
+
+Final endpoint becomes:
+
+```
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics
+```
 
 #### ✅ Final API Endpoints
 
