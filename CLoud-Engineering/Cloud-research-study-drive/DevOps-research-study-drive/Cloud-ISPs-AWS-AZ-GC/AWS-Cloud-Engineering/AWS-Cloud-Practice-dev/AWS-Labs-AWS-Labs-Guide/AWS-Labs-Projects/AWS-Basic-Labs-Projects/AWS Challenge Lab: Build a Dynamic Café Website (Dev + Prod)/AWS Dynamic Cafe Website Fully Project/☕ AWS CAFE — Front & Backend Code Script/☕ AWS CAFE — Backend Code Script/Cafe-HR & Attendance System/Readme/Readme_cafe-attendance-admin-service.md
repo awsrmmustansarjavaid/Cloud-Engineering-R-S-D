@@ -184,6 +184,190 @@ You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 ```
 **⚠️ All already added and code Updated.. Skip this step**
 
+### 🧪 Final Test & Verification 
+
+### 1️⃣ Frontend  - auth-api.js
+
+#### VERIFY FILE LOCATIONS (LINUX)
+
+```
+cd /var/www/html
+```
+```
+ls -R js
+```
+
+#### You should see:
+
+```
+js/
+ ├── config.js
+ └── auth-api.js
+```
+
+If yes → ✅ continue
+
+If not → stop and fix paths
+
+### 🧪 TEST 1️⃣ — Browser Console
+
+1️⃣ Open DevTools → Console
+
+2️⃣ You should NOT see:
+
+```
+CONFIG is not defined
+```
+
+### 🧪 TEST 2️⃣ — Employee Normal Flow
+
+1️⃣ Login as Employee
+
+2️⃣ Open employee portal
+
+3️⃣ Profile loads
+
+4️⃣ Attendance loads
+
+5️⃣ Admin buttons NOT visible
+
+✅ PASS
+
+### 🧪 TEST 3️⃣ — Employee Tries Admin URL
+
+1️⃣ Login as Employee
+
+2️⃣ Open admin-dashboard.html manually
+
+❌ Access denied
+
+✅ Redirect to login
+
+### 🧪 TEST 4️⃣ — Admin Normal Flow
+
+1️⃣ Login as Admin
+
+2️⃣ Open admin dashboard
+
+3️⃣ Admin buttons visible
+
+4️⃣ Employee list loads
+
+✅ PASS
+
+### 🧪 TEST 5️⃣ — JWT Verification
+
+1️⃣ Open DevTools → Network
+
+2️⃣ Click any API call
+
+3️⃣ Check Headers
+
+#### You MUST see:
+
+```
+Authorization: eyJraWQiOiJ...
+```
+
+✅ Token attached
+
+✅ Cognito authorizer working
+
+### 🧪 TEST 6️⃣ — API Protection
+
+1️⃣ Copy API URL
+
+2️⃣ Open in browser without token
+
+❌ 401 / 403 error
+
+✅ Secure
+
+### 🧪 TEST 7️⃣ — Authentication
+
+- Token expires → auto logout
+
+- Logout destroys session
+
+- Back button blocked
+
+### 🧪 TEST 8️⃣  Authorization
+
+Admin cannot be Employee
+
+Employee cannot be Admin
+
+Backend blocks unauthorized API calls
+
+### 🧪 TEST 9️⃣ UX
+
+Loader visible
+
+Errors friendly
+
+No raw error messages
+
+### 🧪 TEST 🔟 Observability
+
+CloudWatch logs visible
+
+Errors traceable
+
+Requests traceable
+
+### 🧪 TEST 1️⃣1️⃣ Token Expiry
+
+Wait 1 hour OR invalidate session
+
+API call triggers auto logout
+
+Redirects to login
+
+
+### 🏁 CONGRATULATIONS
+
+You now have:
+
+✔ Real AWS architecture
+
+✔ Secure Cognito auth
+
+✔ Role-based UI
+
+✔ Hardened APIs
+
+✔ Production-level frontend
+
+✔ Job-ready project
+
+### 1️⃣ . Lambda Test
+
+- Open each Lambda in AWS Console
+
+- Click Test → Use Empty JSON {}
+
+- Check JSON output → Should return today/weekly/monthly attendance
+
+### 2️⃣ . API Gateway Test
+
+- Open API Gateway Console → Resource → GET /admin/attendance/daily
+
+- Click Test → Should return JSON array of attendance
+
+- Repeat for weekly & monthly
+
+### 3️⃣ . Admin Frontend Test
+
+- Login as Admin → Open Dashboard
+
+- Click Daily / Weekly / Monthly buttons
+
+- Check that table populates correctly
+
+- Verify that non-admin users cannot see these buttons or API data
+
+**✅ After this, Admin Attendance Analytics will be fully functional — daily, weekly, monthly summaries with frontend display.**
+
 **✅ PHASE 5️⃣ STATUS**
 
 > **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
@@ -308,11 +492,35 @@ You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 
 - Exports table as CSV
 
-**✅ PHASE 7️⃣ STATUS**
+### ADMIN DASHBOARD ENHANCEMENTS
 
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+- Login as Admin → Open Dashboard
+
+- Check Summary Cards → Total Present / Absent / Leaves
+
+- Filter by Employee → Table updates
+
+- Export CSV → Open downloaded file, verify data matches table
+
+- Unauthorized Access Test → Employee account cannot see dashboard or API results
+
+### 🎯 Outcome:
+
+A- dmin dashboard now has employee-wise filtering
+
+- Export-ready table via CSV
+
+- Summary cards for quick metrics
+
+- Fully integrated with existing Lambda + RDS
+
+- Fully job-ready
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 8️⃣ — HR Attendance Dashboard
+## ☕ Charlie Café PHASE 7️⃣ — HR Attendance Dashboard
 
 #### 2️⃣ Lambda: GetAttendanceAdminLambda
 
@@ -336,10 +544,65 @@ You asked NOT to miss export section — so here is a FULL UPDATED VERSION.
 
 -  Required group: Admin
 
+### ✅ Test 1 — VERIFY TABLE STRUCTURE (VERY IMPORTANT)
 
+- Click your table CafeAttendance
+
+- Go to Overview tab
+
+- Confirm you see:
+
+| Field         | Value                |
+| ------------- | -------------------- |
+| Partition key | employee_id (String) |
+| Sort key      | date (String)        |
+| Status        | Active               |
+
+#### If this matches → ✅ 100% correct
+
+#### ✅ OPTIONAL: TEST MANUAL ITEM (ONLY TO UNDERSTAND)
+
+- Click Explore table items
+
+- Click Create item
+
+- Switch to JSON view
+
+#### Paste:
+
+```
+{
+  "employee_id": "101",
+  "date": "2026-02-01",
+  "check_in": "09:00",
+  "check_out": "17:00",
+  "role": "Employee"
+}
+```
+
+- Click Create item
+
+This confirms table works.
+
+#### 🔁 FINAL CHECKPOINT
+
+Before moving forward, answer YES to all:
+
+✅ Table name is CafeAttendance
+
+✅ Partition key = employee_id (String)
+
+✅ Sort key = date (String)
+
+✅ Region = us-east-1
+
+✅ Table status = Active
+
+If ANY answer is NO, STOP and fix it.
 
 **✅ PHASE 8️⃣ STATUS**
 
 > **🟢 PHASE 8️⃣ COMPLETE & VERIFIED**
 ---
+
 
