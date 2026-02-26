@@ -880,17 +880,29 @@ def lambda_handler(event, context):
     return make_response(200, result)
 ```
 
-### 🔐 REQUIRED IAM PERMISSIONS
+### ✅ REQUIRED IAM PERMISSIONS
 
-Your Lambda role must allow:
+Attach to Lambda Role:
 
-- secretsmanager:GetSecretValue
+```
+secretsmanager:GetSecretValue
+dynamodb:Query
+```
 
-- rds-db:connect (if IAM auth used)
+If VPC RDS:
 
-- dynamodb:Query
+- Ensure Lambda is inside same VPC
 
-- dynamodb:Scan (optional)
+- Correct security group rules
+
+### ✅ FINAL API ENDPOINT
+
+```
+GET /admin/analytics?type=daily
+GET /admin/analytics?type=weekly&summary=true
+GET /admin/analytics?employee_id=EMP001
+GET /admin/analytics?employee_id=EMP001&date=2026-02-25
+```
 
 ### ✅ WHAT THIS FINAL VERSION DOES
 
