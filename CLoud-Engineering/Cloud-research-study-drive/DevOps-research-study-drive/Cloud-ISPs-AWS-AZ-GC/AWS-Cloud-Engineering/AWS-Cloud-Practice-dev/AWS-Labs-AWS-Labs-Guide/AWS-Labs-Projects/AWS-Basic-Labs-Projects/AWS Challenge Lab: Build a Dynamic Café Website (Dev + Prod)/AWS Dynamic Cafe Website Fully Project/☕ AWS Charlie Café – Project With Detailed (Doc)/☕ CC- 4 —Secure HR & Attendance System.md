@@ -575,7 +575,7 @@ sudo chmod 644 *.html
 
 > **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-## ☕ Charlie Café PHASE 5️⃣ — ADMIN ATTENDANCE ANALYTICS
+## ☕ Charlie Café PHASE 5️⃣ — Cafe Attendance Admin Service
 
 ### 1️⃣ — DATABASE (NO CHANGE, JUST VERIFY)
 
@@ -590,9 +590,9 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 ### 2️⃣ — CREATE ONE LAMBDA ONLY
 
-#### 1️⃣ 📄 Lambda Name : attendance_summary
+#### 1️⃣ 📄 Lambda Name : cafe-attendance-admin-service
 
-[attendance_summary.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/attendance_summary.py)
+[cafe-attendance-admin-service.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/attendance_summary.py)
 
 **✅ PHASE 5️⃣ STATUS**
 
