@@ -213,7 +213,7 @@ sudo ./setup_cafe_hr_attendance.sh
 [hr-attendance.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-attendance.py)
 
 
-#### Step 4️⃣: Add VPC Configuration (CRITICAL)
+#### ✅ Add VPC Configuration (CRITICAL)
 
 - Lambda → Configuration → VPC
 
