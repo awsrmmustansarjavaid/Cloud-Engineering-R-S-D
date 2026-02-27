@@ -197,6 +197,48 @@ def lambda_handler(event, context):
         return response(500, str(e))
 ```
 
+### Option - B hr-checkin & hr-checkinout
+
+### 1️⃣ Create Lambda: hr-checkin
+
+#### Function name:
+
+```
+hr-checkin
+```
+
+> **Replace entire code with this:**
+
+[hr-checkin.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkin.py)
+
+### 2️⃣ Create Lambda: hr-checkout
+> **Repeat Steps Exactly Like hr-checkin**
+
+#### Function name:
+
+```
+hr-checkout
+```
+[hr-checkout.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkout.py)
+
+- Click Create function
+
+- Click Deploy
+
+#### Step 3️⃣: Configure Environment Variables
+
+- Lambda → Configuration → Environment variables
+
+#### Add ALL:
+
+| Key     | Value             |
+| ------- | ----------------- |
+| DB_HOST | your-rds-endpoint |
+| DB_NAME | cafedb            |
+| DB_USER | cafe_user     |
+| DB_PASS | your-db-password  |
+
+- Click Save
 
 ---
 

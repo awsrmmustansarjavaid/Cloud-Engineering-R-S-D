@@ -206,55 +206,12 @@ sudo ./setup_cafe_hr_attendance.sh
 
 - Use existing role: cafe-hr-lambda-role
 
-### Option - A hr-attendance
+### hr-attendance
 
 > **a single merged Lambda, Check-in and check-out are the same domain action (attendance), just different operations.**
 
 [hr-attendance.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-attendance.py)
 
-
-### Option - B hr-checkin & hr-checkinout
-
-### 1️⃣ Create Lambda: hr-checkin
-
-#### Function name:
-
-```
-hr-checkin
-```
-
-> **Replace entire code with this:**
-
-[hr-checkin.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkin.py)
-
-### 2️⃣ Create Lambda: hr-checkout
-> **Repeat Steps Exactly Like hr-checkin**
-
-#### Function name:
-
-```
-hr-checkout
-```
-[hr-checkout.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-checkout.py)
-
-- Click Create function
-
-- Click Deploy
-
-#### Step 3️⃣: Configure Environment Variables
-
-- Lambda → Configuration → Environment variables
-
-#### Add ALL:
-
-| Key     | Value             |
-| ------- | ----------------- |
-| DB_HOST | your-rds-endpoint |
-| DB_NAME | cafedb            |
-| DB_USER | cafe_user     |
-| DB_PASS | your-db-password  |
-
-- Click Save
 
 #### Step 4️⃣: Add VPC Configuration (CRITICAL)
 
