@@ -19,17 +19,6 @@ secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 # ==========================================================
 
 def get_db_secret():
-    """
-    Fetch database credentials from AWS Secrets Manager.
-
-    Expected secret structure:
-    {
-        "host": "...",
-        "username": "...",
-        "password": "...",
-        "dbname": "..."
-    }
-    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
@@ -41,10 +30,6 @@ def get_db_secret():
 connection = None
 
 def get_connection():
-    """
-    Reuse DB connection if open.
-    Otherwise create new connection using secret.
-    """
     global connection
 
     if connection is None or not connection.open:
@@ -64,20 +49,6 @@ def get_connection():
 
 
 # ==========================================================
-# ROLE CHECK (COGNITO GROUP VALIDATION)
-# ==========================================================
-
-def check_role(event, allowed_role):
-    claims = event["requestContext"]["authorizer"]["claims"]
-    groups = claims.get("cognito:groups", [])
-
-    if isinstance(groups, str):
-        groups = [groups]
-
-    return allowed_role in groups
-
-
-# ==========================================================
 # JSON SERIALIZER (DECIMAL & DATE SUPPORT)
 # ==========================================================
 
@@ -90,14 +61,18 @@ def json_serializer(obj):
 
 
 # ==========================================================
-# FORBIDDEN RESPONSE
+# STANDARD RESPONSE
 # ==========================================================
 
-def forbidden():
+def response(status, body):
     return {
-        "statusCode": 403,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"message": "Forbidden"})
+        "statusCode": status,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
+        },
+        "body": json.dumps(body, default=json_serializer)
     }
 
 
@@ -107,24 +82,27 @@ def forbidden():
 
 def lambda_handler(event, context):
     """
-    Returns:
+    Public API that returns:
     - Employee leave history
     - Company holiday list
 
-    Accessible only to users in 'Employee' Cognito group.
+    Expects employee_id in request body.
     """
 
     try:
-        # ----------------------------------------
-        # AUTHORIZATION — EMPLOYEE ONLY
-        # ----------------------------------------
-        ALLOWED_ROLE = "Employee"
+        # Handle CORS preflight
+        if event.get("httpMethod") == "OPTIONS":
+            return response(200, {"message": "CORS preflight successful"})
 
-        if not check_role(event, ALLOWED_ROLE):
-            return forbidden()
+        # Validate request body
+        if not event.get("body"):
+            return response(400, {"message": "Missing request body"})
 
-        claims = event["requestContext"]["authorizer"]["claims"]
-        cognito_user_id = claims["sub"]
+        body = json.loads(event["body"])
+        employee_id = body.get("employee_id")
+
+        if not employee_id:
+            return response(400, {"message": "employee_id is required"})
 
         connection = get_connection()
 
@@ -135,11 +113,10 @@ def lambda_handler(event, context):
             # ----------------------------------------
             cursor.execute("""
                 SELECT leave_date, leave_type
-                FROM leaves l
-                JOIN employees e ON l.employee_id = e.employee_id
-                WHERE e.cognito_user_id=%s
+                FROM leaves
+                WHERE employee_id=%s
                 ORDER BY leave_date DESC
-            """, (cognito_user_id,))
+            """, (employee_id,))
 
             leaves = cursor.fetchall()
 
@@ -154,24 +131,10 @@ def lambda_handler(event, context):
 
             holidays = cursor.fetchall()
 
-        # ----------------------------------------
-        # SUCCESS RESPONSE
-        # ----------------------------------------
-        return {
-            "statusCode": 200,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps(
-                {
-                    "leaves": leaves,
-                    "holidays": holidays
-                },
-                default=json_serializer
-            )
-        }
+        return response(200, {
+            "leaves": leaves,
+            "holidays": holidays
+        })
 
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"error": str(e)})
-        }
+        return response(500, {"error": str(e)})

@@ -532,4 +532,213 @@ Now use:
 ✔ Clean RBAC pattern
 
 ---
+### hr-leaves-holidays.py
+> **Update Version 1.5**
+
+### ✅ What Was Removed
+
+❌ check_role() function
+
+❌ Cognito group validation
+
+❌ claims usage
+
+❌ cognito_user_id lookup
+
+❌ forbidden() function
+
+❌ JOIN using cognito_user_id
+
+### ✅ What Changed
+
+Now expects employee_id in request body
+
+Fetches leave history using employee_id
+
+Holidays remain public (no filtering needed)
+
+Proper CORS handling added
+
+Keeps Secrets Manager + DB reuse
+
+Keeps Decimal/date serializer
+
+### ✅ FINAL LAMBDA CODE (NO COGNITO)
+
+```
+import json
+import os
+import boto3
+import pymysql
+import datetime
+from decimal import Decimal
+
+# ==========================================================
+# SECRETS MANAGER CONFIGURATION
+# ==========================================================
+
+SECRET_NAME = "CafeDevDBSM"
+REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
+
+secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
+
+# ==========================================================
+# FETCH DATABASE SECRET
+# ==========================================================
+
+def get_db_secret():
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+
+# ==========================================================
+# DATABASE CONNECTION (REUSED ACROSS INVOCATIONS)
+# ==========================================================
+
+connection = None
+
+def get_connection():
+    global connection
+
+    if connection is None or not connection.open:
+        secret = get_db_secret()
+
+        connection = pymysql.connect(
+            host=secret["host"],
+            user=secret["username"],
+            password=secret["password"],
+            database=secret["dbname"],
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=10,
+            autocommit=True
+        )
+
+    return connection
+
+
+# ==========================================================
+# JSON SERIALIZER (DECIMAL & DATE SUPPORT)
+# ==========================================================
+
+def json_serializer(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+    return str(obj)
+
+
+# ==========================================================
+# STANDARD RESPONSE
+# ==========================================================
+
+def response(status, body):
+    return {
+        "statusCode": status,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
+        },
+        "body": json.dumps(body, default=json_serializer)
+    }
+
+
+# ==========================================================
+# LAMBDA HANDLER
+# ==========================================================
+
+def lambda_handler(event, context):
+    """
+    Public API that returns:
+    - Employee leave history
+    - Company holiday list
+
+    Expects employee_id in request body.
+    """
+
+    try:
+        # Handle CORS preflight
+        if event.get("httpMethod") == "OPTIONS":
+            return response(200, {"message": "CORS preflight successful"})
+
+        # Validate request body
+        if not event.get("body"):
+            return response(400, {"message": "Missing request body"})
+
+        body = json.loads(event["body"])
+        employee_id = body.get("employee_id")
+
+        if not employee_id:
+            return response(400, {"message": "employee_id is required"})
+
+        connection = get_connection()
+
+        with connection.cursor() as cursor:
+
+            # ----------------------------------------
+            # FETCH EMPLOYEE LEAVES
+            # ----------------------------------------
+            cursor.execute("""
+                SELECT leave_date, leave_type
+                FROM leaves
+                WHERE employee_id=%s
+                ORDER BY leave_date DESC
+            """, (employee_id,))
+
+            leaves = cursor.fetchall()
+
+            # ----------------------------------------
+            # FETCH COMPANY HOLIDAYS
+            # ----------------------------------------
+            cursor.execute("""
+                SELECT holiday_date, description
+                FROM holidays
+                ORDER BY holiday_date DESC
+            """)
+
+            holidays = cursor.fetchall()
+
+        return response(200, {
+            "leaves": leaves,
+            "holidays": holidays
+        })
+
+    except Exception as e:
+        return response(500, {"error": str(e)})
+```
+
+### ✅ Example Frontend Request
+
+```
+POST /employee/leaves
+{
+  "employee_id": 5
+}
+```
+
+### ⚠️ Production Warning
+
+This API is now fully public:
+
+Anyone can view any employee’s leave history
+
+No authentication
+
+No authorization
+
+Sensitive HR data exposed
+
+If this is production, at minimum add:
+
+API key
+
+JWT
+
+Private network restriction
+
+Or IAM authorizer
+
+---
+
 
