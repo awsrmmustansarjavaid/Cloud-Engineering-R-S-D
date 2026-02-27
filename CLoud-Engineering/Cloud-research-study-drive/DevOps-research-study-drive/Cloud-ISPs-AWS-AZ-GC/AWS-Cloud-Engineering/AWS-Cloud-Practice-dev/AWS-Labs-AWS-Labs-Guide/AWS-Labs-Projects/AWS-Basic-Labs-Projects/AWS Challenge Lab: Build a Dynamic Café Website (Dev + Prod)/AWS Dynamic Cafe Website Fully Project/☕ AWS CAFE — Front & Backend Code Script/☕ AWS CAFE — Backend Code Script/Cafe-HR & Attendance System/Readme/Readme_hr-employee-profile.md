@@ -621,4 +621,32 @@ def lambda_handler(event, context):
         return response(500, {"error": str(e)})
 ```
 
+### ✅ Frontend Request Example
+
+```
+POST /employee/profile
+{
+  "employee_id": 5
+}
+```
+
+### ⚠️ Important (Production Warning)
+
+Since this API is fully public:
+
+Anyone can fetch any employee profile
+
+Salaries are exposed
+
+No identity verification exists
+
+If this is for development/testing → fine.
+If production → you should at least add:
+
+API key
+
+JWT auth
+
+Or internal network restriction
+---
 
