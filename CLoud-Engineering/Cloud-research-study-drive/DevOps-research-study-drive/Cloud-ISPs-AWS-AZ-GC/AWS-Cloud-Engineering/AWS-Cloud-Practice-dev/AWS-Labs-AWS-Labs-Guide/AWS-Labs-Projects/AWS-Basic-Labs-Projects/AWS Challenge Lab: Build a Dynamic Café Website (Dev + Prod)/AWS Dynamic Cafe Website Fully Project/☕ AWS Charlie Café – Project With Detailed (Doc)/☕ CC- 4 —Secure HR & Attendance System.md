@@ -395,15 +395,61 @@ HR Secure Attendance & Employee Management API
 
     - Click Method → Actions → Enable CORS
 
-#### Settings:
+#### ✅ CORRECT PUBLIC CORS CONFIGURATION
 
-    - Access-Control-Allow-Headers: Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token
+Because you are using Lambda Proxy Integration, API Gateway CORS headers are NOT required in Method Response.
 
-    - Access-Control-Allow-Methods: GET,POST,OPTIONS
+Your Lambda already returns:
 
-    - Access-Control-Allow-Origin: *
+```
+"headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+}
+```
 
-- Click Enable CORS and replace existing CORS headers
+That is enough.
+
+### 🎯 Proper Public CORS Setup in API Gateway
+
+For each resource:
+
+#### Step 1 — Create OPTIONS Method
+
+- Click Resource
+
+- Actions → Create Method
+
+- Select OPTIONS
+
+- Integration Type: Mock Integration
+
+- Save
+
+### Step 2 — Configure OPTIONS Response
+
+Method Response → Add:
+
+```
+200
+```
+
+Integration Response → Add Headers:
+
+```
+Access-Control-Allow-Origin: '*'
+Access-Control-Allow-Headers: 'Content-Type'
+Access-Control-Allow-Methods: 'GET,POST,OPTIONS'
+```
+
+Your final public CORS headers should be:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Methods: GET,POST,OPTIONS
+```
 
 - Deploy API (Step 7)
 
@@ -422,6 +468,8 @@ HR Secure Attendance & Employee Management API
 ```
 https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/
 ```
+
+
 
 **✅ PHASE 3️⃣ STATUS**
 
