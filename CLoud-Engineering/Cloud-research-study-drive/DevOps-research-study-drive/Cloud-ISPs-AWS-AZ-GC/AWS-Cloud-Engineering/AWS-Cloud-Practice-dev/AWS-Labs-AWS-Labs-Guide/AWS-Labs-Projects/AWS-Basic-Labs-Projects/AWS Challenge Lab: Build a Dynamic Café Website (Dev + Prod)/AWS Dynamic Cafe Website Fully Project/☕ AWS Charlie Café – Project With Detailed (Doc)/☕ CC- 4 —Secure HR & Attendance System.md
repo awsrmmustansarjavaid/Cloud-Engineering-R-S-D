@@ -320,31 +320,17 @@ HR Secure Attendance & Employee Management API
 
 **⚠️ If you are following optional -B then follow this below configureations**
 
-#### Optional - B 
-
-> **We will create 5 resources, one for each Lambda.**
-
-| Resource           | Path                  | Lambda Function         |
-| ------------------ | --------------------- | ----------------------- |
-| checkin           | `/checkin`            | `hr-checkin`            |
-| checkout         | `/checkout`           | `hr-checkout`           |
-| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
-| Attendance History | `/attendance-history` | `hr-attendance-history` |
-| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
-
 #### Step 1 — Add /checkin
 
 - Click Actions → Create Resource
 
 - Resource Name: CheckIn
 
-- Resource Path: /checkin
+- Resource Path: /attendance
 
 - Click Create Resource
 
 #### Step 2 — Repeat for remaining resources
-
-- /checkout
 
 - /employee-profile
 
@@ -358,7 +344,7 @@ HR Secure Attendance & Employee Management API
 
     - Click on Resource → Actions → Create Method
 
-    - Select POST for /checkin and /checkout
+    - Select POST for /attendance
 
     - Select GET for /employee-profile, /attendance-history, /leaves-holidays
 

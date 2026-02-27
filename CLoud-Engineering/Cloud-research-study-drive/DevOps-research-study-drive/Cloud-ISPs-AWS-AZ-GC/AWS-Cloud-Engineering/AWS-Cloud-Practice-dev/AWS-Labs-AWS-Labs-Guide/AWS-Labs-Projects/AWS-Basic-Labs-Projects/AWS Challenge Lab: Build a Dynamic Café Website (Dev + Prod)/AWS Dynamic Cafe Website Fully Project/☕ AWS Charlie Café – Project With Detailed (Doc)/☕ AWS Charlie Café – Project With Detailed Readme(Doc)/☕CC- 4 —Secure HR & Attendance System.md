@@ -422,6 +422,19 @@ This is enterprise-grade HR security.
 
 - Follow real job-level backend standards
 
+#### Optional - B 
+
+> **We will create 5 resources, one for each Lambda.**
+
+| Resource           | Path                  | Lambda Function         |
+| ------------------ | --------------------- | ----------------------- |
+| checkin           | `/checkin`            | `hr-checkin`            |
+| checkout         | `/checkout`           | `hr-checkout`           |
+| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
+| Attendance History | `/attendance-history` | `hr-attendance-history` |
+| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
+
+
 
 > **🟢 PHASE 2️⃣  R & D COMPLETE**
 ---
