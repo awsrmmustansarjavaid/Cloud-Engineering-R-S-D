@@ -313,8 +313,7 @@ HR Secure Attendance & Employee Management API
 
 | Resource           | Path                  | Lambda Function         |
 | ------------------ | --------------------- | ----------------------- |
-| checkin           | `/checkin`            | `hr-attendance`            |
-| checkout         | `/checkout`           | `hr-attendance`           |
+| attendance          | `/attendance`            | `hr-attendance`            |
 | Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
 | Attendance History | `/attendance-history` | `hr-attendance-history` |
 | Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
@@ -630,10 +629,6 @@ GET /admin/analytics?type=weekly&summary=true
 GET /admin/analytics?employee_id=EMP001
 GET /admin/analytics?employee_id=EMP001&date=2026-02-25
 ```
-
-
-
-
 
 **✅ PHASE 5️⃣ STATUS**
 
