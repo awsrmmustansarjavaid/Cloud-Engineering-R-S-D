@@ -1,3 +1,10 @@
+# Charlie Cafe -- HR & Attendance System
+
+### A hr-attendance.py
+
+> **Update Version:1.0**
+
+```
 import json
 import os
 import boto3
@@ -8,7 +15,7 @@ from datetime import date, datetime
 # AWS SECRETS MANAGER CONFIG
 # ==========================================================
 
-SECRET_NAME = "CafeDevDBSM"
+SECRET_NAME = "CafeDevDBSM"   # Name of secret in AWS Secrets Manager
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
@@ -18,6 +25,16 @@ secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 # ==========================================================
 
 def get_db_secret():
+    """
+    Fetch database credentials from AWS Secrets Manager.
+    Expected secret JSON format:
+    {
+        "host": "...",
+        "username": "...",
+        "password": "...",
+        "dbname": "..."
+    }
+    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     secret = json.loads(response["SecretString"])
     return secret
@@ -27,9 +44,13 @@ def get_db_secret():
 # CREATE / REUSE DATABASE CONNECTION
 # ==========================================================
 
-connection = None
+connection = None  # Global connection (reused across Lambda invocations)
 
 def get_connection():
+    """
+    Reuse existing DB connection if available.
+    Otherwise create new connection using Secrets Manager.
+    """
     global connection
 
     if connection is None or not connection.open:
@@ -49,15 +70,35 @@ def get_connection():
 
 
 # ==========================================================
+# ROLE CHECK (RBAC USING COGNITO GROUP)
+# ==========================================================
+
+def check_role(event, allowed_role):
+    """
+    Allow only users in required Cognito group
+    """
+    claims = event["requestContext"]["authorizer"]["claims"]
+    groups = claims.get("cognito:groups", [])
+
+    if isinstance(groups, str):
+        groups = [groups]
+
+    return allowed_role in groups
+
+
+# ==========================================================
 # STANDARD API RESPONSE
 # ==========================================================
 
 def response(status, message):
+    """
+    Standardized API Gateway response with CORS
+    """
     return {
         "statusCode": status,
         "headers": {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Headers": "Authorization,Content-Type",
             "Access-Control-Allow-Methods": "POST,OPTIONS"
         },
         "body": json.dumps({"message": message})
@@ -70,38 +111,37 @@ def response(status, message):
 
 def lambda_handler(event, context):
     """
-    Public API for employee check-in and check-out.
-    Expects employee_id in request body.
+    Handles employee check-in and check-out.
+    Requires user to belong to 'Employee' Cognito group.
     """
 
     try:
-        # Handle OPTIONS (CORS preflight)
-        if event.get("httpMethod") == "OPTIONS":
-            return response(200, "CORS preflight successful")
+        # --------------------------------------------------
+        # AUTHORIZATION — EMPLOYEE ONLY
+        # --------------------------------------------------
+        if not check_role(event, "Employee"):
+            return response(403, "Forbidden")
 
-        # Parse request body
-        if not event.get("body"):
-            return response(400, "Missing request body")
-
-        body = json.loads(event["body"])
-        employee_id = body.get("employee_id")
-
-        if not employee_id:
-            return response(400, "employee_id is required")
+        claims = event["requestContext"]["authorizer"]["claims"]
+        cognito_user_id = claims["sub"]
 
         today = date.today()
         now = datetime.now().time()
 
+        # Identify route (checkin / checkout)
         path = event.get("resource") or event.get("path", "")
 
+        # Get DB connection from Secrets Manager
         connection = get_connection()
 
         with connection.cursor() as cursor:
 
-            # Validate employee exists
+            # --------------------------------------------------
+            # FETCH EMPLOYEE ID
+            # --------------------------------------------------
             cursor.execute(
-                "SELECT employee_id FROM employees WHERE employee_id=%s",
-                (employee_id,)
+                "SELECT employee_id FROM employees WHERE cognito_user_id=%s",
+                (cognito_user_id,)
             )
 
             employee = cursor.fetchone()
@@ -109,10 +149,12 @@ def lambda_handler(event, context):
             if not employee:
                 return response(404, "Employee not found")
 
+            employee_id = employee["employee_id"]
+
             # ==================================================
-            # CHECK-IN LOGIC
+            # ✅ CHECK-IN LOGIC
             # ==================================================
-            if "checkin" in path.lower():
+            if "checkin" in path:
 
                 try:
                     cursor.execute("""
@@ -128,9 +170,9 @@ def lambda_handler(event, context):
                     return response(400, "Already checked in today")
 
             # ==================================================
-            # CHECK-OUT LOGIC
+            # ✅ CHECK-OUT LOGIC
             # ==================================================
-            elif "checkout" in path.lower():
+            elif "checkout" in path:
 
                 cursor.execute("""
                     UPDATE attendance
@@ -145,11 +187,16 @@ def lambda_handler(event, context):
                 connection.commit()
                 return response(200, "Check-out successful")
 
-            # ==================================================
+            # --------------------------------------------------
             # UNKNOWN ROUTE
-            # ==================================================
+            # --------------------------------------------------
             else:
                 return response(404, "Invalid attendance action")
 
     except Exception as e:
         return response(500, str(e))
+```
+
+
+---
+
