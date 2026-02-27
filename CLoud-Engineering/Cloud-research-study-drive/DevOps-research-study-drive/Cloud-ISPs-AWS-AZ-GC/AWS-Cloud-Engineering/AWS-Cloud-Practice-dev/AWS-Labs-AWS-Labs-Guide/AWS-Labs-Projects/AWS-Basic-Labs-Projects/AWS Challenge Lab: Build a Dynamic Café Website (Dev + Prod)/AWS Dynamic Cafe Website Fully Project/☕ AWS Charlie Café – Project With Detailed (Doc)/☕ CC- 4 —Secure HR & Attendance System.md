@@ -592,25 +592,13 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
     - Enable Lambda Proxy Integration ✅
 
-### 4️⃣ Attach Authorizer to GET Method
-
-- Go to /admin/analytics
-
-- Click GET
-
-- Click Method Request
-
-- Authorization → Select: HR-Cognito-Authorizer
-
-- Click Save
-
-### 5️⃣ ENABLE CORS
+### 4️⃣ ENABLE CORS
 
 Still inside /admin/analytics:
 
 - Click Actions → Enable CORS
 
-- Headers: Authorization,Content-Type
+- Headers: None ,Content-Type
 
 - Methods: GET,OPTIONS
 
