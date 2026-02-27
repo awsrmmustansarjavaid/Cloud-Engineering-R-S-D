@@ -9,7 +9,7 @@ from decimal import Decimal
 # SECRETS MANAGER CONFIGURATION
 # ==========================================================
 
-SECRET_NAME = "CafeDevDBSM"   # Your existing RDS secret
+SECRET_NAME = "CafeDevDBSM"
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
@@ -19,17 +19,6 @@ secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 # ==========================================================
 
 def get_db_secret():
-    """
-    Retrieve database credentials from AWS Secrets Manager.
-
-    Expected secret JSON structure:
-    {
-        "host": "...",
-        "username": "...",
-        "password": "...",
-        "dbname": "..."
-    }
-    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
@@ -41,10 +30,6 @@ def get_db_secret():
 connection = None
 
 def get_connection():
-    """
-    Reuse existing DB connection if open.
-    Otherwise create new connection using secret credentials.
-    """
     global connection
 
     if connection is None or not connection.open:
@@ -64,20 +49,6 @@ def get_connection():
 
 
 # ==========================================================
-# ROLE CHECK (COGNITO GROUP VALIDATION)
-# ==========================================================
-
-def check_role(event, allowed_role):
-    claims = event["requestContext"]["authorizer"]["claims"]
-    groups = claims.get("cognito:groups", [])
-
-    if isinstance(groups, str):
-        groups = [groups]
-
-    return allowed_role in groups
-
-
-# ==========================================================
 # JSON SERIALIZER (FOR DECIMAL & DATE)
 # ==========================================================
 
@@ -90,14 +61,18 @@ def json_serializer(obj):
 
 
 # ==========================================================
-# FORBIDDEN RESPONSE
+# STANDARD RESPONSE
 # ==========================================================
 
-def forbidden():
+def response(status, body):
     return {
-        "statusCode": 403,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"message": "Forbidden"})
+        "statusCode": status,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
+        },
+        "body": json.dumps(body, default=json_serializer)
     }
 
 
@@ -107,21 +82,24 @@ def forbidden():
 
 def lambda_handler(event, context):
     """
-    Returns logged-in employee profile.
-    Only accessible by users in 'Employee' Cognito group.
+    Public API that returns employee profile.
+    Expects employee_id in request body.
     """
 
     try:
-        # ----------------------------------------
-        # AUTHORIZATION — EMPLOYEE ONLY
-        # ----------------------------------------
-        ALLOWED_ROLE = "Employee"
+        # Handle CORS preflight
+        if event.get("httpMethod") == "OPTIONS":
+            return response(200, {"message": "CORS preflight successful"})
 
-        if not check_role(event, ALLOWED_ROLE):
-            return forbidden()
+        # Validate body
+        if not event.get("body"):
+            return response(400, {"message": "Missing request body"})
 
-        claims = event["requestContext"]["authorizer"]["claims"]
-        cognito_user_id = claims["sub"]
+        body = json.loads(event["body"])
+        employee_id = body.get("employee_id")
+
+        if not employee_id:
+            return response(400, {"message": "employee_id is required"})
 
         # ----------------------------------------
         # DATABASE QUERY
@@ -130,32 +108,20 @@ def lambda_handler(event, context):
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT name, job_title, salary, start_date
+                SELECT employee_id, name, job_title, salary, start_date
                 FROM employees
-                WHERE cognito_user_id=%s
-            """, (cognito_user_id,))
+                WHERE employee_id=%s
+            """, (employee_id,))
 
             employee = cursor.fetchone()
 
         if not employee:
-            return {
-                "statusCode": 404,
-                "headers": {"Access-Control-Allow-Origin": "*"},
-                "body": json.dumps({"message": "Employee not found"})
-            }
+            return response(404, {"message": "Employee not found"})
 
         # ----------------------------------------
         # SUCCESS RESPONSE
         # ----------------------------------------
-        return {
-            "statusCode": 200,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps(employee, default=json_serializer)
-        }
+        return response(200, employee)
 
     except Exception as e:
-        return {
-            "statusCode": 500,
-            "headers": {"Access-Control-Allow-Origin": "*"},
-            "body": json.dumps({"error": str(e)})
-        }
+        return response(500, {"error": str(e)})
