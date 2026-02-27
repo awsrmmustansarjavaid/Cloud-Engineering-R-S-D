@@ -759,5 +759,33 @@ def lambda_handler(event, context):
         }
 ```
 
+---
+### Enable Cognito Authorizer
+
+#### Step 1 — Create Authorizer
+
+- API Gateway → Authorizers → Create New Authorizer
+
+- Name: HR-Cognito-Authorizer
+
+- Type: Cognito
+
+- Cognito User Pool: Select your café User Pool
+
+- Token Source: Authorization
+
+- Click Create
+
+#### Step 2 — Attach Authorizer to Methods
+
+#### For each resource method:
+
+    - Click on Method → Method Request
+
+    - Authorization: select HR-Cognito-Authorizer
+
+    - Save
+---
+
 
 

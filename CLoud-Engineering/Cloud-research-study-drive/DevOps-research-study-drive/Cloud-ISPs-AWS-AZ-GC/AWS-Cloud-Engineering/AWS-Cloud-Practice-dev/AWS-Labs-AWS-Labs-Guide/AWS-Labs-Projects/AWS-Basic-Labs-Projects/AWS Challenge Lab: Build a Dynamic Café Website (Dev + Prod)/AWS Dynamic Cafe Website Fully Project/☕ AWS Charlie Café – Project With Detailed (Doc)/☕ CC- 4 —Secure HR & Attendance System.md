@@ -389,33 +389,7 @@ HR Secure Attendance & Employee Management API
 
 - Grant permissions when prompted → Yes
 
-### 5️⃣ Enable Cognito Authorizer
-
-#### Step 1 — Create Authorizer
-
-- API Gateway → Authorizers → Create New Authorizer
-
-- Name: HR-Cognito-Authorizer
-
-- Type: Cognito
-
-- Cognito User Pool: Select your café User Pool
-
-- Token Source: Authorization
-
-- Click Create
-
-#### Step 2 — Attach Authorizer to Methods
-
-#### For each resource method:
-
-    - Click on Method → Method Request
-
-    - Authorization: select HR-Cognito-Authorizer
-
-    - Save
-
-### 6️⃣ Enable CORS (Cross-Origin Resource Sharing)
+### 5️⃣ Enable CORS (Cross-Origin Resource Sharing)
 
 #### For each resource method:
 
@@ -433,7 +407,7 @@ HR Secure Attendance & Employee Management API
 
 - Deploy API (Step 7)
 
-### 7️⃣ Deploy API
+### 6️⃣ Deploy API
 
 - Actions → Deploy API
 
