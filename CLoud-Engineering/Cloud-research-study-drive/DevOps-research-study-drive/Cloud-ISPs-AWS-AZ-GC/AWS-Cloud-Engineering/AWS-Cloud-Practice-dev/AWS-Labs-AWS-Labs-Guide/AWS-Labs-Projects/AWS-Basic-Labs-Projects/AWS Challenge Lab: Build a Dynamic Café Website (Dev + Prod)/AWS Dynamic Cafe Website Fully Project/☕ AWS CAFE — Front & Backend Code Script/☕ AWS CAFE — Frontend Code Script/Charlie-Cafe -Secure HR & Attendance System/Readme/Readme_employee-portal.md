@@ -1677,4 +1677,509 @@ if (window.location.hash) {
 
 - Comments – Clear explanation for each part for easy future maintenance.
 
+
+### ✅ Fully Final Code
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie Café | Employee Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- ================= Bootstrap CSS ================= -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- ================= jsPDF (LOCAL PDF) ================= -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(40,25,15,0.85), rgba(40,25,15,0.85)),
+                url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: "Segoe UI", sans-serif;
+            padding: 20px;
+        }
+
+        body.light-mode { background: #f8f5f2; }
+        .page-title { font-family: Georgia, serif; color: #f5c16c; }
+
+        .content-card {
+            background-color: rgba(255, 255, 255, 0.97);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+            margin-bottom: 25px;
+        }
+
+        table th { background-color: #2b1b12; color: #fff; }
+        #emp-name { color: #fff; font-size: 1.2rem; }
+        .status-badge { font-size: 1rem; }
+    </style>
+</head>
+
+<body style="display:none;"><!-- Hidden until auth passes -->
+
+<div class="container">
+
+    <!-- ================= Header ================= -->
+    <div class="text-center mb-4">
+        <h1 class="page-title">☕ Charlie Café</h1>
+        <p class="text-light">Employee Self-Service Portal</p>
+        <p id="emp-name"></p>
+
+        <span id="today-status" class="badge status-badge bg-secondary">
+            Loading today status...
+        </span>
+
+        <div class="mt-3 d-flex justify-content-center gap-2 flex-wrap">
+
+            <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
+                🌗 Toggle Theme
+            </button>
+
+            <button class="btn btn-outline-light btn-sm"
+                    onclick="openCentralPrint('#attendancePrintArea')">
+                🖨️ Print / Export
+            </button>
+
+            <button class="btn btn-outline-light btn-sm" onclick="downloadPDF()">
+                📄 Download Attendance
+            </button>
+
+            <button class="btn btn-warning btn-sm" id="logoutBtn">
+                🔒 Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= Profile ================= -->
+    <div class="content-card">
+        <h4>👤 My Profile</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+                <tr><th>Name</th><td id="profile-name"></td></tr>
+                <tr><th>Job Title</th><td id="profile-job"></td></tr>
+                <tr><th>Salary</th><td id="profile-salary"></td></tr>
+                <tr><th>Start Date</th><td id="profile-start"></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ================= Attendance ================= -->
+    <div class="content-card" id="attendancePrintArea">
+        <h4>🕒 Attendance History</h4>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered" id="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ================= Leaves ================= -->
+    <div class="content-card">
+        <h4>📅 Leaves & Holidays</h4>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered" id="leaves-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type / Description</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= LOAD CENTRAL MODULES ================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+<script src="central-printing.js"></script>
+
+<script>
+/* =====================================================
+   🔐 AUTH INITIALIZATION
+===================================================== */
+
+// Protect page (Cognito Hosted UI based)
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.requireEmployee();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+// Setup logout button
+CHARLIE_AUTH.login; // ensures module loaded
+document.getElementById("logoutBtn")
+        .addEventListener("click", () => CHARLIE_AUTH.logout());
+
+
+/* =====================================================
+   🖨️ CENTRAL PRINT FUNCTION
+===================================================== */
+function openCentralPrint(selector) {
+    const source = document.querySelector(selector);
+    if (!source) {
+        alert("Printable content not found.");
+        return;
+    }
+
+    const printWindow = window.open("/central-print.html", "_blank");
+    printWindow.onload = function () {
+        if (printWindow.centralPrint &&
+            typeof printWindow.centralPrint.loadContent === "function") {
+            printWindow.centralPrint.loadContent(source.outerHTML);
+        }
+    };
+}
+
+
+/* =====================================================
+   📡 LOAD PROFILE (PROTECTED API)
+===================================================== */
+async function loadProfile() {
+
+    const data = await CHARLIE_API.protected.getAttendance
+        ? await fetch(`${CHARLIE_CONFIG.API_BASE}/employee/profile`, {
+            headers: {
+                Authorization: "Bearer " + CHARLIE_UTILS.getToken()
+            }
+        }).then(r => r.json())
+        : null;
+
+    document.getElementById("profile-name").innerText = data.name;
+    document.getElementById("profile-job").innerText = data.job_title;
+    document.getElementById("profile-salary").innerText = data.salary;
+    document.getElementById("profile-start").innerText = data.start_date;
+    document.getElementById("emp-name").innerText = `Welcome, ${data.name} ☕`;
+}
+
+
+/* =====================================================
+   📡 LOAD ATTENDANCE
+===================================================== */
+async function loadAttendance() {
+
+    const records = await fetch(`${CHARLIE_CONFIG.API_BASE}/attendance/history`, {
+        headers: {
+            Authorization: "Bearer " + CHARLIE_UTILS.getToken()
+        }
+    }).then(r => r.json());
+
+    const tbody = document.querySelector("#attendance-table tbody");
+    tbody.innerHTML = "";
+
+    const today = new Date().toISOString().slice(0,10);
+    let todayRecord = null;
+
+    records.forEach(r => {
+        if (r.attendance_date === today) todayRecord = r;
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${r.attendance_date}</td>
+                <td>${r.checkin_time || "-"}</td>
+                <td>${r.checkout_time || "-"}</td>
+            </tr>`;
+    });
+
+    updateTodayStatus(todayRecord);
+}
+
+
+/* =====================================================
+   📡 LOAD LEAVES
+===================================================== */
+async function loadLeaves() {
+
+    const data = await fetch(`${CHARLIE_CONFIG.API_BASE}/leaves-holidays`, {
+        headers: {
+            Authorization: "Bearer " + CHARLIE_UTILS.getToken()
+        }
+    }).then(r => r.json());
+
+    const tbody = document.querySelector("#leaves-table tbody");
+    tbody.innerHTML = "";
+
+    data.leaves.forEach(l =>
+        tbody.innerHTML += `<tr><td>${l.leave_date}</td><td>${l.leave_type}</td></tr>`
+    );
+
+    data.holidays.forEach(h =>
+        tbody.innerHTML += `<tr><td>${h.holiday_date}</td><td>${h.description}</td></tr>`
+    );
+}
+
+
+/* =====================================================
+   🟢 TODAY STATUS BADGE
+===================================================== */
+function updateTodayStatus(record) {
+
+    const badge = document.getElementById("today-status");
+
+    if (!record) {
+        badge.textContent = "Not Checked-In Today";
+        badge.className = "badge bg-danger status-badge";
+    } else if (record.checkin_time && !record.checkout_time) {
+        badge.textContent = "Checked-In";
+        badge.className = "badge bg-success status-badge";
+    } else {
+        badge.textContent = "Checked-Out";
+        badge.className = "badge bg-secondary status-badge";
+    }
+}
+
+
+/* =====================================================
+   📄 LOCAL PDF EXPORT
+===================================================== */
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Charlie Café – Attendance History", 10, 10);
+    doc.text(document.getElementById("attendance-table").innerText, 10, 20);
+    doc.save("attendance.pdf");
+}
+
+
+/* =====================================================
+   🌗 THEME TOGGLE
+===================================================== */
+function toggleTheme() {
+    document.body.classList.toggle("light-mode");
+}
+
+
+/* =====================================================
+   🚀 INITIAL LOAD
+===================================================== */
+loadProfile();
+loadAttendance();
+loadLeaves();
+
+</script>
+
+</body>
+</html>
+```
+
+---
+### ✅ employee-portal.html
+
+> **Update Version:2.0**
+
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- BOOTSTRAP -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- GOOGLE FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 900px;
+    margin-top: 50px;
+}
+
+.card-header {
+    font-weight: 700;
+}
+
+.table th, .table td {
+    vertical-align: middle !important;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+    <!-- EMPLOYEE PROFILE -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Employee Profile
+        </div>
+        <div class="card-body">
+            <h5 id="profile-name">Loading...</h5>
+            <p>Job Title: <span id="profile-job"></span></p>
+            <p>Salary: <span id="profile-salary"></span></p>
+            <p>Start Date: <span id="profile-start"></span></p>
+            <h6 id="emp-name"></h6>
+        </div>
+    </div>
+
+    <!-- ATTENDANCE HISTORY -->
+    <div class="card">
+        <div class="card-header">
+            Attendance History
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="attendance-history">
+                    <tr><td colspan="3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- SYSTEM FILES -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+
+<script>
+/* ==========================================================
+   PAGE PROTECTION
+   - Protect visibility with Cognito
+   - API calls remain public (no auth headers needed)
+========================================================== */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+/* ==========================================================
+   LOAD EMPLOYEE PROFILE
+   - Uses public HR API: /attendance POST with action=get_profile
+   - No Authorization header required
+========================================================== */
+async function loadProfile() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
+
+        // Call public API for employee profile
+        const data = await CHARLIE_API.recordAttendance({
+            employee_id: employeeId,
+            action: "get_profile"
+        });
+
+        // Populate DOM
+        document.getElementById("profile-name").innerText = data.name;
+        document.getElementById("profile-job").innerText = data.job_title;
+        document.getElementById("profile-salary").innerText = data.salary;
+        document.getElementById("profile-start").innerText = data.start_date;
+        document.getElementById("emp-name").innerText = `Welcome, ${data.name} ☕`;
+
+    } catch (error) {
+        console.error("Failed to load profile:", error);
+        document.getElementById("profile-name").innerText = "Error loading profile";
+    }
+}
+
+/* ==========================================================
+   LOAD ATTENDANCE HISTORY
+   - Uses public HR API: /attendance POST with action=get_history
+   - Handles table population
+========================================================== */
+async function loadAttendance() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
+
+        const records = await CHARLIE_API.recordAttendance({
+            employee_id: employeeId,
+            action: "get_history"
+        });
+
+        const tbody = document.getElementById("attendance-history");
+        tbody.innerHTML = "";
+
+        if (records && records.length) {
+            records.forEach(r => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${r.date}</td>
+                    <td>${r.action}</td>
+                    <td>${r.time}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="3">No records found</td></tr>`;
+        }
+
+    } catch (error) {
+        console.error("Failed to load attendance:", error);
+        const tbody = document.getElementById("attendance-history");
+        tbody.innerHTML = `<tr><td colspan="3">Error loading attendance</td></tr>`;
+    }
+}
+
+/* ==========================================================
+   INITIALIZATION
+========================================================== */
+loadProfile();
+loadAttendance();
+
+</script>
+
+</body>
+</html>
+```
+
+### ✅ Key Fixes Implemented
+
+- Removed unnecessary Authorization headers
+
+    - API is public, no Cognito needed for HR endpoints.
+
+- Fixed POST vs GET mismatch
+
+    - recordAttendance({ action: "get_profile" }) and recordAttendance({ action: "get_history" }) use POST as required by your Lambda.
+
+- Removed CHARLIE_API.protected references
+
+    - Now directly calls CHARLIE_API.recordAttendance.
+
+- DOM updates
+
+    - Profile fields populated dynamically.
+
+    - Attendance history table populated dynamically.
+
+- Error handling
+
+    - Shows messages in DOM if API fails.
+
+- Inline comments
+
+    - Explains why POST is used, why headers are removed, and which API calls are made.
+
 ---
