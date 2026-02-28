@@ -19,7 +19,7 @@ body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
 <body>
 <div class="container">
 
-    <!-- ================= PROFILE SECTION ================= -->
+    <!-- ================= PROFILE ================= -->
     <div class="card">
         <h4>Employee Profile</h4>
         <p><strong>Name:</strong> <span id="profile-name"></span></p>
@@ -41,14 +41,12 @@ body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Filled dynamically -->
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
+
 </div>
 
-<!-- Load system scripts -->
 <script src="config.js"></script>
 <script src="utils.js"></script>
 <script src="api.js"></script>
@@ -56,19 +54,17 @@ body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
 
 <script>
 /* =====================================================
-   PAGE PROTECTION
-   - Optional Cognito protection
+   PAGE PROTECTION — Optional Cognito login
 ===================================================== */
 CHARLIE_AUTH.protectPage();
 CHARLIE_AUTH.startAutoLogoutWatcher();
 
 /* =====================================================
-   LOAD PROFILE
-   - Uses dedicated API helper getEmployeeProfile()
+   LOAD EMPLOYEE PROFILE
 ===================================================== */
 async function loadProfile() {
     try {
-        const employeeId = CHARLIE_UTILS.getEmployeeId(); // Stored locally
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
         const data = await CHARLIE_API.getEmployeeProfile(employeeId);
 
         document.getElementById("profile-name").innerText = data.name;
@@ -76,7 +72,6 @@ async function loadProfile() {
         document.getElementById("profile-salary").innerText = data.salary;
         document.getElementById("profile-start").innerText = data.start_date;
         document.getElementById("emp-name").innerText = `Welcome, ${data.name} ☕`;
-
     } catch (err) {
         console.error("Error loading profile:", err);
         alert("Failed to load profile.");
@@ -85,7 +80,6 @@ async function loadProfile() {
 
 /* =====================================================
    LOAD ATTENDANCE HISTORY
-   - Uses dedicated API helper getAttendanceHistory()
 ===================================================== */
 async function loadAttendance() {
     try {
@@ -93,19 +87,18 @@ async function loadAttendance() {
         const records = await CHARLIE_API.getAttendanceHistory(employeeId);
 
         const tbody = document.getElementById("attendanceTable").querySelector("tbody");
-        tbody.innerHTML = ""; // Clear existing
+        tbody.innerHTML = ""; // Clear previous rows
 
         records.forEach(rec => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                <td>${rec.date}</td>
-                <td>${rec.checkin || "-"}</td>
-                <td>${rec.checkout || "-"}</td>
+                <td>${rec.attendance_date}</td>
+                <td>${rec.checkin_time || "-"}</td>
+                <td>${rec.checkout_time || "-"}</td>
                 <td>${rec.status || "-"}</td>
             `;
             tbody.appendChild(tr);
         });
-
     } catch (err) {
         console.error("Error loading attendance:", err);
         alert("Failed to load attendance history.");
@@ -120,5 +113,6 @@ window.addEventListener("DOMContentLoaded", () => {
     loadAttendance();
 });
 </script>
+
 </body>
 </html>
