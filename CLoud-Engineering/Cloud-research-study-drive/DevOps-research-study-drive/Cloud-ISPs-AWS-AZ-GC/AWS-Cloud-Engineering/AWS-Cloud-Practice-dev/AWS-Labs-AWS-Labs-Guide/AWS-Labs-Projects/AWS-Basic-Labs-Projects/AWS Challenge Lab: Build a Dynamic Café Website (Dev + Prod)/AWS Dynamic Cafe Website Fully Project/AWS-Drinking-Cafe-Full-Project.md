@@ -1049,7 +1049,7 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 sudo nano s3_export.sh
 ```
 
-[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/%20S3%20TO%20EC2%20EXPORT%20SCRIPT/%20S3%20TO%20EC2%20EXPORT%20SCRIPT.sh)
 
 
 ```
