@@ -706,46 +706,122 @@ But since you’re building a real HR system, I do NOT recommend this.
 
 - Click Test.
 
-#### For POST methods (/attendance):
+- Select the stage: prod
 
-  - Enter the JSON body exactly as your Lambda expects. For your attendance Lambda, the body may be empty, but you still need proper JSON:
+- Click Test → see response code (200, 400, 403, 500) and body.
+
+### 1️⃣ Test /attendance
+
+- Enter the JSON body exactly as your Lambda expects. For your attendance Lambda, the body may be empty, but you still need proper JSON:
+
+#### Request body:
 
 ```
 {
-  "employee_id": "EMP123",
+  "employee_id": "EMP001",
   "action": "checkin"
 }
 ```
 
-Click Test → you should see:
+Click Test 
+
+#### Expected result:
 
 ```
+Status: 200
 {
   "message": "Check-in successful"
 }
 ```
 
-Try the same with:
+#### Now test checkout:
 
 ```
 {
-  "employee_id": "EMP123",
+  "employee_id": "EMP001",
   "action": "checkout"
+}
+```
+
+#### Expected result:
+
+```
+Status: 200
+{
+  "message": "Check-out successful"
 }
 ```
 
 → You should see "Check-out successful".
 
+### 2️⃣ Test /employee-profile
 
-- Select the stage: prod
+```
+{
+  "employee_id": "EMP001"
+}
+```
 
-- Click Test → see response code (200, 400, 403, 500) and body.
+#### Expected:
 
-#### For GET methods (/employee-profile, /attendance-history, /leaves-holidays):
+```
+Status: 200
+{
+  "employee_id": "EMP001",
+  "name": "...",
+  "job_title": "...",
+  "salary": ...,
+  "start_date": "2023-01-01"
+}
+```
 
-- No body needed, just click Test.
+#### If employee does not exist:
 
-- Make sure your Cognito Authorizer token is applied (if using API console test, there’s a field to enter it).
+```
+Status: 404
+{
+  "message": "Employee not found"
+}
+```
+
+### 3️⃣ Test /attendance-history
+
+```
+{
+  "employee_id": "EMP001"
+}
+```
+
+#### Expected:
+
+```
+Status: 200
+[
+  {
+    "attendance_date": "2024-02-10",
+    "checkin_time": "09:00:00",
+    "checkout_time": "17:00:00"
+  }
+]
+```
+
+### 4️⃣ Test /leaves-holidays
+
+```
+{
+  "employee_id": "EMP001"
+}
+```
+
+#### Expected:
+
+```
+Status: 200
+{
+  "leaves": [...],
+  "holidays": [...]
+}
+```
 
 #### ✅ API Gateway console is the fastest for functional verification.
 
@@ -753,104 +829,122 @@ Try the same with:
 
 Important: Your endpoints are protected with Cognito Authorizer, so Authorization header is required.
 
-#### Step A — Get Cognito JWT token
+### 1️⃣ Test Attendance
 
-- Use AWS Cognito Hosted UI or a test user with username/password.
-
-- Use aws cognito-idp initiate-auth or a simple Postman login to get ID Token (JWT).
-
-Example using AWS CLI (replace PoolId & ClientId):
+#### 1️⃣ Check-in:
 
 ```
-aws cognito-idp initiate-auth \
-  --auth-flow USER_PASSWORD_AUTH \
-  --client-id YOUR_CLIENT_ID \
-  --auth-parameters USERNAME=testuser,PASSWORD=YourPassword
-```
-
-- Copy IdToken from response → this will be your Authorization header.
-
-#### Step B — curl Examples
-
-### 1️⃣ POST /attendance
-
-```
-# Replace <API_URL> with your API Gateway invoke URL
-API_URL="https://xxxxxxx.execute-api.us-east-1.amazonaws.com/prod/attendance"
-
-# Check-in
-curl -X POST $API_URL \
+curl -X POST $API_URL/attendance \
 -H "Content-Type: application/json" \
--d '{"employee_id":"EMP123","action":"checkin"}'
+-d '{"employee_id":"EMP001","action":"checkin"}'
+```
 
-# Check-out
-curl -X POST $API_URL \
+#### Expected:
+
+```
+{"message":"Check-in successful"}
+```
+
+#### 2️⃣ Checkout:
+
+```
+curl -X POST $API_URL/attendance \
 -H "Content-Type: application/json" \
--d '{"employee_id":"EMP123","action":"checkout"}'
+-d '{"employee_id":"EMP001","action":"checkout"}'
 ```
 
-Response should be JSON like:
+#### Expected:
 
 ```
-{"message": "Check-in successful"}
+{"message":"Check-out successful"}
 ```
 
-or
+### 2️⃣ Test Employee Profile
 
 ```
-{"message": "Check-out successful"}
+curl -X POST $API_URL/employee-profile \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001"}'
 ```
 
-#### 🔹 Optional: Test with Python on EC2
+#### Expected:
 
-If you prefer Python script:
+JSON employee data.
 
-```
-import requests
-
-API_URL = "https://xxxxxxx.execute-api.us-east-1.amazonaws.com/prod/attendance"
-
-payload = {"employee_id": "EMP123", "action": "checkin"}
-
-response = requests.post(API_URL, json=payload)
-
-print(response.json())
-```
-
-#### 🔹 Tips for EC2 testing
-
-- Make sure your EC2 security group allows outbound HTTPS (port 443) to reach API Gateway.
-
-- If your Lambda uses Secrets Manager in VPC, ensure Lambda has internet/NAT access if API Gateway is public.
-
-- Check CloudWatch logs for Lambda execution if responses are unexpected.
-
-### 2️⃣ GET /employee-profile
+### 3️⃣ Test Attendance History
 
 ```
-curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/employee-profile" \
--H "Authorization: <YOUR_ID_TOKEN>"
-```
-### 3️⃣ GET /attendance-history
-
-```
-curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/attendance-history" \
--H "Authorization: <YOUR_ID_TOKEN>"
+curl -X POST $API_URL/attendance-history \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001"}'
 ```
 
-### 4️⃣ GET /leaves-holidays
+#### Expected:
+
+JSON array of attendance records.
+
+### 4️⃣ Test Leaves & Holidays
 
 ```
-curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/leaves-holidays" \
--H "Authorization: <YOUR_ID_TOKEN>"
+curl -X POST $API_URL/leaves-holidays \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001"}'
 ```
 
-### ⚠️ Notes:
+#### Expected:
 
-- The -d '{"body":"{}"}' you were using is wrong. Lambda Proxy expects the JSON body directly, not wrapped in "body" unless your Lambda specifically parses it that way.
-✅ Correct: -d '{}' or any fields your Lambda expects.
+```
+{"leaves":[...],"holidays":[...]}
+```
 
-- Cognito token required: Without it, you get 403 Forbidden.
+### ✅ If Something Fails
+
+#### If 500 Error
+
+- Go to:  
+
+CloudWatch → Log groups →
+/aws/lambda/hr-attendance
+(or respective lambda)
+
+- Check error message.
+
+#### If 403 Forbidden
+
+- Check API deployed to correct stage
+
+- Check correct URL
+
+- Ensure Lambda permission added
+
+- If CORS error (frontend only)
+
+- Your Lambda headers already allow:
+
+```
+Access-Control-Allow-Origin: *
+```
+
+So you are safe.
+
+### 🎯 FINAL CONFIRMATION CHECKLIST
+
+| Item                          | Status |
+| ----------------------------- | ------ |
+| All endpoints use POST        | ✅      |
+| Lambda Proxy enabled          | ✅      |
+| CORS OPTIONS added            | ✅      |
+| API deployed to prod          | ✅      |
+| EC2 can access HTTPS outbound | ✅      |
+
+### 🚀 Architecture Status
+
+You now have a clean architecture:
+
+Client → API Gateway (REST Regional) → Lambda → RDS → Secrets Manager
+
+This is production-grade design.
+
 
 **✅ PHASE 3️⃣ STATUS**
 
