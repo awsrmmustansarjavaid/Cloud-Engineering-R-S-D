@@ -2182,4 +2182,219 @@ loadAttendance();
 
     - Explains why POST is used, why headers are removed, and which API calls are made.
 
+### ✅ Fully Final code 
+
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ==========================================================
+   BOOTSTRAP CSS
+========================================================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- ==========================================================
+   GOOGLE FONT
+========================================================== -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f4f4;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Card styling */
+.card {
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+.status-msg {
+    margin-top: 10px;
+    font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ================= Employee Header ================= -->
+    <div class="card p-4 mb-4">
+        <h3 id="emp-name">Welcome, Employee ☕</h3>
+        <p>Employee ID: <span id="emp-id"></span></p>
+    </div>
+
+    <!-- ================= Employee Profile ================= -->
+    <div class="card p-4 mb-4">
+        <h5>Profile Information</h5>
+        <hr>
+        <p>Name: <span id="profile-name">Loading...</span></p>
+        <p>Job Title: <span id="profile-job">Loading...</span></p>
+        <p>Salary: <span id="profile-salary">Loading...</span></p>
+        <p>Start Date: <span id="profile-start">Loading...</span></p>
+    </div>
+
+    <!-- ================= Attendance History ================= -->
+    <div class="card p-4 table-container">
+        <h5>Attendance History</h5>
+        <hr>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="attendance-table">
+                <tr>
+                    <td colspan="4" class="text-center">Loading attendance...</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="status-msg" id="attendance-status"></div>
+    </div>
+
+</div>
+
+<!-- ==========================================================
+   SYSTEM SCRIPTS
+========================================================== -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="central-auth.js"></script>
+<script src="api.js"></script>
+
+<script>
+/* ==========================================================
+   PAGE PROTECTION
+   - Hide page if not authenticated
+   - Auto logout watcher (if using central auth)
+========================================================== */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+/* ==========================================================
+   HELPER FUNCTION — Show messages
+========================================================== */
+function showStatus(msg, success = true) {
+    const statusEl = document.getElementById("attendance-status");
+    statusEl.innerText = msg;
+    statusEl.style.color = success ? "green" : "red";
+}
+
+/* ==========================================================
+   LOAD EMPLOYEE PROFILE
+   - Uses public POST HR API /attendance with action: get_profile
+   - Can also create a dedicated /employee-profile endpoint
+========================================================== */
+async function loadProfile() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
+        document.getElementById("emp-id").innerText = employeeId;
+
+        // Call HR API for profile
+        const data = await CHARLIE_API.recordAttendance({
+            employee_id: employeeId,
+            action: "get_profile"
+        });
+
+        document.getElementById("profile-name").innerText = data.name || "-";
+        document.getElementById("profile-job").innerText = data.job_title || "-";
+        document.getElementById("profile-salary").innerText = data.salary || "-";
+        document.getElementById("profile-start").innerText = data.start_date || "-";
+        document.getElementById("emp-name").innerText = `Welcome, ${data.name || "Employee"} ☕`;
+
+    } catch (error) {
+        console.error("Error loading profile:", error);
+        showStatus("Failed to load profile", false);
+    }
+}
+
+/* ==========================================================
+   LOAD ATTENDANCE HISTORY
+   - Uses public POST HR API /attendance with action: get_history
+========================================================== */
+async function loadAttendance() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
+
+        // Call HR API for history
+        const records = await CHARLIE_API.recordAttendance({
+            employee_id: employeeId,
+            action: "get_history"
+        });
+
+        const tbody = document.getElementById("attendance-table");
+        tbody.innerHTML = "";
+
+        if (!records || records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center">No attendance records found</td></tr>`;
+            return;
+        }
+
+        // Populate table
+        records.forEach(r => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${r.date || "-"}</td>
+                <td>${r.checkin || "-"}</td>
+                <td>${r.checkout || "-"}</td>
+                <td>${r.status || "-"}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error loading attendance:", error);
+        showStatus("Failed to load attendance", false);
+    }
+}
+
+/* ==========================================================
+   INITIALIZE PAGE
+========================================================== */
+async function init() {
+    await loadProfile();
+    await loadAttendance();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
+```
+
+### ✅ What’s Fixed / Improved
+
+- No CHARLIE_API.protected references — uses the updated public API.
+
+- No Authorization headers — not required for public HR Lambda.
+
+- POST endpoints correctly called — avoids 405 errors.
+
+- Clear comments for every section.
+
+- Attendance table shows meaningful data or a “no records” message.
+
+- Profile section loads dynamically from recordAttendance action "get_profile".
+
+- Fully aligned with your current api.js design.
 ---
