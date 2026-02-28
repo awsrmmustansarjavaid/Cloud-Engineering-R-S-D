@@ -750,36 +750,26 @@ aws cognito-idp initiate-auth \
 ### 1️⃣ POST /checkin
 
 ```
-curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/checkin" \
+curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/attendance" \
 -H "Content-Type: application/json" \
 -H "Authorization: <YOUR_ID_TOKEN>" \
 -d '{}'
 ```
 
-### 2️⃣ POST /checkout
-
-```
-curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/checkout" \
--H "Content-Type: application/json" \
--H "Authorization: <YOUR_ID_TOKEN>" \
--d '{}'
-```
-
-### 3️⃣ GET /employee-profile
+### 2️⃣ GET /employee-profile
 
 ```
 curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/employee-profile" \
 -H "Authorization: <YOUR_ID_TOKEN>"
 ```
-
-### 4️⃣ GET /attendance-history
+### 3️⃣ GET /attendance-history
 
 ```
 curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/attendance-history" \
 -H "Authorization: <YOUR_ID_TOKEN>"
 ```
 
-### 5️⃣ GET /leaves-holidays
+### 4️⃣ GET /leaves-holidays
 
 ```
 curl -X GET "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/leaves-holidays" \
