@@ -10,6 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
+/* ==========================
+   GLOBAL STYLES
+========================== */
 body {
     font-family: 'Poppins', sans-serif;
     background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
@@ -20,50 +23,115 @@ body {
     position: relative;
     color: white;
 }
+
+/* Dark overlay */
 .overlay {
-    position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
 }
+
+/* Terminal Card */
 .terminal-card {
-    position: relative; z-index: 2; width: 450px; background: rgba(58,37,28,0.95);
-    border-radius: 20px; padding: 35px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    position: relative;
+    z-index: 2;
+    width: 450px;
+    background: rgba(58,37,28,0.95);
+    border-radius: 20px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
+
+/* Big Clock */
 .big-clock { font-size: 42px; font-weight: 700; letter-spacing: 2px; }
+
+/* Date */
 .date-text { font-size: 14px; opacity: 0.8; }
+
+/* Toggle Check-In / Check-Out */
 .mode-toggle-container { position: relative; width: 100%; }
 .mode-toggle-container input { display: none; }
 .mode-toggle {
-    position: relative; display: flex; background: #2b1b14; border-radius: 50px; height: 55px; overflow: hidden;
+    position: relative;
+    display: flex;
+    background: #2b1b14;
+    border-radius: 50px;
+    height: 55px;
+    overflow: hidden;
     border: 2px solid rgba(255,255,255,0.2);
 }
-.toggle-slider { position: absolute; width: 50%; height: 100%; background: linear-gradient(135deg,#4caf50,#2e7d32); border-radius: 50px; transition: 0.4s ease; }
-.toggle-option { flex:1; display:flex; align-items:center; justify-content:center; font-weight:600; z-index:2; cursor:pointer; }
-#checkoutMode:checked ~ .mode-toggle .toggle-slider { left:50%; background: linear-gradient(135deg,#e53935,#b71c1c); }
+.toggle-slider {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    border-radius: 50px;
+    transition: 0.4s ease;
+}
+.toggle-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    z-index: 2;
+    cursor: pointer;
+}
+#checkoutMode:checked ~ .mode-toggle .toggle-slider {
+    left: 50%;
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+}
+
+/* Fingerprint Area */
 .fingerprint {
-    width:160px; height:160px; margin:20px auto; border-radius:50%;
-    background: radial-gradient(circle,#ff9800,#ff5722);
-    display:flex; align-items:center; justify-content:center; font-size:40px; cursor:pointer; transition:0.3s; position:relative;
+    width: 160px;
+    height: 160px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff9800, #ff5722);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
 }
 .fingerprint:hover { transform: scale(1.1); }
 .fingerprint::after {
-    content:""; position:absolute; width:100%; height:100%; border-radius:50%; border:3px solid rgba(255,255,255,0.6);
-    animation:pulse 2s infinite;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.6);
+    animation: pulse 2s infinite;
 }
-@keyframes pulse { 0% { transform:scale(1); opacity:1 } 100% { transform:scale(1.4); opacity:0 } }
-#statusMsg { margin-top:15px; font-weight:bold; }
-.session-timer { font-size:14px; margin-top:10px; color:#90ee90; }
+@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+/* Status Message */
+#statusMsg { margin-top: 15px; font-weight: bold; }
+/* Session Timer */
+.session-timer { font-size: 14px; margin-top: 10px; color: #90ee90; }
 </style>
 </head>
+
 <body>
 
 <div class="overlay"></div>
 
 <div class="terminal-card">
+
     <h3>☕ Charlie Café</h3>
     <p>Biometric Attendance Terminal</p>
 
+    <!-- Live Clock -->
     <div class="big-clock" id="liveClock">00:00:00</div>
     <div class="date-text" id="liveDate"></div>
 
+    <!-- Timezone Selector -->
     <select id="timezoneSelect" class="form-select mt-2 mb-3">
         <option value="Asia/Karachi">🇵🇰 Pakistan</option>
         <option value="UTC">🌍 UTC</option>
@@ -74,6 +142,7 @@ body {
 
     <hr>
 
+    <!-- Check-in / Check-out toggle -->
     <div class="mode-toggle-container mb-3">
         <input type="radio" name="attendanceMode" id="checkinMode" value="checkin" checked>
         <input type="radio" name="attendanceMode" id="checkoutMode" value="checkout">
@@ -84,22 +153,29 @@ body {
         </div>
     </div>
 
+    <!-- Employee ID -->
     <input type="number" id="employeeId" class="form-control mb-3" placeholder="Enter Employee ID">
 
+    <!-- Fingerprint -->
     <div class="fingerprint" onclick="simulateScan()">🔐</div>
     <p>Tap fingerprint to confirm attendance</p>
 
     <div id="statusMsg"></div>
     <div class="session-timer" id="sessionTimer"></div>
+
 </div>
 
+<!-- Load system scripts -->
 <script src="config.js"></script>
 <script src="utils.js"></script>
 <script src="api.js"></script>
 
 <script>
-// ================= LIVE CLOCK =================
 let selectedTimezone = "Asia/Karachi";
+
+/* =====================================================
+   LIVE CLOCK — updates every second
+===================================================== */
 function updateClock() {
     const now = new Date();
     const timeOptions = { timeZone: selectedTimezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
@@ -111,24 +187,33 @@ setInterval(updateClock, 1000);
 updateClock();
 document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
 
-// ================= SESSION TIMER =================
+/* =====================================================
+   SESSION TIMER — counts working hours
+===================================================== */
 let sessionStart = null;
 let sessionInterval = null;
 function startSessionTimer() {
     sessionStart = new Date();
     sessionInterval = setInterval(() => {
-        const diff = Math.floor((new Date() - sessionStart)/1000);
-        const hrs = String(Math.floor(diff/3600)).padStart(2,"0");
-        const mins = String(Math.floor((diff%3600)/60)).padStart(2,"0");
-        const secs = String(diff%60).padStart(2,"0");
+        const diff = Math.floor((new Date() - sessionStart) / 1000);
+        const hrs = String(Math.floor(diff / 3600)).padStart(2,"0");
+        const mins = String(Math.floor((diff % 3600)/60)).padStart(2,"0");
+        const secs = String(diff % 60).padStart(2,"0");
         document.getElementById("sessionTimer").innerText = "Working Time: " + hrs + ":" + mins + ":" + secs;
     }, 1000);
 }
 
-// ================= LATE DETECTION =================
-function isLate() { return new Date().getHours() >= 10; } // Optional: server time is better
+/* =====================================================
+   LATE CHECK-IN DETECTION — after 10 AM local
+===================================================== */
+function isLate() {
+    const now = new Date();
+    return now.getHours() >= 10;
+}
 
-// ================= FINGERPRINT SCAN =================
+/* =====================================================
+   FINGERPRINT SCAN SIMULATION — calls API.js
+===================================================== */
 async function simulateScan() {
     const employeeId = document.getElementById("employeeId").value.trim();
     const action = document.querySelector('input[name="attendanceMode"]:checked').value;
@@ -139,16 +224,16 @@ async function simulateScan() {
 
     setTimeout(async () => {
         try {
-            // ================= FIX: Call Lambda path /checkin or /checkout
-            await CHARLIE_API.recordAttendance({ employee_id: employeeId, action });
+            // ✅ Call updated API.js recordAttendance() with proper path
+            await CHARLIE_API.recordAttendance({ employee_id: employeeId, action: action });
 
             if (action === "checkin") {
                 if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
                 else showMessage("✅ Check-In Successful", true);
-                startSessionTimer();
+                startSessionTimer(); // Start working timer
             } else {
                 showMessage("🔴 Check-Out Successful", true);
-                clearInterval(sessionInterval);
+                clearInterval(sessionInterval); // Stop timer
                 document.getElementById("sessionTimer").innerText = "";
             }
 
@@ -159,12 +244,15 @@ async function simulateScan() {
     }, 2000);
 }
 
-// ================= STATUS MESSAGE =================
-function showMessage(message, success=true) {
+/* =====================================================
+   SHOW STATUS MESSAGE
+===================================================== */
+function showMessage(message, success = true) {
     const msg = document.getElementById("statusMsg");
     msg.innerText = message;
     msg.style.color = success ? "lightgreen" : "tomato";
 }
 </script>
+
 </body>
 </html>
