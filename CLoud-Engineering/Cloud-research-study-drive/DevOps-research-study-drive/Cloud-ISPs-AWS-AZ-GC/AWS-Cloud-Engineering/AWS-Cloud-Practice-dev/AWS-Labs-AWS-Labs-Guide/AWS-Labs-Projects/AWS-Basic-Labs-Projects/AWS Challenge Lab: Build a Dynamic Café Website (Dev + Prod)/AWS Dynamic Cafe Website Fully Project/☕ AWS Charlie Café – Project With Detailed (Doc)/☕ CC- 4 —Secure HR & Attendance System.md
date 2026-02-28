@@ -324,7 +324,7 @@ HR Secure Attendance & Employee Management API
 
 - Click Actions → Create Resource
 
-- Resource Name: CheckIn
+- Resource Name: attendance
 
 - Resource Path: /attendance
 
