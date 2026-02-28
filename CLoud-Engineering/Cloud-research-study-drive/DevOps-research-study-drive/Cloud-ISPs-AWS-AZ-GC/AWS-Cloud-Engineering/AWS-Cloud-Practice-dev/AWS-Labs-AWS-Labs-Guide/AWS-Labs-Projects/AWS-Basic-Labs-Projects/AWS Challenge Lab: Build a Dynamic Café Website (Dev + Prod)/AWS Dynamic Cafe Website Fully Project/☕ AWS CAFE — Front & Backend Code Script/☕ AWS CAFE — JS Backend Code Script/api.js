@@ -1,24 +1,26 @@
 /* =========================================================
    CHARLIE CAFE — API MODULE (FINAL - PROD)
    ---------------------------------------------------------
-   ✔ Single Stage: /prod (from CONFIG.API_BASE)
-   ✔ All APIs are public (no Cognito/Auth headers for HR)
-   ✔ Fully aligned with frontend pages and Lambda endpoints
+   ✅ Single Stage: /prod (from CONFIG.API_BASE)
+   ✅ Public HR APIs (no Cognito/Auth headers)
+   ✅ Dedicated HR helpers fixed to correct Lambda endpoints
+   ✅ Fully compatible with checkin.html & employee-portal.html
 ========================================================= */
 
 window.CHARLIE_API = (() => {
 
-    const CONFIG = window.CHARLIE_CONFIG;
+    const CONFIG = window.CHARLIE_CONFIG; // Load API base from config.js
 
     /* =====================================================
        🔧 HELPER — STANDARD FETCH WRAPPER
-       - Handles JSON parsing and non-200 errors
+       - Centralized fetch for all API calls
+       - Handles JSON parsing & throws errors for non-200 responses
     ===================================================== */
     async function apiFetch(url, options = {}) {
         const response = await fetch(url, {
             headers: {
                 "Content-Type": "application/json",
-                ...(options.headers || {})
+                ...(options.headers || {}) // Merge optional headers
             },
             ...options
         });
@@ -33,6 +35,7 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        🛒 CUSTOMER ORDERS
+       - Example: Coffee orders, status tracking, employee orders
     ===================================================== */
     function placeOrder(payload) {
         return apiFetch(`${CONFIG.API_BASE}/orders`, { method: "POST", body: JSON.stringify(payload) });
@@ -72,9 +75,14 @@ window.CHARLIE_API = (() => {
     /* =====================================================
        👥 HR — ATTENDANCE (PUBLIC)
        - Check-in / Check-out API
+       - Does NOT require Cognito token
+       - Called by checkin.html fingerprint simulation
     ===================================================== */
     function recordAttendance(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/attendance`, { method: "POST", body: JSON.stringify(payload) });
+        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
     }
 
     function getAllEmployees() {
@@ -83,8 +91,11 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        🟢 DEDICATED HR HELPERS — FIXED ENDPOINTS
-       - Fully aligned with Lambda
+       - Correctly call Lambda endpoints
+       - Fully aligned with employee-portal.html
     ===================================================== */
+
+    // Fetch employee profile from hr-employee-profile Lambda
     function getEmployeeProfile(employeeId) {
         return apiFetch(`${CONFIG.API_BASE}/employee-profile`, {
             method: "POST",
@@ -92,6 +103,7 @@ window.CHARLIE_API = (() => {
         });
     }
 
+    // Fetch attendance history from hr-attendance-history Lambda
     function getAttendanceHistory(employeeId) {
         return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
             method: "POST",
@@ -99,6 +111,7 @@ window.CHARLIE_API = (() => {
         });
     }
 
+    // Fetch leaves and company holidays from hr-leaves-holidays Lambda
     function getLeavesAndHolidays(employeeId) {
         return apiFetch(`${CONFIG.API_BASE}/leaves-holidays`, {
             method: "POST",
@@ -108,6 +121,8 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        📊 ADMIN — ATTENDANCE ANALYTICS (PUBLIC READ)
+       - Daily / Weekly / Monthly summaries
+       - Optional admin dashboard integration
     ===================================================== */
     const adminAttendance = {
         getDailySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`); },
@@ -117,6 +132,8 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        📈 ADMIN — DASHBOARD & USER MANAGEMENT (PUBLIC READ)
+       - Fetch dashboard data
+       - Create users
     ===================================================== */
     const adminDashboard = {
         fetchData(employeeId = "") {
@@ -125,26 +142,40 @@ window.CHARLIE_API = (() => {
             return apiFetch(url);
         },
         createUser(payload) {
-            return apiFetch(`${CONFIG.API_BASE}/admin/create-user`, { method: "POST", body: JSON.stringify(payload) });
+            return apiFetch(`${CONFIG.API_BASE}/admin/create-user`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
         }
     };
 
     /* =====================================================
        🚀 EXPORT ALL APIs
+       - Orders, HR (public), HR helpers, Admin
     ===================================================== */
     return {
         // Orders
-        placeOrder, updateOrder, getOrderStatus, getCafeOrderStatus, getGetOrderStatus, getOrders,
-        getEmployeeOrders, createEmployeeOrder,
+        placeOrder,
+        updateOrder,
+        getOrderStatus,
+        getCafeOrderStatus,
+        getGetOrderStatus,
+        getOrders,
+        getEmployeeOrders,
+        createEmployeeOrder,
 
         // HR Attendance Public
-        recordAttendance, getAllEmployees,
+        recordAttendance,
+        getAllEmployees,
 
         // Dedicated HR helpers
-        getEmployeeProfile, getAttendanceHistory, getLeavesAndHolidays,
+        getEmployeeProfile,
+        getAttendanceHistory,
+        getLeavesAndHolidays,
 
         // Admin
-        adminAttendance, adminDashboard
+        adminAttendance,
+        adminDashboard
     };
 
 })();

@@ -3810,5 +3810,6 @@ function showMessage(message, success = true) {
 - Fully commented for clarity and maintainability.
 
 - Fully aligned with your final API.JS and employee-portal.html.
+
 ---
 

@@ -2179,5 +2179,209 @@ window.CHARLIE_API = (() => {
 
 - Admin / orders / dashboard remain unchanged
 
+### ✅ API.JS
+
+fully final, production-ready API.JS with detailed comments, fully aligned with your HR Lambda functions, frontend pages (checkin.html and employee-portal.html), and public API setup (no Cognito required for HR).
+
+```
+/* =========================================================
+   CHARLIE CAFE — API MODULE (FINAL - PROD)
+   ---------------------------------------------------------
+   ✅ Single Stage: /prod (from CONFIG.API_BASE)
+   ✅ Public HR APIs (no Cognito/Auth headers)
+   ✅ Dedicated HR helpers fixed to correct Lambda endpoints
+   ✅ Fully compatible with checkin.html & employee-portal.html
+========================================================= */
+
+window.CHARLIE_API = (() => {
+
+    const CONFIG = window.CHARLIE_CONFIG; // Load API base from config.js
+
+    /* =====================================================
+       🔧 HELPER — STANDARD FETCH WRAPPER
+       - Centralized fetch for all API calls
+       - Handles JSON parsing & throws errors for non-200 responses
+    ===================================================== */
+    async function apiFetch(url, options = {}) {
+        const response = await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {}) // Merge optional headers
+            },
+            ...options
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API Error: ${errorText}`);
+        }
+
+        return response.json();
+    }
+
+    /* =====================================================
+       🛒 CUSTOMER ORDERS
+       - Example: Coffee orders, status tracking, employee orders
+    ===================================================== */
+    function placeOrder(payload) {
+        return apiFetch(`${CONFIG.API_BASE}/orders`, { method: "POST", body: JSON.stringify(payload) });
+    }
+
+    function updateOrder(payload) {
+        return apiFetch(`${CONFIG.API_BASE}/order-update`, { method: "POST", body: JSON.stringify(payload) });
+    }
+
+    function getOrderStatus(orderId) {
+        return apiFetch(`${CONFIG.API_BASE}/order-status?order_id=${encodeURIComponent(orderId)}`);
+    }
+
+    function getCafeOrderStatus(orderId) {
+        return apiFetch(`${CONFIG.API_BASE}/cafe-order-status?order_id=${encodeURIComponent(orderId)}`);
+    }
+
+    function getGetOrderStatus(orderId) {
+        return apiFetch(`${CONFIG.API_BASE}/get-order-status?order_id=${encodeURIComponent(orderId)}`);
+    }
+
+    async function getOrders() {
+        const res = await fetch(`${CONFIG.API_BASE}/get-order-status`);
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        return typeof data.body === "string" ? JSON.parse(data.body) : data;
+    }
+
+    function getEmployeeOrders() {
+        return apiFetch(`${CONFIG.API_BASE}/employee/orders`);
+    }
+
+    function createEmployeeOrder(payload) {
+        return apiFetch(`${CONFIG.API_BASE}/employee/order`, { method: "POST", body: JSON.stringify(payload) });
+    }
+
+    /* =====================================================
+       👥 HR — ATTENDANCE (PUBLIC)
+       - Check-in / Check-out API
+       - Does NOT require Cognito token
+       - Called by checkin.html fingerprint simulation
+    ===================================================== */
+    function recordAttendance(payload) {
+        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+    }
+
+    function getAllEmployees() {
+        return apiFetch(`${CONFIG.API_BASE}/employees`);
+    }
+
+    /* =====================================================
+       🟢 DEDICATED HR HELPERS — FIXED ENDPOINTS
+       - Correctly call Lambda endpoints
+       - Fully aligned with employee-portal.html
+    ===================================================== */
+
+    // Fetch employee profile from hr-employee-profile Lambda
+    function getEmployeeProfile(employeeId) {
+        return apiFetch(`${CONFIG.API_BASE}/employee-profile`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
+        });
+    }
+
+    // Fetch attendance history from hr-attendance-history Lambda
+    function getAttendanceHistory(employeeId) {
+        return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
+        });
+    }
+
+    // Fetch leaves and company holidays from hr-leaves-holidays Lambda
+    function getLeavesAndHolidays(employeeId) {
+        return apiFetch(`${CONFIG.API_BASE}/leaves-holidays`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
+        });
+    }
+
+    /* =====================================================
+       📊 ADMIN — ATTENDANCE ANALYTICS (PUBLIC READ)
+       - Daily / Weekly / Monthly summaries
+       - Optional admin dashboard integration
+    ===================================================== */
+    const adminAttendance = {
+        getDailySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`); },
+        getWeeklySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`); },
+        getMonthlySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`); }
+    };
+
+    /* =====================================================
+       📈 ADMIN — DASHBOARD & USER MANAGEMENT (PUBLIC READ)
+       - Fetch dashboard data
+       - Create users
+    ===================================================== */
+    const adminDashboard = {
+        fetchData(employeeId = "") {
+            let url = `${CONFIG.API_BASE}/admin/dashboard`;
+            if (employeeId) url += `?employee_id=${encodeURIComponent(employeeId)}`;
+            return apiFetch(url);
+        },
+        createUser(payload) {
+            return apiFetch(`${CONFIG.API_BASE}/admin/create-user`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+        }
+    };
+
+    /* =====================================================
+       🚀 EXPORT ALL APIs
+       - Orders, HR (public), HR helpers, Admin
+    ===================================================== */
+    return {
+        // Orders
+        placeOrder,
+        updateOrder,
+        getOrderStatus,
+        getCafeOrderStatus,
+        getGetOrderStatus,
+        getOrders,
+        getEmployeeOrders,
+        createEmployeeOrder,
+
+        // HR Attendance Public
+        recordAttendance,
+        getAllEmployees,
+
+        // Dedicated HR helpers
+        getEmployeeProfile,
+        getAttendanceHistory,
+        getLeavesAndHolidays,
+
+        // Admin
+        adminAttendance,
+        adminDashboard
+    };
+
+})();
+```
+
+### ✅ Key Fixes / Improvements
+
+- getEmployeeProfile() → now calls /employee-profile Lambda correctly.
+
+- getAttendanceHistory() → now calls /attendance-history Lambda correctly.
+
+- getLeavesAndHolidays() → calls /leaves-holidays Lambda.
+
+- recordAttendance() → continues to call /attendance (check-in/check-out).
+
+- Fully compatible with checkin.html (fingerprint simulation) and employee-portal.html (profile + history).
+
+- All public HR APIs do not require Cognito auth — matches your architecture.
+
+- Comments added for clarity for every section.
+
 ---
 
