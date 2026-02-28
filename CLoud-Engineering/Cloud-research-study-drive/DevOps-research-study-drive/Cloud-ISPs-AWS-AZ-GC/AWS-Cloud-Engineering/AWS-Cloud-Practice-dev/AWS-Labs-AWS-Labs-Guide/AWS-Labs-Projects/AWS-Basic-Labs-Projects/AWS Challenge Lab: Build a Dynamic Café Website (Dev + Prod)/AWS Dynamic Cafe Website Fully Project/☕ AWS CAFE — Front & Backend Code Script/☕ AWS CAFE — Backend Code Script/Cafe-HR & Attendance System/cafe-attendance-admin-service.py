@@ -17,8 +17,9 @@ def get_db_secret():
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
+
 # ==========================================================
-# RDS CONNECTION (REUSED)
+# RDS CONNECTION (REUSED ACROSS INVOCATIONS)
 # ==========================================================
 
 connection = None
@@ -41,14 +42,15 @@ def get_rds_connection():
 
     return connection
 
+
 # ==========================================================
 # DYNAMODB CONFIGURATION
 # ==========================================================
 
 DYNAMODB_TABLE = os.environ["DYNAMODB_TABLE"]
-
 dynamodb = boto3.resource("dynamodb")
 dynamo_table = dynamodb.Table(DYNAMODB_TABLE)
+
 
 # ==========================================================
 # STANDARD RESPONSE (CORS ENABLED)
@@ -65,24 +67,37 @@ def make_response(status_code, body):
         "body": json.dumps(body, default=str)
     }
 
+
 # ==========================================================
-# MAIN LAMBDA HANDLER (PUBLIC)
+# DATE FILTER HELPER
+# ==========================================================
+
+def build_date_filter(query_type):
+    if query_type == "daily":
+        return "a.date = CURDATE()"
+    elif query_type == "weekly":
+        return "a.date >= CURDATE() - INTERVAL 7 DAY"
+    elif query_type == "monthly":
+        return "MONTH(a.date) = MONTH(CURDATE()) AND YEAR(a.date) = YEAR(CURDATE())"
+    else:
+        return None
+
+
+# ==========================================================
+# MAIN LAMBDA HANDLER
 # ==========================================================
 
 def lambda_handler(event, context):
 
-    # Handle CORS preflight
+    # Handle CORS
     if event.get("httpMethod") == "OPTIONS":
         return make_response(200, {"message": "CORS preflight successful"})
 
-    # ------------------------------------------------------
-    # READ QUERY PARAMETERS
-    # ------------------------------------------------------
     params = event.get("queryStringParameters") or {}
 
-    query_type = params.get("type", "daily")   # daily | weekly | monthly
-    employee_id = params.get("employee_id")    # Optional
-    lookup_date = params.get("date")           # Optional (DynamoDB filter)
+    query_type = params.get("type", "daily")
+    employee_id = params.get("employee_id")
+    lookup_date = params.get("date")
     include_summary = params.get("summary", "false").lower() == "true"
 
     result = {
@@ -99,62 +114,62 @@ def lambda_handler(event, context):
         conn = get_rds_connection()
         cursor = conn.cursor()
 
-        # Date filtering logic
-        if query_type == "daily":
-            sql = """
-                SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
-                FROM attendance a
-                JOIN employees e ON a.employee_id = e.employee_id
-                WHERE a.date = CURDATE()
-            """
-        elif query_type == "weekly":
-            sql = """
-                SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
-                FROM attendance a
-                JOIN employees e ON a.employee_id = e.employee_id
-                WHERE a.date >= CURDATE() - INTERVAL 7 DAY
-            """
-        elif query_type == "monthly":
-            sql = """
-                SELECT e.employee_id, e.name, a.date, a.checkin_time, a.checkout_time
-                FROM attendance a
-                JOIN employees e ON a.employee_id = e.employee_id
-                WHERE MONTH(a.date) = MONTH(CURDATE())
-                AND YEAR(a.date) = YEAR(CURDATE())
-            """
-        else:
+        date_filter = build_date_filter(query_type)
+
+        if not date_filter:
             return make_response(400, {"message": "Invalid type parameter"})
 
-        # Optional employee filter
+        sql = f"""
+            SELECT e.employee_id,
+                   e.name,
+                   a.date,
+                   a.checkin_time,
+                   a.checkout_time
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.employee_id
+            WHERE {date_filter}
+        """
+
+        values = []
+
         if employee_id:
             sql += " AND e.employee_id = %s"
-            cursor.execute(sql, (employee_id,))
-        else:
-            cursor.execute(sql)
+            values.append(employee_id)
 
+        cursor.execute(sql, values)
         result["attendance_rds"] = cursor.fetchall()
 
         # =====================================================
-        # SUMMARY (OPTIONAL)
+        # SUMMARY (ALIGNED WITH TYPE)
         # =====================================================
 
         if include_summary:
-            summary_sql = """
+
+            summary_sql = f"""
                 SELECT
-                    COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL AND a.date = CURDATE() THEN e.employee_id END) AS total_present,
-                    COUNT(DISTINCT e.employee_id) - COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL AND a.date = CURDATE() THEN e.employee_id END) AS total_absent,
-                    (SELECT COUNT(*) FROM leaves WHERE leave_date = CURDATE()) AS total_leaves
+                    COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL THEN e.employee_id END) AS total_present,
+                    COUNT(DISTINCT e.employee_id)
+                    - COUNT(DISTINCT CASE WHEN a.checkin_time IS NOT NULL THEN e.employee_id END) AS total_absent,
+                    (
+                        SELECT COUNT(*)
+                        FROM leaves
+                        WHERE {date_filter.replace("a.date", "leave_date")}
+                    ) AS total_leaves
                 FROM employees e
-                LEFT JOIN attendance a ON e.employee_id = a.employee_id AND a.date = CURDATE()
+                LEFT JOIN attendance a
+                    ON e.employee_id = a.employee_id
+                    AND {date_filter}
             """
+
             cursor.execute(summary_sql)
             result["summary"] = cursor.fetchone()
 
     except Exception as e:
         return make_response(500, {"error": f"RDS error: {str(e)}"})
 
+
     # =====================================================
-    # DYNAMODB LOOKUP (OPTIONAL)
+    # OPTIONAL DYNAMODB LOOKUP
     # =====================================================
 
     if employee_id:
@@ -175,6 +190,7 @@ def lambda_handler(event, context):
 
         except Exception as e:
             return make_response(500, {"error": f"DynamoDB error: {str(e)}"})
+
 
     # =====================================================
     # FINAL RESPONSE
