@@ -18,7 +18,6 @@ window.CHARLIE_API = (() => {
        - Used for all endpoints (POST + GET)
     ===================================================== */
     async function apiFetch(url, options = {}) {
-
         const response = await fetch(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -38,19 +37,12 @@ window.CHARLIE_API = (() => {
     /* =====================================================
        🛒 CUSTOMER ORDERS
     ===================================================== */
-
     function placeOrder(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/orders`, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
+        return apiFetch(`${CONFIG.API_BASE}/orders`, { method: "POST", body: JSON.stringify(payload) });
     }
 
     function updateOrder(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/order-update`, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
+        return apiFetch(`${CONFIG.API_BASE}/order-update`, { method: "POST", body: JSON.stringify(payload) });
     }
 
     function getOrderStatus(orderId) {
@@ -67,10 +59,7 @@ window.CHARLIE_API = (() => {
 
     async function getOrders() {
         const res = await fetch(`${CONFIG.API_BASE}/get-order-status`);
-        if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`API Error: ${errorText}`);
-        }
+        if (!res.ok) throw new Error(`API Error: ${await res.text()}`);
         const data = await res.json();
         return typeof data.body === "string" ? JSON.parse(data.body) : data;
     }
@@ -80,10 +69,7 @@ window.CHARLIE_API = (() => {
     }
 
     function createEmployeeOrder(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/employee/order`, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
+        return apiFetch(`${CONFIG.API_BASE}/employee/order`, { method: "POST", body: JSON.stringify(payload) });
     }
 
     /* =====================================================
@@ -92,12 +78,8 @@ window.CHARLIE_API = (() => {
        - No Authorization headers required
        - Matches checkin.html usage
     ===================================================== */
-
     function recordAttendance(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
+        return apiFetch(`${CONFIG.API_BASE}/attendance`, { method: "POST", body: JSON.stringify(payload) });
     }
 
     function getAttendance(employeeId) {
@@ -109,19 +91,36 @@ window.CHARLIE_API = (() => {
     }
 
     /* =====================================================
-       📊 ADMIN — ATTENDANCE ANALYTICS (PUBLIC READ)
+       👤 HR — EMPLOYEE PORTAL ADDITIONS
+       - Dedicated API for employee-portal.html
     ===================================================== */
 
-    const adminAttendance = {
+    function getEmployeeProfile(employeeId) {
+        // Dedicated POST endpoint for profile
+        return apiFetch(`${CONFIG.API_BASE}/employee/profile`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
+        });
+    }
 
+    function getAttendanceHistory(employeeId) {
+        // Dedicated POST endpoint for attendance history
+        return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
+        });
+    }
+
+    /* =====================================================
+       📊 ADMIN — ATTENDANCE ANALYTICS (PUBLIC READ)
+    ===================================================== */
+    const adminAttendance = {
         getDailySummary() {
             return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
         },
-
         getWeeklySummary() {
             return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
         },
-
         getMonthlySummary() {
             return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
         }
@@ -130,27 +129,20 @@ window.CHARLIE_API = (() => {
     /* =====================================================
        📈 ADMIN — DASHBOARD & USER MANAGEMENT (PUBLIC READ)
     ===================================================== */
-
     const adminDashboard = {
-
         fetchData(employeeId = "") {
             let url = `${CONFIG.API_BASE}/admin/dashboard`;
             if (employeeId) url += `?employee_id=${encodeURIComponent(employeeId)}`;
             return apiFetch(url);
         },
-
         createUser(payload) {
-            return apiFetch(`${CONFIG.API_BASE}/admin/create-user`, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
+            return apiFetch(`${CONFIG.API_BASE}/admin/create-user`, { method: "POST", body: JSON.stringify(payload) });
         }
     };
 
     /* =====================================================
        🚀 EXPORT ALL APIs
     ===================================================== */
-
     return {
         placeOrder,
         updateOrder,
@@ -166,6 +158,10 @@ window.CHARLIE_API = (() => {
         recordAttendance,
         getAttendance,
         getAllEmployees,
+
+        // ✅ HR Employee Portal APIs
+        getEmployeeProfile,
+        getAttendanceHistory,
 
         adminAttendance,
         adminDashboard
