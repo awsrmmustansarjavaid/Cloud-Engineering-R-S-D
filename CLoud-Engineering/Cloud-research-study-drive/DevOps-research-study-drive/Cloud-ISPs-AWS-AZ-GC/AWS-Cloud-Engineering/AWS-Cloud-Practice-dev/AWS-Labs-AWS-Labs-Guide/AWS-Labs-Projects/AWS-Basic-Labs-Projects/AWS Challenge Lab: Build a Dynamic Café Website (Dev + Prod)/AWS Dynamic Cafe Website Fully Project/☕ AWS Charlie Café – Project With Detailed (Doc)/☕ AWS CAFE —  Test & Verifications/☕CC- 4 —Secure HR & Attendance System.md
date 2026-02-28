@@ -772,14 +772,58 @@ aws cognito-idp initiate-auth \
 
 #### Step B — curl Examples
 
-### 1️⃣ POST /checkin
+### 1️⃣ POST /attendance
 
 ```
-curl -X POST "https://xxxx.execute-api.us-east-1.amazonaws.com/prod/attendance" \
+# Replace <API_URL> with your API Gateway invoke URL
+API_URL="https://xxxxxxx.execute-api.us-east-1.amazonaws.com/prod/attendance"
+
+# Check-in
+curl -X POST $API_URL \
 -H "Content-Type: application/json" \
--H "Authorization: <YOUR_ID_TOKEN>" \
--d '{}'
+-d '{"employee_id":"EMP123","action":"checkin"}'
+
+# Check-out
+curl -X POST $API_URL \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP123","action":"checkout"}'
 ```
+
+Response should be JSON like:
+
+```
+{"message": "Check-in successful"}
+```
+
+or
+
+```
+{"message": "Check-out successful"}
+```
+
+#### 🔹 Optional: Test with Python on EC2
+
+If you prefer Python script:
+
+```
+import requests
+
+API_URL = "https://xxxxxxx.execute-api.us-east-1.amazonaws.com/prod/attendance"
+
+payload = {"employee_id": "EMP123", "action": "checkin"}
+
+response = requests.post(API_URL, json=payload)
+
+print(response.json())
+```
+
+#### 🔹 Tips for EC2 testing
+
+- Make sure your EC2 security group allows outbound HTTPS (port 443) to reach API Gateway.
+
+- If your Lambda uses Secrets Manager in VPC, ensure Lambda has internet/NAT access if API Gateway is public.
+
+- Check CloudWatch logs for Lambda execution if responses are unexpected.
 
 ### 2️⃣ GET /employee-profile
 
