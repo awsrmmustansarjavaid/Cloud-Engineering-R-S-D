@@ -372,7 +372,37 @@ HR Secure Attendance & Employee Management API
 
 #### For each resource method:
 
-    - Click Method → Actions → Enable CORS
+- Click Method → Actions → Enable CORS
+
+- Integration type → Mock Integration
+
+Now configure 
+
+#### Method Response
+
+- Add status code: 200
+
+- Add Response Headers:
+
+    - Access-Control-Allow-Origin
+
+    - Access-Control-Allow-Headers
+
+    - Access-Control-Allow-Methods
+
+#### Integration Response
+
+Under Header Mappings add:  
+
+```
+Access-Control-Allow-Origin  ->  '*'
+Access-Control-Allow-Headers ->  'Content-Type'
+Access-Control-Allow-Methods ->  'GET,POST,OPTIONS'
+```
+
+- Save.
+
+- Repeat for all 4 resources.
 
 #### ✅ CORRECT PUBLIC CORS CONFIGURATION
 
@@ -389,48 +419,6 @@ Your Lambda already returns:
 ```
 
 That is enough.
-
-### 🎯 Proper Public CORS Setup in API Gateway
-
-For each resource:
-
-#### Step 1 — Create OPTIONS Method
-
-- Click Resource
-
-- Actions → Create Method
-
-- Select OPTIONS
-
-- Integration Type: Mock Integration
-
-- Save
-
-### Step 2 — Configure OPTIONS Response
-
-Method Response → Add:
-
-```
-200
-```
-
-Integration Response → Add Headers:
-
-```
-Access-Control-Allow-Origin: '*'
-Access-Control-Allow-Headers: 'Content-Type'
-Access-Control-Allow-Methods: 'GET,POST,OPTIONS'
-```
-
-Your final public CORS headers should be:
-
-```
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Headers: Content-Type
-Access-Control-Allow-Methods: GET,POST,OPTIONS
-```
-
-- Deploy API (Step 7)
 
 ### 6️⃣ Deploy API
 
