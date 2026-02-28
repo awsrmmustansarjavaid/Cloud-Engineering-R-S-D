@@ -1396,3 +1396,15 @@ window.CHARLIE_API = (() => {
 })();
 ```
 
+### ✅ Key Updates
+
+- All HR APIs (recordAttendance, getAttendance, getAllEmployees) are fully public — no Authorization headers.
+
+- Matches exactly what checkin.html and employee-portal.html need.
+
+- Admin attendance & dashboard APIs are also public-read, can be used in future public dashboards.
+
+- Fully supports Lambda Proxy Integration parsing and safe JSON handling.
+
+---
+
