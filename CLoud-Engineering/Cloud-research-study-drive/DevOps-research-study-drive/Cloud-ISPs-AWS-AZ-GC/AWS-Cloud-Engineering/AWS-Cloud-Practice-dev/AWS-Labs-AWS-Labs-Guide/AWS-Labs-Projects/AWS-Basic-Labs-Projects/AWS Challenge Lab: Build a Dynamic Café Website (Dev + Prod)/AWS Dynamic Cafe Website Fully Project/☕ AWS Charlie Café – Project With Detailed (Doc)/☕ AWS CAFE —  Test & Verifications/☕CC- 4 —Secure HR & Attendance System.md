@@ -706,11 +706,36 @@ But since you’re building a real HR system, I do NOT recommend this.
 
 - Click Test.
 
-#### For POST methods (/checkin and /checkout):
+#### For POST methods (/attendance):
 
   - Enter the JSON body exactly as your Lambda expects. For your attendance Lambda, the body may be empty, but you still need proper JSON:
 
-{}
+```
+{
+  "employee_id": "EMP123",
+  "action": "checkin"
+}
+```
+
+Click Test → you should see:
+
+```
+{
+  "message": "Check-in successful"
+}
+```
+
+Try the same with:
+
+```
+{
+  "employee_id": "EMP123",
+  "action": "checkout"
+}
+```
+
+→ You should see "Check-out successful".
+
 
 - Select the stage: prod
 
