@@ -29,6 +29,238 @@ holidays
 
 ## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
+### 1️⃣ hr-attendance Test Event in Lambda Console
+
+- Open your Lambda in AWS console.
+
+- Click “Test” → Configure test event.
+
+- Choose “Create new test event” with type API Gateway AWS Proxy (or plain JSON).
+
+- For check-in, example event:
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/checkin",
+  "body": "{\"employee_id\":\"12345\"}"
+}
+```
+
+For check-out, example event:
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/checkout",
+  "body": "{\"employee_id\":\"12345\"}"
+```
+
+For CORS preflight test, example event:
+
+```
+{
+  "httpMethod": "OPTIONS",
+  "resource": "/checkin"
+}
+```
+
+### ✅ Example Test & Response
+
+Test Event (Check-in):
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/checkin",
+  "body": "{\"employee_id\":\"12345\"}"
+}
+```
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+  },
+  "body": "{\"message\": \"Check-in successful\"}"
+}
+```
+
+If the employee already checked in today:
+
+```
+{
+  "statusCode": 400,
+  "headers": { ... },
+  "body": "{\"message\": \"Already checked in today\"}"
+}
+```
+
+#### ✅ Once you set this up, you can test check-in first, then check-out, and verify the attendance table in MySQL to see the records inserted/updated.
+
+### 2️⃣ hr-employee-profile
+
+- Open your Lambda in AWS console.
+
+- Click “Test” → “Configure test event” → “Create new test event”.
+
+- Choose “API Gateway AWS Proxy” (or plain JSON).
+
+- Example test events:
+
+- Check Employee Profile (Valid ID):
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{\"employee_id\": \"12345\"}"
+}
+```
+
+Check Employee Profile (Missing ID):
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{}"
+}
+```
+
+CORS Preflight Test:
+
+```
+{
+  "httpMethod": "OPTIONS"
+}
+```
+
+Employee Not Found:
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{\"employee_id\": \"99999\"}"
+}
+```
+
+### 3️⃣ hr-attendance-history
+
+- Open your Lambda in AWS console.
+
+- Click “Test” → “Configure test event” → “Create new test event”.
+
+- Choose “API Gateway AWS Proxy” (or plain JSON).
+
+- Example Test Events
+
+- Valid Employee History Request:
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{\"employee_id\":\"12345\"}"
+}
+```
+
+Missing employee_id:
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{}"
+}
+```
+
+CORS Preflight:
+
+```
+{
+  "httpMethod": "OPTIONS"
+}
+```
+
+Employee with No Records (optional):
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{\"employee_id\":\"99999\"}"
+}
+```
+
+#### Expected Results
+
+| Scenario                         | Input Example             | Expected Response                                                                                                                                                                                                                                        |
+| -------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CORS Preflight                   | `OPTIONS`                 | 200 OK → `{"message":"CORS preflight successful"}`                                                                                                                                                                                                       |
+| Missing Body                     | `{}` (body missing)       | 400 Bad Request → `{"message":"Missing request body"}`                                                                                                                                                                                                   |
+| Missing `employee_id`            | `{"body":"{}"}`           | 400 Bad Request → `{"message":"employee_id is required"}`                                                                                                                                                                                                |
+| Employee with No Records         | `{"employee_id":"99999"}` | 200 OK → empty array: `[]`                                                                                                                                                                                                                               |
+| Employee with Attendance Records | `{"employee_id":"12345"}` | 200 OK → array of records, newest first, e.g.: <br>`json [ { "attendance_date": "2026-02-27", "checkin_time": "09:05:00", "checkout_time": "17:10:00" }, { "attendance_date": "2026-02-26", "checkin_time": "09:00:00", "checkout_time": "17:00:00" } ]` |
+
+
+### 4️⃣ hr-leaves-holidays 
+
+- Open your Lambda in AWS console.
+
+- Click “Test” → “Configure test event” → “Create new test event”.
+
+- Choose “API Gateway AWS Proxy” (or plain JSON).
+
+- Example Test Events
+
+- Valid Employee Request:
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{\"employee_id\":\"12345\"}"
+}
+```
+
+Missing employee_id:
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{}"
+}
+```
+
+CORS Preflight:
+
+```
+{
+  "httpMethod": "OPTIONS"
+}
+```
+
+Employee with No Leaves (optional):
+
+```
+{
+  "httpMethod": "POST",
+  "body": "{\"employee_id\":\"99999\"}"
+}
+```
+
+#### Expected Results
+
+| Scenario                | Input Example             | Expected Response                                                                                                                                                                                                                                                                                           |
+| ----------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CORS Preflight          | `OPTIONS`                 | 200 OK → `{"message":"CORS preflight successful"}`                                                                                                                                                                                                                                                          |
+| Missing Body            | `{}` (body missing)       | 400 Bad Request → `{"message":"Missing request body"}`                                                                                                                                                                                                                                                      |
+| Missing `employee_id`   | `{"body":"{}"}`           | 400 Bad Request → `{"message":"employee_id is required"}`                                                                                                                                                                                                                                                   |
+| Employee with No Leaves | `{"employee_id":"99999"}` | 200 OK → `{ "leaves": [], "holidays": [ ... all company holidays ... ] }`                                                                                                                                                                                                                                   |
+| Employee with Leaves    | `{"employee_id":"12345"}` | 200 OK → example:<br>`json { "leaves": [ { "leave_date": "2026-02-25", "leave_type": "Sick" }, { "leave_date": "2026-02-15", "leave_type": "Casual" } ], "holidays": [ { "holiday_date": "2026-01-01", "description": "New Year" }, { "holiday_date": "2026-02-14", "description": "Valentine's Day" } ] }` |
+
+
+
 
 
 
