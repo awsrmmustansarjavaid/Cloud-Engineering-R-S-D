@@ -2678,4 +2678,192 @@ window.addEventListener("DOMContentLoaded", () => {
 
 These are the final versions. No more updates required.
 
+### ✅ Fully Final employee-portal.html
+
+### 3️⃣ employee-portal.html (SMALL FIX)
+
+```
+// Fix attendance table status column
+records.forEach(rec => {
+    const status = (!rec.checkin_time ? "Absent" : (!rec.checkout_time ? "Checked In" : "Checked Out"));
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td>${rec.attendance_date}</td>
+        <td>${rec.checkin_time || "-"}</td>
+        <td>${rec.checkout_time || "-"}</td>
+        <td>${status}</td>
+    `;
+    tbody.appendChild(tr);
+});
+```
+
+✅ Status column now computed from actual checkin/checkout times.
+
+#### Fully Final code
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Google Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================
+   GLOBAL STYLES
+========================== */
+body { 
+    font-family: 'Poppins', sans-serif; 
+    background: #f8f9fa; 
+}
+.container { 
+    max-width: 900px; 
+    margin-top: 40px; 
+}
+.card { 
+    padding: 20px; 
+    margin-bottom: 20px; 
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+    <!-- ================= PROFILE ================= -->
+    <div class="card">
+        <h4>Employee Profile</h4>
+        <p><strong>Name:</strong> <span id="profile-name"></span></p>
+        <p><strong>Job Title:</strong> <span id="profile-job"></span></p>
+        <p><strong>Salary:</strong> <span id="profile-salary"></span></p>
+        <p><strong>Start Date:</strong> <span id="profile-start"></span></p>
+        <h5 id="emp-name"></h5>
+    </div>
+
+    <!-- ================= ATTENDANCE HISTORY ================= -->
+    <div class="card">
+        <h4>Attendance History</h4>
+        <table class="table table-striped" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="api.js"></script>
+<script src="central-auth.js"></script>
+
+<script>
+/* =====================================================
+   PAGE PROTECTION — Optional Cognito login
+   - Ensures only logged-in users can access this page
+   - Uses CHARLIE_AUTH from central-auth.js
+===================================================== */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+/* =====================================================
+   LOAD EMPLOYEE PROFILE
+   - Fetches employee info via CHARLIE_API.getEmployeeProfile
+   - Populates profile card
+===================================================== */
+async function loadProfile() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId(); // Get ID from local/session storage
+        const data = await CHARLIE_API.getEmployeeProfile(employeeId);
+
+        document.getElementById("profile-name").innerText = data.name;
+        document.getElementById("profile-job").innerText = data.job_title;
+        document.getElementById("profile-salary").innerText = data.salary;
+        document.getElementById("profile-start").innerText = data.start_date;
+        document.getElementById("emp-name").innerText = `Welcome, ${data.name} ☕`;
+    } catch (err) {
+        console.error("Error loading profile:", err);
+        alert("Failed to load profile.");
+    }
+}
+
+/* =====================================================
+   LOAD ATTENDANCE HISTORY
+   - Fetches attendance via CHARLIE_API.getAttendanceHistory
+   - Dynamically populates table rows
+   - ✅ Status column computed from actual checkin/checkout times
+===================================================== */
+async function loadAttendance() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
+        const records = await CHARLIE_API.getAttendanceHistory(employeeId);
+
+        const tbody = document.getElementById("attendanceTable").querySelector("tbody");
+        tbody.innerHTML = ""; // Clear previous rows
+
+        records.forEach(rec => {
+            // Compute status based on checkin/checkout times
+            const status = (!rec.checkin_time ? "Absent" 
+                            : (!rec.checkout_time ? "Checked In" 
+                            : "Checked Out"));
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${rec.attendance_date}</td>
+                <td>${rec.checkin_time || "-"}</td>
+                <td>${rec.checkout_time || "-"}</td>
+                <td>${status}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("Error loading attendance:", err);
+        alert("Failed to load attendance history.");
+    }
+}
+
+/* =====================================================
+   INITIALIZE PAGE
+   - Load profile and attendance on DOMContentLoaded
+===================================================== */
+window.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+    loadAttendance();
+});
+</script>
+
+</body>
+</html>
+```
+
+### ✅ Fixes & Improvements:
+
+- Attendance Status Column Fixed
+
+- "Absent" if no check-in.
+
+- "Checked In" if checked in but no check-out.
+
+- "Checked Out" if both check-in and check-out exist.
+
+- Comments Added
+
+- Clear explanations for each function and logic.
+
+- Fully Compatible
+
+- Works with the updated api.js, checkin.html, and HR Lambda endpoints.
+
 ---

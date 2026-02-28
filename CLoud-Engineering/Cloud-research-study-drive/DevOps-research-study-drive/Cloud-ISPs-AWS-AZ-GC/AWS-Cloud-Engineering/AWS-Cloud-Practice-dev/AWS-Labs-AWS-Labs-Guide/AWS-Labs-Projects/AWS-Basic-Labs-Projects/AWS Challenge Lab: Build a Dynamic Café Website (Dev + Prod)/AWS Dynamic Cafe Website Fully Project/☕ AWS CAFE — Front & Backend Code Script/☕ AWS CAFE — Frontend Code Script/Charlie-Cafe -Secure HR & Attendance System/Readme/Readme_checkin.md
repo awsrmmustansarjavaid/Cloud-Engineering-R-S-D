@@ -4079,6 +4079,191 @@ function showMessage(message, success = true) {
 - Comments added for clarity, session timers, late detection, and live clocks work.
 
 These are the final versions. No more updates required.
+
+###   ✅ Final checkin.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Biometric Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Google Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: white;
+}
+.overlay {
+    position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+}
+.terminal-card {
+    position: relative; z-index: 2; width: 450px; background: rgba(58,37,28,0.95);
+    border-radius: 20px; padding: 35px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+.big-clock { font-size: 42px; font-weight: 700; letter-spacing: 2px; }
+.date-text { font-size: 14px; opacity: 0.8; }
+.mode-toggle-container { position: relative; width: 100%; }
+.mode-toggle-container input { display: none; }
+.mode-toggle {
+    position: relative; display: flex; background: #2b1b14; border-radius: 50px; height: 55px; overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+.toggle-slider { position: absolute; width: 50%; height: 100%; background: linear-gradient(135deg,#4caf50,#2e7d32); border-radius: 50px; transition: 0.4s ease; }
+.toggle-option { flex:1; display:flex; align-items:center; justify-content:center; font-weight:600; z-index:2; cursor:pointer; }
+#checkoutMode:checked ~ .mode-toggle .toggle-slider { left:50%; background: linear-gradient(135deg,#e53935,#b71c1c); }
+.fingerprint {
+    width:160px; height:160px; margin:20px auto; border-radius:50%;
+    background: radial-gradient(circle,#ff9800,#ff5722);
+    display:flex; align-items:center; justify-content:center; font-size:40px; cursor:pointer; transition:0.3s; position:relative;
+}
+.fingerprint:hover { transform: scale(1.1); }
+.fingerprint::after {
+    content:""; position:absolute; width:100%; height:100%; border-radius:50%; border:3px solid rgba(255,255,255,0.6);
+    animation:pulse 2s infinite;
+}
+@keyframes pulse { 0% { transform:scale(1); opacity:1 } 100% { transform:scale(1.4); opacity:0 } }
+#statusMsg { margin-top:15px; font-weight:bold; }
+.session-timer { font-size:14px; margin-top:10px; color:#90ee90; }
+</style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="terminal-card">
+    <h3>☕ Charlie Café</h3>
+    <p>Biometric Attendance Terminal</p>
+
+    <div class="big-clock" id="liveClock">00:00:00</div>
+    <div class="date-text" id="liveDate"></div>
+
+    <select id="timezoneSelect" class="form-select mt-2 mb-3">
+        <option value="Asia/Karachi">🇵🇰 Pakistan</option>
+        <option value="UTC">🌍 UTC</option>
+        <option value="Asia/Dubai">🇦🇪 UAE</option>
+        <option value="Europe/London">🇬🇧 London</option>
+        <option value="America/New_York">🇺🇸 New York</option>
+    </select>
+
+    <hr>
+
+    <div class="mode-toggle-container mb-3">
+        <input type="radio" name="attendanceMode" id="checkinMode" value="checkin" checked>
+        <input type="radio" name="attendanceMode" id="checkoutMode" value="checkout">
+        <div class="mode-toggle">
+            <div class="toggle-slider"></div>
+            <label for="checkinMode" class="toggle-option">🟢 Check-In</label>
+            <label for="checkoutMode" class="toggle-option">🔴 Check-Out</label>
+        </div>
+    </div>
+
+    <input type="number" id="employeeId" class="form-control mb-3" placeholder="Enter Employee ID">
+
+    <div class="fingerprint" onclick="simulateScan()">🔐</div>
+    <p>Tap fingerprint to confirm attendance</p>
+
+    <div id="statusMsg"></div>
+    <div class="session-timer" id="sessionTimer"></div>
+</div>
+
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="api.js"></script>
+
+<script>
+// ================= LIVE CLOCK =================
+let selectedTimezone = "Asia/Karachi";
+function updateClock() {
+    const now = new Date();
+    const timeOptions = { timeZone: selectedTimezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
+    const dateOptions = { timeZone: selectedTimezone, weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    document.getElementById("liveClock").innerText = new Intl.DateTimeFormat("en-GB", timeOptions).format(now);
+    document.getElementById("liveDate").innerText = new Intl.DateTimeFormat("en-GB", dateOptions).format(now);
+}
+setInterval(updateClock, 1000);
+updateClock();
+document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
+
+// ================= SESSION TIMER =================
+let sessionStart = null;
+let sessionInterval = null;
+function startSessionTimer() {
+    sessionStart = new Date();
+    sessionInterval = setInterval(() => {
+        const diff = Math.floor((new Date() - sessionStart)/1000);
+        const hrs = String(Math.floor(diff/3600)).padStart(2,"0");
+        const mins = String(Math.floor((diff%3600)/60)).padStart(2,"0");
+        const secs = String(diff%60).padStart(2,"0");
+        document.getElementById("sessionTimer").innerText = "Working Time: " + hrs + ":" + mins + ":" + secs;
+    }, 1000);
+}
+
+// ================= LATE DETECTION =================
+function isLate() { return new Date().getHours() >= 10; } // Optional: server time is better
+
+// ================= FINGERPRINT SCAN =================
+async function simulateScan() {
+    const employeeId = document.getElementById("employeeId").value.trim();
+    const action = document.querySelector('input[name="attendanceMode"]:checked').value;
+
+    if (!employeeId) { showMessage("❌ Enter Employee ID first", false); return; }
+
+    showMessage("🔍 Scanning fingerprint...", true);
+
+    setTimeout(async () => {
+        try {
+            // ================= FIX: Call Lambda path /checkin or /checkout
+            await CHARLIE_API.recordAttendance({ employee_id: employeeId, action });
+
+            if (action === "checkin") {
+                if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
+                else showMessage("✅ Check-In Successful", true);
+                startSessionTimer();
+            } else {
+                showMessage("🔴 Check-Out Successful", true);
+                clearInterval(sessionInterval);
+                document.getElementById("sessionTimer").innerText = "";
+            }
+
+        } catch (error) {
+            showMessage("❌ Scan failed or API error", false);
+            console.error("Attendance API error:", error);
+        }
+    }, 2000);
+}
+
+// ================= STATUS MESSAGE =================
+function showMessage(message, success=true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "lightgreen" : "tomato";
+}
+</script>
+</body>
+</html>
+```
+
+### ✅ Key Fixes
+
+- simulateScan() now calls /attendance/checkin or /attendance/checkout
+
+- Matches current hr-attendance Lambda
+
+- Status message works
+
+- Session timer works
+
+- No other changes needed
 ---
-
-

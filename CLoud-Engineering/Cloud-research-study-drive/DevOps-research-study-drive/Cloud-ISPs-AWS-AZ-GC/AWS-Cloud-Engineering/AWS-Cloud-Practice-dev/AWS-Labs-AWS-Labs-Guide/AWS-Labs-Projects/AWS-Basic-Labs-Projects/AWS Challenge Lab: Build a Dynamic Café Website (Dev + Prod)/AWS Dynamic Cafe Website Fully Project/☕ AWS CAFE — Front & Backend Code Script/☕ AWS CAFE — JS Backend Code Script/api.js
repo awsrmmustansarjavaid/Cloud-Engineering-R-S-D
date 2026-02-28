@@ -77,11 +77,14 @@ window.CHARLIE_API = (() => {
        - Check-in / Check-out API
        - Does NOT require Cognito token
        - Called by checkin.html fingerprint simulation
+       - ✅ FIXED: Now calls /attendance/checkin or /attendance/checkout
     ===================================================== */
     function recordAttendance(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
+        // payload: { employee_id, action: "checkin"|"checkout" }
+        const url = `${CONFIG.API_BASE}/attendance/${payload.action}`;
+        return apiFetch(url, {
             method: "POST",
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ employee_id: payload.employee_id })
         });
     }
 
@@ -95,7 +98,6 @@ window.CHARLIE_API = (() => {
        - Fully aligned with employee-portal.html
     ===================================================== */
 
-    // Fetch employee profile from hr-employee-profile Lambda
     function getEmployeeProfile(employeeId) {
         return apiFetch(`${CONFIG.API_BASE}/employee-profile`, {
             method: "POST",
@@ -103,7 +105,6 @@ window.CHARLIE_API = (() => {
         });
     }
 
-    // Fetch attendance history from hr-attendance-history Lambda
     function getAttendanceHistory(employeeId) {
         return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
             method: "POST",
@@ -111,7 +112,6 @@ window.CHARLIE_API = (() => {
         });
     }
 
-    // Fetch leaves and company holidays from hr-leaves-holidays Lambda
     function getLeavesAndHolidays(employeeId) {
         return apiFetch(`${CONFIG.API_BASE}/leaves-holidays`, {
             method: "POST",
