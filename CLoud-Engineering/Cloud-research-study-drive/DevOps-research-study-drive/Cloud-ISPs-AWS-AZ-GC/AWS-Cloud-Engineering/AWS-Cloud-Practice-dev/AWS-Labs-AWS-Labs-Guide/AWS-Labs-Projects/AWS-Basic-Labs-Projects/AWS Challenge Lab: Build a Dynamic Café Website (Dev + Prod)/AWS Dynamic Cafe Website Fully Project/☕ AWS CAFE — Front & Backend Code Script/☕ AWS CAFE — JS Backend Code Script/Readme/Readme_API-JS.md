@@ -1611,5 +1611,13 @@ New API functions for employee-portal.html:
 
 - Public access: No Cognito, no Authorization headers — fully aligned with your public Lambda setup.
 
+#### Once this updated api.js is in place, your employee-portal.html can now do:
+
+```
+const profile = await CHARLIE_API.getEmployeeProfile(CHARLIE_UTILS.getEmployeeId());
+const records = await CHARLIE_API.getAttendanceHistory(CHARLIE_UTILS.getEmployeeId());
+```
+
+No workarounds, no hacks, fully proper POST requests.
 ---
 
