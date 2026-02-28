@@ -237,7 +237,7 @@ body {
 </div>
 
 <!-- ==========================================================
-   LOAD YOUR EXISTING SYSTEM FILES
+   LOAD EXISTING SYSTEM FILES
 ========================================================== -->
 <script src="config.js"></script>
 <script src="utils.js"></script>
@@ -247,6 +247,8 @@ body {
 <script>
 /* ==========================================================
    COGNITO PAGE PROTECTION
+   - Protects page visibility
+   - Does NOT affect HR APIs (public)
 ========================================================== */
 CHARLIE_AUTH.protectPage();
 CHARLIE_AUTH.startAutoLogoutWatcher();
@@ -254,11 +256,9 @@ CHARLIE_AUTH.startAutoLogoutWatcher();
 /* ==========================================================
    LIVE CLOCK WITH TIMEZONE SUPPORT
 ========================================================== */
-
 let selectedTimezone = "Asia/Karachi";
 
 function updateClock() {
-
     const now = new Date();
 
     const timeOptions = {
@@ -279,7 +279,6 @@ function updateClock() {
 
     document.getElementById("liveClock").innerText =
         new Intl.DateTimeFormat("en-GB", timeOptions).format(now);
-
     document.getElementById("liveDate").innerText =
         new Intl.DateTimeFormat("en-GB", dateOptions).format(now);
 }
@@ -293,32 +292,27 @@ document.getElementById("timezoneSelect").addEventListener("change", function() 
 });
 
 /* ==========================================================
-   SESSION TIMER (Tracks working duration after check-in)
+   SESSION TIMER
+   - Tracks working duration after check-in
 ========================================================== */
-
 let sessionStart = null;
 let sessionInterval = null;
 
 function startSessionTimer() {
-
     sessionStart = new Date();
-
     sessionInterval = setInterval(() => {
-
         const diff = Math.floor((new Date() - sessionStart) / 1000);
-
         const hrs = String(Math.floor(diff / 3600)).padStart(2,"0");
         const mins = String(Math.floor((diff % 3600) / 60)).padStart(2,"0");
         const secs = String(diff % 60).padStart(2,"0");
-
         document.getElementById("sessionTimer").innerText =
             "Working Time: " + hrs + ":" + mins + ":" + secs;
-
     }, 1000);
 }
 
 /* ==========================================================
-   LATE DETECTION (After 10 AM local browser time)
+   LATE DETECTION
+   - After 10 AM local browser time
 ========================================================== */
 function isLate() {
     const now = new Date();
@@ -327,6 +321,7 @@ function isLate() {
 
 /* ==========================================================
    FINGERPRINT SCAN SIMULATION
+   - Calls public POST HR API: /attendance
 ========================================================== */
 async function simulateScan() {
 
@@ -341,36 +336,30 @@ async function simulateScan() {
     showMessage("🔍 Scanning fingerprint...", true);
 
     setTimeout(async () => {
-
         try {
-
-            await CHARLIE_API.protected.recordAttendance({
+            // ✅ Public HR API call, POST /attendance
+            await CHARLIE_API.recordAttendance({
                 employee_id: employeeId,
                 action: action
             });
 
             if (action === "checkin") {
-
                 if (isLate()) {
                     showMessage("⚠️ Late Check-In recorded", false);
                 } else {
                     showMessage("✅ Check-In Successful", true);
                 }
-
                 startSessionTimer();
-
             } else {
-
                 showMessage("🔴 Check-Out Successful", true);
                 clearInterval(sessionInterval);
                 document.getElementById("sessionTimer").innerText = "";
-
             }
 
         } catch (error) {
-            showMessage("❌ Scan failed or unauthorized", false);
+            showMessage("❌ Scan failed or API error", false);
+            console.error("Attendance API error:", error);
         }
-
     }, 2000);
 }
 
