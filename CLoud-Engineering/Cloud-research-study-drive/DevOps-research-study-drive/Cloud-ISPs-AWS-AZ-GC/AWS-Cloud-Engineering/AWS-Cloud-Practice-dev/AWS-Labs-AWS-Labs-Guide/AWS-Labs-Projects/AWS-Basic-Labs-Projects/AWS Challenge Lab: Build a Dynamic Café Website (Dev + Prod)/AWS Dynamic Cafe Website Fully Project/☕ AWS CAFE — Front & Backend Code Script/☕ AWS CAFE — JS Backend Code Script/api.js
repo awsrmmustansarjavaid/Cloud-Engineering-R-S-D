@@ -144,7 +144,7 @@ window.CHARLIE_API = (() => {
     ===================================================== */
 
     function recordAttendance(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/hr/attendance`, {
+        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
             method: "POST",
             body: JSON.stringify(payload)
         });
@@ -152,12 +152,12 @@ window.CHARLIE_API = (() => {
 
     function getAttendance(employeeId) {
         return apiFetch(
-            `${CONFIG.API_BASE}/hr/attendance?employee_id=${encodeURIComponent(employeeId)}`
+            `${CONFIG.API_BASE}/attendance?employee_id=${encodeURIComponent(employeeId)}`
         );
     }
 
     function getAllEmployees() {
-        return apiFetch(`${CONFIG.API_BASE}/hr/employees`);
+        return apiFetch(`${CONFIG.API_BASE}/employees`);
     }
 
     /* =====================================================
