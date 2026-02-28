@@ -360,9 +360,7 @@ HR Secure Attendance & Employee Management API
 
 #### Lambda Function:
 
-    - /checkin → hr-attendance
-
-    - /checkout → hr-attendance
+    - /attendance → hr-attendance
 
     - /employee-profile → hr-employee-profile
 
