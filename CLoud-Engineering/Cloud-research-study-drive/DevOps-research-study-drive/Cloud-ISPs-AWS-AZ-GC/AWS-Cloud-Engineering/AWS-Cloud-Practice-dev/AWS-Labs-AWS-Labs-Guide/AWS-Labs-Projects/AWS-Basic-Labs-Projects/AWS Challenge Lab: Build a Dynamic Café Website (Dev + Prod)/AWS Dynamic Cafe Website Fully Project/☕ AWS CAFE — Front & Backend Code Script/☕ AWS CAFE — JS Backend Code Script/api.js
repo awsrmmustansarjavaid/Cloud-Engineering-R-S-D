@@ -2,9 +2,8 @@
    CHARLIE CAFE — API MODULE (FINAL - PROD)
    ---------------------------------------------------------
    ✔ Single Stage: /prod (from CONFIG.API_BASE)
-   ✔ All APIs are public (no Cognito/Auth headers)
-   ✔ Fully aligned with config.js
-   ✔ Includes dedicated HR helpers
+   ✔ All APIs are public (no Cognito/Auth headers for HR)
+   ✔ Fully aligned with frontend pages and Lambda endpoints
 ========================================================= */
 
 window.CHARLIE_API = (() => {
@@ -72,7 +71,7 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        👥 HR — ATTENDANCE (PUBLIC)
-       - All APIs are public
+       - Check-in / Check-out API
     ===================================================== */
     function recordAttendance(payload) {
         return apiFetch(`${CONFIG.API_BASE}/attendance`, { method: "POST", body: JSON.stringify(payload) });
@@ -83,20 +82,27 @@ window.CHARLIE_API = (() => {
     }
 
     /* =====================================================
-       🟢 DEDICATED HR HELPERS
-       - Cleaner and purpose-specific
+       🟢 DEDICATED HR HELPERS — FIXED ENDPOINTS
+       - Fully aligned with Lambda
     ===================================================== */
     function getEmployeeProfile(employeeId) {
-        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
+        return apiFetch(`${CONFIG.API_BASE}/employee-profile`, {
             method: "POST",
-            body: JSON.stringify({ employee_id: employeeId, action: "get_profile" })
+            body: JSON.stringify({ employee_id: employeeId })
         });
     }
 
     function getAttendanceHistory(employeeId) {
-        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
+        return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
             method: "POST",
-            body: JSON.stringify({ employee_id: employeeId, action: "get_history" })
+            body: JSON.stringify({ employee_id: employeeId })
+        });
+    }
+
+    function getLeavesAndHolidays(employeeId) {
+        return apiFetch(`${CONFIG.API_BASE}/leaves-holidays`, {
+            method: "POST",
+            body: JSON.stringify({ employee_id: employeeId })
         });
     }
 
@@ -135,7 +141,7 @@ window.CHARLIE_API = (() => {
         recordAttendance, getAllEmployees,
 
         // Dedicated HR helpers
-        getEmployeeProfile, getAttendanceHistory,
+        getEmployeeProfile, getAttendanceHistory, getLeavesAndHolidays,
 
         // Admin
         adminAttendance, adminDashboard
