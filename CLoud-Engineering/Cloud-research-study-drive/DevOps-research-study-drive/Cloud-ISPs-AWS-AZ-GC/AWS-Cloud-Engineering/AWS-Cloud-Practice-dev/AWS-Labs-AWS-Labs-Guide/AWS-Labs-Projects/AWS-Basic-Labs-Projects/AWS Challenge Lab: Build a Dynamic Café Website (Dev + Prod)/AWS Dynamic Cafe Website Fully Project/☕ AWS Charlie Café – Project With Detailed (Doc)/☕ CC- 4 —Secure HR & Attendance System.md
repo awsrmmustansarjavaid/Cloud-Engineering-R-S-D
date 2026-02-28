@@ -495,17 +495,17 @@ sudo nano /var/www/html/employee-portal.html
 ✅ Employees can view profile, attendance, leaves, and holidays.
 
 ### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
-> **📄 admin-dashboard.html**
+> **📄 cafe-admin-dashboard.html**
 
 #### 1️⃣ Create file to EC2:
 
 ```
-sudo nano /var/www/html/admin-dashboard.html
+sudo nano /var/www/html/cafe-admin-dashboard.html
 ```
 
-#### 2️⃣ admin-dashboard.html Code
+#### 2️⃣ cafe-admin-dashboard.html Code
 
-[admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/admin-dashboard.html)
+[cafe-admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script//Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
 
 #### 3️⃣ Set permissions:
 
