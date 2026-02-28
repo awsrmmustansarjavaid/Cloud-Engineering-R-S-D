@@ -1043,6 +1043,24 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 ## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND central FOUNDATION (REUSABLE)
 
+### ✅ S3 TO EC2 EXPORT SCRIPT
+
+```
+sudo nano s3_export.sh
+```
+
+[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+
+
+```
+sudo chmod +x s3_export.sh
+```
+
+```
+sudo ./s3_export.sh
+```
+
+
 ### 1️⃣ Create config.js (NO LOGIC HERE)
 > **This file will be reused across all pages.**
 
