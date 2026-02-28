@@ -1,10 +1,10 @@
 /* =========================================================
-   CHARLIE CAFE — API MODULE (FINAL - PROD ONLY)
+   CHARLIE CAFE — API MODULE (FINAL - PROD)
    ---------------------------------------------------------
    ✔ Single Stage: /prod (from CONFIG.API_BASE)
-   ✔ All APIs are public (no Cognito or Authorization required)
+   ✔ All APIs are public (no Cognito/Auth headers)
    ✔ Fully aligned with config.js
-   ✔ Supports Lambda Proxy Integration parsing
+   ✔ Includes dedicated HR helpers
 ========================================================= */
 
 window.CHARLIE_API = (() => {
@@ -13,9 +13,7 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        🔧 HELPER — STANDARD FETCH WRAPPER
-       - Ensures consistent JSON handling
-       - Handles non-200 responses
-       - Used for all endpoints (POST + GET)
+       - Handles JSON parsing and non-200 errors
     ===================================================== */
     async function apiFetch(url, options = {}) {
         const response = await fetch(url, {
@@ -59,7 +57,7 @@ window.CHARLIE_API = (() => {
 
     async function getOrders() {
         const res = await fetch(`${CONFIG.API_BASE}/get-order-status`);
-        if (!res.ok) throw new Error(`API Error: ${await res.text()}`);
+        if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         return typeof data.body === "string" ? JSON.parse(data.body) : data;
     }
@@ -74,16 +72,10 @@ window.CHARLIE_API = (() => {
 
     /* =====================================================
        👥 HR — ATTENDANCE (PUBLIC)
-       - All HR APIs are fully public
-       - No Authorization headers required
-       - Matches checkin.html usage
+       - All APIs are public
     ===================================================== */
     function recordAttendance(payload) {
         return apiFetch(`${CONFIG.API_BASE}/attendance`, { method: "POST", body: JSON.stringify(payload) });
-    }
-
-    function getAttendance(employeeId) {
-        return apiFetch(`${CONFIG.API_BASE}/attendance?employee_id=${encodeURIComponent(employeeId)}`);
     }
 
     function getAllEmployees() {
@@ -91,23 +83,20 @@ window.CHARLIE_API = (() => {
     }
 
     /* =====================================================
-       👤 HR — EMPLOYEE PORTAL ADDITIONS
-       - Dedicated API for employee-portal.html
+       🟢 DEDICATED HR HELPERS
+       - Cleaner and purpose-specific
     ===================================================== */
-
     function getEmployeeProfile(employeeId) {
-        // Dedicated POST endpoint for profile
-        return apiFetch(`${CONFIG.API_BASE}/employee/profile`, {
+        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
             method: "POST",
-            body: JSON.stringify({ employee_id: employeeId })
+            body: JSON.stringify({ employee_id: employeeId, action: "get_profile" })
         });
     }
 
     function getAttendanceHistory(employeeId) {
-        // Dedicated POST endpoint for attendance history
-        return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
+        return apiFetch(`${CONFIG.API_BASE}/attendance`, {
             method: "POST",
-            body: JSON.stringify({ employee_id: employeeId })
+            body: JSON.stringify({ employee_id: employeeId, action: "get_history" })
         });
     }
 
@@ -115,15 +104,9 @@ window.CHARLIE_API = (() => {
        📊 ADMIN — ATTENDANCE ANALYTICS (PUBLIC READ)
     ===================================================== */
     const adminAttendance = {
-        getDailySummary() {
-            return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`);
-        },
-        getWeeklySummary() {
-            return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`);
-        },
-        getMonthlySummary() {
-            return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`);
-        }
+        getDailySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`); },
+        getWeeklySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`); },
+        getMonthlySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`); }
     };
 
     /* =====================================================
@@ -144,27 +127,18 @@ window.CHARLIE_API = (() => {
        🚀 EXPORT ALL APIs
     ===================================================== */
     return {
-        placeOrder,
-        updateOrder,
-        getOrderStatus,
-        getCafeOrderStatus,
-        getGetOrderStatus,
-        getOrders,
+        // Orders
+        placeOrder, updateOrder, getOrderStatus, getCafeOrderStatus, getGetOrderStatus, getOrders,
+        getEmployeeOrders, createEmployeeOrder,
 
-        getEmployeeOrders,
-        createEmployeeOrder,
+        // HR Attendance Public
+        recordAttendance, getAllEmployees,
 
-        // ✅ HR Attendance Public APIs
-        recordAttendance,
-        getAttendance,
-        getAllEmployees,
+        // Dedicated HR helpers
+        getEmployeeProfile, getAttendanceHistory,
 
-        // ✅ HR Employee Portal APIs
-        getEmployeeProfile,
-        getAttendanceHistory,
-
-        adminAttendance,
-        adminDashboard
+        // Admin
+        adminAttendance, adminDashboard
     };
 
 })();

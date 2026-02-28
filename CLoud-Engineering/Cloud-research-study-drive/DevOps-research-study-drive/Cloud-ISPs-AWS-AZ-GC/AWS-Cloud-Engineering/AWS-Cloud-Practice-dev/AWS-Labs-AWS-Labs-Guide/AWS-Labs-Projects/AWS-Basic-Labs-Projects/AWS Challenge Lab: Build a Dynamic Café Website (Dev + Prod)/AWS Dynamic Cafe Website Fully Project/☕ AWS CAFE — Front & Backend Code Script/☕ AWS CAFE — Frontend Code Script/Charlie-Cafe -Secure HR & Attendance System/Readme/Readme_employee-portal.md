@@ -2397,4 +2397,147 @@ init();
 - Profile section loads dynamically from recordAttendance action "get_profile".
 
 - Fully aligned with your current api.js design.
+
+### ✅ Fully Final Code
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Google Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Poppins', sans-serif; background: #f8f9fa; }
+.container { max-width: 900px; margin-top: 40px; }
+.card { padding: 20px; margin-bottom: 20px; }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+    <!-- ================= PROFILE SECTION ================= -->
+    <div class="card">
+        <h4>Employee Profile</h4>
+        <p><strong>Name:</strong> <span id="profile-name"></span></p>
+        <p><strong>Job Title:</strong> <span id="profile-job"></span></p>
+        <p><strong>Salary:</strong> <span id="profile-salary"></span></p>
+        <p><strong>Start Date:</strong> <span id="profile-start"></span></p>
+        <h5 id="emp-name"></h5>
+    </div>
+
+    <!-- ================= ATTENDANCE HISTORY ================= -->
+    <div class="card">
+        <h4>Attendance History</h4>
+        <table class="table table-striped" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filled dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Load system scripts -->
+<script src="config.js"></script>
+<script src="utils.js"></script>
+<script src="api.js"></script>
+<script src="central-auth.js"></script>
+
+<script>
+/* =====================================================
+   PAGE PROTECTION
+   - Optional Cognito protection
+===================================================== */
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.startAutoLogoutWatcher();
+
+/* =====================================================
+   LOAD PROFILE
+   - Uses dedicated API helper getEmployeeProfile()
+===================================================== */
+async function loadProfile() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId(); // Stored locally
+        const data = await CHARLIE_API.getEmployeeProfile(employeeId);
+
+        document.getElementById("profile-name").innerText = data.name;
+        document.getElementById("profile-job").innerText = data.job_title;
+        document.getElementById("profile-salary").innerText = data.salary;
+        document.getElementById("profile-start").innerText = data.start_date;
+        document.getElementById("emp-name").innerText = `Welcome, ${data.name} ☕`;
+
+    } catch (err) {
+        console.error("Error loading profile:", err);
+        alert("Failed to load profile.");
+    }
+}
+
+/* =====================================================
+   LOAD ATTENDANCE HISTORY
+   - Uses dedicated API helper getAttendanceHistory()
+===================================================== */
+async function loadAttendance() {
+    try {
+        const employeeId = CHARLIE_UTILS.getEmployeeId();
+        const records = await CHARLIE_API.getAttendanceHistory(employeeId);
+
+        const tbody = document.getElementById("attendanceTable").querySelector("tbody");
+        tbody.innerHTML = ""; // Clear existing
+
+        records.forEach(rec => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${rec.date}</td>
+                <td>${rec.checkin || "-"}</td>
+                <td>${rec.checkout || "-"}</td>
+                <td>${rec.status || "-"}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    } catch (err) {
+        console.error("Error loading attendance:", err);
+        alert("Failed to load attendance history.");
+    }
+}
+
+/* =====================================================
+   INITIALIZE PAGE
+===================================================== */
+window.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+    loadAttendance();
+});
+</script>
+</body>
+</html>
+```
+
+### ✅ What’s fixed and finalized
+
+- No more protected calls – APIs are public.
+
+- No unnecessary Authorization headers.
+
+- Dedicated helpers (getEmployeeProfile, getAttendanceHistory) used everywhere.
+
+- Clean, maintainable HTML with proper table rendering.
+
+- Fully compatible with your Lambda endpoints (POST /attendance).
+
+- Comments throughout to explain each section.
 ---
