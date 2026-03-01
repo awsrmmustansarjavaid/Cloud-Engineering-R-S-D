@@ -91,4 +91,548 @@ function login() {
 - UI, styling, colors untouched.
 
 - Redirect after login remains to cafe-admin-dashboard.html.
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP + ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* ================= BODY & LAYOUT ================= */
+body {
+    background-color: #0f0f10;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    display: none; /* Hidden until authentication succeeds */
+}
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+}
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+.sidebar a:hover,
+.sidebar a.active {
+    background: #ff9800;
+    color: #000;
+}
+.main { margin-left: 260px; padding: 25px; }
+.kpi-card { border-radius: 20px; padding: 20px; color: white; }
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+.table-container { margin-top: 30px; background: #1c1c1e; border-radius: 15px; padding: 20px; }
+.section { display: none; }
+.section.active { display: block; }
+.print-btn { display: inline-block; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <h4>☕ Charlie Café</h4>
+    <p class="text-muted">Admin Dashboard</p>
+
+    <a class="active" onclick="showSection(event,'orders')">
+        <i class="bi bi-bag-check"></i> Orders
+    </a>
+
+    <a onclick="showSection(event,'hr')">
+        <i class="bi bi-people"></i> HR / Attendance
+    </a>
+
+    <a id="logoutBtn">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main">
+
+    <!-- ORDERS SECTION -->
+    <div id="orders" class="section active">
+        <h4>Orders Dashboard</h4>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3"><div class="kpi-card bg-green"><h6>Sales</h6><h3 id="sales">$0</h3></div></div>
+            <div class="col-md-3"><div class="kpi-card bg-purple"><h6>Orders</h6><h3 id="ordersCount">0</h3></div></div>
+            <div class="col-md-3"><div class="kpi-card bg-blue"><h6>Drinks</h6><h3 id="drinksCount">0</h3></div></div>
+            <div class="col-md-3"><div class="kpi-card bg-orange"><h6>Avg</h6><h3 id="avgPrice">$0</h3></div></div>
+        </div>
+
+        <div class="table-container">
+            <h5>Latest Orders</h5>
+            <button class="btn btn-outline-dark print-btn"
+                    onclick="openCentralPrint('#ordersTable')">
+                🖨️ Print / Export
+            </button>
+
+            <table class="table table-hover text-white">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Table</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HR SECTION -->
+    <div id="hr" class="section">
+        <h4>HR & Attendance Dashboard</h4>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-success text-white p-3">
+                    <h6>Total Present</h6>
+                    <h3 id="cardPresent">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white p-3">
+                    <h6>Total Absent</h6>
+                    <h3 id="cardAbsent">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark p-3">
+                    <h6>Total Leaves</h6>
+                    <h3 id="cardLeaves">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-outline-primary" onclick="loadHR('daily')">Daily</button>
+        <button class="btn btn-outline-primary" onclick="loadHR('weekly')">Weekly</button>
+        <button class="btn btn-outline-primary" onclick="loadHR('monthly')">Monthly</button>
+    </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/role-guard.js"></script> <!-- ADD THIS LINE -->
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+
+/* ================= SECTION SWITCHING ================= */
+function showSection(e,id){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".sidebar a").forEach(a=>a.classList.remove("active"));
+    if(e) e.currentTarget.classList.add("active");
+}
+
+/* ================= ORDERS DASHBOARD ================= */
+async function loadOrdersDashboard(){
+    try{
+        const data=await CHARLIE_API.adminDashboard.fetchData();
+
+        document.getElementById("sales").innerText=`$${data.sales||0}`;
+        document.getElementById("ordersCount").innerText=data.orders||0;
+        document.getElementById("drinksCount").innerText=data.drinks||0;
+        document.getElementById("avgPrice").innerText=`$${data.avg||0}`;
+
+        const table=document.getElementById("ordersTable");
+        table.innerHTML="";
+
+        (data.latest_orders||[]).forEach(o=>{
+            table.innerHTML+=`<tr>
+                <td>${o.customer_name||"Anonymous"}</td>
+                <td>${o.item}</td>
+                <td>${o.quantity}</td>
+                <td>${o.table_number||"-"}</td>
+                <td>${o.date}</td>
+            </tr>`;
+        });
+
+    }catch(e){
+        console.error("Orders Dashboard Error:",e);
+    }
+}
+
+/* ================= HR DASHBOARD (FIXED summary=true) ================= */
+async function loadHR(type){
+    try{
+        const url=`${CHARLIE_CONFIG.API_BASE}/admin/analytics?type=${type}&summary=true`;
+
+        const response=await fetch(url);
+        if(!response.ok){
+            throw new Error(await response.text());
+        }
+
+        const data=await response.json();
+
+        document.getElementById("cardPresent").innerText=data.summary?.total_present||0;
+        document.getElementById("cardAbsent").innerText=data.summary?.total_absent||0;
+        document.getElementById("cardLeaves").innerText=data.summary?.total_leaves||0;
+
+    }catch(e){
+        console.error("HR Dashboard Error:",e);
+    }
+}
+
+/* ================= AUTHENTICATION (FULLY FIXED) ================= */
+async function initPage(){
+    try{
+        await CHARLIE_AUTH.protectPage();
+        CHARLIE_AUTH.startAutoLogoutWatcher();
+
+        // Show dashboard after auth success
+        document.body.style.display='block';
+
+        // Load dashboards
+        loadOrdersDashboard();
+        loadHR('daily');
+
+        // Logout handler
+        document.getElementById('logoutBtn')
+            .addEventListener('click',e=>{
+                e.preventDefault();
+                CHARLIE_AUTH.logout();
+            });
+
+    }catch(e){
+        console.error("Authentication failed:",e);
+        window.location.href='/login.html';
+    }
+}
+
+initPage();
+
+</script>
+
+</body>
+</html>
+```
+---
+### cafe-admin-dashboard.html
+
+> **Update Version;1.1**
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ================= BOOTSTRAP + ICONS ================= -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+/* ================= BODY & LAYOUT ================= */
+body {
+    background-color: #0f0f10;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    display: none; /* Hidden until authentication succeeds */
+}
+.sidebar {
+    width: 250px;
+    background: #151515;
+    min-height: 100vh;
+    position: fixed;
+    padding: 20px;
+}
+.sidebar a {
+    display: block;
+    color: #bbb;
+    padding: 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+.sidebar a:hover,
+.sidebar a.active {
+    background: #ff9800;
+    color: #000;
+}
+.main { margin-left: 260px; padding: 25px; }
+.kpi-card { border-radius: 20px; padding: 20px; color: white; }
+.bg-green { background: #1abc9c; }
+.bg-purple { background: #9b59b6; }
+.bg-blue { background: #3498db; }
+.bg-orange { background: #e67e22; }
+.table-container { margin-top: 30px; background: #1c1c1e; border-radius: 15px; padding: 20px; }
+.section { display: none; }
+.section.active { display: block; }
+.print-btn { display: inline-block; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+    <h4>☕ Charlie Café</h4>
+    <p class="text-muted">Admin Dashboard</p>
+
+    <!-- Orders Section Link -->
+    <a class="active" onclick="showSection(event,'orders')">
+        <i class="bi bi-bag-check"></i> Orders
+    </a>
+
+    <!-- HR Section Link -->
+    <a onclick="showSection(event,'hr')">
+        <i class="bi bi-people"></i> HR / Attendance
+    </a>
+
+    <!-- Logout -->
+    <a id="logoutBtn">
+        <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main">
+
+    <!-- ORDERS SECTION -->
+    <div id="orders" class="section active">
+        <h4>Orders Dashboard</h4>
+
+        <!-- KPI Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3"><div class="kpi-card bg-green"><h6>Sales</h6><h3 id="sales">$0</h3></div></div>
+            <div class="col-md-3"><div class="kpi-card bg-purple"><h6>Orders</h6><h3 id="ordersCount">0</h3></div></div>
+            <div class="col-md-3"><div class="kpi-card bg-blue"><h6>Drinks</h6><h3 id="drinksCount">0</h3></div></div>
+            <div class="col-md-3"><div class="kpi-card bg-orange"><h6>Avg</h6><h3 id="avgPrice">$0</h3></div></div>
+        </div>
+
+        <!-- Latest Orders Table -->
+        <div class="table-container">
+            <h5>Latest Orders</h5>
+            <button class="btn btn-outline-dark print-btn"
+                    onclick="openCentralPrint('#ordersTable')">
+                🖨️ Print / Export
+            </button>
+
+            <table class="table table-hover text-white" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Table</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HR SECTION -->
+    <div id="hr" class="section">
+        <h4>HR & Attendance Dashboard</h4>
+
+        <!-- HR KPI Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-success text-white p-3">
+                    <h6>Total Present</h6>
+                    <h3 id="cardPresent">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-danger text-white p-3">
+                    <h6>Total Absent</h6>
+                    <h3 id="cardAbsent">0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-dark p-3">
+                    <h6>Total Leaves</h6>
+                    <h3 id="cardLeaves">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- HR Filter Buttons -->
+        <button class="btn btn-outline-primary" onclick="loadHR('daily')">Daily</button>
+        <button class="btn btn-outline-primary" onclick="loadHR('weekly')">Weekly</button>
+        <button class="btn btn-outline-primary" onclick="loadHR('monthly')">Monthly</button>
+    </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/role-guard.js"></script> <!-- Admin Role Guard -->
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+/* ================= SECTION SWITCHING ================= */
+function showSection(e,id){
+    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".sidebar a").forEach(a=>a.classList.remove("active"));
+    if(e) e.currentTarget.classList.add("active");
+}
+
+/* ================= ORDERS DASHBOARD ================= */
+async function loadOrdersDashboard(){
+    try{
+        // Ensure only admins can fetch orders
+        await CHARLIE_ROLE_GUARD.adminOnly();
+
+        const data = await CHARLIE_API.adminDashboard.fetchData();
+
+        // Update KPI Cards
+        document.getElementById("sales").innerText = `$${data.sales||0}`;
+        document.getElementById("ordersCount").innerText = data.orders||0;
+        document.getElementById("drinksCount").innerText = data.drinks||0;
+        document.getElementById("avgPrice").innerText = `$${data.avg||0}`;
+
+        // Populate orders table
+        const table = document.getElementById("ordersTable");
+        table.innerHTML = "";
+        (data.latest_orders||[]).forEach(o=>{
+            table.innerHTML += `<tr>
+                <td>${o.customer_name||"Anonymous"}</td>
+                <td>${o.item}</td>
+                <td>${o.quantity}</td>
+                <td>${o.table_number||"-"}</td>
+                <td>${o.date}</td>
+            </tr>`;
+        });
+
+    }catch(e){
+        console.error("Orders Dashboard Error:", e);
+    }
+}
+
+/* ================= HR DASHBOARD ================= */
+async function loadHR(type){
+    try{
+        // Ensure admin role before fetching HR data
+        await CHARLIE_ROLE_GUARD.adminOnly();
+
+        const url = `${CHARLIE_CONFIG.API_BASE}/admin/analytics?type=${type}&summary=true`;
+        const response = await fetch(url);
+
+        if(!response.ok) throw new Error(await response.text());
+
+        const data = await response.json();
+
+        document.getElementById("cardPresent").innerText = data.summary?.total_present || 0;
+        document.getElementById("cardAbsent").innerText  = data.summary?.total_absent || 0;
+        document.getElementById("cardLeaves").innerText  = data.summary?.total_leaves || 0;
+
+    }catch(e){
+        console.error("HR Dashboard Error:", e);
+    }
+}
+
+/* ================= CENTRAL PRINT ================= */
+function openCentralPrint(selector){
+    const target = document.querySelector(selector);
+    if(!target) return;
+    const win = window.open("central-printing.html", "_blank");
+    if(!win) return alert("Popup blocked");
+    win.onload = () => {
+        const container = win.document.getElementById("printContent");
+        if(container) container.innerHTML = target.outerHTML;
+    };
+}
+
+/* ================= PAGE INITIALIZATION ================= */
+async function initPage(){
+    try{
+        // Protect page for authenticated users
+        await CHARLIE_AUTH.protectPage();
+
+        // Ensure only admin can access
+        await CHARLIE_ROLE_GUARD.adminOnly();
+
+        // Start auto logout watcher
+        CHARLIE_AUTH.startAutoLogoutWatcher();
+
+        // Show page content
+        document.body.style.display='block';
+
+        // Load dashboards
+        loadOrdersDashboard();
+        loadHR('daily');
+
+        // Logout button handler
+        document.getElementById('logoutBtn').addEventListener('click', e=>{
+            e.preventDefault();
+            CHARLIE_AUTH.logout();
+        });
+
+    }catch(e){
+        console.error("Authentication / Role Error:", e);
+        // Redirect non-admin users
+        window.location.href='/login.html';
+    }
+}
+
+initPage();
+</script>
+
+</body>
+</html>
+```
+
+### ✅ What’s New / Fixed
+
+Admin Role Guard Added:
+
+- CHARLIE_ROLE_GUARD.adminOnly() called before loading Orders or HR dashboards.
+
+- Ensures only admins can view / fetch sensitive data.
+
+Page Hidden Until Auth Success:
+
+- Prevents unauthorized users from seeing the UI flash.
+
+Logout Handler:
+
+- Properly clears session via CHARLIE_AUTH.logout().
+
+Central Print Ready:
+
+- Works for orders table.
+
+Comments Added:
+
+- Every function now has a descriptive comment for clarity and maintainability.
+
+Error Handling:
+
+- Dashboard and HR fetches now log detailed errors in console.
 ---

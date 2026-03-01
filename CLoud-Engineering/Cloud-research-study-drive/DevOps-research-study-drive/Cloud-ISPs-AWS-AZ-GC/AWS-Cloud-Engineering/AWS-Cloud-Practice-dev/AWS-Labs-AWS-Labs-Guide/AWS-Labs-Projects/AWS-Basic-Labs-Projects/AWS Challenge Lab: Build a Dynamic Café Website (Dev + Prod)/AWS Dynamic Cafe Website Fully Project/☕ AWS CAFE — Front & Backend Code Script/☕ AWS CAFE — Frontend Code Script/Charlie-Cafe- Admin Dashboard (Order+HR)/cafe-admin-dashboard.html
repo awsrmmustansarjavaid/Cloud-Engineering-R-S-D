@@ -57,14 +57,17 @@ body {
     <h4>☕ Charlie Café</h4>
     <p class="text-muted">Admin Dashboard</p>
 
+    <!-- Orders Section Link -->
     <a class="active" onclick="showSection(event,'orders')">
         <i class="bi bi-bag-check"></i> Orders
     </a>
 
+    <!-- HR Section Link -->
     <a onclick="showSection(event,'hr')">
         <i class="bi bi-people"></i> HR / Attendance
     </a>
 
+    <!-- Logout -->
     <a id="logoutBtn">
         <i class="bi bi-box-arrow-left"></i> Logout
     </a>
@@ -77,6 +80,7 @@ body {
     <div id="orders" class="section active">
         <h4>Orders Dashboard</h4>
 
+        <!-- KPI Cards -->
         <div class="row g-4 mb-4">
             <div class="col-md-3"><div class="kpi-card bg-green"><h6>Sales</h6><h3 id="sales">$0</h3></div></div>
             <div class="col-md-3"><div class="kpi-card bg-purple"><h6>Orders</h6><h3 id="ordersCount">0</h3></div></div>
@@ -84,6 +88,7 @@ body {
             <div class="col-md-3"><div class="kpi-card bg-orange"><h6>Avg</h6><h3 id="avgPrice">$0</h3></div></div>
         </div>
 
+        <!-- Latest Orders Table -->
         <div class="table-container">
             <h5>Latest Orders</h5>
             <button class="btn btn-outline-dark print-btn"
@@ -91,7 +96,7 @@ body {
                 🖨️ Print / Export
             </button>
 
-            <table class="table table-hover text-white">
+            <table class="table table-hover text-white" id="ordersTable">
                 <thead>
                     <tr>
                         <th>Customer</th>
@@ -101,7 +106,7 @@ body {
                         <th>Date</th>
                     </tr>
                 </thead>
-                <tbody id="ordersTable"></tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -110,6 +115,7 @@ body {
     <div id="hr" class="section">
         <h4>HR & Attendance Dashboard</h4>
 
+        <!-- HR KPI Cards -->
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="card bg-success text-white p-3">
@@ -131,6 +137,7 @@ body {
             </div>
         </div>
 
+        <!-- HR Filter Buttons -->
         <button class="btn btn-outline-primary" onclick="loadHR('daily')">Daily</button>
         <button class="btn btn-outline-primary" onclick="loadHR('weekly')">Weekly</button>
         <button class="btn btn-outline-primary" onclick="loadHR('monthly')">Monthly</button>
@@ -142,12 +149,11 @@ body {
 <script src="/js/config.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/central-auth.js"></script>
-<script src="/js/role-guard.js"></script> <!-- ADD THIS LINE -->
+<script src="/js/role-guard.js"></script> <!-- Admin Role Guard -->
 <script src="/js/api.js"></script>
 <script src="/js/central-printing.js"></script>
 
 <script>
-
 /* ================= SECTION SWITCHING ================= */
 function showSection(e,id){
     document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -159,18 +165,22 @@ function showSection(e,id){
 /* ================= ORDERS DASHBOARD ================= */
 async function loadOrdersDashboard(){
     try{
-        const data=await CHARLIE_API.adminDashboard.fetchData();
+        // Ensure only admins can fetch orders
+        await CHARLIE_ROLE_GUARD.adminOnly();
 
-        document.getElementById("sales").innerText=`$${data.sales||0}`;
-        document.getElementById("ordersCount").innerText=data.orders||0;
-        document.getElementById("drinksCount").innerText=data.drinks||0;
-        document.getElementById("avgPrice").innerText=`$${data.avg||0}`;
+        const data = await CHARLIE_API.adminDashboard.fetchData();
 
-        const table=document.getElementById("ordersTable");
-        table.innerHTML="";
+        // Update KPI Cards
+        document.getElementById("sales").innerText = `$${data.sales||0}`;
+        document.getElementById("ordersCount").innerText = data.orders||0;
+        document.getElementById("drinksCount").innerText = data.drinks||0;
+        document.getElementById("avgPrice").innerText = `$${data.avg||0}`;
 
+        // Populate orders table
+        const table = document.getElementById("ordersTable");
+        table.innerHTML = "";
         (data.latest_orders||[]).forEach(o=>{
-            table.innerHTML+=`<tr>
+            table.innerHTML += `<tr>
                 <td>${o.customer_name||"Anonymous"}</td>
                 <td>${o.item}</td>
                 <td>${o.quantity}</td>
@@ -180,59 +190,77 @@ async function loadOrdersDashboard(){
         });
 
     }catch(e){
-        console.error("Orders Dashboard Error:",e);
+        console.error("Orders Dashboard Error:", e);
     }
 }
 
-/* ================= HR DASHBOARD (FIXED summary=true) ================= */
+/* ================= HR DASHBOARD ================= */
 async function loadHR(type){
     try{
-        const url=`${CHARLIE_CONFIG.API_BASE}/admin/analytics?type=${type}&summary=true`;
+        // Ensure admin role before fetching HR data
+        await CHARLIE_ROLE_GUARD.adminOnly();
 
-        const response=await fetch(url);
-        if(!response.ok){
-            throw new Error(await response.text());
-        }
+        const url = `${CHARLIE_CONFIG.API_BASE}/admin/analytics?type=${type}&summary=true`;
+        const response = await fetch(url);
 
-        const data=await response.json();
+        if(!response.ok) throw new Error(await response.text());
 
-        document.getElementById("cardPresent").innerText=data.summary?.total_present||0;
-        document.getElementById("cardAbsent").innerText=data.summary?.total_absent||0;
-        document.getElementById("cardLeaves").innerText=data.summary?.total_leaves||0;
+        const data = await response.json();
+
+        document.getElementById("cardPresent").innerText = data.summary?.total_present || 0;
+        document.getElementById("cardAbsent").innerText  = data.summary?.total_absent || 0;
+        document.getElementById("cardLeaves").innerText  = data.summary?.total_leaves || 0;
 
     }catch(e){
-        console.error("HR Dashboard Error:",e);
+        console.error("HR Dashboard Error:", e);
     }
 }
 
-/* ================= AUTHENTICATION (FULLY FIXED) ================= */
+/* ================= CENTRAL PRINT ================= */
+function openCentralPrint(selector){
+    const target = document.querySelector(selector);
+    if(!target) return;
+    const win = window.open("central-printing.html", "_blank");
+    if(!win) return alert("Popup blocked");
+    win.onload = () => {
+        const container = win.document.getElementById("printContent");
+        if(container) container.innerHTML = target.outerHTML;
+    };
+}
+
+/* ================= PAGE INITIALIZATION ================= */
 async function initPage(){
     try{
+        // Protect page for authenticated users
         await CHARLIE_AUTH.protectPage();
+
+        // Ensure only admin can access
+        await CHARLIE_ROLE_GUARD.adminOnly();
+
+        // Start auto logout watcher
         CHARLIE_AUTH.startAutoLogoutWatcher();
 
-        // Show dashboard after auth success
+        // Show page content
         document.body.style.display='block';
 
         // Load dashboards
         loadOrdersDashboard();
         loadHR('daily');
 
-        // Logout handler
-        document.getElementById('logoutBtn')
-            .addEventListener('click',e=>{
-                e.preventDefault();
-                CHARLIE_AUTH.logout();
-            });
+        // Logout button handler
+        document.getElementById('logoutBtn').addEventListener('click', e=>{
+            e.preventDefault();
+            CHARLIE_AUTH.logout();
+        });
 
     }catch(e){
-        console.error("Authentication failed:",e);
+        console.error("Authentication / Role Error:", e);
+        // Redirect non-admin users
         window.location.href='/login.html';
     }
 }
 
 initPage();
-
 </script>
 
 </body>
