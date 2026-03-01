@@ -49,12 +49,88 @@
 
 #### ✅ 2.2 Open Security Group (MANDATORY)
 
-Ensure EC2 Security Group allows:
+- Default SG (for general VPC resources)
+
+- RDS SG (for MySQL database)
+
+- Lambda SG (for Lambdas that need RDS access)
+
+### Security Group Overview
+
+| Security Group | Purpose                             | Attached Resources | Inbound Rules                          | Outbound Rules               |
+| -------------- | ----------------------------------- | ------------------ | -------------------------------------- | ---------------------------- |
+| **Default SG** | General default security group      | RDS, EC2 (if any)  | SSH, HTTP, HTTPS, MySQL, ALL TCP       | All traffic allowed          |
+| **RDS SG**     | Protect database                    | RDS instance       | MySQL only from Lambda SG + Default SG | Allow Lambda SG & Default SG |
+| **Lambda SG**  | Lambda functions needing VPC access | Lambda (VPC)       | SSH, HTTP, HTTPS, allow RDS MySQL      | Allow all outbound (default) |
 
 
-| Type | Port | Source    |
-| ---- | ---- | --------- |
-| HTTP | 80   | 0.0.0.0/0 |
+### 1️⃣ Default Security Group
+
+- Name: charlie-default-sg
+
+- Attached to: RDS, any EC2/other resources
+
+- Inbound Rules:
+
+| Type         | Protocol | Port Range | Source                                              |
+| ------------ | -------- | ---------- | --------------------------------------------------- |
+| SSH          | TCP      | 22         | 0.0.0.0/0 (or your IP)                              |
+| HTTP         | TCP      | 80         | 0.0.0.0/0                                           |
+| HTTPS        | TCP      | 443        | 0.0.0.0/0                                           |
+| MySQL/Aurora | TCP      | 3306       | 0.0.0.0/0 (or Lambda SG + RDS SG only for security) |
+| ALL TCP      | TCP      | 0-65535    | 0.0.0.0/0                                           |
+
+- Outbound Rules:
+
+  - All traffic allowed (default)
+
+### 2️⃣ RDS Security Group
+
+- Name: charlie-rds-sg
+
+- Attached to: RDS instance
+
+- Inbound Rules:
+
+| Type         | Protocol | Port Range | Source                                  |
+| ------------ | -------- | ---------- | --------------------------------------- |
+| MySQL/Aurora | TCP      | 3306       | Lambda SG (allow only Lambda functions) |
+| MySQL/Aurora | TCP      | 3306       | Default SG (if needed for admin access) |
+
+- Outbound Rules:
+
+  - All traffic allowed (default)
+
+  - Can optionally restrict to Lambda SG only
+
+#### Note: RDS SG is private, only Lambda can access 3306.
+
+### 3️⃣ Lambda Security Group
+
+- Name: charlie-lambda-sg
+
+- Attached to: Lambda functions in VPC
+
+- Inbound Rules:
+
+| Type  | Protocol | Port Range | Source                                |
+| ----- | -------- | ---------- | ------------------------------------- |
+| SSH   | TCP      | 22         | Default SG (if admin needs)           |
+| HTTP  | TCP      | 80         | Default SG (for API testing)          |
+| HTTPS | TCP      | 443        | Default SG                            |
+| MySQL | TCP      | 3306       | RDS SG (so Lambda can connect to RDS) |
+
+- Outbound Rules:
+
+  - All traffic allowed (default)
+
+#### Notes:
+
+- Lambda in VPC requires SG to allow outbound to RDS SG on 3306
+
+- SSH/HTTP/HTTPS in inbound is optional unless you want Lambda testing/debugging
+
+
 
 
 ### 5️⃣ IAM Role & Policies
