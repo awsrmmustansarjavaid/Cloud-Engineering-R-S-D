@@ -9,7 +9,7 @@
 AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY_HERE"
 AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY_HERE"
 AWS_REGION="us-east-1"           # Replace with your bucket region
-S3_BUCKET="your-bucket-name"     # Replace with your S3 bucket name
+S3_BUCKET="charlie-cafe-s3-bucket"     # Replace with your S3 bucket name
 
 # =========================
 # FOLDERS TO SYNC
