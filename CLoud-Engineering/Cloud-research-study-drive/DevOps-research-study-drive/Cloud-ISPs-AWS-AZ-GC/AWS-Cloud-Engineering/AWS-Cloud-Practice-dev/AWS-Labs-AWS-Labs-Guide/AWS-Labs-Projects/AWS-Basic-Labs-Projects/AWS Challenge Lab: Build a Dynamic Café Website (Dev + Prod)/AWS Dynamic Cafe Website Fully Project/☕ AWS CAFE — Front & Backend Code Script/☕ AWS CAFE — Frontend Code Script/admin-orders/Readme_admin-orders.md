@@ -813,7 +813,609 @@ setInterval(loadOrders, 30000);
 
 🧾 Clear comments explaining every section
 
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charlie Café ☕ | Admin Orders Dashboard</title>
+
+<!-- BOOTSTRAP CSS + ICONS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ================== GLOBAL STYLES ================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920') center/cover fixed;
+    background-size: cover;
+    color: #f5e9d4;
+    margin: 0;
+}
+body::before {
+    content:"";
+    position: fixed; inset: 0;
+    background: rgba(26,17,11,0.7);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+}
+
+/* ================== SIDEBAR ================== */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    background: #2c1b12;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    transition: 0.3s;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar h4 {
+    color: #f5e9d4;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #e8d9c0;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.sidebar a i { margin-right: 10px; font-size: 1.2rem; }
+.sidebar.collapsed a span { display: none; }
+
+.sidebar a:hover { background: #c97b44; color: white; }
+
+/* Expandable submenu */
+.submenu {
+    display: none;
+    flex-direction: column;
+    margin-left: 1.5rem;
+}
+.submenu a { padding: 5px 15px; font-size: 0.95rem; }
+
+#sidebarToggle {
+    background: transparent;
+    border: none;
+    color: #f5e9d4;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+/* ================== MAIN CONTENT ================== */
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    transition: margin-left 0.3s;
+}
+.sidebar.collapsed ~ .main-content {
+    margin-left: 70px;
+}
+
+.dashboard-card {
+    background: rgba(58,37,28,.85);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+}
+
+/* ================== TABLE ================== */
+.table thead th {
+    background: #3a251c;
+    color: #f5e9d4;
+}
+
+.table tbody tr {
+    background: rgba(58,37,28,0.6);
+    transition: 0.3s;
+}
+.table tbody tr:hover {
+    background: rgba(201,123,68,0.4);
+}
+
+.badge-paid { background: #6b9e78; }
+.badge-pending { background: #d9a66d; color: #1a110b; }
+.badge-card { background: #6b829e; }
+
+.btn-paid, .btn-print { border-radius: 50px; border: none; color: white; padding: 6px 12px; }
+.btn-paid { background: #c97b44; }
+.btn-print { background: #6b829e; }
+
+/* ================== RESPONSIVE ================== */
+@media(max-width:768px){
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .sidebar.collapsed { width: 100%; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .table-responsive { overflow-x: auto; }
+}
+</style>
+</head>
+
+<body style="display:none;">
+
+<!-- ================== SIDEBAR ================== -->
+<div class="sidebar" id="sidebar">
+    <button id="sidebarToggle"><i class="bi bi-list"></i></button>
+    <h4>☕ Charlie Café</h4>
+
+    <!-- Dashboard -->
+    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/cafe-admindashboard.html">
+        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+    </a>
+
+    <!-- Orders with submenu -->
+    <a onclick="toggleSubmenu('ordersSub')">
+        <i class="bi bi-list-check"></i> <span>Orders</span> <i class="bi bi-caret-down-fill ms-auto"></i>
+    </a>
+    <div class="submenu" id="ordersSub">
+        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/order-status.html"><i class="bi bi-clock-history"></i> Status</a>
+        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/orderanatltics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+    </div>
+
+    <!-- Admin Logout -->
+    <a onclick="CHARLIE_AUTH.logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
+</div>
+
+<!-- ================== MAIN CONTENT ================== -->
+<div class="main-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h3><i class="bi bi-receipt"></i> Orders Dashboard</h3>
+        <button class="btn btn-paid" onclick="CHARLIE_AUTH.logout()">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="table-responsive">
+
+            <!-- Print All Orders -->
+            <button class="btn btn-print mb-3" onclick="printAllOrders()">
+                <i class="bi bi-printer-fill"></i> Print All Orders
+            </button>
+
+            <!-- Orders Table -->
+            <table class="table table-hover text-white" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-upc-scan"></i> Order ID</th>
+                        <th><i class="bi bi-people-fill"></i> Table</th>
+                        <th><i class="bi bi-basket-fill"></i> Item</th>
+                        <th><i class="bi bi-stack"></i> Qty</th>
+                        <th><i class="bi bi-credit-card-2-front-fill"></i> Payment</th>
+                        <th><i class="bi bi-clock-fill"></i> Status</th>
+                        <th><i class="bi bi-tools"></i> Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Orders dynamically loaded -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ================== JS FILES ================== -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/role-guard.js"></script> <!-- ADD THIS LINE -->
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+// ================== Cognito Admin Protection ==================
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.requireAdmin();
+document.body.style.display = "block";
+
+// ================== Sidebar Collapsible ==================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+
+// ================== Expandable Submenu ==================
+function toggleSubmenu(id) {
+    const menu = document.getElementById(id);
+    menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+}
+
+// ================== Load Orders (Public API) ==================
+async function loadOrders() {
+    const tbody = document.querySelector('#ordersTable tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">Loading orders...</td></tr>';
+    try {
+        const orders = await CHARLIE_API.public.adminDashboard();
+        if (!orders || orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">No orders found ☕</td></tr>';
+            return;
+        }
+        tbody.innerHTML = orders.map(order => {
+            const method = order.payment_method ?? 'UNKNOWN';
+            const status = order.payment_status ?? 'UNKNOWN';
+
+            // Individual Mark Paid button or Print button
+            const actionBtn = (method === 'CASH' && status === 'PENDING')
+                ? `<button class="btn btn-paid btn-sm" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
+                    <i class="bi bi-check2-circle"></i> Mark Paid
+                  </button>`
+                : `<button class="btn btn-print btn-sm" onclick="printOrder('${order.order_id}')">
+                    <i class="bi bi-printer-fill"></i> Print
+                  </button>`;
+
+            const paymentBadge = method === 'CARD'
+                ? `<span class="badge badge-card"><i class="bi bi-credit-card-2-front-fill"></i> CARD</span>`
+                : `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>`;
+
+            const statusBadge = status === 'PAID'
+                ? `<span class="badge badge-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
+                : `<span class="badge badge-pending"><i class="bi bi-clock-fill"></i> PENDING</span>`;
+
+            return `<tr>
+                <td>${order.order_id}</td>
+                <td>${order.table_number}</td>
+                <td>${order.item}</td>
+                <td>${order.quantity}</td>
+                <td>${paymentBadge}</td>
+                <td>${statusBadge}</td>
+                <td>${actionBtn}</td>
+            </tr>`;
+        }).join('');
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load orders</td></tr>';
+    }
+}
+
+// ================== Mark Individual Order Paid ==================
+async function markAsPaid(button) {
+    const orderId = button.getAttribute('data-order-id');
+    if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
+    button.disabled = true;
+    button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
+    try {
+        const result = await CHARLIE_API.public.updateOrder({ order_id: orderId });
+        if (result.success) {
+            alert("Payment marked as PAID ☕");
+            loadOrders();
+        } else alert(result.message || "Update failed");
+    } catch (err) { alert("Server error"); console.error(err); }
+    button.disabled = false;
+    button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
+}
+
+// ================== Print Single Order ==================
+function printOrder(orderId) {
+    const row = Array.from(document.querySelectorAll('#ordersTable tbody tr'))
+        .find(r => r.cells[0].innerText === orderId);
+    if (!row) return alert("Order not found!");
+    const content = `<html><head><title>Order ${orderId}</title></head><body>
+        <h2>☕ Charlie Café</h2>
+        <h3>Order #${orderId}</h3>
+        <table border="1" cellpadding="10">
+            <tr><th>Table</th><td>${row.cells[1].innerText}</td></tr>
+            <tr><th>Item</th><td>${row.cells[2].innerText}</td></tr>
+            <tr><th>Qty</th><td>${row.cells[3].innerText}</td></tr>
+            <tr><th>Payment</th><td>${row.cells[4].innerText}</td></tr>
+            <tr><th>Status</th><td>${row.cells[5].innerText}</td></tr>
+        </table>
+        </body></html>`;
+    const win = window.open('', '_blank');
+    win.document.write(content);
+    win.document.close();
+    win.print();
+}
+
+// ================== Print All Orders ==================
+function printAllOrders() {
+    const tableHtml = document.querySelector('#ordersTable').outerHTML;
+    const win = window.open('', '_blank');
+    win.document.write(`<html><head><title>All Orders</title></head><body>${tableHtml}</body></html>`);
+    win.document.close();
+    win.print();
+}
+
+// ================== INITIAL LOAD + AUTO REFRESH ==================
+loadOrders();
+setInterval(loadOrders, 30000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
 ---
+### admin-orders.html
 
+> **update version:2.0**
 
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charlie Café ☕ | Admin Orders Dashboard</title>
+
+<!-- BOOTSTRAP CSS + ICONS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ================== GLOBAL STYLES ================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1920') center/cover fixed;
+    background-size: cover;
+    color: #f5e9d4;
+    margin: 0;
+}
+body::before {
+    content:"";
+    position: fixed; inset: 0;
+    background: rgba(26,17,11,0.7);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+}
+
+/* ================== SIDEBAR ================== */
+.sidebar { width: 250px; height: 100vh; position: fixed; background: #2c1b12; padding: 2rem 1rem; overflow-y: auto; transition: 0.3s; }
+.sidebar.collapsed { width: 70px; }
+.sidebar h4 { color: #f5e9d4; font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 2rem; }
+.sidebar a { display: flex; align-items: center; padding: 10px 15px; margin-bottom: 8px; border-radius: 10px; text-decoration: none; color: #e8d9c0; transition: 0.3s; cursor: pointer; }
+.sidebar a i { margin-right: 10px; font-size: 1.2rem; }
+.sidebar.collapsed a span { display: none; }
+.sidebar a:hover { background: #c97b44; color: white; }
+.submenu { display: none; flex-direction: column; margin-left: 1.5rem; }
+.submenu a { padding: 5px 15px; font-size: 0.95rem; }
+#sidebarToggle { background: transparent; border: none; color: #f5e9d4; font-size: 1.5rem; cursor: pointer; margin-bottom: 1rem; }
+
+/* ================== MAIN CONTENT ================== */
+.main-content { margin-left: 250px; padding: 2rem; transition: margin-left 0.3s; }
+.sidebar.collapsed ~ .main-content { margin-left: 70px; }
+.dashboard-card { background: rgba(58,37,28,.85); border-radius: 20px; padding: 2rem; box-shadow: 0 12px 40px rgba(0,0,0,0.55); }
+
+/* ================== TABLE ================== */
+.table thead th { background: #3a251c; color: #f5e9d4; }
+.table tbody tr { background: rgba(58,37,28,0.6); transition: 0.3s; }
+.table tbody tr:hover { background: rgba(201,123,68,0.4); }
+.badge-paid { background: #6b9e78; }
+.badge-pending { background: #d9a66d; color: #1a110b; }
+.badge-card { background: #6b829e; }
+.btn-paid, .btn-print { border-radius: 50px; border: none; color: white; padding: 6px 12px; }
+.btn-paid { background: #c97b44; }
+.btn-print { background: #6b829e; }
+
+/* ================== RESPONSIVE ================== */
+@media(max-width:768px){
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .sidebar.collapsed { width: 100%; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .table-responsive { overflow-x: auto; }
+}
+</style>
+</head>
+
+<body style="display:none;">
+
+<!-- ================== SIDEBAR ================== -->
+<div class="sidebar" id="sidebar">
+    <button id="sidebarToggle"><i class="bi bi-list"></i></button>
+    <h4>☕ Charlie Café</h4>
+
+    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/cafe-admindashboard.html">
+        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+    </a>
+
+    <a onclick="toggleSubmenu('ordersSub')">
+        <i class="bi bi-list-check"></i> <span>Orders</span> <i class="bi bi-caret-down-fill ms-auto"></i>
+    </a>
+    <div class="submenu" id="ordersSub">
+        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/order-status.html"><i class="bi bi-clock-history"></i> Status</a>
+        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/orderanatltics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+    </div>
+
+    <a onclick="CHARLIE_AUTH.logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
+</div>
+
+<!-- ================== MAIN CONTENT ================== -->
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h3><i class="bi bi-receipt"></i> Orders Dashboard</h3>
+        <button class="btn btn-paid" onclick="CHARLIE_AUTH.logout()">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="table-responsive">
+            <button class="btn btn-print mb-3" onclick="printAllOrders()">
+                <i class="bi bi-printer-fill"></i> Print All Orders
+            </button>
+            <table class="table table-hover text-white" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-upc-scan"></i> Order ID</th>
+                        <th><i class="bi bi-people-fill"></i> Table</th>
+                        <th><i class="bi bi-basket-fill"></i> Item</th>
+                        <th><i class="bi bi-stack"></i> Qty</th>
+                        <th><i class="bi bi-credit-card-2-front-fill"></i> Payment</th>
+                        <th><i class="bi bi-clock-fill"></i> Status</th>
+                        <th><i class="bi bi-tools"></i> Action</th>
+                    </tr>
+                </thead>
+                <tbody><!-- Orders dynamically loaded --></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ================== JS FILES ================== -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/role-guard.js"></script> <!-- role guard -->
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+// ================== ADMIN ROLE GUARD ==================
+window.addEventListener("DOMContentLoaded", async () => {
+    // 1️⃣ Check if user is logged in and in "admin" or "manager" Cognito group
+    await window.CHARLIE_ROLE_GUARD.adminOnly();
+
+    // 2️⃣ Show page after validation
+    document.body.style.display = "block";
+
+    // 3️⃣ Load orders only AFTER role confirmed
+    loadOrders();
+    setInterval(loadOrders, 30000);
+});
+
+// ================== Sidebar Collapsible ==================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+
+// ================== Expandable Submenu ==================
+function toggleSubmenu(id) {
+    const menu = document.getElementById(id);
+    menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+}
+
+// ================== Load Orders (Admin API) ==================
+async function loadOrders() {
+    const tbody = document.querySelector('#ordersTable tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">Loading orders...</td></tr>';
+    try {
+        const orders = await CHARLIE_API.public.adminDashboard();
+        if (!orders || orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">No orders found ☕</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = orders.map(order => {
+            const method = order.payment_method ?? 'UNKNOWN';
+            const status = order.payment_status ?? 'UNKNOWN';
+
+            const actionBtn = (method === 'CASH' && status === 'PENDING')
+                ? `<button class="btn btn-paid btn-sm" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
+                    <i class="bi bi-check2-circle"></i> Mark Paid
+                  </button>`
+                : `<button class="btn btn-print btn-sm" onclick="printOrder('${order.order_id}')">
+                    <i class="bi bi-printer-fill"></i> Print
+                  </button>`;
+
+            const paymentBadge = method === 'CARD'
+                ? `<span class="badge badge-card"><i class="bi bi-credit-card-2-front-fill"></i> CARD</span>`
+                : `<span class="badge bg-secondary"><i class="bi bi-cash-stack"></i> CASH</span>`;
+
+            const statusBadge = status === 'PAID'
+                ? `<span class="badge badge-paid"><i class="bi bi-check-circle-fill"></i> PAID</span>`
+                : `<span class="badge badge-pending"><i class="bi bi-clock-fill"></i> PENDING</span>`;
+
+            return `<tr>
+                <td>${order.order_id}</td>
+                <td>${order.table_number}</td>
+                <td>${order.item}</td>
+                <td>${order.quantity}</td>
+                <td>${paymentBadge}</td>
+                <td>${statusBadge}</td>
+                <td>${actionBtn}</td>
+            </tr>`;
+        }).join('');
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load orders</td></tr>';
+    }
+}
+
+// ================== Mark Individual Order Paid ==================
+async function markAsPaid(button) {
+    const orderId = button.getAttribute('data-order-id');
+    if (!confirm(`Confirm CASH payment for order ${orderId}?`)) return;
+    button.disabled = true;
+    button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
+    try {
+        const result = await CHARLIE_API.public.updateOrder({ order_id: orderId });
+        if (result.success) {
+            alert("Payment marked as PAID ☕");
+            loadOrders();
+        } else alert(result.message || "Update failed");
+    } catch (err) { alert("Server error"); console.error(err); }
+    button.disabled = false;
+    button.innerHTML = `<i class="bi bi-check2-circle"></i> Mark Paid`;
+}
+
+// ================== Print Single Order ==================
+function printOrder(orderId) {
+    const row = Array.from(document.querySelectorAll('#ordersTable tbody tr'))
+        .find(r => r.cells[0].innerText === orderId);
+    if (!row) return alert("Order not found!");
+    const content = `<html><head><title>Order ${orderId}</title></head><body>
+        <h2>☕ Charlie Café</h2>
+        <h3>Order #${orderId}</h3>
+        <table border="1" cellpadding="10">
+            <tr><th>Table</th><td>${row.cells[1].innerText}</td></tr>
+            <tr><th>Item</th><td>${row.cells[2].innerText}</td></tr>
+            <tr><th>Qty</th><td>${row.cells[3].innerText}</td></tr>
+            <tr><th>Payment</th><td>${row.cells[4].innerText}</td></tr>
+            <tr><th>Status</th><td>${row.cells[5].innerText}</td></tr>
+        </table>
+        </body></html>`;
+    const win = window.open('', '_blank');
+    win.document.write(content);
+    win.document.close();
+    win.print();
+}
+
+// ================== Print All Orders ==================
+function printAllOrders() {
+    const tableHtml = document.querySelector('#ordersTable').outerHTML;
+    const win = window.open('', '_blank');
+    win.document.write(`<html><head><title>All Orders</title></head><body>${tableHtml}</body></html>`);
+    win.document.close();
+    win.print();
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+```
+
+### ✅ Key Improvements in This Version
+
+- Role Guard First: adminOnly() runs before anything else.
+
+- Body Hidden Until Validation: Prevents page flash for unauthorized users.
+
+- Load Orders After Guard: loadOrders() runs only after admin confirmed, safe from accidental API calls.
+
+- Comments: Each section explains exactly what it does.
+
+- Sidebar & Submenu: Fully collapsible and works with roles.
+
+- Mark Paid & Print: Buttons and badges work correctly.
 
