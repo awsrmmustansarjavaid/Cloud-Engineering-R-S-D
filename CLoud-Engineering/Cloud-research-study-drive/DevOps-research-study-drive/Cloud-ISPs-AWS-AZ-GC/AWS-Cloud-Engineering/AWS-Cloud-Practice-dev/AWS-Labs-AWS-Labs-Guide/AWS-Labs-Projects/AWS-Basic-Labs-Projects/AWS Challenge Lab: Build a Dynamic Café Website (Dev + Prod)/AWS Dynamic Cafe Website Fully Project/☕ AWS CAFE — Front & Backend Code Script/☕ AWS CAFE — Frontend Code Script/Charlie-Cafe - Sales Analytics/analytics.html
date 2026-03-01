@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cafe Analytics ☕</title>
 
 <!-- ===================== BOOTSTRAP CSS ===================== -->
@@ -81,7 +82,7 @@ body {
 @media (max-width: 768px) {
   .sidebar { position: relative; width: 100%; }
   .main-content { margin-left: 0; padding-top: 140px; }
-  .btn-success { position: relative; width: 100%; }
+  .btn-success { position: relative; width: 100%; margin-top: 10px; }
 }
 </style>
 </head>
@@ -149,7 +150,7 @@ body {
 <script src="/js/config.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/central-auth.js"></script>
-<script src="/js/role-guard.js"></script> <!-- ADD THIS LINE -->
+<script src="/js/role-guard.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/central-printing.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -158,8 +159,7 @@ body {
 document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔐 Protect page: Only admin users can access
-  CHARLIE_AUTH.protectPage();
-  CHARLIE_AUTH.requireAdmin();
+  await CHARLIE_ROLE_GUARD.adminOnly(); // checks if user is admin, blocks otherwise
   CHARLIE_AUTH.startAutoLogoutWatcher();
 
   // Show body after authentication
@@ -170,23 +170,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     CHARLIE_AUTH.logout();
   });
 
-  // Initial load
+  // Initial load of analytics
   await loadData();
 });
 
 /* =========================================================
    LOAD ANALYTICS DATA
    - Uses PUBLIC API only
+   - Updates metrics and chart dynamically
 ========================================================= */
 async function loadData() {
   try {
-    CHARLIE_AUTH.requireAdmin(); // ensure admin
+    // Ensure only admin can trigger
+    CHARLIE_ROLE_GUARD.adminOnly();
 
     const period = document.getElementById("period").value;
 
-    // ✅ PUBLIC API call
+    // ✅ PUBLIC API call to get analytics
     const data = await CHARLIE_API.public.adminDashboard(period);
 
+    // Update metrics
     document.getElementById("sales").textContent  = data.total_sales ?? 0;
     document.getElementById("cost").textContent   = data.total_cost ?? 0;
     document.getElementById("profit").textContent = data.profit ?? 0;
@@ -215,14 +218,16 @@ async function loadData() {
 
 /* =========================================================
    DOWNLOAD PDF (placeholder)
+   - Extend with real PDF export API
 ========================================================= */
 function downloadPDF() {
-  CHARLIE_AUTH.requireAdmin();
+  CHARLIE_ROLE_GUARD.adminOnly();
   alert("Connect to public PDF export endpoint.");
 }
 
 /* =========================================================
    CENTRAL PRINT
+   - Opens new window to print the container
 ========================================================= */
 function openCentralPrint(selector) {
   const target = document.querySelector(selector);
