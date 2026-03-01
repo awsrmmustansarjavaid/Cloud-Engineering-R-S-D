@@ -170,4 +170,100 @@ If cognito:groups is missing:
 ❌ Role guard will fail
 ❌ API Gateway will deny access
 
+### ✅ exact file, you should replace this part:
+
+```
+// ================== Cognito Admin Protection ==================
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.requireAdmin();
+document.body.style.display = "block";
+```
+
+Because now you are using:
+
+```
+window.CHARLIE_ROLE_GUARD.adminOnly();
+```
+
+### ✅ ✅ EXACTLY Where To Put It
+
+Go to the bottom of your HTML where this script starts:
+
+```
+<script>
+```
+
+Then replace the first section inside it with this:
+
+```
+<script>
+// ================== ADMIN ROLE GUARD ==================
+window.addEventListener("DOMContentLoaded", async () => {
+    await window.CHARLIE_ROLE_GUARD.adminOnly();
+    document.body.style.display = "block";
+});
+```
+
+### ✅ Your Final Structure Will Look Like This
+
+```
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/role-guard.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
+
+<script>
+// ================== ADMIN ROLE GUARD ==================
+window.addEventListener("DOMContentLoaded", async () => {
+    await window.CHARLIE_ROLE_GUARD.adminOnly();
+    document.body.style.display = "block";
+});
+
+// ================== Sidebar Collapsible ==================
+const sidebar = document.getElementById('sidebar');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+```
+
+Everything else stays exactly the same.
+
+### 🚨 Why This Is Better
+
+Instead of:
+
+```
+CHARLIE_AUTH.protectPage();
+CHARLIE_AUTH.requireAdmin();
+```
+
+You now use:
+
+```
+CHARLIE_ROLE_GUARD.adminOnly();
+```
+
+Which:
+
+✔ checks login
+✔ checks Cognito groups
+✔ blocks non-admins
+✔ logs them out automatically
+
+Cleaner + centralized control.
+
+### ⚠️ VERY IMPORTANT
+
+Make sure:
+
+```
+<body style="display:none;">
+```
+
+stays there.
+
+That prevents flashing the page before role validation.
+
 ---
