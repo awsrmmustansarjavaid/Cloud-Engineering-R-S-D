@@ -102,6 +102,31 @@ If the employee already checked in today:
 }
 ```
 
+Test Event (Check-out):
+
+```
+{
+  "httpMethod": "POST",
+  "resource": "/checkout",
+  "body": "{\"employee_id\": 1}"
+}
+```
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+  },
+  "body": "{\"message\": \"checkout successful\"}"
+}
+```
+
+
 #### ✅ Once you set this up, you can test check-in first, then check-out, and verify the attendance table in MySQL to see the records inserted/updated.
 
 ### 2️⃣ hr-employee-profile
