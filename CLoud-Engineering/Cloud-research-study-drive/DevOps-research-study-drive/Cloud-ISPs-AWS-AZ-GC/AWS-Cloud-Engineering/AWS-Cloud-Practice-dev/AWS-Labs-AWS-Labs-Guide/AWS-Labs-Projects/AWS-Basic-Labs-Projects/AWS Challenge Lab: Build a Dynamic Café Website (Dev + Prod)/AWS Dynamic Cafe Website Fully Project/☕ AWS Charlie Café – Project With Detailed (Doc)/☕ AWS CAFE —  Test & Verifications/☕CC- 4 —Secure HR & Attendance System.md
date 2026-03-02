@@ -452,13 +452,6 @@ SELECT leave_date, leave_type FROM leaves WHERE employee_id = 1 ORDER BY leave_d
 SELECT holiday_date, description FROM holidays ORDER BY holiday_date DESC;
 ```
 
-
-
-
-
-
-
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
