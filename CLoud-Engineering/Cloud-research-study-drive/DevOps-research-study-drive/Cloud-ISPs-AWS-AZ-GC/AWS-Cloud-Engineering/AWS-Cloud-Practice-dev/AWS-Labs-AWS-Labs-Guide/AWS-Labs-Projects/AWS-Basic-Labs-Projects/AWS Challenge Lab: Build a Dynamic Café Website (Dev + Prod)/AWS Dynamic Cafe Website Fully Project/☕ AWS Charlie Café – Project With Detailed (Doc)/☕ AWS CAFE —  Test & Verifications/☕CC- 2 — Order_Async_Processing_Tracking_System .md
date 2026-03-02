@@ -21,7 +21,15 @@ Since this Lambda currently handles one item per order, a sample test JSON for A
 
 ```
 {
-  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2}"
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"payment_method\":\"CASH\"}"
+}
+```
+
+OR if paying by card:
+
+```
+{
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"payment_method\":\"CARD\"}"
 }
 ```
 
@@ -259,7 +267,8 @@ In Request Body, paste:
   "table_number": 3,
   "customer_name": "ApiTest",
   "item": "Coffee",
-  "quantity": 1
+  "quantity": 1,
+  "payment_method": "CASH"
 }
 ```
 
