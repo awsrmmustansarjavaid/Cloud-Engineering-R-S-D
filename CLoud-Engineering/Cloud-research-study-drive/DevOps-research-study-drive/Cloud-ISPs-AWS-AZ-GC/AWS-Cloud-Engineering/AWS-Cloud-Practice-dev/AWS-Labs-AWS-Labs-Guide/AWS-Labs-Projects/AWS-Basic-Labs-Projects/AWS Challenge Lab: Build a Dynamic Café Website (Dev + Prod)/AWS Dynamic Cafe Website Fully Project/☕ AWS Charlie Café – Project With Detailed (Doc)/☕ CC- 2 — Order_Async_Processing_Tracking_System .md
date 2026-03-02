@@ -622,7 +622,8 @@ In Request Body, paste:
   "table_number": 3,
   "customer_name": "ApiTest",
   "item": "Coffee",
-  "quantity": 1
+  "quantity": 1,
+  "payment_method": "CASH"
 }
 ```
 
@@ -667,9 +668,9 @@ Test outside PHP first.
 - Open terminal:
 
 ```
-curl -X POST https://abc123.execute-api.us-east-1.amazonaws.com/Prod/orders \
+curl -X POST https://hihe1z5ci7.execute-api.us-east-1.amazonaws.com/prod/orders \
 -H "Content-Type: application/json" \
--d '{"table_number":5,"customer_name":"John","item":"Coffee","quantity":2}'
+-d '{"table_number":5,"customer_name":"John","item":"Coffee","quantity":2,"payment_method":"CASH"}'
 ```
 
 If correct, you get:
