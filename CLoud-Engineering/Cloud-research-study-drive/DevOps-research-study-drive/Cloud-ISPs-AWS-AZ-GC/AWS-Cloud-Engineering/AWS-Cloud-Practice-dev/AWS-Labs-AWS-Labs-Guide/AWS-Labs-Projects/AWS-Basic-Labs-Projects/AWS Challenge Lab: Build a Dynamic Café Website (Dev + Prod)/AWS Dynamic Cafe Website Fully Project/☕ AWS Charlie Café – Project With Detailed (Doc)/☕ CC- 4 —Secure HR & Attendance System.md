@@ -131,9 +131,6 @@ SELECT * FROM holidays;
 
 If you see your inserted rows and table names, your RDS configuration is fully functional. ✅
 
-
-
-
 ### 2️⃣ Method - 1 HR & Attendance System Create Tables
 
 > **This table links Cognito users with café employees.**
