@@ -165,17 +165,12 @@ body {
 
 </div>
 
-<!-- Load system scripts -->
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="api.js"></script>
-
 <script>
 let selectedTimezone = "Asia/Karachi";
 
-/* =====================================================
-   LIVE CLOCK — updates every second
-===================================================== */
+/* ==========================
+   LIVE CLOCK
+========================== */
 function updateClock() {
     const now = new Date();
     const timeOptions = { timeZone: selectedTimezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
@@ -187,9 +182,9 @@ setInterval(updateClock, 1000);
 updateClock();
 document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
 
-/* =====================================================
-   SESSION TIMER — counts working hours
-===================================================== */
+/* ==========================
+   SESSION TIMER
+========================== */
 let sessionStart = null;
 let sessionInterval = null;
 function startSessionTimer() {
@@ -203,50 +198,64 @@ function startSessionTimer() {
     }, 1000);
 }
 
-/* =====================================================
-   LATE CHECK-IN DETECTION — after 10 AM local
-===================================================== */
+/* ==========================
+   LATE CHECK-IN DETECTION
+========================== */
 function isLate() {
     const now = new Date();
     return now.getHours() >= 10;
 }
 
-/* =====================================================
-   FINGERPRINT SCAN SIMULATION — calls API.js
-===================================================== */
+/* ==========================
+   FINGERPRINT SCAN SIMULATION
+========================== */
 async function simulateScan() {
-    const employeeId = document.getElementById("employeeId").value.trim();
+    const employeeIdInput = document.getElementById("employeeId").value.trim();
     const action = document.querySelector('input[name="attendanceMode"]:checked').value;
 
-    if (!employeeId) { showMessage("❌ Enter Employee ID first", false); return; }
+    if (!employeeIdInput) { showMessage("❌ Enter Employee ID first", false); return; }
+
+    const employeeId = parseInt(employeeIdInput, 10); // convert to numeric
+    if (isNaN(employeeId)) { showMessage("❌ Employee ID must be a number", false); return; }
 
     showMessage("🔍 Scanning fingerprint...", true);
 
     setTimeout(async () => {
         try {
-            // ✅ Call updated API.js recordAttendance() with proper path
-            await CHARLIE_API.recordAttendance({ employee_id: employeeId, action: action });
+            // Call Lambda API
+            const payload = { employee_id: employeeId, action: action };
 
+            const response = await fetch("https://hihe1z5ci7.execute-api.us-east-1.amazonaws.com/prod/attendance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.message || "API error");
+
+            // Display success messages
             if (action === "checkin") {
                 if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
                 else showMessage("✅ Check-In Successful", true);
-                startSessionTimer(); // Start working timer
+                startSessionTimer();
             } else {
                 showMessage("🔴 Check-Out Successful", true);
-                clearInterval(sessionInterval); // Stop timer
+                clearInterval(sessionInterval);
                 document.getElementById("sessionTimer").innerText = "";
             }
 
         } catch (error) {
-            showMessage("❌ Scan failed or API error", false);
+            showMessage("❌ Scan failed or API error: " + error.message, false);
             console.error("Attendance API error:", error);
         }
-    }, 2000);
+    }, 1500);
 }
 
-/* =====================================================
+/* ==========================
    SHOW STATUS MESSAGE
-===================================================== */
+========================== */
 function showMessage(message, success = true) {
     const msg = document.getElementById("statusMsg");
     msg.innerText = message;
