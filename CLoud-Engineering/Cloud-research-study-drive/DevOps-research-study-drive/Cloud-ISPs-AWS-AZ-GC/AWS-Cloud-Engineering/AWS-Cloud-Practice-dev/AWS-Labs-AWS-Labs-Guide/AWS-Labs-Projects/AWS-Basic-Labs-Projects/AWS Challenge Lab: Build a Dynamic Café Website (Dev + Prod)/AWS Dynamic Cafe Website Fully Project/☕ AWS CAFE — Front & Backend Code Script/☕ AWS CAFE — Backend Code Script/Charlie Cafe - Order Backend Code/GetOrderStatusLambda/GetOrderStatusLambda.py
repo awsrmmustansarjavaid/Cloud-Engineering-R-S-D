@@ -6,11 +6,11 @@ import pymysql
 # CHARLIE CAFE - GET ORDER STATUS LAMBDA
 # ------------------------------------------------------------
 # This Lambda:
-# 1. Retrieves DB credentials from AWS Secrets Manager
-# 2. Connects to RDS MySQL
-# 3. Fetches last 20 orders
-# 4. Reads metrics from DynamoDB
-# 5. Returns combined response to API Gateway
+# 1️⃣ Retrieves DB credentials from AWS Secrets Manager
+# 2️⃣ Connects to RDS MySQL
+# 3️⃣ Fetches last 20 orders (including payment_status!)
+# 4️⃣ Reads metrics from DynamoDB
+# 5️⃣ Returns combined response to API Gateway
 # ============================================================
 
 # ---------------- AWS CLIENTS ----------------
@@ -18,8 +18,8 @@ secrets_client = boto3.client('secretsmanager')
 dynamodb = boto3.resource('dynamodb')
 
 # ---------------- CONSTANTS ----------------
-SECRET_NAME = "CafeDevDBSM"          # Name of secret in AWS Secrets Manager
-METRICS_TABLE = "CafeOrderMetrics"  # DynamoDB table name
+SECRET_NAME = "CafeDevDBSM"          # Secret in AWS Secrets Manager
+METRICS_TABLE = "CafeOrderMetrics"  # DynamoDB metrics table
 
 # DynamoDB table reference
 metrics_table = dynamodb.Table(METRICS_TABLE)
@@ -29,14 +29,13 @@ metrics_table = dynamodb.Table(METRICS_TABLE)
 # ============================================================
 def get_db_secret():
     """
-    Fetches RDS credentials from AWS Secrets Manager.
+    Fetch RDS credentials from AWS Secrets Manager.
     Returns:
         dict: {host, username, password, dbname}
     """
     response = secrets_client.get_secret_value(
         SecretId=SECRET_NAME
     )
-
     return json.loads(response["SecretString"])
 
 
@@ -65,6 +64,7 @@ def lambda_handler(event, context):
         metrics = metrics_table.scan().get("Items", [])
 
         # ---------------- 4️⃣ Fetch Last 20 Orders from RDS ----------------
+        # NOTE: Added `payment_status` to fix Mark Paid button issue
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT
@@ -76,6 +76,7 @@ def lambda_handler(event, context):
                     total_amount,
                     status,
                     payment_method,
+                    payment_status,  -- ✅ crucial for frontend
                     created_at
                 FROM orders
                 ORDER BY created_at DESC
