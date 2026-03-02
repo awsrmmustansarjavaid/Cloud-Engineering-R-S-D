@@ -72,6 +72,14 @@ window.CHARLIE_API = (() => {
         return apiFetch(`${CONFIG.API_BASE}/employee/order`, { method: "POST", body: JSON.stringify(payload) });
     }
 
+  // ================== ADMIN — MARK CASH ORDER AS PAID ==================
+    function markCashOrderPaid(orderId) {
+        return apiFetch(`${CONFIG.API_BASE}/admin/mark-paid`, {
+            method: "POST",
+            body: JSON.stringify({ order_id: orderId })
+        });
+    }
+
     /* =====================================================
        👥 HR — ATTENDANCE (PUBLIC)
        - Check-in / Check-out API
@@ -160,6 +168,7 @@ window.CHARLIE_API = (() => {
         getOrderStatus,
         getCafeOrderStatus,
         getGetOrderStatus,
+ 	    markCashOrderPaid,
         getOrders,
         getEmployeeOrders,
         createEmployeeOrder,
