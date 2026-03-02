@@ -100,57 +100,58 @@ MySQL stays updated (so GetOrderStatusLambda shows the latest payment_status)
 import json
 import boto3
 import pymysql
+from decimal import Decimal
+from datetime import datetime
 import os
 
 # -----------------------------
 # DynamoDB setup
 # -----------------------------
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('CafeOrders')
+dynamo_table = dynamodb.Table('CafeOrders')
 
 # -----------------------------
-# MySQL setup
-# Replace with your actual RDS/MySQL credentials
+# Secrets Manager
 # -----------------------------
-MYSQL_HOST = os.environ.get('MYSQL_HOST', 'your-mysql-host')
-MYSQL_USER = os.environ.get('MYSQL_USER', 'your-mysql-user')
-MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'your-mysql-password')
-MYSQL_DB = os.environ.get('MYSQL_DB', 'your-mysql-database')
+SECRETS_NAME = os.environ.get('SECRET_NAME', 'CafeDevDBSM')
+secrets_client = boto3.client('secretsmanager')
+
+def get_db_secret():
+    """Fetch DB credentials from Secrets Manager"""
+    secret = secrets_client.get_secret_value(SecretId=SECRETS_NAME)
+    return json.loads(secret['SecretString'])
 
 def lambda_handler(event, context):
     """
-    Expected request body:
+    Expects:
     {
         "order_id": "ORD-123456"
     }
     """
     try:
-        # -----------------------------
-        # Parse incoming request
-        # -----------------------------
         body = json.loads(event['body'])
         order_id = body['order_id']
 
         # -----------------------------
-        # Update DynamoDB payment_status
+        # 1️⃣ Update DynamoDB
         # -----------------------------
-        table.update_item(
+        dynamo_table.update_item(
             Key={'order_id': order_id},
             UpdateExpression="SET payment_status = :ps",
-            ExpressionAttributeValues={
-                ':ps': 'PAID'
-            }
+            ExpressionAttributeValues={':ps': 'PAID'}
         )
 
         # -----------------------------
-        # Update MySQL payment_status
+        # 2️⃣ Update MySQL
         # -----------------------------
+        secret = get_db_secret()
         connection = pymysql.connect(
-            host=MYSQL_HOST,
-            user=MYSQL_USER,
-            password=MYSQL_PASSWORD,
-            database=MYSQL_DB,
-            cursorclass=pymysql.cursors.DictCursor
+            host=secret['host'],
+            user=secret['username'],
+            password=secret['password'],
+            database=secret['dbname'],
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=10
         )
 
         try:
@@ -162,56 +163,58 @@ def lambda_handler(event, context):
             connection.close()
 
         # -----------------------------
-        # Success response
+        # 3️⃣ Return success
         # -----------------------------
         return {
             "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type": "application/json"
-            },
-            "body": json.dumps({
-                "success": True,
-                "message": f"Order {order_id} marked as PAID in DynamoDB & MySQL"
-            })
+            "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
+            "body": json.dumps({"success": True, "message": f"Order {order_id} marked as PAID in DynamoDB & MySQL"})
         }
 
     except Exception as e:
         # -----------------------------
-        # Error handling
+        # 4️⃣ Error handling
         # -----------------------------
         return {
             "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type": "application/json"
-            },
-            "body": json.dumps({
-                "success": False,
-                "error": str(e)
-            })
+            "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
+            "body": json.dumps({"success": False, "error": str(e)})
         }
 ```
 
-### ✅ Key Points
+### ✅ Key Fixes
 
-DynamoDB update: stays the same as before.
+Secrets Manager used: Fetches MySQL credentials dynamically (CafeDevDBSM), just like your CafeOrderProcessor.
 
-MySQL update:
+Removed hardcoded MySQL host/user/password → no more connection failure.
 
-Connects to your MySQL database.
+DynamoDB update remains unchanged.
 
-Updates payment_status in the orders table.
+Error handling will now show a real error if MySQL fails.
 
-Commits the change.
+Connect timeout added to prevent hanging.
 
-Environment variables:
+### 🔹 Next Steps
 
-MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
+Go to your Lambda Configuration → Environment variables:
 
-Use Lambda environment variables for security instead of hardcoding credentials.
+SECRET_NAME = CafeDevDBSM (or your actual secret name)
 
-Error handling: If either DynamoDB or MySQL fails, Lambda returns an error.
+Make sure the Lambda has network access to your RDS:
 
-Response: Confirms both databases were updated.
+If RDS is in a VPC, attach Lambda to the same VPC + subnets + security group allowing port 3306.
+
+Include pymysql in your Lambda deployment:
+
+Either via a Lambda Layer or package pymysql inside your ZIP deployment.
+
+Test Lambda with this payload in AWS Console → Test:
+
+```
+{
+  "body": "{\"order_id\": \"ORD-20260302-5056\"}"
+}
+```
+
+After this, your Mark as Paid button should update both DynamoDB and MySQL, and your frontend will show PAID after refreshing.
 ----
