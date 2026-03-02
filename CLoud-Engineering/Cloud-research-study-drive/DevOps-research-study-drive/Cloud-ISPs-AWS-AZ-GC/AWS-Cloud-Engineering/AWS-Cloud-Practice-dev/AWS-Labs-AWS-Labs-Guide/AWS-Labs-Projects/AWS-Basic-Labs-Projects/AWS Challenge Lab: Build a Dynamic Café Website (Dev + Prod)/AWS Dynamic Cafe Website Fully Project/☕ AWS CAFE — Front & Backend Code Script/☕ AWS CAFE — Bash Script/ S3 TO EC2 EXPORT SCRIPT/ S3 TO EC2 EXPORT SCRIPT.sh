@@ -17,7 +17,7 @@ S3_BUCKET="charlie-cafe-s3-bucket"     # Replace with your S3 bucket name
 S3_HTML_FOLDER="Charlie Cafe Code Drive/html/"
 EC2_HTML_FOLDER="/var/www/html"
 
-S3_BASH_FOLDER="Charlie Cafe Code Drive/bash-scripts/"
+S3_BASH_FOLDER="Charlie Cafe Code Drive/bash script/"
 EC2_BASH_FOLDER="/home/download"
 
 # =========================
