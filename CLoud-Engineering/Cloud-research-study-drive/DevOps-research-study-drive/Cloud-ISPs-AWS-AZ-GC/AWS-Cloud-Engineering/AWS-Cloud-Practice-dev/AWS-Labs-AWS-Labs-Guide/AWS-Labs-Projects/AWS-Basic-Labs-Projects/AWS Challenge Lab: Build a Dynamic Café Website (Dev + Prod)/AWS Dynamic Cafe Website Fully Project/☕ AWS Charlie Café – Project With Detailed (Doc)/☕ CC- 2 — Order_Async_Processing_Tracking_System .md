@@ -2570,7 +2570,33 @@ AdminMarkPaidLambda
 
 [AdminMarkPaidLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminMarkPaidLambda/AdminMarkPaidLambda.py)
 
-### 4️⃣ — CREATE ADMIN API ENDPOINT
+### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**    
+
+### 5️⃣ Attach Lambda Layer
+
+- same steps 
+
+### 6️⃣ — CREATE ADMIN API ENDPOINT
 
 #### 🔹 4.1 Open API Gateway
 
@@ -2635,7 +2661,7 @@ This creates endpoint /admin/mark-paid
 POST https://xxxx.execute-api.us-east-1.amazonaws.com/prod/admin/mark-paid
 ```
 
-### 5️⃣ — admin-orders.html
+### 7️⃣ — admin-orders.html
 
 [admin-orders.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders/admin-orders.html)
 
