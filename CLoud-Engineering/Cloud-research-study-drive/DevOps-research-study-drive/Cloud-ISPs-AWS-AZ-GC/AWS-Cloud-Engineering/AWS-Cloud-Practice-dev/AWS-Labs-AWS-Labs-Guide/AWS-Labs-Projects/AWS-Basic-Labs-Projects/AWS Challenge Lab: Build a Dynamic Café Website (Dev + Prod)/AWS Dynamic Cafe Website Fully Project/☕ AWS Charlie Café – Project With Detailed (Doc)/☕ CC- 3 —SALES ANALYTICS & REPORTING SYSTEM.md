@@ -15,7 +15,28 @@
 
 ## PHASE 1️⃣ – RDS 
 
-### 
+### ⚠️ IMPORTANT REQUIREMENTS
+
+Your MySQL orders table MUST contain:
+
+```
+created_at      DATETIME
+payment_status  VARCHAR
+order_status    VARCHAR
+item_name       VARCHAR
+quantity        INT
+item_price      DECIMAL
+item_cost       DECIMAL
+```
+
+If created_at does not exist → add it:
+
+```
+ALTER TABLE orders ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+```
+
+
+
 
 
 **✅ PHASE 1 STATUS**
