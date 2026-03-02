@@ -638,10 +638,10 @@ body {
 
 <!-- ===================== SIDEBAR ===================== -->
 <div class="sidebar">
-  <a href="cafe-admin-dashboard.html"><i class="bi bi-house-fill"></i> Dashboard</a>
-  <a href="admin-orders.html"><i class="bi bi-list-check"></i> Orders Admin</a>
-  <a href="order-status.html"><i class="bi bi-box-seam"></i> Order Status</a>
-  <a class="active" href="analytics.html"><i class="bi bi-graph-up"></i> Analytics</a>
+  <a href="https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+  <a href="https://dyoqxkx8bd8d7.cloudfront.net/admin-orders.html"><i class="bi bi-list-check"></i> Orders Admin</a>
+  <a href="https://dyoqxkx8bd8d7.cloudfront.net/order-status.html"><i class="bi bi-box-seam"></i> Order Status</a>
+  <a class="active" href="https://dyoqxkx8bd8d7.cloudfront.net/analytics.html"><i class="bi bi-graph-up"></i> Analytics</a>
   <hr class="text-secondary">
   <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
 </div>
