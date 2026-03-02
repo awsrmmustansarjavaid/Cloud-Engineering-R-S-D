@@ -14,10 +14,10 @@ S3_BUCKET="charlie-cafe-s3-bucket"     # Replace with your S3 bucket name
 # =========================
 # FOLDERS TO SYNC
 # =========================
-S3_HTML_FOLDER="html/"
+S3_HTML_FOLDER="Charlie Cafe Code Drive/html/"
 EC2_HTML_FOLDER="/var/www/html"
 
-S3_BASH_FOLDER="bash-scripts/"
+S3_BASH_FOLDER="Charlie Cafe Code Drive/bash-scripts/"
 EC2_BASH_FOLDER="/home/download"
 
 # =========================
