@@ -210,6 +210,20 @@ Employee Not Found:
 }
 ```
 
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+  },
+  "body": "[{\"attendance_date\": \"2026-03-02\", \"checkin_time\": \"21:40:55\", \"checkout_time\": \"21:42:09\"}]"
+}
+```
+
 Missing employee_id:
 
 ```
