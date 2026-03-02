@@ -80,6 +80,12 @@ window.CHARLIE_API = (() => {
         });
     }
 
+// ================== ADMIN — ANALYTICS (PUBLIC READ) ==================
+function getAnalytics(period = "today") {
+    const url = `${CONFIG.API_BASE}/analytics?period=${encodeURIComponent(period)}`;
+    return apiFetch(url);
+}
+
     /* =====================================================
        👥 HR — ATTENDANCE (PUBLIC)
        - Check-in / Check-out API
@@ -172,6 +178,10 @@ window.CHARLIE_API = (() => {
         getOrders,
         getEmployeeOrders,
         createEmployeeOrder,
+
+ 	    // ... other functions
+   	    getAnalytics,
+    	// admin dashboard functions
 
         // HR Attendance Public
         recordAttendance,
