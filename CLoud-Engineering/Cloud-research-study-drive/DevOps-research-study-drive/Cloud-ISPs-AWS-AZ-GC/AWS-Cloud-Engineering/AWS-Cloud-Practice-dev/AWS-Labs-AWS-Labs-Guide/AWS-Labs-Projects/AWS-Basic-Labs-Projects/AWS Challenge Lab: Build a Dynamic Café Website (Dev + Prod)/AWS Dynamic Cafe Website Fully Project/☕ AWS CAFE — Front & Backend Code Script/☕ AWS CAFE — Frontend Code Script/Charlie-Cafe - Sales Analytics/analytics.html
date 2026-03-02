@@ -100,10 +100,10 @@ body {
 
 <!-- ===================== SIDEBAR ===================== -->
 <div class="sidebar">
-  <a href="cafe-admin-dashboard.html"><i class="bi bi-house-fill"></i> Dashboard</a>
-  <a href="admin-orders.html"><i class="bi bi-list-check"></i> Orders Admin</a>
-  <a href="order-status.html"><i class="bi bi-box-seam"></i> Order Status</a>
-  <a class="active" href="analytics.html"><i class="bi bi-graph-up"></i> Analytics</a>
+  <a href="https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html"><i class="bi bi-house-fill"></i> Dashboard</a>
+  <a href="https://dyoqxkx8bd8d7.cloudfront.net/admin-orders.html"><i class="bi bi-list-check"></i> Orders Admin</a>
+  <a href="https://dyoqxkx8bd8d7.cloudfront.net/order-status.html"><i class="bi bi-box-seam"></i> Order Status</a>
+  <a class="active" href="https://dyoqxkx8bd8d7.cloudfront.net/analytics.html"><i class="bi bi-graph-up"></i> Analytics</a>
   <hr class="text-secondary">
   <a id="logoutBtn" style="cursor:pointer"><i class="bi bi-door-closed-fill"></i> Logout</a>
 </div>
@@ -159,13 +159,13 @@ body {
 document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔐 Protect page: Only admin users can access
-  await CHARLIE_ROLE_GUARD.adminOnly(); // checks if user is admin, blocks otherwise
+  await CHARLIE_ROLE_GUARD.adminOnly();
   CHARLIE_AUTH.startAutoLogoutWatcher();
 
   // Show body after authentication
   document.body.style.display = "block";
 
-  // 🚪 Logout
+  // 🚪 Logout button
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
     CHARLIE_AUTH.logout();
   });
@@ -175,54 +175,70 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* =========================================================
-   LOAD ANALYTICS DATA
-   - Uses PUBLIC API only
+   LOAD ANALYTICS DATA — CORRECTED
+   - Uses CHARLIE_API.getAnalytics(period)
    - Updates metrics and chart dynamically
+   - Fully admin-protected
 ========================================================= */
 async function loadData() {
-  try {
-    // Ensure only admin can trigger
-    CHARLIE_ROLE_GUARD.adminOnly();
+    try {
+        // 🔒 Admin-only guard
+        await CHARLIE_ROLE_GUARD.adminOnly();
 
-    const period = document.getElementById("period").value;
+        // 📅 Read selected period from dropdown
+        const periodDropdown = document.getElementById("period");
+        const period = periodDropdown ? periodDropdown.value : "today";
 
-    // ✅ PUBLIC API call to get analytics
-    const data = await CHARLIE_API.public.adminDashboard(period);
+        // 🔹 Map frontend period to API expected values
+        const periodMap = { today: "today", week: "week", month: "month" };
+        const apiPeriod = periodMap[period] || "today";
 
-    // Update metrics
-    document.getElementById("sales").textContent  = data.total_sales ?? 0;
-    document.getElementById("cost").textContent   = data.total_cost ?? 0;
-    document.getElementById("profit").textContent = data.profit ?? 0;
+        // ✅ Fetch analytics data from backend
+        const data = await CHARLIE_API.getAnalytics(apiPeriod);
 
-    // Destroy old chart if exists
-    if (window.salesChart) window.salesChart.destroy();
+        // 📊 Update dashboard metrics
+        document.getElementById("sales").textContent  = data.total_sales ?? 0;
+        document.getElementById("cost").textContent   = data.total_cost ?? 0;
+        document.getElementById("profit").textContent = data.profit ?? 0;
 
-    // Create new chart
-    window.salesChart = new Chart(document.getElementById("chart"), {
-      type: "bar",
-      data: {
-        labels: ["Sales", "Cost", "Profit"],
-        datasets: [{
-          data: [data.total_sales ?? 0, data.total_cost ?? 0, data.profit ?? 0],
-          backgroundColor: ["#ffcc80","#ffab91","#c5e1a5"]
-        }]
-      },
-      options: { plugins: { legend: { display: false } } }
-    });
+        // 📉 Destroy previous chart if exists
+        if (window.salesChart) window.salesChart.destroy();
 
-  } catch (err) {
-    console.error("Analytics load error:", err);
-    alert("Failed to load analytics data");
-  }
+        // 📈 Create new Chart.js bar chart
+        const ctx = document.getElementById("chart").getContext("2d");
+        window.salesChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Sales", "Cost", "Profit"],
+                datasets: [{
+                    data: [data.total_sales ?? 0, data.total_cost ?? 0, data.profit ?? 0],
+                    backgroundColor: ["#ffcc80", "#ffab91", "#c5e1a5"]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+    } catch (err) {
+        // ❌ Error handling
+        console.error("Analytics load error:", err);
+        alert("Failed to load analytics data. Check console for details.");
+    }
 }
 
 /* =========================================================
    DOWNLOAD PDF (placeholder)
-   - Extend with real PDF export API
+   - Extend with real PDF export endpoint
 ========================================================= */
 function downloadPDF() {
-  CHARLIE_ROLE_GUARD.adminOnly();
-  alert("Connect to public PDF export endpoint.");
+    CHARLIE_ROLE_GUARD.adminOnly();
+    alert("Connect to public PDF export endpoint.");
 }
 
 /* =========================================================
@@ -230,16 +246,16 @@ function downloadPDF() {
    - Opens new window to print the container
 ========================================================= */
 function openCentralPrint(selector) {
-  const target = document.querySelector(selector);
-  if (!target) return;
+    const target = document.querySelector(selector);
+    if (!target) return;
 
-  const win = window.open("central-printing.html", "_blank");
-  if (!win) return alert("Popup blocked");
+    const win = window.open("central-printing.html", "_blank");
+    if (!win) return alert("Popup blocked");
 
-  win.onload = () => {
-    const container = win.document.getElementById("printContent");
-    if (container) container.innerHTML = target.outerHTML;
-  };
+    win.onload = () => {
+        const container = win.document.getElementById("printContent");
+        if (container) container.innerHTML = target.outerHTML;
+    };
 }
 </script>
 
