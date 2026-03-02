@@ -72,7 +72,7 @@ body::before {
     <button id="sidebarToggle"><i class="bi bi-list"></i></button>
     <h4>☕ Charlie Café</h4>
 
-    <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/cafe-admindashboard.html">
+    <a href="https://dyoqxkx8bd8d7.cloudfront.net/cafe-admindashboard.html">
         <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
     </a>
 
@@ -80,8 +80,8 @@ body::before {
         <i class="bi bi-list-check"></i> <span>Orders</span> <i class="bi bi-caret-down-fill ms-auto"></i>
     </a>
     <div class="submenu" id="ordersSub">
-        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/order-status.html"><i class="bi bi-clock-history"></i> Status</a>
-        <a href="https://YOUR-CLOUDFRONT-DOMAIN.cloudfront.net/orderanatltics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+        <a href="https://dyoqxkx8bd8d7.cloudfront.net/order-status.html"><i class="bi bi-clock-history"></i> Status</a>
+        <a href="https://dyoqxkx8bd8d7.cloudfront.net/orderanatltics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
     </div>
 
     <a onclick="CHARLIE_AUTH.logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
@@ -104,13 +104,15 @@ body::before {
             <table class="table table-hover text-white" id="ordersTable">
                 <thead>
                     <tr>
-                        <th><i class="bi bi-upc-scan"></i> Order ID</th>
-                        <th><i class="bi bi-people-fill"></i> Table</th>
-                        <th><i class="bi bi-basket-fill"></i> Item</th>
-                        <th><i class="bi bi-stack"></i> Qty</th>
-                        <th><i class="bi bi-credit-card-2-front-fill"></i> Payment</th>
-                        <th><i class="bi bi-clock-fill"></i> Status</th>
-                        <th><i class="bi bi-tools"></i> Action</th>
+                        <th>Order ID</th>
+                        <th>Table</th>
+                        <th>Customer</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Total ($)</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody><!-- Orders dynamically loaded --></tbody>
@@ -123,20 +125,15 @@ body::before {
 <script src="/js/config.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/central-auth.js"></script>
-<script src="/js/role-guard.js"></script> <!-- role guard -->
+<script src="/js/role-guard.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/central-printing.js"></script>
 
 <script>
 // ================== ADMIN ROLE GUARD ==================
 window.addEventListener("DOMContentLoaded", async () => {
-    // 1️⃣ Check if user is logged in and in "admin" or "manager" Cognito group
     await window.CHARLIE_ROLE_GUARD.adminOnly();
-
-    // 2️⃣ Show page after validation
     document.body.style.display = "block";
-
-    // 3️⃣ Load orders only AFTER role confirmed
     loadOrders();
     setInterval(loadOrders, 30000);
 });
@@ -153,20 +150,24 @@ function toggleSubmenu(id) {
     menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
 }
 
-// ================== Load Orders (Admin API) ==================
+// ================== Load Orders Function ==================
 async function loadOrders() {
     const tbody = document.querySelector('#ordersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">Loading orders...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-5">Loading orders...</td></tr>';
+
     try {
-        const orders = await CHARLIE_API.public.adminDashboard();
-        if (!orders || orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5">No orders found ☕</td></tr>';
+        // ✅ Use getOrders() instead of adminDashboard()
+        const response = await CHARLIE_API.getOrders();
+        const orders = response.orders || [];
+
+        if (orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center py-5">No orders found ☕</td></tr>';
             return;
         }
 
         tbody.innerHTML = orders.map(order => {
             const method = order.payment_method ?? 'UNKNOWN';
-            const status = order.payment_status ?? 'UNKNOWN';
+            const status = order.status ?? 'PENDING';
 
             const actionBtn = (method === 'CASH' && status === 'PENDING')
                 ? `<button class="btn btn-paid btn-sm" data-order-id="${order.order_id}" onclick="markAsPaid(this)">
@@ -187,16 +188,19 @@ async function loadOrders() {
             return `<tr>
                 <td>${order.order_id}</td>
                 <td>${order.table_number}</td>
+                <td>${order.customer_name || "-"}</td>
                 <td>${order.item}</td>
                 <td>${order.quantity}</td>
-                <td>${paymentBadge}</td>
+                <td>${order.total_amount || "-"}</td>
                 <td>${statusBadge}</td>
+                <td>${paymentBadge}</td>
                 <td>${actionBtn}</td>
             </tr>`;
         }).join('');
+
     } catch (err) {
         console.error(err);
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load orders</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Failed to load orders</td></tr>';
     }
 }
 
@@ -207,7 +211,7 @@ async function markAsPaid(button) {
     button.disabled = true;
     button.innerHTML = `<i class="bi bi-hourglass-split"></i> Processing...`;
     try {
-        const result = await CHARLIE_API.public.updateOrder({ order_id: orderId });
+        const result = await CHARLIE_API.updateOrder({ order_id: orderId });
         if (result.success) {
             alert("Payment marked as PAID ☕");
             loadOrders();
@@ -227,10 +231,12 @@ function printOrder(orderId) {
         <h3>Order #${orderId}</h3>
         <table border="1" cellpadding="10">
             <tr><th>Table</th><td>${row.cells[1].innerText}</td></tr>
-            <tr><th>Item</th><td>${row.cells[2].innerText}</td></tr>
-            <tr><th>Qty</th><td>${row.cells[3].innerText}</td></tr>
-            <tr><th>Payment</th><td>${row.cells[4].innerText}</td></tr>
-            <tr><th>Status</th><td>${row.cells[5].innerText}</td></tr>
+            <tr><th>Customer</th><td>${row.cells[2].innerText}</td></tr>
+            <tr><th>Item</th><td>${row.cells[3].innerText}</td></tr>
+            <tr><th>Qty</th><td>${row.cells[4].innerText}</td></tr>
+            <tr><th>Total</th><td>${row.cells[5].innerText}</td></tr>
+            <tr><th>Status</th><td>${row.cells[6].innerText}</td></tr>
+            <tr><th>Payment</th><td>${row.cells[7].innerText}</td></tr>
         </table>
         </body></html>`;
     const win = window.open('', '_blank');
