@@ -144,9 +144,25 @@ Expected Response:
 ```
 {
   "httpMethod": "POST",
-  "body": "{\"employee_id\": \"12345\"}"
+  "resource": "/employee-profile",
+  "body": "{\"employee_id\": 1}"
 }
 ```
+
+Expected Response:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST,OPTIONS"
+  },
+  "body": "{\"employee_id\": 1, \"name\": \"Alice\", \"job_title\": \"Barista\", \"salary\": 40000.0, \"start_date\": \"2025-12-01\"}"
+}
+```
+
 
 Check Employee Profile (Missing ID):
 
