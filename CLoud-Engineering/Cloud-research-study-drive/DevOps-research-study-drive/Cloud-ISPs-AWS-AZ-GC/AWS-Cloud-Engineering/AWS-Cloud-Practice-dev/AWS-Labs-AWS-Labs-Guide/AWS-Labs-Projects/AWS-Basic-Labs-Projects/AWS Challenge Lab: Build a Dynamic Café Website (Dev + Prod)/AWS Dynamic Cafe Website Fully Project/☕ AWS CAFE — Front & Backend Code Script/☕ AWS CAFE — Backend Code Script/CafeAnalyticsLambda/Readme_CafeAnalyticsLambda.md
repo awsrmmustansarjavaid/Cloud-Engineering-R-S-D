@@ -118,6 +118,15 @@ def lambda_handler(event, context):
         "orders_count": len(orders),
         "profit_per_item": profit_per_item
     })
-    ```
+```
 
-    
+### ✅ Key Changes:
+
+- Removed all Cognito/claims checks (401 / 403).
+
+- Now publicly callable via API Gateway without any authorizer.
+
+- Functionality for analytics remains exactly the same.
+
+- Fully compatible with your frontend query (period=today).    
+---
