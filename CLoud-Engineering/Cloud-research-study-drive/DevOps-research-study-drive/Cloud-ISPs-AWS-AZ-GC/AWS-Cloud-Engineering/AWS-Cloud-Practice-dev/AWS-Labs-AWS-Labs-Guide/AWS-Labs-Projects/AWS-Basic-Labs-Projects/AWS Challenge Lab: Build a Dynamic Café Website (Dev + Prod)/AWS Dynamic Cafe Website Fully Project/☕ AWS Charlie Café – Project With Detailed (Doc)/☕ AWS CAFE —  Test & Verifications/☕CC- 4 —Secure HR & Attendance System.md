@@ -276,7 +276,8 @@ Employee with No Records (optional):
 ```
 {
   "httpMethod": "POST",
-  "body": "{\"employee_id\":\"12345\"}"
+  "resource": "/leave-history",
+  "body": "{\"employee_id\": 1}"
 }
 ```
 
@@ -315,6 +316,143 @@ Employee with No Leaves (optional):
 | Missing `employee_id`   | `{"body":"{}"}`           | 400 Bad Request → `{"message":"employee_id is required"}`                                                                                                                                                                                                                                                   |
 | Employee with No Leaves | `{"employee_id":"99999"}` | 200 OK → `{ "leaves": [], "holidays": [ ... all company holidays ... ] }`                                                                                                                                                                                                                                   |
 | Employee with Leaves    | `{"employee_id":"12345"}` | 200 OK → example:<br>`json { "leaves": [ { "leave_date": "2026-02-25", "leave_type": "Sick" }, { "leave_date": "2026-02-15", "leave_type": "Casual" } ], "holidays": [ { "holiday_date": "2026-01-01", "description": "New Year" }, { "holiday_date": "2026-02-14", "description": "Valentine's Day" } ] }` |
+
+
+### RDS Verification
+
+
+### 1️⃣ Connect to RDS from EC2 CLI
+
+```
+mysql -h <RDS-ENDPOINT> -u <DB-USER> -p cafedb
+```
+Replace <RDS-ENDPOINT> with your RDS endpoint.
+
+Replace <DB-USER> with your database username.
+
+Enter password when prompted.
+
+You should see:
+
+```
+mysql>
+```
+
+2️⃣ Lambda Verification Plan
+
+We’ll verify each Lambda against the corresponding tables.
+
+A. HR Attendance Lambda (Check-in / Check-out)
+
+Tables: attendance, employees
+
+SQL Verification:
+
+Check employees exist:
+
+```
+SELECT * FROM employees;
+```
+
+Must include the employee ID you used in the Lambda test.
+
+Check attendance records:
+
+```
+SELECT * FROM attendance
+WHERE employee_id = 1
+ORDER BY attendance_date DESC;
+```
+
+For check-in test, checkin_time should be populated.
+
+For check-out test, checkout_time should also be populated.
+
+✅ This confirms the Lambda successfully inserted/updated attendance records.
+
+B. Employee Profile Lambda
+
+Table: employees
+
+SQL Verification:
+
+```
+SELECT employee_id, name, job_title, salary, start_date
+FROM employees
+WHERE employee_id = 1;
+```
+
+The result should match the Lambda’s JSON response.
+
+C. Attendance History Lambda
+
+Table: attendance
+
+SQL Verification:
+
+```
+SELECT attendance_date, checkin_time, checkout_time
+FROM attendance
+WHERE employee_id = 1
+ORDER BY attendance_date DESC;
+```
+he result should exactly match the JSON array returned by the Lambda.
+
+D. Leaves & Holidays Lambda
+
+Tables: leaves, holidays
+
+SQL Verification:
+
+Employee leaves:
+
+```
+SELECT leave_date, leave_type
+FROM leaves
+WHERE employee_id = 1
+ORDER BY leave_date DESC;
+```
+Company holidays:
+
+```
+SELECT holiday_date, description
+FROM holidays
+ORDER BY holiday_date DESC;
+```
+
+he output should match the Lambda response JSON for leaves and holidays.
+
+3️⃣ Quick Tips
+
+Use ORDER BY to match the Lambda sorting (attendance date DESC, leave date DESC).
+
+If testing check-in/checkout, rerun the Lambda and verify using:
+
+```
+SELECT * FROM attendance WHERE employee_id = 1 AND attendance_date = CURDATE();
+```
+
+For test data cleanup, you can delete old test entries:
+
+```
+DELETE FROM attendance WHERE employee_id = 1 AND attendance_date < '2026-01-01';
+DELETE FROM leaves WHERE employee_id = 1;
+```
+
+If your Lambda returns empty arrays, check for existing data in the table.
+
+✅ Using this method, you can fully verify all 4 Lambdas by comparing the RDS data with your Lambda JSON responses.
+
+### Quick Test 
+
+```
+SELECT * FROM employees WHERE employee_id = 1;
+SELECT * FROM attendance WHERE employee_id = 1 ORDER BY attendance_date DESC;
+SELECT leave_date, leave_type FROM leaves WHERE employee_id = 1 ORDER BY leave_date DESC;
+SELECT holiday_date, description FROM holidays ORDER BY holiday_date DESC;
+```
+
+
 
 
 
