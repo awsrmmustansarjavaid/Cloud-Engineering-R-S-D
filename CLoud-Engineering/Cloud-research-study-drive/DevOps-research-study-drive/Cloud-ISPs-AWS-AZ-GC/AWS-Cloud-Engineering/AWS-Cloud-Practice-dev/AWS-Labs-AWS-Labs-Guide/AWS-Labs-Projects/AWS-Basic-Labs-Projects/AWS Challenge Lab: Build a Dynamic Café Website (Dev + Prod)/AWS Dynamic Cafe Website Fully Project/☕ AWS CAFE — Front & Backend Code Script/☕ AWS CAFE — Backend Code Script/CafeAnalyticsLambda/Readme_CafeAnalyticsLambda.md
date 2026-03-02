@@ -1,3 +1,20 @@
+# Charlie Cafe - CafeAnalyticsLambda
+
+
+### CafeAnalyticsLambda.py
+
+> **Update Version:1.0**
+
+
+- Removing the Admin group check completely.
+
+- Keeping the Lambda fully functional for analytics (still calculating profit, orders, etc.).
+
+- Making it safe for public API calls.
+
+#### Here’s the fully final version of your CafeAnalyticsLambda:
+
+```
 import json
 import os
 import boto3
@@ -101,3 +118,6 @@ def lambda_handler(event, context):
         "orders_count": len(orders),
         "profit_per_item": profit_per_item
     })
+    ```
+
+    
