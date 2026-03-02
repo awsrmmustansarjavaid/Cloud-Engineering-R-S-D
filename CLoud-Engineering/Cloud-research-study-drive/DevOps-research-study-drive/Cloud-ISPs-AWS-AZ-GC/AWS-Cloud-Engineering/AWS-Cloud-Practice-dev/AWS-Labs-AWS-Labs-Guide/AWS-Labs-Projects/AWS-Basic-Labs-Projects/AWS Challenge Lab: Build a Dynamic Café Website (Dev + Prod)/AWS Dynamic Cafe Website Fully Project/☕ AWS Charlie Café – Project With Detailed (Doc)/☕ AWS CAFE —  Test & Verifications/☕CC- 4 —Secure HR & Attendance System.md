@@ -43,7 +43,7 @@ holidays
 {
   "httpMethod": "POST",
   "resource": "/checkin",
-  "body": "{\"employee_id\":\"12345\"}"
+  "body": "{\"employee_id\": 1}"
 }
 ```
 
@@ -53,7 +53,8 @@ For check-out, example event:
 {
   "httpMethod": "POST",
   "resource": "/checkout",
-  "body": "{\"employee_id\":\"12345\"}"
+  "body": "{\"employee_id\": 1}"
+}
 ```
 
 For CORS preflight test, example event:
@@ -73,7 +74,7 @@ Test Event (Check-in):
 {
   "httpMethod": "POST",
   "resource": "/checkin",
-  "body": "{\"employee_id\":\"12345\"}"
+  "body": "{\"employee_id\": 1}"
 }
 ```
 
