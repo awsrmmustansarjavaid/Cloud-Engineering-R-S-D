@@ -205,7 +205,8 @@ Employee Not Found:
 ```
 {
   "httpMethod": "POST",
-  "body": "{\"employee_id\":\"12345\"}"
+  "resource": "/attendance-history",
+  "body": "{\"employee_id\": 1}"
 }
 ```
 
