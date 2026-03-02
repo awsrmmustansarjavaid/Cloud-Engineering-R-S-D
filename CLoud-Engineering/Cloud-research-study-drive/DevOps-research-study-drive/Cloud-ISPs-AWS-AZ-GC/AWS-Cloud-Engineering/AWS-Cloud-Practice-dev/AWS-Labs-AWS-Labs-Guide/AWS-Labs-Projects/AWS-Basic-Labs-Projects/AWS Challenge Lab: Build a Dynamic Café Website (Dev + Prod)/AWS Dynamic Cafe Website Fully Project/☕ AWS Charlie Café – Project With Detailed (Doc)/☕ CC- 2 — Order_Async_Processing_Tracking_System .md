@@ -2568,7 +2568,7 @@ AdminMarkPaidLambda
 
 #### Replace entire Lambda code with this:
 
-[AdminMarkPaidLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminMarkPaidLambda.py)
+[AdminMarkPaidLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminMarkPaidLambda/AdminMarkPaidLambda.py)
 
 ### 4️⃣ — CREATE ADMIN API ENDPOINT
 
