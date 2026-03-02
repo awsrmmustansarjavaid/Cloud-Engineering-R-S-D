@@ -408,9 +408,19 @@ Use this in Lambda Test:
 
 ```
 {
-  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2}"
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"payment_method\":\"CASH\"}"
 }
 ```
+
+OR if paying by card:
+
+```
+{
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"payment_method\":\"CARD\"}"
+}
+```
+
+
 
 #### ✅ Expected:
 
