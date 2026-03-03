@@ -238,6 +238,23 @@ GROUP BY status, payment_status;
 
 Paste result here.
 
+#### ✅ Expected Result:
+
+```
++-----------+----------------+----------+ | status | payment_status | COUNT(*) | +-----------+----------------+----------+ | RECEIVED | NULL | 1 | | PREPARING | NULL | 1 | | RECEIVED | PAID | 4 | +-----------+----------------+----------+ 3 rows in set (0.003 sec)
+```
+
+```
+SELECT order_id, status, payment_status, total_amount, created_at -> FROM orders -> WHERE created_at >= CURDATE() -> ORDER BY created_at DESC;
+```
+
+#### ✅ Expected Result:
+
+```
++-------------------+-----------+----------------+--------------+---------------------+ | order_id | status | payment_status | total_amount | created_at | +-------------------+-----------+----------------+--------------+---------------------+ | ORD-20260302-5056 | RECEIVED | PAID | 3.00 | 2026-03-02 17:32:36 | | ORD-20260302-7481 | RECEIVED | PAID | 8.00 | 2026-03-02 17:31:51 | | ORD-20260302-4290 | RECEIVED | PAID | 4.00 | 2026-03-02 15:43:00 | | ORD-20260302-6674 | RECEIVED | PAID | 2.00 | 2026-03-02 14:01:28 | | NULL | PREPARING | NULL | NULL | 2026-03-02 11:00:05 | | NULL | RECEIVED | NULL | NULL | 2026-03-02 11:00:05 | +-------------------+-----------+----------------+--------------+---------------------+ 6 rows in set (0.001 sec)
+```
+
+
 
 #### 🔹 Why 401 Appears
 
