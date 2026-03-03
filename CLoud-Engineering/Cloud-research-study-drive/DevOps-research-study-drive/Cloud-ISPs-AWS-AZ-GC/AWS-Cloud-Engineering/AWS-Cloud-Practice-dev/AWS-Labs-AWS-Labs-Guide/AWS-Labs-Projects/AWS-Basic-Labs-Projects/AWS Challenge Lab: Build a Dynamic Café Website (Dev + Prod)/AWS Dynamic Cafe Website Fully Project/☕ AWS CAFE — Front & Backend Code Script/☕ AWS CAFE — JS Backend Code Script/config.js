@@ -15,6 +15,11 @@ window.CHARLIE_CONFIG = {
     REGION: "us-east-1",
 
     /* ===============================
+       🔑 Secrets Manager Name for RDS
+    =============================== */
+    rdsSecretName: "CafeDevDBSM",   // Must match your Secrets Manager secret name
+
+    /* ===============================
        🔐 AWS Cognito Configuration
     =============================== */
     USER_POOL_ID: "us-east-1_oeMWJar3T",
