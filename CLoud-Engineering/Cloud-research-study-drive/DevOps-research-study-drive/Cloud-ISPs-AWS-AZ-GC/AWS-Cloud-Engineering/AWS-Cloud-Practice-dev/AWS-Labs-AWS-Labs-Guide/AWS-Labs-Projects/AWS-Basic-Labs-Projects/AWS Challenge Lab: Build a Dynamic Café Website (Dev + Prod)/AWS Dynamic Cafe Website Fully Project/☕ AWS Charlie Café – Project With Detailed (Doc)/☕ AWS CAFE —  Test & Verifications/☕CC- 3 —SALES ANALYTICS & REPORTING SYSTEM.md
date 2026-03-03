@@ -77,13 +77,22 @@ or
 {
   "period": "today",
   "total_sales": 17.0,
-  "total_cost": ...,
-  "profit": ...,
+  "total_cost": 10.0,
+  "profit": 7.0,
   "orders_count": 4,
-  "profit_per_item": [...]
+  "profit_per_item": [
+    {"item": "Latte", "quantity": 2, "sales": 6.0, "cost": 4.0, "profit": 2.0}
+  ]
 }
 ```
 
+- Open frontend, click Load Analytics → should display the same numbers.
+
+### ✅ Next Steps / Notes
+
+- Remove all references to DynamoDB for Analytics.
+
+- If you want, we can also update your AdminMarkPaidLambda to write only to RDS, removing DynamoDB entirely. This will simplify your architecture.
 
 #### ✅ EXPECTED SUCCESS OUTPUT (401 Unauthorized)
 
