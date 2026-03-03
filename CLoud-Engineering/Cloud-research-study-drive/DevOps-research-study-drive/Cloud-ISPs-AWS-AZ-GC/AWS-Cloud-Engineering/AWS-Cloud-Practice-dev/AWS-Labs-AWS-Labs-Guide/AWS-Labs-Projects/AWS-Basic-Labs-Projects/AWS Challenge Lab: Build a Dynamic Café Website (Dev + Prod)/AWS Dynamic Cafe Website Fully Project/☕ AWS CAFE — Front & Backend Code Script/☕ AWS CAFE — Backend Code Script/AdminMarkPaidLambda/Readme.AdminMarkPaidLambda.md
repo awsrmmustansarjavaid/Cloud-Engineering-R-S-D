@@ -184,15 +184,15 @@ def lambda_handler(event, context):
 
 ### ✅ Key Fixes
 
-Secrets Manager used: Fetches MySQL credentials dynamically (CafeDevDBSM), just like your CafeOrderProcessor.
+- Secrets Manager used: Fetches MySQL credentials dynamically (CafeDevDBSM), just like your CafeOrderProcessor.
 
-Removed hardcoded MySQL host/user/password → no more connection failure.
+- Removed hardcoded MySQL host/user/password → no more connection failure.
 
-DynamoDB update remains unchanged.
+- DynamoDB update remains unchanged.
 
-Error handling will now show a real error if MySQL fails.
+- Error handling will now show a real error if MySQL fails.
 
-Connect timeout added to prevent hanging.
+- Connect timeout added to prevent hanging.
 
 ### 🔹 Next Steps
 
