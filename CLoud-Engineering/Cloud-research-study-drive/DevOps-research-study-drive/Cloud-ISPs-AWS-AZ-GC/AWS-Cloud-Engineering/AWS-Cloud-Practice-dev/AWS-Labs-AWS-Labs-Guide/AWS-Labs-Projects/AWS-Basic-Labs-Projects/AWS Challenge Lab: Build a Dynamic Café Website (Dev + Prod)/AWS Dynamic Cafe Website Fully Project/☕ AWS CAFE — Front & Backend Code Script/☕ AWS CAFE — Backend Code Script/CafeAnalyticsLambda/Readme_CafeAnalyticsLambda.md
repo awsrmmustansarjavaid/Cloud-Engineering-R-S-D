@@ -299,19 +299,19 @@ def lambda_handler(event, context):
 
 ### ✅ What Changed / Why This Works:
 
-Removed AND status = 'COMPLETED' → now counts all PAID orders, which matches your real table.
+- Removed AND status = 'COMPLETED' → now counts all PAID orders, which matches your real table.
 
-Works for today / week / month based on created_at.
+- Works for today / week / month based on created_at.
 
-Aggregates total sales, cost, profit, and per-item stats.
+- Aggregates total sales, cost, profit, and per-item stats.
 
-Fully CORS-ready for your frontend analytics button.
+- Fully CORS-ready for your frontend analytics button.
 
-Next step:
+#### 🔷 Next step:
 
-Deploy this Lambda.
+- Deploy this Lambda.
 
-Test in Lambda console with:
+- Test in Lambda console with:
 
 ```
 {
@@ -319,7 +319,7 @@ Test in Lambda console with:
 }
 ```
 
-You should now see real totals:
+#### ✅ You should now see real totals:
 
 ```
 {
