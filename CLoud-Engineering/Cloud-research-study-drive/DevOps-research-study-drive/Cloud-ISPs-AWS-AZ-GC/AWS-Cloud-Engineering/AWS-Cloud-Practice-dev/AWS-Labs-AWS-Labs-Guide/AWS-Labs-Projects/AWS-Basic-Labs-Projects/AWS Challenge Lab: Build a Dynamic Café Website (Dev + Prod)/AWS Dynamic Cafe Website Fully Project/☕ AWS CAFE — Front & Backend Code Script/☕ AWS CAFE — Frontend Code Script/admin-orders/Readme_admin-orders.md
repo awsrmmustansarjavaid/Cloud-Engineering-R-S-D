@@ -68,11 +68,11 @@ body::before { content:""; position: fixed; inset: 0; background: rgba(26,17,11,
 <div class="sidebar" id="sidebar">
     <button id="sidebarToggle"><i class="bi bi-list"></i></button>
     <h4>☕ Charlie Café</h4>
-    <a href="https://dyoqxkx8bd8d7.cloudfront.net/cafe-admindashboard.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+    <a href="cafe-admindashboard.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
     <a onclick="toggleSubmenu('ordersSub')"><i class="bi bi-list-check"></i> <span>Orders</span> <i class="bi bi-caret-down-fill ms-auto"></i></a>
     <div class="submenu" id="ordersSub">
-        <a href="https://dyoqxkx8bd8d7.cloudfront.net/order-status.html"><i class="bi bi-clock-history"></i> Status</a>
-        <a href="https://dyoqxkx8bd8d7.cloudfront.net/orderanalytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+        <a href="order-status.html"><i class="bi bi-clock-history"></i> Status</a>
+        <a href="orderanalytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a>
     </div>
     <a onclick="CHARLIE_AUTH.logout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
 </div>
