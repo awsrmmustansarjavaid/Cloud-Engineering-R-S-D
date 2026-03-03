@@ -15,29 +15,64 @@
 ========================== */
 body { 
     font-family: 'Poppins', sans-serif; 
-    background: #f8f9fa; 
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    background-size: cover;
+    min-height: 100vh;
+    color: #fff;
 }
-.container { 
+.overlay {
+    background: rgba(0,0,0,0.6);
+    position: fixed;
+    top:0; left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.container {
     max-width: 900px; 
-    margin-top: 40px; 
+    margin-top: 60px; 
+    position: relative;
+    z-index: 1;
 }
 .card { 
     padding: 20px; 
     margin-bottom: 20px; 
+    background: rgba(58,37,28,0.85);
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
 }
+h4 { color: #ffca28; }
+.table { background: rgba(255,255,255,0.1); color: #fff; }
+.table th, .table td { color: #fff; }
+.btn-logout {
+    background: linear-gradient(135deg,#ff5722,#ff9800);
+    color: #fff;
+    border:none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.btn-logout:hover { transform: scale(1.05); }
 </style>
 </head>
 
 <body>
+
+<div class="overlay"></div>
+
 <div class="container">
+
+    <!-- Logout Button -->
+    <button id="logoutBtn" class="btn btn-logout float-end">Logout ☕</button>
 
     <!-- ================= PROFILE ================= -->
     <div class="card">
         <h4>Employee Profile</h4>
-        <p><strong>Name:</strong> <span id="profile-name"></span></p>
-        <p><strong>Job Title:</strong> <span id="profile-job"></span></p>
-        <p><strong>Salary:</strong> <span id="profile-salary"></span></p>
-        <p><strong>Start Date:</strong> <span id="profile-start"></span></p>
+        <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+        <p><strong>Job Title:</strong> <span id="profile-job">Loading...</span></p>
+        <p><strong>Salary:</strong> <span id="profile-salary">Loading...</span></p>
+        <p><strong>Start Date:</strong> <span id="profile-start">Loading...</span></p>
         <h5 id="emp-name"></h5>
     </div>
 
@@ -59,84 +94,129 @@ body {
 
 </div>
 
-<!-- ================= SCRIPTS ================= -->
-<script src="config.js"></script>
-<script src="utils.js"></script>
-<script src="api.js"></script>
-<script src="central-auth.js"></script>
-
 <script>
 /* =====================================================
-   PAGE PROTECTION — Optional Cognito login
-   - Ensures only logged-in users can access this page
-   - Uses CHARLIE_AUTH from central-auth.js
+   CONFIGURATION
+   Replace with your Cognito info and CloudFront base
 ===================================================== */
-CHARLIE_AUTH.protectPage();
-CHARLIE_AUTH.startAutoLogoutWatcher();
+const CONFIG = {
+    COGNITO_DOMAIN: "https://us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
+    CLIENT_ID: "42haggs0jctmq5rnaajfi3hmqu",
+    CLOUDFRONT_BASE: "https://dyoqxkx8bd8d7.cloudfront.net",
+    SCOPES: "openid email profile"
+};
 
 /* =====================================================
-   LOAD EMPLOYEE PROFILE
-   - Fetches employee info via CHARLIE_API.getEmployeeProfile
-   - Populates profile card
+   LOGIN HANDLER — Redirects to Cognito Hosted UI
 ===================================================== */
-async function loadProfile() {
-    try {
-        const employeeId = CHARLIE_UTILS.getEmployeeId(); // Get ID from local/session storage
-        const data = await CHARLIE_API.getEmployeeProfile(employeeId);
+function redirectToLogin() {
+    const redirect_uri = CONFIG.CLOUDFRONT_BASE + "/employee-portal.html";
+    const loginUrl = `${CONFIG.COGNITO_DOMAIN}/login?response_type=token&client_id=${CONFIG.CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=${encodeURIComponent(CONFIG.SCOPES)}`;
+    window.location.href = loginUrl;
+}
 
-        document.getElementById("profile-name").innerText = data.name;
-        document.getElementById("profile-job").innerText = data.job_title;
-        document.getElementById("profile-salary").innerText = data.salary;
-        document.getElementById("profile-start").innerText = data.start_date;
-        document.getElementById("emp-name").innerText = `Welcome, ${data.name} ☕`;
-    } catch (err) {
-        console.error("Error loading profile:", err);
-        alert("Failed to load profile.");
+/* =====================================================
+   LOGOUT HANDLER — Clears localStorage and reloads page
+===================================================== */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("id_token");
+    alert("Logged out successfully");
+    redirectToLogin();
+});
+
+/* =====================================================
+   PARSE URL HASH — Extract id_token after login
+===================================================== */
+function parseHashTokens() {
+    if (window.location.hash) {
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const id_token = params.get("id_token");
+        if (id_token) {
+            localStorage.setItem("id_token", id_token);
+            // Remove hash from URL
+            history.replaceState(null, null, window.location.pathname);
+        }
     }
 }
 
 /* =====================================================
-   LOAD ATTENDANCE HISTORY
-   - Fetches attendance via CHARLIE_API.getAttendanceHistory
-   - Dynamically populates table rows
-   - ✅ Status column computed from actual checkin/checkout times
+   VERIFY LOGIN — Check if token exists, else redirect
 ===================================================== */
-async function loadAttendance() {
-    try {
-        const employeeId = CHARLIE_UTILS.getEmployeeId();
-        const records = await CHARLIE_API.getAttendanceHistory(employeeId);
-
-        const tbody = document.getElementById("attendanceTable").querySelector("tbody");
-        tbody.innerHTML = ""; // Clear previous rows
-
-        records.forEach(rec => {
-            // Compute status based on checkin/checkout times
-            const status = (!rec.checkin_time ? "Absent" 
-                            : (!rec.checkout_time ? "Checked In" 
-                            : "Checked Out"));
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${rec.attendance_date}</td>
-                <td>${rec.checkin_time || "-"}</td>
-                <td>${rec.checkout_time || "-"}</td>
-                <td>${status}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        console.error("Error loading attendance:", err);
-        alert("Failed to load attendance history.");
+function checkLogin() {
+    parseHashTokens();
+    const token = localStorage.getItem("id_token");
+    if (!token) {
+        alert("Please login first");
+        redirectToLogin();
+        return false;
     }
+    return true;
+}
+
+/* =====================================================
+   SIMULATED EMPLOYEE DATA — Replace with API if needed
+===================================================== */
+const EMPLOYEE_DATA = {
+    "123": { name:"Alice Johnson", job_title:"Barista", salary:"$1500", start_date:"2024-01-10" },
+    "124": { name:"Bob Smith", job_title:"Chef", salary:"$2000", start_date:"2023-03-05" },
+    "125": { name:"Charlie Lee", job_title:"Manager", salary:"$2500", start_date:"2022-06-20" }
+};
+
+const ATTENDANCE_DATA = {
+    "123":[
+        {attendance_date:"2026-03-01", checkin_time:"09:05", checkout_time:"17:00"},
+        {attendance_date:"2026-03-02", checkin_time:"09:10", checkout_time:"17:05"},
+    ],
+    "124":[
+        {attendance_date:"2026-03-01", checkin_time:"08:50", checkout_time:"16:55"},
+    ],
+    "125":[
+        {attendance_date:"2026-03-01", checkin_time:"09:20", checkout_time:"17:10"},
+    ]
+};
+
+/* =====================================================
+   LOAD EMPLOYEE PROFILE & ATTENDANCE
+===================================================== */
+function loadEmployeeData() {
+    if (!checkLogin()) return;
+
+    // For demo, randomly pick an employee
+    const employeeIds = Object.keys(EMPLOYEE_DATA);
+    const employeeId = employeeIds[Math.floor(Math.random()*employeeIds.length)];
+
+    const profile = EMPLOYEE_DATA[employeeId];
+    const attendance = ATTENDANCE_DATA[employeeId] || [];
+
+    // Populate profile
+    document.getElementById("profile-name").innerText = profile.name;
+    document.getElementById("profile-job").innerText = profile.job_title;
+    document.getElementById("profile-salary").innerText = profile.salary;
+    document.getElementById("profile-start").innerText = profile.start_date;
+    document.getElementById("emp-name").innerText = `Welcome, ${profile.name} ☕`;
+
+    // Populate attendance table
+    const tbody = document.getElementById("attendanceTable").querySelector("tbody");
+    tbody.innerHTML = "";
+    attendance.forEach(rec => {
+        const status = (!rec.checkin_time ? "Absent" : (!rec.checkout_time ? "Checked In" : "Checked Out"));
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${rec.attendance_date}</td>
+            <td>${rec.checkin_time || "-"}</td>
+            <td>${rec.checkout_time || "-"}</td>
+            <td>${status}</td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
 /* =====================================================
    INITIALIZE PAGE
-   - Load profile and attendance on DOMContentLoaded
 ===================================================== */
 window.addEventListener("DOMContentLoaded", () => {
-    loadProfile();
-    loadAttendance();
+    loadEmployeeData();
 });
 </script>
 
