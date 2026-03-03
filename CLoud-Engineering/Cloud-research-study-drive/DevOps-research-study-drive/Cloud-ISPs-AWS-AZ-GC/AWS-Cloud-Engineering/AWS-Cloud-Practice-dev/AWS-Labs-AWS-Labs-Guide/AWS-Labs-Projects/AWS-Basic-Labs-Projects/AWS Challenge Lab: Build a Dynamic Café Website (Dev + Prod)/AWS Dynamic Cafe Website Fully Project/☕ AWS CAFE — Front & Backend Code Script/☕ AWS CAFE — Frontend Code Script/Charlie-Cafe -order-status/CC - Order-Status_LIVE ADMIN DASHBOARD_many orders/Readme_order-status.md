@@ -1,3 +1,11 @@
+# Charlie Cafe - order-status.html
+
+### order-status.html
+
+> **Update Version:1.0**
+
+
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -300,3 +308,6 @@ function logoutUser() {
 
 </body>
 </html>
+```
+
+---
