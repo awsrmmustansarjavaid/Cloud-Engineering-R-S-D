@@ -1,4 +1,4 @@
-# Charlie Cafe - Base URL Centralization
+# Charlie Cafe - hardcoding Base URL Centralization
 
 Good 👌 this is exactly the kind of problem real production apps face.
 
