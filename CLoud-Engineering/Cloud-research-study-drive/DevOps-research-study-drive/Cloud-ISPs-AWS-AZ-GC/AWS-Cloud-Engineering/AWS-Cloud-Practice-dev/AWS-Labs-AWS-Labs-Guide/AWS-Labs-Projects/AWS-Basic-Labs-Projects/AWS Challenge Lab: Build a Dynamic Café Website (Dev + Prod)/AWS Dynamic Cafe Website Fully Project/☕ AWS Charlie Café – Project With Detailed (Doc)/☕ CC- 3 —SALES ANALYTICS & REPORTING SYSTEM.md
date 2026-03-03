@@ -15,11 +15,149 @@
 
 ## PHASE 1️⃣ – RDS 
 
-### 1️⃣ Verify Table Schema
+### 1️⃣ Verify RDS Database Table Schema
+
+```
+SHOW DATABASES;
+```
+
+**⚠️ Make sure your database (example: cafe_db) exists.**
+
+```
+USE cafe_db;
+```
+
+```
+SHOW TABLES;
+```
+
+#### ✅ You MUST see:
+
+```
+orders
+```
+
+#### 2️⃣ Verify Required Columns Exist
+
+#### Your Lambda uses these columns:
+
+```
+item
+quantity
+total_amount
+total_cost
+payment_status
+created_at
+```
+
+#### So check table structure:
 
 ```
 DESCRIBE orders;
 ```
+
+#### ✅ You must see something like:
+
+| Field          | Type     |
+| -------------- | -------- |
+| id             | int      |
+| item           | varchar  |
+| quantity       | int      |
+| total_amount   | decimal  |
+| total_cost     | decimal  |
+| payment_status | varchar  |
+| created_at     | datetime |
+
+### ❗ If created_at is missing
+
+#### Your Lambda filters using:
+
+```
+AND created_at >= %s
+```
+
+#### If missing, add it:
+
+```
+ALTER TABLE orders
+ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+```
+
+### ❗ If payment_status is missing
+
+#### Add it:
+
+```
+ALTER TABLE orders
+ADD COLUMN payment_status VARCHAR(20) DEFAULT 'PENDING';
+```
+
+### 3️⃣ Verify Data Is Correct
+
+#### Run:
+
+```
+SELECT * FROM orders LIMIT 5;
+```
+
+#### ✅ Check:
+
+- payment_status should contain PAID
+
+- created_at should have real timestamps
+
+- total_amount should have numbers
+
+- total_cost should have numbers
+
+### 4️⃣ Verify PAID Orders Exist
+
+#### Your Lambda ONLY reads:
+
+```
+WHERE payment_status = 'PAID'
+```
+
+#### So test:
+
+```
+SELECT COUNT(*) FROM orders
+WHERE payment_status = 'PAID';
+```
+
+If result = 0
+👉 Your analytics will show ZERO sales.
+
+### 5️⃣ Verify Date Filtering Works
+
+#### 🔎 Test manually:
+
+#### 1️⃣ Today:
+
+```
+SELECT COUNT(*) FROM orders
+WHERE payment_status = 'PAID'
+AND created_at >= CURDATE();
+```
+
+#### 2️⃣ Week:
+
+```
+SELECT COUNT(*) FROM orders
+WHERE payment_status = 'PAID'
+AND created_at >= NOW() - INTERVAL 7 DAY;
+```
+
+#### 3️⃣ Month:
+
+```
+SELECT COUNT(*) FROM orders
+WHERE payment_status = 'PAID'
+AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01');
+```
+
+If these return correct data → Lambda will work perfectly.
+
 
 #### Ensure columns:
 
