@@ -197,9 +197,24 @@ Create a secret: CafeDevDBSM
 }
 ```
 
+### ✅ Verify Secrets Manager
 
+- Go to: 👉 AWS Console → Secrets Manager
 
+- Check secret: CafeDevDBSM
 
+#### It must contain JSON like:
+
+```
+{
+  "host": "your-rds-endpoint",
+  "username": "admin",
+  "password": "yourpassword",
+  "dbname": "cafe_db"
+}
+```
+
+**⚠️ If any key name is wrong → Lambda will fail.**
 
 **✅ PHASE 1️⃣ STATUS**
 
