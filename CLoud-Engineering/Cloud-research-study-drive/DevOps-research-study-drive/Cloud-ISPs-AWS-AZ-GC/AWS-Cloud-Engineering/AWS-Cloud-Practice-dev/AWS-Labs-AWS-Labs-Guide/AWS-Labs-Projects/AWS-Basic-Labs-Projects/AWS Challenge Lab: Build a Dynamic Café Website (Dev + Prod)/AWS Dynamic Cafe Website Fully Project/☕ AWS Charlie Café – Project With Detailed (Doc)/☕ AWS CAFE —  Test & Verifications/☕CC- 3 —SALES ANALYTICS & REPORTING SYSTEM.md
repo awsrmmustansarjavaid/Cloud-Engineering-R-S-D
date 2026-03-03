@@ -95,6 +95,41 @@ or
 
 ### 💡 Important :
 
+### ⚠️ IMPORTANT REQUIREMENTS
+
+Your MySQL orders table MUST contain:
+
+```
+created_at      DATETIME
+payment_status  VARCHAR
+order_status    VARCHAR
+item_name       VARCHAR
+quantity        INT
+item_price      DECIMAL
+item_cost       DECIMAL
+```
+
+If created_at does not exist → add it:
+
+```
+ALTER TABLE orders ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+```
+
+Your table structure is different from what the Analytics Lambda expected.
+
+From your DESCRIBE orders;:
+
+```
+item              ✅ (NOT item_name)
+status            ✅ (NOT order_status)
+payment_status    ✅
+total_amount      ✅ (NOT item_price)
+item_cost         ✅
+quantity          ✅
+created_at        ✅
+```
+
+
 
 ### 💡 Why This Will Fix Your Button
 

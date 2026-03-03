@@ -15,48 +15,90 @@
 
 ## PHASE 1️⃣ – RDS 
 
-### ⚠️ IMPORTANT REQUIREMENTS
-
-Your MySQL orders table MUST contain:
+### 1️⃣ Verify Table Schema
 
 ```
-created_at      DATETIME
-payment_status  VARCHAR
-order_status    VARCHAR
-item_name       VARCHAR
-quantity        INT
-item_price      DECIMAL
-item_cost       DECIMAL
+DESCRIBE orders;
 ```
 
-If created_at does not exist → add it:
+#### Ensure columns:
+
+- order_id, table_number, customer_name, item, quantity, item_cost, total_cost, total_amount, payment_method, payment_status, status, created_at, updated_at
+
+- Matches the schema in your final Lambda.
+
+### 2️⃣ Insert Sample Data (optional):
 
 ```
-ALTER TABLE orders ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+INSERT INTO orders (order_id, table_number, customer_name, item, quantity, total_cost, total_amount, payment_method, payment_status, status)
+VALUES ('ORD-20260302-9999', 1, 'Alice', 'Latte', 2, 4.0, 6.0, 'CASH', 'PAID', 'RECEIVED');
 ```
 
-Your table structure is different from what the Analytics Lambda expected.
+### 3️⃣ Configure Secrets Manager
 
-From your DESCRIBE orders;:
+Create a secret: CafeDevDBSM
+
+#### Key/Values:
+
+| Key      | Value                 |
+| -------- | --------------------- |
+| host     | `<your-rds-endpoint>` |
+| username | `<db-username>`       |
+| password | `<db-password>`       |
+| dbname   | cafe_db               |
+
+#### Ensure Lambda role has SecretsManagerReadWrite permission:
 
 ```
-item              ✅ (NOT item_name)
-status            ✅ (NOT order_status)
-payment_status    ✅
-total_amount      ✅ (NOT item_price)
-item_cost         ✅
-quantity          ✅
-created_at        ✅
+{
+    "Effect": "Allow",
+    "Action": [
+        "secretsmanager:GetSecretValue"
+    ],
+    "Resource": "*"
+}
 ```
 
 
 
 
-**✅ PHASE 1 STATUS**
 
-> **🟢 PHASE 1 COMPLETE & VERIFIED**
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
 ## PHASE 2️⃣  – ANALYTICS LAMBDA (FULL CODE)
+
+### ✅ Update Lambda to Use RDS Only
+
+Use the final Analytics Lambda code I provided.
+
+#### Key changes:
+
+```
+# SQL query
+sql = """
+    SELECT item,
+           quantity,
+           total_amount,
+           total_cost
+    FROM orders
+    WHERE payment_status = 'PAID'
+    AND created_at >= %s
+"""
+```
+
+✅ Removes status = 'COMPLETED'
+
+✅ Aggregates all PAID orders
+
+- Environment variable in Lambda: SECRET_NAME = CafeDevDBSM
+
+#### Lambda IAM Role: Must allow:
+
+- Secrets Manager access
+
+- VPC / RDS access (if private)
 
 ### 1️⃣ Create Cafe Analytics Lambda
 
@@ -311,11 +353,34 @@ Which your Lambda reads as:
 event['queryStringParameters']['period']
 ```
 
-**✅ PHASE 3 STATUS**
+**✅ PHASE 3️⃣ STATUS**
 
-> **🟢 PHASE 3 COMPLETE & VERIFIED**
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 ## PHASE 4️⃣  BOOTSTRAP ANALYTICS UI
+
+### ✅ Update Frontend Analytics Button
+
+Endpoint: /analytics?period=today
+
+Fetch example:
+
+```
+async function loadAnalytics(period = 'today') {
+    const url = `${window.CHARLIE_CONFIG.apiBase}/analytics?period=${period}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Analytics:", data);
+}
+```
+
+#### Button:
+
+```
+<button onclick="loadAnalytics('today')">Load Today's Analytics</button>
+```
+
+**⚠️ Already Analytics.html Updated... Skip it**
 
 ### 1️⃣ Create analytics.html
 
