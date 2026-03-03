@@ -100,6 +100,138 @@ MySQL stays updated (so GetOrderStatusLambda shows the latest payment_status)
 import json
 import boto3
 import pymysql
+import os
+
+# -----------------------------
+# DynamoDB setup
+# -----------------------------
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('CafeOrders')
+
+# -----------------------------
+# MySQL setup
+# Replace with your actual RDS/MySQL credentials
+# -----------------------------
+MYSQL_HOST = os.environ.get('MYSQL_HOST', 'your-mysql-host')
+MYSQL_USER = os.environ.get('MYSQL_USER', 'your-mysql-user')
+MYSQL_PASSWORD = os.environ.get('MYSQL_PASSWORD', 'your-mysql-password')
+MYSQL_DB = os.environ.get('MYSQL_DB', 'your-mysql-database')
+
+def lambda_handler(event, context):
+    """
+    Expected request body:
+    {
+        "order_id": "ORD-123456"
+    }
+    """
+    try:
+        # -----------------------------
+        # Parse incoming request
+        # -----------------------------
+        body = json.loads(event['body'])
+        order_id = body['order_id']
+
+        # -----------------------------
+        # Update DynamoDB payment_status
+        # -----------------------------
+        table.update_item(
+            Key={'order_id': order_id},
+            UpdateExpression="SET payment_status = :ps",
+            ExpressionAttributeValues={
+                ':ps': 'PAID'
+            }
+        )
+
+        # -----------------------------
+        # Update MySQL payment_status
+        # -----------------------------
+        connection = pymysql.connect(
+            host=MYSQL_HOST,
+            user=MYSQL_USER,
+            password=MYSQL_PASSWORD,
+            database=MYSQL_DB,
+            cursorclass=pymysql.cursors.DictCursor
+        )
+
+        try:
+            with connection.cursor() as cursor:
+                sql = "UPDATE orders SET payment_status=%s WHERE order_id=%s"
+                cursor.execute(sql, ('PAID', order_id))
+            connection.commit()
+        finally:
+            connection.close()
+
+        # -----------------------------
+        # Success response
+        # -----------------------------
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({
+                "success": True,
+                "message": f"Order {order_id} marked as PAID in DynamoDB & MySQL"
+            })
+        }
+
+    except Exception as e:
+        # -----------------------------
+        # Error handling
+        # -----------------------------
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({
+                "success": False,
+                "error": str(e)
+            })
+        }
+```
+
+### ✅ Key Points
+
+- DynamoDB update: stays the same as before.
+
+- MySQL update:
+
+    - Connects to your MySQL database.
+
+    - Updates payment_status in the orders table.
+
+    - Commits the change.
+
+- Environment variables:
+
+    - MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
+
+    - Use Lambda environment variables for security instead of hardcoding credentials.
+
+    - Error handling: If either DynamoDB or MySQL fails, Lambda returns an error.
+
+    - Response: Confirms both databases were updated.
+
+Ah! Now it’s clear why you are getting the “Server error” when you click Mark Paid.
+
+Your current MarkCashOrderPaidLambda tries to connect to MySQL using hardcoded placeholders like 'your-mysql-host' etc. If you want to use Secrets Manager, like your CafeOrderProcessor Lambda does, you need to fetch the RDS credentials from Secrets Manager instead of environment variables. Otherwise, the Lambda fails to connect → exception → server error.
+
+#### ✅ Here’s a corrected version of MarkCashOrderPaidLambda using Secrets Manager, DynamoDB, and MySQL together:
+
+```
+# ===========================================
+# AdminMarkPaidLambda (MySQL + DynamoDB)
+# Purpose:
+# - Used by ADMIN only
+# - Marks CASH orders as PAID in both DynamoDB and MySQL
+# ===========================================
+
+import json
+import boto3
+import pymysql
 from decimal import Decimal
 from datetime import datetime
 import os
