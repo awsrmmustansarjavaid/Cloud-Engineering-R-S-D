@@ -148,6 +148,95 @@ WHERE created_at >= CURDATE()
 ORDER BY created_at DESC;
 ```
 
+### 🎯 What I Strongly Suspect
+
+From your table:
+
+```
+status default = RECEIVED
+```
+
+Most likely your rows look like:
+
+| status   | payment_status |
+| -------- | -------------- |
+| RECEIVED | PAID           |
+| RECEIVED | UNPAID         |
+
+But NOT:
+
+```
+status = COMPLETED
+```
+
+So your analytics filter removes everything.
+
+### 🔥 Quick Temporary Test
+
+To confirm instantly, modify your SQL in Lambda to:
+
+```
+SELECT item,
+       quantity,
+       total_amount,
+       total_cost
+FROM orders
+WHERE payment_status = 'PAID'
+AND created_at >= %s
+```
+
+👉 Remove this line:
+
+```
+AND status = 'COMPLETED'
+```
+
+Deploy.
+
+Test again:
+
+```
+/analytics?period=today
+```
+
+If totals now appear → 🎯 CONFIRMED.
+
+Your system never sets status = COMPLETED.
+
+### 🎯 Final Recommended WHERE Clause
+
+Use this:
+
+```
+WHERE payment_status = 'PAID'
+AND created_at >= %s
+```
+
+That’s enough for correct revenue tracking.
+
+### 🚀 Why Your Button Was "Not Working"
+
+It was working.
+
+Lambda was returning zero.
+
+Frontend showed zero.
+
+It looked broken.
+
+But the real issue was SQL filtering.
+
+### 🔎 Now Do This
+
+Run:
+
+```
+SELECT status, payment_status, COUNT(*) 
+FROM orders
+GROUP BY status, payment_status;
+```
+
+Paste result here.
 
 
 #### 🔹 Why 401 Appears
