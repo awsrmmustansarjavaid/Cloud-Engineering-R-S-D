@@ -65,14 +65,14 @@ body {
 // ===========================================================
 
 // 1️⃣ Cognito Hosted UI info
-const COGNITO_DOMAIN = "https://us-east-1bzr7fplam.auth.us-east-1.amazoncognito.com";
-const CLIENT_ID = "4b2l8vd8ss4shmlk0pbg8rbiob";
+const COGNITO_DOMAIN = "https://us-east-17taovq95q.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = "1m2lpjfel3mmeds54odmkfk56m";
 
 // 2️⃣ Your admin dashboard after login
-const AFTER_LOGIN = "https://dgexi85ya6bx7.cloudfront.net/cafe-admin-dashboard.html";
+const AFTER_LOGIN = "https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html";
 
 // 3️⃣ Redirect URI (must exactly match Cognito app client callback)
-const REDIRECT_URI = "https://dgexi85ya6bx7.cloudfront.net/login.html";
+const REDIRECT_URI = "https://dyoqxkx8bd8d7.cloudfront.net/login.html";
 
 // 4️⃣ Build Hosted UI login URL (Authorization Code Flow)
 const loginUrl = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=openid+email+profile&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
