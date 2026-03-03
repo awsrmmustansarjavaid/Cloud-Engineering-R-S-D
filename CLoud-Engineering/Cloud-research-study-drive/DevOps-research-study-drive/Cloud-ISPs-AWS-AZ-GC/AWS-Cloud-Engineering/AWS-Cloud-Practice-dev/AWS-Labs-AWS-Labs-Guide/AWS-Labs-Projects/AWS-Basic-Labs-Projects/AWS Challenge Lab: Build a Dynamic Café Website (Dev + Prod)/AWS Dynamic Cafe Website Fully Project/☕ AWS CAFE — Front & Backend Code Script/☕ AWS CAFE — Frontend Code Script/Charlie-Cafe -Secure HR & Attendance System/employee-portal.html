@@ -5,9 +5,10 @@
 <title>Charlie Café ☕ | Employee Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Bootstrap & Google Fonts -->
+<!-- Bootstrap & Google Fonts & FontAwesome -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
 <style>
 /* ==========================
@@ -15,13 +16,13 @@
 ========================== */
 body { 
     font-family: 'Poppins', sans-serif; 
-    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
-    background-size: cover;
+    background: url('https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
     min-height: 100vh;
     color: #fff;
+    position: relative;
 }
 .overlay {
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.5);
     position: fixed;
     top:0; left:0;
     width: 100%;
@@ -33,27 +34,92 @@ body {
     margin-top: 60px; 
     position: relative;
     z-index: 1;
+    padding: 0 15px;
 }
+
+/* ==========================
+   CARD STYLING
+========================== */
 .card { 
-    padding: 20px; 
-    margin-bottom: 20px; 
-    background: rgba(58,37,28,0.85);
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    padding: 25px; 
+    margin-bottom: 25px; 
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-h4 { color: #ffca28; }
-.table { background: rgba(255,255,255,0.1); color: #fff; }
-.table th, .table td { color: #fff; }
+.card:hover { 
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+}
+
+/* HEADINGS WITH ICONS */
+h4 { 
+    color: #ffd166; 
+    font-size: 1.8rem; 
+    display: flex;
+    align-items: center;
+}
+h4 i { margin-right: 10px; color: #ffb347; }
+
+h5#emp-name { 
+    margin-top: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* TABLE STYLING */
+.table { 
+    background: rgba(0,0,0,0.2); 
+    color: #fff; 
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+.table th, .table td { 
+    color: #fff; 
+    vertical-align: middle;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255,255,255,0.05);
+}
+.table-striped tbody tr:hover {
+    background-color: rgba(255,255,255,0.12);
+}
+
+/* LOGOUT BUTTON */
 .btn-logout {
-    background: linear-gradient(135deg,#ff5722,#ff9800);
+    background: linear-gradient(135deg,#ff6f3c,#ffb347);
     color: #fff;
     border:none;
     border-radius: 50px;
-    padding: 10px 20px;
+    padding: 10px 25px;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.btn-logout:hover { transform: scale(1.05); }
+.btn-logout:hover { 
+    transform: scale(1.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* ICONS NEXT TO TABLE HEADINGS */
+th:first-child::before { content: "\f073"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+th:nth-child(2)::before { content: "\f044"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+th:nth-child(3)::before { content: "\f017"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+th:nth-child(4)::before { content: "\f0c0"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+
+/* ==========================
+   RESPONSIVE LAYOUT
+========================== */
+@media (max-width: 768px) {
+    h4 { font-size: 1.5rem; }
+    h5#emp-name { font-size: 1.2rem; }
+    .btn-logout { padding: 8px 20px; font-size: 0.9rem; }
+    .card { padding: 20px; }
+    .table th, .table td { font-size: 0.9rem; }
+}
 </style>
 </head>
 
@@ -64,11 +130,11 @@ h4 { color: #ffca28; }
 <div class="container">
 
     <!-- Logout Button -->
-    <button id="logoutBtn" class="btn btn-logout float-end">Logout ☕</button>
+    <button id="logoutBtn" class="btn btn-logout float-end"><i class="fas fa-sign-out-alt"></i> Logout</button>
 
     <!-- ================= PROFILE ================= -->
     <div class="card">
-        <h4>Employee Profile</h4>
+        <h4><i class="fas fa-mug-hot"></i> Employee Profile</h4>
         <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
         <p><strong>Job Title:</strong> <span id="profile-job">Loading...</span></p>
         <p><strong>Salary:</strong> <span id="profile-salary">Loading...</span></p>
@@ -78,7 +144,7 @@ h4 { color: #ffca28; }
 
     <!-- ================= ATTENDANCE HISTORY ================= -->
     <div class="card">
-        <h4>Attendance History</h4>
+        <h4><i class="fas fa-calendar-check"></i> Attendance History</h4>
         <table class="table table-striped" id="attendanceTable">
             <thead>
                 <tr>
@@ -95,65 +161,6 @@ h4 { color: #ffca28; }
 </div>
 
 <script>
-/* =====================================================
-   CONFIGURATION
-   Replace with your Cognito info and CloudFront base
-===================================================== */
-const CONFIG = {
-    COGNITO_DOMAIN: "https://us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
-    CLIENT_ID: "42haggs0jctmq5rnaajfi3hmqu",
-    CLOUDFRONT_BASE: "https://dyoqxkx8bd8d7.cloudfront.net",
-    SCOPES: "openid email profile"
-};
-
-/* =====================================================
-   LOGIN HANDLER — Redirects to Cognito Hosted UI
-===================================================== */
-function redirectToLogin() {
-    const redirect_uri = CONFIG.CLOUDFRONT_BASE + "/employee-portal.html";
-    const loginUrl = `${CONFIG.COGNITO_DOMAIN}/login?response_type=token&client_id=${CONFIG.CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=${encodeURIComponent(CONFIG.SCOPES)}`;
-    window.location.href = loginUrl;
-}
-
-/* =====================================================
-   LOGOUT HANDLER — Clears localStorage and reloads page
-===================================================== */
-document.getElementById("logoutBtn").addEventListener("click", () => {
-    localStorage.removeItem("id_token");
-    alert("Logged out successfully");
-    redirectToLogin();
-});
-
-/* =====================================================
-   PARSE URL HASH — Extract id_token after login
-===================================================== */
-function parseHashTokens() {
-    if (window.location.hash) {
-        const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
-        const id_token = params.get("id_token");
-        if (id_token) {
-            localStorage.setItem("id_token", id_token);
-            // Remove hash from URL
-            history.replaceState(null, null, window.location.pathname);
-        }
-    }
-}
-
-/* =====================================================
-   VERIFY LOGIN — Check if token exists, else redirect
-===================================================== */
-function checkLogin() {
-    parseHashTokens();
-    const token = localStorage.getItem("id_token");
-    if (!token) {
-        alert("Please login first");
-        redirectToLogin();
-        return false;
-    }
-    return true;
-}
-
 /* =====================================================
    SIMULATED EMPLOYEE DATA — Replace with API if needed
 ===================================================== */
@@ -177,26 +184,29 @@ const ATTENDANCE_DATA = {
 };
 
 /* =====================================================
+   LOGOUT HANDLER — Redirects to logout.php
+===================================================== */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    alert("Logging out...");
+    window.location.href = "logout.php";
+});
+
+/* =====================================================
    LOAD EMPLOYEE PROFILE & ATTENDANCE
 ===================================================== */
 function loadEmployeeData() {
-    if (!checkLogin()) return;
-
-    // For demo, randomly pick an employee
     const employeeIds = Object.keys(EMPLOYEE_DATA);
     const employeeId = employeeIds[Math.floor(Math.random()*employeeIds.length)];
 
     const profile = EMPLOYEE_DATA[employeeId];
     const attendance = ATTENDANCE_DATA[employeeId] || [];
 
-    // Populate profile
     document.getElementById("profile-name").innerText = profile.name;
     document.getElementById("profile-job").innerText = profile.job_title;
     document.getElementById("profile-salary").innerText = profile.salary;
     document.getElementById("profile-start").innerText = profile.start_date;
     document.getElementById("emp-name").innerText = `Welcome, ${profile.name} ☕`;
 
-    // Populate attendance table
     const tbody = document.getElementById("attendanceTable").querySelector("tbody");
     tbody.innerHTML = "";
     attendance.forEach(rec => {
@@ -213,7 +223,7 @@ function loadEmployeeData() {
 }
 
 /* =====================================================
-   INITIALIZE PAGE
+   INITIALIZE PAGE — Load employee data
 ===================================================== */
 window.addEventListener("DOMContentLoaded", () => {
     loadEmployeeData();

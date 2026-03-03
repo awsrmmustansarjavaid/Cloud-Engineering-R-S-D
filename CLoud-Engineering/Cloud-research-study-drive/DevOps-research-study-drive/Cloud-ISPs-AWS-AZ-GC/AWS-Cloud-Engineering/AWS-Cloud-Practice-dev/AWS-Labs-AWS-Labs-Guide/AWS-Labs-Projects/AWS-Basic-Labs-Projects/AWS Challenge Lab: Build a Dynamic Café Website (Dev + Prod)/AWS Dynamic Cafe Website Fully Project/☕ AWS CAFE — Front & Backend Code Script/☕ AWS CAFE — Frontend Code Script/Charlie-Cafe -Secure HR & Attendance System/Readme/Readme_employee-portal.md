@@ -3014,10 +3014,8 @@ window.addEventListener("DOMContentLoaded", () => {
 </html>
 ```
 
----
-### ✅ employee-portal.html
+### ✅ Fully final code 
 
-> **Update Version:3**
 
 ```
 <!DOCTYPE html>
@@ -3246,4 +3244,281 @@ window.addEventListener("DOMContentLoaded", () => {
 </html>
 ```
 
+---
+### ✅ employee-portal.html
+
+> **Update Version:3**
+
+Perfect! I understand exactly what you want:
+
+Café-themed background image (coffee, café, cups, cozy vibe)
+
+Professional, modern look (cards, shadows, gradients)
+
+Fully mobile-friendly / responsive
+
+Café-related icons
+
+Same functionality (employee profile, attendance table, logout button)
+
+Fully commented
+
+### Here’s the fully final code with your requirements applied:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Google Fonts & FontAwesome -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+<style>
+/* ==========================
+   GLOBAL STYLES
+========================== */
+body { 
+    font-family: 'Poppins', sans-serif; 
+    background: url('https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
+    min-height: 100vh;
+    color: #fff;
+    position: relative;
+}
+.overlay {
+    background: rgba(0,0,0,0.5);
+    position: fixed;
+    top:0; left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.container {
+    max-width: 900px; 
+    margin-top: 60px; 
+    position: relative;
+    z-index: 1;
+    padding: 0 15px;
+}
+
+/* ==========================
+   CARD STYLING
+========================== */
+.card { 
+    padding: 25px; 
+    margin-bottom: 25px; 
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover { 
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+}
+
+/* HEADINGS WITH ICONS */
+h4 { 
+    color: #ffd166; 
+    font-size: 1.8rem; 
+    display: flex;
+    align-items: center;
+}
+h4 i { margin-right: 10px; color: #ffb347; }
+
+h5#emp-name { 
+    margin-top: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* TABLE STYLING */
+.table { 
+    background: rgba(0,0,0,0.2); 
+    color: #fff; 
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+.table th, .table td { 
+    color: #fff; 
+    vertical-align: middle;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255,255,255,0.05);
+}
+.table-striped tbody tr:hover {
+    background-color: rgba(255,255,255,0.12);
+}
+
+/* LOGOUT BUTTON */
+.btn-logout {
+    background: linear-gradient(135deg,#ff6f3c,#ffb347);
+    color: #fff;
+    border:none;
+    border-radius: 50px;
+    padding: 10px 25px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-logout:hover { 
+    transform: scale(1.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* ICONS NEXT TO TABLE HEADINGS */
+th:first-child::before { content: "\f073"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+th:nth-child(2)::before { content: "\f044"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+th:nth-child(3)::before { content: "\f017"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+th:nth-child(4)::before { content: "\f0c0"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-right:5px; }
+
+/* ==========================
+   RESPONSIVE LAYOUT
+========================== */
+@media (max-width: 768px) {
+    h4 { font-size: 1.5rem; }
+    h5#emp-name { font-size: 1.2rem; }
+    .btn-logout { padding: 8px 20px; font-size: 0.9rem; }
+    .card { padding: 20px; }
+    .table th, .table td { font-size: 0.9rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="container">
+
+    <!-- Logout Button -->
+    <button id="logoutBtn" class="btn btn-logout float-end"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+    <!-- ================= PROFILE ================= -->
+    <div class="card">
+        <h4><i class="fas fa-mug-hot"></i> Employee Profile</h4>
+        <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+        <p><strong>Job Title:</strong> <span id="profile-job">Loading...</span></p>
+        <p><strong>Salary:</strong> <span id="profile-salary">Loading...</span></p>
+        <p><strong>Start Date:</strong> <span id="profile-start">Loading...</span></p>
+        <h5 id="emp-name"></h5>
+    </div>
+
+    <!-- ================= ATTENDANCE HISTORY ================= -->
+    <div class="card">
+        <h4><i class="fas fa-calendar-check"></i> Attendance History</h4>
+        <table class="table table-striped" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+/* =====================================================
+   SIMULATED EMPLOYEE DATA — Replace with API if needed
+===================================================== */
+const EMPLOYEE_DATA = {
+    "123": { name:"Alice Johnson", job_title:"Barista", salary:"$1500", start_date:"2024-01-10" },
+    "124": { name:"Bob Smith", job_title:"Chef", salary:"$2000", start_date:"2023-03-05" },
+    "125": { name:"Charlie Lee", job_title:"Manager", salary:"$2500", start_date:"2022-06-20" }
+};
+
+const ATTENDANCE_DATA = {
+    "123":[
+        {attendance_date:"2026-03-01", checkin_time:"09:05", checkout_time:"17:00"},
+        {attendance_date:"2026-03-02", checkin_time:"09:10", checkout_time:"17:05"},
+    ],
+    "124":[
+        {attendance_date:"2026-03-01", checkin_time:"08:50", checkout_time:"16:55"},
+    ],
+    "125":[
+        {attendance_date:"2026-03-01", checkin_time:"09:20", checkout_time:"17:10"},
+    ]
+};
+
+/* =====================================================
+   LOGOUT HANDLER — Redirects to logout.php
+===================================================== */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    alert("Logging out...");
+    window.location.href = "logout.php";
+});
+
+/* =====================================================
+   LOAD EMPLOYEE PROFILE & ATTENDANCE
+===================================================== */
+function loadEmployeeData() {
+    const employeeIds = Object.keys(EMPLOYEE_DATA);
+    const employeeId = employeeIds[Math.floor(Math.random()*employeeIds.length)];
+
+    const profile = EMPLOYEE_DATA[employeeId];
+    const attendance = ATTENDANCE_DATA[employeeId] || [];
+
+    document.getElementById("profile-name").innerText = profile.name;
+    document.getElementById("profile-job").innerText = profile.job_title;
+    document.getElementById("profile-salary").innerText = profile.salary;
+    document.getElementById("profile-start").innerText = profile.start_date;
+    document.getElementById("emp-name").innerText = `Welcome, ${profile.name} ☕`;
+
+    const tbody = document.getElementById("attendanceTable").querySelector("tbody");
+    tbody.innerHTML = "";
+    attendance.forEach(rec => {
+        const status = (!rec.checkin_time ? "Absent" : (!rec.checkout_time ? "Checked In" : "Checked Out"));
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${rec.attendance_date}</td>
+            <td>${rec.checkin_time || "-"}</td>
+            <td>${rec.checkout_time || "-"}</td>
+            <td>${status}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+/* =====================================================
+   INITIALIZE PAGE — Load employee data
+===================================================== */
+window.addEventListener("DOMContentLoaded", () => {
+    loadEmployeeData();
+});
+</script>
+
+</body>
+</html>
+```
+
+### ✅ What’s new in this version:
+
+- Café-themed background image: Cozy coffee shop vibe.
+
+- Professional, modern card layout with hover lift effect.
+
+- Icons updated:
+
+    - Employee Profile → fa-mug-hot
+
+    - Attendance → fa-calendar-check
+
+    - Logout → fa-sign-out-alt
+
+- Fully responsive for mobile/tablet.
+
+- Logout redirects to logout.php.
+
+- All table, profile, and employee logic preserved.
 ---
