@@ -250,4 +250,178 @@ Since you're transitioning into front-end architecture (as you mentioned before)
 Absolute URL = external resources
 Relative URL = internal navigation
 
+###  utils.js
+
+Perfect 👌 I will merge your existing JWT utilities + professional navigation helper into one clean, production-ready utils.js.
+
+This version:
+
+✔ Keeps your JWT parsing
+✔ Keeps token expiry check
+✔ Keeps token getter
+✔ Adds centralized navigation helper
+✔ Safely handles missing config.js
+✔ Avoids global pollution
+✔ Production-ready structure
+
+### ✅ FULLY FINAL utils.js (With Navigation + JWT Utilities)
+
+Replace your entire utils.js with this:
+
+```
+/* =========================================================
+   CHARLIE CAFE — GLOBAL UTILITIES
+   ---------------------------------------------------------
+   ✔ JWT Parsing
+   ✔ Token Expiry Check
+   ✔ LocalStorage Token Helper
+   ✔ Centralized Navigation Helper
+   ✔ Safe Base URL Handling
+========================================================= */
+
+window.CHARLIE_UTILS = (() => {
+
+    /* =====================================================
+       🔐 JWT PARSER
+       -----------------------------------------------------
+       Decodes JWT payload (Base64)
+    ===================================================== */
+    function parseJwt(token) {
+        try {
+            if (!token) return {};
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch (error) {
+            console.error("Invalid JWT token:", error);
+            return {};
+        }
+    }
+
+    /* =====================================================
+       ⏳ TOKEN EXPIRY CHECK
+       -----------------------------------------------------
+       Returns true if token is expired
+    ===================================================== */
+    function isTokenExpired(token) {
+        try {
+            const payload = parseJwt(token);
+            if (!payload.exp) return true;
+
+            return payload.exp * 1000 < Date.now();
+        } catch (error) {
+            console.error("Token expiry check failed:", error);
+            return true;
+        }
+    }
+
+    /* =====================================================
+       💾 TOKEN STORAGE HELPERS
+    ===================================================== */
+
+    // Get stored access token
+    function getToken() {
+        return localStorage.getItem("access_token");
+    }
+
+    // Set access token
+    function setToken(token) {
+        localStorage.setItem("access_token", token);
+    }
+
+    // Remove token (logout helper)
+    function clearToken() {
+        localStorage.removeItem("access_token");
+    }
+
+    /* =====================================================
+       🌍 BASE URL DETECTION
+       -----------------------------------------------------
+       Uses config.js if available
+       Falls back to current origin if not
+    ===================================================== */
+    function getBaseUrl() {
+        if (window.CHARLIE_CONFIG && window.CHARLIE_CONFIG.CLOUDFRONT_BASE) {
+            return window.CHARLIE_CONFIG.CLOUDFRONT_BASE;
+        }
+
+        // Fallback: current domain (best for same-origin apps)
+        return window.location.origin;
+    }
+
+    /* =====================================================
+       🚀 NAVIGATION HELPERS
+       -----------------------------------------------------
+       Centralized routing to avoid hardcoded URLs
+    ===================================================== */
+
+    /**
+     * Redirect to page in same tab
+     * Example: goTo('cafe-admin-dashboard.html')
+     */
+    function goTo(page) {
+        if (!page) return;
+        window.location.href = `${getBaseUrl()}/${page}`;
+    }
+
+    /**
+     * Open page in new browser tab
+     */
+    function openPage(page) {
+        if (!page) return;
+        window.open(`${getBaseUrl()}/${page}`, "_blank");
+    }
+
+    /**
+     * Reload current page
+     */
+    function reload() {
+        window.location.reload();
+    }
+
+    /* =====================================================
+       📦 PUBLIC METHODS
+    ===================================================== */
+    return {
+        parseJwt,
+        isTokenExpired,
+        getToken,
+        setToken,
+        clearToken,
+        goTo,
+        openPage,
+        reload
+    };
+
+})();
+```
+
+### ✅ HOW TO USE NOW (Everywhere)
+
+Instead of this ❌
+
+```
+window.location.href = "https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html";
+```
+
+Use this ✅
+
+```
+CHARLIE_UTILS.goTo("cafe-admin-dashboard.html");
+```
+
+### ✅ Sidebar Example
+
+```
+<a href="#" onclick="CHARLIE_UTILS.goTo('analytics.html')">
+    Analytics
+</a>
+```
+
+### 🧠 Why This Is Advanced & Clean
+
+✔ No more hardcoded CloudFront URLs
+✔ Only edit config.js if domain changes
+✔ Works even if config.js fails (fallback to current origin)
+✔ Centralized routing logic
+✔ Cleaner architecture
+
 ----
