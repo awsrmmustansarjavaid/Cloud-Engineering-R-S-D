@@ -425,3 +425,119 @@ CHARLIE_UTILS.goTo("cafe-admin-dashboard.html");
 ✔ Cleaner architecture
 
 ----
+### Simple Base URL Centralication 
+
+### ✅ 1️⃣ Keep a Central config.js
+
+Make sure your config.js lives in /var/www/html/js/config.js:
+
+```
+/* =========================================================
+   CHARLIE CAFE — GLOBAL CONFIGURATION
+========================================================= */
+window.CHARLIE_CONFIG = {
+    CLOUDFRONT_BASE: "https://dyoqxkx8bd8d7.cloudfront.net",
+    COGNITO_DOMAIN: "us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
+    CLIENT_ID: "42haggs0jctmq5rnaajfi3hmqu",
+    API_BASE: "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/prod",
+    REGION: "us-east-1",
+};
+```
+
+#### ✅ You only update this once whenever your CloudFront URL changes.
+
+### ✅ 2️⃣ Use CLOUDFRONT_BASE Dynamically in HTML / JS
+
+Instead of hardcoding:
+
+```
+<a href="https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html">Dashboard</a>
+```
+
+Do this:
+
+```
+<a id="sidebar-dashboard" href="#">Dashboard</a>
+
+<script src="/js/config.js"></script>
+<script>
+document.getElementById("sidebar-dashboard").href =
+    `${window.CHARLIE_CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`;
+</script>
+```
+
+- No matter how many pages you have, the URL will always come from config.js.
+
+- Easy, one-time change for CloudFront URL.
+
+### ✅ 3️⃣ Dynamic Redirects Anywhere
+
+If you have JS code or buttons that redirect:
+
+```
+// Old hardcoded redirect
+window.location.href = "https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html";
+
+// New dynamic redirect
+window.location.href = `${window.CHARLIE_CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`;
+```
+
+### ✅ 4️⃣ Use it in PHP Pages
+
+Even in PHP files, you can use a small inline JS snippet:
+
+```
+<script src="/js/config.js"></script>
+<script>
+let dashboardUrl = `${window.CHARLIE_CONFIG.CLOUDFRONT_BASE}/cafe-admin-dashboard.html`;
+// Example redirect
+document.getElementById("dashboard-btn").onclick = () => {
+    window.location.href = dashboardUrl;
+};
+</script>
+```
+
+- PHP only generates the HTML; the URL is always taken from config.js.
+
+- No need to replace PHP code when CloudFront changes.
+
+### ✅ 5️⃣ Optional: Auto-Update All Sidebar Links
+
+If you have multiple links in the sidebar:
+
+```
+<ul id="sidebar-menu">
+  <li><a data-page="cafe-admin-dashboard.html" href="#">Dashboard</a></li>
+  <li><a data-page="analytics.html" href="#">Analytics</a></li>
+  <li><a data-page="orders.html" href="#">Orders</a></li>
+</ul>
+
+<script src="/js/config.js"></script>
+<script>
+document.querySelectorAll("#sidebar-menu a").forEach(link => {
+    const page = link.dataset.page;
+    if (page) {
+        link.href = `${window.CHARLIE_CONFIG.CLOUDFRONT_BASE}/${page}`;
+    }
+});
+</script>
+```
+
+- Now all sidebar links automatically use the current CloudFront base URL.
+
+- If the CloudFront URL changes, just update config.js → all pages instantly updated.
+
+### ✅ Advantages of This Approach
+
+- One central file (config.js) for all environment URLs.
+
+- Works for HTML, PHP, JS pages.
+
+- No need to manually change dozens of files on deployment.
+
+- Lightweight, no complex build system required.
+
+- Simple and easy to maintain.
+
+---
+
