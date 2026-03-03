@@ -6,6 +6,23 @@
 
 ## PHASE 1️⃣ – RDS
 
+### test in MySQL:
+
+```
+SELECT order_id, status, payment_status
+FROM orders
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+If you see:
+
+```
+status = RECEIVED
+```
+
+Then analytics will show 0.
+
 
 
 **✅ PHASE 1 STATUS**
@@ -73,6 +90,65 @@ or
 ```
 { "statusCode": 401, "headers": { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }, "body": "\"Unauthorized\"" }
 ```
+
+---
+
+### 💡 Important :
+
+
+### 💡 Why This Will Fix Your Button
+
+Previously:
+
+- Lambda was filtering wrong columns
+
+- So it returned 0
+
+- So frontend looked like it "wasn't working"
+
+Now:
+
+- Correct SQL
+
+- Correct column names
+
+- Real filtering
+
+- RDS only
+
+- No DynamoDB confusion
+
+If after this it still returns 0, send me:
+
+```
+SELECT order_id, status, payment_status, total_amount, total_cost, created_at
+FROM orders
+ORDER BY created_at DESC
+LIMIT 5;
+```
+
+And I’ll pinpoint it immediately.
+
+### 🔎 Let’s Prove It (Run These Queries in MySQL)
+
+#### 1️⃣ Check what statuses actually exist:
+
+```
+SELECT status, payment_status, COUNT(*) 
+FROM orders
+GROUP BY status, payment_status;
+```
+
+#### 2️⃣ Check today's orders without filters:
+
+```
+SELECT order_id, status, payment_status, total_amount, created_at
+FROM orders
+WHERE created_at >= CURDATE()
+ORDER BY created_at DESC;
+```
+
+
 
 #### 🔹 Why 401 Appears
 
