@@ -3521,4 +3521,297 @@ window.addEventListener("DOMContentLoaded", () => {
 - Logout redirects to logout.php.
 
 - All table, profile, and employee logic preserved.
+
+
+Perfect! I can provide a fully final employee-portal.html that:
+
+Uses your Lambda APIs via CHARLIE_API (no mock data)
+
+Is professional, café-themed, mobile-friendly, and responsive
+
+Includes Employee Profile, Attendance History, and Leaves & Holidays
+
+Has logout button
+
+Fully commented for clarity
+
+### Here’s the complete code:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ==========================
+     STYLES & FONTS
+========================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+<style>
+/* ==========================
+   GLOBAL BODY STYLES
+========================== */
+body { 
+    font-family: 'Poppins', sans-serif; 
+    background: url('https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
+    min-height: 100vh;
+    color: #fff;
+    position: relative;
+    padding-bottom: 50px;
+}
+.overlay {
+    background: rgba(0,0,0,0.5);
+    position: fixed;
+    top:0; left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.container {
+    max-width: 950px; 
+    margin-top: 60px; 
+    position: relative;
+    z-index: 1;
+    padding: 0 15px;
+}
+
+/* ==========================
+   CARD STYLING
+========================== */
+.card { 
+    padding: 25px; 
+    margin-bottom: 25px; 
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover { 
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+}
+
+/* ==========================
+   HEADINGS WITH ICONS
+========================== */
+h4 { 
+    color: #ffd166; 
+    font-size: 1.8rem; 
+    display: flex;
+    align-items: center;
+}
+h4 i { margin-right: 10px; color: #ffb347; }
+
+h5#emp-name { 
+    margin-top: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* ==========================
+   TABLE STYLING
+========================== */
+.table { 
+    background: rgba(0,0,0,0.2); 
+    color: #fff; 
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+.table th, .table td { 
+    color: #fff; 
+    vertical-align: middle;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255,255,255,0.05);
+}
+.table-striped tbody tr:hover {
+    background-color: rgba(255,255,255,0.12);
+}
+
+/* ==========================
+   LOGOUT BUTTON
+========================== */
+.btn-logout {
+    background: linear-gradient(135deg,#ff6f3c,#ffb347);
+    color: #fff;
+    border:none;
+    border-radius: 50px;
+    padding: 10px 25px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-logout:hover { 
+    transform: scale(1.1);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* ==========================
+   RESPONSIVE LAYOUT
+========================== */
+@media (max-width: 768px) {
+    h4 { font-size: 1.5rem; }
+    h5#emp-name { font-size: 1.2rem; }
+    .btn-logout { padding: 8px 20px; font-size: 0.9rem; }
+    .card { padding: 20px; }
+    .table th, .table td { font-size: 0.9rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="container">
+
+    <!-- ================= LOGOUT BUTTON ================= -->
+    <button id="logoutBtn" class="btn btn-logout float-end"><i class="fas fa-sign-out-alt"></i> Logout</button>
+
+    <!-- ================= PROFILE CARD ================= -->
+    <div class="card">
+        <h4><i class="fas fa-mug-hot"></i> Employee Profile</h4>
+        <p><strong>Name:</strong> <span id="profile-name">Loading...</span></p>
+        <p><strong>Job Title:</strong> <span id="profile-job">Loading...</span></p>
+        <p><strong>Salary:</strong> <span id="profile-salary">Loading...</span></p>
+        <p><strong>Start Date:</strong> <span id="profile-start">Loading...</span></p>
+        <h5 id="emp-name"></h5>
+    </div>
+
+    <!-- ================= ATTENDANCE HISTORY CARD ================= -->
+    <div class="card">
+        <h4><i class="fas fa-calendar-check"></i> Attendance History</h4>
+        <table class="table table-striped" id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- ================= LEAVES & HOLIDAYS CARD ================= -->
+    <div class="card">
+        <h4><i class="fas fa-calendar-alt"></i> Leaves & Holidays</h4>
+        <div id="leavesList">Loading leaves...</div>
+        <div id="holidaysList" class="mt-2">Loading holidays...</div>
+    </div>
+
+</div>
+
+<!-- ==========================
+     LOAD MODULES
+========================== -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/central-auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/central-printing.js"></script>
+
+<script>
+/* =====================================================
+   LOGOUT HANDLER
+   - Redirects to logout.php or implement Cognito signout
+===================================================== */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    alert("Logging out...");
+    window.location.href = "logout.php";
+});
+
+/* =====================================================
+   FETCH & DISPLAY EMPLOYEE PROFILE, ATTENDANCE, LEAVES
+===================================================== */
+async function loadEmployeeData(employeeId) {
+    try {
+        // --------- PROFILE ---------
+        const profile = await CHARLIE_API.getEmployeeProfile(employeeId);
+        document.getElementById("profile-name").innerText = profile.name;
+        document.getElementById("profile-job").innerText = profile.job_title;
+        document.getElementById("profile-salary").innerText = profile.salary;
+        document.getElementById("profile-start").innerText = profile.start_date;
+        document.getElementById("emp-name").innerText = `Welcome, ${profile.name} ☕`;
+
+        // --------- ATTENDANCE HISTORY ---------
+        const attendance = await CHARLIE_API.getAttendanceHistory(employeeId);
+        const tbody = document.getElementById("attendanceTable").querySelector("tbody");
+        tbody.innerHTML = "";
+        attendance.forEach(rec => {
+            const status = (!rec.checkin_time ? "Absent" : (!rec.checkout_time ? "Checked In" : "Checked Out"));
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${rec.attendance_date}</td>
+                <td>${rec.checkin_time || "-"}</td>
+                <td>${rec.checkout_time || "-"}</td>
+                <td>${status}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // --------- LEAVES & HOLIDAYS ---------
+        const leavesData = await CHARLIE_API.getLeavesAndHolidays(employeeId);
+
+        // Leaves list
+        const leavesHtml = leavesData.leaves.length
+            ? `<ul>${leavesData.leaves.map(l => `<li>${l.leave_date} — ${l.leave_type}</li>`).join('')}</ul>`
+            : "No leaves found.";
+        document.getElementById("leavesList").innerHTML = `<strong>Leaves:</strong> ${leavesHtml}`;
+
+        // Holidays list
+        const holidaysHtml = leavesData.holidays.length
+            ? `<ul>${leavesData.holidays.map(h => `<li>${h.holiday_date} — ${h.description}</li>`).join('')}</ul>`
+            : "No holidays found.";
+        document.getElementById("holidaysList").innerHTML = `<strong>Company Holidays:</strong> ${holidaysHtml}`;
+
+    } catch (err) {
+        console.error("Error loading employee data:", err);
+        alert("Failed to load employee data. Check console for details.");
+    }
+}
+
+/* =====================================================
+   INITIALIZE PAGE
+   - Retrieve logged-in employee_id from session/local storage
+===================================================== */
+window.addEventListener("DOMContentLoaded", () => {
+    const employeeId = localStorage.getItem("employee_id") || 123; // replace with real login ID
+    loadEmployeeData(employeeId);
+});
+</script>
+
+</body>
+</html>
+```
+
+### ✅ Key Features
+
+- Fully fetches real data from Lambda APIs (hr-employee-profile, hr-attendance-history, hr-leaves-holidays) via CHARLIE_API.
+
+- Café-themed, professional layout with transparent cards and shadow effect.
+
+- Mobile-responsive: adjusts font, table, and card sizes.
+
+- Logout button linked to logout.php (or replace with Cognito sign-out logic).
+
+- Comments for each block for easy maintenance.
+
+- Includes Employee Profile, Attendance History, Leaves & Holidays.
+---
+
+
+
+
+
+
+
 ---
