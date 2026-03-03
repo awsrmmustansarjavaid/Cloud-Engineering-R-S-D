@@ -4,40 +4,7 @@
 
 # SECTION 1️⃣ SALES ANALYTICS & REPORTING SYSTEM
 
-## PHASE 1️⃣ – DYNAMODB DESIGN (NO NEW TABLE)
-
-### 1️⃣ TEST INDEX (VERY IMPORTANT)
-
-#### Use DynamoDB PartiQL Editor
-
-```
-SELECT * FROM "CafeOrders"."order_date-index"
-WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31'
-```
-
-✔ If results return → continue
-
-❌ If empty → your data format is wrong
-
-#### FINAL VALIDATION CHECKLIST
-
-Before moving to Phase 2, confirm:
-
-✔ CafeOrders table exists
-
-✔ order_id is PK
-
-✔ order_date is String
-
-✔ order_timestamp is Number
-
-✔ GSI order_date-index is ACTIVE
-
-✔ Query returns correct data
-
-✔ No table scan used
-
-✔ No missing attributes
+## PHASE 1️⃣ – RDS
 
 
 
@@ -67,8 +34,6 @@ Before moving to Phase 2, confirm:
 }
 ```
 
-- **Click Save**
-
 #### ✅ EXPECTED SUCCESS OUTPUT (200)
 
 ```
@@ -80,6 +45,28 @@ Before moving to Phase 2, confirm:
   "body": "{\"total_sales\":100,\"total_cost\":70,\"profit\":30,\"orders_count\":1}"
 }
 ```
+
+or 
+
+```
+{
+  "queryStringParameters": {"period": "today"}
+}
+```
+
+#### ✅ You should now see real totals:
+
+```
+{
+  "period": "today",
+  "total_sales": 17.0,
+  "total_cost": ...,
+  "profit": ...,
+  "orders_count": 4,
+  "profit_per_item": [...]
+}
+```
+
 
 #### ✅ EXPECTED SUCCESS OUTPUT (401 Unauthorized)
 

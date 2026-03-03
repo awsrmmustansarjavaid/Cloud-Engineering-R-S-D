@@ -103,6 +103,32 @@ Execution role: Create new role
 
 👉 Click Save
 
+### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**    
+
+### 5️⃣ Attach Lambda Layer
+
+- same steps 
+
 
 **✅ PHASE 2 STATUS**
 
