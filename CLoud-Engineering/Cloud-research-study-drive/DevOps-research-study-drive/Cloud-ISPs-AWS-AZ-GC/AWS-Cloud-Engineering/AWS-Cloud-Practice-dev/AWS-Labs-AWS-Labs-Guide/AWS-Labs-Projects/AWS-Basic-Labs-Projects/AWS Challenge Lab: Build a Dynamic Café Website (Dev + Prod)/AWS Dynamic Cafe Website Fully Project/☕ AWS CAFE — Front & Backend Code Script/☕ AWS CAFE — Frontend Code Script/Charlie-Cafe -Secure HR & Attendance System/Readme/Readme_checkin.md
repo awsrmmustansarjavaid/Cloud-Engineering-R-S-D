@@ -4840,4 +4840,623 @@ Error messages are more descriptive (numeric ID, API errors).
 
 Works perfectly with the updated Lambda function.
 
+### ✅ fully final latest checkin.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Biometric Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Google Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================
+   GLOBAL STYLES
+========================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: white;
+}
+
+/* Dark overlay */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+}
+
+/* Terminal Card */
+.terminal-card {
+    position: relative;
+    z-index: 2;
+    width: 450px;
+    background: rgba(58,37,28,0.95);
+    border-radius: 20px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* Big Clock */
+.big-clock { font-size: 42px; font-weight: 700; letter-spacing: 2px; }
+
+/* Date */
+.date-text { font-size: 14px; opacity: 0.8; }
+
+/* Toggle Check-In / Check-Out */
+.mode-toggle-container { position: relative; width: 100%; }
+.mode-toggle-container input { display: none; }
+.mode-toggle {
+    position: relative;
+    display: flex;
+    background: #2b1b14;
+    border-radius: 50px;
+    height: 55px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+.toggle-slider {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    border-radius: 50px;
+    transition: 0.4s ease;
+}
+.toggle-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    z-index: 2;
+    cursor: pointer;
+}
+#checkoutMode:checked ~ .mode-toggle .toggle-slider {
+    left: 50%;
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+}
+
+/* Fingerprint Area */
+.fingerprint {
+    width: 160px;
+    height: 160px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff9800, #ff5722);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+}
+.fingerprint:hover { transform: scale(1.1); }
+.fingerprint::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.6);
+    animation: pulse 2s infinite;
+}
+@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+/* Status Message */
+#statusMsg { margin-top: 15px; font-weight: bold; }
+/* Session Timer */
+.session-timer { font-size: 14px; margin-top: 10px; color: #90ee90; }
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="terminal-card">
+
+    <h3>☕ Charlie Café</h3>
+    <p>Biometric Attendance Terminal</p>
+
+    <!-- Live Clock -->
+    <div class="big-clock" id="liveClock">00:00:00</div>
+    <div class="date-text" id="liveDate"></div>
+
+    <!-- Timezone Selector -->
+    <select id="timezoneSelect" class="form-select mt-2 mb-3">
+        <option value="Asia/Karachi">🇵🇰 Pakistan</option>
+        <option value="UTC">🌍 UTC</option>
+        <option value="Asia/Dubai">🇦🇪 UAE</option>
+        <option value="Europe/London">🇬🇧 London</option>
+        <option value="America/New_York">🇺🇸 New York</option>
+    </select>
+
+    <hr>
+
+    <!-- Check-in / Check-out toggle -->
+    <div class="mode-toggle-container mb-3">
+        <input type="radio" name="attendanceMode" id="checkinMode" value="checkin" checked>
+        <input type="radio" name="attendanceMode" id="checkoutMode" value="checkout">
+        <div class="mode-toggle">
+            <div class="toggle-slider"></div>
+            <label for="checkinMode" class="toggle-option">🟢 Check-In</label>
+            <label for="checkoutMode" class="toggle-option">🔴 Check-Out</label>
+        </div>
+    </div>
+
+    <!-- Employee ID -->
+    <input type="number" id="employeeId" class="form-control mb-3" placeholder="Enter Employee ID">
+
+    <!-- Fingerprint -->
+    <div class="fingerprint" onclick="simulateScan()">🔐</div>
+    <p>Tap fingerprint to confirm attendance</p>
+
+    <div id="statusMsg"></div>
+    <div class="session-timer" id="sessionTimer"></div>
+
+</div>
+
+<script>
+let selectedTimezone = "Asia/Karachi";
+
+/* ==========================
+   LIVE CLOCK
+========================== */
+function updateClock() {
+    const now = new Date();
+    const timeOptions = { timeZone: selectedTimezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
+    const dateOptions = { timeZone: selectedTimezone, weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    document.getElementById("liveClock").innerText = new Intl.DateTimeFormat("en-GB", timeOptions).format(now);
+    document.getElementById("liveDate").innerText = new Intl.DateTimeFormat("en-GB", dateOptions).format(now);
+}
+setInterval(updateClock, 1000);
+updateClock();
+document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
+
+/* ==========================
+   SESSION TIMER
+========================== */
+let sessionStart = null;
+let sessionInterval = null;
+function startSessionTimer() {
+    sessionStart = new Date();
+    sessionInterval = setInterval(() => {
+        const diff = Math.floor((new Date() - sessionStart) / 1000);
+        const hrs = String(Math.floor(diff / 3600)).padStart(2,"0");
+        const mins = String(Math.floor((diff % 3600)/60)).padStart(2,"0");
+        const secs = String(diff % 60).padStart(2,"0");
+        document.getElementById("sessionTimer").innerText = "Working Time: " + hrs + ":" + mins + ":" + secs;
+    }, 1000);
+}
+
+/* ==========================
+   LATE CHECK-IN DETECTION
+========================== */
+function isLate() {
+    const now = new Date();
+    return now.getHours() >= 10;
+}
+
+/* ==========================
+   FINGERPRINT SCAN SIMULATION
+========================== */
+async function simulateScan() {
+    const employeeIdInput = document.getElementById("employeeId").value.trim();
+    const action = document.querySelector('input[name="attendanceMode"]:checked').value;
+
+    if (!employeeIdInput) { showMessage("❌ Enter Employee ID first", false); return; }
+
+    const employeeId = parseInt(employeeIdInput, 10); // convert to numeric
+    if (isNaN(employeeId)) { showMessage("❌ Employee ID must be a number", false); return; }
+
+    showMessage("🔍 Scanning fingerprint...", true);
+
+    setTimeout(async () => {
+        try {
+            // Call Lambda API
+            const payload = { employee_id: employeeId, action: action };
+
+            const response = await fetch("https://hihe1z5ci7.execute-api.us-east-1.amazonaws.com/prod/attendance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.message || "API error");
+
+            // Display success messages
+            if (action === "checkin") {
+                if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
+                else showMessage("✅ Check-In Successful", true);
+                startSessionTimer();
+            } else {
+                showMessage("🔴 Check-Out Successful", true);
+                clearInterval(sessionInterval);
+                document.getElementById("sessionTimer").innerText = "";
+            }
+
+        } catch (error) {
+            showMessage("❌ Scan failed or API error: " + error.message, false);
+            console.error("Attendance API error:", error);
+        }
+    }, 1500);
+}
+
+/* ==========================
+   SHOW STATUS MESSAGE
+========================== */
+function showMessage(message, success = true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "lightgreen" : "tomato";
+}
+</script>
+
+</body>
+</html>
+```
+
+---
+### ✅ checkin.html
+
+> **Update Version:1.4**
+
+Perfect — we can just replace the hardcoded API URL with a dynamic one from config.js without touching anything else.
+
+#### Here’s the updated part of your checkin.html JS, fully final with comments:
+
+```
+<!-- ================= CONFIG JS ================= -->
+<script src="/js/config.js"></script>
+
+<script>
+async function simulateScan() {
+    const employeeIdInput = document.getElementById("employeeId").value.trim();
+    const action = document.querySelector('input[name="attendanceMode"]:checked').value;
+
+    if (!employeeIdInput) { showMessage("❌ Enter Employee ID first", false); return; }
+
+    const employeeId = parseInt(employeeIdInput, 10); // convert to numeric
+    if (isNaN(employeeId)) { showMessage("❌ Employee ID must be a number", false); return; }
+
+    showMessage("🔍 Scanning fingerprint...", true);
+
+    setTimeout(async () => {
+        try {
+            // ===========================
+            // USE CONFIG.JS FOR API BASE
+            // ===========================
+            // window.CHARLIE_CONFIG.API_BASE is defined in config.js
+            const apiBase = window.CHARLIE_CONFIG.API_BASE;
+            const endpoint = `${apiBase}/attendance`;
+
+            const payload = { employee_id: employeeId, action: action };
+
+            // Call Lambda API dynamically
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.message || "API error");
+
+            // Display success messages
+            if (action === "checkin") {
+                if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
+                else showMessage("✅ Check-In Successful", true);
+                startSessionTimer();
+            } else {
+                showMessage("🔴 Check-Out Successful", true);
+                clearInterval(sessionInterval);
+                document.getElementById("sessionTimer").innerText = "";
+            }
+
+        } catch (error) {
+            showMessage("❌ Scan failed or API error: " + error.message, false);
+            console.error("Attendance API error:", error);
+        }
+    }, 1500);
+}
+</script>
+```
+
+### ✅ What changed:
+
+- Dynamic API URL using config.js:
+
+```
+const apiBase = window.CHARLIE_CONFIG.API_BASE;
+const endpoint = `${apiBase}/attendance`;
+```
+
+- No hardcoded URL — if your CloudFront or API changes, just update config.js.
+
+- Everything else in your code remains untouched.
+
+### ✅ Fully Final checkin.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Biometric Attendance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap & Google Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================
+   GLOBAL STYLES
+========================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: white;
+}
+
+/* Dark overlay */
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+}
+
+/* Terminal Card */
+.terminal-card {
+    position: relative;
+    z-index: 2;
+    width: 450px;
+    background: rgba(58,37,28,0.95);
+    border-radius: 20px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* Big Clock */
+.big-clock { font-size: 42px; font-weight: 700; letter-spacing: 2px; }
+
+/* Date */
+.date-text { font-size: 14px; opacity: 0.8; }
+
+/* Toggle Check-In / Check-Out */
+.mode-toggle-container { position: relative; width: 100%; }
+.mode-toggle-container input { display: none; }
+.mode-toggle {
+    position: relative;
+    display: flex;
+    background: #2b1b14;
+    border-radius: 50px;
+    height: 55px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+.toggle-slider {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    border-radius: 50px;
+    transition: 0.4s ease;
+}
+.toggle-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    z-index: 2;
+    cursor: pointer;
+}
+#checkoutMode:checked ~ .mode-toggle .toggle-slider {
+    left: 50%;
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+}
+
+/* Fingerprint Area */
+.fingerprint {
+    width: 160px;
+    height: 160px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ff9800, #ff5722);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+}
+.fingerprint:hover { transform: scale(1.1); }
+.fingerprint::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.6);
+    animation: pulse 2s infinite;
+}
+@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+/* Status Message */
+#statusMsg { margin-top: 15px; font-weight: bold; }
+/* Session Timer */
+.session-timer { font-size: 14px; margin-top: 10px; color: #90ee90; }
+</style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="terminal-card">
+
+    <h3>☕ Charlie Café</h3>
+    <p>Biometric Attendance Terminal</p>
+
+    <!-- Live Clock -->
+    <div class="big-clock" id="liveClock">00:00:00</div>
+    <div class="date-text" id="liveDate"></div>
+
+    <!-- Timezone Selector -->
+    <select id="timezoneSelect" class="form-select mt-2 mb-3">
+        <option value="Asia/Karachi">🇵🇰 Pakistan</option>
+        <option value="UTC">🌍 UTC</option>
+        <option value="Asia/Dubai">🇦🇪 UAE</option>
+        <option value="Europe/London">🇬🇧 London</option>
+        <option value="America/New_York">🇺🇸 New York</option>
+    </select>
+
+    <hr>
+
+    <!-- Check-in / Check-out toggle -->
+    <div class="mode-toggle-container mb-3">
+        <input type="radio" name="attendanceMode" id="checkinMode" value="checkin" checked>
+        <input type="radio" name="attendanceMode" id="checkoutMode" value="checkout">
+        <div class="mode-toggle">
+            <div class="toggle-slider"></div>
+            <label for="checkinMode" class="toggle-option">🟢 Check-In</label>
+            <label for="checkoutMode" class="toggle-option">🔴 Check-Out</label>
+        </div>
+    </div>
+
+    <!-- Employee ID -->
+    <input type="number" id="employeeId" class="form-control mb-3" placeholder="Enter Employee ID">
+
+    <!-- Fingerprint -->
+    <div class="fingerprint" onclick="simulateScan()">🔐</div>
+    <p>Tap fingerprint to confirm attendance</p>
+
+    <div id="statusMsg"></div>
+    <div class="session-timer" id="sessionTimer"></div>
+
+</div>
+
+<!-- ================= CONFIG JS ================= -->
+<script src="/js/config.js"></script>
+
+<script>
+let selectedTimezone = "Asia/Karachi";
+
+/* ========================== LIVE CLOCK ========================== */
+function updateClock() {
+    const now = new Date();
+    const timeOptions = { timeZone: selectedTimezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
+    const dateOptions = { timeZone: selectedTimezone, weekday: "long", year: "numeric", month: "long", day: "numeric" };
+    document.getElementById("liveClock").innerText = new Intl.DateTimeFormat("en-GB", timeOptions).format(now);
+    document.getElementById("liveDate").innerText = new Intl.DateTimeFormat("en-GB", dateOptions).format(now);
+}
+setInterval(updateClock, 1000);
+updateClock();
+document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
+
+/* ========================== SESSION TIMER ========================== */
+let sessionStart = null;
+let sessionInterval = null;
+function startSessionTimer() {
+    sessionStart = new Date();
+    sessionInterval = setInterval(() => {
+        const diff = Math.floor((new Date() - sessionStart) / 1000);
+        const hrs = String(Math.floor(diff / 3600)).padStart(2,"0");
+        const mins = String(Math.floor((diff % 3600)/60)).padStart(2,"0");
+        const secs = String(diff % 60).padStart(2,"0");
+        document.getElementById("sessionTimer").innerText = "Working Time: " + hrs + ":" + mins + ":" + secs;
+    }, 1000);
+}
+
+/* ========================== LATE CHECK-IN ========================== */
+function isLate() {
+    const now = new Date();
+    return now.getHours() >= 10;
+}
+
+/* ========================== FINGERPRINT SCAN ========================== */
+async function simulateScan() {
+    const employeeIdInput = document.getElementById("employeeId").value.trim();
+    const action = document.querySelector('input[name="attendanceMode"]:checked').value;
+
+    if (!employeeIdInput) { showMessage("❌ Enter Employee ID first", false); return; }
+
+    const employeeId = parseInt(employeeIdInput, 10);
+    if (isNaN(employeeId)) { showMessage("❌ Employee ID must be a number", false); return; }
+
+    showMessage("🔍 Scanning fingerprint...", true);
+
+    setTimeout(async () => {
+        try {
+            // Use API Base from config.js
+            const apiBase = window.CHARLIE_CONFIG.API_BASE;
+            const endpoint = `${apiBase}/attendance`;
+
+            const payload = { employee_id: employeeId, action: action };
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.message || "API error");
+
+            if (action === "checkin") {
+                if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
+                else showMessage("✅ Check-In Successful", true);
+                startSessionTimer();
+            } else {
+                showMessage("🔴 Check-Out Successful", true);
+                clearInterval(sessionInterval);
+                document.getElementById("sessionTimer").innerText = "";
+            }
+
+        } catch (error) {
+            showMessage("❌ Scan failed or API error: " + error.message, false);
+            console.error("Attendance API error:", error);
+        }
+    }, 1500);
+}
+
+/* ========================== SHOW STATUS MESSAGE ========================== */
+function showMessage(message, success = true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "lightgreen" : "tomato";
+}
+</script>
+
+</body>
+</html>
+```
+
 ---

@@ -165,12 +165,13 @@ body {
 
 </div>
 
+<!-- ================= CONFIG JS ================= -->
+<script src="/js/config.js"></script>
+
 <script>
 let selectedTimezone = "Asia/Karachi";
 
-/* ==========================
-   LIVE CLOCK
-========================== */
+/* ========================== LIVE CLOCK ========================== */
 function updateClock() {
     const now = new Date();
     const timeOptions = { timeZone: selectedTimezone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false };
@@ -182,9 +183,7 @@ setInterval(updateClock, 1000);
 updateClock();
 document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
 
-/* ==========================
-   SESSION TIMER
-========================== */
+/* ========================== SESSION TIMER ========================== */
 let sessionStart = null;
 let sessionInterval = null;
 function startSessionTimer() {
@@ -198,34 +197,33 @@ function startSessionTimer() {
     }, 1000);
 }
 
-/* ==========================
-   LATE CHECK-IN DETECTION
-========================== */
+/* ========================== LATE CHECK-IN ========================== */
 function isLate() {
     const now = new Date();
     return now.getHours() >= 10;
 }
 
-/* ==========================
-   FINGERPRINT SCAN SIMULATION
-========================== */
+/* ========================== FINGERPRINT SCAN ========================== */
 async function simulateScan() {
     const employeeIdInput = document.getElementById("employeeId").value.trim();
     const action = document.querySelector('input[name="attendanceMode"]:checked').value;
 
     if (!employeeIdInput) { showMessage("❌ Enter Employee ID first", false); return; }
 
-    const employeeId = parseInt(employeeIdInput, 10); // convert to numeric
+    const employeeId = parseInt(employeeIdInput, 10);
     if (isNaN(employeeId)) { showMessage("❌ Employee ID must be a number", false); return; }
 
     showMessage("🔍 Scanning fingerprint...", true);
 
     setTimeout(async () => {
         try {
-            // Call Lambda API
+            // Use API Base from config.js
+            const apiBase = window.CHARLIE_CONFIG.API_BASE;
+            const endpoint = `${apiBase}/attendance`;
+
             const payload = { employee_id: employeeId, action: action };
 
-            const response = await fetch("https://hihe1z5ci7.execute-api.us-east-1.amazonaws.com/prod/attendance", {
+            const response = await fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -235,7 +233,6 @@ async function simulateScan() {
 
             if (!response.ok) throw new Error(result.message || "API error");
 
-            // Display success messages
             if (action === "checkin") {
                 if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
                 else showMessage("✅ Check-In Successful", true);
@@ -253,9 +250,7 @@ async function simulateScan() {
     }, 1500);
 }
 
-/* ==========================
-   SHOW STATUS MESSAGE
-========================== */
+/* ========================== SHOW STATUS MESSAGE ========================== */
 function showMessage(message, success = true) {
     const msg = document.getElementById("statusMsg");
     msg.innerText = message;
