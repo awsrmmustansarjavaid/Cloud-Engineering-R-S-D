@@ -139,9 +139,15 @@ function getAnalytics(period = "today") {
        - Optional admin dashboard integration
     ===================================================== */
     const adminAttendance = {
-        getDailySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`); },
-        getWeeklySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`); },
-        getMonthlySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`); }
+    getDailySummary() { 
+        return apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=daily`); 
+    },
+    getWeeklySummary() { 
+        return apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=weekly`); 
+    },
+    getMonthlySummary() { 
+        return apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=monthly`); 
+    }
     };
 
     /* =====================================================
