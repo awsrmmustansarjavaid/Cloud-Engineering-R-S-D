@@ -539,5 +539,255 @@ document.querySelectorAll("#sidebar-menu a").forEach(link => {
 
 - Simple and easy to maintain.
 
+Good 👌 now I’ll explain this in very practical Charlie Café way, based on your setup:
+
+- All files in:
+/var/www/html/
+
+- JS files in:
+/var/www/html/js/
+
+- You already load:
+
+```
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/central-auth.js"></script>
+```
+
+You want:
+
+❌ No more hardcoding CloudFront URL
+
+❌ No editing 20 files when URL changes
+
+✅ Only update config.js once
+
+### 🟢 BEST & SIMPLEST METHOD (Professional + Clean)
+
+Instead of manually writing JS in every page like:
+
+```
+document.getElementById("sidebar-dashboard").href = ...
+```
+
+We will create ONE small reusable JS file that automatically updates links on ALL pages.
+
+### ✅ STEP 1 — Update Your HTML Links (Very Important)
+
+Instead of:
+
+```
+<a href="https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html">
+  Dashboard
+</a>
+```
+
+Change to this format:
+
+```
+<a data-page="cafe-admin-dashboard.html" href="#">
+  Dashboard
+</a>
+```
+
+For multiple links:
+
+```
+<ul id="sidebar-menu">
+  <li><a data-page="cafe-admin-dashboard.html" href="#">Dashboard</a></li>
+  <li><a data-page="analytics.html" href="#">Analytics</a></li>
+  <li><a data-page="orders.html" href="#">Orders</a></li>
+</ul>
+```
+
+### 🚨 Important:
+
+- Remove full URL
+
+- Use only file name in data-page
+
+- Do this once in your sidebar template.
+
+### ✅ STEP 2 — Create One Small File
+
+Create new file:
+
+```
+/var/www/html/js/link-builder.js
+```
+
+Put this inside:
+
+```
+/* =========================================================
+   CHARLIE CAFE — Automatic CloudFront Link Builder
+   This script updates ALL links that have data-page attribute
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (!window.CHARLIE_CONFIG || !window.CHARLIE_CONFIG.CLOUDFRONT_BASE) {
+        console.error("CLOUDFRONT_BASE not found in config.js");
+        return;
+    }
+
+    const base = window.CHARLIE_CONFIG.CLOUDFRONT_BASE;
+
+    // Select all elements that have data-page attribute
+    document.querySelectorAll("[data-page]").forEach(function (element) {
+
+        const page = element.getAttribute("data-page");
+
+        if (page) {
+            element.href = base + "/" + page;
+        }
+
+    });
+
+});
+```
+
+That’s it. Nothing complex.
+
+### ✅ STEP 3 — Load It On All Pages
+
+At bottom of every page (after config.js):
+
+```
+<script src="/js/config.js"></script>
+<script src="/js/link-builder.js"></script>
+```
+
+That’s all.
+
+### 🔥 WHAT HAPPENS NOW?
+
+If your config.js contains:
+
+```
+CLOUDFRONT_BASE: "https://dyoqxkx8bd8d7.cloudfront.net"
+```
+
+Then this:
+
+```
+<a data-page="orders.html">
+```
+
+Automatically becomes:
+
+```
+https://dyoqxkx8bd8d7.cloudfront.net/orders.html
+```
+
+If tomorrow you change CloudFront to:
+
+```
+https://newcloudfront123.cloudfront.net
+```
+
+You ONLY update:
+
+```
+config.js
+```
+
+Everything updates automatically.
+
+### ✅ Dynamic Redirect Anywhere (Same Concept)
+
+Instead of hardcoding:
+
+```
+window.location.href = "https://dyoqxkx8bd8d7.cloudfront.net/cafe-admin-dashboard.html";
+```
+
+Use:
+
+```
+window.location.href =
+    window.CHARLIE_CONFIG.CLOUDFRONT_BASE + "/cafe-admin-dashboard.html";
+```
+
+#### Works in:
+
+- HTML pages
+
+- PHP pages
+
+- JS files
+
+- Button clicks
+
+- Logout redirects
+
+### ✅ PHP Example (Very Simple)
+
+Inside your PHP page:
+
+```
+<script src="/js/config.js"></script>
+<script src="/js/link-builder.js"></script>
+```
+
+And use:
+
+```
+<a data-page="cafe-admin-dashboard.html">Dashboard</a>
+```
+
+No PHP editing required when URL changes.
+
+### 🚀 BIG BENEFIT of "One Small JS Snippet"
+
+Without this system:
+
+If CloudFront changes:
+
+- You edit 15 HTML files
+
+- 8 JS files
+
+- 4 PHP files
+
+- Risk of missing one
+
+- Production errors
+
+With this system:
+
+You edit:
+
+Only config.js
+
+That’s it.
+
+### 🧠 Even Better (Advanced Tip for You)
+
+Since you’re moving toward professional frontend development:
+
+You can later:
+
+- Move sidebar into one reusable component
+
+- Load sidebar via JS include
+
+- Make your project modular
+
+- Turn it into SPA-style app
+
+But for now, this solution is:
+
+✔ Simple
+✔ Clean
+✔ Production safe
+✔ No framework required
+✔ Works with EC2 + CloudFront
+✔ No complex scripting
+
+
+
 ---
 
