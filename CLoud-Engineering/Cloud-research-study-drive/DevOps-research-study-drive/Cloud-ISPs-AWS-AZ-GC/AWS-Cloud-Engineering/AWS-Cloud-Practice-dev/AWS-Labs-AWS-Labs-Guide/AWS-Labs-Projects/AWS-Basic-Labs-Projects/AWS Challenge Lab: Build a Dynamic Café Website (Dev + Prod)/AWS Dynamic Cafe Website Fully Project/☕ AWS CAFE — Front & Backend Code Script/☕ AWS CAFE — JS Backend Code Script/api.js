@@ -187,7 +187,11 @@ function getAnalytics(period = "today") {
 
  	    // ADMIN — ANALYTICS 
    	    getAnalytics,
-    	// admin dashboard functions
+
+    	// ADMIN — ATTENDANCE ANALYTICS
+        getDailySummary,
+        getWeeklySummary,
+        getMonthlySummary,
 
         // HR Attendance Public
         recordAttendance,
