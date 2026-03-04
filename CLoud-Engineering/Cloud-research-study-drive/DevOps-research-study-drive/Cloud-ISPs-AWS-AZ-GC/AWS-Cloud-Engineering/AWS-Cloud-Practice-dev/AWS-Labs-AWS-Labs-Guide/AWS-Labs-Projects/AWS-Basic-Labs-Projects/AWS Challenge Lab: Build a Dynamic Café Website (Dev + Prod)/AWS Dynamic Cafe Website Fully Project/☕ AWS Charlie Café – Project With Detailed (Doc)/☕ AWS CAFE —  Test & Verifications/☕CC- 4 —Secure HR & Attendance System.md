@@ -840,7 +840,7 @@ You get JWT token from:
 
 ### ✅ TEST 1 — API Gateway Console
 
-- Go to /admin/analytics
+- Go to /hr-analytics
 
 - Click GET
 
@@ -881,7 +881,7 @@ You get JWT token from:
 Paste:
 
 ```
-https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?type=daily
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/hr-analytics?type=daily
 ```
 
 ⚠ Browser will return:
@@ -899,28 +899,28 @@ That is normal.
 Run:
 
 ```
-curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?type=daily" \
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/hr-analytics?type=daily" \
 -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 #### Example with Summary
 
 ```
-curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?type=weekly&summary=true" \
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/hr-analytics?type=weekly&summary=true" \
 -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 #### Example With Employee Filter
 
 ```
-curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?employee_id=EMP001" \
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/hr-analytics?employee_id=EMP001" \
 -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 #### Example With DynamoDB Date Filter
 
 ```
-curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics?employee_id=EMP001&date=2026-02-25" \
+curl -X GET "https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/hr-analytics?employee_id=EMP001&date=2026-02-25" \
 -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
