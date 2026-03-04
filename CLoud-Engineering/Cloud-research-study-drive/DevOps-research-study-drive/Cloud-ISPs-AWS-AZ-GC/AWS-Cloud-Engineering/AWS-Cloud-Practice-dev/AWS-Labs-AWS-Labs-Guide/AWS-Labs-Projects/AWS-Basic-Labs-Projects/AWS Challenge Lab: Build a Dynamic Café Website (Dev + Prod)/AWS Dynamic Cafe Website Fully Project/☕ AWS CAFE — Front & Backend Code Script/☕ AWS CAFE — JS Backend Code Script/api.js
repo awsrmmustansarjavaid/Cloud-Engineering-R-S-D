@@ -179,9 +179,12 @@ function getAnalytics(period = "today") {
         getEmployeeOrders,
         createEmployeeOrder,
 
- 	    // ... other functions
+ 	    // Analytics
    	    getAnalytics,
     	// admin dashboard functions
+        getDailySummary,
+        getWeeklySummary,
+        getMonthlySummary,
 
         // HR Attendance Public
         recordAttendance,
