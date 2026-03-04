@@ -126,7 +126,7 @@ async function loadAttendance() {
     try {
 
         // Build query string dynamically
-        let url = `${CHARLIE_CONFIG.API_BASE}/admin/analytics?type=daily`;
+        let url = `${CHARLIE_CONFIG.API_BASE}/hr-analytics?type=daily`;
 
         if (empId) {
             url += `&employee_id=${encodeURIComponent(empId)}`;

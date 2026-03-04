@@ -621,11 +621,10 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 ### 3️⃣ —API Gateway Configuration
 
-- Resource Structure: /admin/analytics
+- Resource Structure: /hr-analytics
 
 ```
-/admin
-   └── /analytics
+/hr-analytics
 ```
 
 - Method: GET
@@ -640,7 +639,7 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 ### 4️⃣ ENABLE CORS
 
-Still inside /admin/analytics:
+Still inside /hr-analytics:
 
 - Click Actions → Enable CORS
 
@@ -665,16 +664,16 @@ https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod
 Final endpoint becomes:
 
 ```
-https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/admin/analytics
+https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/hr-analytics
 ```
 
 #### ✅ Final API Endpoints
 
 ```
-GET /admin/analytics?type=daily
-GET /admin/analytics?type=weekly&summary=true
-GET /admin/analytics?employee_id=EMP001
-GET /admin/analytics?employee_id=EMP001&date=2026-02-25
+GET /hr-analytics?type=daily
+GET /hr-analytics?type=weekly&summary=true
+GET /hr-analytics?employee_id=EMP001
+GET /hr-analytics?employee_id=EMP001&date=2026-02-25
 ```
 
 **✅ PHASE 5️⃣ STATUS**
