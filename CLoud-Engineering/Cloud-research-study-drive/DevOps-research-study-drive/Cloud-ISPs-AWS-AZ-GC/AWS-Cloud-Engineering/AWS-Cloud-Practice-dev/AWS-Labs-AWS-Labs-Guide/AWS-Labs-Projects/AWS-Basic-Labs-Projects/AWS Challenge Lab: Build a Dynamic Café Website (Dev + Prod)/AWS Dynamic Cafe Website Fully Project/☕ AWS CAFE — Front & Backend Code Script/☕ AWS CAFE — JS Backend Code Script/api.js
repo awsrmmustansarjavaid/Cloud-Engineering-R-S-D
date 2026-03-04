@@ -140,13 +140,13 @@ function getAnalytics(period = "today") {
     ===================================================== */
     const adminAttendance = {
     getDailySummary() { 
-        return apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=daily`); 
+        return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=daily`); 
     },
     getWeeklySummary() { 
-        return apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=weekly`); 
+        return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=weekly`); 
     },
     getMonthlySummary() { 
-        return apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=monthly`); 
+        return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=monthly`); 
     }
     };
 
