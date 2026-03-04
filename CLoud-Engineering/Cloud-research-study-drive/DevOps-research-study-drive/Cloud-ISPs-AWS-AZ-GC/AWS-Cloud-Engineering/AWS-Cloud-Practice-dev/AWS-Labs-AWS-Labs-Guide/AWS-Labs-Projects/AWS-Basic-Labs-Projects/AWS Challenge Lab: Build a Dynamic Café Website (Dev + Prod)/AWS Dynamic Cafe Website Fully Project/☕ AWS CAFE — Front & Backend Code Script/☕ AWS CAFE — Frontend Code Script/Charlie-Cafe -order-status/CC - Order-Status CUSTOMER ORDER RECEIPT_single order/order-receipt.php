@@ -9,51 +9,12 @@
 // ✔ QR Code Tracking
 // ==========================================================
 
-
 // ================= VALIDATE ORDER ID =================
 if (!isset($_GET['order_id']) || empty($_GET['order_id'])) {
     die("❌ Invalid order reference.");
 }
 
-$orderId = $_GET['order_id'];
-
-
-// ================= PROD API ENDPOINT =================
-// PUBLIC ENDPOINT (No Authentication Required)
-$apiBaseUrl = "https://p4vrr4b60c.execute-api.us-east-1.amazonaws.com/prod/order-status";
-
-
-// ================= FETCH ORDER FROM API =================
-function fetchOrder($apiBaseUrl, $orderId) {
-
-    $url = $apiBaseUrl . "?order_id=" . urlencode($orderId);
-
-    $ch = curl_init($url);
-
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 10
-    ]);
-
-    $response = curl_exec($ch);
-
-    if (curl_errno($ch)) {
-        curl_close($ch);
-        return null;
-    }
-
-    curl_close($ch);
-
-    return json_decode($response, true);
-}
-
-$data = fetchOrder($apiBaseUrl, $orderId);
-
-if (!isset($data['order'])) {
-    die("❌ Order not found.");
-}
-
-$order = $data['order'];
+$orderId = htmlspecialchars($_GET['order_id']); // sanitize
 ?>
 
 <!DOCTYPE html>
@@ -74,6 +35,10 @@ $order = $data['order'];
 
 <!-- ================= QR CODE LIBRARY ================= -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+<!-- ================= CONFIG & UTILITIES ================= -->
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
 
 <style>
 /* ================= BODY + BACKGROUND ================= */
@@ -102,16 +67,10 @@ body {
     display: flex;
     align-items: center;
 }
-.navbar .navbar-brand i {
-    margin-right: 10px;
-    font-size: 1.5rem;
-}
+.navbar .navbar-brand i { margin-right: 10px; font-size: 1.5rem; }
 
 /* ================= MAIN CONTENT ================= */
-.main-content {
-    padding-top: 100px;
-    padding-bottom: 50px;
-}
+.main-content { padding-top: 100px; padding-bottom: 50px; }
 
 /* ================= RECEIPT CARD ================= */
 .receipt-card {
@@ -132,15 +91,10 @@ body {
     align-items: center;
     justify-content: center;
 }
-.btn-transparent i {
-    margin-right: 8px;
-}
+.btn-transparent i { margin-right: 8px; }
 
 /* ================= STATUS BADGE ================= */
-.status-badge {
-    font-size: 14px;
-    padding: 6px 12px;
-}
+.status-badge { font-size: 14px; padding: 6px 12px; }
 
 /* ================= QR CODE BOX ================= */
 #qrBox {
@@ -153,9 +107,7 @@ body {
 }
 
 /* ================= RESPONSIVE ================= */
-@media (max-width:768px){
-    .main-content { padding-top: 120px; }
-}
+@media (max-width:768px){ .main-content { padding-top: 120px; } }
 </style>
 </head>
 
@@ -183,35 +135,25 @@ body {
             <hr>
 
             <!-- ================= ORDER DETAILS ================= -->
-            <p><i class="bi bi-upc-scan"></i> <strong>Order ID:</strong> <?= htmlspecialchars($order['order_id']) ?></p>
-            <p><i class="bi bi-person-fill"></i> <strong>Customer:</strong> <?= htmlspecialchars($order['customer_name']) ?></p>
-            <p><i class="bi bi-table"></i> <strong>Table:</strong> <?= htmlspecialchars($order['table_number']) ?></p>
-            <p><i class="bi bi-calendar-event-fill"></i> <strong>Date:</strong> <?= htmlspecialchars($order['created_at']) ?></p>
+            <p><i class="bi bi-upc-scan"></i> <strong>Order ID:</strong> <span id="orderId"><?= $orderId ?></span></p>
+            <p><i class="bi bi-person-fill"></i> <strong>Customer:</strong> <span id="customerName">Loading...</span></p>
+            <p><i class="bi bi-table"></i> <strong>Table:</strong> <span id="tableNumber">Loading...</span></p>
+            <p><i class="bi bi-calendar-event-fill"></i> <strong>Date:</strong> <span id="orderDate">Loading...</span></p>
             <hr>
-            <p><i class="bi bi-cup-fill"></i> <strong>Item:</strong> <?= htmlspecialchars($order['item']) ?></p>
-            <p><i class="bi bi-hash"></i> <strong>Quantity:</strong> <?= htmlspecialchars($order['quantity']) ?></p>
+            <p><i class="bi bi-cup-fill"></i> <strong>Item:</strong> <span id="itemName">Loading...</span></p>
+            <p><i class="bi bi-hash"></i> <strong>Quantity:</strong> <span id="quantity">Loading...</span></p>
             <hr>
 
             <!-- ================= STATUS BADGE ================= -->
-            <?php
-            $status = $order['status'];
-            $badge = "secondary";
-            if ($status === "RECEIVED") $badge = "info";
-            if ($status === "PREPARING") $badge = "warning";
-            if ($status === "READY") $badge = "primary";
-            if ($status === "COMPLETED") $badge = "success";
-            ?>
             <p>
                 <strong>Status:</strong>
-                <span id="statusBadge" class="badge bg-<?= $badge ?> status-badge">
-                    <?= htmlspecialchars($status) ?>
-                </span>
+                <span id="statusBadge" class="badge bg-secondary status-badge">Loading...</span>
             </p>
             <hr>
 
             <p class="fw-bold">
                 <i class="bi bi-currency-dollar"></i>
-                Total Amount: $<?= number_format($order['total_amount'], 2) ?>
+                Total Amount: $<span id="totalAmount">0.00</span>
             </p>
 
             <!-- ================= QR CODE ================= -->
@@ -234,35 +176,63 @@ body {
 <!-- ================= BOOTSTRAP JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- =========================================================
-     PUBLIC PAGE SCRIPT (No Authentication Required)
-========================================================= -->
+<!-- ================= ORDER FETCH & LIVE REFRESH ================= -->
 <script>
-// Show page immediately (no auth needed)
-document.body.style.display = "block";
+document.body.style.display = "block"; // show page
 
-/* =========================================================
-   QR CODE GENERATION
-========================================================= */
-new QRCode(document.getElementById("qrcode"), {
-    text: window.location.href,
-    width: 140,
-    height: 140
-});
+// =========================================================
+// USE CONFIG.JS API BASE (from CHAIR_CONFIG)
+// =========================================================
+const apiBase = `${window.CHARLIE_CONFIG.API_BASE}/order-status`;
+const orderId = document.getElementById('orderId').textContent;
 
-/* =========================================================
-   AUTO REFRESH EVERY 10 SECONDS
-   Keeps status live (RECEIVED → PREPARING → READY → COMPLETED)
-========================================================= */
-setInterval(() => {
-    fetch(window.location.href, { cache: "no-store" })
-        .then(res => res.text())
-        .then(html => {
-            document.open();
-            document.write(html);
-            document.close();
+// Fetch order from API
+async function fetchOrder() {
+    try {
+        const res = await fetch(`${apiBase}?order_id=${encodeURIComponent(orderId)}`);
+        if (!res.ok) throw new Error("Failed to fetch order");
+        const data = await res.json();
+        const order = data.order;
+
+        if (!order) throw new Error("Order not found");
+
+        // Fill HTML dynamically
+        document.getElementById('customerName').textContent = order.customer_name;
+        document.getElementById('tableNumber').textContent = order.table_number;
+        document.getElementById('orderDate').textContent = order.created_at;
+        document.getElementById('itemName').textContent = order.item;
+        document.getElementById('quantity').textContent = order.quantity;
+        document.getElementById('totalAmount').textContent = Number(order.total_amount).toFixed(2);
+
+        // Status badge
+        const statusBadge = document.getElementById('statusBadge');
+        let badge = "secondary";
+        switch(order.status) {
+            case "RECEIVED": badge = "info"; break;
+            case "PREPARING": badge = "warning"; break;
+            case "READY": badge = "primary"; break;
+            case "COMPLETED": badge = "success"; break;
+        }
+        statusBadge.textContent = order.status;
+        statusBadge.className = `badge bg-${badge} status-badge`;
+
+        // QR code with order URL
+        new QRCode(document.getElementById("qrcode"), {
+            text: window.location.href,
+            width: 140,
+            height: 140
         });
-}, 10000);
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Initial fetch
+fetchOrder();
+
+// Live refresh every 10 seconds
+setInterval(fetchOrder, 10000);
 </script>
 
 </body>
