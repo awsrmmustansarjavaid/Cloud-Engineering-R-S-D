@@ -138,17 +138,11 @@ function getAnalytics(period = "today") {
        - Daily / Weekly / Monthly summaries
        - Optional admin dashboard integration
     ===================================================== */
-   const getAnalytics = (period = "today") =>
-        apiFetch(`${CONFIG.API_BASE}/analytics?period=${encodeURIComponent(period)}`);
-
-    const getDailySummary = () =>
-        apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=daily`);
-
-    const getWeeklySummary = () =>
-        apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=weekly`);
-
-    const getMonthlySummary = () =>
-        apiFetch(`${CONFIG.API_BASE}/admin/analytics?type=monthly`);
+    const adminAttendance = {
+        getDailySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=daily`); },
+        getWeeklySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=weekly`); },
+        getMonthlySummary() { return apiFetch(`${CONFIG.API_BASE}/admin/attendance?type=monthly`); }
+    };
 
     /* =====================================================
        📈 ADMIN — DASHBOARD & USER MANAGEMENT (PUBLIC READ)
@@ -185,11 +179,9 @@ function getAnalytics(period = "today") {
         getEmployeeOrders,
         createEmployeeOrder,
 
- 	    // Analytics
-        getAnalytics,
-        getDailySummary,
-        getWeeklySummary,
-        getMonthlySummary,
+ 	    // ADMIN — ANALYTICS 
+   	    getAnalytics,
+    	// admin dashboard functions
 
         // HR Attendance Public
         recordAttendance,
