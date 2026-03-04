@@ -222,7 +222,7 @@ async function loadHR(type){
     try{
         await CHARLIE_ROLE_GUARD.adminOnly();
 
-        const url = `${CHARLIE_CONFIG.API_BASE}/admin/analytics?type=${type}&summary=true`;
+        const url = `${CHARLIE_CONFIG.API_BASE}/hr-analytics?type=${type}&summary=true`;
         const response = await fetch(url);
         if(!response.ok) throw new Error(await response.text());
 
