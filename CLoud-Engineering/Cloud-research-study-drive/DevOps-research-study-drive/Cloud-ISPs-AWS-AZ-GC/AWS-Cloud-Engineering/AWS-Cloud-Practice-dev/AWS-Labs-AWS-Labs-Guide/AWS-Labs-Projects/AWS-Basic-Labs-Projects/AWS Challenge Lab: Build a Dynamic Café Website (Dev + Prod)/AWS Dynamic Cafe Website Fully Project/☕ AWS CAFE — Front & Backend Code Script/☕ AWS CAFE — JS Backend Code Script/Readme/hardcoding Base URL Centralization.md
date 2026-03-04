@@ -787,7 +787,222 @@ But for now, this solution is:
 ✔ Works with EC2 + CloudFront
 ✔ No complex scripting
 
-
-
 ---
+### ✅ link-builder logic inside utils.js
 
+
+Excellent question 👌 — this is exactly how a real frontend developer thinks.
+
+Yes ✅ you absolutely CAN add the link-builder logic inside utils.js.
+In fact, it is cleaner because:
+
+- You already load utils.js on all pages
+
+- You avoid creating extra files
+
+- You keep shared helper logic in one place
+
+So let’s upgrade your utils.js properly — clean, structured, and professional.
+
+### ✅ WHY It’s Safe To Add It Inside utils.js
+
+Your current utils.js:
+
+- Is already global
+
+- Uses window.CHARLIE_UTILS
+
+- Loads on all pages
+
+We’ll simply:
+
+- Add a new function: initCloudFrontLinks()
+
+- Auto-run it when DOM loads
+
+- No conflict. No complexity.
+
+### 🚀 FULLY FINAL utils.js (With CloudFront Auto Link Builder)
+
+Replace your entire utils.js with this:
+
+```
+/* =========================================================
+   CHARLIE CAFE — UTILITIES
+   ---------------------------------------------------------
+   ✔ JWT Parsing
+   ✔ Token Expiry Check
+   ✔ LocalStorage Token Helper
+   ✔ Automatic CloudFront Link Builder
+========================================================= */
+
+window.CHARLIE_UTILS = (() => {
+
+    /* =====================================================
+       🔐 Parse JWT Token
+       -----------------------------------------------------
+       Converts JWT payload into JSON object
+    ===================================================== */
+    function parseJwt(token) {
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return {};
+        }
+    }
+
+    /* =====================================================
+       ⏳ Check if Token is Expired
+    ===================================================== */
+    function isTokenExpired(token) {
+        try {
+            return parseJwt(token).exp * 1000 < Date.now();
+        } catch {
+            return true;
+        }
+    }
+
+    /* =====================================================
+       🔑 Get Access Token from LocalStorage
+    ===================================================== */
+    function getToken() {
+        return localStorage.getItem("access_token");
+    }
+
+    /* =====================================================
+       ☁ Automatic CloudFront Link Builder
+       -----------------------------------------------------
+       Updates all elements with data-page attribute
+       Example:
+       <a data-page="orders.html">
+    ===================================================== */
+    function initCloudFrontLinks() {
+
+        if (!window.CHARLIE_CONFIG || !window.CHARLIE_CONFIG.CLOUDFRONT_BASE) {
+            console.warn("CLOUDFRONT_BASE not found in config.js");
+            return;
+        }
+
+        const base = window.CHARLIE_CONFIG.CLOUDFRONT_BASE;
+
+        document.querySelectorAll("[data-page]").forEach(element => {
+
+            const page = element.getAttribute("data-page");
+
+            if (page) {
+                element.href = `${base}/${page}`;
+            }
+
+        });
+    }
+
+    /* =====================================================
+       🚀 Auto-run when page loads
+    ===================================================== */
+    document.addEventListener("DOMContentLoaded", () => {
+        initCloudFrontLinks();
+    });
+
+    return {
+        parseJwt,
+        isTokenExpired,
+        getToken,
+        initCloudFrontLinks
+    };
+
+})();
+```
+
+### ✅ How To Use It (Very Simple)
+
+On any page:
+
+```
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+```
+
+Then your sidebar:
+
+```
+<ul>
+  <li><a data-page="cafe-admin-dashboard.html">Dashboard</a></li>
+  <li><a data-page="orders.html">Orders</a></li>
+  <li><a data-page="analytics.html">Analytics</a></li>
+</ul>
+```
+
+That’s it.
+
+No extra JS needed anywhere.
+
+### 🔥 What Happens Now?
+
+If config.js has:
+
+```
+CLOUDFRONT_BASE: "https://dyoqxkx8bd8d7.cloudfront.net"
+```
+
+Then:
+
+```
+<a data-page="orders.html">
+```
+
+Automatically becomes:
+
+```
+https://dyoqxkx8bd8d7.cloudfront.net/orders.html
+```
+
+If tomorrow CloudFront changes:
+
+You update ONLY:
+
+```
+config.js
+```
+
+Everything updates automatically across all pages.
+
+### 🧠 Professional Architecture You Just Built
+
+You now have:
+
+- config.js → environment config
+
+- utils.js → reusable helpers + global logic
+
+- central-auth.js → authentication
+
+- api.js → API calls
+
+This is clean modular frontend structure — very good for someone transitioning into front-end development 👏
+
+### ⚡ BONUS (Even Cleaner Redirect Usage)
+
+Anywhere in your code:
+
+```
+window.location.href =
+    window.CHARLIE_CONFIG.CLOUDFRONT_BASE + "/cafe-admin-dashboard.html";
+```
+
+OR cleaner:
+
+```
+function goTo(page) {
+    window.location.href =
+        window.CHARLIE_CONFIG.CLOUDFRONT_BASE + "/" + page;
+}
+
+goTo("orders.html");
+```
+
+If you want next, I can show you something even better:
+
+👉 How to completely remove CloudFront base and use relative paths so you NEVER need CloudFront URL in frontend again.
+
+That is actually the most professional solution.
+---
