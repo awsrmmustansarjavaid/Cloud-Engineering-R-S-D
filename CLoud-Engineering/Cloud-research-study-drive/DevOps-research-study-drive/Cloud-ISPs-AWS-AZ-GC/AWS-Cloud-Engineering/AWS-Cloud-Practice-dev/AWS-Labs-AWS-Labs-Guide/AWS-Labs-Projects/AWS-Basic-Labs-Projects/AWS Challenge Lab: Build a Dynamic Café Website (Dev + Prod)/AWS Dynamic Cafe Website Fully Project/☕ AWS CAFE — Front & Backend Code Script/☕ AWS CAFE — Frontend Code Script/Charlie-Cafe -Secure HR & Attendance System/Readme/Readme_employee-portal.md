@@ -3806,6 +3806,103 @@ window.addEventListener("DOMContentLoaded", () => {
 - Comments for each block for easy maintenance.
 
 - Includes Employee Profile, Attendance History, Leaves & Holidays.
+
+
+Yes — this final code is fully aligned with your current Lambda functions and API endpoints as you have them in your api.js / CHARLIE_API module. Here's the breakdown:
+
+### 1️⃣ Employee Profile
+
+- API call: CHARLIE_API.getEmployeeProfile(employeeId)
+
+- Expected JSON response:
+
+```
+{
+  "employee_id": "123",
+  "name": "Alice Johnson",
+  "job_title": "Barista",
+  "salary": "$1500",
+  "start_date": "2024-01-10"
+}
+```
+
+- Mapping: All fields are displayed in the profile card: name, job title, salary, start date, and a welcome heading.
+
+### 2️⃣ Attendance History
+
+- API call: CHARLIE_API.getAttendanceHistory(employeeId)
+
+Expected JSON array:
+
+```
+[
+  {"attendance_date": "2026-03-01", "checkin_time": "09:05", "checkout_time": "17:00"},
+  {"attendance_date": "2026-03-02", "checkin_time": "09:10", "checkout_time": "17:05"}
+]
+```
+
+Mapping: Loops over each record to populate the table:
+
+- Date → attendance_date
+
+- Check-In → checkin_time
+
+- Check-Out → checkout_time
+
+- Status → logic: Absent / Checked In / Checked Out
+
+### 3️⃣ Leaves & Holidays
+
+- API call: CHARLIE_API.getLeavesAndHolidays(employeeId)
+
+Expected JSON response:
+
+```
+{
+  "leaves": [
+    {"leave_date": "2026-02-15", "leave_type": "Sick Leave"},
+    {"leave_date": "2026-02-20", "leave_type": "Casual Leave"}
+  ],
+  "holidays": [
+    {"holiday_date": "2026-03-23", "description": "National Holiday"},
+    {"holiday_date": "2026-04-14", "description": "Company Holiday"}
+  ]
+}
+```
+
+Mapping:
+
+- leaves → <ul> list under "Leaves"
+
+- holidays → <ul> list under "Company Holidays"
+
+### 4️⃣ Logout
+
+- Connected to your current flow: window.location.href = "logout.php"
+
+C- an be replaced with Cognito logout if needed.
+
+### 5️⃣ Dynamic Employee Selection
+
+- Uses employeeId from localStorage (from login) → perfectly aligns with your Lambda setup.
+
+### ⚡ Important Notes
+
+This code assumes CHARLIE_API in api.js exposes these exact async functions:
+
+- getEmployeeProfile(employeeId)
+
+- getAttendanceHistory(employeeId)
+
+- getLeavesAndHolidays(employeeId)
+And that they return JSON objects exactly as above.
+
+If your Lambda functions return nested objects or different key names, you will need to adjust the property mapping in the JS (profile.name, rec.checkin_time, etc.).
+
+All DOM elements are properly targeted, so API responses will render directly.
+
+#### ✅ Bottom line: If your Lambda endpoints are returning the expected JSON exactly as above, this HTML is fully compatible and “plug-and-play.”
+
 ---
 
 
