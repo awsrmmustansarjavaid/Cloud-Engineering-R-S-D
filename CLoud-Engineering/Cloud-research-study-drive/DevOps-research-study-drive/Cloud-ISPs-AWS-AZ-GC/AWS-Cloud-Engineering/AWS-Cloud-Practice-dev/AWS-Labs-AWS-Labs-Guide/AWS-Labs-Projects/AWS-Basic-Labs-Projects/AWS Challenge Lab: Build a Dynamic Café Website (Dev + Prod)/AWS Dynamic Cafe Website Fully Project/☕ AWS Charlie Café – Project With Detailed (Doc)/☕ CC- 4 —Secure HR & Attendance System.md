@@ -226,6 +226,8 @@ From Cognito, you have the employee details:
 
 - Group: Employee
 
+- Other info → job_title, salary, start_date (you decide or get from HR)
+
 The sub is the unique Cognito user ID, which we will use in RDS to link the Cognito account to your employees table.
 
 #### Step 2: Insert Employee Record
@@ -244,6 +246,8 @@ employees(
 ```
 
 #### ✅ You can insert the employee like this:
+
+- Replace the TEMP-COGNITO-ID with the real Cognito sub for ali, and other fields as appropriate.
 
 ```
 INSERT INTO employees
@@ -273,7 +277,12 @@ VALUES
 
 - start_date → Employment start date
 
-✅ Tip: Always keep cognito_user_id unique so it maps exactly to a Cognito user.
+✅ Tip: 
+
+- Always keep cognito_user_id unique so it maps exactly to a Cognito user.
+
+- Make sure the employees table allows these columns (run DESCRIBE employees; to verify).
+
 
 ### ✅ Insert Test Data in One Go ( Recommanded)
 
