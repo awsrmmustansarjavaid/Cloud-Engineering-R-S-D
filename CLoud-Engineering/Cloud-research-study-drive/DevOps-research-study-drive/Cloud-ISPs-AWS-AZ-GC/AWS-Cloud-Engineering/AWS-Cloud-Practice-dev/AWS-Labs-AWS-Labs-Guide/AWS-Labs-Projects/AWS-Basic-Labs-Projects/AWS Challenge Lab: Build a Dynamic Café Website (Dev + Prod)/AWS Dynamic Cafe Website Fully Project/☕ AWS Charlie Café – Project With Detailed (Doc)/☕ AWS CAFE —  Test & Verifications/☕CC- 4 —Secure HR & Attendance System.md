@@ -22,6 +22,120 @@ leaves
 holidays
 ```
 
+### 2️⃣ Verify attendance
+
+```
+SELECT * FROM attendance;
+```
+
+#### Expected output:
+
+```
++---------------+-------------+-----------------+--------------+---------------+---------------------+
+| attendance_id | employee_id | attendance_date | checkin_time | checkout_time | created_at          |
++---------------+-------------+-----------------+--------------+---------------+---------------------+
+|             3 |           5 | 2026-03-05      | 12:19:38     | 12:20:16      | 2026-03-05 12:19:38 |
++---------------+-------------+-----------------+--------------+---------------+---------------------+
+1 row in set (0.001 sec)
+```
+
+### Get Ali's Employee ID
+
+```
+SELECT id FROM employees 
+WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+```
+
+### Check Employees Table
+
+```
+DESCRIBE employees;
+```
+
+#### Expected output:
+
+```
++-----------------+---------------+------+-----+-------------------+-------------------+
+| Field           | Type          | Null | Key | Default           | Extra             |
++-----------------+---------------+------+-----+-------------------+-------------------+
+| employee_id     | int           | NO   | PRI | NULL              | auto_increment    |
+| cognito_user_id | varchar(100)  | NO   | UNI | NULL              |                   |
+| name            | varchar(100)  | NO   |     | NULL              |                   |
+| job_title       | varchar(50)   | YES  |     | NULL              |                   |
+| salary          | decimal(10,2) | YES  |     | NULL              |                   |
+| start_date      | date          | YES  |     | NULL              |                   |
+| created_at      | timestamp     | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++-----------------+---------------+------+-----+-------------------+-------------------+
+7 rows in set (0.015 sec)
+```
+
+### ✅ Shortest Way (One Command)
+
+Use this single SQL command:
+
+```
+SELECT * 
+FROM attendance
+WHERE employee_id = (
+    SELECT employee_id
+    FROM employees
+    WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962'
+);
+```
+
+This will return Ali's attendance.
+
+### ✅ Better View (Recommended)
+
+Shows Ali name + attendance time
+
+```
+SELECT e.name, a.attendance_date, a.checkin_time, a.checkout_time
+FROM attendance a
+JOIN employees e ON a.employee_id = e.employee_id
+WHERE e.cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+```
+
+#### Expected output:
+
+| name | attendance_date | checkin_time | checkout_time |
+| ---- | --------------- | ------------ | ------------- |
+| Ali  | 2026-03-05      | 12:19:38     | 12:20:16      |
+
+
+### ✅ Quick Check (Find Ali Employee ID)
+
+If you want to see Ali's employee id:
+
+```
+SELECT employee_id, name
+FROM employees
+WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+```
+
+Example:
+
+```
+employee_id | name
+5           | Ali
+```
+
+Then you can simply run:
+
+```
+SELECT * FROM attendance WHERE employee_id = 5;
+```
+
+### ✅ Best practice in real projects
+
+Always use JOIN like this:
+
+```
+SELECT e.name, a.*
+FROM attendance a
+JOIN employees e ON a.employee_id = e.employee_id;
+```
+
 ### ✅ RDS SQL script
 
 
