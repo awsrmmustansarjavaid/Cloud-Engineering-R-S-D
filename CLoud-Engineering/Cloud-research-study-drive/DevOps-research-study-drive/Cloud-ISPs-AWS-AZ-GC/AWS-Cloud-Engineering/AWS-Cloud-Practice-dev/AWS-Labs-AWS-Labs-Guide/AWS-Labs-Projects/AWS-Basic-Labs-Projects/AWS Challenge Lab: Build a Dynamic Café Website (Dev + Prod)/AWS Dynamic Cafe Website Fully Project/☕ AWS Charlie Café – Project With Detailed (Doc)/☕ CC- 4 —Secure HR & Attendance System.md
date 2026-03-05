@@ -188,9 +188,6 @@ CREATE TABLE IF NOT EXISTS holidays (
 );
 ```
 
-> **We will later auto-create employees via Cognito, but this helps now.**
-
-
 ### 4️⃣ Method - 2 HR & Attendance System Create Tables Bash Script 
 
 #### 1️⃣ Create File
@@ -215,8 +212,68 @@ sudo chmod +x setup_cafe_hr_attendance.sh
 sudo ./setup_cafe_hr_attendance.sh
 ```
 
----
+> **We will later auto-create employees via Cognito, but this helps now.**
 
+### 3️⃣ create an employee record in your RDS database
+
+#### Step 1: Identify the Cognito User ID
+
+From Cognito, you have the employee details:
+
+- User name: ali
+
+- Sub (User ID): 74e8a458-a011-700d-dcdb-df9692b61962
+
+- Group: Employee
+
+The sub is the unique Cognito user ID, which we will use in RDS to link the Cognito account to your employees table.
+
+#### Step 2: Insert Employee Record
+
+Assuming your employees table has the following columns:
+
+```
+employees(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cognito_user_id VARCHAR(100) UNIQUE,
+    name VARCHAR(100),
+    job_title VARCHAR(50),
+    salary DECIMAL(10,2),
+    start_date DATE
+)
+```
+
+#### ✅ You can insert the employee like this:
+
+```
+INSERT INTO employees
+(cognito_user_id, name, job_title, salary, start_date)
+VALUES
+('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
+```
+
+### ✅ Insert Test Data
+
+```
+INSERT INTO employees
+(cognito_user_id, name, job_title, salary, start_date)
+VALUES
+('74e8a458-a011-700d-dcdb-df9692b61962', 'Ali', 'Barista', 40000, '2026-03-05');
+```
+
+#### Explanation:
+
+- cognito_user_id → Cognito sub
+
+- name → Employee full name
+
+- job_title → Employee position
+
+- salary → Employee salary
+
+- start_date → Employment start date
+
+✅ Tip: Always keep cognito_user_id unique so it maps exactly to a Cognito user.
 
 ### ✅ Insert Test Data in One Go ( Recommanded)
 
@@ -233,14 +290,48 @@ VALUES
 ('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
 ```
 
-#### ✅ Simple Insert Test Data
+#### Step 3: Verify Employee Record
+
+After insertion, check that the record exists:
 
 ```
-INSERT INTO employees
-(cognito_user_id, name, job_title, salary, start_date)
-VALUES
-('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
+SELECT * FROM employees
+WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
 ```
+
+#### ✅ Expected output:
+
+| id | cognito_user_id                      | name | job_title | salary | start_date |
+| -- | ------------------------------------ | ---- | --------- | ------ | ---------- |
+| 1  | 74e8a458-a011-700d-dcdb-df9692b61962 | Ali  | Barista   | 40000  | 2026-03-05 |
+
+#### Step 4: Optional — Verify via Employee Portal
+
+If your employee-portal.html fetches employees by cognito_user_id, you can now login as Ali in Cognito and check if the portal shows this employee.
+
+#### Step 5: Automate Future Insertions
+
+Later, you can auto-create employees whenever a new Cognito user is added. The general workflow:
+
+- Lambda triggers on Cognito PostConfirmation event
+
+- Lambda inserts a new employee in RDS using the sub as cognito_user_id
+
+- Employee portal automatically shows new employees
+
+Sample Lambda pseudo-query:
+
+```
+sql = """
+INSERT INTO employees (cognito_user_id, name, job_title, salary, start_date)
+VALUES (%s, %s, %s, %s, %s)
+"""
+cursor.execute(sql, (user_sub, full_name, 'Unknown', 0, today))
+```
+
+
+
+
 
 ### ✅ Quick Verification
 
