@@ -2984,6 +2984,67 @@ mysql --defaults-extra-file=/path/to/temp_credentials.cnf -D cafe_db -e "<paste 
 
 - The second result will give a row count per table, showing you if sample data was successfully inserted.
 
+
+### ✅ Full RDS Verification Report
+
+Perfect! What you’re asking is essentially a “Full RDS Verification Report” — in tech terms, you can call it a Database Schema + Row Count Audit Report. This query will produce one single result set per table showing:
+
+- Table name
+
+- Column name, type, keys, defaults
+
+- Row count
+
+Here’s a fully combined query you can run in MySQL/RDS:
+
+```
+-- =============================================================
+-- Task: Charlie Cafe RDS — Full Verification Report
+-- Description: Schema and row counts for all main tables
+-- Tables Checked: attendance, employees, holidays, leaves, orders
+-- =============================================================
+
+-- =============================================================
+-- Generate schema + row count report for all tables
+-- =============================================================
+
+SELECT 
+    t.TABLE_NAME AS table_name,
+    c.COLUMN_NAME AS column_name,
+    c.COLUMN_TYPE AS column_type,
+    c.IS_NULLABLE AS is_nullable,
+    c.COLUMN_KEY AS column_key,
+    c.COLUMN_DEFAULT AS column_default,
+    c.EXTRA AS extra,
+    (SELECT COUNT(*) FROM cafe_db.`attendance` WHERE t.TABLE_NAME='attendance') AS attendance_rows,
+    (SELECT COUNT(*) FROM cafe_db.`employees` WHERE t.TABLE_NAME='employees') AS employees_rows,
+    (SELECT COUNT(*) FROM cafe_db.`holidays` WHERE t.TABLE_NAME='holidays') AS holidays_rows,
+    (SELECT COUNT(*) FROM cafe_db.`leaves` WHERE t.TABLE_NAME='leaves') AS leaves_rows,
+    (SELECT COUNT(*) FROM cafe_db.`orders` WHERE t.TABLE_NAME='orders') AS orders_rows
+FROM INFORMATION_SCHEMA.TABLES t
+JOIN INFORMATION_SCHEMA.COLUMNS c 
+    ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME
+WHERE t.TABLE_SCHEMA='cafe_db'
+  AND t.TABLE_NAME IN ('attendance','employees','holidays','leaves','orders')
+ORDER BY t.TABLE_NAME, c.ORDINAL_POSITION;
+```
+
+### ✅ How this works:
+
+- INFORMATION_SCHEMA.COLUMNS gives all column definitions per table.
+
+- The subqueries (SELECT COUNT(*) …) give the row count for each table.
+
+- The report will let you see schema + row counts for all five tables in one query.
+
+### 💡 Tech Name:
+
+- Database Schema + Row Count Audit
+
+- RDS Verification Report
+
+- Full DB Integrity Check
+
 ---
 
 
