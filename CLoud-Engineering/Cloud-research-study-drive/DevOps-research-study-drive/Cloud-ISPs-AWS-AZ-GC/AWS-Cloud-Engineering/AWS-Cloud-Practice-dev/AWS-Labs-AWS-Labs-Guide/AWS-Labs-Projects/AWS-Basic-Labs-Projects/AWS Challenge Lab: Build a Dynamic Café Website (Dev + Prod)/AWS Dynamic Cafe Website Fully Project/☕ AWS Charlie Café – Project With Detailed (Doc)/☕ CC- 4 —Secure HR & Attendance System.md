@@ -314,11 +314,53 @@ WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
 | -- | ------------------------------------ | ---- | --------- | ------ | ---------- |
 | 1  | 74e8a458-a011-700d-dcdb-df9692b61962 | Ali  | Barista   | 40000  | 2026-03-05 |
 
-#### Step 4: Optional — Verify via Employee Portal
+#### Optional: Check all employees:
+
+```
+SELECT * FROM employees;
+```
+
+#### Check if employee is linked to group (if applicable):
+
+If you have a groups table or employee_groups table, make sure the employee is assigned correctly:
+
+```
+SELECT * FROM employee_groups
+WHERE employee_id = (
+    SELECT id FROM employees WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962'
+);
+```
+
+#### Testing Integration (Optional)
+
+If your app uses cognito_user_id to fetch employee data:
+
+```
+SELECT name, job_title, salary 
+FROM employees
+WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+```
+
+- If the query returns data correctly, your Cognito → RDS mapping works.
+
+- You can now create your app logic to fetch employee info by Cognito login.
+
+#### Step 4: Insert Multiple Employees (Optional)
+
+You can batch insert more employees from Cognito:
+
+```
+INSERT INTO employees (cognito_user_id, name, job_title, salary, start_date)
+VALUES
+('ID-2', 'Bob', 'Chef', 50000, '2026-03-01'),
+('ID-3', 'Carol', 'Manager', 60000, '2026-02-15');
+```
+
+#### Step 5: Optional — Verify via Employee Portal
 
 If your employee-portal.html fetches employees by cognito_user_id, you can now login as Ali in Cognito and check if the portal shows this employee.
 
-#### Step 5: Automate Future Insertions
+#### Step 6: Automate Future Insertions
 
 Later, you can auto-create employees whenever a new Cognito user is added. The general workflow:
 
@@ -338,13 +380,17 @@ VALUES (%s, %s, %s, %s, %s)
 cursor.execute(sql, (user_sub, full_name, 'Unknown', 0, today))
 ```
 
-
-
-
-
 ### ✅ Quick Verification
 
-Run these commands to confirm everything is working:
+- Table structure is correct → DESCRIBE employees;
+
+- Record inserted → SELECT * FROM employees WHERE cognito_user_id = '...';
+
+- Linked correctly to any group → SELECT * FROM employee_groups WHERE employee_id = ...;
+
+- App/API can fetch employee using Cognito sub.
+
+#### ✅ Run these commands to confirm everything is working:
 
 ```
 -- Check tables
@@ -359,7 +405,7 @@ SELECT * FROM holidays;
 
 If you see your inserted rows and table names, your RDS configuration is fully functional. ✅
 
-
+### 
 
 ### 🌐 Final End  – What You Have Now
 
