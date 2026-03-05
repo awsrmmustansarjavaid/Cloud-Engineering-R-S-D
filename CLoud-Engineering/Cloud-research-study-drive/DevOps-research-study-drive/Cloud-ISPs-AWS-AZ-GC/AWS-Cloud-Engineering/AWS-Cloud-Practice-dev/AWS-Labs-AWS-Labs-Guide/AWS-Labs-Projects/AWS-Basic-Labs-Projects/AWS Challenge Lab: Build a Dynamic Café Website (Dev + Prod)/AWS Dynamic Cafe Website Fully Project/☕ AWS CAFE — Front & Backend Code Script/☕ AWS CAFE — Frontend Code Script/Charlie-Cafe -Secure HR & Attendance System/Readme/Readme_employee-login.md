@@ -655,7 +655,7 @@ body {
 </div>
 
 <!-- ================= CONFIG + LOGIN SCRIPT ================= -->
-<script src="config.js"></script>
+<script src="/js/config.js"></script>
 <script>
 /* =========================================================
    🔹 CHARLIE CAFÉ — COGNITO LOGIN
