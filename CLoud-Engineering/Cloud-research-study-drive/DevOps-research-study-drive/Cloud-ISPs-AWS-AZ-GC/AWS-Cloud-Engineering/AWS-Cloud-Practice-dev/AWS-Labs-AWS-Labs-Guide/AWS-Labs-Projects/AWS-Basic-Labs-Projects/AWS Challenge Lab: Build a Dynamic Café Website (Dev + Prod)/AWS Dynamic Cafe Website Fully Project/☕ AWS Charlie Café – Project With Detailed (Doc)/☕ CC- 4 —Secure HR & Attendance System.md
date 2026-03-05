@@ -52,7 +52,7 @@ mysql -h <RDS-ENDPOINT> -u <DB-USER> -p cafedb
 
 - Query Editor → Connect to cafedb
 
-### ✅ Quick Multi-Table Creation
+### ✅ Quick Multi-Table Creation ( Recommanded)
 
 You can create all 4 tables in one SQL script. Copy-paste this inside MySQL prompt:
 
@@ -595,6 +595,7 @@ sudo chown apache:apache *.html
 ```
 sudo chmod 644 *.html
 ```
+
 
 **✅ PHASE 4️⃣ STATUS**
 
