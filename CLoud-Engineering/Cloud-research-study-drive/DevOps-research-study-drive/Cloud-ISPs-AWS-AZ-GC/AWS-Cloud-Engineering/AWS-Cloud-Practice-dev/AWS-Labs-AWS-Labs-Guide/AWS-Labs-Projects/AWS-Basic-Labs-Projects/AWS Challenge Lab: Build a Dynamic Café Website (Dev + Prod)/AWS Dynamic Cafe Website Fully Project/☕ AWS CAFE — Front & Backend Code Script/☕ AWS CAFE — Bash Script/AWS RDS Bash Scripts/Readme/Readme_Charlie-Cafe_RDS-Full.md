@@ -2898,6 +2898,92 @@ If you want, I can also give you a much more powerful script used by DevOps engi
 
 It will become a professional production deployment tool for your cafe system.
 
+
+### ✅ Database Schema & Data Verification Query
+
+a single MySQL query that will give you all table schemas and structure for the five tables: attendance, employees, holidays, leaves, and orders, in one query result that you can easily run for verification.
+
+Here’s a single RDS-ready query using INFORMATION_SCHEMA.COLUMNS and UNION ALL to show table, column, type, nullability, key, default, extra for all five tables at once:
+
+```
+SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'cafe_db'
+AND TABLE_NAME IN ('attendance','employees','holidays','leaves','orders')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+```
+
+### ✅ What this query does:
+
+- TABLE_NAME → Shows which table the column belongs to
+
+- COLUMN_NAME → Column name
+
+- COLUMN_TYPE → Data type (INT, VARCHAR, DECIMAL, etc.)
+
+- IS_NULLABLE → YES/NO
+
+- COLUMN_KEY → PK, UNIQUE, or index
+
+- COLUMN_DEFAULT → Default value
+
+- EXTRA → AUTO_INCREMENT, ON UPDATE, etc.
+
+- Orders columns by table and column position, so you can quickly read each table schema.
+
+### ✅ Here’s a single query that will:
+
+- Show the schema (columns, types, keys, defaults, etc.) for each table.
+
+- Show the row count for each table.
+
+- Include a title/section header for clarity.
+
+```
+-- =============================================================
+-- Task: Charlie Cafe RDS — Schema & Data Verification
+-- Description: Verify table schemas and row counts for all main tables
+-- Tables Checked: attendance, employees, holidays, leaves, orders
+-- =============================================================
+
+-- 1️⃣ Schema Details
+SELECT 
+    TABLE_NAME,
+    COLUMN_NAME,
+    COLUMN_TYPE,
+    IS_NULLABLE,
+    COLUMN_KEY,
+    COLUMN_DEFAULT,
+    EXTRA
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'cafe_db'
+  AND TABLE_NAME IN ('attendance','employees','holidays','leaves','orders')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+
+-- 2️⃣ Row Counts
+SELECT 'attendance' AS TABLE_NAME, COUNT(*) AS ROW_COUNT FROM attendance
+UNION ALL
+SELECT 'employees', COUNT(*) FROM employees
+UNION ALL
+SELECT 'holidays', COUNT(*) FROM holidays
+UNION ALL
+SELECT 'leaves', COUNT(*) FROM leaves
+UNION ALL
+SELECT 'orders', COUNT(*) FROM orders;
+```
+
+### ✅ How to use:
+
+- Connect to your RDS instance:
+
+```
+mysql --defaults-extra-file=/path/to/temp_credentials.cnf -D cafe_db -e "<paste the query>"
+```
+
+- The first result will list all columns and their definitions.
+
+- The second result will give a row count per table, showing you if sample data was successfully inserted.
+
 ---
 
 

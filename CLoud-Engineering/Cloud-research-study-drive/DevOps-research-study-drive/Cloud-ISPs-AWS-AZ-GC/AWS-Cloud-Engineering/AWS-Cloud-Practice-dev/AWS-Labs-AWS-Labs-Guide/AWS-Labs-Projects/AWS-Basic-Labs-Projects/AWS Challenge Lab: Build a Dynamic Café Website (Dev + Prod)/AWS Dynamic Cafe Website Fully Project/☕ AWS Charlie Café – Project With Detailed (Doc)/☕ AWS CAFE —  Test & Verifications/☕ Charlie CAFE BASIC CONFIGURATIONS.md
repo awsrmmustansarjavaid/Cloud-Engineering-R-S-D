@@ -514,9 +514,21 @@ VALUES
 SELECT * FROM orders;
 ```
 
+### 5️⃣ Database Schema & Data Verification Query
+
+```
+SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'cafe_db'
+AND TABLE_NAME IN ('attendance','employees','holidays','leaves','orders')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+```
+
+
+
 ###### ✅ If you see the row → DB is READY
 
-#### 5️⃣ Exit MySQL:
+#### 6️⃣ Exit MySQL:
 
 ```
 EXIT;
