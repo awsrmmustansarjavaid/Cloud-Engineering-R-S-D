@@ -610,6 +610,17 @@ REPORT_FILE="html_upload_report_$(date +%Y%m%d%H%M%S).txt"
 echo "📄 Final report saved to $REPORT_FILE"
 ```
 
+### ✅ Key Points:
+
+- No AWS profile needed: Uses EC2 IAM role.
+
+- Automatic folder creation: Upload path charlie-cafe-web-drive/html/ will exist once files are uploaded.
+
+- Handles spaces and special characters in filenames.
+
+- Full verification of files uploaded to S3.
+
+- Final report saved locally with timestamp.
 
 ---
 
