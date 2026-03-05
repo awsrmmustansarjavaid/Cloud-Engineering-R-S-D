@@ -52,85 +52,6 @@ mysql -h <RDS-ENDPOINT> -u <DB-USER> -p cafedb
 
 - Query Editor → Connect to cafedb
 
-### ✅ Quick Multi-Table Creation ( Recommanded)
-
-You can create all 4 tables in one SQL script. Copy-paste this inside MySQL prompt:
-
-```
--- 1️⃣ employees table
-CREATE TABLE IF NOT EXISTS employees (
-    employee_id INT AUTO_INCREMENT PRIMARY KEY,
-    cognito_user_id VARCHAR(100) NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    job_title VARCHAR(50),
-    salary DECIMAL(10,2),
-    start_date DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 2️⃣ attendance table
-CREATE TABLE IF NOT EXISTS attendance (
-    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT NOT NULL,
-    attendance_date DATE NOT NULL,
-    checkin_time TIME,
-    checkout_time TIME,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(employee_id, attendance_date),
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
-);
-
--- 3️⃣ leaves table
-CREATE TABLE IF NOT EXISTS leaves (
-    leave_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT NOT NULL,
-    leave_date DATE NOT NULL,
-    leave_type VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
-);
-
--- 4️⃣ holidays table
-CREATE TABLE IF NOT EXISTS holidays (
-    holiday_id INT AUTO_INCREMENT PRIMARY KEY,
-    holiday_date DATE NOT NULL,
-    description VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### ✅ Insert Test Data in One Go
-
-```
--- Insert test holidays
-INSERT INTO holidays (holiday_date, description)
-VALUES
-('2026-01-01', 'New Year'),
-('2026-03-23', 'Pakistan Day');
-
--- Insert temporary test employee
-INSERT INTO employees (cognito_user_id, name, job_title, salary, start_date)
-VALUES
-('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
-```
-
-### ✅ Quick Verification
-
-Run these commands to confirm everything is working:
-
-```
--- Check tables
-SHOW TABLES;
-
--- Preview employees
-SELECT * FROM employees;
-
--- Preview holidays
-SELECT * FROM holidays;
-```
-
-If you see your inserted rows and table names, your RDS configuration is fully functional. ✅
-
 ### 2️⃣ Method - 1 HR & Attendance System Create Tables
 
 > **This table links Cognito users with café employees.**
@@ -220,14 +141,55 @@ VALUES
 
 #### 2️⃣ Insert Test Employee (TEMP)
 
-> **We will later auto-create employees via Cognito, but this helps now.**
+### ✅ Quick Multi-Table Creation ( Recommanded)
+
+You can create all 4 tables in one SQL script. Copy-paste this inside MySQL prompt:
 
 ```
-INSERT INTO employees
-(cognito_user_id, name, job_title, salary, start_date)
-VALUES
-('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
+-- 1️⃣ employees table
+CREATE TABLE IF NOT EXISTS employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    cognito_user_id VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    job_title VARCHAR(50),
+    salary DECIMAL(10,2),
+    start_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2️⃣ attendance table
+CREATE TABLE IF NOT EXISTS attendance (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT NOT NULL,
+    attendance_date DATE NOT NULL,
+    checkin_time TIME,
+    checkout_time TIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(employee_id, attendance_date),
+    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+);
+
+-- 3️⃣ leaves table
+CREATE TABLE IF NOT EXISTS leaves (
+    leave_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT NOT NULL,
+    leave_date DATE NOT NULL,
+    leave_type VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+);
+
+-- 4️⃣ holidays table
+CREATE TABLE IF NOT EXISTS holidays (
+    holiday_id INT AUTO_INCREMENT PRIMARY KEY,
+    holiday_date DATE NOT NULL,
+    description VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
+
+> **We will later auto-create employees via Cognito, but this helps now.**
+
 
 ### 4️⃣ Method - 2 HR & Attendance System Create Tables Bash Script 
 
@@ -252,6 +214,52 @@ sudo chmod +x setup_cafe_hr_attendance.sh
 ```
 sudo ./setup_cafe_hr_attendance.sh
 ```
+
+---
+
+
+### ✅ Insert Test Data in One Go ( Recommanded)
+
+```
+-- Insert test holidays
+INSERT INTO holidays (holiday_date, description)
+VALUES
+('2026-01-01', 'New Year'),
+('2026-03-23', 'Pakistan Day');
+
+-- Insert temporary test employee
+INSERT INTO employees (cognito_user_id, name, job_title, salary, start_date)
+VALUES
+('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
+```
+
+#### ✅ Simple Insert Test Data
+
+```
+INSERT INTO employees
+(cognito_user_id, name, job_title, salary, start_date)
+VALUES
+('TEMP-COGNITO-ID', 'Alice', 'Barista', 40000, '2025-12-01');
+```
+
+### ✅ Quick Verification
+
+Run these commands to confirm everything is working:
+
+```
+-- Check tables
+SHOW TABLES;
+
+-- Preview employees
+SELECT * FROM employees;
+
+-- Preview holidays
+SELECT * FROM holidays;
+```
+
+If you see your inserted rows and table names, your RDS configuration is fully functional. ✅
+
+
 
 ### 🌐 Final End  – What You Have Now
 
