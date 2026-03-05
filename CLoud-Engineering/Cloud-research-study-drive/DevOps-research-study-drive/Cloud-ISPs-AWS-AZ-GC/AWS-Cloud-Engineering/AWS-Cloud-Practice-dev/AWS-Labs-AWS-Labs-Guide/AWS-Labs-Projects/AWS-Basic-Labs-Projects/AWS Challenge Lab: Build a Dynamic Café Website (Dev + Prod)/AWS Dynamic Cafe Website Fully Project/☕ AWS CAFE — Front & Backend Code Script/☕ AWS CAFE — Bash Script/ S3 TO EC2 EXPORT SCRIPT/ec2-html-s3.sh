@@ -1,91 +1,48 @@
 #!/bin/bash
 # =========================================================
-# Upload HTML Folder to S3 with Auto Folder Creation & Full Verification
+# Upload /var/www/html to S3 - Fully Final Version
 # =========================================================
-# Requirements:
-# - AWS CLI installed and configured (profile or env vars)
+# Features:
+# - Automatically creates folder structure in S3 (virtual folders)
 # - Handles spaces and special characters in filenames
-# - Automatically creates the S3 root folder if missing
+# - Verifies all files uploaded
+# - Generates a final report
+# - Works using IAM role attached to EC2 (no AWS profile needed)
 # =========================================================
 
 # =========================
 # CONFIGURATION
 # =========================
 LOCAL_HTML_DIR="/var/www/html"                # Local html folder to upload
-S3_BUCKET="charlie-cafe-s3-bucket"              # Replace with your S3 bucket name
-S3_ROOT_FOLDER="charlie-cafe-web-drive"      # Folder in S3 to contain html folder
-S3_TARGET="s3://$S3_BUCKET/$S3_ROOT_FOLDER/html"  # Final upload path
-
-# AWS CLI profile to use (optional)
-AWS_PROFILE="default"
+S3_BUCKET="charlie-cafe-s3-bucket"           # Your S3 bucket name
+S3_ROOT_FOLDER="charlie-cafe-web-drive"      # Virtual folder in S3
+S3_TARGET="s3://$S3_BUCKET/$S3_ROOT_FOLDER/html"
 
 # =========================
-# 1. List all local files and directories
+# 1. List all local files
 # =========================
-echo "🔍 Listing all files and directories in $LOCAL_HTML_DIR ..."
-
-# Using mapfile with null delimiter to handle spaces
+echo "🔍 Listing all files in $LOCAL_HTML_DIR ..."
 mapfile -d $'\0' LOCAL_FILES < <(find "$LOCAL_HTML_DIR" -type f -print0)
-mapfile -d $'\0' LOCAL_DIRS < <(find "$LOCAL_HTML_DIR" -type d -print0)
-
-echo "📁 Local directories:"
-for DIR in "${LOCAL_DIRS[@]}"; do
-    echo "$DIR"
-done
-
-echo
-echo "📄 Local files:"
-for FILE in "${LOCAL_FILES[@]}"; do
-    echo "$FILE"
-done
-
-echo
-echo "Total directories: ${#LOCAL_DIRS[@]}"
-echo "Total files: ${#LOCAL_FILES[@]}"
+echo "Total files found: ${#LOCAL_FILES[@]}"
 echo "---------------------------------------------"
 
 # =========================
-# 2. Ensure S3 root folder exists
-# =========================
-echo "☁️ Ensuring S3 root folder exists: s3://$S3_BUCKET/$S3_ROOT_FOLDER ..."
-aws s3 ls "s3://$S3_BUCKET/$S3_ROOT_FOLDER/" --profile "$AWS_PROFILE" > /dev/null 2>&1
-
-if [ $? -ne 0 ]; then
-    echo "Folder not found. Creating S3 root folder..."
-    # Create an empty placeholder file to ensure folder exists
-    aws s3 cp /dev/null "s3://$S3_BUCKET/$S3_ROOT_FOLDER/.placeholder" --profile "$AWS_PROFILE"
-    if [ $? -eq 0 ]; then
-        echo "✅ S3 root folder created successfully."
-    else
-        echo "❌ ERROR: Failed to create S3 root folder!"
-        exit 1
-    fi
-else
-    echo "✅ S3 root folder already exists."
-fi
-echo "---------------------------------------------"
-
-# =========================
-# 3. Upload html folder to S3
+# 2. Upload html folder to S3
 # =========================
 echo "☁️ Uploading $LOCAL_HTML_DIR to $S3_TARGET ..."
-aws s3 cp "$LOCAL_HTML_DIR" "$S3_TARGET/" --recursive --profile "$AWS_PROFILE"
-UPLOAD_STATUS=$?
-
-if [ $UPLOAD_STATUS -ne 0 ]; then
-    echo "❌ ERROR: Upload failed!"
+aws s3 cp "$LOCAL_HTML_DIR" "$S3_TARGET/" --recursive
+if [ $? -ne 0 ]; then
+    echo "❌ ERROR: Upload failed! Ensure EC2 role has S3 permissions."
     exit 1
 fi
 echo "✅ Upload completed successfully."
 echo "---------------------------------------------"
 
 # =========================
-# 4. Verify all files uploaded
+# 3. Verify all files uploaded
 # =========================
 echo "🔍 Verifying all files uploaded to S3 ..."
-
-# Get list of S3 files with relative paths
-mapfile -t S3_FILES < <(aws s3 ls "$S3_TARGET/" --recursive --profile "$AWS_PROFILE" | awk '{$1=$2=$3=""; print substr($0,4)}')
+mapfile -t S3_FILES < <(aws s3 ls "$S3_TARGET/" --recursive | awk '{$1=$2=$3=""; print substr($0,4)}')
 
 # Generate relative paths of local files
 RELATIVE_LOCAL_FILES=()
@@ -111,7 +68,7 @@ fi
 echo "---------------------------------------------"
 
 # =========================
-# 5. Final Report
+# 4. Final Report
 # =========================
 REPORT_FILE="html_upload_report_$(date +%Y%m%d%H%M%S).txt"
 {
