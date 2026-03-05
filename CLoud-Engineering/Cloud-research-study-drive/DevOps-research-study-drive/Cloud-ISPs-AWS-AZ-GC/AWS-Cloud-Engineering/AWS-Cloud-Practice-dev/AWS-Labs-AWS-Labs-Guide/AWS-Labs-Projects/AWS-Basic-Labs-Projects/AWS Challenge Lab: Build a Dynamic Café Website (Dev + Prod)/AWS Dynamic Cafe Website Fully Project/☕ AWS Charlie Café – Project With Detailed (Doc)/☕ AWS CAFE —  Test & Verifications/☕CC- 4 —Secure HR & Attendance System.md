@@ -22,6 +22,83 @@ leaves
 holidays
 ```
 
+### ✅ RDS SQL script
+
+
+Perfect! I’ll create a ready-to-run MySQL script for your RDS employees table. It will:
+
+- Check if an employee with the given cognito_user_id exists.
+
+- Insert a new employee if not exists.
+
+- Verify the insertion and print the record.
+
+#### Here’s the script:
+
+```
+-- =============================================
+-- Charlie Cafe Employee Insert & Verification
+-- =============================================
+
+-- ===============================
+-- ⚙️  CONFIGURATION
+-- ===============================
+SET @cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+SET @employee_name    = 'Ali';
+SET @job_title        = 'Barista';
+SET @salary           = 40000;
+SET @start_date       = '2026-03-05';
+
+-- ===============================
+-- 1️⃣ Check if employee already exists
+-- ===============================
+SELECT * 
+FROM employees
+WHERE cognito_user_id = @cognito_user_id;
+
+-- ===============================
+-- 2️⃣ Insert new employee if not exists
+-- ===============================
+INSERT INTO employees (cognito_user_id, name, job_title, salary, start_date)
+SELECT @cognito_user_id, @employee_name, @job_title, @salary, @start_date
+FROM DUAL
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM employees 
+    WHERE cognito_user_id = @cognito_user_id
+);
+
+-- ===============================
+-- 3️⃣ Verify insertion
+-- ===============================
+SELECT * 
+FROM employees
+WHERE cognito_user_id = @cognito_user_id;
+```
+
+### How to Use:
+
+- Copy this script into your MySQL client (CLI, Workbench, etc.).
+
+- Change the values of:
+
+```
+@cognito_user_id → Cognito Sub ID of the user
+@employee_name    → Employee full name
+@job_title        → Employee role
+@salary           → Employee salary
+@start_date       → Employment start date
+```
+
+- Run the script.
+
+### ✅ What happens:
+
+- If the employee already exists, it won’t insert a duplicate.
+
+- You get a SELECT output before and after insertion for verification.
+
+
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
