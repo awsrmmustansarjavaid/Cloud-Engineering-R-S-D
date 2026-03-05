@@ -1140,6 +1140,21 @@ sudo chmod +x export_bash_output_s3.sh
 sudo ./export_bash_output_s3.sh
 ```
 
+### 3️⃣ Upload Html Folder in S3
+
+```
+sudo nano ec2-html-s3.sh
+```
+
+[Upload Html Folder in S3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/%20S3%20TO%20EC2%20EXPORT%20SCRIPT/ec2-html-s3.sh)
+
+```
+sudo chmod +x ec2-html-s3.sh
+```
+```
+sudo ./ec2-html-s3.sh
+```
+
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
