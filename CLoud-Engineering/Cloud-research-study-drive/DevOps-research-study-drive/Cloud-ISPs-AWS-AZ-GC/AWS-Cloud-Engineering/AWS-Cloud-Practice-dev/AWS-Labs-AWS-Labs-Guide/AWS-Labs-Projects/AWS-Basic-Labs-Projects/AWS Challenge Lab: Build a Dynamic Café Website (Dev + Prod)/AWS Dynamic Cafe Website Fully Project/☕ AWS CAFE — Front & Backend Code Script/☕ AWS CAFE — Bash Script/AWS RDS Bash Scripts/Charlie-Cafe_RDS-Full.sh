@@ -1,52 +1,31 @@
 #!/bin/bash
 # =============================================================
 # ☕ Charlie Cafe — Master RDS Setup & Verification Script
-# Version: 6.0 (Fully Fixed + Production Ready)
+# Version: 6.0 (Production Ready)
 #
-# PURPOSE
-# This script automatically configures and verifies the MySQL
-# database hosted on AWS RDS for the Charlie Cafe project.
-#
-# FEATURES
-# ✔ Colored terminal UI
+# Features
+# ✔ Colored output UI
 # ✔ Secure AWS Secrets Manager integration
-# ✔ Automatic tool installation
-# ✔ Safe database creation
-# ✔ Idempotent table creation
-# ✔ Sample data insertion
-# ✔ Analytics verification queries
-# ✔ Automatic cleanup of credentials
-#
-# WORKS WITH
-# - Amazon Linux 2023
-# - MariaDB client
-# - MySQL client
-#
-# SECURITY
-# ✔ No plaintext passwords stored
-# ✔ Credentials retrieved from AWS Secrets Manager
-# ✔ SSL connection to RDS
-#
-# REQUIREMENTS
-# - EC2 instance with IAM role allowing:
-#   secretsmanager:GetSecretValue
-# - AWS CLI installed
+# ✔ Automatic dependency installation
+# ✔ Creates ALL required tables
+# ✔ Idempotent (safe to run multiple times)
+# ✔ Analytics verification
+# ✔ Schema verification
+# ✔ Sample data
 # =============================================================
 
 set -euo pipefail
 
 # =============================================================
-# 🎨 TERMINAL COLORS
+# COLOR DEFINITIONS
 # =============================================================
+
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# =============================================================
-# UI FUNCTIONS
-# =============================================================
 print_header() {
 echo -e "\n${BLUE}==============================================================${NC}"
 echo -e "${BLUE}$1${NC}"
@@ -58,20 +37,17 @@ echo -e "${GREEN}✅ $1${NC}\n"
 }
 
 print_warning() {
-echo -e "${YELLOW}⚠️  $1${NC}\n"
+echo -e "${YELLOW}⚠️ $1${NC}\n"
 }
 
 print_error() {
 echo -e "${RED}❌ $1${NC}\n"
 }
 
-print_line() {
-echo -e "${BLUE}--------------------------------------------------------------${NC}"
-}
-
 # =============================================================
 # CONFIGURATION
 # =============================================================
+
 AWS_REGION="us-east-1"
 SECRET_ID="CafeDevDBSM"
 DB_NAME="cafe_db"
@@ -81,32 +57,31 @@ print_header "☕ Charlie Cafe — Complete RDS Setup Starting"
 # =============================================================
 # CHECK REQUIRED TOOLS
 # =============================================================
+
 print_header "📦 Checking Required Tools"
 
-if ! command -v mysql &> /dev/null
-then
+command -v mysql >/dev/null 2>&1 || {
 print_warning "Installing MariaDB client..."
 sudo dnf install -y mariadb105
-fi
+}
 
-if ! command -v jq &> /dev/null
-then
+command -v jq >/dev/null 2>&1 || {
 print_warning "Installing jq..."
 sudo dnf install -y jq
-fi
+}
 
-if ! command -v aws &> /dev/null
-then
-print_error "AWS CLI not installed. Install AWS CLI v2 first."
+command -v aws >/dev/null 2>&1 || {
+print_error "AWS CLI not installed"
 exit 1
-fi
+}
 
 print_success "All required tools are installed"
 
 # =============================================================
-# FETCH DATABASE CREDENTIALS
+# FETCH RDS CREDENTIALS
 # =============================================================
-print_header "🔐 Fetching RDS Credentials from Secrets Manager"
+
+print_header "🔐 Fetching RDS Credentials"
 
 SECRET_JSON=$(aws secretsmanager get-secret-value \
 --secret-id "$SECRET_ID" \
@@ -114,24 +89,21 @@ SECRET_JSON=$(aws secretsmanager get-secret-value \
 --query SecretString \
 --output text)
 
-DB_HOST=$(echo "$SECRET_JSON" | jq -r '.host // .endpoint // empty')
-DB_USER=$(echo "$SECRET_JSON" | jq -r '.username // empty')
-DB_PASS=$(echo "$SECRET_JSON" | jq -r '.password // empty')
+DB_HOST=$(echo "$SECRET_JSON" | jq -r '.host // .endpoint')
+DB_USER=$(echo "$SECRET_JSON" | jq -r '.username')
+DB_PASS=$(echo "$SECRET_JSON" | jq -r '.password')
 DB_PORT=$(echo "$SECRET_JSON" | jq -r '.port // "3306"')
-
-if [[ -z "$DB_HOST" || -z "$DB_USER" || -z "$DB_PASS" ]]; then
-print_error "Missing required fields in Secrets Manager"
-exit 1
-fi
 
 print_success "Credentials Loaded: $DB_USER@$DB_HOST:$DB_PORT"
 
 # =============================================================
-# CREATE TEMP MYSQL CONFIG FILE
+# CREATE TEMP MYSQL CONFIG
 # =============================================================
+
 print_header "🔑 Creating Secure Connection File"
 
 CREDENTIALS_FILE=$(mktemp /tmp/cafe-db.XXXXXX)
+
 chmod 600 "$CREDENTIALS_FILE"
 
 cat > "$CREDENTIALS_FILE" <<EOF
@@ -141,7 +113,6 @@ port=$DB_PORT
 user=$DB_USER
 password=$DB_PASS
 connect-timeout=10
-ssl
 EOF
 
 trap 'rm -f "$CREDENTIALS_FILE"' EXIT
@@ -151,6 +122,7 @@ print_success "Temporary credential file created"
 # =============================================================
 # TEST CONNECTION
 # =============================================================
+
 print_header "🔌 Testing Database Connection"
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "SELECT 1;" >/dev/null
@@ -160,12 +132,15 @@ print_success "Connection to RDS successful"
 # =============================================================
 # CREATE DATABASE
 # =============================================================
+
 print_header "🗄 Ensuring Database Exists"
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" -e "
+
 CREATE DATABASE IF NOT EXISTS $DB_NAME
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
+
 "
 
 print_success "Database is ready"
@@ -173,39 +148,152 @@ print_success "Database is ready"
 # =============================================================
 # CREATE TABLES
 # =============================================================
+
 print_header "📋 Creating Tables"
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
+-- =============================================================
+-- ORDERS TABLE
+-- =============================================================
+
 CREATE TABLE IF NOT EXISTS orders (
+
 id INT AUTO_INCREMENT PRIMARY KEY,
+
 order_id VARCHAR(50),
+
 table_number INT NOT NULL,
+
 customer_name VARCHAR(100),
+
 item VARCHAR(100),
+
 quantity INT NOT NULL,
+
 item_cost DECIMAL(6,2),
+
 total_cost DECIMAL(10,2),
+
 total_amount DECIMAL(10,2),
+
 payment_method VARCHAR(20),
+
 payment_status VARCHAR(20) DEFAULT 'PENDING',
+
 status VARCHAR(20) DEFAULT 'RECEIVED',
+
 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ON UPDATE CURRENT_TIMESTAMP,
 
 INDEX idx_table_number (table_number),
+
 INDEX idx_created_at (created_at)
+
+) ENGINE=InnoDB;
+
+
+-- =============================================================
+-- EMPLOYEES TABLE
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS employees (
+
+employee_id INT AUTO_INCREMENT PRIMARY KEY,
+
+cognito_user_id VARCHAR(100) NOT NULL,
+
+name VARCHAR(100) NOT NULL,
+
+job_title VARCHAR(50),
+
+salary DECIMAL(10,2),
+
+start_date DATE,
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+UNIQUE KEY uk_cognito (cognito_user_id)
+
+) ENGINE=InnoDB;
+
+
+-- =============================================================
+-- ATTENDANCE TABLE
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS attendance (
+
+attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+
+employee_id INT NOT NULL,
+
+attendance_date DATE NOT NULL,
+
+checkin_time TIME,
+
+checkout_time TIME,
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+UNIQUE KEY uk_day (employee_id, attendance_date),
+
+FOREIGN KEY (employee_id)
+REFERENCES employees(employee_id)
+ON DELETE CASCADE
+
+) ENGINE=InnoDB;
+
+
+-- =============================================================
+-- LEAVES TABLE
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS leaves (
+
+leave_id INT AUTO_INCREMENT PRIMARY KEY,
+
+employee_id INT NOT NULL,
+
+leave_date DATE NOT NULL,
+
+leave_type VARCHAR(50),
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+FOREIGN KEY (employee_id)
+REFERENCES employees(employee_id)
+ON DELETE CASCADE
+
+) ENGINE=InnoDB;
+
+
+-- =============================================================
+-- HOLIDAYS TABLE
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS holidays (
+
+holiday_id INT AUTO_INCREMENT PRIMARY KEY,
+
+holiday_date DATE NOT NULL UNIQUE,
+
+description VARCHAR(100),
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 ) ENGINE=InnoDB;
 
 EOF
 
-print_success "Tables created successfully"
+print_success "All tables created successfully"
 
 # =============================================================
 # INSERT SAMPLE DATA
 # =============================================================
+
 print_header "🌱 Inserting Sample Data"
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
@@ -222,18 +310,32 @@ EOF
 print_success "Sample data inserted"
 
 # =============================================================
-# ANALYTICS VERIFICATION
+# VERIFY SCHEMA
 # =============================================================
-print_header "📊 Running Analytics Verification"
+
+print_header "🔎 Verifying Schema"
+
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" -e "
+
+SHOW TABLES;
+
+DESCRIBE orders;
+
+SELECT * FROM orders LIMIT 5;
+
+"
+
+print_success "Schema verification completed"
+
+# =============================================================
+# ANALYTICS TEST
+# =============================================================
+
+print_header "📊 Running Analytics Queries"
 
 mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
 
-SELECT 'Preview Orders' AS section;
-SELECT id,item,quantity,total_amount,total_cost,payment_status,created_at
-FROM orders
-LIMIT 5;
-
-SELECT 'Paid Orders Count' AS section;
+SELECT 'Paid Orders' AS section;
 SELECT COUNT(*) AS paid_orders
 FROM orders
 WHERE payment_status='PAID';
@@ -260,9 +362,6 @@ EOF
 
 print_success "Analytics verification completed"
 
-# =============================================================
-# FINISH
-# =============================================================
 print_header "🎉 ALL TASKS COMPLETED SUCCESSFULLY"
 
 echo -e "${GREEN}Charlie Cafe RDS setup finished successfully ☕${NC}"
