@@ -284,7 +284,7 @@ VALUES
 - Make sure the employees table allows these columns (run DESCRIBE employees; to verify).
 
 
-### ✅ Insert Test Data in One Go ( Recommanded)
+### ✅ Insert Test Data in One Go
 
 ```
 -- Insert test holidays
