@@ -34,7 +34,7 @@ This script will:
 # CONFIGURATION
 # =========================
 LOCAL_HTML_DIR="/var/www/html"        # Local html folder to upload
-S3_BUCKET="your-s3-bucket-name"       # Replace with your S3 bucket name
+S3_BUCKET="charlie-cafe-s3-bucket"       # Replace with your S3 bucket name
 S3_ROOT_FOLDER="charlie-cafe-web-drive"  # Folder in S3 to contain html folder
 S3_TARGET="$S3_BUCKET/$S3_ROOT_FOLDER/html"
 
@@ -168,7 +168,7 @@ Perfect! I’ve rewritten your Bash script to handle spaces in filenames, fully 
 # CONFIGURATION
 # =========================
 LOCAL_HTML_DIR="/var/www/html"                # Local html folder to upload
-S3_BUCKET="your-s3-bucket-name"              # Replace with your S3 bucket name
+S3_BUCKET="charlie-cafe-s3-bucket"              # Replace with your S3 bucket name
 S3_ROOT_FOLDER="charlie-cafe-web-drive"      # Folder in S3 to contain html folder
 S3_TARGET="s3://$S3_BUCKET/$S3_ROOT_FOLDER/html"
 
@@ -318,7 +318,7 @@ Perfect! I’ve updated the script so that it automatically creates the S3 root 
 # CONFIGURATION
 # =========================
 LOCAL_HTML_DIR="/var/www/html"                # Local html folder to upload
-S3_BUCKET="your-s3-bucket-name"              # Replace with your S3 bucket name
+S3_BUCKET="charlie-cafe-s3-bucket"              # Replace with your S3 bucket name
 S3_ROOT_FOLDER="charlie-cafe-web-drive"      # Folder in S3 to contain html folder
 S3_TARGET="s3://$S3_BUCKET/$S3_ROOT_FOLDER/html"  # Final upload path
 
