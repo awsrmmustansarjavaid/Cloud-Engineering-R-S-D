@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* ===================== BODY & BACKGROUND ===================== */
+/* ================= BODY & OVERLAY ================= */
 body {
     font-family: 'Poppins', sans-serif;
     background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93') no-repeat center center/cover;
@@ -28,7 +28,7 @@ body {
     height: 100%;
 }
 
-/* ===================== LOGIN CARD ===================== */
+/* ================= LOGIN CARD ================= */
 .login-card {
     position: relative;
     background: rgba(58,37,28,0.95);
@@ -42,7 +42,7 @@ body {
 .logo { font-size: 40px; margin-bottom: 10px; }
 .cafe-title { font-size: 26px; font-weight: 700; margin-bottom: 25px; }
 
-/* ===================== LOGIN BUTTON ===================== */
+/* ================= LOGIN BUTTON ================= */
 .btn-login {
     background: linear-gradient(135deg,#ff5722,#ff9800);
     border: none; 
@@ -66,60 +66,59 @@ body {
     <div class="cafe-title">Charlie Café Employee</div>
     <p class="mb-4">Welcome back! Please login to access the portal.</p>
     
-    <!-- Login Button -->
+    <!-- ================= LOGIN BUTTON ================= -->
     <button id="loginBtn" class="btn btn-login">Login with Cognito</button>
 </div>
 
-<!-- ===================== CONFIG + LOGIN SCRIPT ===================== -->
-<script src="config.js"></script>
+<!-- ================= CONFIG + LOGIN SCRIPT ================= -->
+<script src="/js/config.js"></script>
 <script>
-// ============================================================
-// 🔹 Employee Login using Cognito Hosted UI
-// ============================================================
+/* =========================================================
+   🔹 CHARLIE CAFÉ — COGNITO LOGIN
+   ---------------------------------------------------------
+   This script handles:
+   1️⃣ Redirecting users to Cognito Hosted UI (Authorization Code Flow)
+   2️⃣ Receiving the authorization code on redirect
+   3️⃣ Storing the code in sessionStorage for backend token exchange
+========================================================= */
 
-// Load Cognito & CloudFront config from config.js
-const DOMAIN = window.CHARLIE_CONFIG.COGNITO_DOMAIN;
-const CLIENT_ID = window.CHARLIE_CONFIG.CLIENT_ID;
-const REDIRECT_URI = window.CHARLIE_CONFIG.CLOUDFRONT_BASE + "/employee-portal.html";
+// ======= Cognito config from config.js =======
+const DOMAIN = window.CHARLIE_CONFIG.COGNITO_DOMAIN; // e.g., https://us-east-11hpdn6h7f.auth.us-east-1.amazoncognito.com
+const CLIENT_ID = window.CHARLIE_CONFIG.CLIENT_ID;    // App Client ID
+const REDIRECT_URI = window.CHARLIE_CONFIG.CLOUDFRONT_BASE + "/employee-portal.html"; // must match Cognito App Client
+const SCOPE = encodeURIComponent("openid email profile"); // ⚠️ Space-separated, URL-encoded
 
-/**
- * Build Cognito Hosted UI login URL
- * Implicit Flow: returns access_token & id_token in URL hash
- */
-const loginUrl = `${DOMAIN}/login?response_type=token&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=email+openid+profile`;
+// ======= Build Cognito Login URL =======
+const loginUrl = `${DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=${SCOPE}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
 
-// Redirect user to Cognito login when button clicked
+// ======= Redirect to Cognito Hosted UI on button click =======
 document.getElementById("loginBtn").addEventListener("click", () => {
     window.location.href = loginUrl;
 });
 
-// ============================================================
-// 🔹 Handle redirect back from Cognito after login
-// ============================================================
+// ======= Handle redirect back from Cognito with code =======
+function handleCognitoCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
 
-function handleCognitoRedirect() {
-    if (window.location.hash) {
-        const hash = window.location.hash.substring(1); // remove '#'
-        const params = new URLSearchParams(hash);
-        const accessToken = params.get("access_token");
-        const idToken = params.get("id_token");
+    if (code) {
+        // ✅ Store code temporarily for backend token exchange
+        sessionStorage.setItem("auth_code", code);
+        console.log("Authorization code received:", code);
 
-        if (accessToken && idToken) {
-            // Store tokens securely in sessionStorage
-            sessionStorage.setItem("access_token", accessToken);
-            sessionStorage.setItem("id_token", idToken);
+        // OPTIONAL: Call your backend API to exchange code for tokens
+        // fetch("/api/exchange-code", { method: "POST", body: JSON.stringify({ code }) })
 
-            // Clear URL hash to prevent re-processing
-            window.history.replaceState({}, document.title, window.location.pathname);
+        // ✅ Clean URL to remove ?code=... from browser
+        window.history.replaceState({}, document.title, window.location.pathname);
 
-            // Redirect to Employee Portal
-            window.location.href = REDIRECT_URI;
-        }
+        // OPTIONAL: Redirect automatically to portal page if needed
+        // window.location.href = REDIRECT_URI;
     }
 }
 
-// Execute redirect handling on page load
-handleCognitoRedirect();
+// Execute on page load
+handleCognitoCode();
 </script>
 </body>
 </html>
