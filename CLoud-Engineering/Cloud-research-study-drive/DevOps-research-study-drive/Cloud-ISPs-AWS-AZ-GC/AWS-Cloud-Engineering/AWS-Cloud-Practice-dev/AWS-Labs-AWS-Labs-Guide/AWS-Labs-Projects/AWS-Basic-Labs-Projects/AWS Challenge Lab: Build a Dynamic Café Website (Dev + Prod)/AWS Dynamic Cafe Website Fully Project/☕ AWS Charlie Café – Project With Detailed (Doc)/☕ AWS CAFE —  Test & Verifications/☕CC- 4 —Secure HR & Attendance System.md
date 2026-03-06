@@ -179,8 +179,64 @@ custom:employee_id
 
 That confirms the problem.
 
+### ✅ check the attendance records
 
+#### 1️⃣ Show all records in the attendance table
 
+```
+SELECT * FROM attendance;
+```
+
+This will list all attendance records for all employees. Useful to see the table structure and what data exists.
+
+#### 2️⃣ Show Ali’s attendance only
+
+```
+SELECT *
+FROM attendance
+WHERE employee_id = 3;
+```
+
+This will display all check-in/check-out records for Ali.
+
+#### 3️⃣ Show only check-in and check-out times for Ali
+
+```
+SELECT attendance_date, checkin_time, checkout_time
+FROM attendance
+WHERE employee_id = 3
+ORDER BY attendance_date DESC;
+```
+
+- attendance_date → The day of attendance
+
+- checkin_time → Time Ali checked in
+
+- checkout_time → Time Ali checked out
+
+Sorting by attendance_date DESC shows the latest records first.
+
+#### 4️⃣ Optional: Check today’s attendance for Ali
+
+```
+SELECT *
+FROM attendance
+WHERE employee_id = 3
+AND attendance_date = CURDATE();
+```
+
+- CURDATE() gives today’s date.
+
+- This is useful if you just want to see if Ali has checked in today.
+
+#### 💡 Tip: You can also combine filtering and formatting if you want a clean report, for example:
+
+```
+SELECT CONCAT('Date: ', attendance_date, ', Check-in: ', checkin_time, ', Check-out: ', checkout_time) AS record
+FROM attendance
+WHERE employee_id = 3
+ORDER BY attendance_date DESC;
+```
 
 ### ✅ RDS SQL script
 
