@@ -719,11 +719,13 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
                Cognito /oauth2/token
 ```
 
-#### 1️⃣ Function name
+#### 1️⃣ Basic Configurations
 
-```
-hr-cognito-token-exchange
-```
+- Function name: hr-cognito-token-exchange
+
+- Runtime: Python 3.12
+
+- Architecture: x86_64
 
 #### 2️⃣ Code:
 

@@ -1,36 +1,56 @@
 import json
+import os
 import urllib.parse
 import urllib.request
 
-COGNITO_DOMAIN = "https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com"
-CLIENT_ID = "7c5793cnvnbl110ljthmdiohch"
-REDIRECT_URI = "https://d2xb54di3chfgj.cloudfront.net/employee-portal.html"
+COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
+CLIENT_ID = os.environ["COGNITO_CLIENT_ID"]
+REDIRECT_URI = os.environ["COGNITO_REDIRECT_URI"]
 
 def lambda_handler(event, context):
 
-    body = json.loads(event["body"])
-    code = body["code"]
+    try:
 
-    data = urllib.parse.urlencode({
-        "grant_type": "authorization_code",
-        "client_id": CLIENT_ID,
-        "redirect_uri": REDIRECT_URI,
-        "code": code
-    }).encode()
+        body = json.loads(event["body"])
+        code = body["code"]
 
-    req = urllib.request.Request(
-        COGNITO_DOMAIN + "/oauth2/token",
-        data=data,
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
-    )
+        data = urllib.parse.urlencode({
+            "grant_type": "authorization_code",
+            "client_id": CLIENT_ID,
+            "redirect_uri": REDIRECT_URI,
+            "code": code
+        }).encode()
 
-    response = urllib.request.urlopen(req)
-    result = json.loads(response.read())
+        url = f"{COGNITO_DOMAIN}/oauth2/token"
 
-    return {
-        "statusCode":200,
-        "headers":{
-            "Access-Control-Allow-Origin":"*"
-        },
-        "body":json.dumps(result)
-    }
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={"Content-Type":"application/x-www-form-urlencoded"},
+            method="POST"
+        )
+
+        response = urllib.request.urlopen(req)
+        result = json.loads(response.read())
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "POST,OPTIONS"
+            },
+            "body": json.dumps(result)
+        }
+
+    except Exception as e:
+
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "error": str(e)
+            })
+        }
