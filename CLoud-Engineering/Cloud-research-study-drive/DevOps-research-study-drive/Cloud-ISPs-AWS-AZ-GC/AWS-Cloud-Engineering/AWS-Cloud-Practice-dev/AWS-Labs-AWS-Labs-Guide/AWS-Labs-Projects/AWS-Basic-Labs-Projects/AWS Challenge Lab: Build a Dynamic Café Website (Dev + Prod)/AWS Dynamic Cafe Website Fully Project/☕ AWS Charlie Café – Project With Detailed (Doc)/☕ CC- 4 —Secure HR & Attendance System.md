@@ -427,7 +427,7 @@ employee_id | name | job_title
 
 Clear old token:
 
-``
+```
 localStorage.clear()
 ```
 
