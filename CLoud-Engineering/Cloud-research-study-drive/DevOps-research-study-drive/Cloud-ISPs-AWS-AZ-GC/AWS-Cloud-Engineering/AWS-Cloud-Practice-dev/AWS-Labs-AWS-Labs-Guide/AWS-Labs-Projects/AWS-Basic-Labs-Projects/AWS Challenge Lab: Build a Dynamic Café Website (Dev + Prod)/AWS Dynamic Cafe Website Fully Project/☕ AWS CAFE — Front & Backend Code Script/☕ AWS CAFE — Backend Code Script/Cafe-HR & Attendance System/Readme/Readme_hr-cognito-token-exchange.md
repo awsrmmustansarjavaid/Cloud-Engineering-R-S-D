@@ -343,7 +343,17 @@ def lambda_handler(event, context):
         }
 ```
 
+### ✅ Fix 1 — Correct Environment Variables
 
+Change your Lambda environment variables to exactly this:
+
+| Key                  | Value                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CLIENT_ID            | 7c5793cnvnbl110ljthmdiohch                                                                                               |
+| COGNITO_DOMAIN       | us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com                                                                      |
+| COGNITO_REDIRECT_URI | [https://d2xb54di3chfgj.cloudfront.net/employee-portal.html](https://d2xb54di3chfgj.cloudfront.net/employee-portal.html) |
+
+---
 
 
 
