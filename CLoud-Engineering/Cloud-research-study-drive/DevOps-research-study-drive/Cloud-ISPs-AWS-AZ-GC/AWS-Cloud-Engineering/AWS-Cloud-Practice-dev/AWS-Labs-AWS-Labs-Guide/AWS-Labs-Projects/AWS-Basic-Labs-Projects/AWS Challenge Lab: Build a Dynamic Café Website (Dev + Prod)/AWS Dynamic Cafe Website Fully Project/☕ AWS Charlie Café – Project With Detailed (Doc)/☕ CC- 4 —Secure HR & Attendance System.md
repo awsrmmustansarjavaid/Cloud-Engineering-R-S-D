@@ -924,10 +924,34 @@ That is enough.
 
 - Deploy
 
-#### Copy the Invoke URL. Example:
+### ✅ Copy the Invoke URL. Example:
 
 ```
 https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/
+```
+
+### ✅ Final API Endpoint
+
+Your endpoint becomes:
+
+```
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/attendance
+```
+
+```
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/employee-profile
+```
+
+```
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/attendance-history
+```
+
+```
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/leaves-holidays
+```
+
+```
+https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/exchange-token
 ```
 
 
