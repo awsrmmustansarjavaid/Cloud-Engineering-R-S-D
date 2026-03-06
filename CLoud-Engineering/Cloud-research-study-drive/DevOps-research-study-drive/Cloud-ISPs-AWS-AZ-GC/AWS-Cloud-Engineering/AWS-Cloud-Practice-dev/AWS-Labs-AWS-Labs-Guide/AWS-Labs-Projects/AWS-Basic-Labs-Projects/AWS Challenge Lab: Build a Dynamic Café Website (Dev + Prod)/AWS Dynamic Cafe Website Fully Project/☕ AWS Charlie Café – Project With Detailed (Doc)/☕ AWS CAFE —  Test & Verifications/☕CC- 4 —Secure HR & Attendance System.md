@@ -71,6 +71,8 @@ WHERE cognito_user_id = '44380458-0091-70a3-e16b-85f38973d335';
 
 #### Expected output:
 
+This should return the numeric ID of Ali.
+
 ```
 +-------------+
 | employee_id |
