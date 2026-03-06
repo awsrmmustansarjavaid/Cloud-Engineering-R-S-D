@@ -200,6 +200,16 @@ You built correctly:
 Only 1 Lambda missing.
 
 ----
+## hr-cognito-token-exchange
+
+
+
+### hr-cognito-token-exchange.py
+
+> **Update Version:1.0**
+
+
+```
 
 
 
