@@ -407,86 +407,7 @@ SELECT * FROM holidays;
 
 If you see your inserted rows and table names, your RDS configuration is fully functional. ✅
 
-### 2️⃣ Create Employee ID Attribute in Cognito
-
-To make Employee ID flow correctly from Cognito → Employee Portal → Lambda → RDS, your Cognito configuration must include the Employee ID inside the ID Token.
-Below is the complete correct setup step-by-step.
-
-- Go to : Amazon Cognito Console → User Pools → Your User Pool
-
-- Open Sign-up experience
-
-- Scroll to Custom attributes
-
-- Click Add custom attribute
-
-#### Create:
-
-```
-Name: employee_id
-Type: String
-Mutable: Yes
-```
-
-#### Cognito will internally store it as:
-
-```
-custom:employee_id
-```
-
-#### ⚠️ This is the exact name that will appear inside the JWT token.
-
-### 3️⃣ Add attribute to App Client
-
-- Go to: App integration
-
-- Open your App Client
-
-- Find: Attribute read permissions
-
-- Enable: custom:employee_id
-
-- Save.
-
-### 4️⃣ Add Employee ID to Users
-
-- Go to: User Pools → Users → Create user / select user
-
-- Edit attributes.
-
-- Add:
-
-```
-custom:employee_id = 5
-```
-
-#### Example:
-
-```
-Username: ali
-Email: ali@charliecafe.com
-custom:employee_id = 5
-```
-
-#### Now Cognito stores:
-
-```
-custom:employee_id = 5
-```
-
-Where 5 must match the employee_id in your RDS employees table.
-
-#### Example:
-
-```
-employees table
-
-employee_id | name
-5           | Ali
-6           | Ahmed
-```
-
-#### Verify on RDS
+### 2️⃣  Verify Employee ID on RDS
 
 ```
 SELECT * FROM employees;
@@ -496,7 +417,7 @@ This must match the employee_id in your RDS employees table.
 
 #### Example RDS:
 
-
+```
 employee_id | name | job_title
 --------------------------------
 5           | Ali  | Barista
