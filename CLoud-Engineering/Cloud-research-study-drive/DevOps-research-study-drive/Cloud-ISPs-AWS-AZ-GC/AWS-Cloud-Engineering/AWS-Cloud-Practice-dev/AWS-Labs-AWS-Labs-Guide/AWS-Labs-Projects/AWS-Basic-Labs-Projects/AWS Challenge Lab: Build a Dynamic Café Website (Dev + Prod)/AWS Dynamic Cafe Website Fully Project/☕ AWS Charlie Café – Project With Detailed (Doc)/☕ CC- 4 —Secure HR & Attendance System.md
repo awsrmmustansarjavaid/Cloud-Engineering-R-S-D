@@ -682,9 +682,13 @@ Everything will work.
 ### ✅ Most Common Mistakes
 
 ❌ Employee ID not added to Cognito user
+
 ❌ openid scope missing
+
 ❌ Wrong redirect URL
+
 ❌ Using employee_id instead of custom:employee_id
+
 ❌ Token exchange not implemented
 
 ### 🌐 Final End  – What You Have Now
