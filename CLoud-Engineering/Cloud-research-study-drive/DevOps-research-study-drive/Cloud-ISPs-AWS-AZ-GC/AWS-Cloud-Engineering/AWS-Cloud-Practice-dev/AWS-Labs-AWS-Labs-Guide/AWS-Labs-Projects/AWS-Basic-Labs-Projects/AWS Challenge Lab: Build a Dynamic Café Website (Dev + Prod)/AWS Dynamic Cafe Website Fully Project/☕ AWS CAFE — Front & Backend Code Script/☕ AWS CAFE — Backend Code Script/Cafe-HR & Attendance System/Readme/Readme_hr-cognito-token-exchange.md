@@ -290,6 +290,9 @@ Add:
 
 > **Update Version:1.2**
 
+#### Add logging inside Lambda
+
+
 ```
 import json
 import os
