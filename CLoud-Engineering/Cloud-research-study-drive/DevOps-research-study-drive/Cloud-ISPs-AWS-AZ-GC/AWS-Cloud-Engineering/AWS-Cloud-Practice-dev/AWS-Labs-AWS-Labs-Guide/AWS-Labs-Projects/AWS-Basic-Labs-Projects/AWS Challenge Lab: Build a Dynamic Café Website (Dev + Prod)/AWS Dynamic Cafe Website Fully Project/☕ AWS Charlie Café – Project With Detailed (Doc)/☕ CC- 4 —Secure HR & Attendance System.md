@@ -423,7 +423,7 @@ employee_id | name | job_title
 5           | Ali  | Barista
 ```
 
-### 4️⃣ Logout and Login Again
+### 3️⃣ Logout and Login Again
 
 Clear old token:
 
