@@ -2510,7 +2510,22 @@ charlie-cafe-auth.auth.us-east-1.amazoncognito.com
 
 ❌ Do NOT include https.
 
-### 🟢 STEP 7 — Create Groups (FINAL STRUCTURE)
+### 🟢 STEP 7 — App Client Authentication Flows
+
+- Go to: User pool → App clients → Show details
+
+#### Ensure these are enabled:
+
+✔ ALLOW_USER_PASSWORD_AUTH
+
+✔ ALLOW_USER_SRP_AUTH
+
+✔ ALLOW_REFRESH_TOKEN_AUTH
+
+- ❌ Do NOT enable other unnecessary flows.
+
+
+### 🟢 STEP 8 — Create Groups (FINAL STRUCTURE)
 
 - Go to: User pool → Groups → Create group
 
@@ -2522,7 +2537,7 @@ charlie-cafe-auth.auth.us-east-1.amazoncognito.com
 
 - ❌ No IAM role attached.
 
-### 🟢 STEP 8 — Create Users
+### 🟢 STEP 9 — Create Users
 
 Create:
 
@@ -2536,19 +2551,47 @@ Create:
 
 - Add each to correct group.
 
-### 🟢 STEP 9 — App Client Authentication Flows
+### 🟢 STEP 10 — Create Employee ID Attribute in Cognito
 
-- Go to: User pool → App clients → Show details
+To make Employee ID flow correctly from Cognito → Employee Portal → Lambda → RDS, your Cognito configuration must include the Employee ID inside the ID Token.
+Below is the complete correct setup step-by-step.
 
-#### Ensure these are enabled:
+- Go to : Amazon Cognito Console → User Pools → Your User Pool
 
-✔ ALLOW_USER_PASSWORD_AUTH
+- Open Sign-up experience
 
-✔ ALLOW_USER_SRP_AUTH
+- Scroll to Custom attributes
 
-✔ ALLOW_REFRESH_TOKEN_AUTH
+- Click Add custom attribute
 
-- ❌ Do NOT enable other unnecessary flows.
+#### Create:
+
+```
+Name: employee_id
+Type: String
+Mutable: Yes
+```
+
+#### Cognito will internally store it as:
+
+```
+custom:employee_id
+```
+
+#### ⚠️ This is the exact name that will appear inside the JWT token.
+
+### 🟢 STEP 11 — Add attribute to App Client
+
+- Go to: App integration
+
+- Open your App Client
+
+- Find: Attribute read permissions
+
+- Enable: custom:employee_id
+
+- Save.
+
 
 ### 🟢 STEP 10 — Amazon Cognito Hosted UI — Callback + Logout
 
