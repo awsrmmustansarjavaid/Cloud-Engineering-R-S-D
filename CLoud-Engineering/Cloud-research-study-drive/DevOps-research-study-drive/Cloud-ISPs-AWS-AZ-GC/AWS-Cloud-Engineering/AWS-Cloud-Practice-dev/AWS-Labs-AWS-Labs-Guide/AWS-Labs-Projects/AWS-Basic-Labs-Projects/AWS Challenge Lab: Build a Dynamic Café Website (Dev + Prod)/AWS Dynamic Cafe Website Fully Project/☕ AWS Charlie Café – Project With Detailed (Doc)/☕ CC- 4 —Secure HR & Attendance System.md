@@ -705,6 +705,34 @@ hr-leaves-holidays
 
 - Deploy.
 
+### 6️⃣ Create Lambda: hr-cognito-token-exchange
+
+> **AWS Cognito Authorization Code Exchange via API Gateway + Lambda**
+
+We will build:
+
+```
+Browser
+   ↓
+API Gateway  →  Lambda (hr-cognito-token-exchange)
+                    ↓
+               Cognito /oauth2/token
+```
+
+#### 1️⃣ Function name
+
+```
+hr-cognito-token-exchange
+```
+
+#### 2️⃣ Code:
+
+[hr-cognito-token-exchange.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-cognito-token-exchange.py)
+
+- Deploy
+
+
+
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
