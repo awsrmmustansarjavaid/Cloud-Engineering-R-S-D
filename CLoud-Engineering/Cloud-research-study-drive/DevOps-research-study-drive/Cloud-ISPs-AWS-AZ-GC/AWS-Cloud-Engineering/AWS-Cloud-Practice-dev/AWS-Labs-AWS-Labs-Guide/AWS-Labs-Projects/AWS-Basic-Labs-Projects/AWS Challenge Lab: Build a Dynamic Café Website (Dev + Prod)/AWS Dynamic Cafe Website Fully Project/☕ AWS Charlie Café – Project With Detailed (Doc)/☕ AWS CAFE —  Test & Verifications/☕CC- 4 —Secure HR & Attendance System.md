@@ -42,8 +42,8 @@ SELECT * FROM attendance;
 ### Get Ali's Employee ID
 
 ```
-SELECT id FROM employees 
-WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+SELECT employee_id FROM employees
+WHERE cognito_user_id = '44380458-0091-70a3-e16b-85f38973d335';
 ```
 
 ### Check Employees Table
