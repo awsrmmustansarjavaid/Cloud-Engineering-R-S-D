@@ -1,56 +1,47 @@
 import json
 import os
-import urllib.parse
-import urllib.request
-
-COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
-CLIENT_ID = os.environ["COGNITO_CLIENT_ID"]
-REDIRECT_URI = os.environ["COGNITO_REDIRECT_URI"]
+from urllib import parse, request, error
 
 def lambda_handler(event, context):
-
+    print("Received event:", event)
+    
     try:
+        body = json.loads(event.get("body", "{}"))
+        code = body.get("code")
+        print("Authorization code:", code)
 
-        body = json.loads(event["body"])
-        code = body["code"]
-
-        data = urllib.parse.urlencode({
+        token_url = f"https://{os.environ['COGNITO_DOMAIN']}/oauth2/token"
+        data = {
             "grant_type": "authorization_code",
-            "client_id": CLIENT_ID,
-            "redirect_uri": REDIRECT_URI,
+            "client_id": os.environ["CLIENT_ID"],
+            "redirect_uri": os.environ["COGNITO_REDIRECT_URI"],
             "code": code
-        }).encode()
+        }
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
-        url = f"{COGNITO_DOMAIN}/oauth2/token"
-
-        req = urllib.request.Request(
-            url,
-            data=data,
-            headers={"Content-Type":"application/x-www-form-urlencoded"},
-            method="POST"
-        )
-
-        response = urllib.request.urlopen(req)
-        result = json.loads(response.read())
+        encoded_data = parse.urlencode(data).encode()
+        req = request.Request(token_url, data=encoded_data, headers=headers)
+        
+        with request.urlopen(req) as resp:
+            response_text = resp.read().decode()
+            print("Cognito response:", response_text)
 
         return {
             "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "POST,OPTIONS"
-            },
-            "body": json.dumps(result)
+            "body": response_text,
+            "headers": {"Content-Type": "application/json"}
         }
 
+    except error.HTTPError as e:
+        err_msg = e.read().decode()
+        print("HTTPError:", err_msg)
+        return {
+            "statusCode": e.code,
+            "body": json.dumps({"error": err_msg})
+        }
     except Exception as e:
-
+        print("Lambda error:", str(e))
         return {
             "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*"
-            },
-            "body": json.dumps({
-                "error": str(e)
-            })
+            "body": json.dumps({"error": str(e)})
         }
