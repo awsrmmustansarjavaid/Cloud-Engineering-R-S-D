@@ -870,6 +870,18 @@ HR Secure Attendance & Employee Management API
 
 - Integration type → Mock Integration
 
+- Allowed:
+
+    - POST
+
+    - OPTIONS
+
+- Headers: 
+
+```
+*
+```
+
 Now configure 
 
 #### Method Response
@@ -953,8 +965,6 @@ https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/leaves-holidays
 ```
 https://abcdefg123.execute-api.us-east-1.amazonaws.com/prod/exchange-token
 ```
-
-
 
 **✅ PHASE 3️⃣ STATUS**
 
