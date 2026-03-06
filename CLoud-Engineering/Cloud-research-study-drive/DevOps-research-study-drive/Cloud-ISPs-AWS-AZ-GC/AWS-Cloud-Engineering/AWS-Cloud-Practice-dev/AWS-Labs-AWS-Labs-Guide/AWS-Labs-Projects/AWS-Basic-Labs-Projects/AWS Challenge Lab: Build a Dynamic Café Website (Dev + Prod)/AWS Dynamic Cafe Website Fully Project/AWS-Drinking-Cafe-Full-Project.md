@@ -2596,6 +2596,8 @@ custom:employee_id
 
   - ✔ Write
 
+> **This is exactly what is required so the App Client can access the attribute and include it in the JWT ID token.**
+
 Save changes.
 
 - Save.
