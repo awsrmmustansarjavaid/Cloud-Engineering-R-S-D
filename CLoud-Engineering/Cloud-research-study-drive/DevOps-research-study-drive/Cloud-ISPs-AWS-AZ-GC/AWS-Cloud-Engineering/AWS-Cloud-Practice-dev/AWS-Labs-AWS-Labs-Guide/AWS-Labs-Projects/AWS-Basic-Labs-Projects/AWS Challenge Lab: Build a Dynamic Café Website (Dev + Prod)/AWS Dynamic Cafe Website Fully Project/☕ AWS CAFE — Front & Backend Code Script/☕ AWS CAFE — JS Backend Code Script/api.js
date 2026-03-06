@@ -170,6 +170,19 @@ function getAnalytics(period = "today") {
     };
 
     /* =====================================================
+       🔐 AUTH — COGNITO TOKEN EXCHANGE
+       - Exchanges OAuth authorization code for id_token
+       - Uses API Gateway → Lambda → Cognito
+       ===================================================== */
+
+        function exchangeCognitoToken(code) {
+            return apiFetch(`${CONFIG.API_BASE}/exchange-token`, {
+        method: "POST",
+        body: JSON.stringify({ code: code })
+    });
+    }
+
+    /* =====================================================
        🚀 EXPORT ALL APIs
        - Orders, HR (public), HR helpers, Admin
     ===================================================== */
@@ -205,6 +218,10 @@ function getAnalytics(period = "today") {
         // Admin
         adminAttendance,
         adminDashboard
+
+        // AUTH
+        exchangeCognitoToken,
+
     };
 
 })();
