@@ -900,7 +900,7 @@ Status: 200
 }
 ```
 
-#### Expected:
+#### ✅ Expected:
 
 ```
 Status: 200
@@ -909,6 +909,37 @@ Status: 200
   "holidays": [...]
 }
 ```
+
+### 5️⃣ Test /exchange-token
+
+#### 1️⃣ Body:
+
+```
+{
+ "code":"TEST_AUTH_CODE"
+}
+```
+
+#### ✅ Expected:
+
+```
+500
+```
+
+#### 2️⃣ Body:
+
+```
+{
+ "error":"HTTP Error 400: Bad Request"
+}
+```
+
+#### ✅ This confirms:
+
+✅ API → Lambda works
+
+✅ Lambda → Cognito works
+
 
 #### ✅ API Gateway console is the fastest for functional verification.
 
@@ -978,11 +1009,32 @@ curl -X POST $API_URL/leaves-holidays \
 -d '{"employee_id":"EMP001"}'
 ```
 
-#### Expected:
+#### ✅ Expected:
 
 ```
 {"leaves":[...],"holidays":[...]}
 ```
+
+### 5️⃣ Test /exchange-token
+
+```
+curl -X POST https://cdnky6qicd.execute-api.us-east-1.amazonaws.com/prod/exchange-token \
+-H "Content-Type: application/json" \
+-d '{"code":"TEST_AUTH_CODE"}'
+```
+
+#### ✅ Expected:
+
+```
+{
+ "error": "HTTP Error 400: Bad Request"
+}
+```
+
+#### 📢 Again this is correct because code is fake.
+
+
+
 
 ### ✅ If Something Fails
 
