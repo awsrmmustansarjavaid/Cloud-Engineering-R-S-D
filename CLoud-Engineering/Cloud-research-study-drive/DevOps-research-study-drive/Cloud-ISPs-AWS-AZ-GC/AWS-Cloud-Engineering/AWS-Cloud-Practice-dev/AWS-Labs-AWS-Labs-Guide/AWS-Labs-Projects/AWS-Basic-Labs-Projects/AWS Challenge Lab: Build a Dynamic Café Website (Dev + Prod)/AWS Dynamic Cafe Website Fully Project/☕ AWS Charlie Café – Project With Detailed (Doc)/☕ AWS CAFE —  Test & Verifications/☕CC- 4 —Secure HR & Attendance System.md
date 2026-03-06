@@ -600,7 +600,7 @@ Employee with No Leaves (optional):
 }
 ```
 
-#### Expected Results
+#### ✅ Expected Results
 
 | Scenario                | Input Example             | Expected Response                                                                                                                                                                                                                                                                                           |
 | ----------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -611,7 +611,38 @@ Employee with No Leaves (optional):
 | Employee with Leaves    | `{"employee_id":"12345"}` | 200 OK → example:<br>`json { "leaves": [ { "leave_date": "2026-02-25", "leave_type": "Sick" }, { "leave_date": "2026-02-15", "leave_type": "Casual" } ], "holidays": [ { "holiday_date": "2026-01-01", "description": "New Year" }, { "holiday_date": "2026-02-14", "description": "Valentine's Day" } ] }` |
 
 
-### RDS Verification
+### 5️⃣ hr-cognito-token-exchange
+
+- Click Test → Configure test event
+
+- Event name: tokenTest
+
+- **Test JSON:**
+
+```
+{
+  "body": "{\"code\":\"TEST_AUTH_CODE\"}"
+}
+```
+
+#### ✅ Expected Results
+
+Because the code is fake:
+
+```
+{
+ "statusCode": 500,
+ "body": "{\"error\":\"HTTP Error 400: Bad Request\"}"
+}
+```
+
+#### This means:
+
+✅ Lambda executed correctly
+
+✅ Cognito endpoint reached
+
+### ✅ RDS Verification
 
 
 ### 1️⃣ Connect to RDS from EC2 CLI
