@@ -2553,8 +2553,8 @@ Create:
 
 ### 🟢 STEP 10 — Create Employee ID Attribute in Cognito
 
-To make Employee ID flow correctly from Cognito → Employee Portal → Lambda → RDS, your Cognito configuration must include the Employee ID inside the ID Token.
-Below is the complete correct setup step-by-step.
+> **To make Employee ID flow correctly from Cognito → Employee Portal → Lambda → RDS, your Cognito configuration must include the Employee ID inside the ID Token.
+Below is the complete correct setup step-by-step.**
 
 - Go to : Amazon Cognito Console → User Pools → Your User Pool
 
