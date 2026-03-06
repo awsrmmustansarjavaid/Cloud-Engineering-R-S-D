@@ -2590,6 +2590,12 @@ custom:employee_id
 
 - Enable: custom:employee_id
 
+  - ✔ Read
+  
+  - ✔ Write
+
+Save changes.
+
 - Save.
 
 
