@@ -39,13 +39,6 @@ SELECT * FROM attendance;
 1 row in set (0.001 sec)
 ```
 
-### Get Ali's Employee ID
-
-```
-SELECT employee_id FROM employees
-WHERE cognito_user_id = '44380458-0091-70a3-e16b-85f38973d335';
-```
-
 ### Check Employees Table
 
 ```
@@ -68,6 +61,25 @@ DESCRIBE employees;
 +-----------------+---------------+------+-----+-------------------+-------------------+
 7 rows in set (0.015 sec)
 ```
+
+### Get Ali's Employee ID
+
+```
+SELECT employee_id FROM employees
+WHERE cognito_user_id = '44380458-0091-70a3-e16b-85f38973d335';
+```
+
+#### Expected output:
+
+```
++-------------+
+| employee_id |
++-------------+
+|           3 |
++-------------+
+1 row in set (0.001 sec)
+```
+
 
 ### ✅ Shortest Way (One Command)
 
