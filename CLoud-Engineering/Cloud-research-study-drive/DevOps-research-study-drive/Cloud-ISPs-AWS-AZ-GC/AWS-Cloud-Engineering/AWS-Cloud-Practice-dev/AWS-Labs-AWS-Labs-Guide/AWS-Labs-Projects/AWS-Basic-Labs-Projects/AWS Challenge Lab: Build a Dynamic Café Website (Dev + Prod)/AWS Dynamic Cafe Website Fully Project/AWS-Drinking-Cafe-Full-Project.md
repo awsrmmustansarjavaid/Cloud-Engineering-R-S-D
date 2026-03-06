@@ -2629,13 +2629,15 @@ custom:employee_id = 5
 
 Where 5 must match the employee_id in your RDS employees table.
 
-#### Example: employees table
+#### Example users: employees table
 
-```
-employee_id | name
-5           | Ali
-6           | Ahmed
-```
+| Cognito Username | Employee ID |
+| ---------------- | ----------- |
+| ali              | 5           |
+| ahmed            | 6           |
+| sara             | 7           |
+
+- Save.
 
 
 ### 🟢 STEP 10 — Amazon Cognito Hosted UI — Callback + Logout
