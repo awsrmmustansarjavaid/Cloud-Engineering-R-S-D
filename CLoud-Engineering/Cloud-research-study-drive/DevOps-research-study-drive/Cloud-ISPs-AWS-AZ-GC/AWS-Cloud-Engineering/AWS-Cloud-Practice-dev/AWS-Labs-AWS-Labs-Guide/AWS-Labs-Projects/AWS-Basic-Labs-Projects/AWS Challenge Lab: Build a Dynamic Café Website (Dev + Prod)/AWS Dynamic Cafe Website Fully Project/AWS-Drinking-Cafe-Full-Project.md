@@ -2644,7 +2644,7 @@ Where 5 must match the employee_id in your RDS employees table.
 
 
 
-### 🟢 STEP 10 — Amazon Cognito Hosted UI — Callback + Logout
+### 🟢 STEP 13 — Amazon Cognito Hosted UI — Callback + Logout
 
 ✅ Updated Login.html (with your Cognito config structure ready)
 
@@ -2742,7 +2742,7 @@ This single-file approach is:
 
 ✔ Cleaner file structure
 
-### 🟢 STEP 11 — — central-auth-api
+### 🟢 STEP 14 — — central-auth-api
 
 ### 🔥 STEP 1 — config.js (NO LOGIC HERE)
 
@@ -2809,7 +2809,7 @@ This file handles API logic only.
 
 If groups are missing → your Lambda 403 will happen again.
 
-### 🔐 PART 12 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
+### 🔐 PART 15 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
 
 You asked for easiest method.
 
