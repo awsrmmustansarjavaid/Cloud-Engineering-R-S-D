@@ -1,5 +1,38 @@
 # Charlie Cafe - hr-cognito-token-exchange
 
+Your frontend code is actually correct now 👍.
+The problem is not employee-portal.html anymore. The issue is happening in the Cognito → token exchange step.
+
+From the network data you posted, the key problem is:
+
+#### ⚠️ Your browser never successfully receives the id_token.
+
+So this line later fails:
+
+```
+const employeeId =
+decoded["custom:employee_id"] ||
+decoded["employee_id"] ||
+decoded["cognito:username"];
+```
+
+Because decoded is never created → token exchange failed.
+
+### 🔎 Root Cause (Very Important)
+
+Your request to Cognito:
+
+```
+POST
+https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com/oauth2/token
+```
+
+But there is NO response shown.
+
+This means the request is being blocked by CORS.
+
+And this is expected behaviour.
+
 ### 🚨 Cognito does NOT allow token exchange from browser JavaScript.
 
 Amazon designed it this way.
