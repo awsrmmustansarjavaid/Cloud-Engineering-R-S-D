@@ -268,6 +268,25 @@ def lambda_handler(event, context):
         }
 ```
 
+### Configure Environment Variables
+
+Go to:
+
+```
+Lambda → Configuration → Environment Variables
+```
+
+Add:
+
+| Key                  | Value                                                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| COGNITO_DOMAIN       | [https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com](https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com) |
+| COGNITO_CLIENT_ID    | 7c5793cnvnbl110ljthmdiohch                                                                                                 |
+| COGNITO_REDIRECT_URI | [https://d2xb54di3chfgj.cloudfront.net/employee-portal.html](https://d2xb54di3chfgj.cloudfront.net/employee-portal.html)   |
+
+
+---
+
 
 
 
