@@ -2601,6 +2601,43 @@ Save changes.
 - Save.
 
 
+### 🟢 STEP 12 — Add Employee ID to Users
+
+- Go to: User Pools → Users → Create user / select user
+
+- Edit attributes.
+
+- Add:
+
+```
+custom:employee_id = 5
+```
+
+#### Example:
+
+```
+Username: ali
+Email: ali@charliecafe.com
+custom:employee_id = 5
+```
+
+#### Now Cognito stores:
+
+```
+custom:employee_id = 5
+```
+
+Where 5 must match the employee_id in your RDS employees table.
+
+#### Example: employees table
+
+```
+employee_id | name
+5           | Ali
+6           | Ahmed
+```
+
+
 ### 🟢 STEP 10 — Amazon Cognito Hosted UI — Callback + Logout
 
 ✅ Updated Login.html (with your Cognito config structure ready)
