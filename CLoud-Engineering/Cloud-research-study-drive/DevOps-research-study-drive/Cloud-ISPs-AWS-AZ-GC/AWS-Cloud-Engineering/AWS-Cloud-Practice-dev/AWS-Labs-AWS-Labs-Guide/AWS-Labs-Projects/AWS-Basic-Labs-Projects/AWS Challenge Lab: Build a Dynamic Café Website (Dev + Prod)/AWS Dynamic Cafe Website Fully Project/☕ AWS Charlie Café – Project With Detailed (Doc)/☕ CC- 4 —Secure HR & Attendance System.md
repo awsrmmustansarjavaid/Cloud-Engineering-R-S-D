@@ -214,7 +214,9 @@ sudo ./setup_cafe_hr_attendance.sh
 
 > **We will later auto-create employees via Cognito, but this helps now.**
 
-### 3️⃣ create an employee record in your RDS database
+### 3️⃣ Create Employee ID
+
+### 1️⃣ create an employee record in your RDS database
 
 #### Step 1: Identify the Cognito User ID
 
@@ -405,7 +407,205 @@ SELECT * FROM holidays;
 
 If you see your inserted rows and table names, your RDS configuration is fully functional. ✅
 
-### 
+### 2️⃣ Create Employee ID Attribute in Cognito
+
+- Go to : Amazon Cognito Console → User Pools → Your User Pool
+
+- Open Sign-up experience
+
+- Scroll to Custom attributes
+
+- Click Add custom attribute
+
+#### Create:
+
+```
+Name: employee_id
+Type: String
+Mutable: Yes
+```
+
+#### Cognito will internally store it as:
+
+```
+custom:employee_id
+```
+
+#### ⚠️ This is the exact name that will appear inside the JWT token.
+
+### 3️⃣ Add Employee ID to Users
+
+- Go to: User Pools → Users → Create user
+
+#### Example:
+
+```
+Username: ali
+Email: ali@charliecafe.com
+custom:employee_id = 5
+```
+
+#### Now Cognito stores:
+
+```
+custom:employee_id = 5
+```
+
+This must match the employee_id in your RDS employees table.
+
+#### Example RDS:
+
+```
+SELECT * FROM employees;
+
+employee_id | name | job_title
+--------------------------------
+5           | Ali  | Barista
+```
+
+### 4️⃣ Configure App Client (VERY IMPORTANT)
+
+- Go to: User Pool → App clients
+
+- Select your App Client
+
+- Open Edit Hosted UI configuration
+
+#### Enable OAuth Flow
+
+- ✔ Authorization code grant
+
+#### Enable  OAuth Scopes
+
+```
+openid
+email
+profile
+```
+
+openid is required to receive ID token.
+
+### 5️⃣ Configure Redirect URLs
+
+Add your portal URL.
+
+#### Example:
+
+```
+https://d3hg4gkyr2w5ay.cloudfront.net/employee-portal.html
+```
+
+Also add logout URL:
+
+```
+https://d3hg4gkyr2w5ay.cloudfront.net/employee-login.html
+```
+
+### 6️⃣ Configure Domain
+
+- Go to: User Pool → Domain
+
+### Example domain:
+
+```
+charlie-cafe-auth
+```
+
+#### Your login URL becomes:
+
+```
+https://charlie-cafe-auth.auth.us-east-1.amazoncognito.com/login
+```
+
+### 7️⃣ Login URL Example
+
+Your Login Button should redirect to:
+
+```
+https://charlie-cafe-auth.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://d3hg4gkyr2w5ay.cloudfront.net/employee-portal.html
+```
+
+After login Cognito redirects to:
+
+```
+employee-portal.html?code=xxxx
+```
+
+Your portal then exchanges the code → id_token.
+
+### 8️⃣ Verify Token Contains Employee ID
+
+After login open Chrome Console:
+
+```
+console.log(parseJwt(localStorage.getItem("id_token")))
+```
+
+#### Expected output:
+
+```
+{
+ "sub": "abc123",
+ "email": "ali@charliecafe.com",
+ "custom:employee_id": "5"
+}
+```
+
+Now your portal will read:
+
+```
+employeeId = decoded["custom:employee_id"]
+```
+
+And call:
+
+```
+GET /employee/profile?employee_id=5
+```
+
+Which triggers your AWS Lambda to query Amazon RDS.
+
+### ✅ Final Flow (Complete Architecture)
+
+```
+Employee Login
+      │
+      ▼
+Amazon Cognito
+      │
+      ▼
+Returns id_token (JWT)
+      │
+      ▼
+Employee Portal HTML
+      │
+      ▼
+Extract custom:employee_id
+      │
+      ▼
+API Gateway
+      │
+      ▼
+AWS Lambda
+      │
+      ▼
+Amazon RDS
+      │
+      ▼
+Employee Data
+```
+
+### ✅ Most Common Mistakes
+
+❌ Employee ID not added to Cognito user
+❌ openid scope missing
+❌ Wrong redirect URL
+❌ Using employee_id instead of custom:employee_id
+❌ Token exchange not implemented
 
 ### 🌐 Final End  – What You Have Now
 
