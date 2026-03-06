@@ -3904,6 +3904,288 @@ All DOM elements are properly targeted, so API responses will render directly.
 #### ✅ Bottom line: If your Lambda endpoints are returning the expected JSON exactly as above, this HTML is fully compatible and “plug-and-play.”
 
 ---
+### ✅ employee-portal.html
+
+Got it! I’ve rewritten your full employee-portal.html to fully integrate the API.JS exchangeCognitoToken helper, including:
+
+Cognito OAuth code → Lambda → API Gateway
+
+id_token storage in localStorage
+
+Employee ID extraction
+
+Profile, Attendance, Leaves, Holidays display
+
+Logout button
+
+Auto-redirect if no code is present
+
+#### ✅ I’ve also added comments for clarity. Here’s the final version:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ==============================
+     BOOTSTRAP + GOOGLE FONTS
+================================ -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    font-family:'Poppins',sans-serif;
+    background:#111;
+    color:white;
+}
+.container{
+    max-width:900px;
+    margin-top:40px;
+}
+.card{
+    background:#1c1c1c;
+    padding:25px;
+    margin-bottom:20px;
+    border-radius:12px;
+}
+h4{
+    color:#ffd166;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<button id="logoutBtn" class="btn btn-danger float-end">Logout</button>
+
+<h2 class="mb-4">Employee Portal</h2>
+
+<!-- ================= PROFILE ================= -->
+<div class="card">
+<h4>Employee Profile</h4>
+<p><b>Name:</b> <span id="profile-name">Loading...</span></p>
+<p><b>Job:</b> <span id="profile-job">Loading...</span></p>
+<p><b>Salary:</b> <span id="profile-salary">Loading...</span></p>
+<p><b>Start Date:</b> <span id="profile-start">Loading...</span></p>
+</div>
+
+<!-- ================= ATTENDANCE ================= -->
+<div class="card">
+<h4>Attendance History</h4>
+<table class="table table-dark table-striped">
+<thead>
+<tr>
+<th>Date</th>
+<th>Checkin</th>
+<th>Checkout</th>
+</tr>
+</thead>
+<tbody id="attendanceTable"></tbody>
+</table>
+</div>
+
+<!-- ================= LEAVES ================= -->
+<div class="card">
+<h4>Leaves</h4>
+<table class="table table-dark">
+<thead>
+<tr>
+<th>Date</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody id="leaveTable"></tbody>
+</table>
+</div>
+
+<!-- ================= HOLIDAYS ================= -->
+<div class="card">
+<h4>Holidays</h4>
+<table class="table table-dark">
+<thead>
+<tr>
+<th>Date</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody id="holidayTable"></tbody>
+</table>
+</div>
+
+</div>
+
+<!-- ==============================
+     REQUIRED JS
+================================ -->
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+/* =====================================================
+   🔹 HELPER — PARSE JWT
+   Decodes JWT token to extract employee info
+===================================================== */
+function parseJwt(token){
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(atob(base64));
+}
+
+/* =====================================================
+   🔹 STEP 1 — GET AUTHORIZATION CODE FROM URL
+===================================================== */
+const urlParams = new URLSearchParams(window.location.search);
+const authCode = urlParams.get("code");
+
+/* =====================================================
+   🔹 STEP 2 — AUTO REDIRECT IF CODE MISSING
+===================================================== */
+if(!authCode && !localStorage.getItem("id_token")){
+    // Redirect user to Cognito login if no code and no stored token
+    window.location.href = `${CHARLIE_CONFIG.COGNITO_DOMAIN}/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
+}
+
+/* =====================================================
+   🔹 STEP 3 — EXCHANGE AUTH CODE FOR TOKEN VIA API.JS
+===================================================== */
+async function exchangeTokenIfNeeded(){
+    let token = localStorage.getItem("id_token");
+
+    if(authCode){
+        try {
+            const tokenResponse = await CHARLIE_API.exchangeCognitoToken(authCode);
+            console.log("Token Response:", tokenResponse);
+
+            token = tokenResponse.id_token;
+            localStorage.setItem("id_token", token);
+
+            // Remove code from URL
+            window.history.replaceState({}, document.title, "/employee-portal.html");
+        } catch(err){
+            console.error("Token exchange failed:", err);
+            alert("Login failed. Please try again.");
+            window.location.href = `${CHARLIE_CONFIG.COGNITO_DOMAIN}/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
+        }
+    }
+
+    return token;
+}
+
+/* =====================================================
+   🔹 STEP 4 — GET EMPLOYEE ID FROM TOKEN
+===================================================== */
+async function getEmployeeId(){
+    const token = await exchangeTokenIfNeeded();
+    if(!token) return null;
+
+    const decoded = parseJwt(token);
+    console.log("Decoded Token:", decoded);
+
+    const employeeId = parseInt(
+        decoded["custom:employee_id"] ||
+        decoded["employee_id"] ||
+        decoded["cognito:username"]
+    );
+
+    if(!employeeId){
+        alert("Employee ID missing. Login again.");
+        localStorage.removeItem("id_token");
+        window.location.href = `${CHARLIE_CONFIG.COGNITO_DOMAIN}/login?redirect_uri=${encodeURIComponent(window.location.href)}`;
+        return null;
+    }
+
+    return employeeId;
+}
+
+/* =====================================================
+   🔹 STEP 5 — LOAD EMPLOYEE DATA
+===================================================== */
+async function loadPortal(){
+    const employeeId = await getEmployeeId();
+    if(!employeeId) return;
+
+    try {
+        // ===== PROFILE =====
+        const profile = await CHARLIE_API.getEmployeeProfile(employeeId);
+        document.getElementById("profile-name").textContent = profile.name;
+        document.getElementById("profile-job").textContent = profile.job_title;
+        document.getElementById("profile-salary").textContent = profile.salary;
+        document.getElementById("profile-start").textContent = profile.start_date;
+
+        // ===== ATTENDANCE =====
+        const attendance = await CHARLIE_API.getAttendanceHistory(employeeId);
+        const attTable = document.getElementById("attendanceTable");
+        attendance.forEach(r => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${r.attendance_date}</td><td>${r.checkin_time || "-"}</td><td>${r.checkout_time || "-"}</td>`;
+            attTable.appendChild(row);
+        });
+
+        // ===== LEAVES + HOLIDAYS =====
+        const leavesHolidays = await CHARLIE_API.getLeavesAndHolidays(employeeId);
+
+        // Leaves
+        const leaveTable = document.getElementById("leaveTable");
+        leavesHolidays.leaves.forEach(l => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${l.leave_date}</td><td>${l.leave_type}</td>`;
+            leaveTable.appendChild(row);
+        });
+
+        // Holidays
+        const holidayTable = document.getElementById("holidayTable");
+        leavesHolidays.holidays.forEach(h => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${h.holiday_date}</td><td>${h.description}</td>`;
+            holidayTable.appendChild(row);
+        });
+
+    } catch(err){
+        console.error("Failed to load portal data:", err);
+        alert("Error loading portal data. Please try again later.");
+    }
+}
+
+/* =====================================================
+   🔹 STEP 6 — LOGOUT HANDLER
+===================================================== */
+document.getElementById("logoutBtn").onclick = () => {
+    localStorage.removeItem("id_token");
+    window.location.href = "/employee-login.html";
+};
+
+/* =====================================================
+   🔹 START PORTAL
+===================================================== */
+loadPortal();
+</script>
+
+</body>
+</html>
+```
+
+### ✅ Features in this final version
+
+OAuth Code → Lambda → Cognito token using CHARLIE_API.exchangeCognitoToken(code)
+
+Auto redirect to login if code or token missing
+
+LocalStorage stores id_token for future API calls
+
+Employee ID extraction from JWT safely using integer conversion
+
+Profile, Attendance, Leaves, Holidays rendered dynamically
+
+Logout button clears token and redirects
+
+Clean, commented, production-ready code
+
+---
 
 
 
