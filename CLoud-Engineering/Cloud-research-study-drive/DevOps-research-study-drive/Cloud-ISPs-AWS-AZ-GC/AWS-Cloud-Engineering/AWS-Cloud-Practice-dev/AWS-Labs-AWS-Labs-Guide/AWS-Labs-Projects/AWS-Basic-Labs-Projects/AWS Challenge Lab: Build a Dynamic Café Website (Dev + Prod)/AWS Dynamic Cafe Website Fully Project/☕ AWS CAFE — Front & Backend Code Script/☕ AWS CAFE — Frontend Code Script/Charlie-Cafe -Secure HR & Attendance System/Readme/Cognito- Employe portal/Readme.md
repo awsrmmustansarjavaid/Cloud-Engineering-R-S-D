@@ -490,12 +490,14 @@ parseJwt() → Decodes id_token to extract employee_id
 
 Always parse employee_id as integer:
 
-
+```
 ✅ Notes
 
 exchangeCognitoToken(code) → Calls API Gateway → Lambda → Cognito
 
 parseJwt() → Decodes id_token to extract employee_id
+```
+
 
 Always parse employee_id as integer:
 
