@@ -719,7 +719,7 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
                Cognito /oauth2/token
 ```
 
-#### 1️⃣ Basic Configurations
+### 1️⃣ Basic Configurations
 
 - Function name: hr-cognito-token-exchange
 
@@ -727,11 +727,26 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
 
 - Architecture: x86_64
 
-#### 2️⃣ Code:
+### 2️⃣ Code:
 
 [hr-cognito-token-exchange.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-cognito-token-exchange.py)
 
 - Deploy
+
+### 3️⃣ Configure Environment Variables
+
+- Go to: Lambda → Configuration → Environment Variables
+
+- Add:
+
+| Key                  | Value                                                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| COGNITO_DOMAIN       | [https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com](https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com) |
+| COGNITO_CLIENT_ID    | 7c5793cnvnbl110ljthmdiohch                                                                                                 |
+| COGNITO_REDIRECT_URI | [https://d2xb54di3chfgj.cloudfront.net/employee-portal.html](https://d2xb54di3chfgj.cloudfront.net/employee-portal.html)   |
+
+
+- Save.
 
 
 
