@@ -436,9 +436,29 @@ custom:employee_id
 
 #### ⚠️ This is the exact name that will appear inside the JWT token.
 
-### 3️⃣ Add Employee ID to Users
+### 3️⃣ Add attribute to App Client
 
-- Go to: User Pools → Users → Create user
+- Go to: App integration
+
+- Open your App Client
+
+- Find: Attribute read permissions
+
+- Enable: custom:employee_id
+
+- Save.
+
+### 4️⃣ Add Employee ID to Users
+
+- Go to: User Pools → Users → Create user / select user
+
+- Edit attributes.
+
+- Add:
+
+```
+custom:employee_id = 5
+```
 
 #### Example:
 
@@ -454,19 +474,74 @@ custom:employee_id = 5
 custom:employee_id = 5
 ```
 
+Where 5 must match the employee_id in your RDS employees table.
+
+#### Example:
+
+```
+employees table
+
+employee_id | name
+5           | Ali
+6           | Ahmed
+```
+
+#### Verify on RDS
+
+```
+SELECT * FROM employees;
+```
+
 This must match the employee_id in your RDS employees table.
 
 #### Example RDS:
 
-```
-SELECT * FROM employees;
 
 employee_id | name | job_title
 --------------------------------
 5           | Ali  | Barista
 ```
 
-### 4️⃣ Configure App Client (VERY IMPORTANT)
+### 4️⃣ Logout and Login Again
+
+Clear old token:
+
+``
+localStorage.clear()
+```
+
+Then login again.
+
+Now your console log will show:
+
+```
+Decoded Token:
+{
+ "custom:employee_id": "5",
+ "email": "...",
+ "cognito:username": "ali"
+}
+```
+
+Now the portal will work.
+
+### ✅ Another Small Improvement (Recommended)
+
+Update your code to ensure number:
+
+```
+const employeeId = parseInt(
+decoded["custom:employee_id"] ||
+decoded["employee_id"] ||
+decoded["cognito:username"]
+)
+```
+
+Because your Lambda requires numeric employee_id.
+
+### ✅ Verify Cognito Configuration 
+
+### 1️⃣ Configure App Client (VERY IMPORTANT)
 
 - Go to: User Pool → App clients
 
@@ -488,7 +563,7 @@ profile
 
 openid is required to receive ID token.
 
-### 5️⃣ Configure Redirect URLs
+### 2️⃣ Configure Redirect URLs
 
 Add your portal URL.
 
@@ -504,7 +579,7 @@ Also add logout URL:
 https://d3hg4gkyr2w5ay.cloudfront.net/employee-login.html
 ```
 
-### 6️⃣ Configure Domain
+### 3️⃣ Configure Domain
 
 - Go to: User Pool → Domain
 
@@ -520,7 +595,7 @@ charlie-cafe-auth
 https://charlie-cafe-auth.auth.us-east-1.amazoncognito.com/login
 ```
 
-### 7️⃣ Login URL Example
+### 4️⃣ Login URL Example
 
 Your Login Button should redirect to:
 
@@ -540,7 +615,7 @@ employee-portal.html?code=xxxx
 
 Your portal then exchanges the code → id_token.
 
-### 8️⃣ Verify Token Contains Employee ID
+### 5️⃣ Verify Token Contains Employee ID
 
 After login open Chrome Console:
 
@@ -601,6 +676,8 @@ Amazon RDS
       ▼
 Employee Data
 ```
+
+Everything will work.
 
 ### ✅ Most Common Mistakes
 

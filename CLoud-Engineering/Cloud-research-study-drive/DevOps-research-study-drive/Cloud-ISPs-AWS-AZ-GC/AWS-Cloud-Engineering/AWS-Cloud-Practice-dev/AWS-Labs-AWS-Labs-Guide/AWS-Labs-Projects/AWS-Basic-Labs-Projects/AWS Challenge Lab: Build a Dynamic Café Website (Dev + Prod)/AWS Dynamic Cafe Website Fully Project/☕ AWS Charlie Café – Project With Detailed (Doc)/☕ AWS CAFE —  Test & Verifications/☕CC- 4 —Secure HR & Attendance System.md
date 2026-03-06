@@ -136,6 +136,38 @@ FROM attendance a
 JOIN employees e ON a.employee_id = e.employee_id;
 ```
 
+### ✅ How to Verify employee_id  (VERY IMPORTANT)
+
+Open browser console on the portal page.
+
+You already log this:
+
+```
+console.log("Decoded Token:",decoded)
+```
+
+#### You will see something like:
+
+```
+{
+ "sub": "...",
+ "email": "...",
+ "cognito:username": "ali",
+ "token_use": "id"
+}
+```
+
+You will NOT see
+
+```
+custom:employee_id
+```
+
+That confirms the problem.
+
+
+
+
 ### ✅ RDS SQL script
 
 
