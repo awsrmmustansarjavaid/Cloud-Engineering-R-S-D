@@ -748,8 +748,6 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
 
 - Save.
 
-
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
@@ -767,6 +765,16 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
 - RDS database with employees, attendance, leaves, holidays
 
 - Cognito User Pool already created
+
+| Resource           | Path                  | Lambda Function         |
+| ------------------ | --------------------- | ----------------------- |
+| attendance          | `/attendance`            | `hr-attendance`     |
+| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
+| Attendance History | `/attendance-history` | `hr-attendance-history` |
+| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
+| exchange-token  | `/exchange-token`    | `hr-cognito-token-exchange`    |
+
+**⚠️ All methods = POST**
 
 ### 1️⃣ Open API Gateway
 
@@ -792,14 +800,13 @@ HR Secure Attendance & Employee Management API
 
 ### 2️⃣ Create Resources (Paths)
 
-| Resource           | Path                  | Lambda Function         |
-| ------------------ | --------------------- | ----------------------- |
-| attendance          | `/attendance`            | `hr-attendance`            |
-| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
-| Attendance History | `/attendance-history` | `hr-attendance-history` |
-| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
-
-**⚠️ All methods = POST**
+| Resource           | Path                  | Lambda Function                | Method |
+|--------------------|-----------------------|--------------------------------|--------|
+| attendance         | `/attendance`         | `hr-attendance`                | POST   |
+| Employee Profile   | `/employee-profile`   | `hr-employee-profile`          | POST   |
+| Attendance History | `/attendance-history` | `hr-attendance-history`        | POST   |
+| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`           | POST   |
+| exchange-token     | `/exchange-token`     | `hr-cognito-token-exchange`    | POST   |
 
 #### Step 1 — Add /attendance 
 
@@ -819,13 +826,15 @@ HR Secure Attendance & Employee Management API
 
 - /leaves-holidays
 
+- /exchange-token
+
 ### 3️⃣ Create Methods
 
 #### For each resource:
 
     - Click on Resource → Actions → Create Method
 
-    - Select POST for /attendance,  /employee-profile, /attendance-history, /leaves-holidays
+    - Select POST for /attendance,  /employee-profile, /attendance-history, /leaves-holidays , /exchange-token
 
 ### 4️⃣ Integrate Lambda Function
 
@@ -846,6 +855,8 @@ HR Secure Attendance & Employee Management API
     - /attendance-history → hr-attendance-history
 
     - /leaves-holidays → hr-leaves-holidays
+
+    - /exchange-token → hr-cognito-token-exchange
 
 - Click Save
 
