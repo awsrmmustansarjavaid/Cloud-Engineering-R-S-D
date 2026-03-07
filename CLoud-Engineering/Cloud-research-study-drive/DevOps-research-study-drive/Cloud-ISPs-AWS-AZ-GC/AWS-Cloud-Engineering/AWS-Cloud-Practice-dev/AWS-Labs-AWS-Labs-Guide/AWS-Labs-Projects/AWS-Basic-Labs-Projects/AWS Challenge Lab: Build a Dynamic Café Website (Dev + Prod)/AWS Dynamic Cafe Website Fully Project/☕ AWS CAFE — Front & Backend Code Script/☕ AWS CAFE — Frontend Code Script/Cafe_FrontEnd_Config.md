@@ -23,7 +23,7 @@ sudo nano /var/www/html/js/config.js
 
 #### 3️⃣ Copy & Paste Script
 
-[config.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+[config.js](./☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
 
 
 
