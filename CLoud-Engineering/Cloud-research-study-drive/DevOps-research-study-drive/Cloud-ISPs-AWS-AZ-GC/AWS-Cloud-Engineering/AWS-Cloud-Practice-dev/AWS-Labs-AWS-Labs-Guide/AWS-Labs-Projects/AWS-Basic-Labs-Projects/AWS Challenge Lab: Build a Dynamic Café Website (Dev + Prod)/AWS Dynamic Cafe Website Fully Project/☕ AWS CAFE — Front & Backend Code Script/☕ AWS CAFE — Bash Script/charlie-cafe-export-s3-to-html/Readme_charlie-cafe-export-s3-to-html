@@ -1,0 +1,262 @@
+# Charlie Cafe - charlie-cafe-export-s3-to-html
+
+### ✅ S3 TO EC2 EXPORT SCRIPT
+
+```
+sudo nano s3_export.sh
+```
+
+[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/%20S3%20TO%20EC2%20EXPORT%20SCRIPT/%20S3%20TO%20EC2%20EXPORT%20SCRIPT.sh)
+
+```
+sudo chmod +x s3_export.sh
+```
+
+```
+sudo ./s3_export.sh
+```
+
+### ✅ Apache SECURITY & PERMISSIONS
+
+```
+sudo nano apache_permissions.sh
+```
+
+[apache_permissions.sh](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Apache%20SECURITY%20&%20PERMISSIONS/apache_permissions.sh)
+
+```
+sudo chmod +x apache_permissions.sh
+```
+
+```
+sudo ./apache_permissions.sh
+```
+
+## Charlie Cafe Export S3 to HTML Script
+
+### one merged Bash script that will:
+
+- Sync files from S3 → EC2
+
+- Then automatically set Apache permissions
+
+- Script name: charlie-cafe-export-s3-to-html.sh
+
+- Fully working and clean.
+
+- Below is the final merged script.
+
+### Charlie Cafe Export S3 to HTML Script
+
+```
+#!/bin/bash
+# =========================================================
+# CHARLIE CAFE ☕
+# S3 TO EC2 EXPORT + PERMISSIONS SCRIPT
+# File Name: charlie-cafe-export-s3-to-html.sh
+# =========================================================
+
+# =========================================================
+# ⚙️ AWS CONFIGURATION
+# =========================================================
+AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY_HERE"
+AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY_HERE"
+AWS_REGION="us-east-1"
+S3_BUCKET="charlie-cafe-s3-bucket"
+
+# =========================================================
+# 📂 S3 FOLDERS
+# =========================================================
+S3_HTML_FOLDER="Charlie Cafe Code Drive/html/"
+S3_BASH_FOLDER="Charlie Cafe Code Drive/bash script/"
+
+# =========================================================
+# 📂 EC2 DESTINATIONS
+# =========================================================
+EC2_HTML_FOLDER="/var/www/html"
+EC2_BASH_FOLDER="/home/download"
+
+# =========================================================
+# 🚀 STEP 1 — EXPORT FILES FROM S3
+# =========================================================
+echo "======================================================="
+echo "🚀 Starting Charlie Cafe S3 Export..."
+echo "Bucket: $S3_BUCKET"
+echo "Region: $AWS_REGION"
+echo "======================================================="
+
+echo "📥 Syncing HTML folder from S3 to EC2..."
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+aws s3 sync "s3://$S3_BUCKET/$S3_HTML_FOLDER" "$EC2_HTML_FOLDER" \
+--region $AWS_REGION --delete
+
+echo "📥 Syncing Bash scripts from S3 to EC2..."
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+aws s3 sync "s3://$S3_BUCKET/$S3_BASH_FOLDER" "$EC2_BASH_FOLDER" \
+--region $AWS_REGION --delete
+
+echo "======================================================="
+echo "✅ S3 Export Completed!"
+echo "HTML folder → $EC2_HTML_FOLDER"
+echo "Bash folder → $EC2_BASH_FOLDER"
+echo "======================================================="
+
+# =========================================================
+# 🔐 STEP 2 — SET APACHE PERMISSIONS
+# =========================================================
+
+echo ""
+echo "🔐 Setting Apache permissions..."
+
+# ---------------------------------------------------------
+# List of files
+# ---------------------------------------------------------
+FILES=(
+"/var/www/html/index.php"
+"/var/www/html/cafe-admin-dashboard.html"
+"/var/www/html/orders.php"
+"/var/www/html/order-status.html"
+"/var/www/html/order-receipt.php"
+"/var/www/html/admin-orders.html"
+"/var/www/html/payment-status.php"
+"/var/www/html/central-print.html"
+"/var/www/html/analytics.html"
+"/var/www/html/login.html"
+"/var/www/html/logout.php"
+"/var/www/html/price-list.html"
+"/var/www/html/employee-login.html"
+"/var/www/html/employee-portal.html"
+"/var/www/html/hr-attendance.html"
+"/var/www/html/checkin.html"
+"/var/www/html/js/config.js"
+"/var/www/html/js/central-auth.js"
+"/var/www/html/js/utils.js"
+"/var/www/html/js/api.js"
+"/var/www/html/js/central-printing.js"
+"/var/www/html/js/role-guard.js"
+"/var/www/html/css/central_cafe_style.css"
+)
+
+# ---------------------------------------------------------
+# List of directories
+# ---------------------------------------------------------
+DIRS=(
+"/var/www/html/js"
+"/var/www/html/css"
+)
+
+echo "---------------------------------------------"
+echo "Setting ownership to apache:apache..."
+
+sudo chown apache:apache "${FILES[@]}"
+sudo chown -R apache:apache "${DIRS[@]}"
+
+echo "---------------------------------------------"
+echo "Setting directory permissions to 755..."
+
+for dir in "${DIRS[@]}"; do
+    sudo chmod 755 "$dir"
+done
+
+echo "---------------------------------------------"
+echo "Setting file permissions to 644..."
+
+for file in "${FILES[@]}"; do
+    sudo chmod 644 "$file"
+done
+
+# =========================================================
+# 🔎 VERIFY PERMISSIONS
+# =========================================================
+echo "---------------------------------------------"
+echo "Verifying permissions..."
+
+for file in "${FILES[@]}"; do
+    perms=$(ls -l "$file" | awk '{print $1}')
+    owner=$(ls -l "$file" | awk '{print $3":"$4}')
+    echo "$file : $owner : $perms"
+done
+
+for dir in "${DIRS[@]}"; do
+    perms=$(ls -ld "$dir" | awk '{print $1}')
+    owner=$(ls -ld "$dir" | awk '{print $3":"$4}')
+    echo "$dir : $owner : $perms"
+done
+
+echo "---------------------------------------------"
+echo "✅ Charlie Cafe Deployment Completed!"
+echo "S3 files synced + permissions applied."
+echo "---------------------------------------------"
+```
+
+### How to Use the Script
+
+#### 1️⃣ Save Script
+
+```
+sudo nano charlie-cafe-export-s3-to-html.sh
+```
+
+Paste script → Save.
+
+#### 2️⃣ Make Executable
+
+```
+sudo chmod +x charlie-cafe-export-s3-to-html.sh
+```
+
+#### 3️⃣ Run Script
+
+```
+sudo ./charlie-cafe-export-s3-to-html.sh
+```
+
+### What This Script Does (Complete Flow)
+
+1️⃣ Connects to AWS S3
+
+2️⃣ Downloads:
+
+```
+S3/html → /var/www/html
+S3/bash → /home/download
+````
+
+3️⃣ Deletes removed files (--delete)
+
+4️⃣ Sets ownership:
+
+```
+apache:apache
+```
+
+5️⃣ Sets permissions:
+
+```
+Directories → 755
+Files → 644
+```
+
+6️⃣ Verifies everything.
+
+### Optional (Highly Recommended for Security)
+
+Instead of hardcoding:
+
+```
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+```
+
+Use IAM Role on EC2 (much safer).
+
+Then remove:
+
+```
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+```
+
+from the script.
+
+---

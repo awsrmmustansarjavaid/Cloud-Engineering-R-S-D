@@ -974,39 +974,11 @@ upload: ./pymysql-layer.zip to s3://charlie-cafe-s3-bucket/layers/pymysql-layer.
 
 [Download & Upload Html Directory ](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/html/)
 
-### 2️⃣ S3 TO EC2 EXPORT SCRIPT
+### 2️⃣ Charlie Cafe Export S3 to HTML Script
 
-```
-sudo nano s3_export.sh
-```
+[Charlie Cafe Export S3 to HTML Script](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/Cafe_FrontEnd_Config.md)
 
-[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/%20S3%20TO%20EC2%20EXPORT%20SCRIPT/%20S3%20TO%20EC2%20EXPORT%20SCRIPT.sh)
-
-```
-sudo chmod +x s3_export.sh
-```
-
-```
-sudo ./s3_export.sh
-```
-
-### 3️⃣ Apache SECURITY & PERMISSIONS
-
-```
-sudo nano apache_permissions.sh
-```
-
-[apache_permissions.sh](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Apache%20SECURITY%20&%20PERMISSIONS/apache_permissions.sh)
-
-```
-sudo chmod +x apache_permissions.sh
-```
-
-```
-sudo ./apache_permissions.sh
-```
-
-### 4️⃣ ALLOW /var/www/html/js IN APACHE
+### 3️⃣ ALLOW /var/www/html/js IN APACHE
 
 Open Apache main config:
 
@@ -1032,7 +1004,7 @@ Find this block (or similar):
 </Directory>
 ```
 
-### 5️⃣ EXPLICITLY ALLOW JS DIRECTORY (BEST PRACTICE)
+### 4️⃣ EXPLICITLY ALLOW JS DIRECTORY (BEST PRACTICE)
 
 Add this at the bottom of the file:
 
@@ -1042,7 +1014,7 @@ Add this at the bottom of the file:
 </Directory>
 ```
 
-### 6️⃣ SET PROPER MIME TYPE FOR JS
+### 5️⃣ SET PROPER MIME TYPE FOR JS
 
 Still in the same file, add (or ensure exists):
 
@@ -1050,7 +1022,7 @@ Still in the same file, add (or ensure exists):
 AddType application/javascript .js
 ```
 
-### 7️⃣ Restart Apache (MANDATORY)
+### 6️⃣ Restart Apache (MANDATORY)
 
 ```
 sudo systemctl restart httpd
