@@ -130,9 +130,6 @@
 
 - SSH/HTTP/HTTPS in inbound is optional unless you want Lambda testing/debugging
 
-
-
-
 ### 5️⃣ IAM Role & Policies
 
 ### 1️⃣ IAM Role for EC2 (Secrets Access)
