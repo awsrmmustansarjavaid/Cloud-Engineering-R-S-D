@@ -802,7 +802,7 @@ sudo ./s3_export.sh
 sudo nano apache_permissions.sh
 ```
 
-[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/%20S3%20TO%20EC2%20EXPORT%20SCRIPT/%20S3%20TO%20EC2%20EXPORT%20SCRIPT.sh)
+[apache_permissions.sh](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Apache%20SECURITY%20&%20PERMISSIONS/apache_permissions.sh)
 
 ```
 sudo chmod +x apache_permissions.sh
