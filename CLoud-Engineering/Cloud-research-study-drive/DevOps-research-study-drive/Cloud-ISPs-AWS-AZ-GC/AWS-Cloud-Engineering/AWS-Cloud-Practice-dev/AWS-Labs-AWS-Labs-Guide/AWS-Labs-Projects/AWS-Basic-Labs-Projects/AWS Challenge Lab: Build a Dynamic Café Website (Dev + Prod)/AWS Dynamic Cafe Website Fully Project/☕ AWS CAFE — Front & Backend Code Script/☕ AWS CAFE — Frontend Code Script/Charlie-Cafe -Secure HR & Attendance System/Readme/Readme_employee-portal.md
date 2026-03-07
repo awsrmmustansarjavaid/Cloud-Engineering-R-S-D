@@ -4639,3 +4639,556 @@ https://d2xb54di3chfgj.cloudfront.net/employee-login.html
 
 ---
 ### ✅ employee-portal.html
+
+Great — your portal code is already structured well. I will now give you a clean final version of your employee-portal.html with the debug/error logger integrated properly, with comments so you can understand every step.
+
+I did not change your authentication logic (Authorization Code flow with Amazon Cognito) — I only added:
+
+Debug log box
+
+API tracking
+
+Token exchange tracking
+
+Runtime error tracking
+
+Portal step tracking
+
+This will help you immediately see where failures occur between:
+
+```
+Portal → API Gateway → Lambda → Cognito → RDS
+```
+
+### Final employee-portal.html (with Debug Logger)
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap + Fonts -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#111;
+    color:white;
+}
+
+.container{
+    max-width:900px;
+    margin-top:40px;
+}
+
+.card{
+    background:#1c1c1c;
+    padding:25px;
+    margin-bottom:20px;
+    border-radius:12px;
+}
+
+h4{
+    color:#ffd166;
+}
+
+/* ================= DEBUG LOGGER UI ================= */
+
+#debugBox{
+    position:fixed;
+    bottom:10px;
+    right:10px;
+    width:360px;
+    max-height:260px;
+    overflow:auto;
+    background:#000;
+    color:#0f0;
+    font-size:12px;
+    padding:10px;
+    border-radius:8px;
+    z-index:9999;
+    box-shadow:0 0 10px rgba(0,0,0,0.7);
+}
+
+#debugBox h6{
+    color:#ffd166;
+    font-size:13px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<button id="logoutBtn" class="btn btn-danger float-end">Logout</button>
+
+<h2 class="mb-4">Employee Portal</h2>
+
+<!-- PROFILE -->
+<div class="card">
+<h4>Employee Profile</h4>
+<p><b>Name:</b> <span id="profile-name">Loading...</span></p>
+<p><b>Job:</b> <span id="profile-job">Loading...</span></p>
+<p><b>Salary:</b> <span id="profile-salary">Loading...</span></p>
+<p><b>Start Date:</b> <span id="profile-start">Loading...</span></p>
+</div>
+
+<!-- ATTENDANCE -->
+<div class="card">
+<h4>Attendance History</h4>
+
+<table class="table table-dark table-striped">
+<thead>
+<tr>
+<th>Date</th>
+<th>Checkin</th>
+<th>Checkout</th>
+</tr>
+</thead>
+
+<tbody id="attendanceTable"></tbody>
+
+</table>
+</div>
+
+<!-- LEAVES -->
+<div class="card">
+<h4>Leaves</h4>
+
+<table class="table table-dark">
+<thead>
+<tr>
+<th>Date</th>
+<th>Type</th>
+</tr>
+</thead>
+
+<tbody id="leaveTable"></tbody>
+</table>
+
+</div>
+
+<!-- HOLIDAYS -->
+<div class="card">
+<h4>Holidays</h4>
+
+<table class="table table-dark">
+<thead>
+<tr>
+<th>Date</th>
+<th>Description</th>
+</tr>
+</thead>
+
+<tbody id="holidayTable"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<!-- ================= DEBUG LOG BOX ================= -->
+
+<div id="debugBox">
+<h6>Portal Debug Log</h6>
+<div id="debugLogs"></div>
+</div>
+
+
+<!-- ================= JS FILES ================= -->
+
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+
+/* =====================================================
+DEBUG LOGGER
+===================================================== */
+
+function logDebug(message,type="info"){
+
+const box=document.getElementById("debugLogs")
+
+const line=document.createElement("div")
+
+let color="#0f0"
+
+if(type==="error") color="#ff4d4d"
+if(type==="warn") color="#ffaa00"
+
+line.style.color=color
+
+const time=new Date().toLocaleTimeString()
+
+line.textContent="["+time+"] "+message
+
+box.prepend(line)
+
+}
+
+
+/* =====================================================
+GLOBAL ERROR TRACKING
+===================================================== */
+
+window.onerror=function(msg){
+
+logDebug("JS ERROR: "+msg,"error")
+
+}
+
+window.addEventListener("unhandledrejection",function(event){
+
+logDebug("PROMISE ERROR: "+event.reason,"error")
+
+})
+
+
+/* =====================================================
+FETCH API TRACKER
+===================================================== */
+
+const originalFetch=window.fetch
+
+window.fetch=async function(...args){
+
+logDebug("API CALL: "+args[0])
+
+try{
+
+const response=await originalFetch(...args)
+
+if(!response.ok){
+
+logDebug("API ERROR "+response.status+" "+args[0],"error")
+
+}else{
+
+logDebug("API SUCCESS "+args[0])
+
+}
+
+return response
+
+}
+catch(err){
+
+logDebug("API FAILED "+err.message,"error")
+throw err
+
+}
+
+}
+
+
+/* =====================================================
+JWT TOKEN PARSER
+===================================================== */
+
+function parseJwt(token){
+
+const base64Url=token.split('.')[1]
+
+const base64=base64Url.replace(/-/g,'+').replace(/_/g,'/')
+
+return JSON.parse(atob(base64))
+
+}
+
+
+/* =====================================================
+STEP 1 — READ AUTH CODE
+===================================================== */
+
+const urlParams=new URLSearchParams(window.location.search)
+
+const authCode=urlParams.get("code")
+
+logDebug("Auth Code: "+authCode)
+
+
+/* =====================================================
+STEP 2 — REDIRECT TO COGNITO LOGIN
+===================================================== */
+
+if(!authCode && !localStorage.getItem("id_token")){
+
+logDebug("No token found. Redirecting to Cognito login")
+
+const redirectUri=encodeURIComponent(
+CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html"
+)
+
+const loginUrl=
+CHARLIE_CONFIG.COGNITO_DOMAIN+
+"/login?response_type=code"+
+"&client_id="+CHARLIE_CONFIG.CLIENT_ID+
+"&scope=openid+email+profile"+
+"&redirect_uri="+redirectUri
+
+window.location.href=loginUrl
+
+}
+
+
+/* =====================================================
+STEP 3 — EXCHANGE AUTH CODE FOR TOKEN
+===================================================== */
+
+async function exchangeTokenIfNeeded(){
+
+let token=localStorage.getItem("id_token")
+
+if(authCode){
+
+logDebug("Exchanging auth code for token")
+
+try{
+
+const tokenResponse=
+await CHARLIE_API.exchangeCognitoToken(authCode)
+
+logDebug("Token exchange success")
+
+token=tokenResponse.id_token
+
+localStorage.setItem("id_token",token)
+
+window.history.replaceState(
+{},
+document.title,
+CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html"
+)
+
+}
+catch(err){
+
+logDebug("Token exchange failed: "+err,"error")
+
+alert("Login failed")
+
+localStorage.removeItem("id_token")
+
+location.reload()
+
+}
+
+}
+
+return token
+
+}
+
+
+/* =====================================================
+STEP 4 — GET EMPLOYEE ID FROM TOKEN
+===================================================== */
+
+async function getEmployeeId(){
+
+const token=await exchangeTokenIfNeeded()
+
+if(!token){
+
+logDebug("Token missing","error")
+
+return null
+
+}
+
+const decoded=parseJwt(token)
+
+logDebug("Token decoded")
+
+const employeeId=parseInt(
+
+decoded["custom:employee_id"] ||
+decoded["employee_id"] ||
+decoded["cognito:username"]
+
+)
+
+if(!employeeId){
+
+logDebug("Employee ID missing","error")
+
+alert("Employee ID missing")
+
+localStorage.removeItem("id_token")
+
+location.reload()
+
+return null
+
+}
+
+logDebug("Employee ID: "+employeeId)
+
+return employeeId
+
+}
+
+
+/* =====================================================
+STEP 5 — LOAD PORTAL DATA
+===================================================== */
+
+async function loadPortal(){
+
+logDebug("Loading portal")
+
+const employeeId=await getEmployeeId()
+
+if(!employeeId) return
+
+try{
+
+logDebug("Loading employee profile")
+
+const profile=
+await CHARLIE_API.getEmployeeProfile(employeeId)
+
+document.getElementById("profile-name").textContent=profile.name
+document.getElementById("profile-job").textContent=profile.job_title
+document.getElementById("profile-salary").textContent=profile.salary
+document.getElementById("profile-start").textContent=profile.start_date
+
+
+logDebug("Loading attendance")
+
+const attendance=
+await CHARLIE_API.getAttendanceHistory(employeeId)
+
+const attTable=document.getElementById("attendanceTable")
+
+attendance.forEach(row=>{
+
+const tr=document.createElement("tr")
+
+tr.innerHTML=`
+<td>${row.attendance_date}</td>
+<td>${row.checkin_time||"-"}</td>
+<td>${row.checkout_time||"-"}</td>
+`
+
+attTable.appendChild(tr)
+
+})
+
+
+logDebug("Loading leaves & holidays")
+
+const data=
+await CHARLIE_API.getLeavesAndHolidays(employeeId)
+
+const leaveTable=document.getElementById("leaveTable")
+
+data.leaves.forEach(l=>{
+
+const tr=document.createElement("tr")
+
+tr.innerHTML=`
+<td>${l.leave_date}</td>
+<td>${l.leave_type}</td>
+`
+
+leaveTable.appendChild(tr)
+
+})
+
+const holidayTable=document.getElementById("holidayTable")
+
+data.holidays.forEach(h=>{
+
+const tr=document.createElement("tr")
+
+tr.innerHTML=`
+<td>${h.holiday_date}</td>
+<td>${h.description}</td>
+`
+
+holidayTable.appendChild(tr)
+
+})
+
+logDebug("Portal loaded successfully")
+
+}
+catch(err){
+
+logDebug("Portal loading failed: "+err,"error")
+
+alert("Failed to load employee data")
+
+}
+
+}
+
+
+/* =====================================================
+STEP 6 — LOGOUT
+===================================================== */
+
+document.getElementById("logoutBtn").onclick=()=>{
+
+logDebug("User logout")
+
+localStorage.removeItem("id_token")
+
+window.location.href=
+CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-login.html"
+
+}
+
+
+/* =====================================================
+START PORTAL
+===================================================== */
+
+loadPortal()
+
+</script>
+
+</body>
+</html>
+```
+
+What this logger will show you
+
+Examples:
+
+Successful flow
+
+```
+Auth Code received
+Exchanging auth code for token
+Token exchange success
+Employee ID: 5
+Loading employee profile
+API SUCCESS /employee/profile
+Portal loaded successfully
+```
+
+Failure example
+
+```
+Auth Code received
+Exchanging auth code for token
+API ERROR 400 /exchange-token
+Token exchange failed
+```
+
+Or
+
+```
+Employee ID missing
+```
