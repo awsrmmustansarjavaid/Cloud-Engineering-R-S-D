@@ -781,7 +781,7 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 ## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND central FOUNDATION (REUSABLE)
 
-Read ablout all "FrontEnd Configuration"
+### ⚠️ Read ablout all "FrontEnd Configuration"
 
 [Cafe_FrontEnd_Config](.//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config.md)
 
