@@ -143,18 +143,49 @@
 EC2-Cafe-Secrets-Role
 ```
 
-- **IAM Role for EC2 (Secrets Access) Policies**
+### What You Need To Replace
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Action": "secretsmanager:GetSecretValue",
-    "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*"
-  }]
-}
+Only ONE value needs to be replaced.
+
+Replace:
+
 ```
+YOUR_ACCOUNT_ID
+```
+
+Example:
+
+```
+arn:aws:lambda:us-east-1:123456789012:function:*
+```
+
+You can find your account ID here:
+
+AWS Console → Top Right → Account ID
+
+### 1️⃣ Number of AWS Managed Policies
+
+AWS Managed Policies:
+These are policies created by Amazon Web Services like:
+
+AmazonS3FullAccess
+
+AWSLambdaFullAccess
+
+AmazonDynamoDBFullAccess
+
+In your case:
+
+You did NOT use any AWS managed policy.
+
+✅ AWS Managed Policies = 0
+
+2️⃣ Number of Custom Policies
+
+You created your own policy JSON and merged everything into one file.
+
+So in IAM it will appear as:
+
 
 #### COPY-PASTE READY POLICY JSON
 
