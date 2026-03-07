@@ -25,8 +25,6 @@ sudo nano /var/www/html/js/config.js
 
 [config.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
 
-
-
 ### 2️⃣ Create utils.js (Shared Helpers)
 
 Move all generic helpers here.
