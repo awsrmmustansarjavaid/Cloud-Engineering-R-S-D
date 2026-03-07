@@ -153,7 +153,7 @@ sudo nano /var/www/html/cafe-admin-dashboard.html
 
 ### 2️⃣ Paste this clean landing page code:
 
-[cafe-admin-dashboard.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
+[cafe-admin-dashboard.html](../Charlie-Cafe-%20Admin%20Dashboard%20(Order%2BHR)/cafe-admin-dashboard.html)
 
 #### 3️⃣ Save File
 
@@ -180,7 +180,7 @@ sudo nano /var/www/html/orders.php
 ```
 #### 2️⃣ MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
-[orders.php](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+[orders.php](../Charlie-Cafe%20-order.php/orders.php)
 
 #### 3️⃣ Save File
 
@@ -215,7 +215,7 @@ fetch("https://API_ID.execute-api.region.amazonaws.com/prod/order-status")
 fetch("https://abcd1234.execute-api.us-east-1.amazonaws.com/admin/order-status")
 ```
 
-[order-status.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+[order-status.html](../Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 #### 3️⃣ Save File
 
@@ -237,7 +237,7 @@ sudo nano /var/www/html/order-receipt.php
 
 #### 2️⃣ code
 
-[order-receipt.php](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
+[order-receipt.php](../Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
 
 #### 3️⃣ Save File
 
@@ -259,7 +259,7 @@ sudo nano /var/www/html/admin-orders.html
 
 #### 2️⃣ code
 
-[admin-orders.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders/admin-orders.html)
+[admin-orders.html](../admin-orders/admin-orders.html)
 
 #### 3️⃣ Save File
 
@@ -280,7 +280,7 @@ sudo nano /var/www/html/payment-status.php
 
 #### 2️⃣ code
 
-[payment-status.php](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/)
+[payment-status.php](../payment-status.php/)
 
 #### 3️⃣ Save File
 
@@ -301,7 +301,7 @@ sudo nano /var/www/html/central-print.html
 
 #### 2️⃣ code
 
-[central-print.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/☕%20AWS%20CAFE%20—%20Printing%20System/central-print.html)
+[central-print.html](../☕%20AWS%20CAFE%20—%20Printing%20System/central-print.html)
 
 #### 3️⃣ Save File
 
@@ -321,7 +321,7 @@ sudo nano /var/www/html/analytics.html
 
 #### 2️⃣ code
 
-[analytics.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
+[analytics.html](../Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
 
 #### 3️⃣ Save File
 
@@ -339,7 +339,7 @@ sudo nano /var/www/html/login.html
 
 #### 2️⃣ code
 
-[login.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/login.html)
+[login.html](../Cognito%20Hosted%20UI/login.html)
 
 #### 3️⃣ Save File
 
@@ -359,7 +359,7 @@ sudo nano /var/www/html/price-list.html
 
 #### 2️⃣ code
 
-[price-list.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/price-list.html)
+[price-list.html](../Charlie-Cafe%20-order.php/price-list.html)
 
 #### 3️⃣ Save File
 
@@ -379,7 +379,7 @@ sudo nano /var/www/html/logout.php
 
 #### 2️⃣ code
 
-[logout.php](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+[logout.php](../Cognito%20Hosted%20UI/logout.php)
 
 #### 3️⃣ Save File
 
@@ -398,7 +398,7 @@ sudo nano /var/www/html/employee-login.html
 
 #### 2️⃣ code
 
-[employee-login.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-login.html)
+[employee-login.html](../Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-login.html)
 
 #### 3️⃣ Save File
 
@@ -417,7 +417,7 @@ sudo nano /var/www/html/employee-portal.html
 
 #### 2️⃣ code
 
-[employee-portal.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-portal.html)
+[employee-portal.html](../Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/employee-portal.html)
 
 #### 3️⃣ Save File
 
@@ -436,7 +436,7 @@ sudo nano /var/www/html/hr-attendance.html
 
 #### 2️⃣ code
 
-[hr-attendance.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/hr-attendance.html)
+[hr-attendance.html](../Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/hr-attendance.html)
 
 #### 3️⃣ Save File
 
@@ -455,7 +455,7 @@ sudo nano /var/www/html/checkin.html
 
 #### 2️⃣ code
 
-[checkin.html](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/checkin.html)
+[checkin.html](../Charlie-Cafe%20-Secure%20HR%20%26%20Attendance%20System/checkin.html)
 
 #### 3️⃣ Save File
 
