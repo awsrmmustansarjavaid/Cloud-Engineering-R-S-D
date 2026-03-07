@@ -797,22 +797,6 @@ sudo chmod +x s3_export.sh
 ```
 sudo ./s3_export.sh
 ```
-
-
-
-
-**✅ PHASE 1️⃣ STATUS**
-
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-
-
-**✅ PHASE 2️⃣ STATUS**
-
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
----
-## ☕ AWS CAFE - PHASE 3️⃣ FrontEnd Deployment Final Configurations
-
 ### 1️⃣ SECURITY & PERMISSIONS
 
 ```
@@ -952,11 +936,12 @@ AddType application/javascript .js
 sudo systemctl restart httpd
 ```
 
-**✅ PHASE 3️⃣ STATUS**
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## 🔐 PHASE 4️⃣ — Set Up Automatic HTTP → HTTPS Redirection
+## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
 
 > **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
 
@@ -1410,9 +1395,9 @@ d2og2zrs47voou.cloudfront.net
 ```
 **This is your Return URL**
 
-**✅ PHASE 4️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---`
