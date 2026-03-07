@@ -1,0 +1,228 @@
+/* ==========================================================
+   CENTRAL CAFE STYLE SHEET
+   File: central-cafe-style.css
+   Project: Charlie Cafe Lab (Frontend + Printing + Export)
+   Purpose:
+   - Global UI/UX styling for ALL cafe pages
+   - Centralized PRINT & THERMAL PRINT styles
+   - Responsive Bootstrap-friendly layout helpers
+   - Avoid CSS duplication across pages
+   ========================================================== */
+
+/* ==========================================================
+   1️⃣ GLOBAL BASE STYLES (ALL PAGES)
+   ========================================================== */
+
+/* Default body styling */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Cafe background (used on dashboards & print hub) */
+body.cafe-bg {
+  background-image: url('/images/cafe-background.jpg'); /* Cafe theme image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Overlay for readability on background images */
+.cafe-overlay {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ==========================================================
+   2️⃣ NAVBAR (SHARED ACROSS ALL PAGES)
+   ========================================================== */
+
+.navbar-cafe {
+  background: linear-gradient(90deg, #2b2b2b, #000000);
+}
+
+.navbar-cafe .navbar-brand {
+  font-weight: bold;
+  color: #ffffff !important;
+}
+
+.navbar-cafe .navbar-brand img {
+  height: 40px;
+  margin-right: 8px;
+}
+
+.navbar-cafe .nav-link {
+  color: #e0e0e0 !important;
+}
+
+.navbar-cafe .nav-link:hover {
+  color: #ffc107 !important; /* cafe accent */
+}
+
+/* Mobile navbar spacing */
+@media (max-width: 768px) {
+  .navbar-cafe .navbar-brand {
+    font-size: 16px;
+  }
+}
+
+/* ==========================================================
+   3️⃣ BUTTONS & ACTION UI (PRINT / EXPORT)
+   ========================================================== */
+
+.btn-cafe {
+  border-radius: 50px;
+  padding: 10px 18px;
+  font-size: 14px;
+}
+
+.btn-print {
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+.btn-thermal {
+  background-color: #fd7e14;
+  color: #ffffff;
+}
+
+.btn-csv {
+  background-color: #198754;
+  color: #ffffff;
+}
+
+.btn-pdf {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+/* Floating action bar (bottom) */
+.print-action-bar {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 9999;
+}
+
+/* ==========================================================
+   4️⃣ GLOBAL PRINT STYLES (A4 / NORMAL PRINTERS)
+   ========================================================== */
+@media print {
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide UI-only elements */
+  button,
+  .btn,
+  .no-print,
+  nav,
+  footer,
+  .navbar {
+    display: none !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px;
+  }
+
+  th,
+  td {
+    border: 1px solid #000000 !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: bold;
+  }
+
+  h1, h2, h3 {
+    text-align: center !important;
+  }
+
+  table,
+  .receipt,
+  .invoice,
+  .print-section {
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}
+
+/* ==========================================================
+   5️⃣ THERMAL PRINTER STYLES (80mm RECEIPTS)
+   ========================================================== */
+@media print {
+
+  body.thermal-print {
+    width: 80mm;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    font-family: monospace !important;
+    font-size: 12px;
+  }
+
+  .receipt {
+    width: 72mm;
+    margin: auto;
+  }
+
+  .receipt h4,
+  .receipt p {
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  .receipt table {
+    width: 100%;
+    font-size: 11px;
+  }
+
+  .receipt td {
+    padding: 2px 0;
+    border: none !important;
+  }
+
+  .receipt .total {
+    border-top: 1px dashed #000000;
+    margin-top: 6px;
+    padding-top: 6px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  body.thermal-print * {
+    visibility: hidden;
+  }
+
+  body.thermal-print .receipt,
+  body.thermal-print .receipt * {
+    visibility: visible;
+  }
+}
+
+/* ==========================================================
+   6️⃣ PRINT UTILITIES
+   ========================================================== */
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+}
+
