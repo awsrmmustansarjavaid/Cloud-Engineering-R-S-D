@@ -23,7 +23,7 @@ sudo nano /var/www/html/js/config.js
 
 #### 3️⃣ Copy & Paste Script
 
-[config.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+[config.js](../../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
 
 ### 2️⃣ Create utils.js (Shared Helpers)
 
@@ -33,7 +33,7 @@ Move all generic helpers here.
 sudo nano /var/www/html/js/utils.js
 ```
 
-[utils.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
+[utils.js](../../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
 
 
 
@@ -47,7 +47,7 @@ No API routes inside.
 sudo nano /var/www/html/js/central-auth.js
 ```
 
-[central-auth.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
+[central-auth.js](../../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
 
 
 
@@ -59,7 +59,7 @@ This file handles API logic only.
 sudo nano /var/www/html/js/api.js
 ```
 
-[api.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
+[api.js](../../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
 
 ### 5️⃣ Create central-printing.js
 
@@ -67,7 +67,7 @@ sudo nano /var/www/html/js/api.js
 sudo nano /var/www/html/js/central-printing.js
 ```
 
-[central-printing.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
+[central-printing.js](../../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
 
 ### 6️⃣ Create role-guard.js
 
@@ -75,7 +75,7 @@ sudo nano /var/www/html/js/central-printing.js
 sudo nano /var/www/html/js/role-guard.js
 ```
 
-[role-guard.js](../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/role-guard.js)
+[role-guard.js](../../☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/role-guard.js)
 
 
 #### ⚠️ Use * to apply it to all files (all extensions) in the directory:
@@ -107,7 +107,7 @@ sudo nano /var/www/html/css/central_cafe_style.css
 
 #### 3️⃣ Copy & Paste CSS
 
-[central_cafe_style.css](../☕%20AWS%20CAFE%20—%20Central%20Style%20Css/central_cafe_style.css)
+[central_cafe_style.css](../../☕%20AWS%20CAFE%20—%20Central%20Style%20Css/central_cafe_style.css)
 
 #### 3️⃣ Fix File Permissions
 
@@ -130,7 +130,7 @@ sudo nano /var/www/html/index.php
 
 #### 2️⃣ Paste this clean landing page code:
 
-[index.php](../☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-Index.php/Index.php)
+[index.php](../Charlie-Cafe%20-Index.php/Index.php)
 
 **⚠️ Replace S3_IMAGE_URL_HERE later (next phase)**
 
