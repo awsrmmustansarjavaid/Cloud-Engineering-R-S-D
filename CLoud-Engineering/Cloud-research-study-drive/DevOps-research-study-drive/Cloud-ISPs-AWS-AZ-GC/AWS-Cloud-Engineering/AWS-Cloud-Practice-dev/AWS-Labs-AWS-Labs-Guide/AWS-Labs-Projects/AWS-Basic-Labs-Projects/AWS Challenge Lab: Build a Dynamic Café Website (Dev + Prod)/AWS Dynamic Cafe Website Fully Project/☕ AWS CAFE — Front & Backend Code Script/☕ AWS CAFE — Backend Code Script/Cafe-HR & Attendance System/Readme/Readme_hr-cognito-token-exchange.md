@@ -354,9 +354,248 @@ Change your Lambda environment variables to exactly this:
 | COGNITO_REDIRECT_URI | [https://d2xb54di3chfgj.cloudfront.net/employee-portal.html](https://d2xb54di3chfgj.cloudfront.net/employee-portal.html) |
 
 ---
+### ✅ hr-cognito-token-exchange.py
+
+You are correct to avoid changing the whole authentication method now. Since your project is already built on Authorization Code Flow, the safest path is to fix the code-exchange step, not redesign the login flow.
+
+Your architecture with Amazon Cognito + AWS Lambda + Amazon API Gateway + Amazon RDS is correct. The problem is almost certainly in the token exchange step.
+
+#### 1️⃣ What is actually happening right now
+
+Your portal loads this URL:
+
+```
+employee-portal.html?code=62dc80fb-72ab...
+```
+
+This is correct for Authorization Code Flow.
+
+But then the portal must do this:
+
+```
+POST /exchange-token
+{
+ "code": "62dc80fb..."
+}
+```
+
+Then your Lambda must call Cognito:
+
+```
+POST /oauth2/token
+grant_type=authorization_code
+client_id=xxxx
+redirect_uri=https://d2xb54di3chfgj.cloudfront.net/employee-portal.html
+code=xxxx
+```
+
+If ANY ONE of these values is different from Cognito configuration, Cognito returns:
+
+```
+invalid_grant
+```
+
+Which you already saw earlier.
+
+#### 2️⃣ The most common cause (90% of cases)
+
+The redirect_uri in Lambda is not identical to the one in Cognito App Client.
+
+Even a single character difference causes failure.
+
+Example:
+
+Correct:
+
+```
+https://d2xb54di3chfgj.cloudfront.net/employee-portal.html
+```
+
+Wrong examples:
+
+```
+https://d2xb54di3chfgj.cloudfront.net/employee-portal.html/
+https://d2xb54di3chfgj.cloudfront.net
+http://d2xb54di3chfgj.cloudfront.net/employee-portal.html
+```
+
+Check in Amazon Cognito:
+
+```
+User Pool
+ → App Integration
+ → App Client
+ → Callback URLs
+```
+
+You must have exactly:
+
+```
+https://d2xb54di3chfgj.cloudfront.net/employee-portal.html
+```
+
+#### 3️⃣ Verify your Lambda environment variables
+
+In AWS Lambda, confirm these:
+
+```
+CLIENT_ID=7c5793cnvnbl110ljthmdiohch
+COGNITO_DOMAIN=us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com
+COGNITO_REDIRECT_URI=https://d2xb54di3chfgj.cloudfront.net/employee-portal.html
+```
+
+No trailing slash.
 
 
+#### 4️⃣ Correct Lambda code (safe version)
 
+Use this version (no requests dependency):
+
+```
+import json
+import urllib.parse
+import urllib.request
+import os
+
+def lambda_handler(event, context):
+
+    body = json.loads(event.get("body", "{}"))
+    code = body.get("code")
+
+    data = urllib.parse.urlencode({
+        "grant_type": "authorization_code",
+        "client_id": os.environ["CLIENT_ID"],
+        "redirect_uri": os.environ["COGNITO_REDIRECT_URI"],
+        "code": code
+    }).encode()
+
+    url = "https://" + os.environ["COGNITO_DOMAIN"] + "/oauth2/token"
+
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={"Content-Type": "application/x-www-form-urlencoded"}
+    )
+
+    try:
+        response = urllib.request.urlopen(req)
+        result = response.read().decode()
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": result
+        }
+
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(str(e))
+        }
+```
+
+No extra libraries needed.
+
+#### 5️⃣ How to test correctly
+
+You cannot use TEST_AUTH_CODE.
+
+Authorization codes expire in ~60 seconds.
+
+Correct test:
+
+Login through Cognito
+
+Copy the code from browser URL
+
+Example:
+
+```
+employee-portal.html?code=abc123
+```
+
+Test Lambda with:
+
+```
+{
+ "body": "{\"code\":\"abc123\"}"
+}
+```
+
+#### 6️⃣ What success response looks like
+
+Lambda should return:
+
+```
+{
+ "access_token": "...",
+ "id_token": "...",
+ "expires_in": 3600,
+ "token_type": "Bearer"
+}
+```
+
+Then your portal will decode:
+
+```
+id_token
+```
+
+And get:
+
+```
+custom:employee_id
+```
+
+Then call backend:
+
+```
+/employee/profile?employee_id=5
+```
+
+Which loads data from Amazon RDS.
+
+#### 7️⃣ The reason your portal still shows login error
+
+Your code already contains this:
+
+```
+alert("Login failed. Please try again.")
+```
+
+That only happens when token exchange API fails.
+
+So the failure is definitely in:
+
+```
+Portal → API Gateway → Lambda → Cognito /oauth2/token
+```
+
+Not the database.
+
+#### 8️⃣ If you want, I can also help you finish the last 10% quickly
+
+If you send me:
+
+1️⃣ Your config.js
+2️⃣ Your api.js
+3️⃣ Your exchange-token Lambda URL
+
+I can pinpoint the issue and give you the exact fix in minutes so your portal finally shows:
+
+```
+Ali
+Waiter
+Salary
+Attendance
+Leaves
+Holidays
+```
+
+----
 
 
 
