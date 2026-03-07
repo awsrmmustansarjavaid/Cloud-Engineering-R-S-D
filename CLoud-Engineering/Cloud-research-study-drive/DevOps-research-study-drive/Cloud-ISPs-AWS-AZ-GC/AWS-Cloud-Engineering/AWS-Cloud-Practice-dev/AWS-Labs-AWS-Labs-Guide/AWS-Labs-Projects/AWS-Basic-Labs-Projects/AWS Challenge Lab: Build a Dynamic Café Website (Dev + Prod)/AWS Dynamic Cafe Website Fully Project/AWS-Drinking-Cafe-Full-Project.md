@@ -143,6 +143,56 @@
 EC2-Cafe-Secrets-Role
 ```
 
+This policy contains permissions for:
+
+- Lambda
+
+- DynamoDB
+
+- SQS
+
+- S3
+
+- Secrets Manager
+
+- RDS
+
+- API Gateway
+
+- CloudWatch
+
+- Elastic Load Balancer
+
+- CloudFront
+
+So this single custom policy replaces many AWS managed policies.
+
+### AWS Managed Policies
+
+In your merged setup you are using 0 AWS Managed Policies.
+
+If you had used AWS managed policies instead of merging, the list would normally be something like:
+
+- AWSLambda_FullAccess
+
+- AmazonDynamoDBFullAccess
+
+- AmazonS3FullAccess
+
+- AmazonSQSFullAccess
+
+- SecretsManagerReadWrite
+
+- AmazonRDSFullAccess
+
+- AmazonAPIGatewayAdministrator
+
+- CloudWatchFullAccess
+
+- ElasticLoadBalancingFullAccess
+
+- CloudFrontFullAccess
+
 ### What You Need To Replace
 
 Only ONE value needs to be replaced.
