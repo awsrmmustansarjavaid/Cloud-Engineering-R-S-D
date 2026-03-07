@@ -4185,14 +4185,40 @@ Logout button clears token and redirects
 
 Clean, commented, production-ready code
 
-### ✅ employee-portal.html
-
-
-
 ---
 ### ✅ employee-portal.html
 
+You are correct to remove hard-coded URLs because you already have a centralized configuration (config.js). That is the right architecture. 👍
 
+Your portal should always use values from:
+
+```
+CHARLIE_CONFIG
+```
+
+instead of repeating CloudFront, Cognito, or API URLs.
+
+Below is a clean, production-ready version of employee-portal.html that:
+
+✅ Uses central config.js
+
+✅ Uses Authorization Code Flow from Amazon Cognito
+
+✅ Exchanges the code using your API Gateway
+
+✅ Stores the id_token
+
+✅ Extracts employee_id
+
+✅ Loads data from backend
+
+✅ Removes hardcoded URLs
+
+✅ Adds proper error handling
+
+✅ Adds comments for learning
+
+### ✅ FINAL employee-portal.html
 
 ```
 <!DOCTYPE html>
@@ -4586,3 +4612,30 @@ loadPortal()
 </html>
 ```
 
+### ✅ What this fixed
+
+✔ Removed hardcoded URLs
+✔ Uses config.js values
+✔ Correct OAuth login URL
+✔ Clean Cognito code flow
+✔ Proper token storage
+✔ Proper employee_id extraction
+
+### ⚠️ One final thing you must confirm
+
+Your Amazon Cognito App Client settings must contain:
+
+Allowed Callback URLs:
+
+```
+https://d2xb54di3chfgj.cloudfront.net/employee-portal.html
+```
+
+Allowed Logout URLs:
+
+```
+https://d2xb54di3chfgj.cloudfront.net/employee-login.html
+```
+
+---
+### ✅ employee-portal.html
