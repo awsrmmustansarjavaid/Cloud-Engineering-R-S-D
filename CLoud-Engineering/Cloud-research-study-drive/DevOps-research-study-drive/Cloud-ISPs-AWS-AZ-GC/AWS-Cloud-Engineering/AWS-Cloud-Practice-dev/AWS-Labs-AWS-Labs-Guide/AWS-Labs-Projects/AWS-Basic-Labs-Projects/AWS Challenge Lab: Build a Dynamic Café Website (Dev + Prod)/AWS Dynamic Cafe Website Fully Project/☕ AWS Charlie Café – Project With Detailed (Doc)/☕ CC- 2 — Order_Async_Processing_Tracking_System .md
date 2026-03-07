@@ -23,197 +23,7 @@
 
 ## SECTION 1️⃣ Cafe Order Processor
 
-## PHASE 1️⃣ — Lambda Layer (pymysql)
-
-### 1️⃣ - PyMySQL Lambda Layer
-
-### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)
-
-```
-sudo nano upload-pymysql-layer.sh
-```
-
-[PyMySQL Lambda Layer](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/upload-pymysql-layer.sh)
-
-```
-sudo chmod +x upload-pymysql-layer.sh
-```
-
-```
-sudo ./upload-pymysql-layer.sh
-```
-
-### Method 2️⃣ - PyMySQL Lambda Layer (1-to-1)
-
-#### Verify prerequisites (Optional)
-
-```
-aws --version
-```
-
-```
-python3 --version
-```
-
-```
-pip3 --version
-```
-
-#### 👁‍🗨 You should see:
-
-```
-aws-cli/2.x
-
-Python 3.x
-```
-
-#### ❗️ If pip3 missing:
-
-#### 1️⃣ Prepare ZIP File (EC2 or Local)
-
-```bash
-sudo dnf install -y python3 python3-pip
-```
-
-#### 🔹 STEP 1 — Create clean working directory
-
-```
-sudo mkdir lambda-layer && cd lambda-layer
-```
-
-#### 🔹 STEP 2 — Create required Lambda layer folder structure
-
-⚠️ Lambda REQUIRES this exact structure
-
-```
-mkdir python
-```
-
-#### 👁‍🗨 You should see:
-
-```
-pymysql-layer/
-└── python/
-```
-
-#### 🔹 STEP 3 — Install PyMySQL INTO python folder
-
-```
-pip3 install pymysql -t python/
-```
-
-#### 🔄 Verify install:
-
-```
-ls python/
-```
-
-#### 👁‍🗨 You should see:
-
-```
-pymysql/
-pymysql-*.dist-info/
-```
-
-#### 🔹 STEP 4 — Create ZIP file (VERY IMPORTANT)
-
-```
-zip -r pymysql-layer.zip python
-```
-
-#### Confirm ZIP exists:
-
-```
-ls -lh pymysql-layer.zip
-```
-
-#### 👁‍🗨 You should see:
-
-```
-pymysql-layer.zip   (few MB)
-```
-
-### ✅ METHOD 1 — PyMySQL Lambda Layer via AWS CLI (NO S3)
-
-
-
-[PyMySQL Lambda Layer via AWS CLI](./☕%20CC-%206%20—pymysql-layer.md)
-
-
-### 2️⃣ — S3 Bucket - Upload ZIP
-
-### ✅ METHOD 2 — PyMySQL Lambda Layer via S3
-
-## 1️⃣ S3 Bucket - Upload ZIP to Lambda
-
-### Upload layer → Attach to Lambda.
-
-### 1️⃣ Upload ZIP to S3
-
-#### connect Configure AWS CLI
-
-Run this on your local machine / EC2 / CloudShell:
-
-```
-aws configure
-```
-
-#### Enter values exactly like this:
-
-```
-AWS Access Key ID [None]: AKIA************
-AWS Secret Access Key [None]: ********************
-Default region name [None]: us-east-1
-Default output format [None]: json
-```
-
-✔ Press Enter after each input
-
-#### Verify CLI Configuration
-
-```
-aws sts get-caller-identity
-```
-
-#### Expected output:
-
-```
-{
-  "UserId": "AIDA************",
-  "Account": "123456789012",
-  "Arn": "arn:aws:iam::123456789012:user/cafe-lab-cli-user"
-}
-```
-
-✔ This confirms AWS CLI is correctly authenticated.
-
-
-#### Upload via AWS CLI (Recommended)
-
-```bash
-aws s3 cp pymysql-layer.zip s3://charlie-cafe-s3-bucket/layers/pymysql-layer.zip
-```
-
-#### Expected output:
-
-```
-upload: ./pymysql-layer.zip to s3://charlie-cafe-s3-bucket/layers/pymysql-layer.zip
-```
-
-
-##### Option B: Upload via S3 Console
-
-* Open your S3 bucket
-* Click **Upload**
-* Add file → select `pymysql-layer.zip`
-* Click **Upload**
-
-
-**✅ PHASE 1️⃣ STATUS**
-
-> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
----
-## PHASE 2️⃣ — SQS/LAMBDA (Producer)
+## PHASE 1️⃣ — SQS/LAMBDA (Producer)
 
 ### 1️⃣ Create SQS Queue
 
@@ -256,11 +66,11 @@ upload: ./pymysql-layer.zip to s3://charlie-cafe-s3-bucket/layers/pymysql-layer.
 - Copy Queue URL (IMPORTANT — save it)
 
 
-**✅ PHASE 2️⃣ STATUS**
+**✅ PHASE 1️⃣ STATUS**
 
-> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 3️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+## PHASE 2️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
 
 ### 1️⃣ Create Lambda Role
 
@@ -420,8 +230,6 @@ OR if paying by card:
 }
 ```
 
-
-
 #### ✅ Expected:
 
 - Order inserted in RDS
@@ -439,11 +247,11 @@ OR if paying by card:
 }
 ```
 
-**✅ PHASE 3️⃣ STATUS**
+**✅ PHASE 2️⃣ STATUS**
 
-> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 4️⃣ — API Gateway
+## PHASE 3️⃣ — API Gateway
 
 ### Objective:
 
@@ -823,12 +631,12 @@ The difference is:
 | API Gateway integration method | Structured & production-ready |
 
 
-**✅ PHASE 4️⃣ STATUS**
+**✅ PHASE 3️⃣ STATUS**
 
-> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
 ---
 
-## PHASE 5️⃣ — Frontend Development Code
+## PHASE 4️⃣ — Frontend Development Code
 
 ### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
 
@@ -836,11 +644,11 @@ The difference is:
 
 **🔁 Replace with your real API Gateway URL**
 
-**✅ PHASE 5️⃣ STATUS**
+**✅ PHASE 4️⃣ STATUS**
 
-> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 6️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
+## PHASE 5️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
 
 ### 1️⃣ Fix Security Groups (MANDATORY)
 
@@ -984,17 +792,17 @@ print("DEBUG: RDS connected")
 
 This lets us see exactly where it stops.
 
-**✅ PHASE 6️⃣ STATUS**
+**✅ PHASE 5️⃣ STATUS**
 
-> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
 ---
-## PHASE 7️⃣ — Test & Verification ( Must)
+## PHASE 6️⃣ — Test & Verification ( Must)
 
 _ **Please refer to the Test & Verification documentation for detailed procedures.**
 
-**✅ PHASE 7️⃣ STATUS**
+**✅ PHASE 6️⃣ STATUS**
 
-> **🟢 PHASE 7️⃣ COMPLETE & VERIFIED**
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
 
 ## 🟢 SECTION 1️⃣ COMPLETE & VERIFIED
 ---
