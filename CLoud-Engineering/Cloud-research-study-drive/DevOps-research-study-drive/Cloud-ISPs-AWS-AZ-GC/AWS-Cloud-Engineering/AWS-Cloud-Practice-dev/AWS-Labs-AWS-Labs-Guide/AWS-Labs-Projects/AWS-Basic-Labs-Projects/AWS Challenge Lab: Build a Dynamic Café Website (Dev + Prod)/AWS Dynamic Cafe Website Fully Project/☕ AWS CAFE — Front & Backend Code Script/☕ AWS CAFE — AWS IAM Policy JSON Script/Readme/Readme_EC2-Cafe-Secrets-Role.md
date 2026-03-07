@@ -270,5 +270,142 @@ For production you should restrict:
 
 - Specific Secrets Manager secrets
 
+### ✅ S3 Full Access added
+
+Below is your fully merged and updated IAM policy with S3 Full Access added.
+This policy includes permissions for:
+
+Lambda
+
+DynamoDB
+
+SQS
+
+S3 (Full Access)
+
+Secrets Manager
+
+RDS
+
+API Gateway
+
+CloudWatch
+
+ALB
+
+CloudFront
+
+### Final Working Merged IAM Policy
+
+Replace YOUR_ACCOUNT_ID with your AWS account ID.
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
+    {
+      "Sid": "InvokeLambdaFunctions",
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:function:*"
+    },
+
+    {
+      "Sid": "LambdaFullAccess",
+      "Effect": "Allow",
+      "Action": "lambda:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "DynamoDBFullAccess",
+      "Effect": "Allow",
+      "Action": "dynamodb:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "SQSFullAccess",
+      "Effect": "Allow",
+      "Action": "sqs:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "S3FullAccess",
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "SecretsManagerFullAccess",
+      "Effect": "Allow",
+      "Action": "secretsmanager:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "RDSFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "rds:*",
+        "rds-data:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "APIGatewayFullAccess",
+      "Effect": "Allow",
+      "Action": "apigateway:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "CloudWatchFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:*",
+        "cloudwatch:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "ElasticLoadBalancingFullAccess",
+      "Effect": "Allow",
+      "Action": "elasticloadbalancing:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "CloudFrontFullAccess",
+      "Effect": "Allow",
+      "Action": "cloudfront:*",
+      "Resource": "*"
+    }
+
+  ]
+}
+```
+
+### Important Note (For Your AWS Café Project)
+
+This policy gives very broad permissions (*), which is OK for learning, labs, and testing, especially if you are building your:
+
+- Charlie Café AWS architecture
+
+- Lambda + API Gateway
+
+- RDS attendance system
+
+- Cognito login system
+
+- CloudFront frontend
+
+- But in production, permissions should be restricted.
+
 ---
 
