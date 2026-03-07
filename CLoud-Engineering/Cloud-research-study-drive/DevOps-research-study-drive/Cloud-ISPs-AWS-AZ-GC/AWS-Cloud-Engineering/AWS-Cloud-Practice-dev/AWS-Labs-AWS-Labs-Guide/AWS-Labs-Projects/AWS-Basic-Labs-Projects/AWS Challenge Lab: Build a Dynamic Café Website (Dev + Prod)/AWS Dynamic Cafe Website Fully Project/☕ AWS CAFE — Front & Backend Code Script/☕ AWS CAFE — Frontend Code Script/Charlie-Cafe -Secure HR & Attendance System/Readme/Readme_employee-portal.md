@@ -4185,8 +4185,12 @@ Logout button clears token and redirects
 
 Clean, commented, production-ready code
 
+### ✅ employee-portal.html
+
+
+
 ---
-### employee-portal.html
+### ✅ employee-portal.html
 
 
 
