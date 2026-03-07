@@ -971,12 +971,23 @@ upload: ./pymysql-layer.zip to s3://charlie-cafe-s3-bucket/layers/pymysql-layer.
 [Cafe_FrontEnd_Config](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/Cafe_FrontEnd_Config.md)
 
 
-
 [Download & Upload Html Directory ](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/html/)
 
 ### 2️⃣ Charlie Cafe Export S3 to HTML Script
 
-[Charlie Cafe Export S3 to HTML Script](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/Cafe_FrontEnd_Config.md)
+```
+sudo nano charlie-cafe-export-s3-to-html.sh
+```
+
+[Charlie Cafe Export S3 to HTML Script](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie-cafe-export-s3-to-html/charlie-cafe-export-s3-to-html.sh)
+
+```
+sudo chmod +x charlie-cafe-export-s3-to-html.sh
+```
+
+```
+sudo ./charlie-cafe-export-s3-to-html.sh
+```
 
 ### 3️⃣ ALLOW /var/www/html/js IN APACHE
 

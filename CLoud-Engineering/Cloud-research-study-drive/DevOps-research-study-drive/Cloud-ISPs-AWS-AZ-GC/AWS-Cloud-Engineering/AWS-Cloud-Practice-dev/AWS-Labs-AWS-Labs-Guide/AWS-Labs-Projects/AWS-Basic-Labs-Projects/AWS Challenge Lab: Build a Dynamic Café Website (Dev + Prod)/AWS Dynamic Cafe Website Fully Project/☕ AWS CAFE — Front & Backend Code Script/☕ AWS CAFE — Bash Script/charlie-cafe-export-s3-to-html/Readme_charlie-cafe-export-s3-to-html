@@ -6,7 +6,7 @@
 sudo nano s3_export.sh
 ```
 
-[s3_export.sh](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/%20S3%20TO%20EC2%20EXPORT%20SCRIPT/%20S3%20TO%20EC2%20EXPORT%20SCRIPT.sh)
+[s3_export.sh](./%20S3%20TO%20EC2%20EXPORT%20SCRIPT/ec2-html-s3.sh)
 
 ```
 sudo chmod +x s3_export.sh
@@ -22,7 +22,7 @@ sudo ./s3_export.sh
 sudo nano apache_permissions.sh
 ```
 
-[apache_permissions.sh](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Apache%20SECURITY%20&%20PERMISSIONS/apache_permissions.sh)
+[apache_permissions.sh](./Apache%20SECURITY%20&%20PERMISSIONS/apache_permissions.sh)
 
 ```
 sudo chmod +x apache_permissions.sh
@@ -220,7 +220,7 @@ sudo ./charlie-cafe-export-s3-to-html.sh
 ```
 S3/html → /var/www/html
 S3/bash → /home/download
-````
+```
 
 3️⃣ Deletes removed files (--delete)
 
@@ -259,4 +259,269 @@ AWS_SECRET_ACCESS_KEY=...
 
 from the script.
 
+---
+
+### ✅ PRO DevOps production-grade deployment script
+
+a PRO DevOps production-grade deployment script for your Charlie Café system.
+
+This version includes:
+
+✅ S3 → EC2 deployment
+
+✅ Permission fixing
+
+✅ Apache restart
+
+✅ Error detection
+
+✅ Deployment log file
+
+✅ Safe execution (script stops if error occurs)
+
+✅ Timestamp logging
+
+✅ Production-style structure
+
+Script Name:
+
+```
+charlie-cafe-auto-deploy.sh
+```
+
+#### ✅ Charlie Café PRO Auto Deployment Script
+
+```
+#!/bin/bash
+# =========================================================
+# CHARLIE CAFE ☕ PRO DEPLOYMENT SCRIPT
+# S3 → EC2 AUTO DEPLOY + PERMISSIONS + APACHE RESTART
+# =========================================================
+
+set -e   # Stop script if any command fails
+
+# =========================================================
+# CONFIGURATION
+# =========================================================
+
+AWS_REGION="us-east-1"
+S3_BUCKET="charlie-cafe-s3-bucket"
+
+S3_HTML_FOLDER="Charlie Cafe Code Drive/html/"
+S3_BASH_FOLDER="Charlie Cafe Code Drive/bash script/"
+
+EC2_HTML_FOLDER="/var/www/html"
+EC2_BASH_FOLDER="/home/download"
+
+LOG_FILE="/var/log/charlie-cafe-deploy.log"
+
+# =========================================================
+# LOGGING FUNCTION
+# =========================================================
+
+log() {
+echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a $LOG_FILE
+}
+
+log "======================================================="
+log "🚀 Charlie Cafe Deployment Started"
+log "======================================================="
+
+# =========================================================
+# CHECK AWS CLI
+# =========================================================
+
+if ! command -v aws &> /dev/null
+then
+    log "❌ AWS CLI not installed!"
+    exit 1
+fi
+
+log "✅ AWS CLI detected"
+
+# =========================================================
+# SYNC HTML FILES
+# =========================================================
+
+log "📥 Syncing HTML files from S3..."
+
+aws s3 sync "s3://$S3_BUCKET/$S3_HTML_FOLDER" "$EC2_HTML_FOLDER" \
+--region $AWS_REGION --delete
+
+log "✅ HTML sync completed"
+
+# =========================================================
+# SYNC BASH SCRIPTS
+# =========================================================
+
+log "📥 Syncing Bash scripts from S3..."
+
+aws s3 sync "s3://$S3_BUCKET/$S3_BASH_FOLDER" "$EC2_BASH_FOLDER" \
+--region $AWS_REGION --delete
+
+log "✅ Bash scripts sync completed"
+
+# =========================================================
+# FILE LIST
+# =========================================================
+
+FILES=(
+"/var/www/html/index.php"
+"/var/www/html/cafe-admin-dashboard.html"
+"/var/www/html/orders.php"
+"/var/www/html/order-status.html"
+"/var/www/html/order-receipt.php"
+"/var/www/html/admin-orders.html"
+"/var/www/html/payment-status.php"
+"/var/www/html/central-print.html"
+"/var/www/html/analytics.html"
+"/var/www/html/login.html"
+"/var/www/html/logout.php"
+"/var/www/html/price-list.html"
+"/var/www/html/employee-login.html"
+"/var/www/html/employee-portal.html"
+"/var/www/html/hr-attendance.html"
+"/var/www/html/checkin.html"
+"/var/www/html/js/config.js"
+"/var/www/html/js/central-auth.js"
+"/var/www/html/js/utils.js"
+"/var/www/html/js/api.js"
+"/var/www/html/js/central-printing.js"
+"/var/www/html/js/role-guard.js"
+"/var/www/html/css/central_cafe_style.css"
+)
+
+DIRS=(
+"/var/www/html/js"
+"/var/www/html/css"
+)
+
+# =========================================================
+# SET PERMISSIONS
+# =========================================================
+
+log "🔐 Setting Apache ownership..."
+
+sudo chown apache:apache "${FILES[@]}"
+sudo chown -R apache:apache "${DIRS[@]}"
+
+log "📁 Setting directory permissions..."
+
+for dir in "${DIRS[@]}"; do
+sudo chmod 755 "$dir"
+done
+
+log "📄 Setting file permissions..."
+
+for file in "${FILES[@]}"; do
+sudo chmod 644 "$file"
+done
+
+log "✅ Permissions applied"
+
+# =========================================================
+# VERIFY PERMISSIONS
+# =========================================================
+
+log "🔍 Verifying permissions..."
+
+for file in "${FILES[@]}"; do
+perms=$(ls -l "$file" | awk '{print $1}')
+owner=$(ls -l "$file" | awk '{print $3":"$4}')
+log "$file : $owner : $perms"
+done
+
+# =========================================================
+# RESTART APACHE
+# =========================================================
+
+log "🔄 Restarting Apache..."
+
+sudo systemctl restart httpd
+
+log "✅ Apache restarted"
+
+# =========================================================
+# DEPLOYMENT COMPLETE
+# =========================================================
+
+log "======================================================="
+log "🎉 Charlie Cafe Deployment Completed Successfully"
+log "======================================================="
+```
+
+### Deployment Log File
+
+Every deployment will be saved in:
+
+```
+/var/log/charlie-cafe-deploy.log
+```
+
+Example log:
+
+```
+2026-03-07 20:55:10 - Charlie Cafe Deployment Started
+2026-03-07 20:55:11 - HTML sync completed
+2026-03-07 20:55:12 - Bash scripts sync completed
+2026-03-07 20:55:13 - Permissions applied
+2026-03-07 20:55:14 - Apache restarted
+2026-03-07 20:55:14 - Deployment Completed
+```
+
+### Make Script Executable
+
+```
+sudo chmod +x charlie-cafe-auto-deploy.sh
+```
+
+Run it:
+
+```
+sudo ./charlie-cafe-auto-deploy.sh
+```
+
+### Production Automation (Very Powerful)
+
+You can run this automatically every 5 minutes using cron.
+
+Open cron:
+
+```
+crontab -e
+```
+
+Add:
+
+```
+*/5 * * * * /home/ec2-user/charlie-cafe-auto-deploy.sh
+```
+
+Now your EC2 auto-syncs with S3 every 5 minutes.
+
+This becomes a mini CI/CD pipeline.
+
+### Ultra-Professional Upgrade (Optional)
+
+If you want, I can also show you how to build FULL AWS DevOps Pipeline for Charlie Café:
+
+Architecture:
+
+```
+Developer Push Code
+       ↓
+GitHub
+       ↓
+AWS CodePipeline
+       ↓
+AWS CodeBuild
+       ↓
+S3
+       ↓
+EC2 Auto Deploy Script
+       ↓
+Live Website Updated
+```
+
+This is how Netflix / Amazon style deployments work.
 ---
