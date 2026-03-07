@@ -781,7 +781,11 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 ## ☕ AWS CAFE - PHASE 1️⃣ FRONTEND central FOUNDATION (REUSABLE)
 
-### ✅ S3 TO EC2 EXPORT SCRIPT
+Read ablout all "FrontEnd Configuration"
+
+[Cafe_FrontEnd_Config](.//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config.md)
+
+### 1️⃣ S3 TO EC2 EXPORT SCRIPT
 
 ```
 sudo nano s3_export.sh
@@ -797,7 +801,7 @@ sudo chmod +x s3_export.sh
 ```
 sudo ./s3_export.sh
 ```
-### 1️⃣ SECURITY & PERMISSIONS
+### 2️⃣ SECURITY & PERMISSIONS
 
 ```
 sudo nano apache_permissions.sh
