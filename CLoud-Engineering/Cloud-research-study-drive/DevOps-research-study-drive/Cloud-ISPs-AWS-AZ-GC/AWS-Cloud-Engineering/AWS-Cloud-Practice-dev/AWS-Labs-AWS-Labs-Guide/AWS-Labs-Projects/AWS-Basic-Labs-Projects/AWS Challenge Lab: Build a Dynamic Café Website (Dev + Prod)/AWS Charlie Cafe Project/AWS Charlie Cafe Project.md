@@ -233,7 +233,7 @@ So in IAM it will appear as:
 
 You can paste this directly into IAM → Policies → Create policy → JSON
 
-[EC2-Cafe-Secrets-Role](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20AWS%20IAM%20Policy%20JSON%20Script/EC2-Cafe-Secrets-Role.json)
+[EC2-Cafe-Secrets-Role](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20AWS%20IAM%20Policy%20JSON%20Script/EC2-Cafe-Secrets-Role.json)
 
 **⚠️ Attach role to EC2 (NO reboot).**
 
@@ -305,7 +305,7 @@ Allow Lambda to read menu items from DynamoDB
 
 You can paste this directly into IAM → Policies → Create policy → JSON
 
-[charlie-cafe-iam-policy](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20AWS%20IAM%20Policy%20JSON%20Script/charlie-cafe-iam-policy.json)
+[charlie-cafe-iam-policy](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20AWS%20IAM%20Policy%20JSON%20Script/charlie-cafe-iam-policy.json)
 
 **⚠️ JUST Replace "Your AWS ACCOUNT ID " with your own account ID**
 
@@ -345,7 +345,7 @@ CafeDevWebServer
 ### 1️⃣ LAMP Server USER DATA
 > **📍 File Location: AWS-LAMP Server-Bash-Script.md**
 
-[AWS-LAMP Server Bash-Script](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Linux%20Lamp%20Server/Lamp%20Server%20Script.sh)
+[AWS-LAMP Server Bash-Script](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/)
 
 ### 8️⃣ Development and Delopment LAMP Server 
 
