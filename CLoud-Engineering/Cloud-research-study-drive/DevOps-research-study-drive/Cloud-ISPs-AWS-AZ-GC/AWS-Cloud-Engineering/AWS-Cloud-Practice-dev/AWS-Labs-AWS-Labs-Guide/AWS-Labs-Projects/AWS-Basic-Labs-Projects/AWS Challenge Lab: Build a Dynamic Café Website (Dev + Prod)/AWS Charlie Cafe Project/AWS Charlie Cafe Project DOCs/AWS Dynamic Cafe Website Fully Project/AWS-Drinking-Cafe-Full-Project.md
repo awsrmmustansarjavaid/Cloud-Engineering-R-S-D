@@ -2037,7 +2037,7 @@ This single-file approach is:
 
 This replaces hardcoded config from your old file.
 
-[config.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+[config.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
 
 #### ✅ Replace with your real values:
 
@@ -2053,7 +2053,7 @@ This replaces hardcoded config from your old file.
 
 Move all generic helpers here.
 
-[utils.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
+[utils.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
 
 
 ### 🔐 STEP 3 — central-auth.js (COGNITO ONLY)
@@ -2062,17 +2062,17 @@ This file contains ONLY authentication logic.
 
 No API routes inside.
 
-[central-auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
+[central-auth.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
 
 ### 🌐 STEP 4 — api.js (PUBLIC + PROTECTED FETCH)
 
 This file handles API logic only.
 
-[api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
+[api.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
 
 ### 🌐 STEP 5 — Create central-printing.js
 
-[central-printing.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
+[central-printing.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
 
 ### 🌐 STEP 6 — Create role-guard.js
 
