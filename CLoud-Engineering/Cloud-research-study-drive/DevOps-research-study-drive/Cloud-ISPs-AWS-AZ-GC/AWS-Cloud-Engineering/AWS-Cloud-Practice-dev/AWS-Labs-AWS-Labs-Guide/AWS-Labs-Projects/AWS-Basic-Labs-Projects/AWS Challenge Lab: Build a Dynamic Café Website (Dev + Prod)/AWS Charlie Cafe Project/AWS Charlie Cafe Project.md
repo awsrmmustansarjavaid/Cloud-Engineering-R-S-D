@@ -707,7 +707,7 @@ sudo ./upload-pymysql-layer.sh
 sudo nano charlie-cafe-export-s3-to-html.sh
 ```
 
-[Charlie Cafe Export S3 to HTML Script](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie-cafe-export-s3-to-html/charlie-cafe-export-s3-to-html.sh)
+[Charlie Cafe Export S3 to HTML Script](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie-cafe-export-s3-to-html/charlie-cafe-export-s3-to-html.sh)
 
 ```
 sudo chmod +x charlie-cafe-export-s3-to-html.sh
