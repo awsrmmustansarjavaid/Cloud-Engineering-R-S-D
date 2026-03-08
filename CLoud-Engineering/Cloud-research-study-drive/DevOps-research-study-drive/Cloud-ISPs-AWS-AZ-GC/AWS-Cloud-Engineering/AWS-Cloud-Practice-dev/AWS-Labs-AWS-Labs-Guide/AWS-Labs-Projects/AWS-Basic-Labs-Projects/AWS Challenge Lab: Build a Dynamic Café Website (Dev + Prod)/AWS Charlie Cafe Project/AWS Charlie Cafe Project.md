@@ -4872,7 +4872,7 @@ Execution role: Create new role
 
 🌱 Environment variable usage clarified
 
-[CafeAnalyticsLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
+[CafeAnalyticsLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
 
 
 ### 3️⃣ 🔐 Environment Variable Required
@@ -5136,7 +5136,7 @@ sudo nano /var/www/html/analytics.html
 
 ### 2️⃣ analytics.html (FULL CODE)
 
-[analytics.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
+[analytics.html](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-%20Sales%20Analytics/analytics.html)
 
 ### 3️⃣ File PERMISSIONS (MANDATORY)
 
@@ -5165,7 +5165,7 @@ sudo systemctl restart httpd
 
 **⚠️ All these changes have already been made in all the admin files, so there is no need to follow these steps.**
 
-[order-status.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+[order-status.html](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
 
 ### 2️⃣ Restart Apache (MANDATORY)
 
@@ -5307,7 +5307,7 @@ CloudWatchLogsFullAccess
 
 #### 2️⃣ Paste THIS CODE (COPY EXACTLY)
 
-[CafeAnalyticsLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
+[CafeAnalyticsLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
 
 - Click Deploy
 
@@ -5876,7 +5876,7 @@ AWSSecretsManagerReadWrite
 
 ### 5️⃣ — CONNECT CafeMenu TABLE IN LAMBDA
 
-[CafeOrderProcessingLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderProcessor/CafeOrderProcessingLambda.py)
+[CafeOrderProcessingLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderProcessor/CafeOrderProcessingLambda.py)
 
 #### 2️⃣ — DEPLOY LAMBDA (DO NOT SKIP)
 
@@ -6006,7 +6006,7 @@ item_profit = item_sales - item_cost
 
 - **Open CafeAnalyticsLambda**
 
-[CafeAnalyticsLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
+[CafeAnalyticsLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
 
 ### 4️⃣ CONFIGURE LAMBDA ENVIRONMENT VARIABLES (MANDATORY)
 
@@ -6238,7 +6238,7 @@ if 'Admin' not in groups:
 
 - **Open CafeAnalyticsLambda**
 
-[CafeAnalyticsLambda.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
+[CafeAnalyticsLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
 
 #### 4️⃣ CONFIGURE LAMBDA ENVIRONMENT VARIABLES (MANDATORY)
 
@@ -6387,6 +6387,6 @@ Change test event to:
 **✅ PHASE 9️⃣ STATUS**
 
 > **🟢 PHASE 9️⃣ COMPLETE & VERIFIED**
----
+
 # SECTION 🔟 SALES ANALYTICS & REPORTING SYSTEM COMPLETE & VERIFIED ✅
 ---
