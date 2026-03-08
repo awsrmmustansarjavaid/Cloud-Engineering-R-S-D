@@ -3222,3 +3222,506 @@ Use boto3 to fetch menu/prices before processing orders.
 
 # 🟢 SECTION 6️⃣ COMPLETE & VERIFIED
 ---
+# SECTION 7️⃣ — ORDER STATUS DASHBOARD
+
+## PHASE 1️⃣ — DYNAMODB METRICS TABLE (FULL)
+
+### 1️⃣ Open DynamoDB Console
+
+#### AWS Console → DynamoDB → Tables → Create table
+
+### 2️⃣ CREATE DYNAMODB METRICS TABLE
+
+#### 1️⃣ Table configuration
+
+| Field         | Value              |
+| ------------- | ------------------ |
+| Table name    | `CafeOrderMetrics` |
+| Partition key | `metric` (String)  |
+| Sort key      | ❌ None             |
+| Table class   | Standard           |
+| Capacity      | On-demand          |
+| Encryption    | Default            |
+
+#### Sample items:
+
+```
+{ "metric": "TOTAL_ORDERS", "count": 120 }
+{ "metric": "TODAY_ORDERS", "count": 25 }
+```
+
+Click Create table
+
+**🕐 WAIT until status = ACTIVE**
+
+### 3️⃣ Insert initial items (VERY IMPORTANT)
+
+**Click table → Explore table → Create item**
+
+#### Item 1
+
+```
+{
+  "metric": {
+    "S": "TOTAL_ORDERS"
+  },
+  "count": {
+    "N": "0"
+  }
+}
+```
+
+Click Create item
+
+#### Item 2
+
+```
+{
+  "metric": {
+    "S": "TODAY_ORDERS"
+  },
+  "count": {
+    "N": "0"
+  }
+}
+```
+
+Click Create item
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 2️⃣ — VERIFICATION (MANDATORY)
+
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
+
+## PHASE 3️⃣ — Update CafeOrderProcessor
+> **⚠️ This step is inside existing Worker Lambda, NOT API Lambda.**
+
+###  1️⃣ Open Worker Lambda
+
+### AWS Console → Lambda → CafeOrderWorker
+
+###  2️⃣ UPDATE Update CafeOrderProcessor
+
+### 1️⃣ Add this code at the TOP
+
+```
+metrics_table = dynamodb.Table("CafeOrderMetrics")
+```
+
+### 2️⃣ Add this AFTER successful RDS insert
+
+⚠️ Place it AFTER cursor.execute(...) and commit()
+
+#### Inside your SQS CafeOrderProcessor, after DB insert:
+
+```
+metrics_table.update_item(
+    Key={"metric": "TOTAL_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+```
+
+#### 📢 your current CafeOrderWorker does NOT update CafeOrderMetrics yet.
+
+Right now it only updates:
+
+```
+menu_table = dynamodb.Table(DYNAMODB_TABLE)  # CafeMenu
+```
+
+It does NOT reference:
+
+```
+CafeOrderMetrics
+```
+
+### ✅ What You Need To Add 
+
+#### 1️⃣ Add this near your constants:
+
+```
+METRICS_TABLE = "CafeOrderMetrics"
+metrics_table = dynamodb.Table(METRICS_TABLE)
+```
+
+#### 2️⃣ Inside the loop, after the RDS insert, add:
+
+```
+# ---------- UPDATE TOTAL ORDERS ----------
+metrics_table.update_item(
+    Key={"metric": "TOTAL_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+
+# ---------- UPDATE TODAY ORDERS ----------
+metrics_table.update_item(
+    Key={"metric": "TODAY_ORDERS"},
+    UpdateExpression="ADD #c :inc",
+    ExpressionAttributeNames={"#c": "count"},
+    ExpressionAttributeValues={":inc": Decimal(1)}
+)
+```
+
+#### ✅ Place it right after:
+
+```
+cursor.execute(...)
+```
+
+#### ✅ Your DynamoDB Items Are Now Correct
+
+You now have:
+
+```
+{ "metric": "TOTAL_ORDERS", "count": 0 }
+{ "metric": "TODAY_ORDERS", "count": 0 }
+```
+
+✔ Perfect
+
+✔ No duplicates
+
+✔ Correct partition keys
+
+### 3️⃣ ✅ FINAL WORKER LAMBDA CODE
+
+#### Below is the FINAL, READY-TO-DEPLOY Worker Lambda code with:
+
+[CafeOrderProcessor.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Charlie%20Cafe%20-%20Order%20Backend%20Code/CafeOrderProcessor/CafeOrderProcessor.py)
+
+**⚠️ Already Updated, So skip this step**
+
+✔️ RDS remains main source
+
+✔️ DynamoDB gives fast counters
+
+### 3️⃣ IAM ROLE CHECK (DO THIS FIRST)
+
+Make sure Worker Lambda Role has:
+
+### 4️⃣ VERIFY THIS STEP
+
+1️⃣ Place one new order
+
+2️⃣ Go to DynamoDB → CafeOrderMetrics
+
+3️⃣ Open TOTAL_ORDERS
+
+✔ Count increased by 1
+
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 4️⃣ — CREATE ORDER STATUS LAMBDA (NEW)
+> **📢 This Lambda ONLY READS DATA.**
+
+### 1️⃣ Create Lambda
+
+#### AWS Console → Lambda → Create function
+
+| Setting        | Value                                   |
+| -------------- | --------------------------------------- |
+| Name           | `GetOrderStatusLambda`                  |
+| Runtime        | Python 3.12                             |
+| Execution role | Use existing role                       |
+| Role           | Same role as Worker (read-only is fine) |
+
+
+- **✔️ Click Create function**
+
+### 2️⃣ Lambda Status Order Code
+
+[GetOrderStatusLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Charlie%20Cafe%20-%20Order%20Backend%20Code/GetOrderStatusLambda/GetOrderStatusLambda.py)
+
+### 3️⃣ Attach Layer to Lambda Function
+
+####  1️⃣ Open Lambda Function
+
+* Lambda → Functions → `GetOrderStatusLambda`
+
+#### 2️⃣ Add Layer
+
+* Scroll to **Layers** section
+* Click **Add a layer**
+* Choose **Custom layers**
+* Select:
+
+  * Layer: `pymysql-layer`
+  * Version: latest
+
+Click **Add**
+
+### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
+### 5️⃣ Test Lambda
+
+#### Test Event Name:
+
+```
+Test-GetOrderStatusLambda
+```
+
+#### Test event:
+
+```
+{}
+```
+
+#### Expected:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+  },
+  "body": "{\"metrics\": [{\"metric\": \"TOTAL_ORDERS\", \"count\": \"2\"}], \"recent_orders\": ..........."
+}
+```
+
+✔ Status code: 200
+
+✔ JSON returned
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 5️⃣ — API GATEWAY ENDPOINT
+
+👉 Use your EXISTING API
+
+👉 Create a NEW METHOD (GET /order-status) on it
+
+❌ Do NOT create a new API
+
+### 🧠 WHY YOU SHOULD USE THE EXISTING API
+
+#### You already have something like:
+
+```
+CafeOrdersAPI
+https://xxxxx.execute-api.us-east-1.amazonaws.com/prod
+```
+
+#### And inside it you probably have:
+
+```
+POST /orders       → CreateOrderLambda
+```
+
+#### ✔️ This is CORRECT architecture
+
+One API = One backend system
+Multiple resources/methods inside it
+
+**Creating multiple APIs would be:**
+
+❌ Hard to manage
+
+❌ Bad practice
+
+❌ Confusing for frontend
+
+### STRUCTURE (VISUAL)
+
+```
+CafeOrdersAPI
+│
+├── POST /orders
+│     └── CreateOrderLambda
+│
+└── GET /get-order-status
+      └── GetOrderStatusLambda
+```
+
+✔️ SAME API
+
+✔️ DIFFERENT Lambda functions
+
+### 1️⃣ Open API Gateway
+
+#### API Gateway → Open Your Existing API (example: CafeOrdersAPI) → Resources
+
+### 2️⃣ Create Resource
+
+```
+Resource name: get-order-status
+Resource path: /get-order-status
+```
+
+Click Create resource
+
+### 3️⃣ Create NEW METHOD
+
+Select /get-order-status
+
+Click Create Method
+
+```
+GET /get-order-status
+```
+
+- **Method:** GET
+
+- **Integration:** Lambda
+
+- **Select GetOrderStatusLambda**
+
+- **Lambda name:** GetOrderStatusLambda
+
+✔️ Enable Lambda proxy integration
+
+Click Create method
+
+
+### 4️⃣ Enable CORS (VERY IMPORTANT)
+
+Select /get-order-status
+
+Actions → Enable CORS
+
+✔️ GET
+
+✔️ OPTIONS
+
+Click Enable CORS and replace existing CORS headers
+
+### 5️⃣ Deploy API (MOST MISSED STEP 🚨)
+
+API Gateway → Actions → Deploy API
+
+| Field            | Value                 |
+| ---------------- | --------------------- |
+| Deployment stage | Exist stage             |
+| Stage name       | Prod               |
+| Description      | Order status endpoint |
+
+Click Deploy
+
+### 6️⃣ Test with API Gateway
+
+#### 1️⃣ Test API Gateway Endpoint (Console Method)
+
+- Go to AWS Console
+
+- Click API Gateway
+
+- Open your API
+
+- Click Resources
+
+- Click /get-order-status
+
+- Click GET
+
+- On the GET method page
+
+- Click the Test button (top right)
+
+- Update Request Body
+
+In Request Body, paste:
+
+```
+{}
+```
+
+#### 🌐 FINAL API URL
+
+```
+GET https://xxxxx.execute-api.us-east-1.amazonaws.com/prod/get-order-status
+```
+
+#### 🧪 TEST IT (MUST WORK)
+
+```
+curl https://xxxxx.execute-api.us-east-1.amazonaws.com/prod/get-order-status
+```
+
+#### ✅ You MUST see JSON like:
+
+```
+{
+  "metrics": [
+    {"metric":"Total Orders","count":15}
+  ],
+  "recent_orders": [
+    {
+      "customer_name":"Ali",
+      "item":"Coffee",
+      "quantity":2,
+      "created_at":"2026-01-09 12:30:00"
+    }
+  ]
+}
+```
+
+❌ If this does not work → STOP. Fix backend first.
+
+#### Open browser:
+
+```
+https://API_ID.execute-api.region.amazonaws.com/prod/get-order-status
+```
+
+#### Example;
+
+```
+https://a1053skr51.execute-api.us-east-1.amazonaws.com/prod/get-order-status
+```
+
+✔ JSON visible
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 6️⃣ — FRONTEND ORDER STATUS PAGE
+
+[order-status.html](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status_LIVE%20ADMIN%20DASHBOARD_many%20orders/order-status.html)
+
+**🔁 Replace with your real API Gateway URL**
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 7️⃣ — FEATURE VERIFICATION (IMPORTANT)
+
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
+
+# 🟢 SECTION 7️⃣ COMPLETE & VERIFIED
+---
