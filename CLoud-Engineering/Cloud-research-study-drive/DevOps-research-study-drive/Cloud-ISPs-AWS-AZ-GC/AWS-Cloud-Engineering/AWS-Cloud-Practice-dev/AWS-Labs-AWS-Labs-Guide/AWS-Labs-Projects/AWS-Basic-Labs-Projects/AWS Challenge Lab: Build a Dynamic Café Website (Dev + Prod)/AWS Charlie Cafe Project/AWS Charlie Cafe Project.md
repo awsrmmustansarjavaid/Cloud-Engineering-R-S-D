@@ -660,6 +660,10 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 ---
 ## ☕ AWS CAFE - PHASE 2️⃣ Lambda Layer (pymysql)
 
+Read more about Charlie Cafe Lambda Layer (pymysql)
+
+[Lambda Layer (pymysql)](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20Charlie%20Café%2)
+
 ### 1️⃣ - PyMySQL Lambda Layer
 
 ### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)
@@ -769,8 +773,6 @@ pymysql-layer.zip   (few MB)
 ```
 
 ### ✅ METHOD 1 — PyMySQL Lambda Layer via AWS CLI (NO S3)
-
-
 
 [PyMySQL Lambda Layer via AWS CLI](./☕%20CC-%206%20—pymysql-layer.md)
 
