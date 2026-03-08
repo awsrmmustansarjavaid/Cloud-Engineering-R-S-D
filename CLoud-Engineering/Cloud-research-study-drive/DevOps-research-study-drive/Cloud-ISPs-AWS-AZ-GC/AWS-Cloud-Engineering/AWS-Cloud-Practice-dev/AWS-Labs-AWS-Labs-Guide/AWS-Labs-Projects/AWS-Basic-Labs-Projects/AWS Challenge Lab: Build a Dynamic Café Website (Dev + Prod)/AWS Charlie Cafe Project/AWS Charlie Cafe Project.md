@@ -666,7 +666,7 @@ Read more about Charlie Cafe Lambda Layer (pymysql)
 
 ### 1️⃣ - PyMySQL Lambda Layer
 
-### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)
+> #### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)
 
 ```
 sudo nano upload-pymysql-layer.sh
@@ -686,7 +686,6 @@ sudo ./upload-pymysql-layer.sh
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
 
-
 ## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
 ---
 ## 📢 SECTION 4️⃣ CAFE FrontEnd Development & Deployment
@@ -697,7 +696,7 @@ sudo ./upload-pymysql-layer.sh
 
 ### ⚠️ Read ablout all "FrontEnd Configuration"
 
-[Cafe_FrontEnd_Config](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/Cafe_FrontEnd_Config.md)
+[Cafe_FrontEnd_Config](../☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/Cafe_FrontEnd_Config.md)
 
 
 [Download & Upload Html Directory ](./☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cafe_FrontEnd_Config/html/)
