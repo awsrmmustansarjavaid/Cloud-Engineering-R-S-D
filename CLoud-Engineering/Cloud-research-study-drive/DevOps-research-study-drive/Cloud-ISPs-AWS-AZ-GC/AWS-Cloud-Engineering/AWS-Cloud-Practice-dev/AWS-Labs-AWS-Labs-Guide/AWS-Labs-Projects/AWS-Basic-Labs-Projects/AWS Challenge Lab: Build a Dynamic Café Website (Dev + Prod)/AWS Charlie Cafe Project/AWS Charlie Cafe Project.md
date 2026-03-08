@@ -4249,3 +4249,358 @@ order-receipt.php
 
 # 🟢 SECTION 8️⃣ COMPLETE & VERIFIED
 ---
+# SECTION 9️⃣ ☕ Charlie Café – Order Payment System
+
+## ☕ CHARLIE CAFÉ PHASE 1️⃣ Cach Payment System 
+
+### 1️⃣ DynamoDB / RDS (Order Table)
+> **UPDATE DATABASE (VERY IMPORTANT)**
+
+#### 1️⃣ If you are using DynamoDB
+
+#### 🔹 Step 1.1 — Create the CafeOrders Table
+
+- AWS Console → DynamoDB → Tables → CafeOrders
+
+- Fill EXACTLY like this
+
+| Field         | Value        |
+| ------------- | ------------ |
+| Table name    | `CafeOrders` |
+| Partition key | `order_id`   |
+| Type          | `String`     |
+| Sort key      | ❌ NONE       |
+| Table class   | Standard     |
+| Capacity mode | On-demand    |
+| Encryption    | Default      |
+
+
+- Click Create table.
+
+**🕐 Wait 1-2 minutes until status shows Active.**
+
+#### 🔹 Step 1.2 — Confirm Primary Key
+
+- Your table must have:
+
+```
+Partition Key: order_id (String)
+```
+
+**⚠️ If not, STOP — this lab assumes order_id is the key.**
+
+#### 🔹 Step 1.3 — Add Attributes (NO MIGRATION NEEDED)
+
+#### Basic test item (CASH payment – PENDING)
+
+```
+{
+  "order_id": { "S": "ORD-TEST-001" },
+  "table_number": { "N": "5" },
+  "item": { "S": "Coffee" },
+  "quantity": { "N": "2" },
+  "total_amount": { "N": "6" },
+
+  "payment_method": { "S": "CASH" },
+  "payment_status": { "S": "PENDING" },
+
+  "status": { "S": "RECEIVED" },
+  "created_at": { "S": "2026-01-14T10:30:00Z" }
+}
+```
+
+#### Another test item (CARD payment – PAID)
+
+```
+{
+  "order_id": { "S": "ORD-TEST-002" },
+  "table_number": { "N": "5" },
+  "item": { "S": "Coffee" },
+  "quantity": { "N": "2" },
+  "total_amount": { "N": "6" },
+
+  "payment_method": { "S": "CARD" },
+  "payment_status": { "S": "PENDING" },
+
+  "status": { "S": "RECEIVED" },
+  "created_at": { "S": "2026-01-14T10:30:00Z" }
+}
+```
+#### 🔎 VERIFY STEP 1.3 WORKED
+
+Click the item → you should see:
+
+```
+payment_method: CASH
+payment_status: PENDING
+```
+
+✅ That’s it
+
+✅ Nothing else to configure here
+
+✅ DynamoDB auto-creates attributes
+
+❌ No further DB action needed
+
+#### 2️⃣ If you are using RDS (MySQL)
+
+#### Run this ONCE:
+
+```
+ALTER TABLE orders
+ADD payment_method VARCHAR(10),
+ADD payment_status VARCHAR(10);
+```
+
+#### verify
+
+```
+use cafe_db;
+```
+
+```
+DESCRIBE orders;
+```
+
+#### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+
+[orders.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+
+## ☕ CHARLIE CAFÉ PHASE 2️⃣ Admin marks a CASH order as PAID
+
+### 1️⃣ — CREATE ADMIN LAMBDA
+
+#### 🔹 1.1 Open AWS Lambda
+
+- AWS Console → Lambda → Create function
+
+#### 🔹 1.2 Function Settings
+
+- Function name: AdminMarkPaidLambda
+
+- Runtime: Python 3.10
+
+- Execution role: Use existing role
+(Must allow DynamoDB UpdateItem)
+
+- Permissions: Choose existing role or create new role with DynamoDB access
+
+- Click Create function
+
+### 2️⃣ — IAM PERMISSIONS (CRITICAL)
+
+Lambda needs UpdateItem permission for your table.
+
+#### Open:
+
+```
+AdminMarkPaidLambda
+→ Configuration
+→ Permissions
+→ Role
+```
+
+#### Ensure this permission exists:
+
+```
+{
+  "Effect": "Allow",
+  "Action": [
+    "dynamodb:UpdateItem",
+    "dynamodb:GetItem",
+    "dynamodb:Query"
+  ],
+  "Resource": "arn:aws:dynamodb:*:*:table/CafeOrders"
+}
+```
+
+- Attach this policy to the Lambda’s role.
+
+- **⚠️ If missing → Admin cannot mark paid.**
+
+- **⚠️ 2️⃣ is ALREADY implemented in your orders.php.You do NOT need structural changes.**
+
+
+### 3️⃣ — ADMIN LAMBDA CODE (WITH COMMENTS)
+
+#### Replace entire Lambda code with this:
+
+[AdminMarkPaidLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/AdminMarkPaidLambda/AdminMarkPaidLambda.py)
+
+### 4️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**    
+
+### 5️⃣ Attach Lambda Layer
+
+- same steps 
+
+### 6️⃣ — CREATE ADMIN API ENDPOINT
+
+#### 🔹 4.1 Open API Gateway
+
+- AWS Console → API Gateway → Choose your existing REST API (or create a new one)
+
+#### 🔹 4.2 Create Resource
+
+- Select your API → Actions → Create Resource
+
+```
+/admin
+   └── /mark-paid
+```
+
+#### Steps:
+
+- Select /
+
+- Create Resource
+
+- Resource name: admin
+
+- Create sub-resource → mark-paid
+
+> **Resource Name: admin → Create Sub-resource mark-paid**
+
+This creates endpoint /admin/mark-paid
+
+#### 🔹 4.3 Create POST Method
+
+- Select /admin/mark-paid
+
+- Create Method → POST
+
+- Integration type: Lambda
+
+- Lambda name: AdminMarkPaidLambda
+
+- Save
+
+#### 🔹 4.4 Enable CORS (MANDATORY)
+
+- Select /admin/mark-paid
+
+- Click Enable CORS
+
+- Accept defaults
+
+- Save
+
+#### 🔹 4.5 Deploy API
+
+- Actions → Deploy API
+
+- Stage: prod
+
+- Deploy
+
+📌 Endpoint URL:
+
+```
+POST https://xxxx.execute-api.us-east-1.amazonaws.com/prod/admin/mark-paid
+```
+
+### 7️⃣ — admin-orders.html
+
+[admin-orders.html](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/admin-orders/admin-orders.html)
+
+**🔁 Replace with your real API Gateway URL**
+
+```
+sudo systemctl restart httpd
+```
+
+**✅ Admin feature COMPLETE**
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## ☕ CHARLIE CAFÉ PHASE 3️⃣ Order status page understands CARD vs CASH
+
+### 🧠 WHAT THIS PAGE MUST DO
+
+Based on DB values:
+
+| Condition      | Show               |
+| -------------- | ------------------ |
+| CARD + PAID    | “Payment received” |
+| CASH + PENDING | “Pay at counter”   |
+| CASH + PAID    | “Cash received”    |
+
+### 🟦 STEP 6 — ORDER STATUS API MUST RETURN FIELDS
+
+Your existing Order Status API must return:
+
+```
+{
+  "order_id": "ORD-123",
+  "payment_method": "CASH",
+  "payment_status": "PENDING"
+}
+```
+
+**⚠️ If missing, update backend first.**
+
+### 🟦 STEP 7 — UPDATE payment-status.php
+
+#### ✅ FULL UPDATED FILE (WITH COMMENTS)
+
+[payment-status.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+**🔁 Replace with your real API Gateway URL**
+
+```
+sudo systemctl restart httpd
+```
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+
+## ☕ CHARLIE CAFÉ PHASE 4️⃣ 🔁 REDIRECTING TO payment-status.php
+
+### 🟦 STEP 1 — REDIRECT FROM order.php (CARD + CASH)
+
+#### 🔁 1️⃣ Change destination page (VERY IMPORTANT)
+
+### ✅ FINAL payment-status.php (CLEAN + PRINT REDIRECT)
+
+Below is a clean, correct version aligned with your flow.
+
+#### 📄 payment-status.php
+
+[payment-status.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/payment-status.php/payment-status.php)
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 9️⃣ COMPLETE & VERIFIED
+---
