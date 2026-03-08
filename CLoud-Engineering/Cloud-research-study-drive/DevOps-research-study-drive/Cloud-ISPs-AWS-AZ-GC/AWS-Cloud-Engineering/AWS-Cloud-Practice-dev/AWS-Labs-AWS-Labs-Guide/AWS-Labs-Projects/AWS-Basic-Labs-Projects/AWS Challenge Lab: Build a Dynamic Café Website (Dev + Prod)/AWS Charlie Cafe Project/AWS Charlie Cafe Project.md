@@ -3725,3 +3725,527 @@ https://a1053skr51.execute-api.us-east-1.amazonaws.com/prod/get-order-status
 
 # 🟢 SECTION 7️⃣ COMPLETE & VERIFIED
 ---
+# ☕ SECTION 8️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
+
+## 🔔 PHASE 1️⃣ — Customer Order Tracking (Read-Only Backend, Zero-Risk)
+
+### 1️⃣ — CREATE NEW LAMBDA (READ-ONLY)
+
+#### 1️⃣ Open AWS Lambda
+
+AWS Console → Lambda → Create function
+
+#### 2️⃣ Function Settings
+
+| Field         | Value                         |
+| ------------- | ----------------------------- |
+| Function name | `CafeOrderStatusLambda`       |
+| Runtime       | Python 3.12                   |
+| Architecture  | x86_64                        |
+| Role          | Same role used for RDS access |
+
+Click Create function
+
+Wait until status = Active
+
+### 2️⃣ — ADD PyMySQL LAYER
+
+- Lambda → Layers → Add layer
+
+- Custom layers
+
+- Select PyMySQLLayer
+
+- Latest version
+
+- Click Add
+
+### 3️⃣ — FINAL LAMBDA CODE (READ-ONLY)
+
+> **⚠️ COPY EXACTLY — do NOT modify**
+
+[CafeOrderStatusLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda/CafeOrderStatusLambda.py)
+
+Click Deploy
+
+### 4️⃣ — Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
+### 5️⃣ — TEST LAMBDA (MANDATORY)
+
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
+
+### 6️⃣ — CREATE API GATEWAY (READ-ONLY)
+
+#### 1️⃣ Open API Gateway 
+
+- Open → REST API 
+
+#### 2️⃣ Create Resource
+
+```
+/cafe-order-status
+```
+
+#### 3️⃣ Create GET Method
+
+#### Integration:
+
+    - Lambda Function
+
+    - CafeOrderStatusLambda
+
+Enable Lambda Proxy Integration
+
+#### 4️⃣ Enable CORS
+
+- **Allow Origin:** *
+
+- **Allow Methods:** GET
+
+- **Allow Headers:** *
+
+#### 5️⃣ Deploy API
+
+#### Stage name:
+
+```
+prod
+```
+
+**Copy Invoke URL**
+
+#### Example:
+
+```
+https://xxxx.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status
+```
+
+### 7️⃣ — TEST API (CRITICAL)
+
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
+
+### 8️⃣ — CREATE order-status.php
+
+This file is frontend-only and SAFE
+
+[order-receipt.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
+
+#### ✅ WHAT YOU NEED TO REPLACE (VERY CLEAR)
+
+Inside the PHP file, ONLY replace this line:
+
+```
+$apiUrl = "https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status?order_id=$orderId";
+```
+
+**🔁 Replace with your real API Gateway URL**
+
+### 9️⃣ — END-TO-END TEST
+
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## 🔄 PHASE 3️⃣ — Real Order State Machine (RECEIVED → PREPARING → READY → COMPLETED)
+
+### 🧑‍💻 STEP 1 — MODIFY DATABASE (ONE TIME)
+
+#### 1️⃣ Open RDS → Query Editor (or MySQL client)
+
+Connect to your cafe database.
+
+#### 2️⃣ Verify Columns
+
+```
+DESCRIBE orders;
+```
+
+#### You MUST see:
+
+- order_id
+
+- status
+
+- total_amount
+
+- updated_at
+
+### 🧠 ORDER ID FORMAT (STANDARD)
+
+```
+ORD-YYYYMMDD-XXXX
+```
+
+#### Example:
+
+```
+ORD-20260114-8392
+```
+
+### 🧑‍💻 STEP 2 — TEST ORDER CREATION
+
+- **Please refer to the Test & Verification documentation for detailed procedures.Please refer to the Test & Verification documentation for detailed procedures.**
+
+### 🧑‍💻 STEP 3 — CREATE WORKER (KITCHEN) LAMBDA
+
+#### This simulates:
+
+- Barista
+
+- Kitchen staff
+
+- Admin panel
+
+### 1️⃣ Create Lambda
+
+| Setting | Value                   |
+| ------- | ----------------------- |
+| Name    | `CafeOrderWorkerLambda` |
+| Runtime | Python 3.12             |
+| Role    | Same RDS role           |
+
+
+### 2️⃣ Lambda Code (STRICT COPY)
+
+[CafeOrderWorkerLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderWorkerLambda/CafeOrderWorkerLambda.py)
+
+### 3️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**    
+
+### 4️⃣ Attach Lambda Layer
+
+- same steps 
+
+### 🌐 STEP 5 — CREATE New Resources API GATEWAY FOR WORKER
+
+#### Resources
+
+```
+/order-update
+```
+
+- API Method: POST
+
+- Integration: CafeOrderWorkerLambda
+
+- Enable CORS
+
+- Check Box : POST
+
+- Deploy stage: order-update
+
+#### Endpoint 
+
+```
+POST /order-update
+```
+
+### 🧪 STEP 6 — TEST STATUS FLOW (MANDATORY)
+
+#### 1️⃣ RECEIVED → PREPARING
+
+```
+{
+  "order_id": "ORD-XXXX",
+  "status": "PREPARING"
+}
+```
+
+#### 2️⃣ PREPARING → READY
+
+#### 3️⃣ READY → COMPLETED
+
+❌ Try skipping → must fail
+
+### 🧑‍💻 STEP 7 — UPDATE ORDER STATUS LAMBDA (READ REAL STATUS)
+
+#### Replace SELECT query:
+
+> **🔁 Replace ONLY the SQL + response logic**
+
+> **(keep env vars, VPC, API Gateway exactly as-is)**
+
+```
+SELECT order_id, table_number, item, quantity, total_amount, status, created_at
+FROM orders
+WHERE order_id=%s
+```
+#### ✅ FINAL — Order Status Lambda
+
+```
+import json
+import os
+import pymysql
+
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASS"],
+        database=os.environ["DB_NAME"],
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+def lambda_handler(event, context):
+    params = event.get("queryStringParameters") or {}
+    order_id = params.get("order_id")
+
+    if not order_id:
+        return {
+            "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": "order_id required"})
+        }
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                order_id,
+                table_number,
+                customer_name,
+                item,
+                quantity,
+                total_amount,
+                status,
+                created_at
+            FROM orders
+            WHERE order_id = %s
+        """, (order_id,))
+
+        order = cursor.fetchone()
+
+        if not order:
+            return {
+                "statusCode": 404,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "Order not found"})
+            }
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            },
+            "body": json.dumps({
+                "order": order
+            }, default=str)
+        }
+
+    finally:
+        cursor.close()
+        conn.close()
+```
+#### ⚠️ Already Added And CafeOrderStatusLambda.py code is updated... Skip this step
+
+[CafeOrderStatusLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeOrderStatusLambda.py)
+
+### 🧑‍💻 STEP 8 — order-receipt.php
+
+#### Add billing & live status:
+
+#### 📌 Requirement: Your backend must expose a GET order status API like:
+
+```
+GET https://YOUR_API_ID.execute-api.us-east-1.amazonaws.com/prod/cafe-order-status?order_id=ORD-XXXX
+```
+
+#### 📁 WHERE THIS FILE BELONGS
+
+```
+/web
+ ├── order.php
+ ├── order-receipt.php   ✅ (THIS FILE)
+ └── index.html
+```
+
+#### Code order-receipt.php
+
+```
+<p><strong>Total:</strong> $<?= $data['order']['total_amount'] ?></p>
+<p><strong>Status:</strong>
+<span class="badge bg-success"><?= $data['order']['status'] ?></span>
+</p>
+```
+
+**Print button already exists ✅**
+
+**⚠️ STEP 8 is ALREADY implemented in your order-receipt.php.You do NOT need structural changes.**
+
+[order-receipt.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
+
+**☕ You now have a REAL SaaS-LEVEL CUSTOMER ORDER TRACKING SYSTEM**
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+## 🔔 PHASE 4️⃣ — Customer Order Tracking, Billing & Receipt (Frontend-Only, Zero-Risk)
+
+### 🧩 STEP 1 — DATABASE (VERIFY ONLY)
+
+#### 1️⃣ Open RDS → Query Editor (or MySQL client)
+
+#### 2️⃣ Run:
+
+```
+use cafe_db;
+```
+
+```
+DESCRIBE orders;
+```
+
+❌ Do NOT drop or modify existing columns
+
+✅ Only verify these exist
+
+#### Required columns in orders table
+
+```
+order_id        VARCHAR(40) PRIMARY KEY
+customer_name  VARCHAR(100)
+table_number   INT
+item            VARCHAR(50)
+quantity        INT
+total_amount   DECIMAL(10,2)
+status          VARCHAR(20)
+created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+```
+
+✔ If these already exist → DO NOTHING
+
+✔ If order_id exists → must be unique
+
+### 🧩 STEP 2 — BACKEND API (READ-ONLY)
+
+#### Endpoint
+
+```
+GET /order-receipt.php?order_id=ORD-XXXX
+```
+
+#### Lambda responsibility
+
+- Fetch order by order_id
+
+- Return JSON
+
+- No updates
+
+- No auth
+
+#### Expected JSON response (MANDATORY)
+
+```
+{
+  "order": {
+    "order_id": "ORD-20260114-8392",
+    "customer_name": "John",
+    "table_number": 4,
+    "item": "Latte",
+    "quantity": 2,
+    "total_amount": 8.00,
+    "status": "PREPARING",
+    "created_at": "2026-01-14 10:42:00"
+  }
+}
+```
+
+✔ If this API already exists → DO NOTHING
+
+✔ If not → create a new Lambda (read-only)
+
+### 🧩 STEP 3 — ORDER PAGE (MINIMAL CHANGE)
+
+#### File: order.php
+
+After successful order placement, backend already returns order_id.
+
+#### Add this line ONLY (no other change):
+
+```
+echo "<a class='btn btn-success mt-2'
+      href='order-status.php?order_id={$order_id}'>
+      📦 Track Your Order
+      </a>";
+```
+
+✔ Existing order logic untouched
+
+✔ This only adds a link
+
+**⚠️ STEP 3 is ALREADY implemented in your order.php.You do NOT need structural changes.**
+
+[order.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+### 🧩 STEP 4 — CREATE CUSTOMER TRACKING PAGE
+
+#### File name (NEW)
+
+```
+order-receipt.php
+```
+
+#### Location
+
+```
+/web/order-receipt.php
+```
+
+### 🧩 STEP 5 — FINAL order-receipt.php (LATEST VERSION)
+
+**⚠️ STEP 5 is ALREADY implemented in your order-receipt.php.You do NOT need structural changes.**
+
+[order-receipt.php](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order-status/CC%20-%20Order-Status%20CUSTOMER%20ORDER%20RECEIPT_single%20order/order-receipt.php)
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 8️⃣ COMPLETE & VERIFIED
+---
