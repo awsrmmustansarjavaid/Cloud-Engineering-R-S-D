@@ -397,7 +397,6 @@ sudo ./lamp-verify.sh
 
 ## 📢 SECTION 1️⃣ CAFE BASIC CONFIGURATIONS COMPLETE ✅
 ---
-
 ## 📢 SECTION 2️⃣ CAFE DATABASE CONFIGURATIONS
 
 ## PHASE 1️⃣ — Basic RDS CONFIGURATIONS
@@ -503,9 +502,7 @@ sudo chmod +x connect-rds.sh
 sudo ./connect-rds.sh
 ```
 
----
-
-### 2️⃣ cafe_db
+### 3️⃣ cafe_db
 
 ### ✅ Charlie Cafe – Order Processing & HR Schema Setup + Verification
 
