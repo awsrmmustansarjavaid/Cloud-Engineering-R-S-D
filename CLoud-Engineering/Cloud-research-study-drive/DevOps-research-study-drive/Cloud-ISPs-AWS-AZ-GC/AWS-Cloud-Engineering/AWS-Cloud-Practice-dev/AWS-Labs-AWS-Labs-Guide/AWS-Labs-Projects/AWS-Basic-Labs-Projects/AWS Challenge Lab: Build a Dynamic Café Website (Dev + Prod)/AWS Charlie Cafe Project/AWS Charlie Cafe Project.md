@@ -2878,3 +2878,347 @@ _ **Please refer to the Test & Verification documentation for detailed procedure
 
 ## 🟢 SECTION 5️⃣ COMPLETE & VERIFIED
 ---
+## SECTION 6️⃣ — AWS Cafe Menu + Cache Layer
+
+## PHASE 1 — AMAZON DYNAMODB (Menu + Cache Layer)
+
+### 1️⃣ Create DynamoDB Table
+
+- **DynamoDB → Create table**
+
+### 1️⃣ Basic Table Settings
+
+| Field         | Value      |
+| ------------- | ---------- |
+| Table name    | `CafeMenu` |
+| Partition key | `item`     |
+| Type          | `String`   |
+
+##### ⚠️ Do NOT add Sort key
+
+##### ⚠️ Partition key name must be exactly item
+
+### 2️⃣ Table Settings (Capacity)
+
+Scroll down to Table settings
+
+- Capacity mode:
+
+    ✅ On-demand
+
+#### Why?
+
+- No capacity planning
+
+- Free-tier friendly
+
+- Ideal for learning & small apps
+
+### 3️⃣ Additional Settings (Keep Default)
+
+Leave ALL of these as default:
+
+- Encryption at rest: AWS owned key
+
+- Table class: Standard
+
+- Deletion protection: Disabled
+
+- Tags: Optional (skip)
+
+### 4️⃣ Create Table
+
+- Click Create table
+
+#### Wait until:
+
+```
+Status = ACTIVE
+```
+
+##### ⏳ This may take 20–60 seconds
+
+### 2️⃣ Insert Menu Items
+
+- **DynamoDB → CafeMenu → Explore table → Create item**
+
+### 1️⃣ Method 1 JSON EDitor
+
+#### 1️⃣ Create First Item (Coffee)
+
+You will see a JSON editor.
+
+Replace everything with:
+
+```
+{
+  "item": {
+    "S": "Coffee"
+  },
+  "price": {
+    "N": "3"
+  }
+}
+```
+
+- ✅ Click Create item
+
+#### 2️⃣ Create Second Item (Latte)
+
+Click Create item again:
+
+```
+{
+  "item": {
+    "S": "Latte"
+  },
+  "price": {
+    "N": "5"
+  }
+}
+```
+
+- ✅ Click Create item
+
+#### 3️⃣ Create Third Item (Tea)
+
+Click Create item again:
+
+```
+{
+  "item": {
+    "S": "Tea"
+  },
+  "price": {
+    "N": "2"
+  }
+}
+```
+
+- ✅ Click Create item
+
+---
+
+#### 4️⃣ Create 4th Item (Cappuccino)
+
+```
+{
+  "item": {
+    "S": "Cappuccino"
+  },
+  "price": {
+    "N": "8"
+  }
+}
+```
+
+- ✅ Click Create item
+
+---
+
+#### 5️⃣ Create 5th Item (Fresh Juice)
+
+```
+{
+  "item": {
+    "S": "Fresh Juice"
+  },
+  "price": {
+    "N": "6"
+  }
+}
+```
+
+- ✅ Click Create item
+
+---
+
+### 2️⃣ Method 2 Item editor screen
+
+
+#### 1️⃣ Create First Item (Coffee)
+
+1. Partition key:
+
+- item → Coffee
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 3
+
+- ✅ Click Create item
+
+#### 2️⃣ Create Second Item (Latte)
+
+1. Partition key:
+
+- item → Latte
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 5
+
+- ✅ Click Create item
+
+#### 3️⃣ Create Third Item (Tea)
+
+1. Partition key:
+
+- item → Latte
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 2
+
+- ✅ Click Create item
+
+#### 4️⃣ Create 4th Item (Cappuccino)
+
+1. Partition key:
+
+- item → Cappuccino
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 8
+
+- ✅ Click Create item
+
+#### 5️⃣ Create 5th Item (Fresh Juice)
+
+1. Partition key:
+
+- item → Fresh Juice
+
+2. Click Add new attribute
+
+- Type: Number
+
+- Attribute name: price
+
+- Value: 6
+
+- ✅ Click Create item
+
+---
+### 3️⃣ Verify Items
+
+You should now see 5 items in the table. You should now see:
+
+| item   | price |
+| ------ | ----- |
+| Coffee | 3     |
+| Latte  | 5     |
+| Cappuccino    | 8     |
+| Fresh Juice    | 6     |
+
+✅ DynamoDB table is ready
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 2️⃣ — CafeMenuLambda
+### 1️⃣ Attach Policy to Lambda Role
+
+You likely have two Lambdas:
+
+    API Lambda
+
+    Worker Lambda
+
+👉 Attach this policy to API Lambda role
+
+- **Go to IAM → Roles → Search for your Lambda role**
+
+Example:
+
+```
+CafeAPILambdaRole
+```
+
+- Attach Policy to API Lambda role **CafeLambdaExecutionRole**
+
+```
+CafeMenuDynamoDBReadPolicy
+```
+✅ IAM is now correctly configured
+
+✅ Lambda now has DynamoDB access
+
+
+### 2️⃣ CREATE NEW LAMBDA (MENU API)
+
+- Open AWS Lambda
+
+- **Function details:**
+
+| Field          | Value                     |
+| -------------- | ------------------------- |
+| Function name  | `CafeMenuLambda`          |
+| Runtime        | Python 3.12               |
+| Architecture   | x86_64                    |
+| Execution role | Use existing role         |
+| Role           | `CafeLambdaExecutionRole` |
+
+**✔️ Click Create function**
+
+### 5️⃣ Lambda Code: Read Menu from DynamoDB (Python)
+
+Now we implement the logic.
+
+Use boto3 to fetch menu/prices before processing orders.
+
+[CafeMenuLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeMenuLambda.py)
+
+**✔️ Click Deploy**
+
+### 6️⃣ TEST LAMBDA (MANDATORY)
+
+- Click Test
+
+- Test name: MenuTest
+
+- Event JSON:
+
+```
+{}
+```
+
+**✔️ Click Test**
+
+#### ✅ Expected Output:
+
+```
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "[{\"price\": 5, \"item\": \"Latte\"}, {\"price\": 8, \"item\": \"Cappuccino\"}, {\"price\": 6, \"item\": \"Fresh Juice\"}, {\"price\": 2, \"item\": \"Tea\"}, {\"price\": 3, \"item\": \"Coffee\"}]"
+}
+```
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+# 🟢 SECTION 6️⃣ COMPLETE & VERIFIED
+---
