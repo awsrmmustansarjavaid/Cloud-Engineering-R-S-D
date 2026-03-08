@@ -340,31 +340,136 @@ VALUES
 
 Run these queries to verify the database.
 
-### 1️⃣ Verify Orders
+### 1️⃣ Verify Database Exists
+
+```
+SHOW DATABASES;
+```
+
+#### ✅ Expected output should include:
+
+```
+cafe_db
+```
+
+### 2️⃣ Verify Current Database
+
+```
+SELECT DATABASE();
+```
+
+#### ✅ Expected result:
+
+```
+cafe_db
+```
+
+### 3️⃣ Verify All Tables
+
+```
+SHOW TABLES;
+```
+
+#### ✅ Expected result:
+
+```
+orders
+employees
+attendance
+leaves
+holidays
+```
+
+### 4️⃣ Verify Table Structure
+
+### 1️⃣ Orders Table
+
+```
+DESCRIBE orders;
+```
+
+or 
+
+```
+SHOW CREATE TABLE orders;
+```
+
+#### ✅ Expected result:
+
+```
+id
+order_id
+table_number
+customer_name
+item
+quantity
+total_amount
+status
+payment_status
+created_at
+updated_at
+```
+
+### 2️⃣ Verify Orders
 
 ```
 SELECT * FROM orders;
 ```
 
-### 2️⃣ Verify Employees
+### 3️⃣ Employees Table
+
+```
+DESCRIBE employees;
+```
+
+#### ✅ Expected result:
+
+```
+employee_id
+cognito_user_id
+name
+job_title
+salary
+start_date
+created_at
+```
+
+### 4️⃣ Verify Employees
 
 ```
 SELECT * FROM employees;
 ```
 
-### 3️⃣ Verify Attendance
+### 5️⃣ Attendance Table
+
+```
+DESCRIBE attendance;
+```
+
+#### ✅ Expected result:
+
+```
+attendance_id
+employee_id
+attendance_date
+checkin_time
+checkout_time
+created_at
+```
+
+### 6️⃣ Verify Attendance
 
 ```
 SELECT * FROM attendance;
 ```
 
-### 4️⃣ Verify Holidays
+### 7️⃣ Verify Holidays
 
 ```
 SELECT * FROM holidays;
 ```
 
-### ✅ Expected Result
+#### ✅ Expected Result
 
 You should see:
 
@@ -376,4 +481,191 @@ You should see:
 
 - Holiday data visible
 
-### 
+### 8️⃣ Verify Foreign Keys
+
+Check if attendance → employees relation exists.
+
+```
+SELECT
+TABLE_NAME,
+COLUMN_NAME,
+CONSTRAINT_NAME,
+REFERENCED_TABLE_NAME
+FROM
+information_schema.KEY_COLUMN_USAGE
+WHERE
+TABLE_SCHEMA = 'cafe_db'
+AND REFERENCED_TABLE_NAME IS NOT NULL;
+```
+
+#### ✅ Expected Result
+
+```
+attendance.employee_id → employees.employee_id
+```
+
+### 9️⃣ Verify Indexes (Performance Check)
+
+Indexes improve query speed in AWS RDS.
+
+Check Orders Indexes
+
+```
+SHOW INDEX FROM orders;
+```
+
+#### ✅ Expected Result
+
+```
+PRIMARY
+idx_table_number
+idx_created_at
+idx_order_id
+```
+
+### 🔟 Verify Row Counts (Quick Health Check)
+
+```
+SELECT
+(SELECT COUNT(*) FROM orders) AS total_orders,
+(SELECT COUNT(*) FROM employees) AS total_employees,
+(SELECT COUNT(*) FROM attendance) AS total_attendance,
+(SELECT COUNT(*) FROM holidays) AS total_holidays;
+```
+
+#### ✅ Expected Result
+
+```
+total_orders      8
+total_employees   3
+total_attendance  3
+total_holidays    3
+```
+
+### 1️⃣1️⃣ Functional Query Tests
+
+### 1️⃣ Orders by Table
+
+```
+SELECT table_number, COUNT(*) AS total_orders
+FROM orders
+GROUP BY table_number;
+```
+
+### 2️⃣ Daily Orders
+
+```
+SELECT DATE(created_at) AS order_day, COUNT(*) AS orders
+FROM orders
+GROUP BY order_day;
+```
+
+### 3️⃣ Employees Attendance
+
+```
+SELECT 
+e.name,
+a.attendance_date,
+a.checkin_time
+FROM attendance a
+JOIN employees e
+ON a.employee_id = e.employee_id;
+```
+
+### 4️⃣ Payment Verification
+
+```
+SELECT
+payment_status,
+COUNT(*) AS total_orders
+FROM orders
+GROUP BY payment_status;
+```
+
+#### ✅ Expected Result
+
+```
+PENDING 5
+PAID    3
+```
+
+### 1️⃣2️⃣ Data Integrity Test
+
+Test foreign key protection.
+
+Run:
+
+```
+INSERT INTO attendance
+(employee_id, attendance_date, checkin_time)
+VALUES
+(999, '2026-03-08', '09:00:00');
+```
+
+#### ✅ Expected Result
+
+```
+ERROR 1452: Cannot add or update a child row
+```
+
+Meaning foreign key works correctly.
+
+### 1️⃣3️⃣ Database Size Verification
+
+```
+SELECT
+table_schema AS "Database",
+SUM(data_length + index_length) / 1024 / 1024 AS "Size_MB"
+FROM information_schema.TABLES
+WHERE table_schema = "cafe_db"
+GROUP BY table_schema;
+```
+
+### 1️⃣4️⃣ Full System Health Check (Recommended)
+
+```
+SELECT
+table_name,
+table_rows
+FROM information_schema.tables
+WHERE table_schema = 'cafe_db';
+```
+
+#### ✅ Expected Result
+
+```
+orders       10
+employees    3
+attendance   3
+holidays     3
+leaves       0
+```
+
+### ✅ Final Verification Checklist
+
+| Check                | Query                      |
+| -------------------- | -------------------------- |
+| Database exists      | `SHOW DATABASES`           |
+| Tables created       | `SHOW TABLES`              |
+| Table structure      | `DESCRIBE table_name`      |
+| Indexes working      | `SHOW INDEX FROM table`    |
+| Data inserted        | `SELECT * FROM table`      |
+| Foreign keys working | `information_schema` query |
+| Row counts           | `COUNT(*)` queries         |
+
+### 💡 Pro Tip (Real AWS DevOps Practice)
+
+Create one quick verification script:
+
+```
+SELECT 'orders' AS table_name, COUNT(*) FROM orders
+UNION
+SELECT 'employees', COUNT(*) FROM employees
+UNION
+SELECT 'attendance', COUNT(*) FROM attendance
+UNION
+SELECT 'holidays', COUNT(*) FROM holidays;
+```
+
+This gives instant database health summary.
+---
