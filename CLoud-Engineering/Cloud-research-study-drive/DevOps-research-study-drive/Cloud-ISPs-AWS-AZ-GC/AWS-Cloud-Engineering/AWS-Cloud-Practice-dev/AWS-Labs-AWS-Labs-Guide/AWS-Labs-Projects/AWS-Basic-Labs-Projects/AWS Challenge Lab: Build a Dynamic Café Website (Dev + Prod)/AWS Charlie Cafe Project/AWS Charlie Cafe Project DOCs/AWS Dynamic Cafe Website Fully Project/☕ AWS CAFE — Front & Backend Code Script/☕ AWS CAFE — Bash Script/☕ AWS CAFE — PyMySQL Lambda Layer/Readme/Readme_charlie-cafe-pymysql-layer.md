@@ -6,166 +6,56 @@
 
 ```
 #!/bin/bash
-# ============================================================
-# Charlie Cafe ☕
-# PyMySQL Lambda Layer – FULL AUTOMATION SCRIPT
-# Author: You
-# Purpose:
-#  - Build PyMySQL Lambda Layer
-#  - Publish via AWS CLI (NO S3)
-#  - Auto-attach to all Lambdas
-#  - Optional Docker parity build
-#  - Optional Secrets Manager creation
-# ============================================================
+# =========================================
+# Bash Script: Create PyMySQL Lambda Layer
+# Correct Structure for AWS Lambda
+# =========================================
 
-set -e  # Exit immediately if any command fails
+set -e  # Exit on error
 
-# -----------------------------
-# CONFIGURATION (EDIT THESE)
-# -----------------------------
-LAYER_NAME="pymysql-layer"
-PYTHON_RUNTIMES="python3.9 python3.10 python3.11"
-WORKDIR="$HOME/pymysql-layer"
-REGION="$(aws configure get region)"
+# -------- CONFIGURATION --------
+AWS_DEFAULT_REGION="us-east-1"
 
-# Secrets Manager (optional)
-SECRET_NAME="cafe-db-credentials"
-DB_SECRET_JSON='{
-  "host":"db-endpoint",
-  "user":"admin",
-  "password":"secret",
-  "dbname":"cafe"
-}'
+S3_BUCKET="charlie-cafe-s3-bucket"
+S3_KEY="layers/pymysql-layer.zip"
 
-# -----------------------------
-# PHASE 0️⃣ – PREREQUISITES
-# -----------------------------
-echo "🔍 Verifying prerequisites..."
+# Local build folders
+BUILD_DIR="lambda-layer"
+PYTHON_DIR="$BUILD_DIR/python"
+ZIP_FILE="pymysql-layer.zip"
 
-aws --version
-python3 --version || sudo dnf install -y python3
-pip3 --version || sudo dnf install -y python3-pip
-zip -v >/dev/null || sudo dnf install -y zip
+# -------- STEP 1: Prepare Environment --------
+echo "✅ Installing Python & Pip (if missing)..."
+sudo dnf install -y python3 python3-pip zip
 
-echo "✅ Prerequisites OK"
-echo
+# Clean old builds
+echo "🧹 Cleaning old build files..."
+rm -rf "$BUILD_DIR" "$ZIP_FILE"
 
-# -----------------------------
-# PHASE 1️⃣ – BUILD PYMYSQL LAYER
-# -----------------------------
-echo "📦 Building PyMySQL Lambda Layer..."
+# -------- STEP 2: Create Correct Folder Structure --------
+echo "📁 Creating Lambda layer structure..."
+mkdir -p "$PYTHON_DIR"
 
-# Clean old directory if exists
-rm -rf "$WORKDIR"
-mkdir -p "$WORKDIR/python"
-cd "$WORKDIR"
+# -------- STEP 3: Install PyMySQL --------
+echo "📦 Installing PyMySQL into python/ folder..."
+pip3 install pymysql -t "$PYTHON_DIR" --no-cache-dir
 
-echo "📥 Installing pymysql into python/ directory..."
-pip3 install pymysql -t python/
+# -------- STEP 4: Zip ONLY python/ --------
+echo "🗜️ Zipping layer (correct structure)..."
+cd "$BUILD_DIR"
+zip -r "../$ZIP_FILE" python
+cd ..
 
-echo "📂 Verifying installation..."
-ls python/
+# -------- STEP 5: Verify ZIP CONTENT --------
+echo "🔍 Verifying ZIP structure..."
+unzip -l "$ZIP_FILE"
 
-echo "🗜 Creating ZIP archive..."
-zip -r pymysql-layer.zip python >/dev/null
+# -------- STEP 6: Upload to S3 --------
+echo "☁️ Uploading to S3..."
+aws s3 cp "$ZIP_FILE" "s3://$S3_BUCKET/$S3_KEY" --region "$AWS_DEFAULT_REGION"
 
-echo "📏 ZIP size:"
-ls -lh pymysql-layer.zip
-echo
-
-# -----------------------------
-# PHASE 1️⃣ – PUBLISH LAYER
-# -----------------------------
-echo "🚀 Publishing Lambda Layer via AWS CLI (NO S3)..."
-
-LAYER_PUBLISH_OUTPUT=$(aws lambda publish-layer-version \
-  --layer-name "$LAYER_NAME" \
-  --description "Charlie Cafe PyMySQL Lambda Layer" \
-  --zip-file fileb://pymysql-layer.zip \
-  --compatible-runtimes $PYTHON_RUNTIMES)
-
-echo "$LAYER_PUBLISH_OUTPUT"
-
-LAYER_ARN=$(echo "$LAYER_PUBLISH_OUTPUT" | jq -r '.LayerVersionArn')
-
-echo "✅ Layer published:"
-echo "$LAYER_ARN"
-echo
-
-# -----------------------------
-# PHASE 2️⃣ – AUTO-ATTACH TO ALL LAMBDAS
-# -----------------------------
-echo "🔁 Attaching layer to ALL Lambda functions..."
-
-FUNCTIONS=$(aws lambda list-functions \
-  --query 'Functions[].FunctionName' \
-  --output text)
-
-for FN in $FUNCTIONS; do
-  echo "➡ Updating Lambda: $FN"
-
-  aws lambda update-function-configuration \
-    --function-name "$FN" \
-    --layers "$LAYER_ARN"
-done
-
-echo "✅ All Lambdas updated"
-echo
-
-# -----------------------------
-# PHASE 3️⃣ – OPTIONAL DOCKER BUILD
-# -----------------------------
-echo "🐳 Optional: Docker-based AWS parity build"
-echo "⏭ Skipped by default (uncomment section to enable)"
-: '
-docker build -t pymysql-layer-docker - <<EOF
-FROM public.ecr.aws/lambda/python:3.10
-RUN pip install pymysql -t /layer/python
-CMD ["bash"]
-EOF
-
-docker run --rm -v $(pwd):/out pymysql-layer-docker \
-  cp -r /layer /out
-
-zip -r pymysql-layer.zip layer/python
-
-aws lambda publish-layer-version \
-  --layer-name "$LAYER_NAME" \
-  --zip-file fileb://pymysql-layer.zip \
-  --compatible-runtimes python3.10
-'
-echo
-
-# -----------------------------
-# PHASE 4️⃣ – OPTIONAL SECRETS MANAGER
-# -----------------------------
-echo "🔐 Optional: Creating Secrets Manager DB credentials"
-echo "⏭ Skipped if secret already exists"
-
-if ! aws secretsmanager describe-secret --secret-id "$SECRET_NAME" >/dev/null 2>&1; then
-  aws secretsmanager create-secret \
-    --name "$SECRET_NAME" \
-    --secret-string "$DB_SECRET_JSON"
-
-  echo "✅ Secret created: $SECRET_NAME"
-else
-  echo "ℹ️ Secret already exists: $SECRET_NAME"
-fi
-
-echo
-
-# -----------------------------
-# CLEANUP (OPTIONAL)
-# -----------------------------
-echo "🧹 Cleanup local build files (optional)"
-echo "⏭ Comment out next line if you want to keep files"
-rm -rf "$WORKDIR"
-
-echo
-echo "🎉 ALL DONE!"
-echo "Layer ARN: $LAYER_ARN"
-echo "Region: $REGION"
-echo "Charlie Cafe ☕ infrastructure ready."
+echo "✅ DONE!"
+echo "Attach this layer to Lambda (Python 3.9 / 3.10 / 3.11)"
 ```
 
 ### Method 2️⃣ - PyMySQL Lambda Layer (1-to-1)
