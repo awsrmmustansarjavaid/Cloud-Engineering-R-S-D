@@ -2093,3 +2093,788 @@ https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-D
 
 ## SECTION 4️⃣ Secure Admin Order Dashboard COMPLETE ✅
 ---
+## SECTION 5️⃣ Cafe Order Processor
+
+## PHASE 1️⃣ — SQS/LAMBDA (Producer)
+
+### 1️⃣ Create SQS Queue
+
+- **SQS → Create queue**
+
+- **Queue Type:** Standard
+
+    ⚠️ Do NOT select FIFO
+
+- **Name:** CafeOrdersQueue
+
+**Configuration:**
+
+- **Visibility timeout:** 60
+
+> **💡 Why: Worker Lambda must finish DB insert within this time**
+
+- **Message retention:** 4 days **(Leave default)**
+
+- **Maximum message size:** 256 KB **(Leave default)**
+
+- **Delivery delay:** 0 seconds **(Leave default)**
+
+- **Receive message wait time:** 0 seconds **(Leave default)**
+
+- **Dead-letter queue:** ❌ Disable for now **(we’ll add later)**
+
+- **Encryption:** Select: Disabled **(Free tier friendly)**
+
+- **Access Policy:** Leave Basic **(Do NOT change)**
+
+**✔️ Click Create queue**
+
+### ✅ Verify
+
+- Queue status should be Available
+
+- Copy Queue ARN
+
+- Copy Queue URL (IMPORTANT — save it)
+
+
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 2️⃣ — AUTOMATION Lambda Cafe-Order (SERVERLESS)
+
+### 1️⃣ Create Lambda Role
+
+* Name: `Lambda-Cafe-Order-Role`
+* Policies:
+
+  * AWSLambdaBasicExecutionRole
+  * Secrets Manager custom policy
+
+
+### 2️⃣ Create Lambda Function
+
+* Name: `CafeOrderProcessor`
+* Runtime: Python 3.12
+* Role: `Lambda-Cafe-Order-Role`
+
+### 3️⃣ Create Lambda Layer Using S3
+
+#### 1️⃣  Lambda Console
+
+* AWS Console → **Lambda**
+* Click **Layers**
+* Click **Create layer**
+
+#### 2️⃣  Layer Settings
+
+| Field              | Value                                                          |
+| ------------------ | -------------------------------------------------------------- |
+| Name               | `pymysql-layer`                                                |
+| Description        | PyMySQL dependency layer                                       |
+| Code entry type    | **Upload a file from Amazon S3**                               |
+| S3 URI             | `s3://cafe-lambda-artifacts-<unique>/layers/pymysql-layer.zip` |
+| Compatible runtime | Python 3.12                                                    |
+
+Click **Create**
+
+✅ Lambda Layer created from S3
+
+### 4️⃣ Attach Layer to Lambda Function
+
+####  1️⃣ Open Lambda Function
+
+* Lambda → Functions → `CafeOrderProcessor`
+
+#### 2️⃣ Add Layer
+
+* Scroll to **Layers** section
+* Click **Add a layer**
+* Choose **Custom layers**
+* Select:
+
+  * Layer: `pymysql-layer`
+  * Version: latest
+
+Click **Add**
+
+### 5️⃣ Lambda Payload Code (INSERT INTO MariaDB)
+
+Paste THIS EXACT CODE ⬇️
+
+[CafeOrderProcessor.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project//☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Charlie%20Cafe%20-%20Order%20Backend%20Code/CafeOrderProcessor/CafeOrderProcessor.py)
+
+Save Lambda
+
+Click Deploy (top right)
+---- 
+
+### 6️⃣ Move Lambda Into VPC
+
+- AWS Console → Lambda → Your Function
+
+- Go to Configuration
+
+- Open VPC
+
+- Click Edit
+
+- Select:
+
+    - **VPC → same as EC2**
+
+    - **Subnets → PRIVATE subnets (important)**
+
+    - **Security Group → Lambda SG**
+
+    - Save
+
+**⏳ Wait until Lambda status = Active**
+
+### 7️⃣ Increase Lambda Timeout
+
+**Lambda → Configuration → General configuration → Edit**
+
+| Setting | Value          |
+| ------- | -------------- |
+| Timeout | **15 seconds** |
+| Memory  | **512 MB**     |
+
+
+👉 Why:
+
+- ENI creation
+
+- Cold start
+
+- DB connection
+
+- Memory also improves network performance.
+
+Click Save
+
+
+#### 8️⃣ Add Environment Variable:
+
+- Configuration → Environment variables
+
+```
+SQS_QUEUE_URL = https://sqs.us-east-1.amazonaws.com/xxxxxxxx/CafeOrdersQueue
+```
+
+- Click Edit
+
+- Add:
+
+| Key           | Value                  |
+| ------------- | ---------------------- |
+| SQS_QUEUE_URL | (paste your Queue URL) |
+
+
+#### 📍 How to get Queue URL:
+
+- Open SQS
+
+- Click CafeOrdersQueue
+
+- Copy Queue URL
+
+**✔️ Click Save**
+
+**✔️ Everything else remains same.**
+
+### 🧪 LAMBDA TEST EVENT JSON
+
+Use this in Lambda Test:
+
+```
+{
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"payment_method\":\"CASH\"}"
+}
+```
+
+OR if paying by card:
+
+```
+{
+  "body": "{\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"payment_method\":\"CARD\"}"
+}
+```
+
+#### ✅ Expected:
+
+- Order inserted in RDS
+
+- DynamoDB updated
+
+- SQS message sent
+
+- StatusCode 200
+
+```
+{
+  "statusCode": 200,
+  "body": "{\"order_id\":\"ORD-20260220-1234\",\"table_number\":5,\"customer_name\":\"John\",\"item\":\"Coffee\",\"quantity\":2,\"total\":6.0,\"status\":\"RECEIVED\",\"created_at\":\"2026-02-20 10:30:00\"}"
+}
+```
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 3️⃣ — API Gateway
+
+### Objective:
+
+Expose your `CafeOrderProcessor` Lambda function via REST API so your EC2 Café web app can send orders to it.
+
+### 1️⃣ Create a REST API
+
+1. Open **AWS Management Console → API Gateway**.
+2. Click **Create API**.
+3. Choose **REST API → Build**.
+4. **Configuration:**
+   - API name: `CafeOrderAPI`
+   - Description: `API for processing café orders`
+   - Endpoint type: `Regional` (default)
+5. Click **Create API**.
+
+### 2️⃣ Create Resource
+
+1. In your API, click **Resources → Actions → Create Resource**.
+2. Configure:
+   - Resource Name: `orders`
+   - Resource Path: `/orders`
+3. Click **Create Resource**.
+
+### 3️⃣ Create POST Method
+
+1. Select `/orders` resource.
+2. Click **Actions → Create Method → POST**.
+3. Integration type: **Lambda Function**
+   - Check **Use Lambda Proxy integration**
+   - Lambda Region: `us-east-1`
+   - Lambda Function: `CafeOrderProcessor`
+4. Click **Save** → **OK** to give permissions to API Gateway to invoke Lambda.
+
+### 4️⃣ Enable CORS (Cross-Origin Resource Sharing)
+
+1. Select `/orders` resource.
+2. Click **Actions → Enable CORS**.
+3. Configure:
+   - Allowed Methods: `POST`
+   - Allowed Headers: `Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token`
+   - Allow Credentials: unchecked
+4. Click **Enable CORS and replace existing CORS headers**.
+5. Click **Yes, replace existing values** if prompted.
+
+**⚠️ DO NOT attach authorizer**
+
+### 5️⃣ Deploy API
+
+1. Click **Actions → Deploy API**.
+2. Configure:
+   - Deployment stage: `prod`
+   - Stage description: `Development stage`
+   - Deployment description: `Initial deployment`
+3. Click **Deploy**.
+
+### 6️⃣ Copy API Invoke URL
+
+After deployment, you’ll see an **Invoke URL** at the top of the Stage page, e.g.:
+
+```
+https://abcdef123.execute-api.us-east-1.amazonaws.com/prod/orders
+```
+
+> This URL will be used in your EC2 PHP web app `curl` requests.
+
+### 2nd Method - ADD API GATEWAY TRIGGER Method
+
+### 1️⃣ ADD API GATEWAY TRIGGER
+
+
+When you go to:
+
+- CafeOrderProcessor Lambda → Add Trigger → API Gateway
+
+- Choose: Create an API
+
+| Setting  | Value              |
+| -------- | ------------------ |
+| API Type | REST API           |
+| Security | Open (for testing) |
+
+- Click Add
+
+#### ➡️ AWS automatically:
+
+```
+- Creates an API
+
+- Creates a resource
+
+- Creates a method (POST/GET)
+
+- Connects it to the Lambda
+
+- Adds permission so API Gateway can invoke the Lambda
+
+- This is the Lambda-centric way.
+
+You start from Lambda and let AWS build the API for you.
+```
+
+### 2️⃣ Get Your Endpoint
+
+- Go to API Gateway → Open your new API
+
+- Click: Stages → Prod
+
+#### ✅ You will see:
+
+```
+Invoke URL:
+https://abc123.execute-api.us-east-1.amazonaws.com/Prod
+```
+
+Your final endpoint will be:
+
+```
+https://abc123.execute-api.us-east-1.amazonaws.com/Prod
+```
+
+If resource path is /orders:
+
+```
+https://abc123.execute-api.us-east-1.amazonaws.com/Prod/orders
+```
+
+### 3️⃣ — ENABLE CORS
+
+- Inside API Gateway:
+
+- Click Resources
+
+- Select /orders
+
+- Click Actions
+
+- Choose: Enable CORS
+
+- Confirm
+
+- Deploy API again
+
+This prevents browser blocking.
+
+### 4️⃣ — Deploy API
+
+- After any change:
+
+- Click Actions
+
+- Click Deploy API
+
+- Choose: Prod
+
+- Deploy
+
+Without deploy → it will NOT work.
+
+### 5️⃣ — TEST 
+
+#### 1️⃣ Test API Gateway Endpoint (Console Method)
+
+- Go to AWS Console
+
+- Click API Gateway
+
+- Open your API
+
+- Click Resources
+
+- Click /orders
+
+- Click POST
+
+- On the POST method page
+
+- Click the Test button (top right)
+
+- Update Request Body
+
+In Request Body, paste:
+
+```
+{
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1,
+  "payment_method": "CASH"
+}
+```
+
+- Leave:
+
+  - Headers empty (unless using auth)
+
+  - Query params empty
+
+- Click “Test” (Blue Button)
+
+- Scroll down to see:
+
+  - Request
+
+  - Response Body
+
+  - Response Headers
+
+  - Logs
+
+#### ✅ Expected Success Response
+
+You should see:
+
+```
+{
+  "order_id": "...",
+  "table_number": 3,
+  "customer_name": "ApiTest",
+  "item": "Coffee",
+  "quantity": 1,
+  "total": 3.0,
+  "status": "RECEIVED",
+  "created_at": "..."
+}
+```
+#### 2️⃣ TEST WITH CURL (Important)
+
+Test outside PHP first.
+
+- Open terminal:
+
+```
+curl -X POST https://hihe1z5ci7.execute-api.us-east-1.amazonaws.com/prod/orders \
+-H "Content-Type: application/json" \
+-d '{"table_number":5,"customer_name":"John","item":"Coffee","quantity":2,"payment_method":"CASH"}'
+```
+
+If correct, you get:
+
+```
+{
+  "message": "Order created successfully",
+  "table_number": 5
+}
+```
+
+#### Then check:
+
+- RDS → new row
+
+- DynamoDB → updated
+
+- SQS → message sent
+
+### 🔹 2️⃣ “Lambda integrated inside API Gateway”
+
+When you go to:
+
+- API Gateway → Create Resource → Create Method → Integration = Lambda
+
+You are:
+
+- Designing API structure first
+
+- Choosing which Lambda to connect
+
+- Controlling stages, routes, throttling, etc.
+
+- This is the API-centric way.
+
+You start from API Gateway and connect Lambda manually.
+
+### 🎯 Technically:
+
+👉 Both result in the exact same architecture.
+
+Internally it always becomes:
+
+```
+Client → API Gateway → Lambda
+```
+
+There is no architectural difference. The difference is only how you configure it.
+
+### 🚀 Real Differences (Practical)
+
+| Feature             | Add Trigger from Lambda | Integrate from API Gateway |
+| ------------------- | ----------------------- | -------------------------- |
+| Setup Speed         | Very fast               | Manual setup               |
+| Control over routes | Limited                 | Full control               |
+| Good for production | ❌ Not ideal             | ✅ Yes                      |
+| Multi-endpoint APIs | Hard                    | Easy                       |
+| Versioning & stages | Basic                   | Full control               |
+| Best for quick test | ✅ Yes                   | ❌ Overkill                 |
+
+### 🔥 When Should You Use Each?
+
+#### ✅ Use “Add Trigger from Lambda” if:
+
+- Quick prototype
+
+- Testing only
+
+- Single endpoint
+
+- Small internal tool
+
+### ✅ Use “Integrate from API Gateway” if:
+
+Production system
+
+Multiple endpoints like:
+
+```
+POST /orders
+GET /orders
+PUT /orders/{id}
+GET /serving
+POST /payment
+```
+
+- Need throttling
+
+- Need authentication
+
+- Need API keys
+
+- Need usage plans
+
+### 💡 Another Important Difference (Permissions)
+
+When you add trigger from Lambda:
+
+AWS automatically adds this permission:
+
+```
+{
+  "Principal": "apigateway.amazonaws.com"
+}
+```
+
+When you integrate from API Gateway:
+
+You may need to manually allow Lambda invocation.
+
+So Lambda-trigger method is easier for beginners.
+
+### 🎯 Final Recommendation For You
+
+Since your system is growing (admin, status, metrics, serving, payments):
+
+👉 Use API Gateway as the main controller
+
+👉 Integrate Lambdas inside API Gateway
+
+👉 Don’t rely on “Add Trigger” shortcut
+
+This gives you:
+
+- Cleaner architecture
+
+- Easier scaling
+
+- Better long-term management
+
+- Production-ready structure
+
+### 🏆 Summary
+
+There is no runtime difference.
+
+The difference is:
+
+| Lambda trigger method | Quick & automatic |
+| API Gateway integration method | Structured & production-ready |
+
+
+**✅ PHASE 3️⃣ STATUS**
+
+> **🟢 PHASE 3️⃣ COMPLETE & VERIFIED**
+---
+
+## PHASE 4️⃣ — Frontend Development Code
+
+### 💻 MODERN CAFE-STYLE orders.php (Frontend Only Modified)
+
+[orders.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Charlie-Cafe%20-order.php/orders.php)
+
+**🔁 Replace with your real API Gateway URL**
+
+**✅ PHASE 4️⃣ STATUS**
+
+> **🟢 PHASE 4️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 5️⃣ — VPC ENDPOINTS (THIS IS WHERE MOST FAIL)
+
+### 1️⃣ Fix Security Groups (MANDATORY)
+
+**A) RDS Security Group**
+
+#### Inbound rule:
+
+| Type         | Port | Source        |
+| ------------ | ---- | ------------- |
+| MySQL/Aurora | 3306 | **Lambda-SG** |
+
+
+❌ NOT 0.0.0.0/0
+
+✅ MUST be Lambda SG
+
+**B) Lambda Security Group**
+
+#### Outbound rule (default usually OK):
+
+| Type        | Destination |
+| ----------- | ----------- |
+| All traffic | 0.0.0.0/0   |
+
+
+### 2️⃣ Create Secrets Manager Endpoint
+
+- **AWS Console → VPC → Endpoints → Create endpoint**
+
+- **Endpoint Name:** secretsmanager-INT-EP
+
+- **Service category:** AWS services
+
+- **Service name:** com.amazonaws.us-east-1.secretsmanager
+
+- **Type:** Interface
+
+- **VPC:** Select VPC 
+
+- **Subnets:**
+
+**✔ Select the SAME private subnets used by Lambda**
+
+- **Security Group:**
+
+**Allow HTTPS (443) inbound from Lambda SG**
+
+Create endpoint ✅
+
+### 3️⃣ Create SQS Interface Endpoint
+
+**VPC → Endpoints → Create endpoint**
+
+| Field          | Value                         |
+| -------------- | ----------------------------- |
+| Name           | sqs-INT-EP                    |
+| Service        | `com.amazonaws.us-east-1.sqs` |
+| Type           | Interface                     |
+| VPC            | Same VPC                      |
+| Subnets        | Same private subnets          |
+| Security group | Lambda-SG                     |
+| Private DNS    | ✅ ENABLE                      |
+
+### 4️⃣ Create CloudWatch Logs Interface Endpoint
+
+- **Name:**
+
+```
+cloudwatch-INT-EP 
+```
+
+- **Service:**
+
+```
+com.amazonaws.us-east-1.logs
+```
+
+Same settings as above
+
+Private DNS ✅
+
+### 5️⃣ Create DynamoDB Gateway Endpoint (VERY IMPORTANT)
+
+- **Name:**
+
+```
+dynamodb-GW-EP 
+```
+
+
+- **Service:**
+
+```
+com.amazonaws.us-east-1.dynamodb
+```
+
+- **Type:** Gateway
+
+- **Attach to:**
+
+  - ALL private route tables
+
+Click Create
+
+### 6️⃣ Verify Secrets Manager Keys (VERY IMPORTANT)
+
+Your secret must contain EXACT keys:
+
+```
+{
+  "host": "your-rds-endpoint",
+  "username": "cafe_user",
+  "password": "********",
+  "dbname": "cafe_db"
+}
+```
+
+❌ If even ONE key name differs → connection fails silently
+
+### 7️⃣ Add DEBUG LOGS (TEMPORARY - Optional)
+
+Update your Lambda code temporarily:
+
+```
+print("DEBUG: Lambda invoked")
+print("DEBUG: Event =", event)
+
+secret = get_db_secret()
+print("DEBUG: Secret fetched")
+
+connection = pymysql.connect(
+    host=secret["host"],
+    user=secret["username"],
+    password=secret["password"],
+    database=secret["dbname"],
+    connect_timeout=5
+)
+
+print("DEBUG: RDS connected")
+```
+
+This lets us see exactly where it stops.
+
+**✅ PHASE 5️⃣ STATUS**
+
+> **🟢 PHASE 5️⃣ COMPLETE & VERIFIED**
+---
+## PHASE 6️⃣ — Test & Verification ( Must)
+
+_ **Please refer to the Test & Verification documentation for detailed procedures.**
+
+**✅ PHASE 6️⃣ STATUS**
+
+> **🟢 PHASE 6️⃣ COMPLETE & VERIFIED**
+
+## 🟢 SECTION 5️⃣ COMPLETE & VERIFIED
+---
