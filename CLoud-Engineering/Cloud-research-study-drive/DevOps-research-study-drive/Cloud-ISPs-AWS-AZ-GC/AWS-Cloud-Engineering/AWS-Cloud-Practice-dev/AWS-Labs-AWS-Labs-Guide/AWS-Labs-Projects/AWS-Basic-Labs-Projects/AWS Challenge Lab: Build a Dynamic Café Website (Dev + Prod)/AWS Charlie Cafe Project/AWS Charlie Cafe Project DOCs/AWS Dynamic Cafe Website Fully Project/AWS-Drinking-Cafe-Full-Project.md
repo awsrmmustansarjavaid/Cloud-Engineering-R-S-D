@@ -883,7 +883,7 @@ pymysql-layer.zip   (few MB)
 
 
 
-[PyMySQL Lambda Layer via AWS CLI](./☕%20CC-%206%20—pymysql-layer.md)
+[PyMySQL Lambda Layer via AWS CLI](../Charlie%20Cafe%20Lambda%20pymysql-layer.md)
 
 
 ### 2️⃣ — S3 Bucket - Upload ZIP
