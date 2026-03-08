@@ -767,8 +767,1329 @@ AddType application/javascript .js
 sudo systemctl restart httpd
 ```
 
+**✅ PHASE 1️⃣ STATUS**
+
+> **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+---
+## 🔐 PHASE 2️⃣ — Set Up Automatic HTTP → HTTPS Redirection
+
+> **✅ EASY & CORRECT METHOD (RECOMMENDED FOR LAB)**
+
+### 1️⃣  — HTTPS REQUIREMENT (CRITICAL)
+
+**⚠️ Cognito does NOT allow HTTP except localhost.**
+
+So we must add HTTPS.
+
+You have TWO EASY OPTIONS
+
+### 1️⃣  — USE ALB
+
+> **This is the simplest HTTPS solution.**
+
+### STEP 1️⃣ — CREATE APPLICATION LOAD BALANCER
+
+```
+EC2 → Load Balancers → Create Load Balancer
+```
+
+#### Choose:
+
+```
+Application Load Balancer
+```
+
+### STEP 2️⃣ — BASIC ALB Configuration
+
+
+| Setting                  | Value / Selection                                      | Notes / Requirement                          |
+|--------------------------|--------------------------------------------------------|----------------------------------------------|
+| **Name**                 | charlie-cafe-alb                                       | Unique name for your ALB                     |
+| **Scheme**               | Internet-facing                                        | Allows public internet access                |
+| **IP address type**      | IPv4                                                   | Standard for most setups                     |
+| **VPC**                  | Same VPC as your EC2 instance                          | Must match EC2 placement                     |
+| **Subnets**              | Select at least 2 **public** subnets                   | Required for internet-facing ALB; choose different Availability Zones if possible |
+| **Availability Zones**   | At least 2 AZs (where public subnets exist)            | Improves high availability                   |
+
+
+### STEP 3️⃣ — SECURITY GROUP
+
+#### Allow:
+
+```
+HTTPS 443  0.0.0.0/0
+```
+
+### STEP 4️⃣ — Target Group Configuration (for EC2 registration)
+
+
+| Setting                  | Value / Selection                          | Notes / Requirement                                      |
+|--------------------------|--------------------------------------------|----------------------------------------------------------|
+| **Type**                 | Instance                                   | Standard for registering EC2 instances by ID             |
+| **Protocol**             | HTTP                                       | Matches your web server on EC2 (use HTTPS only if EC2 already has SSL) |
+| **Port**                 | 80                                         | Default HTTP port your web server listens on             |
+| **Target registration**  | Register your EC2 instance                 | Select your EC2 instance by name/ID (not IP)             |
+| **Health check path**    | / (or /cafe-admin-dashboard.html)                  | Path ALB uses to check if instance is healthy            |
+
+### STEP 5️⃣ — Add Listener to ALB 
+
+#### - Add HTTP listener 
+
+- **Listener:** HTTP 80
+
+- **Target Group:** Select Your Target Group
+
+#### - Add HTTPS listener (Optional)
+
+
+| Setting                  | Value / Selection                                      | Notes / Requirement                                                                 |
+|--------------------------|--------------------------------------------------------|-------------------------------------------------------------------------------------|
+| **Listener**             | HTTPS : 443                                            | Standard secure port for HTTPS traffic                                              |
+| **Certificate**          | Request or select from ACM (AWS Certificate Manager)   | Must use a valid SSL/TLS certificate; free public certs available via ACM           |
+| **Certificate source**   | ACM                                                    | Recommended – free, auto-renewing certificates                                      |
+| **Domain name (for ACM request)** | Your domain (e.g., charliecafe.com, *.charliecafe.com) | Required to request certificate; can be:<br>• Real domain you own<br>• Wildcard (*.example.com)<br>• Multiple SANs (Subject Alternative Names) |
+| **Validation method**    | DNS validation (preferred) or Email                    | DNS is faster & automatic if using Route 53                                         |
+| **Default action**       | Forward to target group (e.g., cafe-target-group)      | Routes HTTPS traffic to your EC2 instance(s)                                        |
+| **HTTP → HTTPS redirect** | Add separate HTTP:80 listener with redirect rule       | Recommended: Redirect all HTTP traffic to HTTPS                                     |
+
+### STEP 6️⃣ — GET ALB DNS NAME
+
+Example:
+
+```
+https://charlie-cafe-alb-123.us-east-1.elb.amazonaws.com
+```
+
+### 2️⃣ — CLOUD FRONT
+
+### 🧱 STEP 1️⃣ — CloudFront Origin (ALB)
+
+#### Go to:
+
+```
+AWS Console → CloudFront → Create Distribution
+```
+
+- **Distribution name:** Charlie-Cafe
+
+- **Next:**
+
+- **Origin type:** Elastic Load Balancer
+
+#### CloudFront Origin Settings (CRITICAL)
+
+>**Go to:** CloudFront → Distributions → Your Distribution → Origins → Edit
+
+> **Set EXACTLY like this:**
+
+| Setting                | Value                                                   |
+| ---------------------- | ------------------------------------------------------- |
+| Origin domain          | charlie-cafe-alb-1050813156.us-east-1.elb.amazonaws.com |
+| Origin protocol policy | **HTTP only** ✅                                         |
+| HTTP port              | 80                                                      |
+| Origin SSL protocols   | (doesn’t matter now)                                    |
+
+
+✅ This is correct
+
+❌ Do NOT select EC2 IP
+
+❌ Do NOT select S3
+
+### 🌐 STEP 2️⃣ — Default Cache Behavior (VERY IMPORTANT)
+
+>**Go to:** Behaviors → Default → Edit
+
+
+| Setting                | Value                  |
+| ---------------------- | ---------------------- |
+| Viewer protocol policy | Redirect HTTP to HTTPS |
+| Allowed HTTP methods   | GET, HEAD, OPTIONS     |
+| Cache policy           | CachingDisabled        |
+| Origin request policy  | AllViewer              |
+
+
+**⚠️ Cognito tokens must NOT be cached**
+
+### 🚨 GET, HEAD, OPTIONS is NOT enough
+
+You MUST change it to:
+
+```
+GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+```
+
+**⚠️ (or at minimum include POST)**
+
+### ✅ Correct Setting for Your Case
+
+- Go to: CloudFront → Behaviors → Default → Edit
+
+- Change:
+
+| Setting                | Correct Value                                    |
+| ---------------------- | ------------------------------------------------ |
+| Viewer protocol policy | Redirect HTTP to HTTPS                           |
+| Allowed HTTP methods   | **GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE** |
+| Cache policy           | CachingDisabled                                  |
+| Origin request policy  | AllViewer                                        |
+
+**👉 This ensures:**
+
+- POST requests pass through
+
+- Authorization headers pass
+
+- Cognito tokens are not cached
+
+- No 403 / 405 errors
+
+#### This ensures:
+
+Authorization headers
+
+Query strings
+
+Cookies
+are forwarded correctly.
+
+👉 SAVE
+
+⏳ Wait 5–10 minutes for deployment.
+
+```
+Status = Deployed
+```
+
+#### You’ll get:
+
+```
+xxxxx.cloudfront.net
+```
+
+### 🔐 STEP 3️⃣ — CloudFront General Configuration
+
+> **This step finalizes the CloudFront distribution behavior and ensures it works correctly with ALB + Cognito Hosted UI without breaking authentication or routing.**
+
+### 1️⃣ ⚙️ General Configuration
+
+- **Configure the following settings in CloudFront → Distribution → General.**
+
+#### 1️⃣ IPv6
+
+- **Turn OFF IPv6**
+
+✅ Recommended for learning & labs
+
+🔁 Can be enabled later in production
+
+### 2️⃣ Default Root Object (Optional but Recommended)
+
+```
+cafe-admin-dashboard.html
+```
+
+**⚠️ Do NOT add /order-status.html to Origin Path**
+**Origin Path must remain empty.**
+
+### 🧠 Correct CloudFront Path Logic
+
+| Configuration Item   | Value                             |
+| -------------------- | --------------------------------- |
+| Origin Path          | ❌ Empty                           |
+| Default Root Object  | ✅ `cafe-admin-dashboard.html`             |
+| File location on EC2 | `/var/www/html/cafe-admin-dashboard.html` |
+
+
+This ensures:
+
+```
+CloudFront → ALB → EC2 Apache → cafe-admin-dashboard.html
+```
+
+### 2️⃣ 🔄 CloudFront Invalidations (Admin Dashboard Use Case)
+
+**👉 Invalidation tells CloudFront to delete cached copies immediately.**
+
+- Go to: CloudFront → Distributions → Your Distribution
+
+- Click Invalidations
+
+- Click Create invalidation
+
+- In Object paths, enter:
+
+#### 1️⃣ ✅ invalidation path:
+
+```
+/cafe-admin-dashboard.html
+```
+
+#### 2️⃣ ✅ /var/www/html/js/
+
+#### Example:
+
+```
+/var/www/html/js/config.js
+/var/www/html/js/central-auth.js
+/var/www/html/js/utils.js
+/var/www/html/js/api.js
+/var/www/html/js/central-printing.js
+/var/www/html/js/role-guard.js
+```
+#### ✅ From CloudFront perspective, the paths are:
+
+#### Option 1 — Invalidate One-by-One (Best Practice)
+
+```
+/js/config.js
+/js/central-auth.js
+/js/utils.js
+/js/api.js
+/js/central-printing.js
+/js/role-guard.js
+```
+
+### ✅ BEST PRACTICE (Better Than Invalidation)
+
+Instead of invalidating every time, use versioning:
+
+#### Change:
+
+```
+/js/config.js
+/js/central-auth.js
+/js/utils.js
+/js/api.js
+/js/central-printing.js
+/js/role-guard.js
+```
+
+#### To:
+
+```
+/js/config.v2.js
+/js/central-auth.v2.js
+/js/utils.v2.js
+/js/api.v2.js
+/js/central-printing.v2.js
+/var/www/html/js/role-guard.v2.js
+```
+
+#### Or:
+
+```
+<script src="/js/config.js?v=2"></script>
+<script src="/js/central-auth.js?v=2"></script>
+<script src="/js/utils.js?v=2"></script>
+<script src="/js/app.js?v=2"></script>
+<script src="/js/central-printing.js?v=2"></script>
+<script src="/js/role-guard.js?v=2"></script>
+```
+
+#### Option 2 — Invalidate Entire JS Folder
+
+```
+/js/*
+```
+
+✔ This deletes cache for all JS files
+
+⚠ Use only when necessary
+
+#### Option 3 — Invalidate Everything (Heavy)
+
+```
+/*
+```
+
+⚠ Not recommended often
+
+⚠ Counts toward invalidation limits
+
+**✅ CloudFront treats it as new object → no invalidation needed.**
+
+#### 3️⃣ Very Important — If Using API Gateway
+
+If your JS calls:
+
+```
+https://api-id.execute-api.us-east-1.amazonaws.com/prod
+```
+
+And that is not routed through ALB,
+
+CloudFront settings won’t affect it.
+
+CloudFront only affects traffic going through:
+
+```
+cloudfront.net → ALB → EC2
+```
+
+So confirm:
+
+Are you calling API Gateway directly?
+Or through ALB reverse proxy?
+
+### 5️⃣ Click Create invalidation
+
+⏳ Status will show:
+
+```
+In Progress → Completed
+```
+
+Usually completes in 1–3 minutes.
+
+### How to Confirm Invalidation Worked
+
+After status = Completed:
+
+1️⃣ Open browser
+
+2️⃣ Hard refresh:
+
+- Windows/Linux: Ctrl + F5
+
+- Mac: Cmd + Shift + R
+
+3️⃣ Open:
+
+```
+https://xxxxx.cloudfront.net/cafe-admin-dashboard.html
+```
+
+You should see latest code.
+
+### Common Mistakes (Avoid These)
+
+❌ Invalidating:
+
+```
+cafe-admin-dashboard.html
+```
+
+(missing leading /)
+
+❌ Invalidating wrong file name
+
+❌ Forgetting invalidation after JS changes
+
+### Important Notes:
+
+✔ /order-status.html is the correct invalidation path
+
+✔ Use invalidation after frontend changes
+
+✔ Do not overuse /*
+
+✔ Required when testing Cognito changes
+
+### 🔐 STEP 4️⃣ — CloudFront SSL Certificate (Optional)
+Viewer Certificate
+
+Choose:
+
+```
+Default CloudFront certificate (*.cloudfront.net)
+```
+
+✅ This is fine
+
+✅ HTTPS works automatically
+
+❌ No ACM needed here
+
+
+### 5️⃣ CloudFront Validation (VERY IMPORTANT)
+
+> **After configuration, always validate CloudFront before integrating Cognito.**
+
+### 🔍 Validation Checklist
+
+#### 1️⃣ Distribution Status
+
+Status must be:
+
+```
+Deployed
+```
+
+**⚠️ If status is In Progress, wait 5–10 minutes.**
+
+### 6️⃣ — USE THIS IN COGNITO
+
+```
+d2og2zrs47voou.cloudfront.net
+```
+**This is your Return URL**
+
+**✅ PHASE 2️⃣ STATUS**
+
+> **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
+
+## 📢 SECTION 3️⃣ CAFE DATABASE CONFIGURATIONS COMPLETE ✅
+---`
+## SECTION 4️⃣ Secure Admin Order Dashboard
+
+### READ Me About
+
+[☕ CC- 2 —Secure Charlie Cafe Dashboard System](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/☕CC-%201%20—Secure%20Charlie%20Cafe%20Dashboard%20System.md)
+
+### AWS Cognito + PHP backend + protected API
+
+[☕ AWS Cognito + PHP backend + protected API](./☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20(Doc)/☕%20AWS%20Charlie%20Café%20–%20Project%20With%20Detailed%20Readme(Doc)/AWS%20Cognito%20%2B%20PHP%20backend%20%2B%20protected%20API.md)
+
+
+## 🔐 PHASE 1️⃣ — Cognito Authentication infrastructure 
+> **🔐 COGNITO INTEGRATION (PRODUCTION READY)**
+
+Cognito configuration from scratch based on your NEW architecture plan:
+
+✅ Public routes (no login)
+
+✅ Protected routes (Cognito + Groups)
+
+✅ One prod stage
+
+✅ Role-based backend enforcement
+
+✅ SPA for management team
+
+✅ PHP for public ordering
+
+This will be clean, production-ready, and aligned with your new API structure.
+
+We will rebuild Cognito properly using:
+
+- Amazon Cognito
+
+- Amazon API Gateway
+
+- AWS Lambda
+
+### 🔐 FINAL COGNITO DESIGN (BASED ON YOUR NEW PLAN)
+
+We will configure:
+
+- 1 User Pool
+
+- 1 Public App Client (NO client secret)
+
+- Hosted UI login
+
+- Role groups:
+
+    - Admin
+
+    - Manager
+
+    - Employee
+
+- OAuth Authorization Code Grant (NOT implicit anymore)
+
+### 1️⃣ Basic Cognito Configuration — DEFINE YOUR APPLICATION
+
+> **🚀 STEP-BY-STEP — CLEAN NEW COGNITO SETUP**
+
+### 🟢 STEP 1 — Create User Pool (Clean Setup)
+
+- Go to: AWS Console → Cognito → User pools → Create user pool
+
+- Name:
+
+```
+CharlieCafeAdminSPA
+```
+
+
+#### 1️⃣ Application Type
+
+- Choose: ✅ Single-page application (SPA)
+
+- Click Next.
+
+#### 2️⃣ Sign-in Options
+
+- Select: ☑ Username
+
+#### DO NOT select:
+
+❌ Email
+
+❌ Phone
+
+This keeps login simple:
+
+```
+admin
+manager1
+employee1
+```
+
+- Click Next.
+
+#### 3️⃣ Self Registration
+
+❌ Disable self-registration
+
+(Uncheck enable self-registration)
+
+Production systems never allow public admin registration.
+
+Click Next.
+
+#### 4️⃣ Required Attributes
+
+- Click “Select attributes”
+
+- Choose only: ☑ email
+
+- Do NOT choose anything else.
+
+- Click Save.
+
+- Click Next.
+
+### 🟢 STEP 2 — Security Settings
+
+#### 1️⃣ Password Policy
+
+- Leave default.
+
+- No changes needed.
+
+#### 2️⃣ MFA
+
+- Set: ❌ No MFA (for now)
+
+You can enable later in production.
+
+#### 3️⃣ Account Recovery
+
+- Select: ☑ Email only
+
+- Disable SMS.
+
+- Click Next.
+
+### 🟢 STEP 3 — App Client (CRITICAL)
+
+This is where most mistakes happen.
+
+#### 1️⃣ Client Type
+
+- Choose: ✅ Public client
+
+This disables client secret.
+
+If you accidentally create confidential client → delete and recreate.
+
+#### 2️⃣ App Client Name
+
+Example:
+
+```
+CharlieCafeAdminSPA
+```
+
+- Click Next.
+
+### 🟢 STEP 4 — OAuth Configuration (IMPORTANT CHANGE)
+
+
+#### ⚠️ We are NOT using Implicit anymore.
+
+We will use:
+
+✅ Authorization Code Grant (RECOMMENDED)
+
+❌ Do NOT enable Implicit
+
+Because:
+
+- Implicit = older
+
+- Authorization Code = more secure
+
+- Industry standard now
+
+#### 1️⃣ OAuth 2.0 Grant Types
+
+- Select: ☑ Authorization code grant
+
+❌ Do NOT select implicit.
+
+#### 2️⃣ OAuth Scopes
+
+- Select ONLY:
+
+☑ openid
+
+☑ email
+
+☑ profile
+
+Nothing else.
+
+### 🟢 STEP 5 — Callback & Logout URLs
+
+Add EXACT URLs:
+
+### 1️⃣ Callback URL
+
+#### 1️⃣ Callback Login Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/login.html
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/login.html
+```
+
+#### 2️⃣ Callback Admin Dashboard Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/cafe-admin-dashboard.html
+```
+
+#### 3️⃣ Callback Order Status Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/order-status.html
+```
+
+#### 4️⃣ Callback Admin Order Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/admin-orders.html
+```
+
+#### 5️⃣ Callback Analytics Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/analytics.html
+```
+
+#### 6️⃣ Callback Employee-portal Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/employee-portal.html
+```
+
+#### 7️⃣ Callback hr-attendance Page 
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/hr-attendance.html
+```
+
+### 2️⃣ Sign-out URL
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
+```
+
+Example:
+
+```
+https://dxxxx.cloudfront.net/logout.php?loggedout=true
+```
+
+Must match EXACTLY.
+
+- Save.
+
+⌛️ Wait 30–60 seconds.
+
+### 🟢 STEP 6 — Configure Cognito Domain
+
+- Go to: User pool → App integration → Domain
+
+- Create domain prefix:
+
+```
+charlie-cafe-auth
+```
+
+You will get:
+
+```
+charlie-cafe-auth.auth.us-east-1.amazoncognito.com
+```
+
+- Copy this.
+
+❌ Do NOT include https.
+
+### 🟢 STEP 7 — App Client Authentication Flows
+
+- Go to: User pool → App clients → Show details
+
+#### Ensure these are enabled:
+
+✔ ALLOW_USER_PASSWORD_AUTH
+
+✔ ALLOW_USER_SRP_AUTH
+
+✔ ALLOW_REFRESH_TOKEN_AUTH
+
+- ❌ Do NOT enable other unnecessary flows.
+
+
+### 🟢 STEP 8 — Create Groups (FINAL STRUCTURE)
+
+- Go to: User pool → Groups → Create group
+
+| Group     | Group Name | Precedence |
+|-----------|------------|------------|
+| Group 1   | Admin      | 1          |
+| Group 2   | Manager    | 5          |
+| Group 3   | Employee   | 10         |
+
+- ❌ No IAM role attached.
+
+### 🟢 STEP 9 — Create Users
+
+Create:
+
+| Username  | Group    | Password            |
+|-----------|----------|---------------------|
+| cafeadmin | Admin    | ^MyH%H!A4YjD        |
+| manager1  | Manager  | jfZvm@^3gTVE        |
+| ali       | Employee | *KEXO^C3mjm3        |
+
+- Mark email verified.
+
+- Add each to correct group.
+
+### 🟢 STEP 10 — Create Employee ID Attribute in Cognito
+
+> **To make Employee ID flow correctly from Cognito → Employee Portal → Lambda → RDS, your Cognito configuration must include the Employee ID inside the ID Token.
+Below is the complete correct setup step-by-step.**
+
+- Go to : Amazon Cognito Console → User Pools → Your User Pool
+
+- Open Sign-up experience
+
+- Scroll to Custom attributes
+
+- Click Add custom attribute
+
+#### Create:
+
+```
+Name: employee_id
+Type: String
+Mutable: Yes
+```
+
+#### Cognito will internally store it as:
+
+```
+custom:employee_id
+```
+
+#### ⚠️ This is the exact name that will appear inside the JWT token.
+
+### 🟢 STEP 11 — Add attribute to App Client
+
+- Go to: App integration
+
+- Open your App Client
+
+- Find: Attribute read permissions
+
+- Enable: custom:employee_id
+
+> **✔️ Both permissions are enabled:**
+
+  - ✔ Read
+
+  - ✔ Write
+
+> **This is exactly what is required so the App Client can access the attribute and include it in the JWT ID token.**
+
+Save changes.
+
+- Save.
+
+
+### 🟢 STEP 12 — Add Employee ID to Users
+
+- Go to: User Pools → Users → Create user / select user
+
+- Edit attributes.
+
+- Add:
+
+```
+custom:employee_id = 5
+```
+
+#### Example:
+
+```
+Username: ali
+Email: ali@charliecafe.com
+custom:employee_id = 5
+```
+
+#### Now Cognito stores:
+
+```
+custom:employee_id = 5
+```
+
+Where 5 must match the employee_id in your RDS employees table.
+
+#### Example users: employees table
+
+| Cognito Username | Employee ID |
+| ---------------- | ----------- |
+| ali              | 5           |
+| ahmed            | 6           |
+| sara             | 7           |
+
+- Save.
+
+
+
+
+### 🟢 STEP 13 — Amazon Cognito Hosted UI — Callback + Logout
+
+✅ Updated Login.html (with your Cognito config structure ready)
+
+✅ Proper cognito-callback.php (NEW – required for token handling)
+
+✅ Updated Logout.php (with Cognito global sign-out)
+
+🎨 Café-themed UI (coffee background, icons, logo text, warm styling)
+
+💬 Clear comments inside the code
+
+### 1️⃣ Updated Login Page (Charlie Café Theme)
+
+#### ✅ Replace with your real values:
+
+- YOUR_DOMAIN_PREFIX
+
+- YOUR_REGION
+
+- YOUR_APP_CLIENT_ID
+
+- Cloudfront
+
+[login.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/login.html)
+
+### ✅ 2️⃣ Updated logout.php
+
+(Proper Cognito global sign-out + styled logout page option)
+
+⚠️ Important: If you only destroy session locally, the user stays logged into Cognito.
+We must redirect to Cognito logout endpoint.
+
+🌟 Recommended Logout (Full Cognito Sign-Out)
+
+Rename file to: logout.php
+
+### 🔹 OPTION A — Global Logout (Recommended)
+
+This:
+
+Destroys PHP session
+
+Logs user out from Cognito Hosted UI
+
+Shows styled logout page
+
+#### ⚠️ Important: When logging out from Cognito, you must redirect to Cognito first.
+
+So the styled page must appear after Cognito redirects back.
+
+That means:
+
+First request → destroy session + redirect to Cognito
+
+Second request → show styled page
+
+We can handle both in ONE FILE using a condition.
+
+### ✅ Single File: logout.php
+
+[logout.php](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/logout.php)
+
+### 🧠 Why This Works
+
+- First visit: logout.php → destroys session → redirects to Cognito → Cognito logs user out → redirects back to: 
+
+```
+logout.php?loggedout=true
+```
+
+Now PHP skips redirect and displays styled page.
+
+🔥 Clean. Secure. One file only.
+
+### 🎯 Important Cognito Console Setting
+
+Inside Amazon Cognito:
+
+Set Sign-out URL to:
+
+```
+https://YOUR_CLOUDFRONT_DOMAIN/logout.php?loggedout=true
+```
+
+Otherwise Cognito will reject the redirect.
+
+### 🚀 Recommendation Level
+
+This single-file approach is:
+✔ Professional
+
+✔ Secure
+
+✔ Production-ready
+
+✔ Cleaner file structure
+
+### 🟢 STEP 14 — — central-auth-api
+
+### 🔥 STEP 1 — config.js (NO LOGIC HERE)
+
+This replaces hardcoded config from your old file.
+
+[config.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/config.js)
+
+#### ✅ Replace with your real values:
+
+- YOUR_DOMAIN_PREFIX
+
+- YOUR_REGION
+
+- YOUR_APP_CLIENT_ID
+
+- Cloudfront
+
+### 🔥 STEP 2 — utils.js (Shared Helpers)
+
+Move all generic helpers here.
+
+[utils.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/utils.js)
+
+
+### 🔐 STEP 3 — central-auth.js (COGNITO ONLY)
+
+This file contains ONLY authentication logic.
+
+No API routes inside.
+
+[central-auth.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-auth.js)
+
+### 🌐 STEP 4 — api.js (PUBLIC + PROTECTED FETCH)
+
+This file handles API logic only.
+
+[api.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/api.js)
+
+### 🌐 STEP 5 — Create central-printing.js
+
+[central-printing.js](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/central-printing.js)
+
+### 🌐 STEP 6 — Create role-guard.js
+
+[role-guard.js](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20JS%20Backend%20Code%20Script/role-guard.js)
+
+#### ✅ After This, You Must Verify
+
+- Login
+
+- Check localStorage
+
+- Confirm access_token exists
+
+- Paste token in jwt.io
+
+- Confirm:
+
+- email
+
+- cognito:groups
+
+- exp
+
+If groups are missing → your Lambda 403 will happen again.
+
+### 🔐 PART 15 — EASIEST WAY TO GET ACCESS TOKEN (Manual Test)
+
+You asked for easiest method.
+
+Here is the clean method.
+
+#### STEP 1️⃣ Open Cognito Hosted UI Login
+
+- Go to AWS Console → Cognito → User Pools → Your pool
+
+- Click App integration → App client settings
+
+#### You will see:
+
+- Domain
+
+- Client ID
+
+- Callback URL
+
+- Allowed OAuth flows
+
+#### STEP 2️⃣ Construct the LOGIN URL
+
+Open browser and paste (replace values):
+
+```
+https://YOUR_DOMAIN.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://yourdomain.com/login.html
+```
+
+#### 📌 Example:
+
+```
+https://charlie-cafe.auth.us-east-1.amazoncognito.com/login
+?client_id=YOUR_CLIENT_ID
+&response_type=code
+&scope=openid+email+profile
+&redirect_uri=https://yourdomain.com/login.html
+```
+
+- 👉 Press Enter
+
+#### 🌐 Cognito Access Auth Code
+
+```
+https://yourdomain.com/login.html?code=ebec6a0a-54e8-49c0-a093-d68150c182b1
+```
+
+#### STEP 3️⃣ Login Screen Appears
+
+- Enter username & password
+
+- Click Sign in
+
+If login is successful → browser redirects to:
+
+```
+https://yourdomain.com/login.html?code=AUTH_CODE
+```
+
+Access token will only appear after your frontend exchanges the code via:
+
+```
+POST https://YOUR_DOMAIN/oauth2/token
+```
+
+#### STEP 4️⃣ COPY THE ACCESS TOKEN
+
+From the URL bar, copy ONLY this part:
+
+```
+?code=...
+```
+
+#### ⚠️ Do NOT copy:
+
+- id_token
+
+- expires_in
+
+- token_type
+
+👉 You need access_token
+
+#### STEP 5️⃣ Use Token in API Call (Browser DevTools)
+
+Open Chrome DevTools → Console
+
+Paste:
+
+```
+fetch("https://API_ID.execute-api.REGION.amazonaws.com/status/order-status", {
+  headers: {
+    "Authorization": "Bearer YOUR_ACCESS_TOKEN"
+  }
+})
+.then(res => res.json())
+.then(data => console.log(data));
+```
+
+#### ✅ EXPECTED RESULT
+
+```
+{
+  "orders": [...],
+  "metrics": {...}
+}
+```
+
+🎉 DONE — frontend token works.
+
+### 🧪 METHOD 2 — curl (CLI / AWS TESTING)
+
+Use this after you already have the token.
+
+#### STEP 1️⃣ Open Terminal / CMD
+
+#### STEP 2️⃣ Run curl Command
+
+- Make GET request with header:
+
+```
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+https://API_ID.execute-api.REGION.amazonaws.com/status/order-status
+```
+
+#### 📌 Example:
+
+```
+curl -H "Authorization: Bearer eyJraWQiOiJr..." \
+https://abcd123.execute-api.us-east-1.amazonaws.com/status/order-status
+```
+
+#### ✅ EXPECTED RESPONSES
+
+```
+JSON response with metrics + recent orders
+```
+
+#### ✅ SUCCESS (200)
+
+```
+{
+  "orders": [...],
+  "metrics": {...}
+}
+```
+
+#### ❌ NO TOKEN
+
+```
+{"message":"Unauthorized"}
+```
+
+#### ❌ INVALID TOKEN
+
+```
+401 Unauthorized
+```
+
+#### 3️⃣ Date Filter Test
+
+```
+curl -H "Authorization: Bearer <access_token>" \
+"https://API_ID.execute-api.REGION.amazonaws.com/status/order-status?date=2026-01-17"
+```
+
+#### ✅ Expected: 
+
+```
+Only orders for 2026-01-17 returned
+```
+
+**✅ Metrics counts match filtered orders**
+
+#### 4️⃣ Verify Auto Refresh / Chart in Frontend
+
+- Open order-status.html
+
+- Enter date in filter box
+
+- Click Filter
+
+- Metrics + table + chart should update correctly
+
+- Spinner shows loading
+
+### 📣 Simple & Easy way test 
+
+#### 1️⃣ Login & Token Issued
+
+- Open your Cafe Dashboard frontend (order-status.html).
+
+- Click Login.
+
+- You should be redirected to Cognito Hosted UI.
+
+- Enter Admin credentials.
+
+- After login, you are redirected back to the dashboard.
+
+- Open browser DevTools → Application → Local Storage.
+
+  - **✅ access_token should exist.**
+
+**If no token → STOP, check Cognito setup.**
+
+#### 2️⃣ Dashboard Loads
+
+- After login, the dashboard content should appear (metrics + table).
+
+- Metrics should show Total Orders, Total Items Sold, Customers.
+
+- Orders table should populate with recent orders.
+
+- Spinner should appear while loading, then hide.
+
+- **✅ If dashboard is blank → STOP, check Lambda/API response.**
+
+#### 3️⃣ Auto Refresh Works
+
+- Wait ~10 seconds (or the interval set in frontend).
+
+- Dashboard metrics and table should update automatically.
+
+- Open DevTools → Network tab
+
+  - You should see GET requests to /order-status fired every 10 seconds.
+
+- **✅ If auto refresh doesn’t work → check setInterval(loadData, 10000) in frontend JS.**
+
+#### 4️⃣ Date Filter Works
+
+- On dashboard, select a date in the date picker.
+
+- Click Filter.
+
+- Dashboard metrics + table should update only for that date.
+
+- Network tab → Confirm request URL:
+
+```
+https://API_ID.execute-api.REGION.amazonaws.com/prod/order-status?date=YYYY-MM-DD
+```
+
+- **✅ If metrics or table show wrong data → check Lambda filter code.**
+
+#### 5️⃣ Chart Works
+
+- Chart below metrics should update matching the filtered data.
+
+- Check bars/lines correspond to orders/items counts.
+
+- Change date → chart updates accordingly.
+
+- **✅ If chart does not update → check frontend chart destroy/create logic.**
+
+**✔ Everything works → Phase Complete**
 
 **✅ PHASE 1️⃣ STATUS**
 
 > **🟢 PHASE 1️⃣ COMPLETE & VERIFIED**
+
+## SECTION 4️⃣ Secure Admin Order Dashboard COMPLETE ✅
 ---
