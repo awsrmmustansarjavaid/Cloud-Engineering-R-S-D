@@ -26,23 +26,23 @@
 * VPC Name: `CafeDevVPC`
 * CIDR: `10.0.0.0/16`
 
-### 1️⃣ Create Public Subnet
+### 2️⃣ Create Public Subnet
 
 * Name: `CafeDevPublicSubnet`
 * CIDR: `10.0.1.0/24`
 * Auto‑assign public IP: **Enabled**
 
-### 2️⃣ Create TWO private subnets:
+### 3️⃣ Create TWO private subnets:
 
 - CafeDevPrivateSubnet1 → 10.0.2.0/24 (AZ-a)
 - CafeDevPrivateSubnet2 → 10.0.3.0/24 (AZ-b)
 
-### 3️⃣ Internet Access
+### 4️⃣ Internet Access
 
 * Create Internet Gateway → Attach to VPC
 * Route table → Add route `0.0.0.0/0 → IGW`
 
-### 4️⃣ Security Group and NACL
+### 5️⃣ Security Group and NACL
 
 #### ✅ Open Security Group (MANDATORY)
 
@@ -126,7 +126,7 @@
 
 - SSH/HTTP/HTTPS in inbound is optional unless you want Lambda testing/debugging
 
-### 5️⃣ IAM Role & Policies
+### 6️⃣ IAM Role & Policies
 
 ### 1️⃣ IAM Role for EC2 (Secrets Access)
 
@@ -206,7 +206,7 @@ You can find your account ID here:
 
 AWS Console → Top Right → Account ID
 
-### 1️⃣ Number of AWS Managed Policies
+#### 1️⃣ Number of AWS Managed Policies
 
 AWS Managed Policies:
 These are policies created by Amazon Web Services like:
@@ -223,13 +223,13 @@ You did NOT use any AWS managed policy.
 
 ✅ AWS Managed Policies = 0
 
-2️⃣ Number of Custom Policies
+#### 2️⃣ Number of Custom Policies
 
 You created your own policy JSON and merged everything into one file.
 
 So in IAM it will appear as:
 
-#### COPY-PASTE READY POLICY JSON
+#### ✅ COPY-PASTE READY POLICY JSON
 
 You can paste this directly into IAM → Policies → Create policy → JSON
 
@@ -255,7 +255,7 @@ Allow Lambda to read menu items from DynamoDB
 
 - **IAM Role for Charlie Cafe Policies**
 
-#### 1️⃣ IAM Policies Method -1 ✅ Mega Custom IAM Policy
+### 1️⃣ IAM Policies Method -1 ✅ Mega Custom IAM Policy
 
 **👉 Paste into IAM → Policies → Create policy → JSON**
 
@@ -265,9 +265,9 @@ Allow Lambda to read menu items from DynamoDB
 
 - Account: Your AWS_Account_ID
 
-#### This policy includes:
+### ✅ This policy includes:
 
-#### 1️⃣ AWS Managed Policies (permissions merged)
+### 1️⃣ AWS Managed Policies (permissions merged)
 
 - AmazonDynamoDBFullAccess
 
@@ -281,7 +281,7 @@ Allow Lambda to read menu items from DynamoDB
 
 - CloudWatchLogsFullAccess
 
-#### 2️⃣ Custom Policies (ALL merged)
+### 2️⃣ Custom Policies (ALL merged)
 
 - AWSLambdaBasicExecution (custom logs scope)
 
@@ -301,7 +301,7 @@ Allow Lambda to read menu items from DynamoDB
 
 - SendOrderToSQS
 
-#### COPY-PASTE READY POLICY JSON
+#### ✅ COPY-PASTE READY POLICY JSON
 
 You can paste this directly into IAM → Policies → Create policy → JSON
 
