@@ -439,35 +439,27 @@ RDS → Databases → Create database
 ---
 ## PHASE 2️⃣ — Basic RDS Schema CONFIGURATIONS
 
+Read more about Charlie Cafe RDS
+
+[Charlie Cafe RDS](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Charlie%20Cafe%20%20RDS%20Project.md)
+
 ### 1️⃣ Create Schema in RDS
 
 - **✔️ Connect from EC2:**
 
 ### 2️⃣ — Basic RDS CONFIGURATIONS
 
-#### 1️⃣ Install & Login MySQL Client
-
-```
-sudo dnf install -y mariadb105
-```
-
-##### Verify mysql
+#### 1️⃣ Verify mysql
 
 ```
 mysql --version
 ```
 
-##### Login to MariaDB:
+#### 2️⃣ Login to MariaDB:
 
-```
-mysql -h <rds-endpoint> -u cafe_user -p
-```
+> **🛠️ BASH SCRIPT (Safe RDS Connection)**
 
-or
-
-#### 🛠️ BASH SCRIPT (Safe RDS Connection)
 > **📄 connect-rds.sh**
-
 
 ```
 sudo nano connect-rds.sh
@@ -475,7 +467,6 @@ sudo nano connect-rds.sh
 
 [RDS Credentials to Secrets Manager ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/AWS%20RDS%20Bash%20Scripts/connect-rds.sh)
 
-#### ▶️ How to Run
 
 ```
 sudo chmod +x connect-rds.sh
@@ -485,11 +476,9 @@ sudo chmod +x connect-rds.sh
 sudo ./connect-rds.sh
 ```
 
----
+### 3️⃣ Create cafe_db & Tables
 
-### 2️⃣ cafe_db
-
-### ✅ Charlie Cafe – Order Processing & HR Schema Setup + Verification
+#### ✅ Charlie Cafe – Order Processing & HR Schema Setup + Verification
 
 > **File name: setup_charlie_cafe_db_full.sh**
 
@@ -515,7 +504,7 @@ sudo nano setup_charlie_cafe_db_full.sh
 
 [Order Processing & HR Schema Setup + Verification ](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/AWS%20RDS%20Bash%20Scripts/Charlie-Cafe_RDS-Full.sh)
 
-#### ▶️ How to Run
+#### ▶️ Run
 
 ```
 sudo chmod +x setup_charlie_cafe_db_full.sh
@@ -523,59 +512,6 @@ sudo chmod +x setup_charlie_cafe_db_full.sh
 
 ```
 sudo ./setup_charlie_cafe_db_full.sh
-```
-
-
-#### 1️⃣ Create Café Database
-
-```sql
-CREATE DATABASE cafe_db;
-```
-
-```
-CREATE USER 'cafe_user'@'%' IDENTIFIED BY 'StrongPassword123';
-```
-
-```
-GRANT ALL PRIVILEGES ON cafe_db.* TO 'cafe_user'@'%';
-```
-
-```
-FLUSH PRIVILEGES;
-```
-
-#### 2️⃣ Use the correct database
-
-```
-USE cafe_db;
-```
-
-#### 3️⃣ Orders Table
-
-```sql
-CREATE TABLE orders (
- id INT AUTO_INCREMENT PRIMARY KEY,
- customer_name VARCHAR(100),
- item VARCHAR(50),
- quantity INT,
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### 📢 Recommended Final CREATE TABLE with table_number
-
-```
-CREATE TABLE orders (
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    table_number    INT NOT NULL,                    -- ← Added: table number (1, 2, 3, ...)
-    customer_name   VARCHAR(100),
-    item            VARCHAR(50),
-    quantity        INT NOT NULL,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    INDEX idx_table_number (table_number),           -- optional: faster queries by table
-    INDEX idx_created_at (created_at)                -- optional: good for time-based reports
-);
 ```
 
 ### 5️⃣ Verify table exists
