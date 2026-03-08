@@ -767,6 +767,10 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 ---
 ## ☕ AWS CAFE - PHASE 2️⃣ Lambda Layer (pymysql)
 
+Read more about Charlie Cafe Lambda Layer (pymysql)
+
+[Lambda Layer (pymysql)](../Charlie%20Cafe%20Lambda%20pymysql-layer.md)
+
 ### 1️⃣ - PyMySQL Lambda Layer
 
 ### Method 1️⃣ - PyMySQL Lambda Layer (Bash Script)

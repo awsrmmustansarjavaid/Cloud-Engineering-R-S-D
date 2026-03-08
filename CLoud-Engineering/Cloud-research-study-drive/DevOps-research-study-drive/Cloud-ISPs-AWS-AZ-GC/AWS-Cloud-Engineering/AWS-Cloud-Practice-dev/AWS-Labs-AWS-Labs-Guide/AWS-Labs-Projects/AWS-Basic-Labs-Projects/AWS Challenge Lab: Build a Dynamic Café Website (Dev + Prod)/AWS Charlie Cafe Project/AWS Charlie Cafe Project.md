@@ -662,7 +662,7 @@ https://charlie-cafe-assets.s3.amazonaws.com/hero.jpg
 
 Read more about Charlie Cafe Lambda Layer (pymysql)
 
-[Lambda Layer (pymysql)](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20Charlie%20Café%2)
+[Lambda Layer (pymysql)](./AWS%20Charlie%20Cafe%20Project%20DOCs/Charlie%20Cafe%20Lambda%20pymysql-layer.md)
 
 ### 1️⃣ - PyMySQL Lambda Layer
 
@@ -672,7 +672,7 @@ Read more about Charlie Cafe Lambda Layer (pymysql)
 sudo nano upload-pymysql-layer.sh
 ```
 
-[PyMySQL Lambda Layer](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/upload-pymysql-layer.sh)
+[PyMySQL Lambda Layer](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/upload-pymysql-layer.sh)
 
 ```
 sudo chmod +x upload-pymysql-layer.sh
@@ -681,101 +681,6 @@ sudo chmod +x upload-pymysql-layer.sh
 ```
 sudo ./upload-pymysql-layer.sh
 ```
-
-### Method 2️⃣ - PyMySQL Lambda Layer (1-to-1)
-
-#### Verify prerequisites (Optional)
-
-```
-aws --version
-```
-
-```
-python3 --version
-```
-
-```
-pip3 --version
-```
-
-#### 👁‍🗨 You should see:
-
-```
-aws-cli/2.x
-
-Python 3.x
-```
-
-#### ❗️ If pip3 missing:
-
-#### 1️⃣ Prepare ZIP File (EC2 or Local)
-
-```bash
-sudo dnf install -y python3 python3-pip
-```
-
-#### 🔹 STEP 1 — Create clean working directory
-
-```
-sudo mkdir lambda-layer && cd lambda-layer
-```
-
-#### 🔹 STEP 2 — Create required Lambda layer folder structure
-
-⚠️ Lambda REQUIRES this exact structure
-
-```
-mkdir python
-```
-
-#### 👁‍🗨 You should see:
-
-```
-pymysql-layer/
-└── python/
-```
-
-#### 🔹 STEP 3 — Install PyMySQL INTO python folder
-
-```
-pip3 install pymysql -t python/
-```
-
-#### 🔄 Verify install:
-
-```
-ls python/
-```
-
-#### 👁‍🗨 You should see:
-
-```
-pymysql/
-pymysql-*.dist-info/
-```
-
-#### 🔹 STEP 4 — Create ZIP file (VERY IMPORTANT)
-
-```
-zip -r pymysql-layer.zip python
-```
-
-#### Confirm ZIP exists:
-
-```
-ls -lh pymysql-layer.zip
-```
-
-#### 👁‍🗨 You should see:
-
-```
-pymysql-layer.zip   (few MB)
-```
-
-### ✅ METHOD 1 — PyMySQL Lambda Layer via AWS CLI (NO S3)
-
-[PyMySQL Lambda Layer via AWS CLI](./☕%20CC-%206%20—pymysql-layer.md)
-
 
 ### 2️⃣ — S3 Bucket - Upload ZIP
 
