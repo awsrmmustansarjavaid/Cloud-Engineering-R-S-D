@@ -290,7 +290,7 @@ charlie-cafe-iam-Role
 - **Description:**
 
 ```
-Allow Lambda to read menu items from DynamoDB
+This IAM role is designed to support the backend services of the Charlie Café system by providing controlled access to AWS resources required for logging, database operations, message queue processing, secrets management, and file storage.
 ```
 
 #### Step 3️⃣: Attach Permissions
@@ -306,6 +306,12 @@ Allow Lambda to read menu items from DynamoDB
 - Region: us-east-1
 
 - Account: Your AWS_Account_ID
+
+- **Description:**
+
+```
+This IAM policy is designed to support the backend services of the Charlie Café system by providing controlled access to AWS resources required for logging, database operations, message queue processing, secrets management, and file storage.
+```
 
 ### ✅ This policy includes:
 
