@@ -217,7 +217,7 @@ function getAnalytics(period = "today") {
 
         // Admin
         adminAttendance,
-        adminDashboard
+        adminDashboard,
 
         // Cognito AUTH
         exchangeCognitoToken,  // ✅ Add this
