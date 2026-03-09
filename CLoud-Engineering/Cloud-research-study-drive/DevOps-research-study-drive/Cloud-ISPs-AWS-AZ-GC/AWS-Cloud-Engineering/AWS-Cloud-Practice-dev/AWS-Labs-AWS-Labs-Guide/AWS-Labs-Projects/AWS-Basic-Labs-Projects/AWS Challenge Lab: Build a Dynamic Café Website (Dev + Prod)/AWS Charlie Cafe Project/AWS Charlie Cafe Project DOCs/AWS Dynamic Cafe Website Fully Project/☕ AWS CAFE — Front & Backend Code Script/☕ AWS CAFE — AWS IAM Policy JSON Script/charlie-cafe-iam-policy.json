@@ -51,7 +51,7 @@
         "dynamodb:PutItem",
         "dynamodb:UpdateItem"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:"Your AWS ACCOUNT ID ":table/CafeMenu"
+      "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu"
     },
 
     {
@@ -65,7 +65,7 @@
         "dynamodb:Query",
         "dynamodb:Scan"
       ],
-      "Resource": "arn:aws:dynamodb:us-east-1:"Your AWS ACCOUNT ID ":table/CafeOrders"
+      "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/CafeOrders"
     },
 
     {
@@ -77,7 +77,7 @@
         "sqs:DeleteMessage",
         "sqs:GetQueueAttributes"
       ],
-      "Resource": "arn:aws:sqs:us-east-1:"Your AWS ACCOUNT ID ":CafeOrdersQueue"
+      "Resource": "arn:aws:sqs:us-east-1:123456789012:CafeOrdersQueue"
     },
 
     {
