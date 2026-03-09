@@ -815,6 +815,14 @@ echo "🧹 Temporary ZIP file removed."
 
 > **Update Version: 1.1**
 
+- Uploads all .sh files from /home/ec2-user to S3.
+
+- Zips those .sh files.
+
+- Uploads the folder and zip into a S3 folder named bash script (same way as your HTML folder).
+
+### ✅ Here’s a fully final updated script with that functionality included:
+
 
 ```
 #!/bin/bash
