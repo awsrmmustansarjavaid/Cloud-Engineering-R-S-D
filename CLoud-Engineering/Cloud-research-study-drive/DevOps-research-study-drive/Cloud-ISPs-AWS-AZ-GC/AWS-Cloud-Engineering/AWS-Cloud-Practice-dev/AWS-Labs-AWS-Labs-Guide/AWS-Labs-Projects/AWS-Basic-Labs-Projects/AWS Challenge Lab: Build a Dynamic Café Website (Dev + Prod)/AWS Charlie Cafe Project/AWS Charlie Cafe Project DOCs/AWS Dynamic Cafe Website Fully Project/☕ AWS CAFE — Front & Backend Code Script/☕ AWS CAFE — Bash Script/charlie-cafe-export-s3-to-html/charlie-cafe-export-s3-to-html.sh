@@ -22,7 +22,7 @@ S3_BASH_FOLDER="Charlie Cafe Code Drive/bash script/"
 # 📂 EC2 DESTINATIONS
 # =========================================================
 EC2_HTML_FOLDER="/var/www/html"
-EC2_BASH_FOLDER="/home/download"
+EC2_BASH_FOLDER="/home/ec2-user"
 
 # =========================================================
 # 🚀 STEP 1 — EXPORT FILES FROM S3
