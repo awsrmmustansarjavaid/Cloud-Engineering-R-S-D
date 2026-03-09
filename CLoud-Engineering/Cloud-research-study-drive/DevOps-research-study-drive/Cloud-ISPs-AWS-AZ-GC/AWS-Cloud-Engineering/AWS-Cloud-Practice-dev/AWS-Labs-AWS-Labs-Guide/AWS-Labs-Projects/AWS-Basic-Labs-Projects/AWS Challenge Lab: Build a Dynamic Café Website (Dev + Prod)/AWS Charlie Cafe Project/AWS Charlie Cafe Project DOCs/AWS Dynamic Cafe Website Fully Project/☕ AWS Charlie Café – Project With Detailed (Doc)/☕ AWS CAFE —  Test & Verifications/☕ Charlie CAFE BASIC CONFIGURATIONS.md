@@ -1143,16 +1143,16 @@ sudo ./export_bash_output_s3.sh
 ### 3️⃣ EC2 Export to S3
 
 ```
-sudo nano ec2-export-s3
+sudo nano ec2-export-s3.sh
 ```
 
 [EC2 Export to S3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/charlie-cafe-export-s3-to-html/ec2-export-s3/ec2-export-s3.sh)
 
 ```
-sudo chmod +x ec2-html-s3.sh
+sudo chmod +x ec2-export-s3.sh
 ```
 ```
-sudo ./ec2-html-s3.sh
+sudo ./ec2-export-s3.sh
 ```
 
 **✅ PHASE 1️⃣ STATUS**
