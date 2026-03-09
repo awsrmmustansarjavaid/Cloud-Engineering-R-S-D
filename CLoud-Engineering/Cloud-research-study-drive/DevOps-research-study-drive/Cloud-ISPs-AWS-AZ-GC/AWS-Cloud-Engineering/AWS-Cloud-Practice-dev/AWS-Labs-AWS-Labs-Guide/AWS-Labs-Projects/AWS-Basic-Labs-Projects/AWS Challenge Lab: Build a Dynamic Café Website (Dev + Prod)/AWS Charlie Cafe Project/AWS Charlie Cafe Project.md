@@ -281,11 +281,19 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 charlie-cafe-iam-Role
 ```
 
+- Trusted entity type: AWS service
+
+- Service: Lambda
+
+- Click Next
+
 - **Description:**
 
 ```
 Allow Lambda to read menu items from DynamoDB
 ```
+
+#### Step 3️⃣: Attach Permissions
 
 - **IAM Role for Charlie Cafe Policies**
 
@@ -341,7 +349,9 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 
 [charlie-cafe-iam-policy](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20AWS%20IAM%20Policy%20JSON%20Script/charlie-cafe-iam-policy.json)
 
-**⚠️ JUST Replace "Your AWS ACCOUNT ID " with your own account ID**
+**⚠️ JUST Replace 123456789012 with your real AWS account ID. with your own account ID**
+
+
 
 #### ✅ WHY THIS POLICY IS SAFE & CORRECT
 

@@ -287,6 +287,12 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 charlie-cafe-iam-Role
 ```
 
+- Trusted entity type: AWS service
+
+- Service: Lambda
+
+- Click Next
+
 - **Description:**
 
 ```
@@ -347,7 +353,7 @@ You can paste this directly into IAM → Policies → Create policy → JSON
 
 [charlie-cafe-iam-policy](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20AWS%20IAM%20Policy%20JSON%20Script/charlie-cafe-iam-policy.json)
 
-**⚠️ JUST Replace "Your AWS ACCOUNT ID " with your own account ID**
+**⚠️ JUST Replace 123456789012 with your real AWS account ID. with your own account ID**
 
 #### ✅ WHY THIS POLICY IS SAFE & CORRECT
 
