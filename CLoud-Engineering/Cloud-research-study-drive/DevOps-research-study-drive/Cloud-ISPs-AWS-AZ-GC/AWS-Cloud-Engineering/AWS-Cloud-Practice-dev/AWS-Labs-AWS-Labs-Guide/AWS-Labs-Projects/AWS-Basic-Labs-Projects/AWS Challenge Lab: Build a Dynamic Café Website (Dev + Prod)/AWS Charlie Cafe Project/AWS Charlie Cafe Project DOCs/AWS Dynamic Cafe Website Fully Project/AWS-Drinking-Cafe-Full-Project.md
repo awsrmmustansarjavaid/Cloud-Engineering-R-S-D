@@ -164,6 +164,8 @@ When creating the IAM role:
 
 - Attach your custom policy: EC2-Cafe-Secrets-Role
 
+- Role name example: Cafe-EC2-Secrets-Role
+
 - (Optional description): 
 
 ```
