@@ -717,13 +717,8 @@ EXIT;
 
 - Go to Secrets Manager → Store a new secret
 
-- Type: Other type of secret → Key/Value
+- **Type: Other type of secret → Key/Value**
 
-- Secret name:
-
-```
-CafeDevDBSM
-```
 
 | Key      | Value              |
 |----------|--------------------|
@@ -733,6 +728,54 @@ CafeDevDBSM
 | dbname   | cafe_db            |
 
 - Retrieve Secret ARN for later use in the app
+
+### ✅ JSON Key/Value
+
+```
+{
+  "username": "cafe_user",
+  "password": "StrongPassword123",
+  "host": "your-rds-endpoint.amazonaws.com",
+  "dbname": "cafe_db"
+}
+```
+
+#### ✅  Replace These Values
+
+- username → cafe_user (your DB user)
+
+- password → StrongPassword123 (your real DB password)
+
+- host → your RDS endpoint (example: cafedb.xxxxxx.us-east-1.rds.amazonaws.com)
+
+- dbname → cafe_db
+
+#### Example With Real Format
+
+```
+{
+  "username": "cafe_user",
+  "password": "StrongPassword123",
+  "host": "cafedb.abc123xyz.us-east-1.rds.amazonaws.com",
+  "dbname": "cafe_db"
+}
+```
+
+### ✅ Secret Name
+
+```
+CafeDevDBSM
+```
+
+### ✅ After Creating the Secret
+
+Copy the Secret ARN. It will look like:
+
+```
+arn:aws:secretsmanager:us-east-1:123456789012:secret:CafeDevDBSM-xxxxx
+```
+
+#### ✅ You will use this ARN inside your AWS Lambda code to retrieve the database credentials.
 
 **✅ PHASE 3️⃣ STATUS**
 
