@@ -146,7 +146,7 @@ When creating the IAM role:
 
 > **This allows the EC2 instance to assume the role and use the permissions defined in your policy.**
 
-Complete IAM Role Creation Steps
+#### ✅ Complete IAM Role Creation Steps:
 
 - Go to: AWS Console → IAM → Roles
 
