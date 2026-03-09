@@ -824,6 +824,12 @@ sudo ./upload-pymysql-layer.sh
 
 ### 2️⃣ Charlie Cafe Export S3 to HTML Script
 
+### ➡️ Create Folder on S3 
+
+- Create Folder
+
+- **Name: Charlie Cafe Code Drive**
+
 ```
 sudo nano charlie-cafe-export-s3-to-html.sh
 ```
