@@ -567,6 +567,10 @@ sudo ./setup_charlie_cafe_db_full.sh
 ### 4️⃣ Verify table exists
 
 ```
+USE cafe_db;
+```
+
+```
 SHOW TABLES;
 ```
 
