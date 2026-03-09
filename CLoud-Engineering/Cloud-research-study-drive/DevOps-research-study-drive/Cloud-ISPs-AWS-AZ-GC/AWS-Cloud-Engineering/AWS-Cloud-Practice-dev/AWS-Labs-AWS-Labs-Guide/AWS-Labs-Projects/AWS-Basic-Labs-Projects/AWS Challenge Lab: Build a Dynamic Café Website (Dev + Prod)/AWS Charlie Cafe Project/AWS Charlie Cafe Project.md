@@ -600,6 +600,30 @@ DESCRIBE employees;
 SELECT * FROM employees;
 ```
 
+```
+DESCRIBE attendance;
+```
+
+```
+SELECT * FROM attendance;
+```
+
+```
+DESCRIBE holidays;
+```
+
+```
+SELECT * FROM holidays;
+```
+
+```
+DESCRIBE leaves
+```
+
+```
+SELECT * FROM leaves
+```
+
 ###### ✅ If you see the row → DB is READY
 
 #### Exit MySQL:
