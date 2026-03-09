@@ -7,11 +7,8 @@
 
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- Custom Styles -->
 <style>
   body {
     background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
@@ -21,65 +18,24 @@
     display: flex;
     flex-direction: column;
   }
-
-  .overlay {
-    background-color: rgba(0, 0, 0, 0.6);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    color: #fff;
-  }
-
-  h1, h3 {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  .form-control, .btn {
-    margin-bottom: 0.5rem;
-  }
-
-  table {
-    color: #fff;
-  }
-
-  thead {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .icon {
-    font-size: 1.2rem;
-    margin-right: 0.3rem;
-  }
-
-  .footer {
-    text-align: center;
-    padding: 0.5rem;
-    font-size: 0.9rem;
-    color: #ccc;
-  }
-
-  @media (max-width: 576px) {
-    .form-control, .btn {
-      width: 100%;
-    }
-  }
+  .overlay { background-color: rgba(0,0,0,0.6); flex:1; display:flex; flex-direction:column; padding:2rem; color:#fff; }
+  h1,h3 { text-align:center; margin-bottom:1rem; }
+  .form-control, .btn { margin-bottom:0.5rem; }
+  table { color:#fff; }
+  thead { background-color: rgba(255,255,255,0.2); }
+  tbody tr:nth-child(even) { background-color: rgba(255,255,255,0.1); }
+  .icon { font-size:1.2rem; margin-right:0.3rem; }
+  .footer { text-align:center; padding:0.5rem; font-size:0.9rem; color:#ccc; }
 </style>
 </head>
 <body>
 
 <div class="overlay container">
 
-  <!-- Page Header -->
   <h1><i class="bi bi-cup-straw"></i> Café Cognito Tester ☕</h1>
   <h3>Check Employee ID in Cognito Token</h3>
 
-  <!-- Cognito Configuration Form -->
+  <!-- Cognito Config Form -->
   <div class="row justify-content-center mb-3">
     <div class="col-md-6 col-sm-12">
       <label for="envName" class="form-label">Environment Name</label>
@@ -90,6 +46,9 @@
 
       <label for="clientId" class="form-label">Client ID</label>
       <input type="text" class="form-control" id="clientId" placeholder="your-cognito-client-id">
+
+      <label for="redirectUri" class="form-label">Redirect URI (This Page URL)</label>
+      <input type="text" class="form-control" id="redirectUri" placeholder="https://yourdomain.com/cognito-tester.html">
 
       <button class="btn btn-warning w-100 mt-2" id="loginBtn">
         <i class="bi bi-box-arrow-in-right"></i> Login & Test
@@ -107,74 +66,72 @@
           <th>Decoded Token</th>
         </tr>
       </thead>
-      <tbody id="resultTable">
-        <!-- Results will appear here -->
-      </tbody>
+      <tbody id="resultTable"></tbody>
     </table>
   </div>
 
 </div>
 
-<div class="footer">
-  &copy; 2026 Charlie Café ☕ | Cognito Tester
-</div>
+<div class="footer">&copy; 2026 Charlie Café ☕ | Cognito Tester</div>
 
-<!-- Script -->
 <script>
-  // =========================
-  // Parse JWT token function
-  // =========================
+  // =====================================
+  // Parse JWT function
+  // =====================================
   function parseJwt(token) {
     if(!token) return null;
     return JSON.parse(atob(token.split('.')[1]));
   }
 
-  // =========================
-  // Login Button Click
-  // =========================
-  document.getElementById('loginBtn').onclick = function() {
-    const envName = document.getElementById('envName').value.trim();
-    const domain = document.getElementById('cognitoDomain').value.trim();
-    const clientId = document.getElementById('clientId').value.trim();
+  // =====================================
+  // Helper: POST to Cognito /oauth2/token
+  // =====================================
+  async function exchangeCodeForToken(domain, clientId, redirectUri, code) {
+    const url = `https://${domain}/oauth2/token`;
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      code: code,
+      redirect_uri: redirectUri
+    });
 
-    if(!envName || !domain || !clientId) {
-      alert("Please fill all fields!");
-      return;
-    }
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    });
 
-    // Save environment details in sessionStorage to use after redirect
-    sessionStorage.setItem("testerEnvName", envName);
-
-    // Cognito Hosted UI login URL
-    const redirectUri = window.location.origin + window.location.pathname; // redirect back to this page
-    const loginUrl = `https://${domain}/login?client_id=${clientId}&response_type=token&scope=email+openid&redirect_uri=${encodeURIComponent(redirectUri)}`;
-    window.location.href = loginUrl;
+    if(!res.ok) throw new Error(`Token request failed: ${res.status}`);
+    return await res.json(); // returns { id_token, access_token, refresh_token... }
   }
 
-  // =========================
-  // Check token on page load
-  // =========================
-  window.onload = function() {
-    const hash = window.location.hash; // Cognito returns token in URL hash
-    if(hash) {
-      const params = new URLSearchParams(hash.replace('#','?'));
-      const idToken = params.get('id_token');
-      if(!idToken) return;
+  // =====================================
+  // Handle login redirect
+  // =====================================
+  async function handleCognitoRedirect() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if(!code) return;
+
+    const envName = sessionStorage.getItem('testerEnvName') || "Unknown";
+    const domain = sessionStorage.getItem('testerDomain');
+    const clientId = sessionStorage.getItem('testerClientId');
+    const redirectUri = sessionStorage.getItem('testerRedirectUri');
+
+    try {
+      const tokenData = await exchangeCodeForToken(domain, clientId, redirectUri, code);
+      const idToken = tokenData.id_token;
+      localStorage.setItem('id_token', idToken);
 
       const decoded = parseJwt(idToken);
-      const employeeId = parseInt(
-        decoded["custom:employee_id"] ||
-        decoded["employee_id"] ||
-        decoded["cognito:username"]
-      );
+      const employeeId = parseInt(decoded["custom:employee_id"] || decoded["employee_id"] || decoded["cognito:username"]);
 
-      const envName = sessionStorage.getItem("testerEnvName") || "Unknown";
-      const status = employeeId ? `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Found: ${employeeId}</span>` :
-                                  `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Missing</span>`;
+      const status = employeeId
+        ? `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Found: ${employeeId}</span>`
+        : `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Missing</span>`;
 
       const tokenString = JSON.stringify(decoded, null, 2);
 
-      // Append result to table
       const table = document.getElementById('resultTable');
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -184,13 +141,42 @@
       `;
       table.appendChild(row);
 
-      // Save token in localStorage like your portal
-      localStorage.setItem("id_token", idToken);
-
-      // Clear URL hash for clean reload
-      window.location.hash = "";
+      // Clean URL
+      window.history.replaceState({}, document.title, redirectUri);
+    } catch(err) {
+      alert("Error exchanging code for token: " + err.message);
     }
   }
+
+  // =====================================
+  // Login button
+  // =====================================
+  document.getElementById('loginBtn').onclick = function() {
+    const envName = document.getElementById('envName').value.trim();
+    const domain = document.getElementById('cognitoDomain').value.trim();
+    const clientId = document.getElementById('clientId').value.trim();
+    const redirectUri = document.getElementById('redirectUri').value.trim();
+
+    if(!envName || !domain || !clientId || !redirectUri) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    // Save in sessionStorage for after redirect
+    sessionStorage.setItem('testerEnvName', envName);
+    sessionStorage.setItem('testerDomain', domain);
+    sessionStorage.setItem('testerClientId', clientId);
+    sessionStorage.setItem('testerRedirectUri', redirectUri);
+
+    // Cognito login URL for Authorization Code Grant
+    const loginUrl = `https://${domain}/login?client_id=${clientId}&response_type=code&scope=openid+email+profile&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    window.location.href = loginUrl;
+  }
+
+  // =====================================
+  // On page load
+  // =====================================
+  window.onload = handleCognitoRedirect;
 </script>
 
 </body>

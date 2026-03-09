@@ -385,4 +385,226 @@ Include comments for every section so you can understand/modify it later.
 - Commented code: Each section is explained for easy modification.
 
 ---
+### ✅ Cognito-Tester.html
 
+Perfect — now I understand exactly. Since your production Cognito setup uses Authorization Code Grant (not Implicit Grant), your current tester code won’t get the ID token immediately, because in Auth Code Grant, Cognito returns only a code in the URL, which must be exchanged for tokens via a POST request to /oauth2/token.
+
+I’ve rewritten your tester page to fully support Authorization Code Grant, using JavaScript only, so it works for your SPA and your Cognito configuration. This version:
+
+- Redirects to Cognito Hosted UI.
+
+- After login, reads ?code=... from the URL.
+
+- Exchanges the code for ID token + access token automatically via POST to Cognito.
+
+- Parses the ID token and displays custom:employee_id.
+
+- Stores id_token in localStorage like your portal.
+
+- Fully commented for clarity.
+
+#### ✅ Here’s the final code:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Café Cognito Tester ☕</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+  body {
+    background: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .overlay { background-color: rgba(0,0,0,0.6); flex:1; display:flex; flex-direction:column; padding:2rem; color:#fff; }
+  h1,h3 { text-align:center; margin-bottom:1rem; }
+  .form-control, .btn { margin-bottom:0.5rem; }
+  table { color:#fff; }
+  thead { background-color: rgba(255,255,255,0.2); }
+  tbody tr:nth-child(even) { background-color: rgba(255,255,255,0.1); }
+  .icon { font-size:1.2rem; margin-right:0.3rem; }
+  .footer { text-align:center; padding:0.5rem; font-size:0.9rem; color:#ccc; }
+</style>
+</head>
+<body>
+
+<div class="overlay container">
+
+  <h1><i class="bi bi-cup-straw"></i> Café Cognito Tester ☕</h1>
+  <h3>Check Employee ID in Cognito Token</h3>
+
+  <!-- Cognito Config Form -->
+  <div class="row justify-content-center mb-3">
+    <div class="col-md-6 col-sm-12">
+      <label for="envName" class="form-label">Environment Name</label>
+      <input type="text" class="form-control" id="envName" placeholder="e.g., Dev, Test, Prod">
+
+      <label for="cognitoDomain" class="form-label">Cognito Domain</label>
+      <input type="text" class="form-control" id="cognitoDomain" placeholder="your-domain.auth.us-east-1.amazoncognito.com">
+
+      <label for="clientId" class="form-label">Client ID</label>
+      <input type="text" class="form-control" id="clientId" placeholder="your-cognito-client-id">
+
+      <label for="redirectUri" class="form-label">Redirect URI (This Page URL)</label>
+      <input type="text" class="form-control" id="redirectUri" placeholder="https://yourdomain.com/cognito-tester.html">
+
+      <button class="btn btn-warning w-100 mt-2" id="loginBtn">
+        <i class="bi bi-box-arrow-in-right"></i> Login & Test
+      </button>
+    </div>
+  </div>
+
+  <!-- Result Table -->
+  <div class="table-responsive mt-4">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th>Environment</th>
+          <th>Employee ID Status</th>
+          <th>Decoded Token</th>
+        </tr>
+      </thead>
+      <tbody id="resultTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">&copy; 2026 Charlie Café ☕ | Cognito Tester</div>
+
+<script>
+  // =====================================
+  // Parse JWT function
+  // =====================================
+  function parseJwt(token) {
+    if(!token) return null;
+    return JSON.parse(atob(token.split('.')[1]));
+  }
+
+  // =====================================
+  // Helper: POST to Cognito /oauth2/token
+  // =====================================
+  async function exchangeCodeForToken(domain, clientId, redirectUri, code) {
+    const url = `https://${domain}/oauth2/token`;
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      code: code,
+      redirect_uri: redirectUri
+    });
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    });
+
+    if(!res.ok) throw new Error(`Token request failed: ${res.status}`);
+    return await res.json(); // returns { id_token, access_token, refresh_token... }
+  }
+
+  // =====================================
+  // Handle login redirect
+  // =====================================
+  async function handleCognitoRedirect() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if(!code) return;
+
+    const envName = sessionStorage.getItem('testerEnvName') || "Unknown";
+    const domain = sessionStorage.getItem('testerDomain');
+    const clientId = sessionStorage.getItem('testerClientId');
+    const redirectUri = sessionStorage.getItem('testerRedirectUri');
+
+    try {
+      const tokenData = await exchangeCodeForToken(domain, clientId, redirectUri, code);
+      const idToken = tokenData.id_token;
+      localStorage.setItem('id_token', idToken);
+
+      const decoded = parseJwt(idToken);
+      const employeeId = parseInt(decoded["custom:employee_id"] || decoded["employee_id"] || decoded["cognito:username"]);
+
+      const status = employeeId
+        ? `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Found: ${employeeId}</span>`
+        : `<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Missing</span>`;
+
+      const tokenString = JSON.stringify(decoded, null, 2);
+
+      const table = document.getElementById('resultTable');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${envName}</td>
+        <td>${status}</td>
+        <td><pre style="white-space: pre-wrap; max-width: 400px;">${tokenString}</pre></td>
+      `;
+      table.appendChild(row);
+
+      // Clean URL
+      window.history.replaceState({}, document.title, redirectUri);
+    } catch(err) {
+      alert("Error exchanging code for token: " + err.message);
+    }
+  }
+
+  // =====================================
+  // Login button
+  // =====================================
+  document.getElementById('loginBtn').onclick = function() {
+    const envName = document.getElementById('envName').value.trim();
+    const domain = document.getElementById('cognitoDomain').value.trim();
+    const clientId = document.getElementById('clientId').value.trim();
+    const redirectUri = document.getElementById('redirectUri').value.trim();
+
+    if(!envName || !domain || !clientId || !redirectUri) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    // Save in sessionStorage for after redirect
+    sessionStorage.setItem('testerEnvName', envName);
+    sessionStorage.setItem('testerDomain', domain);
+    sessionStorage.setItem('testerClientId', clientId);
+    sessionStorage.setItem('testerRedirectUri', redirectUri);
+
+    // Cognito login URL for Authorization Code Grant
+    const loginUrl = `https://${domain}/login?client_id=${clientId}&response_type=code&scope=openid+email+profile&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    window.location.href = loginUrl;
+  }
+
+  // =====================================
+  // On page load
+  // =====================================
+  window.onload = handleCognitoRedirect;
+</script>
+
+</body>
+</html>
+```
+
+### ✅ Features / Fixes
+
+- Authorization Code Grant compliant — exchanges code for tokens.
+
+- Automatic ID token decoding — shows custom:employee_id.
+
+- LocalStorage storage — same as your portal.
+
+- Environment tracking — works for multiple environments.
+
+- Clean URL after login — removes ?code=... for UX.
+
+- Fully commented for easy understanding.
+
+This tester now exactly matches your Cognito setup, including Authorization Code Grant, hosted UI, and token decoding.
+
+---
