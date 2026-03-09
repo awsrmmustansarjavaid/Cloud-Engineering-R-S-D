@@ -24,7 +24,7 @@ window.CHARLIE_CONFIG = {
     =============================== */
     USER_POOL_ID: "us-east-1_oeMWJar3T",
     CLIENT_ID: "42haggs0jctmq5rnaajfi3hmqu",
-    COGNITO_DOMAIN: "https:/us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
+    COGNITO_DOMAIN: "https://us-east-1oemwjar3t.auth.us-east-1.amazoncognito.com",
 
     /* ===============================
        🚀 API Gateway (PRODUCTION)
