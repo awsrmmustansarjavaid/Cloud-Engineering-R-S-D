@@ -456,7 +456,7 @@ sudo ./verify_charlie_cafe_rds.sh
 sudo nano rds-secret-test.sh
 ```
 
-[Cafe RDS Tests for Phase 3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/rds-secret-test.sh)
+[Cafe RDS Tests for Phase 3](../../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/AWS%20RDS%20Bash%20Scripts/☕%20AWS%20CAFE%20—%20Bash%20Script/rds-secret-test.sh)
 
 #### ▶️ How to Run
 
