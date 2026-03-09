@@ -296,7 +296,7 @@ charlie-cafe-iam-Role
 - **Description:**
 
 ```
-This IAM Role is designed to support the backend services of the Charlie Café system by providing controlled access to AWS resources required for logging, database operations, message queue processing, secrets management, and file storage.
+This IAM Role is designed to support the backend services of the Charlie Cafe system by providing controlled access to AWS resources required for logging, database operations, message queue processing, secrets management, and file storage.
 ```
 
 - **IAM Role for Charlie Cafe Policies**
@@ -314,7 +314,7 @@ This IAM Role is designed to support the backend services of the Charlie Café s
 - **Description:**
 
 ```
-This IAM policy is designed to support the backend services of the Charlie Café system by providing controlled access to AWS resources required for logging, database operations, message queue processing, secrets management, and file storage.
+This IAM policy is designed to support the backend services of the Charlie Cafe system by providing controlled access to AWS resources required for logging, database operations, message queue processing, secrets management, and file storage.
 ```
 
 #### This policy includes:
