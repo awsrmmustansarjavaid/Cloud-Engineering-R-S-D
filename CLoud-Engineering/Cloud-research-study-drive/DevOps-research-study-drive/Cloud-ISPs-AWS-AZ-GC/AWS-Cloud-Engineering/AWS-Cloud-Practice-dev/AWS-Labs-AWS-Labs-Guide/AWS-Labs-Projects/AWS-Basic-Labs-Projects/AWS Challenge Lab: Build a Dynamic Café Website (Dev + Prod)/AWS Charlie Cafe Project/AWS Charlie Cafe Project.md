@@ -130,13 +130,45 @@
 
 ### 1️⃣ IAM Role for EC2 (Secrets Access)
 
-- **IAM Role Name:**
+#### 1️⃣ IAM Role Name:
 
 ```
 EC2-Cafe-Secrets-Role
 ```
 
-This policy contains permissions for:
+#### 2️⃣ Service You Must Select
+
+When creating the IAM role:
+
+- Trusted Entity Type : AWS Service
+
+- Use Case / Service : ✅ EC2
+
+> **This allows the EC2 instance to assume the role and use the permissions defined in your policy.**
+
+Complete IAM Role Creation Steps
+
+- Go to: AWS Console → IAM → Roles
+
+- Click: Create Role
+
+- Select: Trusted entity type → AWS Service
+
+- Then select: Use case → EC2
+
+- Click: Next
+
+- Attach your custom policy: EC2-Cafe-Secrets-Role
+
+- (Optional description): 
+
+```
+Role for EC2 to access Lambda, RDS, Secrets Manager, S3 and other services
+```
+
+- Click: Create Role
+
+#### ✅ This policy contains permissions for:
 
 - Lambda
 
