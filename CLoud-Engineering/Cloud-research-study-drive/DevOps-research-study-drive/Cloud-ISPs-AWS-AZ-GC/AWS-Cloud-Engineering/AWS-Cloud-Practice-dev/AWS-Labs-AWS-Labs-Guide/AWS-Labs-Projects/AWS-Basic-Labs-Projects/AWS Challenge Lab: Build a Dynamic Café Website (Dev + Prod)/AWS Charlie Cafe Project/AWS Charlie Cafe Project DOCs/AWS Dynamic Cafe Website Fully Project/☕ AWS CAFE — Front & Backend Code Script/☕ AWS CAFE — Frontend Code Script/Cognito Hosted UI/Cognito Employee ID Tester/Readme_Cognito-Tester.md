@@ -607,4 +607,123 @@ I’ve rewritten your tester page to fully support Authorization Code Grant, usi
 
 This tester now exactly matches your Cognito setup, including Authorization Code Grant, hosted UI, and token decoding.
 
+### 📢 Caf3 Cognito Tester – Lab Configuration Notes
+
+### 1️⃣ Prerequisites
+
+Your Cognito User Pool exists with:
+
+- Custom attribute custom:employee_id
+
+- Users assigned employee IDs
+
+- App Client using Authorization Code Grant
+
+- App Client ID and redirect URI configured
+
+This HTML file is hosted at the Redirect URI you provide to Cognito.
+
+### 2️⃣ Input Fields (Configuration for Test)
+
+| Field            | Purpose                           | How to Fill                                                |
+| ---------------- | --------------------------------- | ---------------------------------------------------------- |
+| Environment Name | Logical name for your environment | e.g., Dev, Test, Prod                                      |
+| Cognito Domain   | Your Cognito hosted UI domain     | e.g., `charlie-cafe-auth.auth.us-east-1.amazoncognito.com` |
+| Client ID        | Cognito App Client ID             | e.g., `7c5793cnvnbl110ljthmdiohch`                         |
+| Redirect URI     | The URL of this tester page       | e.g., `https://yourdomain.com/cognito-tester.html`         |
+
+### 3️⃣ Test Steps
+
+- Open the tester page in your browser.
+
+- Fill all four input fields with your environment, domain, client ID, and redirect URI.
+
+- Click Login & Test.
+
+  - This will redirect to the Cognito Hosted UI.
+
+- Enter username and password for a user in your pool.
+
+- After login, Cognito redirects back to your tester page with a ?code=... in the URL.
+
+- On page load, the tester:
+
+  - Reads the authorization code from the URL
+
+  - Exchanges the code for ID token via POST /oauth2/token
+
+  - Parses the ID token and checks for custom:employee_id
+
+  - Displays the environment, employee ID status, and decoded token in the table
+
+### 4️⃣ Expected Behavior / Output
+
+- Environment Column:
+
+  - Should display the value you entered in Environment Name input.
+
+- Employee ID Status Column:
+
+  - If custom:employee_id exists in token → shows green check with numeric employee ID.
+
+  - If missing → shows red cross with “Missing”.
+
+- Decoded Token Column:
+
+  - Shows full decoded ID token JSON, including:
+
+  - sub → Cognito user ID
+
+  - email → user's email
+
+  - cognito:groups → optional, if group assigned
+
+  - custom:employee_id → numeric employee ID
+
+  - exp, iat → token expiry and issue timestamps
+
+  - Confirms your App Client & token configuration is correct.
+
+- LocalStorage:
+
+  - id_token is saved in browser localStorage, same as your portal.
+
+- URL Cleanup:
+
+  - After processing, the ?code=... is removed from the URL for a clean page reload.
+
+### 5️⃣ Test Validation Checklist
+
+- After login, table row appears with correct Environment Name.
+
+-  Employee ID shows green check with correct ID.
+
+- Decoded token JSON includes custom:employee_id.
+
+- id_token is saved in localStorage.
+
+- URL no longer has ?code= parameter.
+
+- No errors in browser console during token exchange.
+
+### 6️⃣ Notes / Troubleshooting
+
+- If the Employee ID shows Missing:
+
+  - Check App Client ID token attributes include custom:employee_id.
+
+  - Check the user has a custom:employee_id assigned.
+
+  - Ensure the Redirect URI in the tester matches the App Client exactly.
+
+- If Token exchange fails:
+
+  - Confirm App Client uses Authorization Code Grant.
+
+  - Confirm client_id and redirect_uri match Cognito settings.
+
+  - Network errors can occur if browser blocks CORS; SPA should be hosted on a valid HTTPS domain.
+
+This documentation will let you test and verify your Cognito setup step-by-step and clearly note expected outcomes in your lab notebook.
+
 ---
