@@ -663,7 +663,7 @@ Everything will work.
 
 - Click Save
 
-### 3️⃣ Create Lambda: hr-employee-profile
+### 2️⃣ Create Lambda: hr-employee-profile
 
 #### 1️⃣ Function name
 
@@ -677,7 +677,7 @@ hr-employee-profile
 
 - Deploy.
 
-### 4️⃣ Create Lambda: hr-attendance-history
+### 3️⃣ Create Lambda: hr-attendance-history
 
 #### 1️⃣ Function name
 
@@ -691,7 +691,7 @@ hr-attendance-history
 
 - Deploy.
 
-### 5️⃣ Create Lambda: hr-leaves-holidays
+### 4️⃣ Create Lambda: hr-leaves-holidays
 
 #### 1️⃣ Function name
 
@@ -705,7 +705,7 @@ hr-leaves-holidays
 
 - Deploy.
 
-### 6️⃣ Create Lambda: hr-cognito-token-exchange
+### 5️⃣ Create Lambda: hr-cognito-token-exchange
 
 > **AWS Cognito Authorization Code Exchange via API Gateway + Lambda**
 
