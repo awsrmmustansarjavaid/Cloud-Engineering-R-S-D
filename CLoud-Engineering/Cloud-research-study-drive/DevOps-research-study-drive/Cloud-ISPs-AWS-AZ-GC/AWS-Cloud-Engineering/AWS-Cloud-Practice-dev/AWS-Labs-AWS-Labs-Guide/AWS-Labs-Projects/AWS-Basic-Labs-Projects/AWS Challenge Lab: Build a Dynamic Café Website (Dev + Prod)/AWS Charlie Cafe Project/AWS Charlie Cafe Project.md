@@ -7566,6 +7566,42 @@ sudo nano /var/www/html/Cognito-Tester.html
 
   - Displays the environment, employee ID status, and decoded token in the table
 
+#### 4️⃣ Expected Behavior / Output
+
+- Environment Column:
+
+  - Should display the value you entered in Environment Name input.
+
+- Employee ID Status Column:
+
+  - If custom:employee_id exists in token → shows green check with numeric employee ID.
+
+  - If missing → shows red cross with “Missing”.
+
+- Decoded Token Column:
+
+  - Shows full decoded ID token JSON, including:
+
+  - sub → Cognito user ID
+
+  - email → user's email
+
+  - cognito:groups → optional, if group assigned
+
+  - custom:employee_id → numeric employee ID
+
+  - exp, iat → token expiry and issue timestamps
+
+  - Confirms your App Client & token configuration is correct.
+
+- LocalStorage:
+
+  - id_token is saved in browser localStorage, same as your portal.
+
+- URL Cleanup:
+
+  - After processing, the ?code=... is removed from the URL for a clean page reload.
+
 ### 4️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 > **📄 cafe-admin-dashboard.html**
 
