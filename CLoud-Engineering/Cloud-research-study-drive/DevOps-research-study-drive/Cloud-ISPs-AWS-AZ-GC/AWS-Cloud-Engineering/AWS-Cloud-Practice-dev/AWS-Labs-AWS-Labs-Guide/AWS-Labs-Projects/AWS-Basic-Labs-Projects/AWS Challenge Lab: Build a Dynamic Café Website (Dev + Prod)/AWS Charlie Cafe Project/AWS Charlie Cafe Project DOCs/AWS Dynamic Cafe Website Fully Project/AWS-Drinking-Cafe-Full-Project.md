@@ -716,11 +716,11 @@ SELECT * FROM holidays;
 ```
 
 ```
-DESCRIBE leaves
+DESCRIBE leaves;
 ```
 
 ```
-SELECT * FROM leaves
+SELECT * FROM leaves;
 ```
 
 ###### ✅ If you see the row → DB is READY
