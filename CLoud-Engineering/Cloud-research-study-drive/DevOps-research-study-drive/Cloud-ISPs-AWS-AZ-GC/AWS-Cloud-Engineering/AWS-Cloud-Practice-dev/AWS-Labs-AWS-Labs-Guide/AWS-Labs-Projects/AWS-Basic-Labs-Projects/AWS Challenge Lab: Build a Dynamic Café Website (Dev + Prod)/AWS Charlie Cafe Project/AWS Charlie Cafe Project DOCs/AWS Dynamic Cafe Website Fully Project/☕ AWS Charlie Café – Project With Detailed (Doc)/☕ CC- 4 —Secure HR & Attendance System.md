@@ -1031,10 +1031,34 @@ sudo nano /var/www/html/employee-portal.html
 sudo nano /var/www/html/Cognito-Tester.html
 ```
 
-#### 2️⃣ employee-portal.html Code
+#### 2️⃣ Cognito-Tester.html Code
 
 [Cognito-Tester.html](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/Cognito%20Employee%20ID%20Tester/Cognito-Tester.html)
 
+
+#### 3️⃣ Test Steps
+
+- Open the tester page in your browser.
+
+- Fill all four input fields with your environment, domain, client ID, and redirect URI.
+
+- Click Login & Test.
+
+  - This will redirect to the Cognito Hosted UI.
+
+- Enter username and password for a user in your pool.
+
+- After login, Cognito redirects back to your tester page with a ?code=... in the URL.
+
+- On page load, the tester:
+
+  - Reads the authorization code from the URL
+
+  - Exchanges the code for ID token via POST /oauth2/token
+
+  - Parses the ID token and checks for custom:employee_id
+
+  - Displays the environment, employee ID status, and decoded token in the table
 
 ### 4️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 > **📄 cafe-admin-dashboard.html**
