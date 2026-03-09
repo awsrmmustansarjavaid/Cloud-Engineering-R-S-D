@@ -3,14 +3,13 @@
 # CHARLIE CAFE ☕
 # S3 TO EC2 EXPORT + PERMISSIONS SCRIPT
 # File Name: charlie-cafe-export-s3-to-html.sh
+# Secure Version (Uses EC2 IAM Role)
 # =========================================================
 
 # =========================================================
 # ⚙️ AWS CONFIGURATION
 # =========================================================
-AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY_HERE"
-AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY_HERE"
-AWS_REGION="us-east-1"
+AWS_REGION="ap-southeast-2"
 S3_BUCKET="charlie-cafe-s3-bucket"
 
 # =========================================================
@@ -35,12 +34,12 @@ echo "Region: $AWS_REGION"
 echo "======================================================="
 
 echo "📥 Syncing HTML folder from S3 to EC2..."
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+
 aws s3 sync "s3://$S3_BUCKET/$S3_HTML_FOLDER" "$EC2_HTML_FOLDER" \
 --region $AWS_REGION --delete
 
 echo "📥 Syncing Bash scripts from S3 to EC2..."
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+
 aws s3 sync "s3://$S3_BUCKET/$S3_BASH_FOLDER" "$EC2_BASH_FOLDER" \
 --region $AWS_REGION --delete
 
