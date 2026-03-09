@@ -7529,7 +7529,21 @@ sudo nano /var/www/html/employee-portal.html
 
 ✅ Employees can view profile, attendance, leaves, and holidays.
 
-### 3️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
+### 3️⃣ Cognito-Tester
+> **📄 Cognito-Tester.html**
+
+#### 1️⃣ Create file to EC2:
+
+```
+sudo nano /var/www/html/Cognito-Tester.html
+```
+
+#### 2️⃣ employee-portal.html Code
+
+[Cognito-Tester.html](./☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/Cognito%20Employee%20ID%20Tester/Cognito-Tester.html)
+
+
+### 4️⃣ ☕ FINAL ADMIN DASHBOARD (CAFÉ THEME)
 > **📄 cafe-admin-dashboard.html**
 
 #### 1️⃣ Create file to EC2:
