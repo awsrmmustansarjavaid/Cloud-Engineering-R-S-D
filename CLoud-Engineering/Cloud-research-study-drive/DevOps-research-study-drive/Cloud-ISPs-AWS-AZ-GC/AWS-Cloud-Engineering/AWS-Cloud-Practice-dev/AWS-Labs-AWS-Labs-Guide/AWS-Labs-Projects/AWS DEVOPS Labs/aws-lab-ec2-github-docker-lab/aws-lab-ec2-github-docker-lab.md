@@ -355,7 +355,7 @@ Docker version 24.0.5, build ffff...
 cd ~
 ```
 
-3️⃣ Clone your repository:
+#### 3️⃣ Clone your repository:
 
 ```
 git clone https://github.com/<your-username>/aws-docker-lab.git
@@ -363,13 +363,13 @@ git clone https://github.com/<your-username>/aws-docker-lab.git
 
 > **⚠️ Replace <your-username> with your GitHub username.**
 
-4️⃣ Go inside the project folder:
+#### 4️⃣ Go inside the project folder:
 
 ```
 cd aws-docker-lab
 ```
 
-5️⃣ Verify files are there:
+#### 5️⃣ Verify files are there:
 
 ```
 ls -l
@@ -382,4 +382,96 @@ server.js
 package.json
 Dockerfile
 ```
+
+### 9️⃣ Build the Docker Image
+
+#### 1️⃣ Run the Docker build command in the project folder:
+
+```
+sudo docker build -t aws-docker-lab .
+```
+
+- -t aws-docker-lab → names the image
+
+- . → current directory (Dockerfile location)
+
+#### 2️⃣ Wait until it finishes — you should see something like:
+
+```
+Successfully built <image-id>
+Successfully tagged aws-docker-lab:latest
+```
+
+### 🔟 Run the Docker Container
+
+#### 1️⃣ Run the container with port mapping:
+
+```
+sudo docker run -d -p 3000:3000 aws-docker-lab
+```
+
+- -d → run in detached mode
+
+- -p 3000:3000 → maps container port 3000 to EC2 port 3000
+
+#### 2️⃣ Verify container is running:
+
+```
+sudo docker ps
+```
+
+docker ps
+
+You should see a container with PORTS 0.0.0.0:3000->3000/tcp and status Up.
+
+### 1️⃣1️⃣ Adjust EC2 Security Group (if needed)
+
+1️⃣ Go to AWS Console → EC2 → Security Groups.
+2️⃣ Select the security group attached to your instance.
+3️⃣ Make sure there’s an Inbound rule:
+
+| Type       | Protocol | Port Range | Source    |
+| ---------- | -------- | ---------- | --------- |
+| SSH        | TCP      | 22         | My IP     |
+| Custom TCP | TCP      | 3000       | 0.0.0.0/0 |
+
+> **This allows your browser to access the Node.js app.**
+
+### 1️⃣2️⃣ Access Your App in Browser
+
+1️⃣ Open your browser.
+2️⃣ Enter your EC2 public IPv4 address with port 3000:
+
+```
+http://<EC2_PUBLIC_IP>:3000
+```
+
+3️⃣ You should see:
+
+```
+Hello from AWS EC2 + Docker!
+```
+
+### 1️⃣3️⃣ Stop or Remove the Container
+
+List containers:
+
+```
+sudo docker ps
+```
+
+Stop a container:
+
+```
+sudo docker stop <container-id>
+```
+
+Remove a container:
+
+```
+sudo docker rm <container-id>
+```
+
+
+
 
