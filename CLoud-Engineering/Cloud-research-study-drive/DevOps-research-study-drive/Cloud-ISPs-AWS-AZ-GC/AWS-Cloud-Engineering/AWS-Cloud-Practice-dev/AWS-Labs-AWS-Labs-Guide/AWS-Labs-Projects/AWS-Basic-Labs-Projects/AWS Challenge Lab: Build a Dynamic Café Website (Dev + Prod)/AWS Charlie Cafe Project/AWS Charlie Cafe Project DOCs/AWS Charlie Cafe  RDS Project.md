@@ -669,3 +669,596 @@ SELECT 'holidays', COUNT(*) FROM holidays;
 
 This gives instant database health summary.
 ---
+## 🌐 RDS Verification 
+
+### 1️⃣ Verify table exists
+
+```
+USE cafe_db;
+```
+
+```
+SHOW TABLES;
+```
+
+#### ✅ You should see:
+
+```
+orders
+employees
+attendance
+leaves
+holidays
+```
+
+```
+DESCRIBE orders;
+```
+
+```
+SELECT * FROM orders;
+```
+
+```
+DESCRIBE employees;
+```
+
+```
+SELECT * FROM employees;
+```
+
+```
+DESCRIBE attendance;
+```
+
+```
+SELECT * FROM attendance;
+```
+
+```
+DESCRIBE holidays;
+```
+
+```
+SELECT * FROM holidays;
+```
+
+```
+DESCRIBE leaves;
+```
+
+```
+SELECT * FROM leaves;
+```
+
+###### ✅ If you see the row → DB is READY
+
+### ✅ Combined RDS Verification Script (One Run)
+
+> #### This is the best single verification script you can run from your EC2 MySQL client.
+
+This gives a single query that verifies:
+
+- Tables exist
+
+- Table structure
+
+- Row counts
+
+- Columns
+
+- Data types
+
+```
+USE cafe_db;
+
+-- =========================
+-- 1️⃣ Verify tables exist
+-- =========================
+SHOW TABLES;
+
+-- =========================
+-- 2️⃣ Orders table check
+-- =========================
+SELECT 'orders table structure' AS section;
+DESCRIBE orders;
+
+SELECT 'orders sample data' AS section;
+SELECT * FROM orders LIMIT 5;
+
+-- =========================
+-- 3️⃣ Employees table check
+-- =========================
+SELECT 'employees table structure' AS section;
+DESCRIBE employees;
+
+SELECT 'employees sample data' AS section;
+SELECT * FROM employees LIMIT 5;
+
+-- =========================
+-- 4️⃣ Attendance table check
+-- =========================
+SELECT 'attendance table structure' AS section;
+DESCRIBE attendance;
+
+SELECT 'attendance sample data' AS section;
+SELECT * FROM attendance LIMIT 5;
+
+-- =========================
+-- 5️⃣ Holidays table check
+-- =========================
+SELECT 'holidays table structure' AS section;
+DESCRIBE holidays;
+
+SELECT 'holidays sample data' AS section;
+SELECT * FROM holidays LIMIT 5;
+
+-- =========================
+-- 6️⃣ Leaves table check
+-- =========================
+SELECT 'leaves table structure' AS section;
+DESCRIBE leaves;
+
+SELECT 'leaves sample data' AS section;
+SELECT * FROM leaves LIMIT 5;
+```
+
+#### ✅ Why this is better
+
+Instead of 10–15 manual commands, you:
+
+- paste one script
+
+- get all verification results
+
+- see clear section labels
+
+- avoid dumping too much data with LIMIT 5
+
+#### ✅ Example Output Sections
+
+You will see results like:
+
+```
+SHOW TABLES
+orders
+employees
+attendance
+holidays
+leaves
+```
+
+Then:
+
+```
+orders table structure
+id
+customer_name
+order_total
+created_at
+```
+
+Then:
+
+```
+orders sample data
+1 | John | 12.50 | 2026-03-10
+```
+
+### 🚀 Pro Tip (Good for your Charlie Café DevOps documentation)
+
+Add a comment header like:
+
+```
+-- Charlie Café RDS Verification Script
+-- Used to verify database migration / deployment
+-- Run from EC2 MySQL client
+```
+
+This makes your lab documentation look professional.
+
+### 🚀 Advanced RDS Verification Query (Professional Method)
+
+Run this from your EC2 MySQL client.
+
+```
+USE cafe_db;
+
+SELECT 
+    TABLE_NAME,
+    COLUMN_NAME,
+    DATA_TYPE,
+    IS_NULLABLE,
+    COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+```
+
+#### ✅ What This Verifies
+
+This one query checks the full schema.
+
+Example output:
+
+| TABLE_NAME | COLUMN_NAME   | DATA_TYPE | IS_NULLABLE | COLUMN_KEY |
+| ---------- | ------------- | --------- | ----------- | ---------- |
+| orders     | id            | int       | NO          | PRI        |
+| orders     | customer_name | varchar   | YES         |            |
+| employees  | id            | int       | NO          | PRI        |
+| attendance | employee_id   | int       | NO          |            |
+
+So you immediately confirm:
+
+✔ tables exist
+
+✔ column structure
+
+✔ data types
+
+✔ primary keys
+
+### 🚀 Optional: Add Row Count Verification (Even Better)
+
+Add this second quick query to verify data exists.
+
+```
+SELECT 
+table_name,
+table_rows
+FROM information_schema.tables
+WHERE table_schema='cafe_db'
+AND table_name IN ('orders','employees','attendance','holidays','leaves');
+```
+
+#### Example output:
+
+| table_name | table_rows |
+| ---------- | ---------- |
+| orders     | 120        |
+| employees  | 8          |
+| attendance | 340        |
+| holidays   | 12         |
+| leaves     | 6          |
+
+### 📘 How You Can Document It in Your Lab Notebook
+
+Example note:
+
+```
+Step: Verify RDS Database Schema
+
+Command used:
+
+SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA='cafe_db';
+
+Expected Result:
+All required Charlie Café tables appear:
+orders
+employees
+attendance
+holidays
+leaves
+
+Verification confirms database migration / deployment success.
+```
+
+### ⭐ DevOps Tip (Very Useful for Your Project)
+
+Real engineers often run these checks after:
+
+- RDS migration
+
+- database deployment
+
+- CI/CD database pipeline
+
+Tools like:
+
+- Flyway
+
+- Liquibase
+
+- GitHub Actions
+
+### 🚀 Charlie Café – RDS Full Health Check Script
+
+Run this once from your EC2 MySQL client.
+
+```
+USE cafe_db;
+
+-- =====================================================
+-- Charlie Café RDS Database Health Check
+-- =====================================================
+
+-- 1️⃣ Verify required tables exist
+SELECT 
+TABLE_NAME,
+ENGINE,
+TABLE_ROWS,
+CREATE_TIME,
+UPDATE_TIME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves');
+
+
+-- 2️⃣ Verify table columns and schema
+SELECT 
+TABLE_NAME,
+COLUMN_NAME,
+DATA_TYPE,
+IS_NULLABLE,
+COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+
+
+-- 3️⃣ Verify indexes (important for performance)
+SELECT 
+TABLE_NAME,
+INDEX_NAME,
+COLUMN_NAME,
+SEQ_IN_INDEX
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves');
+
+
+-- 4️⃣ Verify table storage engine
+SELECT 
+TABLE_NAME,
+ENGINE
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='cafe_db';
+
+
+-- 5️⃣ Verify database size
+SELECT 
+table_schema AS database_name,
+ROUND(SUM(data_length + index_length)/1024/1024,2) AS size_MB
+FROM information_schema.tables
+WHERE table_schema='cafe_db'
+GROUP BY table_schema;
+
+
+-- 6️⃣ Verify row counts quickly
+SELECT 
+TABLE_NAME,
+TABLE_ROWS
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves');
+```
+
+#### ✅ What This Single Script Verifies
+
+| Check           | Purpose                     |
+| --------------- | --------------------------- |
+| Tables exist    | confirms deployment success |
+| Table structure | columns & data types        |
+| Indexes         | performance verification    |
+| Storage engine  | should usually be InnoDB    |
+| Row counts      | confirms data present       |
+| Database size   | quick storage monitoring    |
+
+#### 📊 Example Output
+
+Example result from section 1️⃣:
+
+| TABLE_NAME | ENGINE | TABLE_ROWS |
+| ---------- | ------ | ---------- |
+| orders     | InnoDB | 150        |
+| employees  | InnoDB | 8          |
+| attendance | InnoDB | 340        |
+| holidays   | InnoDB | 12         |
+| leaves     | InnoDB | 5          |
+
+### 🚀 Charlie Café RDS PASS / FAIL Health Check
+
+Run this script once from your EC2 MySQL client.
+
+```
+USE cafe_db;
+
+SELECT 
+'orders table exists' AS check_name,
+CASE 
+WHEN EXISTS (
+SELECT 1 
+FROM information_schema.tables 
+WHERE table_schema='cafe_db' AND table_name='orders'
+)
+THEN 'PASS'
+ELSE 'FAIL'
+END AS status
+
+UNION ALL
+
+SELECT 
+'employees table exists',
+CASE 
+WHEN EXISTS (
+SELECT 1 
+FROM information_schema.tables 
+WHERE table_schema='cafe_db' AND table_name='employees'
+)
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'attendance table exists',
+CASE 
+WHEN EXISTS (
+SELECT 1 
+FROM information_schema.tables 
+WHERE table_schema='cafe_db' AND table_name='attendance'
+)
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'holidays table exists',
+CASE 
+WHEN EXISTS (
+SELECT 1 
+FROM information_schema.tables 
+WHERE table_schema='cafe_db' AND table_name='holidays'
+)
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'leaves table exists',
+CASE 
+WHEN EXISTS (
+SELECT 1 
+FROM information_schema.tables 
+WHERE table_schema='cafe_db' AND table_name='leaves'
+)
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'orders table has data',
+CASE 
+WHEN (SELECT COUNT(*) FROM orders) > 0
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'employees table has data',
+CASE 
+WHEN (SELECT COUNT(*) FROM employees) > 0
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'attendance table has data',
+CASE 
+WHEN (SELECT COUNT(*) FROM attendance) > 0
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'holidays table has data',
+CASE 
+WHEN (SELECT COUNT(*) FROM holidays) > 0
+THEN 'PASS'
+ELSE 'FAIL'
+END
+
+UNION ALL
+
+SELECT 
+'leaves table has data',
+CASE 
+WHEN (SELECT COUNT(*) FROM leaves) > 0
+THEN 'PASS'
+ELSE 'FAIL'
+END;
+```
+
+#### 📊 Example Output
+
+| check_name                | status |
+| ------------------------- | ------ |
+| orders table exists       | PASS   |
+| employees table exists    | PASS   |
+| attendance table exists   | PASS   |
+| holidays table exists     | PASS   |
+| leaves table exists       | PASS   |
+| orders table has data     | PASS   |
+| employees table has data  | PASS   |
+| attendance table has data | PASS   |
+| holidays table has data   | PASS   |
+| leaves table has data     | PASS   |
+
+If something is wrong you will immediately see:
+
+```
+employees table exists | FAIL
+```
+
+### 📘 How to Write This in Your Lab Documentation
+
+Example documentation note:
+
+```
+Step: Charlie Café RDS Deployment Verification
+
+Executed DevOps validation script from EC2 MySQL client.
+
+Verification checks:
+• Table existence
+• Data presence
+• Database integrity
+
+Result:
+All health checks returned PASS confirming successful database deployment on Amazon RDS.
+```
+
+### ⭐ Why This Looks Very Professional
+
+This type of PASS / FAIL verification is used in real pipelines with tools like:
+
+- Jenkins
+
+- GitHub Actions
+
+- Terraform
+
+Example pipeline:
+
+```
+Deploy Infrastructure
+      ↓
+Deploy Lambda APIs
+      ↓
+Run RDS health check
+      ↓
+PASS → Deployment Success
+```
+
+#### 🚀 If you want, I can also give you a “1 command DevOps script” (EXTREMELY COOL) that prints a Charlie Café database dashboard like this:
+
+```
+DATABASE HEALTH REPORT
+----------------------
+Tables: 5
+Rows: 512
+Indexes: OK
+Engine: InnoDB
+Database Size: 12 MB
+Status: HEALTHY
+```
+
+This kind of database health report makes DevOps portfolios look very advanced.
+---
