@@ -4,6 +4,10 @@
 
 #### Deploy a simple “Hello World” Node.js web app from a GitHub repository, containerize it with Docker, and run it on an AWS EC2 instance.
 
+### GitHub Repo:
+
+[Deploy a Simple Web App with Docker on EC2 from GitHub](https://github.com/awsrmmustansarjavaid/aws-docker-lab)
+
 ### 🖼️ AWS Visual Architecture Diagram
 
 Here’s a simple beginner-level diagram for this lab:
