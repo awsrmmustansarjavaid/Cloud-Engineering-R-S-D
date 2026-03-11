@@ -786,7 +786,7 @@ sudo chmod +x charlie-cafe-export-s3-to-html.sh
 sudo ./charlie-cafe-export-s3-to-html.sh
 ```
 
-### 3️⃣ ALLOW /var/www/html/js IN APACHE
+### 3️⃣ ALLOW /var/www/html/js IN APACHE ( Skip it)
 
 Open Apache main config:
 
