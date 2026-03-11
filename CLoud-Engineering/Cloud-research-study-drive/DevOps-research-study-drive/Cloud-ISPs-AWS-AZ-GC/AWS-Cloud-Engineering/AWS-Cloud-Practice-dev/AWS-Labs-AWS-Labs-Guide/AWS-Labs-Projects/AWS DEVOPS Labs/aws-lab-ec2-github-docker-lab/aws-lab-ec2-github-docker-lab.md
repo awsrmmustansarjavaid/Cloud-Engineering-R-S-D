@@ -472,6 +472,13 @@ Remove a container:
 sudo docker rm <container-id>
 ```
 
+Remove the image:
+
+```
+docker rmi aws-docker-lab
+```
+
+#### At this point, your Node.js app is running in Docker on EC2 and publicly accessible. 🎉
 
 
 
