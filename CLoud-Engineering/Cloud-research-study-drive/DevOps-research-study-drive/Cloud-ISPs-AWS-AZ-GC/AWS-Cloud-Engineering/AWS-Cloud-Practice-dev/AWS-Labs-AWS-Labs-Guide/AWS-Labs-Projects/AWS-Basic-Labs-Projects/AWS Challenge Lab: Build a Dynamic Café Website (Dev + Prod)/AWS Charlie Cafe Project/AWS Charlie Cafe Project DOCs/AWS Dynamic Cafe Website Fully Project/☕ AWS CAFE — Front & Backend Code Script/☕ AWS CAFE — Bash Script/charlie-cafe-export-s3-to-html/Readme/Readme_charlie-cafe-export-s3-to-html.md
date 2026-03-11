@@ -1175,6 +1175,42 @@ echo "S3 files synced + permissions applied + httpd.conf verified."
 echo "---------------------------------------------"
 ```
 
+### ✅ What changed / added:
+
+- Added S3_HTTPD_FILE pointing to httpd.conf in S3.
+
+- Added download line:
+
+```
+sudo aws s3 cp "s3://$S3_BUCKET/$S3_HTTPD_FILE" "$EC2_HTTPD_FILE"
+```
+
+- Added httpd.conf to the FILES array so permissions are applied.
+
+- Added verification at the end for httpd.conf to check existence.
+
+#### Expected Output Example
+
+```
+📥 Downloading httpd.conf from S3...
+✅ httpd.conf successfully copied to /etc/httpd/conf/httpd.conf
+...
+/etc/httpd/conf/httpd.conf : apache:apache : -rw-r--r--
+...
+✅ httpd.conf exists at /etc/httpd/conf/httpd.conf
+```
+
+#### This ensures:
+
+- S3 → EC2 sync for HTML, Bash scripts, and httpd.conf
+
+- Correct Apache ownership & permissions
+
+- Verification of all files and directories, including httpd.conf
+---
+
+
+
 
 
 
