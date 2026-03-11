@@ -956,6 +956,104 @@ Tools like:
 
 - GitHub Actions
 
+### 🚀 Charlie Café – RDS Full Health Check Script
+
+Run this once from your EC2 MySQL client.
+
+```
+USE cafe_db;
+
+-- =====================================================
+-- Charlie Café RDS Database Health Check
+-- =====================================================
+
+-- 1️⃣ Verify required tables exist
+SELECT 
+TABLE_NAME,
+ENGINE,
+TABLE_ROWS,
+CREATE_TIME,
+UPDATE_TIME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves');
+
+
+-- 2️⃣ Verify table columns and schema
+SELECT 
+TABLE_NAME,
+COLUMN_NAME,
+DATA_TYPE,
+IS_NULLABLE,
+COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+
+
+-- 3️⃣ Verify indexes (important for performance)
+SELECT 
+TABLE_NAME,
+INDEX_NAME,
+COLUMN_NAME,
+SEQ_IN_INDEX
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves');
+
+
+-- 4️⃣ Verify table storage engine
+SELECT 
+TABLE_NAME,
+ENGINE
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='cafe_db';
+
+
+-- 5️⃣ Verify database size
+SELECT 
+table_schema AS database_name,
+ROUND(SUM(data_length + index_length)/1024/1024,2) AS size_MB
+FROM information_schema.tables
+WHERE table_schema='cafe_db'
+GROUP BY table_schema;
+
+
+-- 6️⃣ Verify row counts quickly
+SELECT 
+TABLE_NAME,
+TABLE_ROWS
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA='cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves');
+```
+
+#### ✅ What This Single Script Verifies
+
+| Check           | Purpose                     |
+| --------------- | --------------------------- |
+| Tables exist    | confirms deployment success |
+| Table structure | columns & data types        |
+| Indexes         | performance verification    |
+| Storage engine  | should usually be InnoDB    |
+| Row counts      | confirms data present       |
+| Database size   | quick storage monitoring    |
+
+#### 📊 Example Output
+
+Example result from section 1️⃣:
+
+| TABLE_NAME | ENGINE | TABLE_ROWS |
+| ---------- | ------ | ---------- |
+| orders     | InnoDB | 150        |
+| employees  | InnoDB | 8          |
+| attendance | InnoDB | 340        |
+| holidays   | InnoDB | 12         |
+| leaves     | InnoDB | 5          |
+
+
+
 #### Exit MySQL:
 
 ```
