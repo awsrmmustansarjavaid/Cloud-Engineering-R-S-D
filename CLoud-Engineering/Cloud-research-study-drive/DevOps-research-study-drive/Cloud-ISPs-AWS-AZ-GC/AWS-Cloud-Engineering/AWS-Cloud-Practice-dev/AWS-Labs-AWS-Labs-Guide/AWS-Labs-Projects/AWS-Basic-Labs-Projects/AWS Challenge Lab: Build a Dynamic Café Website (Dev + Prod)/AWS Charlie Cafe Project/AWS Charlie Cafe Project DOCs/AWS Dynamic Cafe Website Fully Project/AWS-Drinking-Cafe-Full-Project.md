@@ -729,6 +729,18 @@ SELECT * FROM leaves;
 
 > #### This is the best single verification script you can run from your EC2 MySQL client.
 
+This gives a single query that verifies:
+
+- Tables exist
+
+- Table structure
+
+- Row counts
+
+- Columns
+
+- Data types
+
 ```
 USE cafe_db;
 
@@ -836,6 +848,113 @@ Add a comment header like:
 ```
 
 This makes your lab documentation look professional.
+
+### 🚀 Advanced RDS Verification Query (Professional Method)
+
+Run this from your EC2 MySQL client.
+
+```
+USE cafe_db;
+
+SELECT 
+    TABLE_NAME,
+    COLUMN_NAME,
+    DATA_TYPE,
+    IS_NULLABLE,
+    COLUMN_KEY
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'cafe_db'
+AND TABLE_NAME IN ('orders','employees','attendance','holidays','leaves')
+ORDER BY TABLE_NAME, ORDINAL_POSITION;
+```
+
+#### ✅ What This Verifies
+
+This one query checks the full schema.
+
+Example output:
+
+| TABLE_NAME | COLUMN_NAME   | DATA_TYPE | IS_NULLABLE | COLUMN_KEY |
+| ---------- | ------------- | --------- | ----------- | ---------- |
+| orders     | id            | int       | NO          | PRI        |
+| orders     | customer_name | varchar   | YES         |            |
+| employees  | id            | int       | NO          | PRI        |
+| attendance | employee_id   | int       | NO          |            |
+
+So you immediately confirm:
+
+✔ tables exist
+
+✔ column structure
+
+✔ data types
+
+✔ primary keys
+
+### 🚀 Optional: Add Row Count Verification (Even Better)
+
+Add this second quick query to verify data exists.
+
+```
+SELECT 
+table_name,
+table_rows
+FROM information_schema.tables
+WHERE table_schema='cafe_db'
+AND table_name IN ('orders','employees','attendance','holidays','leaves');
+```
+
+#### Example output:
+
+| table_name | table_rows |
+| ---------- | ---------- |
+| orders     | 120        |
+| employees  | 8          |
+| attendance | 340        |
+| holidays   | 12         |
+| leaves     | 6          |
+
+### 📘 How You Can Document It in Your Lab Notebook
+
+Example note:
+
+```
+Step: Verify RDS Database Schema
+
+Command used:
+
+SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA='cafe_db';
+
+Expected Result:
+All required Charlie Café tables appear:
+orders
+employees
+attendance
+holidays
+leaves
+
+Verification confirms database migration / deployment success.
+```
+
+### ⭐ DevOps Tip (Very Useful for Your Project)
+
+Real engineers often run these checks after:
+
+- RDS migration
+
+- database deployment
+
+- CI/CD database pipeline
+
+Tools like:
+
+- Flyway
+
+- Liquibase
+
+- GitHub Actions
 
 #### Exit MySQL:
 
