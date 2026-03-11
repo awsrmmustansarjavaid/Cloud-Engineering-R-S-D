@@ -426,9 +426,11 @@ You should see a container with PORTS 0.0.0.0:3000->3000/tcp and status Up.
 
 ### 1️⃣1️⃣ Adjust EC2 Security Group (if needed)
 
-1️⃣ Go to AWS Console → EC2 → Security Groups.
-2️⃣ Select the security group attached to your instance.
-3️⃣ Make sure there’s an Inbound rule:
+#### 1️⃣ Go to AWS Console → EC2 → Security Groups.
+
+#### 2️⃣ Select the security group attached to your instance.
+
+#### 3️⃣ Make sure there’s an Inbound rule:
 
 | Type       | Protocol | Port Range | Source    |
 | ---------- | -------- | ---------- | --------- |
@@ -439,14 +441,15 @@ You should see a container with PORTS 0.0.0.0:3000->3000/tcp and status Up.
 
 ### 1️⃣2️⃣ Access Your App in Browser
 
-1️⃣ Open your browser.
-2️⃣ Enter your EC2 public IPv4 address with port 3000:
+#### 1️⃣ Open your browser.
+
+#### 2️⃣ Enter your EC2 public IPv4 address with port 3000:
 
 ```
 http://<EC2_PUBLIC_IP>:3000
 ```
 
-3️⃣ You should see:
+#### 3️⃣ You should see:
 
 ```
 Hello from AWS EC2 + Docker!
@@ -454,25 +457,25 @@ Hello from AWS EC2 + Docker!
 
 ### 1️⃣3️⃣ Stop or Remove the Container
 
-List containers:
+#### 1️⃣ List containers:
 
 ```
 sudo docker ps
 ```
 
-Stop a container:
+#### 2️⃣ Stop a container:
 
 ```
 sudo docker stop <container-id>
 ```
 
-Remove a container:
+#### 3️⃣ Remove a container:
 
 ```
 sudo docker rm <container-id>
 ```
 
-Remove the image:
+#### 4️⃣ Remove the image:
 
 ```
 docker rmi aws-docker-lab
