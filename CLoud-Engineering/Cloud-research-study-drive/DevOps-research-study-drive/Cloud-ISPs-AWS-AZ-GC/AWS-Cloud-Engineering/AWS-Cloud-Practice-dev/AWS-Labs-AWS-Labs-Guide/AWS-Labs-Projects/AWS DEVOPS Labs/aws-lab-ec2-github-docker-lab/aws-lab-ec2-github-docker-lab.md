@@ -27,7 +27,7 @@ Here’s a simple beginner-level diagram for this lab:
 
 ### Deploying a Dockerized app on AWS
 
-.[Deploying a Dockerized app on AWS](./aws-lab-ec2-github-docker-lab.png)
+[Deploying a Dockerized app on AWS](./aws-lab-ec2-github-docker-lab.png)
 
 ### Explanation of Flow:
 
