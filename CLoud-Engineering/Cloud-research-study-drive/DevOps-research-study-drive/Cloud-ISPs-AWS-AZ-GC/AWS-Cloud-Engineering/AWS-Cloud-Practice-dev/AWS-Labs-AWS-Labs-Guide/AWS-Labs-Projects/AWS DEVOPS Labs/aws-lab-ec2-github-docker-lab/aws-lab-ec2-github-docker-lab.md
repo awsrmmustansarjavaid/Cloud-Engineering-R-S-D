@@ -496,6 +496,8 @@ http://<EC2_PUBLIC_IP>:3000
 Hello from AWS EC2 + Docker!
 ```
 
+#### ✅ Your Node.js app is now running inside Docker on EC2, publicly accessible.
+
 ### 1️⃣3️⃣ Stop or Remove the Container
 
 #### 1️⃣ List containers:
@@ -510,17 +512,29 @@ sudo docker ps
 sudo docker stop <container-id>
 ```
 
-#### 3️⃣ Remove a container:
+#### 3️⃣ Start a container:
+
+```
+sudo docker start <container-id>
+```
+
+#### 4️⃣ Remove a container:
 
 ```
 sudo docker rm <container-id>
 ```
 
-#### 4️⃣ Remove the image:
+#### 5️⃣ Remove the image:
 
 ```
 docker rmi aws-docker-lab
 ```
+
+#### ▶️ Add Docker Compose later to automate multi-container apps.
+
+#### 🌐 At this point, your AWS lab is fully working from:
+
+- GitHub → EC2 → Docker → Browser ✅
 
 #### At this point, your Node.js app is running in Docker on EC2 and publicly accessible. 🎉
 
