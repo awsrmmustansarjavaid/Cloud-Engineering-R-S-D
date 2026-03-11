@@ -241,7 +241,63 @@ git commit -m "Add Dockerfile"
 git push
 ```
 
-### 6️⃣ Install Docker on Amazon Linux 2023
+### 6️⃣ AWS EC2 Instance
+
+### 1️⃣ Launch an AWS EC2 Instance
+
+- Log in to AWS Management Console
+.
+- Navigate to EC2 → Instances → Launch Instances.
+
+- Choose AMI:
+
+  - Amazon Linux 2023 (recommended) OR
+
+  - Ubuntu 22.04
+
+- Choose Instance Type → t2.micro (free tier eligible).
+
+- Configure Key Pair:
+
+  - Create new key pair → download .pem file → save securely.
+
+- Configure Security Group:
+
+  - Add SSH → port 22 → Source: My IP
+
+  - Add Custom TCP Rule → port 3000 → Source: 0.0.0.0/0 (for testing)
+
+- Click Launch Instance → wait for instance to start.
+
+- Note Public IPv4 address of the instance.
+
+### 2️⃣ Connect to EC2
+
+- Open terminal on your machine.
+
+#### ✅ Set correct permissions for your key:
+
+```
+sudo chmod 400 my-key.pem
+```
+
+- Connect:
+
+- Amazon Linux:
+
+```
+ssh -i my-key.pem ec2-user@<EC2_PUBLIC_IP>
+```
+
+- Ubuntu:
+
+```
+ssh -i my-key.pem ubuntu@<EC2_PUBLIC_IP>
+```
+
+### 7️⃣ Install Docker on Amazon Linux 2023
+
+> **Amazon Linux commands:**
 
 ### 1️⃣ Update packages
 
