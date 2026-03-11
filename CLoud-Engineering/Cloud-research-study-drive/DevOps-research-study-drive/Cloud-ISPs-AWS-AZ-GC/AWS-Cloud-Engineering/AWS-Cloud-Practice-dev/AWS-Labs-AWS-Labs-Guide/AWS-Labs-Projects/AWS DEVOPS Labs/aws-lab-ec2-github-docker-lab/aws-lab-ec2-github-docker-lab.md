@@ -355,24 +355,57 @@ Docker version 24.0.5, build ffff...
 cd ~
 ```
 
-#### 3️⃣ Clone your repository:
+#### 3️⃣ Install Git on Amazon Linux 2023
+
+#### Run these commands:
+
+```
+sudo dnf update -y
+sudo dnf install git -y
+```
+
+- dnf is the package manager for Amazon Linux 2023.
+
+#### After installation, check Git version:
+
+```
+git --version
+```
+
+#### You should see something like:
+
+```
+git version 2.40.1
+```
+
+#### 4️⃣ Clone your repository:
+
+Now you can clone your repo. Use your personal GitHub repo (the one you actually own):
 
 ```
 git clone https://github.com/<your-username>/aws-docker-lab.git
 ```
 
+> **Do not use https://github.com/aws-docker-lab/aws-docker-lab.git because that’s not your repo.**
+
 > **⚠️ Replace <your-username> with your GitHub username.**
 
-#### 4️⃣ Go inside the project folder:
+#### 5️⃣ Go inside the project folder:
 
 ```
 cd aws-docker-lab
 ```
 
-#### 5️⃣ Verify files are there:
+#### 6️⃣ Verify files are there:
 
 ```
 ls -l
+```
+
+or 
+
+```
+cd ~/aws-docker-lab
 ```
 
 #### ✅ You should see:
@@ -382,10 +415,13 @@ server.js
 package.json
 Dockerfile
 ```
+#### ✅ If you see all 3, you’re ready for Docker.
 
 ### 9️⃣ Build the Docker Image
 
 #### 1️⃣ Run the Docker build command in the project folder:
+
+Build the Docker image with a name aws-docker-lab:
 
 ```
 sudo docker build -t aws-docker-lab .
@@ -410,7 +446,7 @@ Successfully tagged aws-docker-lab:latest
 sudo docker run -d -p 3000:3000 aws-docker-lab
 ```
 
-- -d → run in detached mode
+- -d → run in detached mode (runs in background)
 
 - -p 3000:3000 → maps container port 3000 to EC2 port 3000
 
@@ -420,24 +456,29 @@ sudo docker run -d -p 3000:3000 aws-docker-lab
 sudo docker ps
 ```
 
-docker ps
+#### Output example:
 
-You should see a container with PORTS 0.0.0.0:3000->3000/tcp and status Up.
+CONTAINER ID   IMAGE           COMMAND      CREATED        STATUS       PORTS                    NAMES
+a1b2c3d4e5f6   aws-docker-lab "node server.js" 2 minutes ago Up 2 minutes 0.0.0.0:3000->3000/tcp   goofy_hopper
+
+#### ✅ You should see PORTS 0.0.0.0:3000->3000/tcp — that means it’s ready to be accessed.
 
 ### 1️⃣1️⃣ Adjust EC2 Security Group (if needed)
 
-#### 1️⃣ Go to AWS Console → EC2 → Security Groups.
+- Go to AWS Console → EC2 → Security Groups.
 
-#### 2️⃣ Select the security group attached to your instance.
+- Select the security group attached to your instance.
 
-#### 3️⃣ Make sure there’s an Inbound rule:
+#### ✅ Make sure there’s an Inbound rule:
 
 | Type       | Protocol | Port Range | Source    |
 | ---------- | -------- | ---------- | --------- |
 | SSH        | TCP      | 22         | My IP     |
 | Custom TCP | TCP      | 3000       | 0.0.0.0/0 |
 
-> **This allows your browser to access the Node.js app.**
+- Save rules.
+
+> **This allows your browser to access the Node.js app from anywhere**
 
 ### 1️⃣2️⃣ Access Your App in Browser
 
