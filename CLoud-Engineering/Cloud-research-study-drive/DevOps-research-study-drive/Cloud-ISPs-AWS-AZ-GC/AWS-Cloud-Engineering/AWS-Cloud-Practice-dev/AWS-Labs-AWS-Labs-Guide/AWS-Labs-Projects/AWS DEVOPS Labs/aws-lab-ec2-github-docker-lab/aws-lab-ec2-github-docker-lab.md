@@ -552,6 +552,3 @@ docker rmi aws-docker-lab
 - GitHub → EC2 → Docker → Browser ✅
 
 #### At this point, your Node.js app is running in Docker on EC2 and publicly accessible. 🎉
-
-
-
