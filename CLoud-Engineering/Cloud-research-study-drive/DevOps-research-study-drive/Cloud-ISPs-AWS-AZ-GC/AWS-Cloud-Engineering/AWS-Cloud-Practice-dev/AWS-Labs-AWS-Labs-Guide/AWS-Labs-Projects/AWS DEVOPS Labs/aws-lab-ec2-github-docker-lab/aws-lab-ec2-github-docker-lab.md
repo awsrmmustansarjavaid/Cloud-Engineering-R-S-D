@@ -206,3 +206,43 @@ At this point, your Node.js app is ready locally.
 
 Next, you will push it to GitHub, so EC2 can pull it and run it with Docker.
 
+### 5️⃣ Create a Dockerfile
+
+In your project folder, create a file named Dockerfile (no extension).
+
+#### ✅ Add this content:
+
+```
+# Use Node.js official image
+FROM node:18
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy all source files
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Command to run app
+CMD ["npm", "start"]
+```
+
+#### ✅ Commit and push:
+
+```
+git add Dockerfile
+git commit -m "Add Dockerfile"
+git push
+```
+
+### 6️⃣ Install Docker on Amazon Linux 2023
+
+### 1️⃣ Update packages
+
+```
