@@ -25,6 +25,10 @@ Here’s a simple beginner-level diagram for this lab:
        Browser
 ```
 
+### Deploying a Dockerized app on AWS
+
+.[Deploying a Dockerized app on AWS](./aws-lab-ec2-github-docker-lab.png)
+
 ### Explanation of Flow:
 
 - GitHub Repo → stores your Node.js app and Dockerfile.
