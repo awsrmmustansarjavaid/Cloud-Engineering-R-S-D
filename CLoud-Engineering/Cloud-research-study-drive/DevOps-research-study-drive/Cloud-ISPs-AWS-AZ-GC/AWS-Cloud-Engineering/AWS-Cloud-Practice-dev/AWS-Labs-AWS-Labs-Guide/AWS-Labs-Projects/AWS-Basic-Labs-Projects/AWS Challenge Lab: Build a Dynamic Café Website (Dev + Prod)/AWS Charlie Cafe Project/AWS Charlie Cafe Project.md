@@ -566,7 +566,7 @@ sudo ./setup_charlie_cafe_db_full.sh
 
 ### 4️⃣ Verify table exists
 
-[AWS Charlie Cafe RDS Verification](./AWS%20Charlie%20Cafe%20%20RDS%20Project.md#rds-verification)
+[AWS Charlie Cafe RDS Verification](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Charlie%20Cafe%20%20RDS%20Project.md##rds-verification)
 
 #### Exit MySQL:
 

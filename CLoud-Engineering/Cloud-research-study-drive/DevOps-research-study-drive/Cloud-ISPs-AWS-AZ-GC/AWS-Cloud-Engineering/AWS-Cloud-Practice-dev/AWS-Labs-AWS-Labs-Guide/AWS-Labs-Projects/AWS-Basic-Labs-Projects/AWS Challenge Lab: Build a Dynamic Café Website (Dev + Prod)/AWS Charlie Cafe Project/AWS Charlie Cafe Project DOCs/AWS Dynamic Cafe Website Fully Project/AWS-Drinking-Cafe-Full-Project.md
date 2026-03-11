@@ -683,7 +683,7 @@ INSERT INTO orders (table_number, customer_name, item, quantity) VALUES
 
 ### 7️⃣ Verify:
 
-[AWS Charlie Cafe RDS Verification](../AWS%20Charlie%20Cafe%20%20RDS%20Project.md#rds-verification)
+[AWS Charlie Cafe RDS Verification](../AWS%20Charlie%20Cafe%20%20RDS%20Project.md##rds-verification)
 
 #### Exit MySQL:
 
