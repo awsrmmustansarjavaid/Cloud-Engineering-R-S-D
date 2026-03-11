@@ -55,7 +55,7 @@ Here’s a simple beginner-level diagram for this lab:
 
 ## AWS Beginner Lab: Deploy a Node.js App with Docker on EC2 from GitHub
 
-### Step 1: Create a GitHub Repository
+### 1️⃣ Create a GitHub Repository
 
 - Go to GitHub  → log in.
 
@@ -71,13 +71,45 @@ Here’s a simple beginner-level diagram for this lab:
 
 - Click Create Repository.
 
-### Step 2: Create a Node.js App
+### 2️⃣ Create Node.js App on Your Local Machine
 
-- On your local machine, create a folder named aws-docker-lab.
+### 1️⃣ Create a Project Folder
 
-- Inside this folder, create a file called server.js.
+- Open File Explorer (Windows) or Finder (Mac) or terminal.
 
-- Add the following code:
+- Create a folder called aws-docker-lab.
+
+#### ✅ Windows Example:
+
+```
+mkdir aws-docker-lab
+cd aws-docker-lab
+```
+
+#### ✅ Mac/Linux Example:
+
+```
+mkdir ~/aws-docker-lab
+cd ~/aws-docker-lab
+```
+
+### 2️⃣ Create server.js
+
+Inside that folder, create a file called server.js.
+
+#### ✅ On Windows, 
+
+- right-click → New → Text Document → rename to server.js
+
+#### ✅ On Mac/Linux, use:
+
+```
+touch server.js
+```
+
+- Open the file in a code editor (VS Code, Sublime Text, Notepad++).
+
+#### ✅ Paste this following code:
 
 ```
 const express = require('express');
@@ -92,4 +124,40 @@ app.listen(port, () => {
   console.log(`App running at http://localhost:${port}`);
 });
 ```
+
+### 3️⃣ Create package.json
+
+> **This file tells Node.js what dependencies the app needs.**
+
+- Create a file called package.json in the same folder.
+
+#### ✅ Add this content:
+
+```
+{
+  "name": "aws-docker-lab",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+### 4️⃣ Initialize Git (Optional, but needed for GitHub)
+
+### 1️⃣ GitHub APP
+
+- Open terminal in your project folder.
+
+```
+git init
+git add .
+git commit -m "Initial Node.js app"
+```
+
+### 2️⃣ GitHub APP
 
