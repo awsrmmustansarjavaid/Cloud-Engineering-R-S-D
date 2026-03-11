@@ -299,39 +299,39 @@ ssh -i my-key.pem ubuntu@<EC2_PUBLIC_IP>
 
 > **Amazon Linux commands:**
 
-### 1️⃣ Update packages
+#### 1️⃣ Update packages
 
 ```
 sudo dnf update -y
 ```
 
-### 2️⃣ Install Docker
+#### 2️⃣ Install Docker
 
 ```
 sudo dnf install -y docker
 ```
 
-### 3️⃣ Start Docker service
+#### 3️⃣ Start Docker service
 
 ```
 sudo systemctl start docker
 ```
 
-### 4️⃣ Enable Docker to start on boot
+#### 4️⃣ Enable Docker to start on boot
 
 ```
 sudo systemctl enable docker
 ```
 
-### 5️⃣ Add your EC2 user to Docker group (so you don’t need sudo every time)
+#### 5️⃣ Add your EC2 user to Docker group (so you don’t need sudo every time)
 
 ```
 sudo usermod -aG docker ec2-user
 ```
 
-### 6️⃣ Logout and log back in (or just reconnect via SSH) so the group changes take effect.
+#### 6️⃣ Logout and log back in (or just reconnect via SSH) so the group changes take effect.
 
-### 7️⃣ Verify Docker is working
+#### 7️⃣ Verify Docker is working
 
 ```
 docker --version
@@ -345,4 +345,41 @@ Docker version 24.0.5, build ffff...
 
 #### ✔️ After this, you can clone your GitHub repo and run Docker exactly like we planned.
 
-### 
+### 8️⃣ Clone Your GitHub Repository on EC2
+
+#### 1️⃣ Go to your terminal on EC2.
+
+#### 2️⃣ Navigate to your home directory (optional but clean):
+
+```
+cd ~
+```
+
+3️⃣ Clone your repository:
+
+```
+git clone https://github.com/<your-username>/aws-docker-lab.git
+```
+
+> **⚠️ Replace <your-username> with your GitHub username.**
+
+4️⃣ Go inside the project folder:
+
+```
+cd aws-docker-lab
+```
+
+5️⃣ Verify files are there:
+
+```
+ls -l
+```
+
+#### ✅ You should see:
+
+```
+server.js
+package.json
+Dockerfile
+```
+
