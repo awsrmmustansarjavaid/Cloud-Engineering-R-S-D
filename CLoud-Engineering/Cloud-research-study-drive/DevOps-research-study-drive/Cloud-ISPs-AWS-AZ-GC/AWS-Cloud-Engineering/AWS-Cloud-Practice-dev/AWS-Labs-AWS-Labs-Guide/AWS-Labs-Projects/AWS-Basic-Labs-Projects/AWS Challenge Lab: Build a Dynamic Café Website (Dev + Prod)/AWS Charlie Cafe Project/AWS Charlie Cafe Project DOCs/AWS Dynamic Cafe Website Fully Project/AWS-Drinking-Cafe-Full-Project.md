@@ -725,6 +725,118 @@ SELECT * FROM leaves;
 
 ###### ✅ If you see the row → DB is READY
 
+### ✅ Combined RDS Verification Script (One Run)
+
+> #### This is the best single verification script you can run from your EC2 MySQL client.
+
+```
+USE cafe_db;
+
+-- =========================
+-- 1️⃣ Verify tables exist
+-- =========================
+SHOW TABLES;
+
+-- =========================
+-- 2️⃣ Orders table check
+-- =========================
+SELECT 'orders table structure' AS section;
+DESCRIBE orders;
+
+SELECT 'orders sample data' AS section;
+SELECT * FROM orders LIMIT 5;
+
+-- =========================
+-- 3️⃣ Employees table check
+-- =========================
+SELECT 'employees table structure' AS section;
+DESCRIBE employees;
+
+SELECT 'employees sample data' AS section;
+SELECT * FROM employees LIMIT 5;
+
+-- =========================
+-- 4️⃣ Attendance table check
+-- =========================
+SELECT 'attendance table structure' AS section;
+DESCRIBE attendance;
+
+SELECT 'attendance sample data' AS section;
+SELECT * FROM attendance LIMIT 5;
+
+-- =========================
+-- 5️⃣ Holidays table check
+-- =========================
+SELECT 'holidays table structure' AS section;
+DESCRIBE holidays;
+
+SELECT 'holidays sample data' AS section;
+SELECT * FROM holidays LIMIT 5;
+
+-- =========================
+-- 6️⃣ Leaves table check
+-- =========================
+SELECT 'leaves table structure' AS section;
+DESCRIBE leaves;
+
+SELECT 'leaves sample data' AS section;
+SELECT * FROM leaves LIMIT 5;
+```
+
+#### ✅ Why this is better
+
+Instead of 10–15 manual commands, you:
+
+- paste one script
+
+- get all verification results
+
+- see clear section labels
+
+- avoid dumping too much data with LIMIT 5
+
+#### ✅ Example Output Sections
+
+You will see results like:
+
+```
+SHOW TABLES
+orders
+employees
+attendance
+holidays
+leaves
+```
+
+Then:
+
+```
+orders table structure
+id
+customer_name
+order_total
+created_at
+```
+
+Then:
+
+```
+orders sample data
+1 | John | 12.50 | 2026-03-10
+```
+
+#### 🚀 Pro Tip (Good for your Charlie Café DevOps documentation)
+
+Add a comment header like:
+
+```
+-- Charlie Café RDS Verification Script
+-- Used to verify database migration / deployment
+-- Run from EC2 MySQL client
+```
+
+This makes your lab documentation look professional.
+
 #### Exit MySQL:
 
 ```
