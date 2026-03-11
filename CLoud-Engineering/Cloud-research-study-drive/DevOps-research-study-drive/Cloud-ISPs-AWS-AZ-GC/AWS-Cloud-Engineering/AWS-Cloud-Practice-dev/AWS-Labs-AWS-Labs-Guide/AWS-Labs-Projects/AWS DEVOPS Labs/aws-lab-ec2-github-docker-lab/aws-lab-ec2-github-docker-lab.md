@@ -29,6 +29,10 @@ Here’s a simple beginner-level diagram for this lab:
 
 ![Deploying a Dockerized app on AWS](./aws-lab-ec2-github-docker-lab.png)
 
+### Docker deployment flowchart overview
+
+![Deploying a Dockerized app on AWS](./aws-lab-ec2-github-docker-lab-flowcart.png)
+
 ### Explanation of Flow:
 
 - GitHub Repo → stores your Node.js app and Dockerfile.
