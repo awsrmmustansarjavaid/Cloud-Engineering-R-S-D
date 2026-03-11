@@ -669,7 +669,7 @@ SELECT 'holidays', COUNT(*) FROM holidays;
 
 This gives instant database health summary.
 ---
-## 🌐 RDS Verification 
+## RDS Verification
 
 ### 1️⃣ Verify table exists
 
