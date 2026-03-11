@@ -302,3 +302,47 @@ ssh -i my-key.pem ubuntu@<EC2_PUBLIC_IP>
 ### 1️⃣ Update packages
 
 ```
+sudo dnf update -y
+```
+
+### 2️⃣ Install Docker
+
+```
+sudo dnf install -y docker
+```
+
+### 3️⃣ Start Docker service
+
+```
+sudo systemctl start docker
+```
+
+### 4️⃣ Enable Docker to start on boot
+
+```
+sudo systemctl enable docker
+```
+
+### 5️⃣ Add your EC2 user to Docker group (so you don’t need sudo every time)
+
+```
+sudo usermod -aG docker ec2-user
+```
+
+### 6️⃣ Logout and log back in (or just reconnect via SSH) so the group changes take effect.
+
+### 7️⃣ Verify Docker is working
+
+```
+docker --version
+```
+
+#### ✅ You should see something like:
+
+```
+Docker version 24.0.5, build ffff...
+```
+
+#### ✔️ After this, you can clone your GitHub repo and run Docker exactly like we planned.
+
+### 
