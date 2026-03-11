@@ -59,7 +59,7 @@ Here’s a simple beginner-level diagram for this lab:
 
 - Go to GitHub  → log in.
 
-- Click New Repository (green button).
+- Click New Repository (green button on the top right).
 
 - Set repository Name → aws-docker-lab.
 
@@ -67,7 +67,7 @@ Here’s a simple beginner-level diagram for this lab:
 
 - Repository Type → Public or Private.
 
-- Check Add README (optional but helpful).
+- Do not check “Initialize this repository with a README” (or you can, it’s optional but helpful).
 
 - Click Create Repository.
 
@@ -149,7 +149,7 @@ app.listen(port, () => {
 
 ### 4️⃣ Initialize Git (Optional, but needed for GitHub)
 
-### 1️⃣ GitHub APP
+### 1️⃣ Upload Your Project Folder via GitHub APP
 
 - Open terminal in your project folder.
 
@@ -159,5 +159,50 @@ git add .
 git commit -m "Initial Node.js app"
 ```
 
-### 2️⃣ GitHub APP
+### 2️⃣ Upload Your Project Folder via GitHub Web
+
+- Go to your newly created repository page.
+
+- Click Add File → Upload Files.
+
+- On your computer, open the aws-docker-lab folder.
+
+- Drag and drop all files inside the folder (not the folder itself) into GitHub.
+
+  - So, upload server.js, package.json, and later Dockerfile.
+
+- Scroll down, enter a commit message like Initial Node.js app.
+
+- Click Commit changes.
+
+#### ✅ Now your project is on GitHub, and the repository contains all the files needed.
+
+### 📢 Important Notes:
+
+You do not need to upload the folder itself, only the contents of the folder.
+
+#### Your repository on GitHub should now look like this:
+
+```
+aws-docker-lab/
+├── server.js
+├── package.json
+```
+
+- Later, you can add the Dockerfile the same way:
+Add File → Upload Files → Commit.
+
+### ✅ Result on your local machine
+
+Your folder structure should look like this:
+
+```
+aws-docker-lab/
+├── server.js
+├── package.json
+```
+
+At this point, your Node.js app is ready locally.
+
+Next, you will push it to GitHub, so EC2 can pull it and run it with Docker.
 
