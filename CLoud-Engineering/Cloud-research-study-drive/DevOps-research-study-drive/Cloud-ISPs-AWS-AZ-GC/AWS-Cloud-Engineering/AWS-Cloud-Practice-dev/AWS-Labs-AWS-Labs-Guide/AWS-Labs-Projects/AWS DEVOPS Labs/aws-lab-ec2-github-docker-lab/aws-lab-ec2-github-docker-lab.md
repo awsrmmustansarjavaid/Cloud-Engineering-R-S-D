@@ -241,6 +241,21 @@ git commit -m "Add Dockerfile"
 git push
 ```
 
+### ✅ Verify Your Repository
+
+#### After commit, your GitHub repo should display:
+
+```
+aws-docker-lab/
+├── server.js
+├── package.json
+├── Dockerfile
+```
+
+- Each file should have a GitHub icon and clickable filename.
+
+- You now have a complete repo ready for EC2 to clone.
+
 ### 6️⃣ AWS EC2 Instance
 
 ### 1️⃣ Launch an AWS EC2 Instance
