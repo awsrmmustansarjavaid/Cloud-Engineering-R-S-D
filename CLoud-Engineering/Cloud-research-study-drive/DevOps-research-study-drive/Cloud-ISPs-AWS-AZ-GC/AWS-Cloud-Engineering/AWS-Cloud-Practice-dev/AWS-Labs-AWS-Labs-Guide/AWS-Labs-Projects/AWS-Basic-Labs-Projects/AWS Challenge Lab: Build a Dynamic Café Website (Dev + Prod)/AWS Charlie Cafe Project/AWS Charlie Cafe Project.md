@@ -7217,13 +7217,14 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
 
 - Cognito User Pool already created
 
-| Resource           | Path                  | Lambda Function         |
-| ------------------ | --------------------- | ----------------------- |
-| attendance          | `/attendance`            | `hr-attendance`     |
-| Employee Profile   | `/employee-profile`   | `hr-employee-profile`   |
-| Attendance History | `/attendance-history` | `hr-attendance-history` |
-| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`    |
-| exchange-token  | `/exchange-token`    | `hr-cognito-token-exchange`    |
+| Method | Resource           | Path                   | Lambda Function             |
+|-------|-------------------|------------------------|-----------------------------|
+| POST  | Attendance        | `/attendance/checkin`  | `hr-attendance`             |
+| POST  | Attendance        | `/attendance/checkout` | `hr-attendance`             |
+| GET   | Employee Profile  | `/employee-profile`    | `hr-employee-profile`       |
+| GET   | Attendance History| `/attendance-history`  | `hr-attendance-history`     |
+| GET   | Leaves & Holidays | `/leaves-holidays`     | `hr-leaves-holidays`        |
+| POST  | Exchange Token    | `/exchange-token`      | `hr-cognito-token-exchange` |
 
 **⚠️ All methods = POST**
 
