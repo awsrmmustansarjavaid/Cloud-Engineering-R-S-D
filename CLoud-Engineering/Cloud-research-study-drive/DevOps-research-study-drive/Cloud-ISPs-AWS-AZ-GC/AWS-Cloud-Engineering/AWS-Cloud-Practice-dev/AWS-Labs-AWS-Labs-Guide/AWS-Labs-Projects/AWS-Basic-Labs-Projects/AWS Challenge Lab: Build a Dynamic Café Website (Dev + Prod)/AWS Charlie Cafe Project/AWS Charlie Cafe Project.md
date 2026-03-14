@@ -7081,7 +7081,7 @@ Everything will work.
 
 ## ☕ Charlie Café PHASE 2️⃣ — New AWS Lambda Functions (Full Configuration)
 
-### 1️⃣ Lambda: hr-checkin & hr-checkinout
+### 1️⃣ Lambda: hr-attendance
 
 - AWS Console → Lambda
 
