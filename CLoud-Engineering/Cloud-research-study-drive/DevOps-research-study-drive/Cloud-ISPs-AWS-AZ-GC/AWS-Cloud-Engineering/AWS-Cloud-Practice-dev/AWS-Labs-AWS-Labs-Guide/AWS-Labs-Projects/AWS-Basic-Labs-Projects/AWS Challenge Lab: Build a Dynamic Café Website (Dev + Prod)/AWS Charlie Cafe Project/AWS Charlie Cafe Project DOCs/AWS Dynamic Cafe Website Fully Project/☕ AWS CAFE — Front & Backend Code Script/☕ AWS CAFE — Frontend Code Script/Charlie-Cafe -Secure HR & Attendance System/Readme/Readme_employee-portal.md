@@ -6215,6 +6215,60 @@ loadPortal()
 </html>
 ```
 
+### ISSUE 3 — Employee ID parsing bug
+
+- File: employee-portal.html
+
+#### Find this section (~line 270)
+
+```
+const employeeId=parseInt(
+decoded["custom:employee_id"] ||
+decoded["employee_id"] ||
+decoded["cognito:username"]
+)
+```
+
+#### Problem
+
+If username = "ali"
+
+```
+parseInt("ali") → NaN
+```
+
+Then portal shows:
+
+```
+Employee ID missing
+```
+
+#### FIX 3 — Replace with
+
+```
+const rawEmployeeId =
+decoded["custom:employee_id"] ||
+decoded["employee_id"];
+
+const employeeId = parseInt(rawEmployeeId);
+
+if (!employeeId || isNaN(employeeId)) {
+
+    logDebug("Employee ID missing in token","error")
+
+    alert("Employee ID missing")
+
+    localStorage.removeItem("id_token")
+
+    location.reload()
+
+    return null
+}
+```
+
+Remove cognito:username.
+
+
 ---
 ### employee-portal.html
 
