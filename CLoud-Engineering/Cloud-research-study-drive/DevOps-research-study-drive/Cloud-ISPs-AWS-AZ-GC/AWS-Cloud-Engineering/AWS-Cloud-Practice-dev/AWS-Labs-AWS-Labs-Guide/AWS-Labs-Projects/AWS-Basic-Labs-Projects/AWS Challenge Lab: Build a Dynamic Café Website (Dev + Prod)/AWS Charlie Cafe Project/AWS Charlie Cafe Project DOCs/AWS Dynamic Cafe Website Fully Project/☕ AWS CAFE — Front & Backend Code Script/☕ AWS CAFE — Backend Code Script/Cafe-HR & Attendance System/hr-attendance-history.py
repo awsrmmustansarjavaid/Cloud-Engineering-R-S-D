@@ -32,7 +32,7 @@ connection = None
 def get_connection():
     global connection
 
-    if connection is None or not connection.open:
+    if connection is None:
         secret = get_db_secret()
 
         connection = pymysql.connect(
