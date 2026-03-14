@@ -17,21 +17,29 @@ window.CHARLIE_API = (() => {
        - Handles JSON parsing & throws errors for non-200 responses
     ===================================================== */
     async function apiFetch(url, options = {}) {
-        const response = await fetch(url, {
-            headers: {
-                "Content-Type": "application/json",
-                ...(options.headers || {}) // Merge optional headers
-            },
-            ...options
-        });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API Error: ${errorText}`);
-        }
+    const response = await fetch(url, {
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        },
+        ...options
+    });
 
-        return response.json();
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${errorText}`);
     }
+
+    const data = await response.json();
+
+    // unwrap Lambda proxy response
+    if (typeof data.body === "string") {
+        return JSON.parse(data.body);
+    }
+
+    return data;
+}
 
     /* =====================================================
        🛒 CUSTOMER ORDERS
