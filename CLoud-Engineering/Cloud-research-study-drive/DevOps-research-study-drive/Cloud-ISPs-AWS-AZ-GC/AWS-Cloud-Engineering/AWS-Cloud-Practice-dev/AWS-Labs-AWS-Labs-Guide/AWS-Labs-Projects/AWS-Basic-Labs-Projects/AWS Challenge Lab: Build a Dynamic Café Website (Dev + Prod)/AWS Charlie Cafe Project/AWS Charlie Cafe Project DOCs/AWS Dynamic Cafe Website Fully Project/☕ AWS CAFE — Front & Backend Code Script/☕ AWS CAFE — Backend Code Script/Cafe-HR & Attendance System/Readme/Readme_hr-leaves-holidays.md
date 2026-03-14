@@ -1447,6 +1447,7 @@ def lambda_handler(event, context):
     except Exception as e:
         return response(500, {"error": str(e)})
 ```
+
 ### ✅ Key Updates & Fixes:
 
 #### Added explicit numeric validation for employee_id in both Lambdas:
