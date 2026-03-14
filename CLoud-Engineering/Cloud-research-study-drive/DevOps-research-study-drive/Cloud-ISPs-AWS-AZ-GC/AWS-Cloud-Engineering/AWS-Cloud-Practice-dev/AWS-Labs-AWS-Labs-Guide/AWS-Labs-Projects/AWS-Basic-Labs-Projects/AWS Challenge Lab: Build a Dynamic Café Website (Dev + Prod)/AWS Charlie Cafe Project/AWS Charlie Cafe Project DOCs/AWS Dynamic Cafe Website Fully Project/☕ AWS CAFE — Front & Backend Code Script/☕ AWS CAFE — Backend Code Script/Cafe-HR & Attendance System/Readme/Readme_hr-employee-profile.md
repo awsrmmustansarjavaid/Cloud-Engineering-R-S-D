@@ -988,18 +988,60 @@ Simpler logic is safer.
 #### Current code
 
 ```
+body = json.loads(event["body"])
 employee_id = body.get("employee_id")
 
 if not employee_id:
+    return response(400, {"message": "employee_id is required"})
 ```
+
+This code has a problem:
+
+If someone sends:
+
+```
+{
+ "employee_id": "abc"
+}
+```
+
+Your query becomes:
+
+```
+WHERE employee_id='abc'
+```
+
+That is not safe or correct.
+
+So we must force it to numeric integer.
 
 #### Better validation: Replace with:
 
 ```
+body = json.loads(event["body"])
+
+# ----------------------------------------------------------
+# VALIDATE employee_id (MUST BE NUMERIC)
+# ----------------------------------------------------------
+
 try:
     employee_id = int(body.get("employee_id"))
 except:
     return response(400, {"message": "employee_id must be numeric"})
+```
+
+Now Lambda will reject invalid requests like:
+
+```
+{"employee_id":"abc"}
+```
+
+Response becomes:
+
+```
+{
+ "message": "employee_id must be numeric"
+}
 ```
 
 This keeps behavior consistent with your attendance Lambda.
