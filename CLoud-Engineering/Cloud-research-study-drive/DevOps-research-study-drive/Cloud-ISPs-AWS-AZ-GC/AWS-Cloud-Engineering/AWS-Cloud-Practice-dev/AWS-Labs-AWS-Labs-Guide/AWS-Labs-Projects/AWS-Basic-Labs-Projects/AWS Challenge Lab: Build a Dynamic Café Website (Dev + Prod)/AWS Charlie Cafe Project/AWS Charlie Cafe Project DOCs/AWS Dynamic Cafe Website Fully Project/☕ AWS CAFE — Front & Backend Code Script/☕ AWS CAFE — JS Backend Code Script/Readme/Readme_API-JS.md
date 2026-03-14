@@ -3803,6 +3803,128 @@ function getAnalytics(period = "today") {
 })();
 ```
 
+### ISSUE 2 — Lambda body unwrap problem
+
+Your Lambda returns:
+
+```
+{
+  "statusCode":200,
+  "body":"{...}"
+}
+```
+
+But api.js expects normal JSON.
+
+This causes errors like:
+
+```
+employee data cannot fetch
+```
+
+### FIX 2 — Modify api.js
+
+- File: /js/api.js
+
+#### Find this function (around line ~30)
+
+```
+async function apiFetch(url, options = {}) {
+
+    const response = await fetch(url, {
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        },
+        ...options
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${errorText}`);
+    }
+
+    return response.json();
+}
+```
+
+#### Replace with
+
+```
+async function apiFetch(url, options = {}) {
+
+    const response = await fetch(url, {
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        },
+        ...options
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    // unwrap Lambda proxy response
+    if (typeof data.body === "string") {
+        return JSON.parse(data.body);
+    }
+
+    return data;
+}
+```
+
+This fixes ALL HR APIs.
+
+
+### ISSUE 4 — api.js export bug
+
+- File: /js/api.js
+
+#### Go to bottom (~line 300)
+
+You will see:
+
+```
+return {
+
+        // Orders
+        placeOrder,
+        updateOrder,
+        getOrderStatus,
+
+        getDailySummary,
+        getWeeklySummary,
+        getMonthlySummary,
+```
+
+These functions do not exist globally.
+
+### FIX 4
+
+Delete these 3 lines:
+
+```
+getDailySummary,
+getWeeklySummary,
+getMonthlySummary,
+```
+
+You already export them here:
+
+```
+adminAttendance
+```
+
+Correct usage later would be:
+
+```
+CHARLIE_API.adminAttendance.getDailySummary()
+```
+
 ---
 ### API.JS
 
