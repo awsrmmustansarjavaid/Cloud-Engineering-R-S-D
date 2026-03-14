@@ -344,13 +344,24 @@ const decoded=parseJwt(token)
 
 logDebug("Token decoded")
 
-const employeeId=parseInt(
-
+const rawEmployeeId =
 decoded["custom:employee_id"] ||
-decoded["employee_id"] ||
-decoded["cognito:username"]
+decoded["employee_id"];
 
-)
+const employeeId = parseInt(rawEmployeeId);
+
+if (!employeeId || isNaN(employeeId)) {
+
+    logDebug("Employee ID missing in token","error")
+
+    alert("Employee ID missing")
+
+    localStorage.removeItem("id_token")
+
+    location.reload()
+
+    return null
+}
 
 if(!employeeId){
 
