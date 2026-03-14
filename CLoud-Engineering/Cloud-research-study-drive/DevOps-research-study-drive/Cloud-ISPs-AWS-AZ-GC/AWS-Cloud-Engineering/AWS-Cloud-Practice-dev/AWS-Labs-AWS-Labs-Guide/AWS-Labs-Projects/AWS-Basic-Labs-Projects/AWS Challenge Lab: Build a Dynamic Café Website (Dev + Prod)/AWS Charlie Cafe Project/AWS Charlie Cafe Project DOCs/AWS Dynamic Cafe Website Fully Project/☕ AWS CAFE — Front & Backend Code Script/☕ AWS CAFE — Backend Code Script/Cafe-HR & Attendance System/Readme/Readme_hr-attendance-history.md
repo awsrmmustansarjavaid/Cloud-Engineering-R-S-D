@@ -1116,7 +1116,21 @@ def lambda_handler(event, context):
         return response(500, {"error": str(e)})
 ```
 
+### ✅ Key Updates & Fixes:
 
+#### Added explicit numeric validation for employee_id in both Lambdas:
+
+```
+try:
+    employee_id = int(employee_id)
+except (ValueError, TypeError):
+    return response(400, {"message": "employee_id must be a number"})
+```
+- Ensures empty or missing employee_id returns a proper 400 response.
+
+- CORS preflight handling remains unchanged.
+
+- Code is fully production-ready and aligned with your existing HR portal APIs.
 ---
 ### hr-attendance-history.py
 
