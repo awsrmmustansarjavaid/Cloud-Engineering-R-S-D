@@ -3925,6 +3925,50 @@ Correct usage later would be:
 CHARLIE_API.adminAttendance.getDailySummary()
 ```
 
+### ⚠️ Issue 3 — minor API bug in recordAttendance()
+
+Your function:
+
+```
+function recordAttendance(payload) {
+
+const url = `${CONFIG.API_BASE}/attendance/${payload.action}`;
+
+return apiFetch(url, {
+method: "POST",
+body: JSON.stringify({ employee_id: payload.employee_id })
+});
+}
+```
+
+But Lambda also supports action in body.
+
+Better send both.
+
+#### Improved version
+
+```
+function recordAttendance(payload) {
+
+const url = `${CONFIG.API_BASE}/attendance/${payload.action}`;
+
+return apiFetch(url, {
+method: "POST",
+body: JSON.stringify({
+employee_id: payload.employee_id,
+action: payload.action
+})
+});
+}
+```
+
+Your Lambda already supports this:
+
+```
+action = body.get("action", "").lower()
+```
+
+So this improves reliability.
 ---
 ### API.JS
 
