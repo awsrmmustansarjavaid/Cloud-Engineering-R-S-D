@@ -925,7 +925,7 @@ connection = None
 def get_connection():
     global connection
 
-    if connection is None or not connection.open:
+    if connection is None:
         secret = get_db_secret()
 
         connection = pymysql.connect(
@@ -1070,6 +1070,34 @@ def lambda_handler(event, context):
 }
 ```
 
+### ISSUE 7 — Lambda connection reuse stability
+
+- File: All HR Lambdas:
+
+```
+hr-attendance
+hr-employee-profile
+hr-attendance-history
+hr-leaves-holidays
+```
+
+#### Find
+
+```
+if connection is None or not connection.open:
+```
+
+#### Replace with
+
+```
+if connection is None:
+```
+
+Why?
+
+Lambda containers freeze connections sometimes.
+
+Simpler logic is safer.
 
 ---
 ### hr-leaves-holidays.py
