@@ -106,8 +106,11 @@ function getAnalytics(period = "today") {
         const url = `${CONFIG.API_BASE}/attendance/${payload.action}`;
         return apiFetch(url, {
             method: "POST",
-            body: JSON.stringify({ employee_id: payload.employee_id })
-        });
+            body: JSON.stringify({
+            employee_id: payload.employee_id,
+            action: payload.action
+            })
+            });
     }
 
     function getAllEmployees() {
