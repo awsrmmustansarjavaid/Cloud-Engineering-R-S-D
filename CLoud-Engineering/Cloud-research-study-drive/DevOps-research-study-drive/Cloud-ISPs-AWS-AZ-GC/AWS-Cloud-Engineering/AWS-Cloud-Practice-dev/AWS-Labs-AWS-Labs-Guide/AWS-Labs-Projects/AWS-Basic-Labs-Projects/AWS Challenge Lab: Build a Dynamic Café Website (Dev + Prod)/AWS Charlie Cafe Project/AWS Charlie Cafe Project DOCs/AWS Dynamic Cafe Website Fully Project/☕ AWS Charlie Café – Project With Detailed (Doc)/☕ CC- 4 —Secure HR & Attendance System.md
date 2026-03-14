@@ -770,9 +770,9 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
 |-------|-------------------|------------------------|-----------------------------|
 | POST  | Attendance        | `/attendance/checkin`  | `hr-attendance`             |
 | POST  | Attendance        | `/attendance/checkout` | `hr-attendance`             |
-| GET   | Employee Profile  | `/employee-profile`    | `hr-employee-profile`       |
-| GET   | Attendance History| `/attendance-history`  | `hr-attendance-history`     |
-| GET   | Leaves & Holidays | `/leaves-holidays`     | `hr-leaves-holidays`        |
+| POST   | Employee Profile  | `/employee-profile`    | `hr-employee-profile`       |
+| POST   | Attendance History| `/attendance-history`  | `hr-attendance-history`     |
+| POST   | Leaves & Holidays | `/leaves-holidays`     | `hr-leaves-holidays`        |
 | POST  | Exchange Token    | `/exchange-token`      | `hr-cognito-token-exchange` |
 
 **⚠️ All methods = POST**
@@ -801,13 +801,14 @@ HR Secure Attendance & Employee Management API
 
 ### 2️⃣ Create Resources (Paths)
 
-| Resource           | Path                  | Lambda Function                | Method |
-|--------------------|-----------------------|--------------------------------|--------|
-| attendance         | `/attendance`         | `hr-attendance`                | POST   |
-| Employee Profile   | `/employee-profile`   | `hr-employee-profile`          | POST   |
-| Attendance History | `/attendance-history` | `hr-attendance-history`        | POST   |
-| Leaves & Holidays  | `/leaves-holidays`    | `hr-leaves-holidays`           | POST   |
-| exchange-token     | `/exchange-token`     | `hr-cognito-token-exchange`    | POST   |
+| Method | Resource           | Path                   | Lambda Function             |
+|-------|-------------------|------------------------|-----------------------------|
+| POST  | Attendance        | `/attendance/checkin`  | `hr-attendance`             |
+| POST  | Attendance        | `/attendance/checkout` | `hr-attendance`             |
+| POST   | Employee Profile  | `/employee-profile`    | `hr-employee-profile`       |
+| POST   | Attendance History| `/attendance-history`  | `hr-attendance-history`     |
+| POST   | Leaves & Holidays | `/leaves-holidays`     | `hr-leaves-holidays`        |
+| POST  | Exchange Token    | `/exchange-token`      | `hr-cognito-token-exchange` |
 
 #### Step 1 — Add /attendance 
 
@@ -849,7 +850,9 @@ HR Secure Attendance & Employee Management API
 
 #### Lambda Function:
 
-    - /attendance → hr-attendance
+    - /attendance/checkin → hr-attendance
+
+    - /attendance/checkout → hr-attendance
 
     - /employee-profile → hr-employee-profile
 
