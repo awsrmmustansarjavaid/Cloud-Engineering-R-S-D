@@ -6268,6 +6268,57 @@ if (!employeeId || isNaN(employeeId)) {
 
 Remove cognito:username.
 
+### ⚠️ Issue 1 (small bug still present)
+
+In getEmployeeId() you now have duplicate validation.
+
+#### Current code
+
+```
+if (!employeeId || isNaN(employeeId)) {
+
+    logDebug("Employee ID missing in token","error")
+
+    alert("Employee ID missing")
+
+    localStorage.removeItem("id_token")
+
+    location.reload()
+
+    return null
+}
+
+if(!employeeId){
+```
+
+The second block will never run.
+
+### FIX
+
+Remove the second check.
+
+#### Final version should be:
+
+```
+const rawEmployeeId =
+decoded["custom:employee_id"] ||
+decoded["employee_id"];
+
+const employeeId = parseInt(rawEmployeeId);
+
+if (!employeeId || isNaN(employeeId)) {
+
+    logDebug("Employee ID missing in token","error")
+
+    alert("Employee ID missing")
+
+    localStorage.removeItem("id_token")
+
+    location.reload()
+
+    return null
+}
+```
 
 ---
 ### employee-portal.html
