@@ -210,9 +210,7 @@ function getAnalytics(period = "today") {
    	    getAnalytics,
 
     	// ADMIN — ATTENDANCE ANALYTICS
-        getDailySummary,
-        getWeeklySummary,
-        getMonthlySummary,
+        adminAttendance,
 
         // HR Attendance Public
         recordAttendance,
@@ -224,7 +222,6 @@ function getAnalytics(period = "today") {
         getLeavesAndHolidays,
 
         // Admin
-        adminAttendance,
         adminDashboard,
 
         // Cognito AUTH
