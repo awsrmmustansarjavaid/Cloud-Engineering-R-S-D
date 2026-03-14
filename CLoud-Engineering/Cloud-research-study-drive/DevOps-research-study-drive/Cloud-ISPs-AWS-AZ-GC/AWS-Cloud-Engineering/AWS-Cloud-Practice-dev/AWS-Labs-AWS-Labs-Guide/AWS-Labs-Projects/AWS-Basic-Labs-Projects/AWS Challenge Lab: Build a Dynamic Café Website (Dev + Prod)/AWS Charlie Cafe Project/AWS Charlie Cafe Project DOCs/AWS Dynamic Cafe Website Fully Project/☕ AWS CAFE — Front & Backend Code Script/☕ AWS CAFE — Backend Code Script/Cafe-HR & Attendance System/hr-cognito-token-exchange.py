@@ -90,7 +90,7 @@ def lambda_handler(event, context):
 
 
         # Cognito OAuth2 token endpoint
-        token_url = "https://" + os.environ["COGNITO_DOMAIN"] + "/oauth2/token"
+        token_url = os.environ["COGNITO_DOMAIN"] + "/oauth2/token"
 
 
         # ==================================================
