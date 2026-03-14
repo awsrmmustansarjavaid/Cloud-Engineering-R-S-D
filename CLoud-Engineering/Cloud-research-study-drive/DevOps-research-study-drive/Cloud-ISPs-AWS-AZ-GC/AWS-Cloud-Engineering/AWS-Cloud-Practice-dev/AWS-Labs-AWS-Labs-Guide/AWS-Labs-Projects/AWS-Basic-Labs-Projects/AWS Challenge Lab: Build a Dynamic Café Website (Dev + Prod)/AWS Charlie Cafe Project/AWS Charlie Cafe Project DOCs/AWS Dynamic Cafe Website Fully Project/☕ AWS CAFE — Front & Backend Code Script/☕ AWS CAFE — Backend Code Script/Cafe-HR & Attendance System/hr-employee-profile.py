@@ -14,22 +14,31 @@ REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
+
 # ==========================================================
 # FETCH DATABASE SECRET
 # ==========================================================
 
 def get_db_secret():
+    """
+    Fetch database credentials from AWS Secrets Manager
+    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
 
 # ==========================================================
-# DATABASE CONNECTION (REUSED ACROSS INVOCATIONS)
+# DATABASE CONNECTION (REUSED ACROSS LAMBDA INVOCATIONS)
 # ==========================================================
 
 connection = None
 
 def get_connection():
+    """
+    Reuse database connection across Lambda executions
+    to reduce cold start latency.
+    """
+
     global connection
 
     if connection is None:
@@ -49,22 +58,32 @@ def get_connection():
 
 
 # ==========================================================
-# JSON SERIALIZER (FOR DECIMAL & DATE)
+# JSON SERIALIZER (FOR DECIMAL & DATE TYPES)
 # ==========================================================
 
 def json_serializer(obj):
+    """
+    Convert MySQL data types into JSON serializable format.
+    """
+
     if isinstance(obj, Decimal):
         return float(obj)
+
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
+
     return str(obj)
 
 
 # ==========================================================
-# STANDARD RESPONSE
+# STANDARD API RESPONSE FORMAT
 # ==========================================================
 
 def response(status, body):
+    """
+    Standardized API response with CORS headers
+    """
+
     return {
         "statusCode": status,
         "headers": {
@@ -83,30 +102,52 @@ def response(status, body):
 def lambda_handler(event, context):
     """
     Public API that returns employee profile.
-    Expects employee_id in request body.
+
+    Expected request body:
+    {
+        "employee_id": 1001
+    }
     """
 
     try:
-        # Handle CORS preflight
+
+        # --------------------------------------------------
+        # HANDLE CORS PREFLIGHT REQUEST
+        # --------------------------------------------------
+
         if event.get("httpMethod") == "OPTIONS":
             return response(200, {"message": "CORS preflight successful"})
 
-        # Validate body
+
+        # --------------------------------------------------
+        # VALIDATE REQUEST BODY
+        # --------------------------------------------------
+
         if not event.get("body"):
             return response(400, {"message": "Missing request body"})
 
+
         body = json.loads(event["body"])
-        employee_id = body.get("employee_id")
 
-        if not employee_id:
-            return response(400, {"message": "employee_id is required"})
 
-        # ----------------------------------------
+        # --------------------------------------------------
+        # VALIDATE employee_id (MUST BE NUMERIC)
+        # --------------------------------------------------
+
+        try:
+            employee_id = int(body.get("employee_id"))
+        except:
+            return response(400, {"message": "employee_id must be numeric"})
+
+
+        # --------------------------------------------------
         # DATABASE QUERY
-        # ----------------------------------------
+        # --------------------------------------------------
+
         connection = get_connection()
 
         with connection.cursor() as cursor:
+
             cursor.execute("""
                 SELECT employee_id, name, job_title, salary, start_date
                 FROM employees
@@ -115,13 +156,26 @@ def lambda_handler(event, context):
 
             employee = cursor.fetchone()
 
+
+        # --------------------------------------------------
+        # HANDLE EMPLOYEE NOT FOUND
+        # --------------------------------------------------
+
         if not employee:
             return response(404, {"message": "Employee not found"})
 
-        # ----------------------------------------
+
+        # --------------------------------------------------
         # SUCCESS RESPONSE
-        # ----------------------------------------
+        # --------------------------------------------------
+
         return response(200, employee)
 
+
     except Exception as e:
+
+        # --------------------------------------------------
+        # SERVER ERROR HANDLING
+        # --------------------------------------------------
+
         return response(500, {"error": str(e)})
