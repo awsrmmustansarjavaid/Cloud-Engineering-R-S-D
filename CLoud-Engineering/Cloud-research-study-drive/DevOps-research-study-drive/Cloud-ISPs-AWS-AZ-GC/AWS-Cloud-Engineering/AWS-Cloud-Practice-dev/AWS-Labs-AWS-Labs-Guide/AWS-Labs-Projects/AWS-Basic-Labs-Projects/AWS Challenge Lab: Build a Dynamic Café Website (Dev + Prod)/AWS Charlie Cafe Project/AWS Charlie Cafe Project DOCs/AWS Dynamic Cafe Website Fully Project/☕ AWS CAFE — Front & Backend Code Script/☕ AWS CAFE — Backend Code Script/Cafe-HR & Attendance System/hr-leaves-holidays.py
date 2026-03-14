@@ -17,7 +17,7 @@ secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 # ==========================================================
 def get_db_secret():
     """
-    Fetch database credentials from AWS Secrets Manager.
+    Fetch database credentials from AWS Secrets Manager
     """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
@@ -29,7 +29,7 @@ connection = None
 
 def get_connection():
     """
-    Reuse DB connection across Lambda invocations.
+    Reuse DB connection across Lambda invocations
     """
     global connection
     if connection is None:
@@ -63,7 +63,7 @@ def json_serializer(obj):
 # ==========================================================
 def response(status, body):
     """
-    Standard API response with CORS headers.
+    Standard API response with CORS headers
     """
     return {
         "statusCode": status,
@@ -86,7 +86,6 @@ def lambda_handler(event, context):
     Expects JSON body:
     { "employee_id": 1001 }
     """
-
     try:
         # Handle CORS preflight
         if event.get("httpMethod") == "OPTIONS":
@@ -99,8 +98,15 @@ def lambda_handler(event, context):
         body = json.loads(event["body"])
         employee_id = body.get("employee_id")
 
-        if not employee_id:
+        # Validate employee_id exists
+        if employee_id is None:
             return response(400, {"message": "employee_id is required"})
+
+        # ✅ Numeric validation
+        try:
+            employee_id = int(employee_id)
+        except (ValueError, TypeError):
+            return response(400, {"message": "employee_id must be a number"})
 
         # ----------------------------------------
         # DATABASE QUERY
@@ -132,5 +138,4 @@ def lambda_handler(event, context):
         })
 
     except Exception as e:
-        # Catch-all error handler
         return response(500, {"error": str(e)})

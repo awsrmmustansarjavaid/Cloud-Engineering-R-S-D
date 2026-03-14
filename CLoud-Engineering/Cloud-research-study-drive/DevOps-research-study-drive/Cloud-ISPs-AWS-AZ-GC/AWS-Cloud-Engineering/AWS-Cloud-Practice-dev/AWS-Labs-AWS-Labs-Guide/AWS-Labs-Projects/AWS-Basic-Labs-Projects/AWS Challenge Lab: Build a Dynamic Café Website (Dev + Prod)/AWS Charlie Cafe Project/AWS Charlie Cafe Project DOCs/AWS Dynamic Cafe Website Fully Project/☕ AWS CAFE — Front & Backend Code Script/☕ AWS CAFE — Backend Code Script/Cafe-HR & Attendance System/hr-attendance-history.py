@@ -8,11 +8,8 @@ from decimal import Decimal
 # ==========================================================
 # SECRETS MANAGER CONFIGURATION
 # ==========================================================
-# AWS Secrets Manager stores RDS credentials securely.
-# Replace SECRET_NAME with your actual secret name.
 SECRET_NAME = "CafeDevDBSM"
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
-
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 # ==========================================================
@@ -37,7 +34,6 @@ def get_connection():
     to improve performance and reduce cold start latency.
     """
     global connection
-
     if connection is None:
         secret = get_db_secret()
         connection = pymysql.connect(
@@ -55,11 +51,7 @@ def get_connection():
 # JSON SERIALIZER
 # ==========================================================
 def json_serializer(obj):
-    """
-    Converts non-JSON-serializable types to JSON-friendly types:
-    - Decimal -> float
-    - datetime.date/datetime -> ISO format string
-    """
+    """Converts non-JSON-serializable types to JSON-friendly types"""
     if isinstance(obj, Decimal):
         return float(obj)
     if isinstance(obj, (datetime.date, datetime.datetime)):
@@ -70,9 +62,7 @@ def json_serializer(obj):
 # STANDARD RESPONSE FORMAT
 # ==========================================================
 def response(status, body):
-    """
-    Standard API Gateway response with CORS headers.
-    """
+    """Standard API Gateway response with CORS headers"""
     return {
         "statusCode": status,
         "headers": {
@@ -92,9 +82,8 @@ def lambda_handler(event, context):
     Expects JSON body:
     { "employee_id": 1001 }
     """
-
     try:
-        # Handle CORS preflight request
+        # Handle CORS preflight
         if event.get("httpMethod") == "OPTIONS":
             return response(200, {"message": "CORS preflight successful"})
 
@@ -105,8 +94,15 @@ def lambda_handler(event, context):
         body = json.loads(event["body"])
         employee_id = body.get("employee_id")
 
-        if not employee_id:
+        # Validate employee_id exists
+        if employee_id is None:
             return response(400, {"message": "employee_id is required"})
+
+        # ✅ Numeric validation
+        try:
+            employee_id = int(employee_id)
+        except (ValueError, TypeError):
+            return response(400, {"message": "employee_id must be a number"})
 
         # ----------------------------------------
         # DATABASE QUERY
@@ -119,12 +115,9 @@ def lambda_handler(event, context):
                 WHERE employee_id=%s
                 ORDER BY attendance_date DESC
             """, (employee_id,))
-
             records = cursor.fetchall()
 
-        # Return attendance records
         return response(200, records)
 
     except Exception as e:
-        # Catch-all error handler
         return response(500, {"error": str(e)})
