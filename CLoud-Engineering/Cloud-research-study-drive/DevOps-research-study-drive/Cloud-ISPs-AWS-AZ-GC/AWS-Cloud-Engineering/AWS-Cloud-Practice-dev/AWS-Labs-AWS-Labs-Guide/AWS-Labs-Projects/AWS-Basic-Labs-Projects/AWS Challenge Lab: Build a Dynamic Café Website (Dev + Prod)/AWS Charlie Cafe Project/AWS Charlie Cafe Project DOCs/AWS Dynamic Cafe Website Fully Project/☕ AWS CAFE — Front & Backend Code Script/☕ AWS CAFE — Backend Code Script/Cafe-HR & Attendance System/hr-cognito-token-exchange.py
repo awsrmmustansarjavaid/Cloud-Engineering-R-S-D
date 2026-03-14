@@ -42,7 +42,7 @@ def response(status, body):
             "Access-Control-Allow-Headers": "Content-Type",
 
             # Allow POST + OPTIONS (CORS preflight)
-            "Access-Control-Allow-Methods": "POST,OPTIONS"
+            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
         },
         "body": json.dumps(body)
     }
