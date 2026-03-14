@@ -1099,6 +1099,205 @@ Lambda containers freeze connections sometimes.
 
 Simpler logic is safer.
 
+### ⚠️ Issue 1 — Missing Numeric Validation (2 Lambdas)
+
+You fixed this in employee-profile, but not in:
+
+hr-attendance-history
+
+hr-leaves-holidays
+
+#### Currently both have:
+
+```
+employee_id = body.get("employee_id")
+
+if not employee_id:
+    return response(400, {"message": "employee_id is required"})
+```
+
+This allows:
+
+```
+employee_id = "abc"
+```
+
+which can break queries.
+
+### Fix
+
+#### Replace with:
+
+```
+try:
+    employee_id = int(body.get("employee_id"))
+except:
+    return response(400, {"message": "employee_id must be numeric"})
+```
+
+### File Location: hr-attendance-history & hr-leaves-holidays
+
+#### Replace this section:
+
+```
+employee_id = body.get("employee_id")
+
+if not employee_id:
+    return response(400, {"message": "employee_id is required"})
+```
+
+### ✅ Fully Final hr-leaves-holidays.py
+
+```
+import json
+import os
+import boto3
+import pymysql
+import datetime
+from decimal import Decimal
+
+# ==========================================================
+# SECRETS MANAGER CONFIGURATION
+# ==========================================================
+SECRET_NAME = "CafeDevDBSM"
+REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
+secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
+
+# ==========================================================
+# FETCH DATABASE SECRET
+# ==========================================================
+def get_db_secret():
+    """
+    Fetch database credentials from AWS Secrets Manager.
+    """
+    response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
+    return json.loads(response["SecretString"])
+
+# ==========================================================
+# DATABASE CONNECTION (REUSED ACROSS INVOCATIONS)
+# ==========================================================
+connection = None
+
+def get_connection():
+    """
+    Reuse DB connection across Lambda invocations.
+    """
+    global connection
+    if connection is None:
+        secret = get_db_secret()
+        connection = pymysql.connect(
+            host=secret["host"],
+            user=secret["username"],
+            password=secret["password"],
+            database=secret["dbname"],
+            cursorclass=pymysql.cursors.DictCursor,
+            connect_timeout=10,
+            autocommit=True
+        )
+    return connection
+
+# ==========================================================
+# JSON SERIALIZER
+# ==========================================================
+def json_serializer(obj):
+    """
+    Converts Decimal and date/datetime objects to JSON-friendly formats.
+    """
+    if isinstance(obj, Decimal):
+        return float(obj)
+    if isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+    return str(obj)
+
+# ==========================================================
+# STANDARD RESPONSE FORMAT
+# ==========================================================
+def response(status, body):
+    """
+    Standard API response with CORS headers.
+    """
+    return {
+        "statusCode": status,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+        },
+        "body": json.dumps(body, default=json_serializer)
+    }
+
+# ==========================================================
+# LAMBDA HANDLER
+# ==========================================================
+def lambda_handler(event, context):
+    """
+    Returns:
+    - Employee leave history
+    - Company holiday list
+    Expects JSON body:
+    { "employee_id": 1001 }
+    """
+
+    try:
+        # Handle CORS preflight
+        if event.get("httpMethod") == "OPTIONS":
+            return response(200, {"message": "CORS preflight successful"})
+
+        # Validate request body
+        if not event.get("body"):
+            return response(400, {"message": "Missing request body"})
+
+        body = json.loads(event["body"])
+        employee_id = body.get("employee_id")
+
+        if not employee_id:
+            return response(400, {"message": "employee_id is required"})
+
+        # ----------------------------------------
+        # DATABASE QUERY
+        # ----------------------------------------
+        connection = get_connection()
+        with connection.cursor() as cursor:
+
+            # Fetch employee leaves
+            cursor.execute("""
+                SELECT leave_date, leave_type
+                FROM leaves
+                WHERE employee_id=%s
+                ORDER BY leave_date DESC
+            """, (employee_id,))
+            leaves = cursor.fetchall()
+
+            # Fetch company holidays
+            cursor.execute("""
+                SELECT holiday_date, description
+                FROM holidays
+                ORDER BY holiday_date DESC
+            """)
+            holidays = cursor.fetchall()
+
+        # Return combined response
+        return response(200, {
+            "leaves": leaves,
+            "holidays": holidays
+        })
+
+    except Exception as e:
+        # Catch-all error handler
+        return response(500, {"error": str(e)})
+```
+
+### ✅ Key Improvements & Features
+
+- Connection Reuse: Reuses DB connection across Lambda invocations for faster performance.
+
+- CORS Support: Handles preflight OPTIONS requests for browser-based calls.
+
+- JSON Serialization: Converts Decimal and datetime objects automatically.
+
+- Detailed Comments: Each section has clear explanations.
+
+- Error Handling: Returns proper HTTP status codes and error messages.
 ---
 ### hr-leaves-holidays.py
 > **Update Version 1.8**

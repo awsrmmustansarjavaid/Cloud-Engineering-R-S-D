@@ -8,33 +8,32 @@ from decimal import Decimal
 # ==========================================================
 # SECRETS MANAGER CONFIGURATION
 # ==========================================================
-
 SECRET_NAME = "CafeDevDBSM"
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
-
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 # ==========================================================
 # FETCH DATABASE SECRET
 # ==========================================================
-
 def get_db_secret():
+    """
+    Fetch database credentials from AWS Secrets Manager.
+    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
-
 
 # ==========================================================
 # DATABASE CONNECTION (REUSED ACROSS INVOCATIONS)
 # ==========================================================
-
 connection = None
 
 def get_connection():
+    """
+    Reuse DB connection across Lambda invocations.
+    """
     global connection
-
     if connection is None:
         secret = get_db_secret()
-
         connection = pymysql.connect(
             host=secret["host"],
             user=secret["username"],
@@ -44,27 +43,28 @@ def get_connection():
             connect_timeout=10,
             autocommit=True
         )
-
     return connection
 
-
 # ==========================================================
-# JSON SERIALIZER (DECIMAL & DATE SUPPORT)
+# JSON SERIALIZER
 # ==========================================================
-
 def json_serializer(obj):
+    """
+    Converts Decimal and date/datetime objects to JSON-friendly formats.
+    """
     if isinstance(obj, Decimal):
         return float(obj)
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
     return str(obj)
 
-
 # ==========================================================
-# STANDARD RESPONSE
+# STANDARD RESPONSE FORMAT
 # ==========================================================
-
 def response(status, body):
+    """
+    Standard API response with CORS headers.
+    """
     return {
         "statusCode": status,
         "headers": {
@@ -75,18 +75,16 @@ def response(status, body):
         "body": json.dumps(body, default=json_serializer)
     }
 
-
 # ==========================================================
 # LAMBDA HANDLER
 # ==========================================================
-
 def lambda_handler(event, context):
     """
-    Public API that returns:
+    Returns:
     - Employee leave history
     - Company holiday list
-
-    Expects employee_id in request body.
+    Expects JSON body:
+    { "employee_id": 1001 }
     """
 
     try:
@@ -104,37 +102,35 @@ def lambda_handler(event, context):
         if not employee_id:
             return response(400, {"message": "employee_id is required"})
 
+        # ----------------------------------------
+        # DATABASE QUERY
+        # ----------------------------------------
         connection = get_connection()
-
         with connection.cursor() as cursor:
 
-            # ----------------------------------------
-            # FETCH EMPLOYEE LEAVES
-            # ----------------------------------------
+            # Fetch employee leaves
             cursor.execute("""
                 SELECT leave_date, leave_type
                 FROM leaves
                 WHERE employee_id=%s
                 ORDER BY leave_date DESC
             """, (employee_id,))
-
             leaves = cursor.fetchall()
 
-            # ----------------------------------------
-            # FETCH COMPANY HOLIDAYS
-            # ----------------------------------------
+            # Fetch company holidays
             cursor.execute("""
                 SELECT holiday_date, description
                 FROM holidays
                 ORDER BY holiday_date DESC
             """)
-
             holidays = cursor.fetchall()
 
+        # Return combined response
         return response(200, {
             "leaves": leaves,
             "holidays": holidays
         })
 
     except Exception as e:
+        # Catch-all error handler
         return response(500, {"error": str(e)})
