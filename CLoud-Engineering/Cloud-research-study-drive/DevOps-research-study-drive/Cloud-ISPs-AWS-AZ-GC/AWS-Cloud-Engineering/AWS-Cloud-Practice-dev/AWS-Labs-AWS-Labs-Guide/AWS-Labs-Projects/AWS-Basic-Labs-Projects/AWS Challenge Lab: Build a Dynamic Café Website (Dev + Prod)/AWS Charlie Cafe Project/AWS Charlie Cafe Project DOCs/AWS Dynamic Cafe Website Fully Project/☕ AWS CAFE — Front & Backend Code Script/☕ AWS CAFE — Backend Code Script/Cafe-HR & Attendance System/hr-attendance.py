@@ -84,7 +84,9 @@ def lambda_handler(event, context):
 
         today = date.today()
         now = datetime.now().time()
-        path = event.get("resource") or event.get("path", "")
+      #  path = event.get("resource") or event.get("path", "") 
+      # because API Gateway proxy events are inconsistent so below line is better
+        path = event.get("path", "").lower()
 
         connection = get_connection()
 
