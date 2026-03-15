@@ -41,7 +41,7 @@ def get_connection():
 
     global connection
 
-    if connection is None:
+    if connection is None or not connection.open:
         secret = get_db_secret()
 
         connection = pymysql.connect(

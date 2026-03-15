@@ -34,7 +34,7 @@ def get_connection():
     to improve performance and reduce cold start latency.
     """
     global connection
-    if connection is None:
+    if connection is None or not connection.open:
         secret = get_db_secret()
         connection = pymysql.connect(
             host=secret["host"],

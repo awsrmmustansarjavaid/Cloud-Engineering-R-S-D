@@ -32,7 +32,7 @@ def get_connection():
     Reuse DB connection across Lambda invocations
     """
     global connection
-    if connection is None:
+    if connection is None or not connection.open:
         secret = get_db_secret()
         connection = pymysql.connect(
             host=secret["host"],
