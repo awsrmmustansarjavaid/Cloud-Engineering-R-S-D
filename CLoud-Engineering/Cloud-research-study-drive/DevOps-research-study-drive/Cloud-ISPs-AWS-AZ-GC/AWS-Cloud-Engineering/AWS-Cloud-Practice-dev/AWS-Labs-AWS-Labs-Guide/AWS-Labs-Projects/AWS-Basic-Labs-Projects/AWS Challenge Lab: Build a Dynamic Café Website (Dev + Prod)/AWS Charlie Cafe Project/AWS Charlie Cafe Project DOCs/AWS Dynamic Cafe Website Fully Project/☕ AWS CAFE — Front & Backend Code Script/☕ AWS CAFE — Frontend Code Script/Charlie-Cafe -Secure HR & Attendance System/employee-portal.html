@@ -1,28 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<!-- =====================================================
+CHARLIE CAFÉ ☕ — EMPLOYEE PORTAL
+---------------------------------------------------------
+Frontend Portal for Employees
+
+Features
+✔ Cognito OAuth Login
+✔ JWT Token decoding
+✔ Employee Profile
+✔ Attendance History
+✔ Leave History
+✔ Company Holidays
+✔ Debug logging
+
+Architecture
+CloudFront → API Gateway → Lambda → RDS
+===================================================== -->
+
 <meta charset="UTF-8">
 <title>Charlie Café ☕ | Employee Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ================= BOOTSTRAP + GOOGLE FONTS ================= -->
+<!-- =====================================================
+BOOTSTRAP + GOOGLE FONTS
+===================================================== -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* ================= GLOBAL STYLES ================= */
+
+/* =====================================================
+GLOBAL PAGE STYLES
+===================================================== */
 body{
     font-family:'Poppins',sans-serif;
     background:#111;
     color:white;
 }
 
+/* Page container */
 .container{
     max-width:900px;
     margin-top:40px;
 }
 
-/* ================= CARD STYLING ================= */
+/* Card styling */
 .card{
     background:#1c1c1c;
     padding:25px;
@@ -30,11 +55,15 @@ body{
     border-radius:12px;
 }
 
+/* Section titles */
 h4{
     color:#ffd166;
 }
 
-/* ================= DEBUG LOGGER UI ================= */
+/* =====================================================
+DEBUG LOGGER PANEL
+Used during development to track API calls and errors
+===================================================== */
 #debugBox{
     position:fixed;
     bottom:10px;
@@ -55,32 +84,46 @@ h4{
     color:#ffd166;
     font-size:13px;
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- ================= MAIN PORTAL CONTAINER ================= -->
+<!-- =====================================================
+MAIN PORTAL UI
+===================================================== -->
+
 <div class="container">
 
-<!-- Logout Button -->
+<!-- Logout button -->
 <button id="logoutBtn" class="btn btn-danger float-end">Logout</button>
 
 <h2 class="mb-4">Employee Portal</h2>
 
-<!-- ================= EMPLOYEE PROFILE ================= -->
+<!-- =====================================================
+EMPLOYEE PROFILE
+===================================================== -->
 <div class="card">
+
 <h4>Employee Profile</h4>
+
 <p><b>Name:</b> <span id="profile-name">Loading...</span></p>
 <p><b>Job:</b> <span id="profile-job">Loading...</span></p>
 <p><b>Salary:</b> <span id="profile-salary">Loading...</span></p>
 <p><b>Start Date:</b> <span id="profile-start">Loading...</span></p>
+
 </div>
 
-<!-- ================= ATTENDANCE HISTORY ================= -->
+<!-- =====================================================
+ATTENDANCE HISTORY
+===================================================== -->
 <div class="card">
+
 <h4>Attendance History</h4>
+
 <table class="table table-dark table-striped">
+
 <thead>
 <tr>
 <th>Date</th>
@@ -88,266 +131,448 @@ h4{
 <th>Checkout</th>
 </tr>
 </thead>
+
 <tbody id="attendanceTable"></tbody>
+
 </table>
+
 </div>
 
-<!-- ================= EMPLOYEE LEAVES ================= -->
+<!-- =====================================================
+EMPLOYEE LEAVES
+===================================================== -->
 <div class="card">
+
 <h4>Leaves</h4>
+
 <table class="table table-dark">
+
 <thead>
 <tr>
 <th>Date</th>
 <th>Type</th>
 </tr>
 </thead>
+
 <tbody id="leaveTable"></tbody>
+
 </table>
+
 </div>
 
-<!-- ================= COMPANY HOLIDAYS ================= -->
+<!-- =====================================================
+COMPANY HOLIDAYS
+===================================================== -->
 <div class="card">
+
 <h4>Holidays</h4>
+
 <table class="table table-dark">
+
 <thead>
 <tr>
 <th>Date</th>
 <th>Description</th>
 </tr>
 </thead>
+
 <tbody id="holidayTable"></tbody>
+
 </table>
-</div>
 
 </div>
 
-<!-- ================= DEBUG LOG BOX ================= -->
+</div>
+
+<!-- =====================================================
+DEBUG LOG PANEL
+===================================================== -->
 <div id="debugBox">
+
 <h6>Portal Debug Log</h6>
+
 <div id="debugLogs"></div>
+
 </div>
 
-<!-- ================= JS FILES ================= -->
+<!-- =====================================================
+LOAD CONFIG + API MODULE
+===================================================== -->
 <script src="/js/config.js"></script>
 <script src="/js/api.js"></script>
 
 <script>
+
 /* =====================================================
-DEBUG LOGGER FUNCTION
-Logs messages in debug box with color coding.
-type="info" -> green, "warn" -> orange, "error" -> red
+DEBUG LOGGER
+Shows runtime activity inside debug panel
 ===================================================== */
+
 function logDebug(message,type="info"){
+
     const box=document.getElementById("debugLogs")
+
     const line=document.createElement("div")
+
     let color="#0f0"
+
     if(type==="error") color="#ff4d4d"
     if(type==="warn") color="#ffaa00"
+
     line.style.color=color
+
     const time=new Date().toLocaleTimeString()
+
     line.textContent="["+time+"] "+message
+
     box.prepend(line)
+
 }
 
 /* =====================================================
 GLOBAL ERROR HANDLING
-Captures uncaught JS errors and unhandled promise rejections
 ===================================================== */
+
 window.onerror=function(msg){
+
     logDebug("JS ERROR: "+msg,"error")
+
 }
 
 window.addEventListener("unhandledrejection",function(event){
+
     logDebug("PROMISE ERROR: "+event.reason,"error")
+
 })
 
 /* =====================================================
-FETCH API TRACKER
-Wraps fetch to log all API calls and their status
+FETCH TRACKER
+Intercepts all API calls for debugging
 ===================================================== */
+
 const originalFetch=window.fetch
+
 window.fetch=async function(...args){
+
     logDebug("API CALL: "+args[0])
+
     try{
+
         const response=await originalFetch(...args)
+
         if(!response.ok){
-            logDebug("API ERROR "+response.status+" "+args[0],"error")
+            logDebug("API ERROR "+response.status,"error")
         }else{
-            logDebug("API SUCCESS "+args[0])
+            logDebug("API SUCCESS")
         }
+
         return response
+
     }
+
     catch(err){
+
         logDebug("API FAILED "+err.message,"error")
+
         throw err
+
     }
+
 }
 
 /* =====================================================
-JWT TOKEN PARSER
-Decodes JWT to extract payload
+JWT PARSER
+Decodes JWT payload safely
 ===================================================== */
+
 function parseJwt(token){
-    const base64Url=token.split('.')[1]
-    const base64=base64Url.replace(/-/g,'+').replace(/_/g,'/')
-    return JSON.parse(atob(base64))
+
+    try{
+
+        const base64Url=token.split('.')[1]
+
+        const base64=base64Url.replace(/-/g,'+').replace(/_/g,'/')
+
+        return JSON.parse(atob(base64))
+
+    }
+    catch(e){
+
+        logDebug("JWT decode failed","error")
+
+        return null
+
+    }
+
 }
 
 /* =====================================================
-STEP 1 — READ AUTH CODE FROM URL
+READ AUTHORIZATION CODE FROM URL
 ===================================================== */
+
 const urlParams=new URLSearchParams(window.location.search)
+
 const authCode=urlParams.get("code")
+
 logDebug("Auth Code: "+authCode)
 
 /* =====================================================
-STEP 2 — REDIRECT TO COGNITO LOGIN IF NO TOKEN
+REDIRECT TO COGNITO LOGIN IF NO TOKEN
 ===================================================== */
+
 if(!authCode && !localStorage.getItem("id_token")){
-    logDebug("No token found. Redirecting to Cognito login")
+
+    logDebug("No token found → redirecting to Cognito")
+
     const redirectUri=encodeURIComponent(
         CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html"
     )
+
     const loginUrl=
         CHARLIE_CONFIG.COGNITO_DOMAIN+
         "/login?response_type=code"+
         "&client_id="+CHARLIE_CONFIG.CLIENT_ID+
         "&scope=openid+email+profile"+
         "&redirect_uri="+redirectUri
+
     window.location.href=loginUrl
+
 }
 
 /* =====================================================
-STEP 3 — EXCHANGE AUTH CODE FOR TOKEN
+TOKEN EXCHANGE
+Authorization Code → JWT Token
 ===================================================== */
+
 async function exchangeTokenIfNeeded(){
+
     let token=localStorage.getItem("id_token")
+
     if(authCode){
-        logDebug("Exchanging auth code for token")
+
+        logDebug("Exchanging auth code")
+
         try{
+
             const tokenResponse=await CHARLIE_API.exchangeCognitoToken(authCode)
-            logDebug("Token exchange success")
+
             token=tokenResponse.id_token
+
             localStorage.setItem("id_token",token)
-            window.history.replaceState(
-                {},
-                document.title,
-                CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html"
-            )
+
+            logDebug("Token stored")
+
+            window.history.replaceState({},document.title,
+            CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html")
+
         }
         catch(err){
-            logDebug("Token exchange failed: "+err,"error")
+
+            logDebug("Token exchange failed","error")
+
             alert("Login failed")
+
             localStorage.removeItem("id_token")
+
             location.reload()
+
         }
+
     }
+
     return token
+
 }
 
 /* =====================================================
-STEP 4 — GET EMPLOYEE ID FROM TOKEN
+GET EMPLOYEE ID FROM JWT
+Also validates token expiration
 ===================================================== */
+
 async function getEmployeeId(){
+
     const token=await exchangeTokenIfNeeded()
+
     if(!token){
         logDebug("Token missing","error")
         return null
     }
-    const decoded=parseJwt(token)
-    logDebug("Token decoded")
-    const rawEmployeeId = decoded["custom:employee_id"] || decoded["employee_id"];
-    const employeeId = parseInt(rawEmployeeId)
 
-    // ✅ FIXED: SINGLE VALIDATION ONLY
-    if (!employeeId || isNaN(employeeId)) {
-        logDebug("Employee ID missing in token","error")
-        alert("Employee ID missing")
+    const decoded=parseJwt(token)
+
+    if(!decoded) return null
+
+    logDebug("Token decoded")
+
+    /* ---------- TOKEN EXPIRY CHECK ---------- */
+
+    if(decoded.exp*1000<Date.now()){
+
+        logDebug("Token expired","warn")
+
         localStorage.removeItem("id_token")
+
         location.reload()
+
         return null
+
+    }
+
+    const rawEmployeeId=decoded["custom:employee_id"]||decoded["employee_id"]
+
+    const employeeId=parseInt(rawEmployeeId)
+
+    if(!employeeId || isNaN(employeeId)){
+
+        logDebug("Employee ID missing","error")
+
+        alert("Employee ID missing")
+
+        localStorage.removeItem("id_token")
+
+        location.reload()
+
+        return null
+
     }
 
     logDebug("Employee ID: "+employeeId)
+
     return employeeId
+
 }
 
 /* =====================================================
-STEP 5 — LOAD PORTAL DATA
+LOAD PORTAL DATA
+Calls all HR APIs
 ===================================================== */
+
 async function loadPortal(){
+
     logDebug("Loading portal")
+
     const employeeId=await getEmployeeId()
+
     if(!employeeId) return
 
     try{
-        // Load employee profile
-        logDebug("Loading employee profile")
+
+        /* ================= PROFILE ================= */
+
         const profile=await CHARLIE_API.getEmployeeProfile(employeeId)
+
         document.getElementById("profile-name").textContent=profile.name
         document.getElementById("profile-job").textContent=profile.job_title
         document.getElementById("profile-salary").textContent=profile.salary
         document.getElementById("profile-start").textContent=profile.start_date
 
-        // Load attendance history
-        logDebug("Loading attendance")
+        /* ================= ATTENDANCE ================= */
+
         const attendance=await CHARLIE_API.getAttendanceHistory(employeeId)
+
         const attTable=document.getElementById("attendanceTable")
+
+        attTable.innerHTML=""   // Prevent duplicate rows
+
         attendance.forEach(row=>{
+
             const tr=document.createElement("tr")
-            tr.innerHTML=`
-                <td>${row.attendance_date}</td>
-                <td>${row.checkin_time||"-"}</td>
-                <td>${row.checkout_time||"-"}</td>
-            `
+
+            const d1=document.createElement("td")
+            d1.textContent=row.attendance_date
+
+            const d2=document.createElement("td")
+            d2.textContent=row.checkin_time||"-"
+
+            const d3=document.createElement("td")
+            d3.textContent=row.checkout_time||"-"
+
+            tr.appendChild(d1)
+            tr.appendChild(d2)
+            tr.appendChild(d3)
+
             attTable.appendChild(tr)
+
         })
 
-        // Load leaves & holidays
-        logDebug("Loading leaves & holidays")
+        /* ================= LEAVES ================= */
+
         const data=await CHARLIE_API.getLeavesAndHolidays(employeeId)
 
         const leaveTable=document.getElementById("leaveTable")
+        leaveTable.innerHTML=""
+
         data.leaves.forEach(l=>{
+
             const tr=document.createElement("tr")
-            tr.innerHTML=`
-                <td>${l.leave_date}</td>
-                <td>${l.leave_type}</td>
-            `
+
+            const d1=document.createElement("td")
+            d1.textContent=l.leave_date
+
+            const d2=document.createElement("td")
+            d2.textContent=l.leave_type
+
+            tr.appendChild(d1)
+            tr.appendChild(d2)
+
             leaveTable.appendChild(tr)
+
         })
 
+        /* ================= HOLIDAYS ================= */
+
         const holidayTable=document.getElementById("holidayTable")
+        holidayTable.innerHTML=""
+
         data.holidays.forEach(h=>{
+
             const tr=document.createElement("tr")
-            tr.innerHTML=`
-                <td>${h.holiday_date}</td>
-                <td>${h.description}</td>
-            `
+
+            const d1=document.createElement("td")
+            d1.textContent=h.holiday_date
+
+            const d2=document.createElement("td")
+            d2.textContent=h.description
+
+            tr.appendChild(d1)
+            tr.appendChild(d2)
+
             holidayTable.appendChild(tr)
+
         })
 
         logDebug("Portal loaded successfully")
+
     }
     catch(err){
-        logDebug("Portal loading failed: "+err,"error")
+
+        logDebug("Portal loading failed "+err,"error")
+
         alert("Failed to load employee data")
+
     }
+
 }
 
 /* =====================================================
-STEP 6 — LOGOUT FUNCTION
+LOGOUT
 ===================================================== */
+
 document.getElementById("logoutBtn").onclick=()=>{
+
     logDebug("User logout")
+
     localStorage.removeItem("id_token")
-    window.location.href=CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-login.html"
+
+    window.location.href=
+    CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-login.html"
+
 }
 
 /* =====================================================
 START PORTAL
 ===================================================== */
+
 loadPortal()
 
 </script>
