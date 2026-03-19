@@ -1,56 +1,73 @@
 /* =========================================================
-   CHARLIE CAFE — API MODULE (FINAL - PROD)
+   CHARLIE CAFE — API MODULE (FINAL SECURE VERSION)
    ---------------------------------------------------------
-   ✅ Single Stage: /prod (from CONFIG.API_BASE)
-   ✅ Public HR APIs (no Cognito/Auth headers)
-   ✅ Dedicated HR helpers fixed to correct Lambda endpoints
-   ✅ Fully compatible with checkin.html & employee-portal.html
+   ✅ Uses Cognito JWT Authentication
+   ✅ Automatically sends Authorization header (Bearer token)
+   ✅ NO employee_id in frontend (secure)
+   ✅ Compatible with Cognito Authorizer in API Gateway
+   ✅ Clean, production-ready structure
 ========================================================= */
 
 window.CHARLIE_API = (() => {
 
-    const CONFIG = window.CHARLIE_CONFIG; // Load API base from config.js
+    const CONFIG = window.CHARLIE_CONFIG; // Load config
 
     /* =====================================================
-       🔧 HELPER — STANDARD FETCH WRAPPER
-       - Centralized fetch for all API calls
-       - Handles JSON parsing & throws errors for non-200 responses
+       🔐 HELPER — SECURE FETCH WRAPPER
+       -----------------------------------------------------
+       ✔ Adds JWT token automatically
+       ✔ Handles API errors
+       ✔ Parses Lambda proxy responses
     ===================================================== */
     async function apiFetch(url, options = {}) {
 
-    const response = await fetch(url, {
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {})
-        },
-        ...options
-    });
+        // Get JWT token from browser storage
+        const token = localStorage.getItem("id_token");
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API Error: ${errorText}`);
+        const response = await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+
+                // ✅ IMPORTANT: Attach JWT for API Gateway Authorizer
+                ...(token && { "Authorization": "Bearer " + token }),
+
+                ...(options.headers || {})
+            },
+            ...options
+        });
+
+        // Handle API errors
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API Error: ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        // Handle Lambda proxy integration response
+        if (typeof data.body === "string") {
+            return JSON.parse(data.body);
+        }
+
+        return data;
     }
-
-    const data = await response.json();
-
-    // unwrap Lambda proxy response
-    if (typeof data.body === "string") {
-        return JSON.parse(data.body);
-    }
-
-    return data;
-}
 
     /* =====================================================
-       🛒 CUSTOMER ORDERS
-       - Example: Coffee orders, status tracking, employee orders
+       🛒 CUSTOMER ORDERS (OPTIONAL MODULE)
     ===================================================== */
+
     function placeOrder(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/orders`, { method: "POST", body: JSON.stringify(payload) });
+        return apiFetch(`${CONFIG.API_BASE}/orders`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
     }
 
     function updateOrder(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/order-update`, { method: "POST", body: JSON.stringify(payload) });
+        return apiFetch(`${CONFIG.API_BASE}/order-update`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
     }
 
     function getOrderStatus(orderId) {
@@ -61,15 +78,8 @@ window.CHARLIE_API = (() => {
         return apiFetch(`${CONFIG.API_BASE}/cafe-order-status?order_id=${encodeURIComponent(orderId)}`);
     }
 
-    function getGetOrderStatus(orderId) {
-        return apiFetch(`${CONFIG.API_BASE}/get-order-status?order_id=${encodeURIComponent(orderId)}`);
-    }
-
-    async function getOrders() {
-        const res = await fetch(`${CONFIG.API_BASE}/get-order-status`);
-        if (!res.ok) throw new Error(await res.text());
-        const data = await res.json();
-        return typeof data.body === "string" ? JSON.parse(data.body) : data;
+    function getOrders() {
+        return apiFetch(`${CONFIG.API_BASE}/get-order-status`);
     }
 
     function getEmployeeOrders() {
@@ -77,40 +87,30 @@ window.CHARLIE_API = (() => {
     }
 
     function createEmployeeOrder(payload) {
-        return apiFetch(`${CONFIG.API_BASE}/employee/order`, { method: "POST", body: JSON.stringify(payload) });
-    }
-
-  // ================== ADMIN — MARK CASH ORDER AS PAID ==================
-    function markCashOrderPaid(orderId) {
-        return apiFetch(`${CONFIG.API_BASE}/admin/mark-paid`, {
+        return apiFetch(`${CONFIG.API_BASE}/employee/order`, {
             method: "POST",
-            body: JSON.stringify({ order_id: orderId })
+            body: JSON.stringify(payload)
         });
     }
 
-// ================== ADMIN — ANALYTICS (PUBLIC READ) ==================
-function getAnalytics(period = "today") {
-    const url = `${CONFIG.API_BASE}/analytics?period=${encodeURIComponent(period)}`;
-    return apiFetch(url);
-}
-
     /* =====================================================
-       👥 HR — ATTENDANCE (PUBLIC)
-       - Check-in / Check-out API
-       - Does NOT require Cognito token
-       - Called by checkin.html fingerprint simulation
-       - ✅ FIXED: Now calls /attendance/checkin or /attendance/checkout
+       👨‍💼 HR — ATTENDANCE (PUBLIC DEVICE / BIOMETRIC STYLE)
+       -----------------------------------------------------
+       ⚠️ Still uses employee_id (OK for check-in devices only)
     ===================================================== */
+
     function recordAttendance(payload) {
-        // payload: { employee_id, action: "checkin"|"checkout" }
+        // payload: { employee_id, action: "checkin" | "checkout" }
+
         const url = `${CONFIG.API_BASE}/attendance/${payload.action}`;
+
         return apiFetch(url, {
             method: "POST",
             body: JSON.stringify({
-            employee_id: payload.employee_id,
-            action: payload.action
+                employee_id: payload.employee_id,
+                action: payload.action
             })
-            });
+        });
     }
 
     function getAllEmployees() {
@@ -118,59 +118,58 @@ function getAnalytics(period = "today") {
     }
 
     /* =====================================================
-       🟢 DEDICATED HR HELPERS — FIXED ENDPOINTS
-       - Correctly call Lambda endpoints
-       - Fully aligned with employee-portal.html
+       🟢 HR — SECURE EMPLOYEE APIs (JWT BASED)
+       -----------------------------------------------------
+       ✔ NO employee_id sent from frontend
+       ✔ Extracted from JWT in Lambda
     ===================================================== */
 
-    function getEmployeeProfile(employeeId) {
+    function getEmployeeProfile() {
         return apiFetch(`${CONFIG.API_BASE}/employee-profile`, {
-            method: "POST",
-            body: JSON.stringify({ employee_id: employeeId })
+            method: "POST"
         });
     }
 
-    function getAttendanceHistory(employeeId) {
+    function getAttendanceHistory() {
         return apiFetch(`${CONFIG.API_BASE}/attendance-history`, {
-            method: "POST",
-            body: JSON.stringify({ employee_id: employeeId })
+            method: "POST"
         });
     }
 
-    function getLeavesAndHolidays(employeeId) {
+    function getLeavesAndHolidays() {
         return apiFetch(`${CONFIG.API_BASE}/leaves-holidays`, {
-            method: "POST",
-            body: JSON.stringify({ employee_id: employeeId })
+            method: "POST"
         });
     }
 
     /* =====================================================
-       📊 ADMIN — ATTENDANCE ANALYTICS (PUBLIC READ)
-       - Daily / Weekly / Monthly summaries
-       - Optional admin dashboard integration
+       📊 ADMIN — ANALYTICS
     ===================================================== */
-    const adminAttendance = {
-    getDailySummary() { 
-        return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=daily`); 
-    },
-    getWeeklySummary() { 
-        return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=weekly`); 
-    },
-    getMonthlySummary() { 
-        return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=monthly`); 
+
+    function getAnalytics(period = "today") {
+        const url = `${CONFIG.API_BASE}/analytics?period=${encodeURIComponent(period)}`;
+        return apiFetch(url);
     }
+
+    const adminAttendance = {
+        getDailySummary() {
+            return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=daily`);
+        },
+        getWeeklySummary() {
+            return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=weekly`);
+        },
+        getMonthlySummary() {
+            return apiFetch(`${CONFIG.API_BASE}/hr-analytics?type=monthly`);
+        }
     };
 
     /* =====================================================
-       📈 ADMIN — DASHBOARD & USER MANAGEMENT (PUBLIC READ)
-       - Fetch dashboard data
-       - Create users
+       📈 ADMIN DASHBOARD
     ===================================================== */
+
     const adminDashboard = {
-        fetchData(employeeId = "") {
-            let url = `${CONFIG.API_BASE}/admin/dashboard`;
-            if (employeeId) url += `?employee_id=${encodeURIComponent(employeeId)}`;
-            return apiFetch(url);
+        fetchData() {
+            return apiFetch(`${CONFIG.API_BASE}/admin/dashboard`);
         },
         createUser(payload) {
             return apiFetch(`${CONFIG.API_BASE}/admin/create-user`, {
@@ -181,54 +180,40 @@ function getAnalytics(period = "today") {
     };
 
     /* =====================================================
-       🔐 AUTH — COGNITO TOKEN EXCHANGE
-       - Exchanges OAuth authorization code for id_token
-       - Uses API Gateway → Lambda → Cognito
-       ===================================================== */
-
-        function exchangeCognitoToken(code) {
-            return apiFetch(`${CONFIG.API_BASE}/exchange-token`, {
-        method: "POST",
-        body: JSON.stringify({ code: code })
-    });
-    }
+       ❌ REMOVED (NO LONGER NEEDED)
+       -----------------------------------------------------
+       exchangeCognitoToken()
+       → Not required when using Cognito Authorizer
+    ===================================================== */
 
     /* =====================================================
-       🚀 EXPORT ALL APIs
-       - Orders, HR (public), HR helpers, Admin
+       🚀 EXPORT MODULE
     ===================================================== */
+
     return {
+
         // Orders
         placeOrder,
         updateOrder,
         getOrderStatus,
         getCafeOrderStatus,
-        getGetOrderStatus,
- 	    markCashOrderPaid,
         getOrders,
         getEmployeeOrders,
         createEmployeeOrder,
 
- 	    // ADMIN — ANALYTICS 
-   	    getAnalytics,
-
-    	// ADMIN — ATTENDANCE ANALYTICS
-        adminAttendance,
-
-        // HR Attendance Public
+        // HR Attendance (public device)
         recordAttendance,
         getAllEmployees,
 
-        // Dedicated HR helpers
+        // Secure HR APIs (JWT)
         getEmployeeProfile,
         getAttendanceHistory,
         getLeavesAndHolidays,
 
         // Admin
-        adminDashboard,
-
-        // Cognito AUTH
-        exchangeCognitoToken,  // ✅ Add this
+        getAnalytics,
+        adminAttendance,
+        adminDashboard
 
     };
 
