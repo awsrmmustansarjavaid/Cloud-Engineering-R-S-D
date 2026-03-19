@@ -705,49 +705,6 @@ hr-leaves-holidays
 
 - Deploy.
 
-### 5️⃣ Create Lambda: hr-cognito-token-exchange
-
-> **AWS Cognito Authorization Code Exchange via API Gateway + Lambda**
-
-We will build:
-
-```
-Browser
-   ↓
-API Gateway  →  Lambda (hr-cognito-token-exchange)
-                    ↓
-               Cognito /oauth2/token
-```
-
-### 1️⃣ Basic Configurations
-
-- Function name: hr-cognito-token-exchange
-
-- Runtime: Python 3.12
-
-- Architecture: x86_64
-
-### 2️⃣ Code:
-
-[hr-cognito-token-exchange.py](../☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/hr-cognito-token-exchange.py)
-
-- Deploy
-
-### 3️⃣ Configure Environment Variables
-
-- Go to: Lambda → Configuration → Environment Variables
-
-- Add:
-
-| Key                  | Value                                                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CLIENT_ID            | 7c5793cnvnbl110ljthmdiohch                                                                                               |
-| COGNITO_DOMAIN       | https://us-east-1qpvmxxxr2.auth.us-east-1.amazoncognito.com                                                                      |
-| COGNITO_REDIRECT_URI | [https://d2xb54di3chfgj.cloudfront.net/employee-portal.html](https://d2xb54di3chfgj.cloudfront.net/employee-portal.html) |
-
-
-- Save.
-
 **✅ PHASE 2️⃣ STATUS**
 
 > **🟢 PHASE 2️⃣ COMPLETE & VERIFIED**
@@ -773,7 +730,6 @@ API Gateway  →  Lambda (hr-cognito-token-exchange)
 | POST   | Employee Profile  | `/employee-profile`    | `hr-employee-profile`       |
 | POST   | Attendance History| `/attendance-history`  | `hr-attendance-history`     |
 | POST   | Leaves & Holidays | `/leaves-holidays`     | `hr-leaves-holidays`        |
-| POST  | Exchange Token    | `/exchange-token`      | `hr-cognito-token-exchange` |
 
 **⚠️ All methods = POST**
 
@@ -808,7 +764,6 @@ HR Secure Attendance & Employee Management API
 | POST   | Employee Profile  | `/employee-profile`    | `hr-employee-profile`       |
 | POST   | Attendance History| `/attendance-history`  | `hr-attendance-history`     |
 | POST   | Leaves & Holidays | `/leaves-holidays`     | `hr-leaves-holidays`        |
-| POST  | Exchange Token    | `/exchange-token`      | `hr-cognito-token-exchange` |
 
 #### Step 1 — Add /attendance 
 
@@ -929,6 +884,32 @@ Your Lambda already returns:
 ```
 
 That is enough.
+
+### 6️⃣ Cognito Authorizers
+
+- Go to Authorizers
+
+- Create new:
+
+  - Type: Cognito
+
+  - User Pool: your pool
+
+  - Token source: Authorization
+
+- Attach authorizer to ALL endpoints:  
+
+```
+/employee-profile
+/attendance-history
+/leaves-holidays
+```
+
+#### 👉 Now API Gateway expects:
+
+```
+Authorization: Bearer <JWT>
+```
 
 ### 6️⃣ Deploy API
 
