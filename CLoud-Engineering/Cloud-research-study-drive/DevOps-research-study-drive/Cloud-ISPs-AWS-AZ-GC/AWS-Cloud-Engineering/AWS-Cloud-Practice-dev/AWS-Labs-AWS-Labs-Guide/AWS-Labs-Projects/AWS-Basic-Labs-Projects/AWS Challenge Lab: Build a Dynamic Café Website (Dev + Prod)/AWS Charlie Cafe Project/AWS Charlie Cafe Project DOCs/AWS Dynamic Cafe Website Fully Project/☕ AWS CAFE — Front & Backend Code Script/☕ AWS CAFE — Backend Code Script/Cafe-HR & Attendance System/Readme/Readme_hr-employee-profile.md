@@ -1235,3 +1235,12 @@ def lambda_handler(event, context):
 ---
 ### hr-employee-profile.py
 > **Update Version 1.8**
+
+
+
+
+
+
+---
+### hr-employee-profile.py
+> **Update Version 1.9**
