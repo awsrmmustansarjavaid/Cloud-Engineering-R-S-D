@@ -6,7 +6,7 @@ import datetime
 from decimal import Decimal
 
 # ==========================================================
-# SECRETS MANAGER CONFIGURATION
+# 🔐 SECRETS MANAGER CONFIGURATION
 # ==========================================================
 
 SECRET_NAME = "CafeDevDBSM"
@@ -16,7 +16,7 @@ secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 
 # ==========================================================
-# FETCH DATABASE SECRET
+# 🔑 FETCH DATABASE SECRET
 # ==========================================================
 
 def get_db_secret():
@@ -28,15 +28,15 @@ def get_db_secret():
 
 
 # ==========================================================
-# DATABASE CONNECTION (REUSED ACROSS LAMBDA INVOCATIONS)
+# 🔌 DATABASE CONNECTION (REUSE FOR PERFORMANCE)
 # ==========================================================
 
 connection = None
 
 def get_connection():
     """
-    Reuse database connection across Lambda executions
-    to reduce cold start latency.
+    Reuse DB connection across Lambda executions
+    (Improves performance, reduces cold start time)
     """
 
     global connection
@@ -58,12 +58,12 @@ def get_connection():
 
 
 # ==========================================================
-# JSON SERIALIZER (FOR DECIMAL & DATE TYPES)
+# 🔄 JSON SERIALIZER (Decimal + Date Support)
 # ==========================================================
 
 def json_serializer(obj):
     """
-    Convert MySQL data types into JSON serializable format.
+    Convert MySQL types → JSON serializable
     """
 
     if isinstance(obj, Decimal):
@@ -76,19 +76,19 @@ def json_serializer(obj):
 
 
 # ==========================================================
-# STANDARD API RESPONSE FORMAT
+# 🌐 STANDARD RESPONSE FORMAT (CORS ENABLED)
 # ==========================================================
 
 def response(status, body):
     """
-    Standardized API response with CORS headers
+    Standard API response with CORS headers
     """
 
     return {
         "statusCode": status,
         "headers": {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Headers": "Content-Type,Authorization",
             "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
         },
         "body": json.dumps(body, default=json_serializer)
@@ -96,23 +96,25 @@ def response(status, body):
 
 
 # ==========================================================
-# LAMBDA HANDLER
+# 🚀 LAMBDA HANDLER (SECURE VERSION)
 # ==========================================================
 
 def lambda_handler(event, context):
     """
-    Public API that returns employee profile.
+    🔐 SECURE API — Employee Profile
 
-    Expected request body:
-    {
-        "employee_id": 1001
-    }
+    ✔ Uses Cognito Authorizer
+    ✔ Extracts employee_id from JWT
+    ✔ No request body needed
+
+    Flow:
+    Client → API Gateway → Cognito Authorizer → Lambda
     """
 
     try:
 
         # --------------------------------------------------
-        # HANDLE CORS PREFLIGHT REQUEST
+        # 🟡 HANDLE CORS PREFLIGHT
         # --------------------------------------------------
 
         if event.get("httpMethod") == "OPTIONS":
@@ -120,28 +122,29 @@ def lambda_handler(event, context):
 
 
         # --------------------------------------------------
-        # VALIDATE REQUEST BODY
+        # 🔐 EXTRACT JWT CLAIMS (FROM API GATEWAY AUTHORIZER)
         # --------------------------------------------------
 
-        if not event.get("body"):
-            return response(400, {"message": "Missing request body"})
+        claims = event.get("requestContext", {}) \
+                      .get("authorizer", {}) \
+                      .get("claims", {})
 
-
-        body = json.loads(event["body"])
+        if not claims:
+            return response(401, {"message": "Unauthorized - Missing JWT claims"})
 
 
         # --------------------------------------------------
-        # VALIDATE employee_id (MUST BE NUMERIC)
+        # 🆔 EXTRACT EMPLOYEE ID FROM TOKEN
         # --------------------------------------------------
 
         try:
-            employee_id = int(body.get("employee_id"))
+            employee_id = int(claims.get("custom:employee_id"))
         except:
-            return response(400, {"message": "employee_id must be numeric"})
+            return response(400, {"message": "Invalid employee_id in token"})
 
 
         # --------------------------------------------------
-        # DATABASE QUERY
+        # 🗄️ DATABASE QUERY
         # --------------------------------------------------
 
         connection = get_connection()
@@ -158,7 +161,7 @@ def lambda_handler(event, context):
 
 
         # --------------------------------------------------
-        # HANDLE EMPLOYEE NOT FOUND
+        # ❌ EMPLOYEE NOT FOUND
         # --------------------------------------------------
 
         if not employee:
@@ -166,7 +169,7 @@ def lambda_handler(event, context):
 
 
         # --------------------------------------------------
-        # SUCCESS RESPONSE
+        # ✅ SUCCESS RESPONSE
         # --------------------------------------------------
 
         return response(200, employee)
@@ -175,7 +178,9 @@ def lambda_handler(event, context):
     except Exception as e:
 
         # --------------------------------------------------
-        # SERVER ERROR HANDLING
+        # 💥 SERVER ERROR
         # --------------------------------------------------
 
-        return response(500, {"error": str(e)})
+        return response(500, {
+            "error": str(e)
+        })
