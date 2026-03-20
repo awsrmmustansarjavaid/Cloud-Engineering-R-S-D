@@ -7734,7 +7734,7 @@ You now built:
 
 Perfect — here is your FULLY FINAL employee-portal.html (SECURE + PRODUCTION + CLEAN + COMMENTED) ✅
 
-This version is:
+#### This version is:
 
 🔐 JWT-based (no employee_id anywhere)
 
@@ -8089,14 +8089,15 @@ loadPortal()
 </html>
 ```
 
-🔥 What You Now Have
-✅ Fully Secure Flow
+### 🔥 What You Now Have
+
+#### ✅ Fully Secure Flow
 
 ```
 Login → JWT → API Gateway (Authorizer) → Lambda → RDS
 ```
 
-✅ No More Risk
+### ✅ No More Risk
 
 ❌ No employee_id from frontend
 
@@ -8104,7 +8105,7 @@ Login → JWT → API Gateway (Authorizer) → Lambda → RDS
 
 ✅ JWT trusted identity
 
-🧠 Your Level Now
+### 🧠 Your Level Now
 
 This is real-world architecture used in companies using
 Amazon Web Services serverless stack.
