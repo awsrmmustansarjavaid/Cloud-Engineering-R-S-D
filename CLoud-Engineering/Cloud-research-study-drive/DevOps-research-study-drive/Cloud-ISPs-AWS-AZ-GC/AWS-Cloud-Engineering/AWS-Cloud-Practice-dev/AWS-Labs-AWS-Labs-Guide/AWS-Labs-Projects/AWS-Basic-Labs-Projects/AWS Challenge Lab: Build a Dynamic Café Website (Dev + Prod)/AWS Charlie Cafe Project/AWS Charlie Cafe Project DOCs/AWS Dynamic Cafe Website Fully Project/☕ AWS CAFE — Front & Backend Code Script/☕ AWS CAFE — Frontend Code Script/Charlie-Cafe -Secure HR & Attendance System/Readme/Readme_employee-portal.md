@@ -8116,3 +8116,540 @@ Amazon Web Services serverless stack.
 
 > **Updated Version:4.2**
 
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- =============================================================================
+     CHARLIE CAFÉ ☕ — Employee Portal
+     -----------------------------------------------------------------------------
+     Architecture:
+       CloudFront (static hosting)
+         → Cognito Hosted UI (login page)
+         → employee-portal.html (this file)
+         → api.js  →  API Gateway + Cognito Authorizer
+         → Lambda  →  RDS MySQL
+
+     Auth flow:
+       1. Page loads. If no id_token in localStorage, redirect to Cognito login.
+       2. Cognito redirects back with id_token in the URL hash (#id_token=...).
+       3. handleCognitoCallback() extracts and stores the token, cleans the URL.
+       4. All API calls attach the token as: Authorization: Bearer <id_token>
+       5. API Gateway's Cognito Authorizer validates the token before Lambda runs.
+
+     Fixes applied vs original:
+       [FIX 1] profile-name / profile-job etc. were used as bare JS identifiers.
+               Hyphens are not valid in identifiers — changed to getElementById().
+       [FIX 2] attendanceTable / leaveTable / holidayTable used as bare globals.
+               Changed to getElementById() so the browser can find them.
+       [FIX 3] exchangeCognitoToken() was called but removed from api.js.
+               Removed the auth-code exchange flow entirely. Cognito Authorizer
+               only needs the id_token — the token exchange is not required.
+       [FIX 4] Switched Cognito to implicit grant (response_type=token) so the
+               id_token arrives directly in the URL hash — no server-side
+               token endpoint call needed.
+       [FIX 5] logoutBtn.onclick → document.getElementById("logoutBtn").onclick
+               for strict-mode safety.
+============================================================================= -->
+
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap 5 for grid, tables, and utility classes -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+/* -----------------------------------------------------------------------
+   Base theme — dark background, yellow headings, dark cards
+----------------------------------------------------------------------- */
+body {
+    background: #111;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+}
+
+.container {
+    max-width: 900px;
+    margin-top: 40px;
+}
+
+/* Card sections: Profile, Attendance, Leaves, Holidays */
+.card {
+    background: #1c1c1c;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+}
+
+h4 {
+    color: #ffd166;   /* Café gold accent */
+}
+
+/* -----------------------------------------------------------------------
+   Debug log panel — fixed bottom-right corner
+   Green text on black, shows timestamped API call and error messages.
+   Remove or hide in production if needed.
+----------------------------------------------------------------------- */
+#debugBox {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 360px;
+    max-height: 260px;
+    overflow: auto;
+    background: #000;
+    color: #0f0;
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 9999;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Logout button — top right -->
+    <button id="logoutBtn" class="btn btn-danger float-end">Logout</button>
+
+    <h2 class="mb-4">Employee Portal</h2>
+
+    <!-- =========================================================
+         SECTION 1 — Employee Profile
+         Populated by getEmployeeProfile() → hr-employee-profile Lambda
+    ========================================================= -->
+    <div class="card">
+        <h4>Employee Profile</h4>
+        <p><b>Name:</b>       <span id="profile-name">Loading...</span></p>
+        <p><b>Job:</b>        <span id="profile-job">Loading...</span></p>
+        <p><b>Salary:</b>     <span id="profile-salary">Loading...</span></p>
+        <p><b>Start Date:</b> <span id="profile-start">Loading...</span></p>
+    </div>
+
+    <!-- =========================================================
+         SECTION 2 — Attendance History
+         Populated by getAttendanceHistory() → hr-attendance-history Lambda
+    ========================================================= -->
+    <div class="card">
+        <h4>Attendance History</h4>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTable">
+                <!-- Rows inserted dynamically by loadPortal() -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- =========================================================
+         SECTION 3 — Leave History
+         Populated by getLeavesAndHolidays() → hr-leaves-holidays Lambda
+         (data.leaves portion)
+    ========================================================= -->
+    <div class="card">
+        <h4>Leaves</h4>
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody id="leaveTable">
+                <!-- Rows inserted dynamically by loadPortal() -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- =========================================================
+         SECTION 4 — Company Holidays
+         Populated by getLeavesAndHolidays() → hr-leaves-holidays Lambda
+         (data.holidays portion — same API call as leaves)
+    ========================================================= -->
+    <div class="card">
+        <h4>Holidays</h4>
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="holidayTable">
+                <!-- Rows inserted dynamically by loadPortal() -->
+            </tbody>
+        </table>
+    </div>
+
+</div><!-- /.container -->
+
+
+<!-- =========================================================
+     DEBUG PANEL
+     Timestamped log of API calls, successes, and errors.
+     Visible in the bottom-right corner during development.
+========================================================= -->
+<div id="debugBox">
+    <h6 style="color:#0f0; margin:0 0 6px;">Debug Log</h6>
+    <div id="debugLogs"></div>
+</div>
+
+
+<!-- Load config.js before api.js so CHARLIE_CONFIG is defined first -->
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+/* =============================================================================
+   DEBUG LOGGER
+   logDebug(message, type)
+   Prepends a timestamped line to the debug panel.
+   type: "info" (green) | "warn" (orange) | "error" (red)
+============================================================================= */
+function logDebug(message, type = "info") {
+    const box  = document.getElementById("debugLogs");
+    const line = document.createElement("div");
+    const colorMap = { info: "#0f0", warn: "#ffaa00", error: "#ff4d4d" };
+    line.style.color  = colorMap[type] || "#0f0";
+    line.textContent  = "[" + new Date().toLocaleTimeString() + "] " + message;
+    box.prepend(line); // Newest messages at the top
+}
+
+/* --------------------------------------------------------------------------
+   Global error traps — catch any uncaught JS errors and unhandled promise
+   rejections and surface them in the debug panel.
+-------------------------------------------------------------------------- */
+window.onerror = (msg) => logDebug("JS ERROR: " + msg, "error");
+
+window.addEventListener("unhandledrejection", (e) => {
+    logDebug("PROMISE REJECTION: " + (e.reason?.message || e.reason), "error");
+});
+
+/* --------------------------------------------------------------------------
+   Fetch interceptor — logs every outgoing API call and its result.
+   Wraps window.fetch so all calls (including from api.js) are captured.
+-------------------------------------------------------------------------- */
+const _originalFetch = window.fetch;
+window.fetch = async function (...args) {
+    logDebug("→ API CALL: " + args[0]);
+    try {
+        const res = await _originalFetch(...args);
+        logDebug(res.ok ? "✓ OK " + res.status : "✗ ERROR " + res.status,
+                 res.ok ? "info" : "error");
+        return res;
+    } catch (err) {
+        logDebug("✗ NETWORK FAIL: " + err.message, "error");
+        throw err;
+    }
+};
+
+
+/* =============================================================================
+   JWT UTILITY
+   parseJwt(token)
+   Decodes the payload section of a JWT (no signature verification — that
+   happens server-side in API Gateway). Used only to check token expiry
+   before attempting an API call.
+============================================================================= */
+function parseJwt(token) {
+    try {
+        // JWT structure: header.payload.signature (base64url encoded)
+        const base64 = token.split(".")[1]
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+        return JSON.parse(atob(base64));
+    } catch {
+        logDebug("Failed to decode JWT payload", "warn");
+        return null;
+    }
+}
+
+
+/* =============================================================================
+   COGNITO CALLBACK HANDLER
+   handleCognitoCallback()
+   After a successful Cognito login, Cognito redirects back to this page
+   with the id_token in the URL hash fragment:
+     https://your-domain/employee-portal.html#id_token=eyJ...&token_type=Bearer
+
+   This function:
+     1. Checks for id_token in the hash
+     2. Stores it in localStorage under "id_token"
+     3. Cleans the hash from the URL (so tokens aren't visible in the browser bar)
+     4. Returns the token string, or null if no callback token is present
+============================================================================= */
+function handleCognitoCallback() {
+    const hash   = window.location.hash;
+    if (!hash) return null;
+
+    // Parse the hash fragment as URLSearchParams (strip the leading #)
+    const params  = new URLSearchParams(hash.substring(1));
+    const idToken = params.get("id_token");
+
+    if (idToken) {
+        localStorage.setItem("id_token", idToken);
+
+        // Clean the URL — replace hash with the clean portal URL
+        // Using replaceState so the back button doesn't loop through the token URL
+        window.history.replaceState(
+            {},
+            document.title,
+            CHARLIE_CONFIG.CLOUDFRONT_BASE + "/employee-portal.html"
+        );
+
+        logDebug("Token received from Cognito callback");
+        return idToken;
+    }
+
+    return null;
+}
+
+
+/* =============================================================================
+   REDIRECT TO COGNITO LOGIN
+   redirectToLogin()
+   Sends the user to the Cognito Hosted UI login page.
+
+   Uses implicit grant (response_type=token) so the id_token is returned
+   directly in the redirect URL hash — no server-side token exchange needed.
+   This works correctly with API Gateway's Cognito Authorizer.
+============================================================================= */
+function redirectToLogin() {
+    const redirectUri = encodeURIComponent(
+        CHARLIE_CONFIG.CLOUDFRONT_BASE + "/employee-portal.html"
+    );
+
+    window.location.href =
+        CHARLIE_CONFIG.COGNITO_DOMAIN +
+        "/login" +
+        "?response_type=token" +           // Implicit grant → token in hash
+        "&client_id=" + CHARLIE_CONFIG.CLIENT_ID +
+        "&scope=openid+email+profile" +
+        "&redirect_uri=" + redirectUri;
+}
+
+
+/* =============================================================================
+   TOKEN VALIDATION
+   getValidToken()
+   Returns a valid non-expired id_token string, or null.
+
+   Order of checks:
+     1. Fresh token from the Cognito callback hash (just logged in)
+     2. Existing token in localStorage (returning user, still valid)
+     3. null → caller should redirect to login
+============================================================================= */
+function getValidToken() {
+
+    // 1. Check if Cognito just redirected back with a fresh token in the hash
+    const freshToken = handleCognitoCallback();
+    if (freshToken) return freshToken;
+
+    // 2. Check for an existing stored token
+    const token = localStorage.getItem("id_token");
+    if (!token) return null;
+
+    // 3. Decode and check expiry (exp claim is a Unix timestamp in seconds)
+    const decoded = parseJwt(token);
+    if (!decoded) return null;
+
+    if (decoded.exp * 1000 < Date.now()) {
+        logDebug("Token expired — clearing and redirecting to login", "warn");
+        localStorage.removeItem("id_token");
+        return null;
+    }
+
+    return token;
+}
+
+
+/* =============================================================================
+   PORTAL DATA LOADER
+   loadPortal()
+   Main function that runs on page load.
+
+   Steps:
+     1. Get a valid token (or redirect to Cognito login)
+     2. Fetch and render employee profile
+     3. Fetch and render attendance history table
+     4. Fetch and render leaves + holidays tables
+============================================================================= */
+async function loadPortal() {
+
+    // Validate token — redirects to Cognito login if missing or expired
+    const token = getValidToken();
+    if (!token) {
+        redirectToLogin();
+        return;
+    }
+
+    try {
+
+        /* -------------------------------------------------------------------
+           PROFILE
+           getEmployeeProfile() → POST /employee-profile
+           Returns: { employee_id, name, job_title, salary, start_date }
+
+           FIX: Using getElementById() because hyphenated IDs like "profile-name"
+           are NOT valid JavaScript identifiers and cannot be used as bare names.
+        ------------------------------------------------------------------- */
+        const profile = await CHARLIE_API.getEmployeeProfile();
+
+        document.getElementById("profile-name").textContent   = profile.name       || "—";
+        document.getElementById("profile-job").textContent    = profile.job_title  || "—";
+        document.getElementById("profile-salary").textContent = profile.salary     != null
+            ? "$" + Number(profile.salary).toLocaleString()
+            : "—";
+        document.getElementById("profile-start").textContent  = profile.start_date || "—";
+
+        logDebug("Profile loaded for employee #" + profile.employee_id);
+
+
+        /* -------------------------------------------------------------------
+           ATTENDANCE HISTORY
+           getAttendanceHistory() → POST /attendance-history
+           Returns: [{ attendance_date, checkin_time, checkout_time }, ...]
+
+           FIX: Must use getElementById() — same reason as profile fields.
+        ------------------------------------------------------------------- */
+        const attendance     = await CHARLIE_API.getAttendanceHistory();
+        const attendanceTable = document.getElementById("attendanceTable");
+        attendanceTable.innerHTML = "";  // Clear "Loading..." placeholder
+
+        if (attendance.length === 0) {
+            attendanceTable.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No attendance records found.</td>
+                </tr>`;
+        } else {
+            attendance.forEach((row) => {
+                attendanceTable.innerHTML += `
+                    <tr>
+                        <td>${row.attendance_date || "—"}</td>
+                        <td>${row.checkin_time    || "—"}</td>
+                        <td>${row.checkout_time   || "—"}</td>
+                    </tr>`;
+            });
+        }
+
+        logDebug("Attendance history loaded: " + attendance.length + " records");
+
+
+        /* -------------------------------------------------------------------
+           LEAVES + HOLIDAYS
+           getLeavesAndHolidays() → POST /leaves-holidays
+           Returns: { leaves: [...], holidays: [...] }
+
+           Both arrays come from one API call to avoid two round trips.
+
+           FIX: Must use getElementById() for leaveTable and holidayTable.
+        ------------------------------------------------------------------- */
+        const data = await CHARLIE_API.getLeavesAndHolidays();
+
+        // Leaves table
+        const leaveTable  = document.getElementById("leaveTable");
+        leaveTable.innerHTML = "";
+
+        if (data.leaves.length === 0) {
+            leaveTable.innerHTML = `
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No leave records found.</td>
+                </tr>`;
+        } else {
+            data.leaves.forEach((leave) => {
+                leaveTable.innerHTML += `
+                    <tr>
+                        <td>${leave.leave_date || "—"}</td>
+                        <td>${leave.leave_type || "—"}</td>
+                    </tr>`;
+            });
+        }
+
+        // Holidays table
+        const holidayTable = document.getElementById("holidayTable");
+        holidayTable.innerHTML = "";
+
+        if (data.holidays.length === 0) {
+            holidayTable.innerHTML = `
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No holidays listed.</td>
+                </tr>`;
+        } else {
+            data.holidays.forEach((holiday) => {
+                holidayTable.innerHTML += `
+                    <tr>
+                        <td>${holiday.holiday_date || "—"}</td>
+                        <td>${holiday.description  || "—"}</td>
+                    </tr>`;
+            });
+        }
+
+        logDebug("Leaves + holidays loaded");
+        logDebug("Portal fully loaded ✓");
+
+    } catch (err) {
+        logDebug("Portal load error: " + err.message, "error");
+        alert("Failed to load portal data. Please try logging in again.");
+    }
+}
+
+
+/* =============================================================================
+   LOGOUT
+   Clears the stored token and redirects to:
+     1. Cognito's /logout endpoint (invalidates the Cognito session)
+     2. Which then redirects to employee-login.html via logout_uri
+
+   FIX: Using getElementById("logoutBtn") instead of bare `logoutBtn`
+   for strict-mode and future-proof DOM access.
+============================================================================= */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("id_token");
+
+    const logoutUri = encodeURIComponent(
+        CHARLIE_CONFIG.CLOUDFRONT_BASE + "/employee-login.html"
+    );
+
+    window.location.href =
+        CHARLIE_CONFIG.COGNITO_DOMAIN +
+        "/logout" +
+        "?client_id=" + CHARLIE_CONFIG.CLIENT_ID +
+        "&logout_uri=" + logoutUri;
+});
+
+
+/* =============================================================================
+   ENTRY POINT
+   Kick off the portal load when the page is ready.
+   config.js and api.js are already loaded via <script> tags above.
+============================================================================= */
+loadPortal();
+
+</script>
+</body>
+</html>
+```
+
+
+---
+### employee-portal.html
+
+> **Updated Version:4.3**
+
+
+
+
+---
+### employee-portal.html
+
+> **Updated Version:4.4**
+
