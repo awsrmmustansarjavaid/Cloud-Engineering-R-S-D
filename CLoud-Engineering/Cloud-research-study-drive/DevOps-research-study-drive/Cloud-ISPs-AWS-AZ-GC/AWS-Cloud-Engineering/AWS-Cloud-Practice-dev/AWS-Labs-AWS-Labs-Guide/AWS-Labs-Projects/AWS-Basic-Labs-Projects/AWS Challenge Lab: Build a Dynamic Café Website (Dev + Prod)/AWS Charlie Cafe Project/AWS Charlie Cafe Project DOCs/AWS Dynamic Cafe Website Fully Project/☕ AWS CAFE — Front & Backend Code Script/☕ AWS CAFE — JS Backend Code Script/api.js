@@ -22,7 +22,7 @@ window.CHARLIE_API = (() => {
     async function apiFetch(url, options = {}) {
 
         // Get JWT token from browser storage
-        const token = localStorage.getItem("id_token");
+        const token = sessionStorage.getItem("id_token");
 
         const response = await fetch(url, {
             headers: {

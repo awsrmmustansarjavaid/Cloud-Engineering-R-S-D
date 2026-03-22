@@ -1401,6 +1401,103 @@ def lambda_handler(event, context):
         return response(500, {"error": str(e)})
 ```
 
+### ✅ 1. hr-attendance-history (FINAL Lambda)
+
+#### 🔥 Key Fixes:
+❌ REMOVE employee_id from request body
+
+✅ GET it from Cognito JWT (authorizer claims)
+
+### ✅ Fully secure (no spoofing possible)
+
+```
+/**
+=====================================================
+CHARLIE CAFÉ ☕ — HR ATTENDANCE HISTORY LAMBDA
+-----------------------------------------------------
+✔ Uses Cognito Authorizer (JWT)
+✔ Extracts employee_id from token (SECURE)
+✔ No user input allowed for employee_id
+✔ Returns attendance records
+=====================================================
+*/
+
+const mysql = require("mysql2/promise")
+
+exports.handler = async (event) => {
+
+    try {
+
+        /* =====================================================
+        1. EXTRACT USER FROM COGNITO TOKEN
+        ===================================================== */
+
+        const claims = event.requestContext.authorizer.jwt.claims
+
+        // 🔐 IMPORTANT: adjust based on your Cognito setup
+        const employee_id = claims["custom:employee_id"] || claims["sub"]
+
+        if (!employee_id) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Employee ID not found in token" })
+            }
+        }
+
+        /* =====================================================
+        2. DB CONNECTION
+        ===================================================== */
+
+        const connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
+        })
+
+        /* =====================================================
+        3. QUERY ATTENDANCE
+        ===================================================== */
+
+        const [rows] = await connection.execute(
+            `SELECT 
+                attendance_date,
+                checkin_time,
+                checkout_time
+             FROM attendance
+             WHERE employee_id = ?
+             ORDER BY attendance_date DESC`,
+            [employee_id]
+        )
+
+        await connection.end()
+
+        /* =====================================================
+        4. RESPONSE
+        ===================================================== */
+
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*"
+            },
+            body: JSON.stringify(rows)
+        }
+
+    } catch (error) {
+
+        console.error("Attendance Error:", error)
+
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Internal server error" })
+        }
+    }
+}
+```
+
+
+
 ---
 ### hr-attendance-history.py
 
