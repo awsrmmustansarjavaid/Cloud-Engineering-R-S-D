@@ -8116,9 +8116,321 @@ Amazon Web Services serverless stack.
 
 > **Updated Version:4.2**
 
-```
+### ✅ 🔥 FINAL FIXED VERSION (PRODUCTION READY)
+
+#### This version:
+
+✅ REMOVES exchangeToken() completely
+
+✅ Uses Cognito Hosted UI token (implicit/session flow)
+
+✅ Uses sessionStorage (more secure than localStorage)
+
+✅ Fixes DOM bugs (profile-job issue)
+
+✅ Clean + stable + production-ready
+
+### ✅ 👉 FULL FINAL employee-portal.html (WITH COMMENTS)
 
 ```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- =====================================================
+CHARLIE CAFÉ ☕ — EMPLOYEE PORTAL (FINAL FIXED VERSION)
+---------------------------------------------------------
+✔ Cognito Hosted UI Login
+✔ JWT stored in sessionStorage (safer)
+✔ NO exchangeToken() (FIXED)
+✔ Secure API calls via Authorization header
+✔ Clean DOM handling (FIXED bugs)
+✔ Debug logging panel
+
+Architecture:
+CloudFront → API Gateway (Cognito Authorizer) → Lambda → RDS
+===================================================== -->
+
+<meta charset="UTF-8">
+<title>Charlie Café ☕ | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{background:#111;color:white;font-family:'Poppins',sans-serif;}
+.container{max-width:900px;margin-top:40px;}
+.card{background:#1c1c1c;padding:25px;margin-bottom:20px;border-radius:12px;}
+h4{color:#ffd166;}
+#debugBox{
+    position:fixed;bottom:10px;right:10px;width:360px;max-height:260px;
+    overflow:auto;background:#000;color:#0f0;font-size:12px;padding:10px;border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<button id="logoutBtn" class="btn btn-danger float-end">Logout</button>
+
+<h2 class="mb-4">Employee Portal</h2>
+
+<!-- PROFILE -->
+<div class="card">
+<h4>Employee Profile</h4>
+<p><b>Name:</b> <span id="profile-name">Loading...</span></p>
+<p><b>Job:</b> <span id="profile-job">Loading...</span></p>
+<p><b>Salary:</b> <span id="profile-salary">Loading...</span></p>
+<p><b>Start Date:</b> <span id="profile-start">Loading...</span></p>
+</div>
+
+<!-- ATTENDANCE -->
+<div class="card">
+<h4>Attendance History</h4>
+<table class="table table-dark table-striped">
+<thead>
+<tr><th>Date</th><th>Checkin</th><th>Checkout</th></tr>
+</thead>
+<tbody id="attendanceTable"></tbody>
+</table>
+</div>
+
+<!-- LEAVES -->
+<div class="card">
+<h4>Leaves</h4>
+<table class="table table-dark">
+<thead><tr><th>Date</th><th>Type</th></tr></thead>
+<tbody id="leaveTable"></tbody>
+</table>
+</div>
+
+<!-- HOLIDAYS -->
+<div class="card">
+<h4>Holidays</h4>
+<table class="table table-dark">
+<thead><tr><th>Date</th><th>Description</th></tr></thead>
+<tbody id="holidayTable"></tbody>
+</table>
+</div>
+
+</div>
+
+<!-- DEBUG PANEL -->
+<div id="debugBox">
+<h6>Debug Log</h6>
+<div id="debugLogs"></div>
+</div>
+
+<script src="/js/config.js"></script>
+<script src="/js/api.js"></script>
+
+<script>
+
+/* =====================================================
+DEBUG LOGGER
+===================================================== */
+function logDebug(msg,type="info"){
+    const box=document.getElementById("debugLogs")
+    const line=document.createElement("div")
+
+    let color="#0f0"
+    if(type==="error") color="#ff4d4d"
+    if(type==="warn") color="#ffaa00"
+
+    line.style.color=color
+    line.textContent="["+new Date().toLocaleTimeString()+"] "+msg
+    box.prepend(line)
+}
+
+/* =====================================================
+GLOBAL ERROR HANDLING
+===================================================== */
+window.onerror=msg=>logDebug("JS ERROR: "+msg,"error")
+
+window.addEventListener("unhandledrejection",e=>{
+    logDebug("PROMISE ERROR: "+e.reason,"error")
+})
+
+/* =====================================================
+FETCH LOGGER
+===================================================== */
+const originalFetch=window.fetch
+window.fetch=async function(...args){
+    logDebug("API CALL: "+args[0])
+    try{
+        const res=await originalFetch(...args)
+        logDebug(res.ok?"API SUCCESS":"API ERROR "+res.status)
+        return res
+    }catch(err){
+        logDebug("API FAILED "+err.message,"error")
+        throw err
+    }
+}
+
+/* =====================================================
+JWT PARSER
+===================================================== */
+function parseJwt(token){
+    try{
+        const base64=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')
+        return JSON.parse(atob(base64))
+    }catch{
+        logDebug("JWT decode failed","error")
+        return null
+    }
+}
+
+/* =====================================================
+AUTH HANDLING (FIXED VERSION)
+===================================================== */
+
+const params=new URLSearchParams(window.location.search)
+
+/* ✅ Cognito returns token in URL fragment (#id_token=...) */
+const hashParams=new URLSearchParams(window.location.hash.substring(1))
+
+let token=hashParams.get("id_token")
+
+/* Save token after login */
+if(token){
+    sessionStorage.setItem("id_token",token)
+
+    // Clean URL
+    window.history.replaceState({},document.title,
+        CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html"
+    )
+}
+
+/* Get stored token */
+token=sessionStorage.getItem("id_token")
+
+/* Redirect to Cognito if not logged in */
+if(!token){
+
+    const redirect=encodeURIComponent(
+        CHARLIE_CONFIG.CLOUDFRONT_BASE+"/employee-portal.html"
+    )
+
+    window.location.href=
+        CHARLIE_CONFIG.COGNITO_DOMAIN+
+        "/login?response_type=token"+   // ✅ IMPLICIT FLOW (FIXED)
+        "&client_id="+CHARLIE_CONFIG.CLIENT_ID+
+        "&scope=openid+email+profile"+
+        "&redirect_uri="+redirect
+}
+
+/* =====================================================
+VALIDATE TOKEN
+===================================================== */
+function validateToken(){
+
+    if(!token) return null
+
+    const decoded=parseJwt(token)
+
+    if(!decoded) return null
+
+    if(decoded.exp*1000<Date.now()){
+        logDebug("Token expired","warn")
+        sessionStorage.removeItem("id_token")
+        location.reload()
+        return null
+    }
+
+    return token
+}
+
+/* =====================================================
+LOAD PORTAL DATA
+===================================================== */
+async function loadPortal(){
+
+    const validToken=validateToken()
+    if(!validToken) return
+
+    try{
+
+        /* PROFILE */
+        const profile=await CHARLIE_API.getEmployeeProfile()
+
+        document.getElementById("profile-name").textContent=profile.name
+        document.getElementById("profile-job").textContent=profile.job_title
+        document.getElementById("profile-salary").textContent=profile.salary
+        document.getElementById("profile-start").textContent=profile.start_date
+
+        /* ATTENDANCE */
+        const attendance=await CHARLIE_API.getAttendanceHistory()
+
+        const attendanceTable=document.getElementById("attendanceTable")
+        attendanceTable.innerHTML=""
+
+        attendance.forEach(r=>{
+            attendanceTable.innerHTML+=`
+            <tr>
+                <td>${r.attendance_date}</td>
+                <td>${r.checkin_time||"-"}</td>
+                <td>${r.checkout_time||"-"}</td>
+            </tr>`
+        })
+
+        /* LEAVES + HOLIDAYS */
+        const data=await CHARLIE_API.getLeavesAndHolidays()
+
+        const leaveTable=document.getElementById("leaveTable")
+        leaveTable.innerHTML=""
+
+        data.leaves.forEach(l=>{
+            leaveTable.innerHTML+=`
+            <tr>
+                <td>${l.leave_date}</td>
+                <td>${l.leave_type}</td>
+            </tr>`
+        })
+
+        const holidayTable=document.getElementById("holidayTable")
+        holidayTable.innerHTML=""
+
+        data.holidays.forEach(h=>{
+            holidayTable.innerHTML+=`
+            <tr>
+                <td>${h.holiday_date}</td>
+                <td>${h.description}</td>
+            </tr>`
+        })
+
+        logDebug("Portal loaded successfully")
+
+    }catch(err){
+        logDebug("Portal error: "+err.message,"error")
+        alert("Failed to load data")
+    }
+}
+
+/* =====================================================
+LOGOUT
+===================================================== */
+document.getElementById("logoutBtn").onclick=()=>{
+    sessionStorage.removeItem("id_token")
+
+    window.location.href=
+        CHARLIE_CONFIG.COGNITO_DOMAIN+"/logout"+
+        "?client_id="+CHARLIE_CONFIG.CLIENT_ID+
+        "&logout_uri="+CHARLIE_CONFIG.CLOUDFRONT_BASE
+}
+
+/* =====================================================
+START APP
+===================================================== */
+loadPortal()
+
+</script>
+
+</body>
+</html>
+```
+
 
 
 ---
