@@ -274,7 +274,8 @@ async function loadPortal(){
 
         /* PROFILE */
         const profile=await CHARLIE_API.getEmployeeProfile()
-        profile-name.textContent=profile.name
+        // ✅ CORRECT — use getElementById or querySelector
+        document.getElementById("profile-name").textContent = profile.name
         profile-job.textContent=profile.job_title
         profile-salary.textContent=profile.salary
         profile-start.textContent=profile.start_date
