@@ -1,15 +1,3 @@
-# ==============================================================================
-# CHARLIE CAFÉ ☕ — Lambda: hr-employee-profile
-# ==============================================================================
-# Purpose  : Returns the authenticated employee's profile data.
-# Route    : POST /employee-profile
-# Auth     : Cognito Authorizer — API Gateway validates the JWT and injects
-#            the decoded claims into event["requestContext"]["authorizer"]["claims"].
-#            employee_id is extracted from the JWT claim "custom:employee_id".
-#            The frontend sends NO body and NO employee_id — it is 100% token-driven.
-# Database : RDS MySQL via PyMySQL (credentials from AWS Secrets Manager)
-# ==============================================================================
-
 import json
 import os
 import boto3
@@ -17,73 +5,89 @@ import pymysql
 import datetime
 from decimal import Decimal
 
-# ------------------------------------------------------------------------------
-# SECRETS MANAGER — configuration
-# ------------------------------------------------------------------------------
+# ==========================================================
+# 🔐 SECRETS MANAGER CONFIGURATION
+# ==========================================================
+
 SECRET_NAME = "CafeDevDBSM"
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 
-# ------------------------------------------------------------------------------
-# get_db_secret()
-# Fetches RDS credentials from Secrets Manager.
-# Returns a dict: { host, username, password, dbname }
-# ------------------------------------------------------------------------------
+# ==========================================================
+# 🔑 FETCH DATABASE SECRET
+# ==========================================================
+
 def get_db_secret():
+    """
+    Fetch database credentials from AWS Secrets Manager
+    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
 
-# ------------------------------------------------------------------------------
-# Persistent connection — reused across warm Lambda invocations.
-# autocommit=True: this Lambda is read-only (SELECT only), no commits needed.
-# ------------------------------------------------------------------------------
-_connection = None
+# ==========================================================
+# 🔌 DATABASE CONNECTION (REUSE FOR PERFORMANCE)
+# ==========================================================
+
+connection = None
 
 def get_connection():
-    global _connection
-    if _connection is None or not _connection.open:
+    """
+    Reuse DB connection across Lambda executions
+    (Improves performance, reduces cold start time)
+    """
+
+    global connection
+
+    if connection is None or not connection.open:
         secret = get_db_secret()
-        _connection = pymysql.connect(
+
+        connection = pymysql.connect(
             host=secret["host"],
             user=secret["username"],
             password=secret["password"],
             database=secret["dbname"],
             cursorclass=pymysql.cursors.DictCursor,
-            autocommit=True,
-            connect_timeout=10
+            connect_timeout=10,
+            autocommit=True
         )
-    return _connection
+
+    return connection
 
 
-# ------------------------------------------------------------------------------
-# json_serializer()
-# Custom JSON serializer passed to json.dumps as the `default` argument.
-# Handles MySQL types that the standard library cannot serialize:
-#   Decimal  → float   (salary fields)
-#   date/datetime → ISO 8601 string  (start_date, etc.)
-# ------------------------------------------------------------------------------
+# ==========================================================
+# 🔄 JSON SERIALIZER (Decimal + Date Support)
+# ==========================================================
+
 def json_serializer(obj):
+    """
+    Convert MySQL types → JSON serializable
+    """
+
     if isinstance(obj, Decimal):
         return float(obj)
+
     if isinstance(obj, (datetime.date, datetime.datetime)):
         return obj.isoformat()
+
     return str(obj)
 
 
-# ------------------------------------------------------------------------------
-# api_response()
-# Builds a standard API Gateway Lambda proxy response with CORS headers.
-# `body` can be a dict or a list — it is JSON-serialised with json_serializer.
-# Authorization is included in Allow-Headers because Cognito sends a Bearer token.
-# ------------------------------------------------------------------------------
-def api_response(status, body):
+# ==========================================================
+# 🌐 STANDARD RESPONSE FORMAT (CORS ENABLED)
+# ==========================================================
+
+def response(status, body):
+    """
+    Standard API response with CORS headers
+    """
+
     return {
         "statusCode": status,
         "headers": {
-            "Access-Control-Allow-Origin":  "*",
+            "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "Content-Type,Authorization",
             "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
         },
@@ -91,80 +95,92 @@ def api_response(status, body):
     }
 
 
-# ------------------------------------------------------------------------------
-# lambda_handler()
-# Main entry point called by API Gateway for every request.
-#
-# Flow:
-#   1. Handle browser CORS preflight (OPTIONS)
-#   2. Extract employee_id from Cognito JWT claims (no body needed)
-#   3. Query the employees table
-#   4. Return the profile or a 404 if the employee is not found
-# ------------------------------------------------------------------------------
+# ==========================================================
+# 🚀 LAMBDA HANDLER (SECURE VERSION)
+# ==========================================================
+
 def lambda_handler(event, context):
+    """
+    🔐 SECURE API — Employee Profile
+
+    ✔ Uses Cognito Authorizer
+    ✔ Extracts employee_id from JWT
+    ✔ No request body needed
+
+    Flow:
+    Client → API Gateway → Cognito Authorizer → Lambda
+    """
 
     try:
 
-        # ----------------------------------------------------------------------
-        # STEP 1 — Handle CORS preflight
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------
+        # 🟡 HANDLE CORS PREFLIGHT
+        # --------------------------------------------------
+
         if event.get("httpMethod") == "OPTIONS":
-            return api_response(200, {"message": "CORS preflight successful"})
+            return response(200, {"message": "CORS preflight successful"})
 
 
-        # ----------------------------------------------------------------------
-        # STEP 2 — Extract JWT claims injected by the Cognito Authorizer
-        #
-        # API Gateway validates the Bearer token, then populates:
-        #   event["requestContext"]["authorizer"]["claims"]
-        #
-        # The custom attribute "custom:employee_id" must be set on each
-        # Cognito user (in User Pool → Users → Attributes).
-        # ----------------------------------------------------------------------
-        claims = (
-            event
-            .get("requestContext", {})
-            .get("authorizer", {})
-            .get("claims", {})
-        )
+        # --------------------------------------------------
+        # 🔐 EXTRACT JWT CLAIMS (FROM API GATEWAY AUTHORIZER)
+        # --------------------------------------------------
+
+        claims = event.get("requestContext", {}) \
+                      .get("authorizer", {}) \
+                      .get("claims", {})
 
         if not claims:
-            return api_response(401, {"message": "Unauthorized — missing JWT claims"})
+            return response(401, {"message": "Unauthorized - Missing JWT claims"})
 
-        # Cast to int — Cognito custom attributes are always stored as strings
+
+        # --------------------------------------------------
+        # 🆔 EXTRACT EMPLOYEE ID FROM TOKEN
+        # --------------------------------------------------
+
         try:
             employee_id = int(claims.get("custom:employee_id"))
-        except (TypeError, ValueError):
-            return api_response(400, {"message": "Invalid employee_id in token"})
+        except:
+            return response(400, {"message": "Invalid employee_id in token"})
 
 
-        # ----------------------------------------------------------------------
-        # STEP 3 — Query employee profile
-        # Only expose the columns the portal needs — never SELECT *
-        # ----------------------------------------------------------------------
-        conn = get_connection()
+        # --------------------------------------------------
+        # 🗄️ DATABASE QUERY
+        # --------------------------------------------------
 
-        with conn.cursor() as cursor:
+        connection = get_connection()
+
+        with connection.cursor() as cursor:
+
             cursor.execute("""
                 SELECT employee_id, name, job_title, salary, start_date
-                FROM   employees
-                WHERE  employee_id = %s
+                FROM employees
+                WHERE employee_id=%s
             """, (employee_id,))
 
             employee = cursor.fetchone()
 
 
-        # ----------------------------------------------------------------------
-        # STEP 4 — Return result or 404
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------
+        # ❌ EMPLOYEE NOT FOUND
+        # --------------------------------------------------
+
         if not employee:
-            return api_response(404, {"message": "Employee not found"})
-
-        return api_response(200, employee)
+            return response(404, {"message": "Employee not found"})
 
 
-    # --------------------------------------------------------------------------
-    # Global error handler — returns 500 with the exception message
-    # --------------------------------------------------------------------------
+        # --------------------------------------------------
+        # ✅ SUCCESS RESPONSE
+        # --------------------------------------------------
+
+        return response(200, employee)
+
+
     except Exception as e:
-        return api_response(500, {"error": str(e)})
+
+        # --------------------------------------------------
+        # 💥 SERVER ERROR
+        # --------------------------------------------------
+
+        return response(500, {
+            "error": str(e)
+        })
