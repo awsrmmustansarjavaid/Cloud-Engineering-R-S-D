@@ -6,34 +6,31 @@ import datetime
 from decimal import Decimal
 
 # ==========================================================
-# SECRETS MANAGER CONFIGURATION
+# 🔐 SECRETS MANAGER CONFIGURATION
 # ==========================================================
-SECRET_NAME = "CafeDevDBSM"
+SECRET_NAME = os.environ.get("SECRET_NAME", "CafeDevDBSM")
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
+
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
 
 # ==========================================================
-# FETCH DATABASE SECRET
+# 🔑 FETCH DATABASE SECRET
 # ==========================================================
 def get_db_secret():
-    """
-    Fetch database credentials from AWS Secrets Manager
-    """
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
     return json.loads(response["SecretString"])
 
 # ==========================================================
-# DATABASE CONNECTION (REUSED ACROSS INVOCATIONS)
+# 🔌 DATABASE CONNECTION
 # ==========================================================
 connection = None
 
 def get_connection():
-    """
-    Reuse DB connection across Lambda invocations
-    """
     global connection
+
     if connection is None or not connection.open:
         secret = get_db_secret()
+
         connection = pymysql.connect(
             host=secret["host"],
             user=secret["username"],
@@ -43,15 +40,13 @@ def get_connection():
             connect_timeout=10,
             autocommit=True
         )
+
     return connection
 
 # ==========================================================
-# JSON SERIALIZER
+# 🔄 JSON SERIALIZER
 # ==========================================================
 def json_serializer(obj):
-    """
-    Converts Decimal and date/datetime objects to JSON-friendly formats.
-    """
     if isinstance(obj, Decimal):
         return float(obj)
     if isinstance(obj, (datetime.date, datetime.datetime)):
@@ -59,62 +54,67 @@ def json_serializer(obj):
     return str(obj)
 
 # ==========================================================
-# STANDARD RESPONSE FORMAT
+# 🌐 STANDARD RESPONSE
 # ==========================================================
 def response(status, body):
-    """
-    Standard API response with CORS headers
-    """
     return {
         "statusCode": status,
         "headers": {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+            "Access-Control-Allow-Headers": "Content-Type,Authorization",
+            "Access-Control-Allow-Methods": "POST,OPTIONS"
         },
         "body": json.dumps(body, default=json_serializer)
     }
 
 # ==========================================================
-# LAMBDA HANDLER
+# 🚀 LAMBDA HANDLER (SECURE VERSION)
 # ==========================================================
 def lambda_handler(event, context):
     """
-    Returns:
-    - Employee leave history
-    - Company holiday list
-    Expects JSON body:
-    { "employee_id": 1001 }
+    🔐 SECURE: Leaves & Holidays API
+
+    ✔ Uses Cognito Authorizer
+    ✔ Extracts employee_id from JWT
+    ✔ No request body needed
     """
+
     try:
-        # Handle CORS preflight
+
+        print("EVENT:", json.dumps(event))  # ✅ Logging
+
+        # --------------------------------------------------
+        # CORS PREFLIGHT
+        # --------------------------------------------------
         if event.get("httpMethod") == "OPTIONS":
-            return response(200, {"message": "CORS preflight successful"})
+            return response(200, {"message": "CORS OK"})
 
-        # Validate request body
-        if not event.get("body"):
-            return response(400, {"message": "Missing request body"})
+        # --------------------------------------------------
+        # 🔐 EXTRACT JWT CLAIMS
+        # --------------------------------------------------
+        claims = event.get("requestContext", {}) \
+                      .get("authorizer", {}) \
+                      .get("claims", {})
 
-        body = json.loads(event["body"])
-        employee_id = body.get("employee_id")
+        if not claims:
+            return response(401, {"message": "Unauthorized"})
 
-        # Validate employee_id exists
-        if employee_id is None:
-            return response(400, {"message": "employee_id is required"})
-
-        # ✅ Numeric validation
+        # --------------------------------------------------
+        # 🆔 GET EMPLOYEE ID FROM TOKEN
+        # --------------------------------------------------
         try:
-            employee_id = int(employee_id)
-        except (ValueError, TypeError):
-            return response(400, {"message": "employee_id must be a number"})
+            employee_id = int(claims.get("custom:employee_id"))
+        except:
+            return response(400, {"message": "Invalid employee_id in token"})
 
-        # ----------------------------------------
-        # DATABASE QUERY
-        # ----------------------------------------
+        # --------------------------------------------------
+        # 🗄️ DATABASE QUERY
+        # --------------------------------------------------
         connection = get_connection()
+
         with connection.cursor() as cursor:
 
-            # Fetch employee leaves
+            # Employee leaves
             cursor.execute("""
                 SELECT leave_date, leave_type
                 FROM leaves
@@ -123,7 +123,7 @@ def lambda_handler(event, context):
             """, (employee_id,))
             leaves = cursor.fetchall()
 
-            # Fetch company holidays
+            # Company holidays
             cursor.execute("""
                 SELECT holiday_date, description
                 FROM holidays
@@ -131,7 +131,6 @@ def lambda_handler(event, context):
             """)
             holidays = cursor.fetchall()
 
-        # Return combined response
         return response(200, {
             "leaves": leaves,
             "holidays": holidays
