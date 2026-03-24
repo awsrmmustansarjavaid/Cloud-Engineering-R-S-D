@@ -524,7 +524,17 @@ AND TABLE_NAME IN ('attendance','employees','holidays','leaves','orders')
 ORDER BY TABLE_NAME, ORDINAL_POSITION;
 ```
 
+### 🔍 Test timezone in RDS:
 
+```
+SELECT CONVERT_TZ(NOW(), '+00:00', '+05:00');
+```
+
+#### If result is:
+
+✅ correct time → good
+
+❌ NULL → timezone not loaded
 
 ###### ✅ If you see the row → DB is READY
 
