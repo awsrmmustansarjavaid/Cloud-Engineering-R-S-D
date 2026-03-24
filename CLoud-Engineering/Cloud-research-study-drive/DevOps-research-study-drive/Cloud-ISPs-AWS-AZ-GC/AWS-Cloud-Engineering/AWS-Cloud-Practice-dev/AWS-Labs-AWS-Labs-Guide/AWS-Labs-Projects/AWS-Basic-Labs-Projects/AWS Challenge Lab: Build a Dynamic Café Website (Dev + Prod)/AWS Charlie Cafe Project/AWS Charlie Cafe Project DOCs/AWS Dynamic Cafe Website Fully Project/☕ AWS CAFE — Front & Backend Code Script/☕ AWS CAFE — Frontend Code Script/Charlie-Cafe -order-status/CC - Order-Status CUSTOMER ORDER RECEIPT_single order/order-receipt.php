@@ -183,7 +183,7 @@ document.body.style.display = "block"; // show page
 // =========================================================
 // USE CONFIG.JS API BASE (from CHAIR_CONFIG)
 // =========================================================
-const apiBase = `${window.CHARLIE_CONFIG.API_BASE}/order-status`;
+const apiBase = `${window.CHARLIE_CONFIG.API_BASE}/cafe-order-status`;
 const orderId = document.getElementById('orderId').textContent;
 
 // Fetch order from API
