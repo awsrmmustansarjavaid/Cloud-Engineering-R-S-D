@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================
 # ☕ Charlie Cafe — FULL RDS Setup & Verification Script
-# Version: 8.0 (Production Ready)
+# Version: 8.1 (Production Ready)
 #
 # Features
 # ✔ Colored output
@@ -10,6 +10,7 @@
 # ✔ Creates database
 # ✔ Creates all tables
 # ✔ Inserts sample data for ALL tables
+# ✔ Adds order_id and payment_method columns with defaults
 # ✔ Shows schema of each table
 # ✔ Verifies table counts
 # ✔ Verifies foreign keys
@@ -217,6 +218,32 @@ EOF
 print_success "Sample data inserted"
 
 # =============================================================
+# ADD order_id AND payment_method COLUMNS
+# =============================================================
+print_header "Adding order_id and payment_method Columns"
+
+mysql --defaults-extra-file="$CREDENTIALS_FILE" "$DB_NAME" <<'EOF'
+-- 1️⃣ Add nullable order_id column first
+ALTER TABLE orders
+ADD COLUMN IF NOT EXISTS order_id VARCHAR(20) NULL AFTER id;
+
+-- 2️⃣ Generate order IDs for existing rows
+UPDATE orders
+SET order_id = CONCAT('ORD-', DATE_FORMAT(created_at, '%Y%m%d'), '-', LPAD(id,4,'0'))
+WHERE order_id IS NULL;
+
+-- 3️⃣ Make order_id NOT NULL and UNIQUE
+ALTER TABLE orders
+MODIFY COLUMN order_id VARCHAR(20) NOT NULL UNIQUE;
+
+-- 4️⃣ Add payment_method column with default CASH
+ALTER TABLE orders
+ADD COLUMN IF NOT EXISTS payment_method VARCHAR(20) DEFAULT 'CASH' AFTER status;
+EOF
+
+print_success "order_id and payment_method columns added and populated"
+
+# =============================================================
 # FINAL VERIFICATION
 # =============================================================
 print_header "RDS Verification Steps"
@@ -308,6 +335,7 @@ echo -e "${GREEN}✔ RDS Connection Successful${NC}"
 echo -e "${GREEN}✔ Database Created/Verified${NC}"
 echo -e "${GREEN}✔ Tables Created${NC}"
 echo -e "${GREEN}✔ Sample Data Inserted${NC}"
+echo -e "${GREEN}✔ order_id & payment_method Columns Added${NC}"
 echo -e "${GREEN}✔ Schemas Verified${NC}"
 echo -e "${GREEN}✔ Row Counts Verified${NC}"
 echo -e "${GREEN}✔ Analytics Queries Successful${NC}"
