@@ -169,7 +169,13 @@ body {
 <script src="/js/config.js"></script>
 
 <script>
+/* ========================== CONFIG ========================== */
+// Default timezone
 let selectedTimezone = "Asia/Karachi";
+
+// Session timer variables
+let sessionStart = null;
+let sessionInterval = null;
 
 /* ========================== LIVE CLOCK ========================== */
 function updateClock() {
@@ -181,11 +187,14 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 updateClock();
-document.getElementById("timezoneSelect").addEventListener("change", function(){ selectedTimezone = this.value; updateClock(); });
+
+// Update timezone
+document.getElementById("timezoneSelect").addEventListener("change", function(){
+    selectedTimezone = this.value; 
+    updateClock(); 
+});
 
 /* ========================== SESSION TIMER ========================== */
-let sessionStart = null;
-let sessionInterval = null;
 function startSessionTimer() {
     sessionStart = new Date();
     sessionInterval = setInterval(() => {
@@ -200,7 +209,14 @@ function startSessionTimer() {
 /* ========================== LATE CHECK-IN ========================== */
 function isLate() {
     const now = new Date();
-    return now.getHours() >= 10;
+    return now.getHours() >= 10; // Late if check-in >= 10 AM
+}
+
+/* ========================== SHOW STATUS MESSAGE ========================== */
+function showMessage(message, success = true) {
+    const msg = document.getElementById("statusMsg");
+    msg.innerText = message;
+    msg.style.color = success ? "lightgreen" : "tomato";
 }
 
 /* ========================== FINGERPRINT SCAN ========================== */
@@ -208,8 +224,8 @@ async function simulateScan() {
     const employeeIdInput = document.getElementById("employeeId").value.trim();
     const action = document.querySelector('input[name="attendanceMode"]:checked').value;
 
+    // Validation
     if (!employeeIdInput) { showMessage("❌ Enter Employee ID first", false); return; }
-
     const employeeId = parseInt(employeeIdInput, 10);
     if (isNaN(employeeId)) { showMessage("❌ Employee ID must be a number", false); return; }
 
@@ -217,9 +233,9 @@ async function simulateScan() {
 
     setTimeout(async () => {
         try {
-            // Use API Base from config.js
+            // Get API base from config.js
             const apiBase = window.CHARLIE_CONFIG.API_BASE;
-            const endpoint = `${apiBase}/attendance`;
+            const endpoint = `${apiBase}/attendance/${action}`; // ✅ Correct checkin/checkout path
 
             const payload = { employee_id: employeeId, action: action };
 
@@ -233,6 +249,7 @@ async function simulateScan() {
 
             if (!response.ok) throw new Error(result.message || "API error");
 
+            // Success messages
             if (action === "checkin") {
                 if (isLate()) showMessage("⚠️ Late Check-In recorded", false);
                 else showMessage("✅ Check-In Successful", true);
@@ -244,17 +261,11 @@ async function simulateScan() {
             }
 
         } catch (error) {
+            // Catch CORS or network issues
             showMessage("❌ Scan failed or API error: " + error.message, false);
             console.error("Attendance API error:", error);
         }
     }, 1500);
-}
-
-/* ========================== SHOW STATUS MESSAGE ========================== */
-function showMessage(message, success = true) {
-    const msg = document.getElementById("statusMsg");
-    msg.innerText = message;
-    msg.style.color = success ? "lightgreen" : "tomato";
 }
 </script>
 
