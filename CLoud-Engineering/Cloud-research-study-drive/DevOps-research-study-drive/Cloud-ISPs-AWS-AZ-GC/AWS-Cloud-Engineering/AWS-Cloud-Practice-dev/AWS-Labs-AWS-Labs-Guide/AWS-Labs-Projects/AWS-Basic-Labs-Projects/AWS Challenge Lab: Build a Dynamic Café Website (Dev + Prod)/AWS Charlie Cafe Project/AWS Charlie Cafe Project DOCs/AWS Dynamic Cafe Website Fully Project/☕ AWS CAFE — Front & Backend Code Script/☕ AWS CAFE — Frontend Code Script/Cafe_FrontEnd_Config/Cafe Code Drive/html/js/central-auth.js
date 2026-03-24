@@ -1,11 +1,12 @@
 /* =========================================================
-   CHARLIE CAFE — CENTRAL AUTH MODULE
+   CHARLIE CAFE — CENTRAL AUTH MODULE (FIXED)
    ---------------------------------------------------------
    ✔ Cognito Hosted UI Login (No login.html needed)
    ✔ Authorization Code Flow
    ✔ Auto Token Exchange
    ✔ Role-Based UI Control
    ✔ Auto Logout on Expiry
+   ✔ Fixed "https://" duplication bug
 ========================================================= */
 
 window.CHARLIE_AUTH = (() => {
@@ -14,33 +15,40 @@ window.CHARLIE_AUTH = (() => {
     const { getToken, isTokenExpired, parseJwt } = window.CHARLIE_UTILS;
 
     /* =====================================================
-       🔐 REDIRECT TO COGNITO HOSTED UI
+       🔐 HELPER — Build Cognito Login URL
+       -----------------------------------------------------
+       Ensures no double "https://" in URL
     ===================================================== */
-    function redirectToHostedLogin() {
-
+    function buildCognitoLoginUrl() {
+        // Remove https:// if user accidentally included it
+        let domain = CONFIG.COGNITO_DOMAIN.replace(/^https?:\/\//, "");
         const redirectUrl = window.location.origin + window.location.pathname;
 
-        const loginUrl =
-            `https://${CONFIG.COGNITO_DOMAIN}/login` +
+        return `https://${domain}/login` +
             `?response_type=code` +
             `&client_id=${CONFIG.CLIENT_ID}` +
             `&scope=openid+email+profile` +
             `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+    }
 
-        window.location.replace(loginUrl);
+    /* =====================================================
+       🔐 REDIRECT TO COGNITO HOSTED UI
+    ===================================================== */
+    function redirectToHostedLogin() {
+        window.location.replace(buildCognitoLoginUrl());
     }
 
     /* =====================================================
        🚪 LOGOUT
     ===================================================== */
     function logout() {
-
         localStorage.removeItem("access_token");
 
         const logoutRedirect = window.location.origin;
+        let domain = CONFIG.COGNITO_DOMAIN.replace(/^https?:\/\//, "");
 
         const logoutUrl =
-            `https://${CONFIG.COGNITO_DOMAIN}/logout` +
+            `https://${domain}/logout` +
             `?client_id=${CONFIG.CLIENT_ID}` +
             `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
 
@@ -51,18 +59,17 @@ window.CHARLIE_AUTH = (() => {
        🔁 HANDLE AUTHORIZATION CODE → TOKEN
     ===================================================== */
     async function handleRedirect() {
-
         const params = new URLSearchParams(window.location.search);
         const code = params.get("code");
 
         if (!code) return;
 
         try {
-
             const redirectUrl = window.location.origin + window.location.pathname;
+            let domain = CONFIG.COGNITO_DOMAIN.replace(/^https?:\/\//, "");
 
             const response = await fetch(
-                `https://${CONFIG.COGNITO_DOMAIN}/oauth2/token`,
+                `https://${domain}/oauth2/token`,
                 {
                     method: "POST",
                     headers: {
@@ -77,21 +84,15 @@ window.CHARLIE_AUTH = (() => {
                 }
             );
 
-            if (!response.ok) {
-                throw new Error("Token exchange failed");
-            }
+            if (!response.ok) throw new Error("Token exchange failed");
 
             const data = await response.json();
 
             if (data.access_token) {
                 localStorage.setItem("access_token", data.access_token);
 
-                // Clean URL
-                window.history.replaceState(
-                    {},
-                    document.title,
-                    window.location.pathname
-                );
+                // Clean URL (remove code query param)
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
 
         } catch (err) {
@@ -102,11 +103,10 @@ window.CHARLIE_AUTH = (() => {
 
     /* =====================================================
        🛡 PROTECT PAGE (AUTO LOGIN MODE)
-       - No login.html required
+       - No login.html needed
        - Automatically redirects to Hosted UI
     ===================================================== */
     async function protectPage() {
-
         // Hide page until auth completes
         document.body.style.display = "none";
 
@@ -127,7 +127,6 @@ window.CHARLIE_AUTH = (() => {
        👤 ROLE MANAGEMENT (UI ONLY)
     ===================================================== */
     function getUserRoles() {
-
         const token = getToken();
         if (!token) return [];
 
@@ -165,9 +164,7 @@ window.CHARLIE_AUTH = (() => {
        🔄 AUTO LOGOUT WATCHER
     ===================================================== */
     function startAutoLogoutWatcher() {
-
         setInterval(() => {
-
             const token = getToken();
             if (!token) return;
 
@@ -175,8 +172,7 @@ window.CHARLIE_AUTH = (() => {
                 alert("Session expired");
                 logout();
             }
-
-        }, 30000);
+        }, 30000); // check every 30 seconds
     }
 
     return {
