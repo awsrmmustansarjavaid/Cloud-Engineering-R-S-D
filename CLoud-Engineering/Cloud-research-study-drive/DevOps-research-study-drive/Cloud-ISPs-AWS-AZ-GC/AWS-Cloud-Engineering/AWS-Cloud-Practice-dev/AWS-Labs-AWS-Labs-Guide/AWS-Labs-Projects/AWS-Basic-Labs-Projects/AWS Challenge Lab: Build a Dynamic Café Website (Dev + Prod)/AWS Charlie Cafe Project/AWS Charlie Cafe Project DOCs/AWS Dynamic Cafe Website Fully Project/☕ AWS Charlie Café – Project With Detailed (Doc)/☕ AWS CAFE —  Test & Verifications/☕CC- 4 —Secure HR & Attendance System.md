@@ -314,6 +314,74 @@ WHERE cognito_user_id = @cognito_user_id;
 
 - You get a SELECT output before and after insertion for verification.
 
+### ✅ 🔥 Single Verification Query (BEST)
+
+#### Use this:
+
+```
+SELECT 
+    cognito_user_id,
+    name,
+    job_title,
+    salary,
+    start_date,
+    CASE 
+        WHEN COUNT(*) > 0 THEN '✅ RECORD EXISTS'
+        ELSE '❌ NOT FOUND'
+    END AS status
+FROM employees
+WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+```
+
+### 💡 What this does
+
+✔ Shows employee data
+
+✔ Confirms if record exists
+
+✔ Gives clear status (EXISTS / NOT FOUND)
+
+✔ Works perfectly for your Cognito → RDS integration testing
+
+### ✅ Even Cleaner (Production Style)
+
+If you just want a simple check:
+
+```
+SELECT EXISTS (
+    SELECT 1 
+    FROM employees 
+    WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962'
+) AS employee_exists;
+```
+
+👉 Output:
+
+1 = ✅ Exists
+0 = ❌ Not exists
+
+### 🚀 Bonus (Best for your HR System API)
+
+This is what your Lambda/API should use:
+
+```
+SELECT name, job_title, salary
+FROM employees
+WHERE cognito_user_id = '74e8a458-a011-700d-dcdb-df9692b61962';
+```
+
+👉 This is exactly how your Cognito-authenticated user fetches profile data
+
+### 🔥 Pro DevOps Tip
+
+For debugging your full pipeline:
+
+```
+SELECT COUNT(*) AS total_employees FROM employees;
+```
+
+👉 Confirms DB is populated correctly
+
 
 **✅ PHASE 1️⃣ STATUS**
 
