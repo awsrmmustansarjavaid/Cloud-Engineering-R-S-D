@@ -559,6 +559,23 @@ Response body (example):
 }
 ```
 
+### ✅ 3. Test via curl (CORRECT WAY)
+
+```
+curl -X POST "https://1kbgj4vpi9.execute-api.us-east-1.amazonaws.com/prod/admin/mark-paid" \
+-H "Content-Type: application/json" \
+-d '{"order_id": "ORD-123456"}'
+```
+
+#### ✅ 4. Expected Response
+
+```
+{
+  "success": true,
+  "message": "Order ORD-123456 marked as PAID successfully"
+}
+```
+
 **If this works → API Gateway is configured correctly**
 
 ### COMMON MISTAKES (READ CAREFULLY)
