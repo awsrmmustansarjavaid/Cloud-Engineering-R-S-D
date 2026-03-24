@@ -1081,14 +1081,14 @@ or AWS Systems Manager Parameter Store
 Once fixed:
 
 ✅ Cognito login works
+
 ✅ JWT token generated
+
 ✅ API Gateway accepts request
+
 ✅ Lambda gets user identity
+
 ✅ RDS query works
-
-
-
-
 
 👉 Copy the IdToken
 
@@ -1108,11 +1108,6 @@ curl -X POST https://1kbgj4vpi9.execute-api.us-east-1.amazonaws.com/prod/employe
 | Refresh Token | NOT used here          |
 
 👉 Use ID Token for your case
-
-
-
-
-
 
 
 #### ✅ API Gateway console is the fastest for functional verification.
