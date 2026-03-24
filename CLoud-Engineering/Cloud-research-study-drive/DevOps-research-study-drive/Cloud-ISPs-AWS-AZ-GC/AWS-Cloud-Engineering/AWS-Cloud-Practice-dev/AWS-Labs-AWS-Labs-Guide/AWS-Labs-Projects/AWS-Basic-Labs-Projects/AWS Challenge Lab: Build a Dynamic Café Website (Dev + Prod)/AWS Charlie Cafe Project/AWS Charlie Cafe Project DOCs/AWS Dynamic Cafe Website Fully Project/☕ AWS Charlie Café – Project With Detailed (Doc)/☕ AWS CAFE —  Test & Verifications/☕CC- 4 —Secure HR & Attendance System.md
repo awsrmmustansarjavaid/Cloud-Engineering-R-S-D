@@ -812,35 +812,216 @@ Status: 200
 }
 ```
 
-### 5️⃣ Test /exchange-token
+### 5️⃣ Test with REAL Token (CRITICAL)
 
-#### 1️⃣ Body:
+#### When calling API:
 
 ```
-{
- "code":"TEST_AUTH_CODE"
-}
+curl -X POST https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/employee-profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
+
+👉 If token missing → ❌ 401 Unauthorized
+
+👉 If working → ✅ Lambda gets user info
 
 #### ✅ Expected:
 
 ```
-500
+{"message":"Unauthorized"}
 ```
 
-#### 2️⃣ Body:
+this is exactly the right test 👍 means Cognito Authorizer is working, but your request is missing a valid JWT token ❌
+
+### 🔴 Why You're Getting Unauthorized
+
+You used:
+
+```
+-H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+👉 YOUR_JWT_TOKEN is just a placeholder → not a real token
+So API Gateway correctly blocks it.
+
+### ✅ What You Need (Real Token Flow)
+
+You must:
+
+### 1️⃣ Login via Cognito → get JWT
+
+#### You need:
+
+ID Token (most common)
+OR
+Access Token
+
+### 🔥 How to Get REAL JWT Token
+
+### ✅ Option 1 — Using AWS CLI (BEST for you)
+
+#### Run:
+
+```
+aws cognito-idp initiate-auth \
+  --auth-flow USER_PASSWORD_AUTH \
+  --client-id YOUR_APP_CLIENT_ID \
+  --auth-parameters USERNAME=your_user,PASSWORD=your_password
+```
+
+#### ✅ Output will look like:
 
 ```
 {
- "error":"HTTP Error 400: Bad Request"
+  "AuthenticationResult": {
+    "IdToken": "eyJraWQiOiJLT1...",
+    "AccessToken": "eyJraWQiOiJLT1...",
+    "RefreshToken": "eyJjdHkiOiJKV1Qi..."
+  }
 }
 ```
 
-#### ✅ This confirms:
+### 1️⃣ Get REAL App Client ID
 
-✅ API → Lambda works
+Go to:
 
-✅ Lambda → Cognito works
+👉 AWS Console → Cognito → User Pools
+👉 Select your pool
+👉 Go to App integration tab
+👉 Scroll to App clients
+
+You’ll see something like:
+
+```
+App client name: charlie-cafe-client
+App client ID: 4h7k2abc123xyz...
+```
+
+👉 Copy that App client ID
+
+### ⚠️ IMPORTANT CHECK
+
+Click your App Client and confirm:
+
+✅ Enable username-password auth (USER_PASSWORD_AUTH) is enabled
+
+If NOT:
+
+Edit App Client
+Enable:
+
+✔ ALLOW_USER_PASSWORD_AUTH
+
+✔ ALLOW_REFRESH_TOKEN_AUTH
+
+### 2️⃣ Run Command with REAL Values
+
+#### Replace everything properly:
+
+```
+aws cognito-idp initiate-auth \
+  --auth-flow USER_PASSWORD_AUTH \
+  --client-id 4h7k2abc123xyz \
+  --auth-parameters USERNAME=ali,PASSWORD=YourPassword123!
+```
+
+### 3️⃣ Expected Output
+
+```
+{
+  "AuthenticationResult": {
+    "IdToken": "eyJraWQiOiJ...",
+    "AccessToken": "eyJraWQiOiJ...",
+    "RefreshToken": "eyJ..."
+  }
+}
+```
+
+### 4️⃣ Call API with REAL Token
+
+```
+curl -X POST https://1kbgj4vpi9.execute-api.us-east-1.amazonaws.com/prod/employee-profile \
+  -H "Authorization: Bearer eyJraWQiOiJ..."
+```
+
+### 🔥 — this means your Cognito setup is working correctly, but you’ve hit a normal first-time login flow:
+
+```
+"ChallengeName": "NEW_PASSWORD_REQUIRED"
+```
+
+### 🔴 What This Means
+
+👉 Cognito is saying:
+
+“User must change password before getting JWT token”
+
+This happens when:
+
+User is created manually (Admin create user)
+Temporary password is used
+
+### ✅ Fix: Complete the Challenge (Set New Password)
+
+You must respond to this challenge using the Session you received.
+
+### 🔥 Step 1 — Run this command
+
+```
+aws cognito-idp respond-to-auth-challenge \
+  --client-id 3aag3bskuclv4t4rq2n6dai8uq \
+  --challenge-name NEW_PASSWORD_REQUIRED \
+  --challenge-responses USERNAME=ali,NEW_PASSWORD=YourNewPassword123! \
+  --session "PASTE_YOUR_SESSION_HERE"
+```
+
+#### 👉 Replace:
+
+YourNewPassword123! → new strong password
+PASTE_YOUR_SESSION_HERE → from your previous output
+
+### ✅ Step 2 — Expected Output
+
+```
+{
+  "AuthenticationResult": {
+    "IdToken": "eyJraWQiOiJ...",
+    "AccessToken": "eyJraWQiOiJ...",
+    "RefreshToken": "eyJ..."
+  }
+}
+```
+
+
+
+
+
+
+
+
+👉 Copy the IdToken
+
+### ✅ Step 2 — Call API with REAL token
+
+```
+curl -X POST https://1kbgj4vpi9.execute-api.us-east-1.amazonaws.com/prod/employee-profile \
+  -H "Authorization: Bearer YOUR_REAL_ID_TOKEN"
+```
+
+### 🧠 Important: Which Token to Use?
+
+| Token         | Use Case               |
+| ------------- | ---------------------- |
+| ID Token ✅    | Best for user identity |
+| Access Token  | API authorization      |
+| Refresh Token | NOT used here          |
+
+👉 Use ID Token for your case
+
+
+
+
+
 
 
 #### ✅ API Gateway console is the fastest for functional verification.
