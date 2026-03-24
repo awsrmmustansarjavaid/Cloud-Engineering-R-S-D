@@ -1504,6 +1504,21 @@ Returns:
 attendance_dynamo → only that specific date record
 ```
 
+### 🌐 Insert fake data into RDS
+
+Run this:
+
+```
+INSERT INTO attendance (employee_id, attendance_date, checkin_time, checkout_time)
+VALUES
+(3, CURDATE(), '09:05', '17:15'),
+(4, CURDATE(), '08:55', '17:05');
+```
+
+
+
+
+
 ### 🚨 COMMON ERRORS & WHY
 
 | Error            | Reason                  |
@@ -1538,6 +1553,7 @@ RDS (MySQL)
 ↓
 DynamoDB (CafeAttendance)
 ```
+
 
 
 
