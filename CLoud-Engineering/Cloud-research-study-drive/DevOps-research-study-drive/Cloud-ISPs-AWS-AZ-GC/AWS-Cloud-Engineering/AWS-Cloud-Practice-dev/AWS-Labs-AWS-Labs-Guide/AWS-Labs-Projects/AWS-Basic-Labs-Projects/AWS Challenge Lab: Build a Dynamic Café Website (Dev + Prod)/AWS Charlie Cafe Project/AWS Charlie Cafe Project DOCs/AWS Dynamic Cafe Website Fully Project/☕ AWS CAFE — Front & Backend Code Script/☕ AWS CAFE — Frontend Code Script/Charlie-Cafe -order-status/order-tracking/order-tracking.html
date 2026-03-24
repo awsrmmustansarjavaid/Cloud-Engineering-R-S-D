@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Tracking</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+  text-align: center;
+  padding: 30px;
+}
+
+h2 {
+  margin-bottom: 30px;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 40px auto;
+  max-width: 700px;
+  position: relative;
+}
+
+/* Line */
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: #ddd;
+  z-index: 0;
+}
+
+/* Progress bar */
+.progress {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 5px;
+  background: #28a745;
+  width: 0%;
+  z-index: 1;
+  transition: width 1s ease;
+}
+
+/* Steps */
+.step {
+  position: relative;
+  z-index: 2;
+  background: white;
+  border: 3px solid #ccc;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  line-height: 45px;
+  font-size: 20px;
+  color: #ccc;
+  transition: all 0.4s ease;
+}
+
+.step.active {
+  border-color: #28a745;
+  color: #28a745;
+  transform: scale(1.2);
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Status text */
+#statusText {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% { transform: scale(1.2); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1.2); }
+}
+
+.step.active:last-child {
+  animation: pulse 1s infinite;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>🍔 Order Tracking</h2>
+
+<div class="timeline">
+  <div class="progress" id="progressBar"></div>
+
+  <div class="container">
+    <div class="step" id="step0">✔</div>
+    <div class="label">Placed</div>
+  </div>
+
+  <div class="container">
+    <div class="step" id="step1">👨‍🍳</div>
+    <div class="label">Preparing</div>
+  </div>
+
+  <div class="container">
+    <div class="step" id="step2">🚴</div>
+    <div class="label">On the Way</div>
+  </div>
+
+  <div class="container">
+    <div class="step" id="step3">🏁</div>
+    <div class="label">Delivered</div>
+  </div>
+</div>
+
+<div id="statusText">Waiting for update...</div>
+
+<script>
+// ============================
+// CONFIG
+// ============================
+const ORDER_ID = "123"; // dynamically set this
+const WEBSOCKET_URL = "wss://YOUR-WS-API.execute-api.region.amazonaws.com/prod";
+const API_URL = "https://YOUR-REST-API/order-status?order_id=" + ORDER_ID;
+
+// ============================
+// STATUS FLOW
+// ============================
+const steps = ["PLACED", "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED"];
+
+// ============================
+// UI UPDATE FUNCTION
+// ============================
+function updateUI(status) {
+  const index = steps.indexOf(status);
+
+  // Update steps
+  steps.forEach((step, i) => {
+    const el = document.getElementById("step" + i);
+    if (i <= index) {
+      el.classList.add("active");
+    } else {
+      el.classList.remove("active");
+    }
+  });
+
+  // Update progress bar
+  const percent = ((index + 1) / steps.length) * 100;
+  document.getElementById("progressBar").style.width = percent + "%";
+
+  // Status text
+  document.getElementById("statusText").innerText = "Status: " + status;
+}
+
+// ============================
+// WEBSOCKET (REAL-TIME)
+// ============================
+function connectWebSocket() {
+  try {
+    const socket = new WebSocket(WEBSOCKET_URL);
+
+    socket.onopen = () => {
+      console.log("WebSocket connected");
+    };
+
+    socket.onmessage = (event) => {
+      console.log("Received:", event.data);
+      const data = JSON.parse(event.data);
+      if (data.status) {
+        updateUI(data.status);
+      }
+    };
+
+    socket.onerror = () => {
+      console.log("WebSocket error → fallback to polling");
+      startPolling();
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket closed → fallback to polling");
+      startPolling();
+    };
+
+  } catch (e) {
+    console.log("WS failed → fallback");
+    startPolling();
+  }
+}
+
+// ============================
+// POLLING FALLBACK
+// ============================
+function startPolling() {
+  setInterval(async () => {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      if (data.status) {
+        updateUI(data.status);
+      }
+    } catch (err) {
+      console.log("Polling error", err);
+    }
+  }, 3000);
+}
+
+// ============================
+// INIT
+// ============================
+connectWebSocket();
+
+</script>
+
+</body>
+</html>
