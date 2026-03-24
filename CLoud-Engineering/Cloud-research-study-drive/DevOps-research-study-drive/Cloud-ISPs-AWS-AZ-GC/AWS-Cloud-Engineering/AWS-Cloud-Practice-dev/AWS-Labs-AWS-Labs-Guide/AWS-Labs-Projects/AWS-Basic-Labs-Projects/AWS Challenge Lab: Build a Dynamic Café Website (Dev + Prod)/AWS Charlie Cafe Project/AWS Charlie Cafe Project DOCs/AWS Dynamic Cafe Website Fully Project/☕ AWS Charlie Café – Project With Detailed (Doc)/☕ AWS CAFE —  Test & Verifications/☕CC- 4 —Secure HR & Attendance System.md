@@ -812,7 +812,147 @@ Status: 200
 }
 ```
 
-### 5️⃣ Test with REAL Token (CRITICAL)
+#### ✅ API Gateway console is the fastest for functional verification.
+
+### 2️⃣ Testing from EC2 CLI using curl
+
+Important: Your endpoints are protected with Cognito Authorizer, so Authorization header is required.
+
+### 1️⃣ Test Attendance
+
+#### 1️⃣ Check-in:
+
+```
+curl -X POST $API_URL/attendance \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001","action":"checkin"}'
+```
+
+#### Expected:
+
+```
+{"message":"Check-in successful"}
+```
+
+#### 2️⃣ Checkout:
+
+```
+curl -X POST $API_URL/attendance \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001","action":"checkout"}'
+```
+
+#### Expected:
+
+```
+{"message":"Check-out successful"}
+```
+
+### 2️⃣ Test Employee Profile
+
+```
+curl -X POST $API_URL/employee-profile \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001"}'
+```
+
+#### Expected:
+
+JSON employee data.
+
+### 3️⃣ Test Attendance History
+
+```
+curl -X POST $API_URL/attendance-history \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001"}'
+```
+
+#### Expected:
+
+JSON array of attendance records.
+
+### 4️⃣ Test Leaves & Holidays
+
+```
+curl -X POST $API_URL/leaves-holidays \
+-H "Content-Type: application/json" \
+-d '{"employee_id":"EMP001"}'
+```
+
+#### ✅ Expected:
+
+```
+{"leaves":[...],"holidays":[...]}
+```
+
+### 5️⃣ Test /exchange-token
+
+```
+curl -X POST https://cdnky6qicd.execute-api.us-east-1.amazonaws.com/prod/exchange-token \
+-H "Content-Type: application/json" \
+-d '{"code":"TEST_AUTH_CODE"}'
+```
+
+#### ✅ Expected:
+
+```
+{
+ "error": "HTTP Error 400: Bad Request"
+}
+```
+
+#### 📢 Again this is correct because code is fake.
+
+### ✅ If Something Fails
+
+#### If 500 Error
+
+- Go to:  
+
+CloudWatch → Log groups →
+/aws/lambda/hr-attendance
+(or respective lambda)
+
+- Check error message.
+
+#### If 403 Forbidden
+
+- Check API deployed to correct stage
+
+- Check correct URL
+
+- Ensure Lambda permission added
+
+- If CORS error (frontend only)
+
+- Your Lambda headers already allow:
+
+```
+Access-Control-Allow-Origin: *
+```
+
+So you are safe.
+
+### 🎯 FINAL CONFIRMATION CHECKLIST
+
+| Item                          | Status |
+| ----------------------------- | ------ |
+| All endpoints use POST        | ✅      |
+| Lambda Proxy enabled          | ✅      |
+| CORS OPTIONS added            | ✅      |
+| API deployed to prod          | ✅      |
+| EC2 can access HTTPS outbound | ✅      |
+
+### 🚀 Architecture Status
+
+You now have a clean architecture:
+
+Client → API Gateway (REST Regional) → Lambda → RDS → Secrets Manager
+
+This is production-grade design.
+
+### 🌐 Test with REAL Token (CRITICAL)
 
 #### When calling API:
 
@@ -1108,150 +1248,6 @@ curl -X POST https://1kbgj4vpi9.execute-api.us-east-1.amazonaws.com/prod/employe
 | Refresh Token | NOT used here          |
 
 👉 Use ID Token for your case
-
-
-#### ✅ API Gateway console is the fastest for functional verification.
-
-### 2️⃣ Testing from EC2 CLI using curl
-
-Important: Your endpoints are protected with Cognito Authorizer, so Authorization header is required.
-
-### 1️⃣ Test Attendance
-
-#### 1️⃣ Check-in:
-
-```
-curl -X POST $API_URL/attendance \
--H "Content-Type: application/json" \
--d '{"employee_id":"EMP001","action":"checkin"}'
-```
-
-#### Expected:
-
-```
-{"message":"Check-in successful"}
-```
-
-#### 2️⃣ Checkout:
-
-```
-curl -X POST $API_URL/attendance \
--H "Content-Type: application/json" \
--d '{"employee_id":"EMP001","action":"checkout"}'
-```
-
-#### Expected:
-
-```
-{"message":"Check-out successful"}
-```
-
-### 2️⃣ Test Employee Profile
-
-```
-curl -X POST $API_URL/employee-profile \
--H "Content-Type: application/json" \
--d '{"employee_id":"EMP001"}'
-```
-
-#### Expected:
-
-JSON employee data.
-
-### 3️⃣ Test Attendance History
-
-```
-curl -X POST $API_URL/attendance-history \
--H "Content-Type: application/json" \
--d '{"employee_id":"EMP001"}'
-```
-
-#### Expected:
-
-JSON array of attendance records.
-
-### 4️⃣ Test Leaves & Holidays
-
-```
-curl -X POST $API_URL/leaves-holidays \
--H "Content-Type: application/json" \
--d '{"employee_id":"EMP001"}'
-```
-
-#### ✅ Expected:
-
-```
-{"leaves":[...],"holidays":[...]}
-```
-
-### 5️⃣ Test /exchange-token
-
-```
-curl -X POST https://cdnky6qicd.execute-api.us-east-1.amazonaws.com/prod/exchange-token \
--H "Content-Type: application/json" \
--d '{"code":"TEST_AUTH_CODE"}'
-```
-
-#### ✅ Expected:
-
-```
-{
- "error": "HTTP Error 400: Bad Request"
-}
-```
-
-#### 📢 Again this is correct because code is fake.
-
-
-
-
-### ✅ If Something Fails
-
-#### If 500 Error
-
-- Go to:  
-
-CloudWatch → Log groups →
-/aws/lambda/hr-attendance
-(or respective lambda)
-
-- Check error message.
-
-#### If 403 Forbidden
-
-- Check API deployed to correct stage
-
-- Check correct URL
-
-- Ensure Lambda permission added
-
-- If CORS error (frontend only)
-
-- Your Lambda headers already allow:
-
-```
-Access-Control-Allow-Origin: *
-```
-
-So you are safe.
-
-### 🎯 FINAL CONFIRMATION CHECKLIST
-
-| Item                          | Status |
-| ----------------------------- | ------ |
-| All endpoints use POST        | ✅      |
-| Lambda Proxy enabled          | ✅      |
-| CORS OPTIONS added            | ✅      |
-| API deployed to prod          | ✅      |
-| EC2 can access HTTPS outbound | ✅      |
-
-### 🚀 Architecture Status
-
-You now have a clean architecture:
-
-Client → API Gateway (REST Regional) → Lambda → RDS → Secrets Manager
-
-This is production-grade design.
 
 
 **✅ PHASE 3️⃣ STATUS**
