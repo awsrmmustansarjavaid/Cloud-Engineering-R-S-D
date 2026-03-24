@@ -1032,7 +1032,59 @@ This proves:
 
 ✅ You’re 1 step away from full system
 
+### 🔥 Common Mistakes (YOU are hitting these)
 
+#### ❌ Wrong client ID
+
+→ Fix: copy from Cognito console
+
+#### ❌ User not created in Cognito
+
+→ Fix: create user or sign up
+
+#### ❌ Wrong password
+
+→ Fix: reset password / confirm user
+
+### 🧠 Quick Debug Commands
+
+#### List user pools
+
+```
+aws cognito-idp list-user-pools --max-results 10
+```
+
+#### List app clients
+
+```
+aws cognito-idp list-user-pool-clients \
+  --user-pool-id YOUR_POOL_ID
+```
+
+### 🚀 Pro DevOps Tip (VERY IMPORTANT)
+
+For your project:
+
+👉 Never hardcode credentials
+👉 Store:
+
+App Client ID
+User Pool ID
+
+inside:
+
+.env
+or AWS Systems Manager Parameter Store
+
+### ✅ Final Outcome
+
+Once fixed:
+
+✅ Cognito login works
+✅ JWT token generated
+✅ API Gateway accepts request
+✅ Lambda gets user identity
+✅ RDS query works
 
 
 
