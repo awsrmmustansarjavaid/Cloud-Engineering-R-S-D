@@ -7584,6 +7584,13 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
 [cafe-attendance-admin-service.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/Cafe-HR%20%26%20Attendance%20System/cafe-attendance-admin-service.py)
 
+### 🌐 Environment Variables
+
+| Key              | Value            |
+|------------------|------------------|
+| DYNAMODB_TABLE   | CafeAttendance   |
+
+
 ### 3️⃣ —API Gateway Configuration
 
 - Resource Structure: /hr-analytics
