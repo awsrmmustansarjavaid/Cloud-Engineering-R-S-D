@@ -1289,14 +1289,60 @@ Example item inserted later:
 
 ```
 {
-  "employee_id": "101",
-  "date": "2026-02-01",
-  "check_in": "09:03",
-  "check_out": "17:11",
-  "role": "Employee"
+  "employee_id": { "S": "101" },
+  "date": { "S": "2026-02-01" },
+  "check_in": { "S": "09:03" },
+  "check_out": { "S": "17:11" },
+  "role": { "S": "Employee" }
 }
 ```
 
+👉 "S" = String
+
+👉 "N" = Number
+
+### 🔥 Important (VERY IMPORTANT)
+
+#### Your table requires:
+
+employee_id ✅ (Partition key)
+date ✅ (Sort key)
+
+If you miss these → insert will fail.
+
+### 🚀 Best Practice (for your project)
+
+Since you're using Lambda + Python (boto3):
+
+👉 Always use normal JSON (Option 1)
+
+👉 boto3 automatically converts it
+
+### 💡 Bonus Tip (for your HR system)
+
+Later your Lambda will insert like this:
+
+```
+dynamo_table.put_item(
+    Item={
+        "employee_id": "101",
+        "date": "2026-02-01",
+        "check_in": "09:03",
+        "check_out": "17:11",
+        "role": "Employee"
+    }
+)
+```
+
+No typed JSON needed ✅
+
+### ✅ Summary
+
+| Issue               | Fix                     |
+| ------------------- | ----------------------- |
+| Error: Expected '{' | Using wrong JSON format |
+| Solution 1          | Switch to Simple JSON   |
+| Solution 2          | Use `"S"` typed format  |
 
 
 **✅ PHASE 8️⃣ STATUS**
