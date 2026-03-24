@@ -130,7 +130,7 @@ body {
                 <a class="nav-link active" href="orders.php">🛒 Place Order</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="order-status.html">📦 Track Order</a>
+                <a class="nav-link" href="order-receipt.php">📦 Track Order</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="price-list.html">📋 Menu</a>
@@ -220,7 +220,7 @@ async function sendOrderToBackend(paymentMethod){
             document.getElementById("lambda-total").innerText = "$" + result.total;
 
             setTimeout(()=>{
-                window.location.href = "order-status.php?order_id=" + result.order_id;
+                window.location.href = "order-receipt.php?order_id=" + result.order_id;
             },1500);
 
         } else {
