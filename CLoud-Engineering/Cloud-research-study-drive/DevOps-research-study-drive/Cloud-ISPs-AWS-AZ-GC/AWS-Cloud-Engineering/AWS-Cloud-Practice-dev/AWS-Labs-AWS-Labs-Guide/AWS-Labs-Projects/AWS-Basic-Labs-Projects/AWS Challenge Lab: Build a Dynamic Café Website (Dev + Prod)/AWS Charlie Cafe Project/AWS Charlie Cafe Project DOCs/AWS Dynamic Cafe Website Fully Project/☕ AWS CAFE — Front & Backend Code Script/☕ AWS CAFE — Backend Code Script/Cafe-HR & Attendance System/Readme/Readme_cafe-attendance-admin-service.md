@@ -2363,21 +2363,21 @@ def lambda_handler(event, context):
 
 ### ✅ Key Fixes in This Version
 
-RDS attendance_date used instead of date — avoids SQL errors.
+- RDS attendance_date used instead of date — avoids SQL errors.
 
-Date filter builder updated for daily/weekly/monthly.
+- Date filter builder updated for daily/weekly/monthly.
 
-Optional employee filter supported.
+- Optional employee filter supported.
 
-Pakistan timezone applied with get_pk_date().
+- Pakistan timezone applied with get_pk_date().
 
-Summary calculation aligned to attendance_date.
+- Summary calculation aligned to attendance_date.
 
-DynamoDB optional query works safely if configured.
+- DynamoDB optional query works safely if configured.
 
-Full CORS headers for frontend requests.
+- Full CORS headers for frontend requests.
 
-Well-commented, production-ready.
+- Well-commented, production-ready.
 
 ---
 ### cafe-attendance-admin-service.py
