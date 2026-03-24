@@ -891,6 +891,8 @@ That is enough.
 
 - Create new:
 
+  - Name: Cognito-Authorizer
+
   - Type: Cognito
 
   - User Pool: your pool
