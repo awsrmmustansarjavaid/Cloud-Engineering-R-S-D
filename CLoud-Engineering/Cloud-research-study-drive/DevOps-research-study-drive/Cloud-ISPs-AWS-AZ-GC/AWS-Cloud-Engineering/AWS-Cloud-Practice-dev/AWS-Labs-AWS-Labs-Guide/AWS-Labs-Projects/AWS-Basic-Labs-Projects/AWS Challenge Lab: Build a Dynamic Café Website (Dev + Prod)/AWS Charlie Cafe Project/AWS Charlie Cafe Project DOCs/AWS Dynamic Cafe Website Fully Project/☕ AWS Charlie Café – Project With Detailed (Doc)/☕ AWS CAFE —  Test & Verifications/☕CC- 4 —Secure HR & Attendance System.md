@@ -992,6 +992,45 @@ PASTE_YOUR_SESSION_HERE → from your previous output
 }
 ```
 
+### 🚀 Step 3 — Call Your API (NOW IT WILL WORK)
+
+```
+curl -X POST https://1kbgj4vpi9.execute-api.us-east-1.amazonaws.com/prod/employee-profile \
+  -H "Authorization: Bearer YOUR_ID_TOKEN"
+```
+
+### 🧠 Important Notes (VERY IMPORTANT)
+
+#### ✔ Use ID Token
+
+```
+Authorization: Bearer <IdToken>
+```
+
+#### ✔ Token expires (~1 hour)
+
+- If expired → login again
+
+#### ✔ Your Lambda will now receive:
+
+```
+event['requestContext']['authorizer']['claims']['sub']
+```
+
+👉 This = your cognito_user_id
+👉 Matches your RDS table ✅
+
+### 🔥 Why This is GOOD News
+
+This proves:
+
+✅ Cognito User Pool working
+
+✅ App Client working
+
+✅ Authentication flow working
+
+✅ You’re 1 step away from full system
 
 
 
