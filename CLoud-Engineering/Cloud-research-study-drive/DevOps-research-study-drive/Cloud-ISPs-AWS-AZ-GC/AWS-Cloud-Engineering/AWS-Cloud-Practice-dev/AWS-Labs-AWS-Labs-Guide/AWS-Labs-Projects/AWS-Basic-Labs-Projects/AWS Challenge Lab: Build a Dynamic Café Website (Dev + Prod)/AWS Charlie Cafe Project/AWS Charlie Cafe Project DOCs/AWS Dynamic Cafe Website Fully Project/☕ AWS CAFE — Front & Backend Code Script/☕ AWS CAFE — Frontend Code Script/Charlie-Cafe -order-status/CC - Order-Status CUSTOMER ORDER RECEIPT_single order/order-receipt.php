@@ -106,6 +106,70 @@ body {
     align-items: center;
 }
 
+/* ================= TRACKING TIMELINE ================= */
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 20px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    height: 5px;
+    background: #555;
+    z-index: 0;
+}
+
+.progress {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    height: 5px;
+    background: #28a745;
+    width: 0%;
+    z-index: 1;
+    transition: width 0.8s ease;
+}
+
+.container-step {
+    text-align: center;
+    z-index: 2;
+}
+
+.step {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 3px solid #777;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    color: #777;
+    transition: all 0.4s ease;
+}
+
+.step.active {
+    border-color: #28a745;
+    color: #28a745;
+    transform: scale(1.2);
+}
+
+/* Pulse on final step */
+.step.active:last-child {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1.2); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1.2); }
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width:768px){ .main-content { padding-top: 120px; } }
 </style>
@@ -149,6 +213,35 @@ body {
                 <strong>Status:</strong>
                 <span id="statusBadge" class="badge bg-secondary status-badge">Loading...</span>
             </p>
+
+            <!-- ================= ORDER TRACKING ================= -->
+            <div class="mt-4">
+                <h6 class="text-center mb-3">Order Progress</h6>
+
+                <div class="timeline">
+                    <div class="progress" id="progressBar"></div>
+
+                    <div class="container-step">
+                        <div class="step" id="step0">✔</div>
+                        <small>Received</small>
+                    </div>
+
+                    <div class="container-step">
+                        <div class="step" id="step1">👨‍🍳</div>
+                        <small>Preparing</small>
+                    </div>
+
+                    <div class="container-step">
+                        <div class="step" id="step2">📦</div>
+                        <small>Ready</small>
+                    </div>
+
+                    <div class="container-step">
+                        <div class="step" id="step3">🏁</div>
+                        <small>Completed</small>
+                    </div>
+                </div>
+            </div>
             <hr>
 
             <p class="fw-bold">
@@ -181,10 +274,30 @@ body {
 document.body.style.display = "block"; // show page
 
 // =========================================================
-// USE CONFIG.JS API BASE (from CHAIR_CONFIG)
+// USE CONFIG.JS API BASE (from CHARLIE_CONFIG)
 // =========================================================
 const apiBase = `${window.CHARLIE_CONFIG.API_BASE}/cafe-order-status`;
 const orderId = document.getElementById('orderId').textContent;
+
+// ================= TRACKING FLOW =================
+const trackingSteps = ["RECEIVED", "PREPARING", "READY", "COMPLETED"];
+
+function updateTrackingUI(status) {
+    const index = trackingSteps.indexOf(status);
+
+    trackingSteps.forEach((step, i) => {
+        const el = document.getElementById("step" + i);
+        if (i <= index) {
+            el.classList.add("active");
+        } else {
+            el.classList.remove("active");
+        }
+    });
+
+    // progress bar %
+    const percent = ((index + 1) / trackingSteps.length) * 100;
+    document.getElementById("progressBar").style.width = percent + "%";
+}
 
 // Fetch order from API
 async function fetchOrder() {
@@ -215,6 +328,9 @@ async function fetchOrder() {
         }
         statusBadge.textContent = order.status;
         statusBadge.className = `badge bg-${badge} status-badge`;
+
+        // Update tracking timeline
+        updateTrackingUI(order.status);
 
         // QR code with order URL
         new QRCode(document.getElementById("qrcode"), {
