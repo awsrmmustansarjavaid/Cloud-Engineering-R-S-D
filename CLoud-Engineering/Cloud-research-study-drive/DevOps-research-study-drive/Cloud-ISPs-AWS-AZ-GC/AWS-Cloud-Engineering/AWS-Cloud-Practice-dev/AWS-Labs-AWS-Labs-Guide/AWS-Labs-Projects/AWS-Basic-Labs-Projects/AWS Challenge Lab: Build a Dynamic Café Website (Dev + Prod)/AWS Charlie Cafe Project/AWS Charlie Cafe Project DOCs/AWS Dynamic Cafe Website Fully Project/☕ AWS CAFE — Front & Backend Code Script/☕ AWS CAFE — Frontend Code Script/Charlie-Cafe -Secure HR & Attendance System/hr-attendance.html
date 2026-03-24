@@ -5,7 +5,7 @@
 <title>HR Attendance Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Bootstrap -->
+<!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
@@ -43,22 +43,30 @@ body {
 
     <!-- ================= FILTER SECTION ================= -->
     <div class="row mb-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input id="employeeId"
                    class="form-control"
                    placeholder="Employee ID (optional)">
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input id="date"
                    type="date"
                    class="form-control">
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <button class="btn btn-primary w-100"
                     onclick="loadAttendance()">
                 Search
+            </button>
+        </div>
+
+        <div class="col-md-3">
+            <!-- NEW BUTTON TO FETCH DATA -->
+            <button class="btn btn-success w-100"
+                    onclick="fetchAttendanceFromBackend()">
+                Fetch Attendance (RDS)
             </button>
         </div>
     </div>
@@ -90,10 +98,9 @@ body {
 <script>
 
 /* =====================================================
-   🔐 AUTHENTICATION (CORRECTED)
+   🔐 AUTHENTICATION
    - Uses CHARLIE_AUTH
-   - Protects page
-   - Shows page only after valid login
+   - Protects page and shows page only after login
 ===================================================== */
 async function initPage() {
     await CHARLIE_AUTH.protectPage();
@@ -111,12 +118,11 @@ async function initPage() {
 
 initPage();
 
-
 /* =====================================================
-   📊 LOAD ATTENDANCE (CORRECTED)
-   - Calls admin analytics endpoint
-   - Uses GET with query parameters
-   - Reads attendance_rds from response
+   📊 LOAD ATTENDANCE
+   - Uses query filters from input fields
+   - Default: type=daily
+   - Renders RDS data in table
 ===================================================== */
 async function loadAttendance() {
 
@@ -128,13 +134,33 @@ async function loadAttendance() {
         // Build query string dynamically
         let url = `${CHARLIE_CONFIG.API_BASE}/hr-analytics?type=daily`;
 
-        if (empId) {
-            url += `&employee_id=${encodeURIComponent(empId)}`;
+        if (empId) url += `&employee_id=${encodeURIComponent(empId)}`;
+        if (date) url += `&date=${encodeURIComponent(date)}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(await response.text());
         }
 
-        if (date) {
-            url += `&date=${encodeURIComponent(date)}`;
-        }
+        const data = await response.json();
+        renderAttendanceTable(data.attendance_rds);
+
+    } catch (err) {
+        console.error("❌ Failed to load attendance:", err);
+        alert("Failed to load attendance. Check console.");
+    }
+}
+
+/* =====================================================
+   🟢 NEW: FETCH ATTENDANCE FROM BACKEND
+   - Fetches all attendance without filters
+   - Useful for testing or admin purposes
+===================================================== */
+async function fetchAttendanceFromBackend() {
+    try {
+        // API call with no filters to get all data
+        let url = `${CHARLIE_CONFIG.API_BASE}/hr-analytics?type=daily`;
 
         const response = await fetch(url);
 
@@ -144,44 +170,49 @@ async function loadAttendance() {
 
         const data = await response.json();
 
-        const tbody = document.getElementById("attendanceTable");
-        tbody.innerHTML = "";
-
-        // Use RDS data
-        const records = data.attendance_rds || [];
-
-        if (records.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center">
-                        No records found
-                    </td>
-                </tr>`;
-            return;
-        }
-
-        records.forEach(row => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${row.employee_id}</td>
-                    <td>${row.date}</td>
-                    <td>${row.checkin_time || "-"}</td>
-                    <td>${row.checkout_time || "-"}</td>
-                </tr>`;
-        });
+        // Render table
+        renderAttendanceTable(data.attendance_rds);
 
     } catch (err) {
-        console.error("❌ Failed to load attendance:", err);
-        alert("Failed to load attendance. Check console.");
+        console.error("❌ Failed to fetch attendance from backend:", err);
+        alert("Failed to fetch attendance. Check console.");
     }
 }
 
+/* =====================================================
+   🎯 HELPER FUNCTION: RENDER ATTENDANCE TABLE
+   - Clears table body
+   - Fills table with attendance records
+===================================================== */
+function renderAttendanceTable(records) {
+    const tbody = document.getElementById("attendanceTable");
+    tbody.innerHTML = "";
+
+    if (!records || records.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center">
+                    No records found
+                </td>
+            </tr>`;
+        return;
+    }
+
+    records.forEach(row => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${row.employee_id}</td>
+                <td>${row.attendance_date || row.date}</td>
+                <td>${row.checkin_time || "-"}</td>
+                <td>${row.checkout_time || "-"}</td>
+            </tr>`;
+    });
+}
 
 /* =====================================================
    🖨️ CENTRAL PRINT HANDLER
 ===================================================== */
 function openCentralPrint(selector) {
-
     const source = document.querySelector(selector);
 
     if (!source) {
@@ -191,10 +222,7 @@ function openCentralPrint(selector) {
 
     const contentHTML = source.outerHTML;
 
-    const printWindow = window.open(
-        "/central-print.html",
-        "_blank"
-    );
+    const printWindow = window.open("/central-print.html", "_blank");
 
     printWindow.onload = function () {
         if (printWindow.centralPrint &&

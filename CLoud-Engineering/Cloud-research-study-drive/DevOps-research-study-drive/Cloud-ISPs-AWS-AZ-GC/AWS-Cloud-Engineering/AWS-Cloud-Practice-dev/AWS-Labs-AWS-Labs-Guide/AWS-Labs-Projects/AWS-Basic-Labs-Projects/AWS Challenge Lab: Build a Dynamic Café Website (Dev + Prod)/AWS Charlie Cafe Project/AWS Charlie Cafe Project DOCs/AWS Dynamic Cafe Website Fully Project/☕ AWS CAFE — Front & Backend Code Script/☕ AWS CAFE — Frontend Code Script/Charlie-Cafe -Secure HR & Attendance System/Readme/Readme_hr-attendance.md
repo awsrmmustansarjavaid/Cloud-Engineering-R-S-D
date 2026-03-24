@@ -464,4 +464,307 @@ Your hr-attendance.html is now:
 - Production-ready
 
 ---
+### hr-attendance.html
 
+> **Update Version:1.1**
+
+can add a “Fetch Attendance” button that will call your backend Lambda via API Gateway and display results in the same table. I’ll also make sure your code has detailed comments.
+
+#### Here’s your fully updated hr-attendance.html with the new button and functionality:
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HR Attendance Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+/* Hide page until authentication completes */
+body {
+    display: none;
+    background: #f8f9fa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>📊 HR Attendance Dashboard</h2>
+
+        <div>
+            <!-- Print Button -->
+            <button class="btn btn-outline-dark me-2"
+                    onclick="openCentralPrint('#attendanceTableWrapper')">
+                🖨️ Print / Export
+            </button>
+
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="btn btn-danger">
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ================= FILTER SECTION ================= -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <input id="employeeId"
+                   class="form-control"
+                   placeholder="Employee ID (optional)">
+        </div>
+
+        <div class="col-md-3">
+            <input id="date"
+                   type="date"
+                   class="form-control">
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-primary w-100"
+                    onclick="loadAttendance()">
+                Search
+            </button>
+        </div>
+
+        <div class="col-md-3">
+            <!-- NEW BUTTON TO FETCH DATA -->
+            <button class="btn btn-success w-100"
+                    onclick="fetchAttendanceFromBackend()">
+                Fetch Attendance (RDS)
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= TABLE ================= -->
+    <div id="attendanceTableWrapper">
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ================= LOAD MODULES ================= -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/central-auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/central-printing.js"></script>
+
+<script>
+
+/* =====================================================
+   🔐 AUTHENTICATION
+   - Uses CHARLIE_AUTH
+   - Protects page and shows page only after login
+===================================================== */
+async function initPage() {
+    await CHARLIE_AUTH.protectPage();
+    CHARLIE_AUTH.startAutoLogoutWatcher();
+
+    // Show page after auth success
+    document.body.style.display = "block";
+
+    // Attach logout button
+    document.getElementById("logoutBtn")
+        .addEventListener("click", () => {
+            CHARLIE_AUTH.logout();
+        });
+}
+
+initPage();
+
+/* =====================================================
+   📊 LOAD ATTENDANCE
+   - Uses query filters from input fields
+   - Default: type=daily
+   - Renders RDS data in table
+===================================================== */
+async function loadAttendance() {
+
+    const empId = document.getElementById("employeeId").value.trim();
+    const date  = document.getElementById("date").value;
+
+    try {
+
+        // Build query string dynamically
+        let url = `${CHARLIE_CONFIG.API_BASE}/hr-analytics?type=daily`;
+
+        if (empId) url += `&employee_id=${encodeURIComponent(empId)}`;
+        if (date) url += `&date=${encodeURIComponent(date)}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        const data = await response.json();
+        renderAttendanceTable(data.attendance_rds);
+
+    } catch (err) {
+        console.error("❌ Failed to load attendance:", err);
+        alert("Failed to load attendance. Check console.");
+    }
+}
+
+/* =====================================================
+   🟢 NEW: FETCH ATTENDANCE FROM BACKEND
+   - Fetches all attendance without filters
+   - Useful for testing or admin purposes
+===================================================== */
+async function fetchAttendanceFromBackend() {
+    try {
+        // API call with no filters to get all data
+        let url = `${CHARLIE_CONFIG.API_BASE}/hr-analytics?type=daily`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        const data = await response.json();
+
+        // Render table
+        renderAttendanceTable(data.attendance_rds);
+
+    } catch (err) {
+        console.error("❌ Failed to fetch attendance from backend:", err);
+        alert("Failed to fetch attendance. Check console.");
+    }
+}
+
+/* =====================================================
+   🎯 HELPER FUNCTION: RENDER ATTENDANCE TABLE
+   - Clears table body
+   - Fills table with attendance records
+===================================================== */
+function renderAttendanceTable(records) {
+    const tbody = document.getElementById("attendanceTable");
+    tbody.innerHTML = "";
+
+    if (!records || records.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center">
+                    No records found
+                </td>
+            </tr>`;
+        return;
+    }
+
+    records.forEach(row => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${row.employee_id}</td>
+                <td>${row.attendance_date || row.date}</td>
+                <td>${row.checkin_time || "-"}</td>
+                <td>${row.checkout_time || "-"}</td>
+            </tr>`;
+    });
+}
+
+/* =====================================================
+   🖨️ CENTRAL PRINT HANDLER
+===================================================== */
+function openCentralPrint(selector) {
+    const source = document.querySelector(selector);
+
+    if (!source) {
+        alert("Printable content not found.");
+        return;
+    }
+
+    const contentHTML = source.outerHTML;
+
+    const printWindow = window.open("/central-print.html", "_blank");
+
+    printWindow.onload = function () {
+        if (printWindow.centralPrint &&
+            typeof printWindow.centralPrint.loadContent === "function") {
+            printWindow.centralPrint.loadContent(contentHTML);
+        }
+    };
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+```
+
+### ✅ What Changed / Added
+
+#### New Button
+
+```
+<button class="btn btn-success w-100"
+        onclick="fetchAttendanceFromBackend()">
+    Fetch Attendance (RDS)
+</button>
+```
+
+- Fetches all daily attendance without filters.
+
+- Useful for testing new data insertion.
+
+#### New JS Function
+
+```
+async function fetchAttendanceFromBackend() { ... }
+```
+
+- Calls your API Gateway endpoint.
+
+- Renders table using renderAttendanceTable().
+
+#### Helper Function
+
+```
+function renderAttendanceTable(records) { ... }
+```
+
+- Clears table and populates it dynamically.
+
+- Handles both attendance_date (from RDS) and date (if DynamoDB).
+
+#### Preserves Auth
+
+- Page still shows only after CHARLIE_AUTH.protectPage().
+
+- Logout works as before.
+
+---
+### hr-attendance.html
+
+> **Update Version:1.2**
+
+
+
+
+---
+### hr-attendance.html
+
+> **Update Version:1.3**
