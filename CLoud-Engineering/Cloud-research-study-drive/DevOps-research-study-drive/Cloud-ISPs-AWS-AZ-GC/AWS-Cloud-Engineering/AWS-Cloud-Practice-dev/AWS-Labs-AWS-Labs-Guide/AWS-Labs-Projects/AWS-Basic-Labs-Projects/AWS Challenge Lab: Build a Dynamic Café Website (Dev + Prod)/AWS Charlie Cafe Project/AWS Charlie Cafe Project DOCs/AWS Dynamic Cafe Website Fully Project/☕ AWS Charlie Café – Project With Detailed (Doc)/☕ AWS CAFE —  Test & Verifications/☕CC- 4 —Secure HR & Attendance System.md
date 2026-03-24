@@ -1515,6 +1515,18 @@ VALUES
 (4, CURDATE(), '08:55', '17:05');
 ```
 
+### 🧪 Verify
+
+```
+SELECT * FROM attendance;
+```
+
+#### You should see something like:
+
+| attendance_id | employee_id | attendance_date | checkin_time | checkout_time |
+| ------------- | ----------- | --------------- | ------------ | ------------- |
+| 1             | 3           | 2026-03-24      | 09:05:00     | 17:15:00      |
+| 2             | 4           | 2026-03-24      | 08:55:00     | 17:05:00      |
 
 
 
