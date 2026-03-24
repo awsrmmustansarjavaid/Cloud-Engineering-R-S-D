@@ -1,7 +1,7 @@
 /* =========================================================
-   CHARLIE CAFE — CENTRAL AUTH MODULE (HTTPS FIX)
+   CHARLIE CAFE — CENTRAL AUTH MODULE (FIXED HTTPS ISSUE)
    ---------------------------------------------------------
-   ✔ Works even if COGNITO_DOMAIN includes https://
+   ✔ Works even if COGNITO_DOMAIN includes https:// or has typo
    ✔ Authorization Code Flow
    ✔ Auto Token Exchange
    ✔ Role-Based UI Control
@@ -16,24 +16,44 @@ window.CHARLIE_AUTH = (() => {
     /* =====================================================
        🔐 HELPER — Normalize Cognito Domain
        -----------------------------------------------------
-       Removes https:// if already present
+       Ensures the domain does NOT have http:// or https://
+       and removes accidental double slashes.
     ===================================================== */
     function normalizeDomain(domain) {
-        return domain.replace(/^https?:\/\//, "");
+        if (!domain) return "";
+
+        domain = domain.trim();
+
+        // Fix common typo: https// → https://
+        if (/^https\/\/.*/i.test(domain)) {
+            domain = domain.replace(/^https\/\/+/i, "");
+        }
+
+        // Remove any http:// or https://
+        domain = domain.replace(/^https?:\/\//i, "");
+
+        // Remove trailing slash if present
+        domain = domain.replace(/\/$/, "");
+
+        return domain;
     }
 
     /* =====================================================
        🔐 BUILD COGNITO LOGIN URL
+       -----------------------------------------------------
+       - Uses normalized domain
+       - Adds https:// prefix
+       - Adds query parameters
     ===================================================== */
     function buildCognitoLoginUrl() {
         const domain = normalizeDomain(CONFIG.COGNITO_DOMAIN);
         const redirectUrl = window.location.origin + window.location.pathname;
 
         return `https://${domain}/login` +
-            `?response_type=code` +
-            `&client_id=${CONFIG.CLIENT_ID}` +
-            `&scope=openid+email+profile` +
-            `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
+               `?response_type=code` +
+               `&client_id=${CONFIG.CLIENT_ID}` +
+               `&scope=openid+email+profile` +
+               `&redirect_uri=${encodeURIComponent(redirectUrl)}`;
     }
 
     /* =====================================================
@@ -53,8 +73,8 @@ window.CHARLIE_AUTH = (() => {
         const logoutRedirect = window.location.origin;
 
         const logoutUrl = `https://${domain}/logout` +
-            `?client_id=${CONFIG.CLIENT_ID}` +
-            `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
+                          `?client_id=${CONFIG.CLIENT_ID}` +
+                          `&logout_uri=${encodeURIComponent(logoutRedirect)}`;
 
         window.location.replace(logoutUrl);
     }
