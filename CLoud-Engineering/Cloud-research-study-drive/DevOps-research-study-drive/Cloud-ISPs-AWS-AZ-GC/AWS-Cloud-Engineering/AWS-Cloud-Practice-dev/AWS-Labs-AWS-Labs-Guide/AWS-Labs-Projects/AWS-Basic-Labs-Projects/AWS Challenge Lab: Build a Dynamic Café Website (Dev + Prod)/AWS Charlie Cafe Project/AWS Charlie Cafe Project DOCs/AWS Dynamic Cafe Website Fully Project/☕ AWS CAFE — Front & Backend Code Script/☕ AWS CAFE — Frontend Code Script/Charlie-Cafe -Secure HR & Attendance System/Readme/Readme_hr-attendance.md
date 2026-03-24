@@ -564,11 +564,11 @@ body {
 </div>
 
 <!-- ================= LOAD MODULES ================= -->
-<script src="js/config.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/central-auth.js"></script>
-<script src="js/api.js"></script>
-<script src="js/central-printing.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/central-auth.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/central-printing.js"></script>
 
 <script>
 
