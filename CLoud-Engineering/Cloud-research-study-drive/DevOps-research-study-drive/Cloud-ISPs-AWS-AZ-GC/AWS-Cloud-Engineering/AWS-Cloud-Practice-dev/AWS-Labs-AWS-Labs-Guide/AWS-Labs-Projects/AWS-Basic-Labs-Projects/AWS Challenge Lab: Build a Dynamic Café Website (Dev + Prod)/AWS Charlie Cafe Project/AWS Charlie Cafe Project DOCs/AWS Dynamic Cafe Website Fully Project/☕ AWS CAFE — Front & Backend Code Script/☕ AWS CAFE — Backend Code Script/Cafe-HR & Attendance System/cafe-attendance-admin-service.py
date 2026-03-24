@@ -2,16 +2,33 @@ import json
 import os
 import boto3
 import pymysql
+from datetime import datetime, timedelta
 from boto3.dynamodb.conditions import Key
 
 # ==========================================================
-# AWS SECRETS MANAGER CONFIGURATION
+# 🌐 CONFIGURATION
 # ==========================================================
 
 SECRET_NAME = "CafeDevDBSM"
 REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
 
+# DynamoDB table (safe loading)
+DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE")
+
+# AWS Clients
 secrets_client = boto3.client("secretsmanager", region_name=REGION_NAME)
+
+# DynamoDB (only if configured)
+if DYNAMODB_TABLE:
+    dynamodb = boto3.resource("dynamodb")
+    dynamo_table = dynamodb.Table(DYNAMODB_TABLE)
+else:
+    dynamo_table = None
+
+
+# ==========================================================
+# 🔐 GET DB CREDENTIALS FROM SECRETS MANAGER
+# ==========================================================
 
 def get_db_secret():
     response = secrets_client.get_secret_value(SecretId=SECRET_NAME)
@@ -19,7 +36,7 @@ def get_db_secret():
 
 
 # ==========================================================
-# RDS CONNECTION (REUSED ACROSS INVOCATIONS)
+# 🗄️ RDS CONNECTION (REUSE FOR PERFORMANCE)
 # ==========================================================
 
 connection = None
@@ -44,16 +61,38 @@ def get_rds_connection():
 
 
 # ==========================================================
-# DYNAMODB CONFIGURATION
+# 🇵🇰 GET CURRENT DATE IN PAKISTAN TIME (UTC+5)
 # ==========================================================
 
-DYNAMODB_TABLE = os.environ["DYNAMODB_TABLE"]
-dynamodb = boto3.resource("dynamodb")
-dynamo_table = dynamodb.Table(DYNAMODB_TABLE)
+def get_pk_date():
+    return (datetime.utcnow() + timedelta(hours=5)).strftime('%Y-%m-%d')
 
 
 # ==========================================================
-# STANDARD RESPONSE (CORS ENABLED)
+# 📅 DATE FILTER BUILDER (NO MYSQL TIMEZONE DEPENDENCY)
+# ==========================================================
+
+def build_date_filter(query_type):
+    pk_date = get_pk_date()
+
+    if query_type == "daily":
+        return f"a.date = '{pk_date}'"
+
+    elif query_type == "weekly":
+        return f"a.date >= DATE('{pk_date}') - INTERVAL 7 DAY"
+
+    elif query_type == "monthly":
+        return f"""
+        MONTH(a.date) = MONTH('{pk_date}')
+        AND YEAR(a.date) = YEAR('{pk_date}')
+        """
+
+    else:
+        return None
+
+
+# ==========================================================
+# 🌍 STANDARD RESPONSE (CORS ENABLED)
 # ==========================================================
 
 def make_response(status_code, body):
@@ -69,30 +108,16 @@ def make_response(status_code, body):
 
 
 # ==========================================================
-# DATE FILTER HELPER
-# ==========================================================
-
-def build_date_filter(query_type):
-    if query_type == "daily":
-        return "a.date = CURDATE()"
-    elif query_type == "weekly":
-        return "a.date >= CURDATE() - INTERVAL 7 DAY"
-    elif query_type == "monthly":
-        return "MONTH(a.date) = MONTH(CURDATE()) AND YEAR(a.date) = YEAR(CURDATE())"
-    else:
-        return None
-
-
-# ==========================================================
-# MAIN LAMBDA HANDLER
+# 🚀 MAIN LAMBDA HANDLER
 # ==========================================================
 
 def lambda_handler(event, context):
 
-    # Handle CORS
+    # ================= CORS PREFLIGHT =================
     if event.get("httpMethod") == "OPTIONS":
         return make_response(200, {"message": "CORS preflight successful"})
 
+    # ================= INPUT PARAMS =================
     params = event.get("queryStringParameters") or {}
 
     query_type = params.get("type", "daily")
@@ -100,6 +125,7 @@ def lambda_handler(event, context):
     lookup_date = params.get("date")
     include_summary = params.get("summary", "false").lower() == "true"
 
+    # ================= RESPONSE STRUCTURE =================
     result = {
         "attendance_rds": [],
         "attendance_dynamo": [],
@@ -107,7 +133,7 @@ def lambda_handler(event, context):
     }
 
     # =====================================================
-    # RDS ATTENDANCE QUERY
+    # 🗄️ RDS QUERY
     # =====================================================
 
     try:
@@ -132,6 +158,7 @@ def lambda_handler(event, context):
 
         values = []
 
+        # Optional employee filter
         if employee_id:
             sql += " AND e.employee_id = %s"
             values.append(employee_id)
@@ -140,7 +167,7 @@ def lambda_handler(event, context):
         result["attendance_rds"] = cursor.fetchall()
 
         # =====================================================
-        # SUMMARY (ALIGNED WITH TYPE)
+        # 📊 SUMMARY (OPTIONAL)
         # =====================================================
 
         if include_summary:
@@ -169,10 +196,10 @@ def lambda_handler(event, context):
 
 
     # =====================================================
-    # OPTIONAL DYNAMODB LOOKUP
+    # ⚡ DYNAMODB QUERY (OPTIONAL - SAFE)
     # =====================================================
 
-    if employee_id:
+    if employee_id and dynamo_table:
         try:
             if lookup_date:
                 response = dynamo_table.query(
@@ -193,7 +220,7 @@ def lambda_handler(event, context):
 
 
     # =====================================================
-    # FINAL RESPONSE
+    # ✅ FINAL RESPONSE
     # =====================================================
 
     return make_response(200, result)
