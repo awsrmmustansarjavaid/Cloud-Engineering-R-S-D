@@ -93,6 +93,14 @@ window.CHARLIE_API = (() => {
         });
     }
 
+    // ================== ADMIN — MARK CASH ORDER AS PAID ==================
+    function markCashOrderPaid(orderId) {
+        return apiFetch(`${CONFIG.API_BASE}/admin/mark-paid`, {
+            method: "POST",
+            body: JSON.stringify({ order_id: orderId })
+        });
+    }
+
     /* =====================================================
        👨‍💼 HR — ATTENDANCE (PUBLIC DEVICE / BIOMETRIC STYLE)
        -----------------------------------------------------
@@ -200,6 +208,7 @@ window.CHARLIE_API = (() => {
         getOrders,
         getEmployeeOrders,
         createEmployeeOrder,
+        markCashOrderPaid,
 
         // HR Attendance (public device)
         recordAttendance,
