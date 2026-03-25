@@ -456,15 +456,15 @@ I need to understand your current setup better:
 
 Is your frontend inside /var/www/html (PHP + HTML mix)?
 
-Are you using:
+- Are you using:
 
 Pure PHP (no framework)?
 
-Do you want:
+- Do you want:
 
 Keep RDS (recommended) ✅
 
-OR move DB to Docker ❌ (not recommended for prod)
+- OR move DB to Docker ❌ (not recommended for prod)
 
 
 ---
