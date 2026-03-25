@@ -7473,7 +7473,7 @@ sudo nano /var/www/html/employee-portal.html
 sudo nano /var/www/html/Cognito-Tester.html
 ```
 
-#### 2️⃣ Cognito-Tester.html Code
+#### 2️⃣ Cognito-Tester
 
 [Cognito-Tester.html](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Frontend%20Code%20Script/Cognito%20Hosted%20UI/Cognito%20Employee%20ID%20Tester/Cognito-Tester.html)
 
