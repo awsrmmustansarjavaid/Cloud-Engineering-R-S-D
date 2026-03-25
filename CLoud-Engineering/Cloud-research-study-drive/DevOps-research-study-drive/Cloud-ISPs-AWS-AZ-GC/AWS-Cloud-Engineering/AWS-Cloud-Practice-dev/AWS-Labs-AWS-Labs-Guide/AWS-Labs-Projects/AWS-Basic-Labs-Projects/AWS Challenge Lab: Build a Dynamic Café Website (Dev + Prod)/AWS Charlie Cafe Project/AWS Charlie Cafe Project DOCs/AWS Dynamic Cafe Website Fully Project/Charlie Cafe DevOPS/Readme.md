@@ -468,3 +468,192 @@ Keep RDS (recommended) ✅
 
 
 ---
+## Dockerfile (custom for your project)
+
+let’s start Step 1: Dockerize your Charlie Cafe app 🚀
+I’ll keep it practical + tailored to your setup (PHP + Apache + RDS).
+
+### 🧱 STEP 1 — Create Your First Docker Image
+
+Since you said yes, I’ll assume:
+
+✅ You are using pure PHP (no framework)
+
+✅ Your code is inside something like:
+
+```
+app/frontend/
+```
+
+✅ You want to keep RDS (correct decision 👍)
+
+### 🧠 What we are doing
+
+We will replace this:
+
+```
+EC2 → Apache + PHP installed manually
+```
+
+With this:
+
+```
+EC2 → Docker → PHP + Apache container
+```
+
+### 📦 1. Create a Dockerfile
+
+Inside your project root (charlie-cafe-devops/), create:
+
+```
+Dockerfile
+```
+
+### ✅ Your FIRST Dockerfile (Production Ready)
+
+```
+# -------------------------------------------------
+# ☕ Charlie Cafe Dockerfile (PHP + Apache)
+# -------------------------------------------------
+
+# Use official PHP Apache image
+FROM php:8.2-apache
+
+# Install PHP extensions
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Enable Apache mod_rewrite (important)
+RUN a2enmod rewrite
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy your app code into container
+COPY app/frontend/ /var/www/html/
+
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose port 80
+EXPOSE 80
+```
+
+### 📦 2. Create .dockerignore (IMPORTANT)
+
+This prevents junk files from going into Docker image.
+
+```
+.dockerignore
+```
+
+```
+.git
+node_modules
+.env
+*.log
+```
+
+### ⚙️ 3. Build Your Docker Image
+
+SSH into EC2 and go to your project:
+
+```
+cd charlie-cafe-devops
+```
+
+Then run:
+
+```
+docker build -t charlie-cafe .
+```
+
+### ▶️ 4. Run Your Container
+
+```
+docker run -d -p 80:80 --name cafe-app charlie-cafe
+```
+
+### 🌐 Now test in browser:
+
+```
+http://YOUR-EC2-PUBLIC-IP
+```
+
+👉 Your PHP app should load 🔥
+
+### ⚠️ 5. IMPORTANT (RDS Connection)
+
+#### Your app must NOT use:
+
+```
+localhost
+```
+
+#### Instead use:
+
+```
+RDS endpoint
+```
+
+Example:
+
+```
+$host = "your-rds-endpoint.amazonaws.com";
+```
+
+### 🧪 6. Debug Commands (VERY USEFUL)
+
+#### Check running containers:
+
+```
+docker ps
+```
+
+#### See logs:
+
+```
+docker logs cafe-app
+```
+
+#### Enter container:
+
+```
+docker exec -it cafe-app bash
+```
+
+### 🔥 7. What You Achieved
+
+You just:
+
+✅ Removed dependency on EC2 setup
+
+✅ Made your app portable
+
+✅ Prepared for CI/CD
+
+✅ Entered real DevOps workflow
+
+### 🧭 NEXT STEP (Don’t skip this)
+
+Next we will build:
+
+### 👉 Docker Compose (Multi-container setup)
+
+So instead of:
+
+```
+docker run ...
+```
+
+You’ll use:
+
+```
+docker compose up -d
+```
+
+
+
+
+
+
+
