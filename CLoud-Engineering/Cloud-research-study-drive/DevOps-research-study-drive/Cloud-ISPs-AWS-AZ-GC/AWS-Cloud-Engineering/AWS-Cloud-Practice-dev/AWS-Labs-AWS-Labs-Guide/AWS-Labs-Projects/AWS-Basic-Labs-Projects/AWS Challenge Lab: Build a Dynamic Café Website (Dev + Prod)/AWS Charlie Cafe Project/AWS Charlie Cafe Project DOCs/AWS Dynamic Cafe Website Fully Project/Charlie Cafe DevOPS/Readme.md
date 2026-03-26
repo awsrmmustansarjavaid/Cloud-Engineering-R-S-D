@@ -1111,8 +1111,64 @@ docker compose up -d
 
 ---
 
+#### 6. Add verify.sql to CI/CD for QA
 
+#### .github/workflows/deploy.yml
 
+```
+name: Deploy Charlie Cafe
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: cafe_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -uroot -prootpassword; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+
+      - name: Apply schema
+        run: mysql -h 127.0.0.1 -uroot -prootpassword < infrastructure/rds/schema.sql
+
+      - name: Apply sample data
+        run: mysql -h 127.0.0.1 -uroot -prootpassword < infrastructure/rds/data.sql
+
+      - name: Verify schema
+        run: mysql -h 127.0.0.1 -uroot -prootpassword < infrastructure/rds/verify.sql
+```
+
+✅ This allows automatic DB creation + QA verification in CI/CD whenever you push code.
+
+### Step 3 — Production vs Local
+
+- Local development: Use Docker MySQL container + schema + data.
+
+- Production RDS: Run schema.sql only + optional verify.sql.
+
+- No Docker is needed on production RDS — RDS is fully managed by AWS.
 
 
 
