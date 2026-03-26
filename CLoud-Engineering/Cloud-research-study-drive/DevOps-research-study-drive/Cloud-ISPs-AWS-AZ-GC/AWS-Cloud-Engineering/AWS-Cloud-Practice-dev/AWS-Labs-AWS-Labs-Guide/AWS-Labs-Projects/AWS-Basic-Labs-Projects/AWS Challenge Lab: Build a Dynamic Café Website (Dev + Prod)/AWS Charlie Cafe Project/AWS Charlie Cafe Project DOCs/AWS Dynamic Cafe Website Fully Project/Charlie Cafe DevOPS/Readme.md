@@ -1171,5 +1171,136 @@ jobs:
 - No Docker is needed on production RDS — RDS is fully managed by AWS.
 
 
+### 🚀 ✅ FINAL MERGED deploy.yml (FULL DEVOPS PIPELINE)
+
+This version will:
+
+✅ Build Docker (PHP app)
+
+✅ Start MySQL service
+
+✅ Apply schema.sql + data.sql
+
+✅ Run verify.sql (QA testing)
+
+✅ Test container
+
+✅ Fail if anything breaks
+
+#### 📄 Create this file:
+
+```
+.github/workflows/deploy.yml
+```
+
+### ✅ FINAL CODE (COPY-PASTE READY)
+
+```
+name: ☕ Charlie Cafe DevOps CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    # -------------------------------------------------
+    # MySQL Service (for testing DB schema)
+    # -------------------------------------------------
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: cafe_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+
+    # -------------------------------------------------
+    # Checkout Code
+    # -------------------------------------------------
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v3
+
+    # -------------------------------------------------
+    # Install MySQL Client
+    # -------------------------------------------------
+    - name: 🧰 Install MySQL Client
+      run: sudo apt-get update && sudo apt-get install -y mysql-client
+
+    # -------------------------------------------------
+    # Wait for MySQL to be ready
+    # -------------------------------------------------
+    - name: ⏳ Wait for MySQL
+      run: |
+        until mysqladmin ping -h 127.0.0.1 -uroot -prootpassword --silent; do
+          echo "Waiting for MySQL..."
+          sleep 5
+        done
+
+    # -------------------------------------------------
+    # Apply Database Schema
+    # -------------------------------------------------
+    - name: 🗄️ Apply Schema
+      run: mysql -h 127.0.0.1 -uroot -prootpassword < infrastructure/rds/schema.sql
+
+    # -------------------------------------------------
+    # Apply Sample Data
+    # -------------------------------------------------
+    - name: 📊 Apply Sample Data
+      run: mysql -h 127.0.0.1 -uroot -prootpassword < infrastructure/rds/data.sql
+
+    # -------------------------------------------------
+    # Run Verification Tests (QA)
+    # -------------------------------------------------
+    - name: ✅ Run DB Verification
+      run: mysql -h 127.0.0.1 -uroot -prootpassword < infrastructure/rds/verify.sql
+
+    # -------------------------------------------------
+    # Build Docker Image (PHP + Apache)
+    # -------------------------------------------------
+    - name: 🐳 Build Docker Image
+      run: docker build -t charlie-cafe -f docker/apache-php/Dockerfile .
+
+    # -------------------------------------------------
+    # Run Container (Test)
+    # -------------------------------------------------
+    - name: 🚀 Run Docker Container
+      run: docker run -d -p 8080:80 charlie-cafe
+
+    # -------------------------------------------------
+    # Basic Health Check
+    # -------------------------------------------------
+    - name: 🌐 Test Web Server
+      run: |
+        sleep 10
+        curl -I http://localhost:8080 || exit 1
+
+    # -------------------------------------------------
+    # Success
+    # -------------------------------------------------
+    - name: 🎉 Deployment Success
+      run: echo "Charlie Cafe CI/CD Pipeline Successful 🚀"
+```
+
+
+### 📁 2. Correct GitHub Path (VERY IMPORTANT)
+
+You asked this specifically 👇
+
+👉 You MUST create:
+
+```
+.github/workflows/deploy.yml
+```
 
 
