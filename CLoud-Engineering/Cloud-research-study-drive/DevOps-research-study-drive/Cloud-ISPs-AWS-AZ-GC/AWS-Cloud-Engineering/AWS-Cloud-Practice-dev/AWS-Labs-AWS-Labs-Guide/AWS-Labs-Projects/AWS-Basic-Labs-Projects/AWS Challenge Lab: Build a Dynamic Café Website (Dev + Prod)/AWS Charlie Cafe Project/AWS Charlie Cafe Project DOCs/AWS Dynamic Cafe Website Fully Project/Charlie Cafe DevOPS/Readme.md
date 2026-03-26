@@ -1,5 +1,169 @@
 # Charlie Cafe 
 
+### 🐳 ✅ FINAL Dockerfile (Use This Only)
+
+#### Create:
+
+```
+docker/apache-php/Dockerfile
+```
+
+```
+# -------------------------------------------------
+# ☕ Charlie Cafe - FINAL Dockerfile (PHP + Apache)
+# Production Ready | DevOps Standard
+# -------------------------------------------------
+
+# Use official PHP with Apache
+FROM php:8.2-apache
+
+# -------------------------------------------------
+# Install required PHP extensions
+# (For MySQL / RDS connectivity)
+# -------------------------------------------------
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# -------------------------------------------------
+# Enable Apache rewrite module (for clean URLs / routing)
+# -------------------------------------------------
+RUN a2enmod rewrite
+
+# -------------------------------------------------
+# Set working directory
+# -------------------------------------------------
+WORKDIR /var/www/html
+
+# -------------------------------------------------
+# Copy frontend code (NO modification required)
+# -------------------------------------------------
+COPY app/frontend/ /var/www/html/
+
+# -------------------------------------------------
+# Set proper permissions
+# -------------------------------------------------
+RUN chown -R www-data:www-data /var/www/html
+
+# -------------------------------------------------
+# Expose Apache port
+# -------------------------------------------------
+EXPOSE 80
+```
+
+### 🔍 Why This Is the FINAL Version
+
+This combines everything correctly:
+
+| Feature             | Included |
+| ------------------- | -------- |
+| PHP 8.2 Apache      | ✅        |
+| MySQL (RDS) support | ✅        |
+| PDO support         | ✅        |
+| mod_rewrite         | ✅        |
+| Clean WORKDIR       | ✅        |
+| Correct COPY path   | ✅        |
+| Permissions         | ✅        |
+
+### ❗ Important Fix (Why earlier versions differed)
+
+You saw 3 versions because of:
+
+#### ❌ Wrong paths (old versions)
+
+```
+COPY ../../app/frontend/
+```
+
+👉 This breaks Docker build context
+
+#### ✅ Correct version (FINAL)
+
+```
+COPY app/frontend/ /var/www/html/
+```
+
+✔ Works with standard repo structure
+
+✔ Works with docker-compose
+
+✔ No hacks needed
+
+### ⚙️ FINAL docker-compose.yml (MATCHED)
+
+Make sure it matches this Dockerfile:
+
+```
+version: "3.8"
+
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/apache-php/Dockerfile
+    container_name: charlie_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app/frontend:/var/www/html
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: charlie_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cafe_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./infrastructure/rds:/docker-entrypoint-initdb.d
+```
+
+### 🧪 Test It (Final Check)
+
+```
+docker-compose up --build
+```
+
+Open:
+
+```
+http://localhost:8080
+```
+
+### 💡 Pro Tip (Very Important)
+
+Because you are using:
+
+```
+volumes:
+  - ./app/frontend:/var/www/html
+```
+
+#### 👉 This means:
+
+Your local code overrides container code
+So even if COPY fails, your app still works
+
+✔ This is good for development
+
+✔ For production, you can remove volume
+
+### 🧠 Final Understanding
+
+You now have:
+
+- Dockerfile → builds image
+
+- docker-compose → runs services
+
+- schema.sql → creates DB
+
+- GitHub → stores everything
+
+- Lambda → backend API
+
 
 
 
