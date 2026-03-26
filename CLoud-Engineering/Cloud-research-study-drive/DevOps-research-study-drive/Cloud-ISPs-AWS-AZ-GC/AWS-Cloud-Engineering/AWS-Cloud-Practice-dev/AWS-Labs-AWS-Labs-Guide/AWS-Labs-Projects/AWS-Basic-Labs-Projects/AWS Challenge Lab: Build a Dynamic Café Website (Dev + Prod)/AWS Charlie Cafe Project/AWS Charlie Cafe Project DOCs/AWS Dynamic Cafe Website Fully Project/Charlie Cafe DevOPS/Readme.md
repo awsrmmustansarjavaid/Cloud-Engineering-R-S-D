@@ -165,7 +165,212 @@ You now have:
 - Lambda → backend API
 
 
+So the “final” setup is:
 
+✅ Dockerfile #1 → Apache + PHP (frontend)
+
+✅ Dockerfile #2 → MySQL (database with schema.sql)
+
+### 🐳 ✅ FINAL MySQL Dockerfile (Your Requirement)
+
+Create:
+
+```
+docker/mysql/Dockerfile
+```
+
+```
+# -------------------------------------------------
+# ☕ Charlie Cafe - MySQL Dockerfile (FINAL)
+# Auto DB + Schema + Data Setup
+# -------------------------------------------------
+
+FROM mysql:8.0
+
+# -------------------------------------------------
+# Environment Variables
+# -------------------------------------------------
+ENV MYSQL_ROOT_PASSWORD=rootpassword
+ENV MYSQL_DATABASE=cafe_db
+
+# -------------------------------------------------
+# Auto-run SQL files on container startup
+# (Executed in alphabetical order)
+# -------------------------------------------------
+COPY infrastructure/rds/schema.sql /docker-entrypoint-initdb.d/01-schema.sql
+COPY infrastructure/rds/data.sql /docker-entrypoint-initdb.d/02-data.sql
+
+# -------------------------------------------------
+# Expose MySQL port
+# -------------------------------------------------
+EXPOSE 3306
+```
+
+- MySQL image runs the scripts automatically on first container startup.
+
+- verify.sql is not copied — you run it manually or via CI/CD test.
+
+### ⚠️ Important Fix (VERY IMPORTANT)
+
+You wrote:
+
+```
+COPY ../../infrastructure/rds/schema.sql
+```
+
+❌ This is WRONG in Docker
+
+👉 Docker cannot access files outside build context
+
+✅ Correct version (FINAL)
+
+```
+COPY infrastructure/rds/schema.sql ...
+```
+
+✔ Works with docker-compose
+
+✔ Works in CI/CD
+
+✔ Industry standard
+
+### 🐳 ✅ FINAL Apache + PHP Dockerfile (Complete Setup)
+
+```
+# -------------------------------------------------
+# ☕ Charlie Cafe - Apache + PHP Dockerfile (FINAL)
+# -------------------------------------------------
+
+FROM php:8.2-apache
+
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN a2enmod rewrite
+
+WORKDIR /var/www/html
+
+COPY app/frontend/ /var/www/html/
+
+RUN chown -R www-data:www-data /var/www/html
+
+EXPOSE 80
+```
+
+### ⚙️ ✅ FINAL docker-compose.yml (FULLY CONNECTED)
+
+```
+version: "3.8"
+
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/apache-php/Dockerfile
+    container_name: charlie_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app/frontend:/var/www/html
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    build:
+      context: .
+      dockerfile: docker/mysql/Dockerfile
+    container_name: charlie_db
+    ports:
+      - "3306:3306"
+    restart: always
+```
+
+### 🔄 How It Works (Simple)
+
+When you run:
+
+```
+docker-compose up --build
+```
+
+👉 Docker does this:
+
+### 🐬 MySQL container:
+
+Starts MySQL
+
+Runs:
+
+```
+01-schema.sql
+02-data.sql
+```
+
+Creates DB + tables + data
+
+### 🌐 Web container:
+
+Runs Apache + PHP
+
+Loads your frontend
+
+Connects to DB
+
+### 💡 Pro Tips (Very Important)
+
+### ✅ 1. File Execution Order
+
+```
+01-schema.sql
+02-data.sql
+```
+
+✔ Ensures:
+
+Tables created first
+
+Data inserted second
+
+### ✅ 2. First Run Only Behavior
+
+👉 MySQL runs SQL files ONLY if:
+
+```
+database is empty
+```
+
+If you restart container:
+
+❌ SQL will NOT run again
+
+### ✅ 3. Reset Database (if needed)
+
+```
+docker-compose down -v
+docker-compose up --build
+```
+
+### ✅ 4. Optional: Merge schema + data
+
+If you want simpler:
+
+```
+schema.sql (with inserts inside)
+```
+
+### 🎯 Final Result
+
+You now have:
+
+✅ Clean Docker architecture
+
+✅ MySQL auto schema setup
+
+✅ No manual DB setup needed
+
+✅ Works with GitHub + CI/CD
+
+✅ Fully DevOps-ready
 
 ---
 ### Lamp Server Script.sh
@@ -815,6 +1020,8 @@ You’ll use:
 docker compose up -d
 ```
 
+
+---
 
 
 
