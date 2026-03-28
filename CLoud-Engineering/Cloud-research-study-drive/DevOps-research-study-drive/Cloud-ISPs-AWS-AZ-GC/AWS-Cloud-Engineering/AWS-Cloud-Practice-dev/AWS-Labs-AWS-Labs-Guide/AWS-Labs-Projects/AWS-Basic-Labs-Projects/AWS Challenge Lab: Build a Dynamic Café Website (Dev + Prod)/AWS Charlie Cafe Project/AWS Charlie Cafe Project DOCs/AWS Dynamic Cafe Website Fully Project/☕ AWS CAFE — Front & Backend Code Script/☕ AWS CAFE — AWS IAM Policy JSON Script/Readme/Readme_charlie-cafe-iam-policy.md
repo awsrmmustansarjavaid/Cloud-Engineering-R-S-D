@@ -856,6 +856,107 @@ If logs fail → use this:
 }
 ```
 
+### ✅ Fully final merged IAM Policies
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
+    // ================================
+    // ECR Permissions (GitHub + ECS)
+    // ================================
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+      ],
+      "Resource": "*"
+    },
+
+    // ================================
+    // ECS Permissions (GitHub CI/CD)
+    // ================================
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecs:UpdateService",
+        "ecs:DescribeServices",
+        "ecs:RegisterTaskDefinition"
+      ],
+      "Resource": "*"
+    },
+
+    // ================================
+    // IAM Pass Role (required for ECS)
+    // ================================
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "*"
+    },
+
+    // ================================
+    // CloudWatch Logs (ECS Task Execution)
+    // ================================
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:CreateLogGroup"
+      ],
+      "Resource": "*"
+    },
+
+    // ================================
+    // Secrets Manager (ECS Task Role)
+    // ================================
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "*"
+    },
+
+    // ================================
+    // S3 Access (ECS Task Role)
+    // ================================
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### ✅ Explanation of the merged policy
+
+| Section         | Purpose                                                          |
+| --------------- | ---------------------------------------------------------------- |
+| ECR Permissions | GitHub CI/CD can push Docker images to ECR and ECS can pull them |
+| ECS Permissions | Update ECS services and register task definitions                |
+| IAM Pass Role   | Needed for ECS tasks to assume roles (required in deployments)   |
+| CloudWatch Logs | ECS containers can log output for monitoring/debugging           |
+| Secrets Manager | ECS containers can read database credentials or other secrets    |
+| S3 Access       | Optional: ECS containers can read/write files from S3 if needed  |
+
+
+
 ### 🔐 5️⃣ CONNECT TO GITHUB
 
 ### ✅ Step 1 — Create IAM User
@@ -924,169 +1025,146 @@ AWS_SECRET_ACCESS_KEY
 
 ```
 {
-  "Version": "2012-10-17",
-  "Statement": [
-
-    {
-      "Sid": "CloudWatchLogsFullAccess",
-      "Effect": "Allow",
-      "Action": "logs:*",
-      "Resource": "*"
-    },
-
-    {
-      "Sid": "LambdaVPCAccess",
-      "Effect": "Allow",
-      "Action": [
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteNetworkInterface",
-        "ec2:AssignPrivateIpAddresses",
-        "ec2:UnassignPrivateIpAddresses"
-      ],
-      "Resource": "*"
-    },
-
-    {
-      "Sid": "DynamoDBFullAccess",
-      "Effect": "Allow",
-      "Action": "dynamodb:*",
-      "Resource": "*"
-    },
-
-    {
-      "Sid": "RDSDataAPIAccess",
-      "Effect": "Allow",
-      "Action": [
-        "rds-data:ExecuteStatement",
-        "rds-data:BatchExecuteStatement",
-        "rds-data:BeginTransaction",
-        "rds-data:CommitTransaction",
-        "rds-data:RollbackTransaction"
-      ],
-      "Resource": "*"
-    },
-
-    {
-      "Sid": "CafeMenuTableAccess",
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem"
-      ],
-      "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/CafeMenu"
-    },
-
-    {
-      "Sid": "CafeOrdersTableAccess",
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:PutItem",
-        "dynamodb:GetItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Query",
-        "dynamodb:Scan"
-      ],
-      "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/CafeOrders"
-    },
-
-    {
-      "Sid": "CafeOrdersQueueAccess",
-      "Effect": "Allow",
-      "Action": [
-        "sqs:SendMessage",
-        "sqs:ReceiveMessage",
-        "sqs:DeleteMessage",
-        "sqs:GetQueueAttributes"
-      ],
-      "Resource": "arn:aws:sqs:us-east-1:123456789012:CafeOrdersQueue"
-    },
-
-    {
-      "Sid": "CafeSecretsManagerAccess",
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:DescribeSecret"
-      ],
-      "Resource": [
-        "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*",
-        "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSecret*"
-      ]
-    },
-
-    {
-      "Sid": "CafeS3AppBucketAccess",
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "arn:aws:s3:::demo-test-s3-b",
-        "arn:aws:s3:::demo-test-s3-b/*"
-      ]
-    },
-
-    // -------------------------------------------------
-    // 🐳 ECR ACCESS (GitHub CI/CD + ECS)
-    // -------------------------------------------------
-    {
-      "Sid": "ECRAuthAccess",
-      "Effect": "Allow",
-      "Action": [
-        "ecr:GetAuthorizationToken"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "ECRPushPullAccess",
-      "Effect": "Allow",
-      "Action": [
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:BatchGetImage",
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:CompleteLayerUpload",
-        "ecr:UploadLayerPart",
-        "ecr:InitiateLayerUpload",
-        "ecr:PutImage"
-      ],
-      "Resource": "*"
-    },
-
-    // -------------------------------------------------
-    // 🚀 ECS ACCESS (Deployment)
-    // -------------------------------------------------
-    {
-      "Sid": "ECSServiceDeploymentAccess",
-      "Effect": "Allow",
-      "Action": [
-        "ecs:UpdateService",
-        "ecs:DescribeServices",
-        "ecs:RegisterTaskDefinition",
-        "ecs:DescribeTaskDefinition"
-      ],
-      "Resource": "*"
-    },
-
-    // -------------------------------------------------
-    // 🔐 IAM PASS ROLE (CRITICAL FOR ECS)
-    // -------------------------------------------------
-    {
-      "Sid": "IAMPassRoleAccess",
-      "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": "*"
-    }
-
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CloudWatchLogsFullAccess",
+            "Effect": "Allow",
+            "Action": "logs:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "LambdaVPCAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:UnassignPrivateIpAddresses"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "DynamoDBFullAccess",
+            "Effect": "Allow",
+            "Action": "dynamodb:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "RDSDataAPIFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "rds-data:ExecuteStatement",
+                "rds-data:BatchExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
+                "rds-data:RollbackTransaction"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CafeMenuTableAccess",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": "arn:aws:dynamodb:us-east-1:537236558357:table/CafeMenu"
+        },
+        {
+            "Sid": "CafeOrdersTableAccess",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:Query",
+                "dynamodb:Scan"
+            ],
+            "Resource": "arn:aws:dynamodb:us-east-1:537236558357:table/CafeOrders"
+        },
+        {
+            "Sid": "CafeOrdersQueueAccess",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:SendMessage",
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes"
+            ],
+            "Resource": "arn:aws:sqs:us-east-1:537236558357:CafeOrdersQueue"
+        },
+        {
+            "Sid": "CafeSecretsManagerAccess",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*",
+                "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSecret*"
+            ]
+        },
+        {
+            "Sid": "CafeS3AppBucketAccess",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::demo-test-s3-b",
+                "arn:aws:s3:::demo-test-s3-b/*"
+            ]
+        },
+        {
+            "Sid": "ECRFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:CompleteLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:InitiateLayerUpload",
+                "ecr:PutImage",
+                "ecr:BatchGetImage",
+                "ecr:GetDownloadUrlForLayer"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECSFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ecs:UpdateService",
+                "ecs:DescribeServices",
+                "ecs:RegisterTaskDefinition"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "IAMPassRoleSecure",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": [
+                        "ecs.amazonaws.com",
+                        "lambda.amazonaws.com",
+                        "codepipeline.amazonaws.com"
+                    ]
+                }
+            }
+        }
+    ]
 }
 ```
 
