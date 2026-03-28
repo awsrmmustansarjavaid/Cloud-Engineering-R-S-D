@@ -110,3 +110,58 @@
 
   ]
 }
+// -------------------------------------------------
+    // 🐳 ECR ACCESS (GitHub CI/CD + ECS)
+    // -------------------------------------------------
+    {
+      "Sid": "ECRAuthAccess",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ECRPushPullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:CompleteLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage"
+      ],
+      "Resource": "*"
+    },
+
+    // -------------------------------------------------
+    // 🚀 ECS ACCESS (Deployment)
+    // -------------------------------------------------
+    {
+      "Sid": "ECSServiceDeploymentAccess",
+      "Effect": "Allow",
+      "Action": [
+        "ecs:UpdateService",
+        "ecs:DescribeServices",
+        "ecs:RegisterTaskDefinition",
+        "ecs:DescribeTaskDefinition"
+      ],
+      "Resource": "*"
+    },
+
+    // -------------------------------------------------
+    // 🔐 IAM PASS ROLE (CRITICAL FOR ECS)
+    // -------------------------------------------------
+    {
+      "Sid": "IAMPassRoleAccess",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "*"
+    }
+
+  ]
+}
