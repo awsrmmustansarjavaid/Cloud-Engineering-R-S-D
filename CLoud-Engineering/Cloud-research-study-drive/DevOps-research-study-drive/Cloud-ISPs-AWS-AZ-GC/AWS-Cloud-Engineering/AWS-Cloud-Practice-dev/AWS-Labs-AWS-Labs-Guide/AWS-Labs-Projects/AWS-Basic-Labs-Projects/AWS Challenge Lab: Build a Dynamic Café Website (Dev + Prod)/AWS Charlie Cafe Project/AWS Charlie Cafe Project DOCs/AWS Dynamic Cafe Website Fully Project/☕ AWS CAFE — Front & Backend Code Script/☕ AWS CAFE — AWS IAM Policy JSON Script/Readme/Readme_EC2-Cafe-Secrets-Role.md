@@ -766,5 +766,10 @@ This will make your project look like a senior AWS engineer project.
 }
 ```
 
+### 💡 Key takeaway:
+
+- Always match the "Action" to the service. "IAM:*" is not EC2.
+
+- "ec2:*" is the correct way to attach EC2 full access in a policy.
 
 ---
