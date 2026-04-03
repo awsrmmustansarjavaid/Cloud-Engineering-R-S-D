@@ -656,4 +656,115 @@ with proper IAM roles and least-privilege policies.
 
 This will make your project look like a senior AWS engineer project.
 ---
+### EC2-Cafe-Secrets-Role.json
 
+> #### Latest Version: 1.0  for Github
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
+    {
+      "Sid": "AmazonEC2FullAccess",
+      "Effect": "Allow",
+      "Action": "ec2:*", 
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "InvokeLambdaFunctions",
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:function:*"
+    },
+
+    {
+      "Sid": "LambdaFullAccess",
+      "Effect": "Allow",
+      "Action": "lambda:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "DynamoDBFullAccess",
+      "Effect": "Allow",
+      "Action": "dynamodb:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "SQSFullAccess",
+      "Effect": "Allow",
+      "Action": "sqs:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "S3FullAccess",
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "SecretsManagerFullAccess",
+      "Effect": "Allow",
+      "Action": "secretsmanager:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "GetCafeDevDBSecret",
+      "Effect": "Allow",
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*"
+    },
+
+    {
+      "Sid": "RDSFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "rds:*",
+        "rds-data:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "APIGatewayFullAccess",
+      "Effect": "Allow",
+      "Action": "apigateway:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "CloudWatchFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:*",
+        "cloudwatch:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "ElasticLoadBalancingFullAccess",
+      "Effect": "Allow",
+      "Action": "elasticloadbalancing:*",
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "CloudFrontFullAccess",
+      "Effect": "Allow",
+      "Action": "cloudfront:*",
+      "Resource": "*"
+    }
+
+  ]
+}
+```
+
+
+---
