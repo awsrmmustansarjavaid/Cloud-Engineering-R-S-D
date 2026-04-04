@@ -773,3 +773,198 @@ This will make your project look like a senior AWS engineer project.
 - "ec2:*" is the correct way to attach EC2 full access in a policy.
 
 ---
+---
+### EC2-Cafe-Secrets-Role.json
+
+> #### Latest Version: 1.1  for Github
+
+### GitHub IAM User (CI/CD)
+
+Use this:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SSMDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:SendCommand",
+        "ssm:GetCommandInvocation",
+        "ssm:ListCommandInvocations"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "EC2Describe",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### ✅ Fully Corrected IAM Policy (GitHub CI/CD User)
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
+    {
+      "Sid": "EC2Describe",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "SSMDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:SendCommand",
+        "ssm:GetCommandInvocation",
+        "ssm:ListCommandInvocations"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "LambdaFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "InvokeLambdaFunctions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:function:*"
+    },
+
+    {
+      "Sid": "S3FullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "RDSFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "rds:*",
+        "rds-data:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "SecretsManagerFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "GetCafeDevDBSecret",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*"
+    },
+
+    {
+      "Sid": "SQSFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "DynamoDBFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "APIGatewayFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "CloudWatchFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "logs:*",
+        "cloudwatch:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "ElasticLoadBalancingFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:*"
+      ],
+      "Resource": "*"
+    },
+
+    {
+      "Sid": "CloudFrontFullAccess",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:*"
+      ],
+      "Resource": "*"
+    }
+
+  ]
+}
+```
+
+#### ✅ Key Notes:
+
+- SSM: This is for GitHub Actions to execute commands on EC2 → correct.
+
+- EC2 Role: On the EC2 instance, attach AmazonSSMManagedInstanceCore managed policy separately.
+
+- No extra commas → JSON is valid.
+
+- Least privilege:
+
+- You could narrow Lambda/S3/RDS resources if needed (optional).
+
+- Separate responsibilities:
+
+  - EC2 only needs AmazonSSMManagedInstanceCore
+
+  - GitHub Actions user manages deployments via AWS API (Lambda, SSM, EC2 describe)
+---
+
