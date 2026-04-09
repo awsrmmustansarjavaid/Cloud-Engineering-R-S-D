@@ -148,9 +148,9 @@ CafeDevWebServer
 ### 7️⃣ EC2 USER DATA
 
 ### 1️⃣ LAMP Server USER DATA
-> **📍 File Location: AWS-LAMP Server-Bash-Script.md**
+> **📍 File Location: charlie-cafe-devops.sh**
 
-[AWS-LAMP Server Bash-Script](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Linux%20Lamp%20Server/Lamp%20Server%20Script.sh)
+[charlie-cafe-devops.sh](https://github.com/awsrmmustansarjavaid/charlie-cafe-devops/blob/376adc42dbcf412440cbee026e669322886f6d36/infrastructure/scripts/charlie-cafe-devops.sh)
 
 ### 8️⃣ Development and Delopment LAMP Server 
 
@@ -163,13 +163,13 @@ ssh -i CafeDevKey.pem ec2-user@<PUBLIC-IP>
 
 ### 2️⃣ VERIFY EC2 User Data
 
-#### 1️⃣ VERIFY LAMP + MySQL CLIENT (Amazon Linux 2023)
+#### 1️⃣ VERIFY verify-devops-env (Amazon Linux 2023)
 
 ```
 sudo nano lamp-verify.sh
 ```
 
-[VERIFY LAMP + MySQL CLIENT](../AWS%20Charlie%20Cafe%20Project/AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20&%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Bash%20Script/Linux%20Lamp%20Server/lamp-verify.sh)
+[verify-devops-env.sh](https://github.com/awsrmmustansarjavaid/charlie-cafe-devops/blob/376adc42dbcf412440cbee026e669322886f6d36/infrastructure/scripts/verify-devops-env.sh)
 
 ```
 sudo chmod +x lamp-verify.sh
