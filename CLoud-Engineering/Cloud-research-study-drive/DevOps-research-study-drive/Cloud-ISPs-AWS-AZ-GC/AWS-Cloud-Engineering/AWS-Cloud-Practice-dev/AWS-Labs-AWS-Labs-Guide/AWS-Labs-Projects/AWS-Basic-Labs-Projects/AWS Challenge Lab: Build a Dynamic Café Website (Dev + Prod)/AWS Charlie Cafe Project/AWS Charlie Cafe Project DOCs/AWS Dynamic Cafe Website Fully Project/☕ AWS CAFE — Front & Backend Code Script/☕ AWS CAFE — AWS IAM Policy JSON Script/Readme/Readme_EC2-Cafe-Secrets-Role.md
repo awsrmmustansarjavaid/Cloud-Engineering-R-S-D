@@ -975,10 +975,15 @@ Use this:
 
 ```
 {
-    "Sid": "ECRFullAccess",
+    "Sid": "ECRAuthorizationToken",
+    "Effect": "Allow",
+    "Action": "ecr:GetAuthorizationToken",
+    "Resource": "*"
+},
+{
+    "Sid": "ECRRepoAccess",
     "Effect": "Allow",
     "Action": [
-        "ecr:GetAuthorizationToken",
         "ecr:BatchCheckLayerAvailability",
         "ecr:GetDownloadUrlForLayer",
         "ecr:BatchGetImage",
@@ -989,7 +994,7 @@ Use this:
         "ecr:DescribeRepositories",
         "ecr:CreateRepository"
     ],
-    "Resource": "*"
+    "Resource": "arn:aws:ecr:us-east-1:537236558357:repository/charlie-cafe"
 }
 ```
 
@@ -1039,7 +1044,7 @@ Use this:
             "Action": [
                 "lambda:InvokeFunction"
             ],
-            "Resource": "arn:aws:lambda:us-east-1:537236558357:function:*"
+            "Resource": "arn:aws:lambda:us-east-1:aws account id:function:*"
         },
         {
             "Sid": "S3FullAccess",
@@ -1072,7 +1077,7 @@ Use this:
             "Action": [
                 "secretsmanager:GetSecretValue"
             ],
-            "Resource": "arn:aws:secretsmanager:us-east-1:537236558357:secret:CafeDevDBSM*"
+            "Resource": "arn:aws:secretsmanager:us-east-1:your aws account id :secret:CafeDevDBSM*"
         },
         {
             "Sid": "SQSFullAccess",
@@ -1124,10 +1129,15 @@ Use this:
             "Resource": "*"
         },
         {
-            "Sid": "ECRFullAccess",
+            "Sid": "ECRAuthorizationToken",
+            "Effect": "Allow",
+            "Action": "ecr:GetAuthorizationToken",
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECRRepoAccess",
             "Effect": "Allow",
             "Action": [
-                "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
@@ -1138,7 +1148,7 @@ Use this:
                 "ecr:DescribeRepositories",
                 "ecr:CreateRepository"
             ],
-            "Resource": "arn:aws:ecr:us-east-1:537236558357:repository/charlie-cafe"
+            "Resource": "arn:aws:ecr:us-east-1:aws account id:repository/charlie-cafe"
         }
     ]
 }
