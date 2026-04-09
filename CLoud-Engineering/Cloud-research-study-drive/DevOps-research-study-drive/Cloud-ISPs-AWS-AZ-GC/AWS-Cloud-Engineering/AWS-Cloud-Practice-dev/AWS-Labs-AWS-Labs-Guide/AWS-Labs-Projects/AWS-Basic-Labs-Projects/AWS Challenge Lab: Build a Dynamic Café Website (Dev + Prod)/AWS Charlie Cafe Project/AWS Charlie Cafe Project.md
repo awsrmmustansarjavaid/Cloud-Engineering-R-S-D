@@ -4701,7 +4701,7 @@ Execution role: Create new role
 [CafeAnalyticsLambda.py](./AWS%20Charlie%20Cafe%20Project%20DOCs/AWS%20Dynamic%20Cafe%20Website%20Fully%20Project/☕%20AWS%20CAFE%20—%20Front%20%26%20Backend%20Code%20Script/☕%20AWS%20CAFE%20—%20Backend%20Code%20Script/CafeAnalyticsLambda/CafeAnalyticsLambda.py)
 
 
-### 3️⃣ 🔐 Environment Variable Required
+### 3️⃣ 🔐 Environment Variable Required ( Do not required it )
 
 - Open Lambda → Your Function
 
