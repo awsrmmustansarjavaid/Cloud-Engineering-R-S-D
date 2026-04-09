@@ -7360,7 +7360,7 @@ CREATE INDEX idx_attendance_employee ON attendance(employee_id);
 
     - Type: Lambda
 
-    - Lambda: hr-admin-attendance-analytics
+    - Lambda: cafe-attendance-admin-service
 
     - Enable Lambda Proxy Integration ✅
 
