@@ -1154,6 +1154,23 @@ Use this:
 }
 ```
 
+### Steps to fix:
+
+- Edit your EC2 role’s IAM policy and replace your current "ECRFullAccess" statement with the two statements above.
+
+- Refresh IAM credentials on the EC2 instance:
+
+```
+aws sts get-caller-identity
+```
+
+- Retry the login:
+
+```
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin your aws account id.dkr.ecr.us-east-1.amazonaws.com
+```
+
+✅ After this, the login will succeed, and you can push/pull images from charlie-cafe repository.
 
 ---
 
