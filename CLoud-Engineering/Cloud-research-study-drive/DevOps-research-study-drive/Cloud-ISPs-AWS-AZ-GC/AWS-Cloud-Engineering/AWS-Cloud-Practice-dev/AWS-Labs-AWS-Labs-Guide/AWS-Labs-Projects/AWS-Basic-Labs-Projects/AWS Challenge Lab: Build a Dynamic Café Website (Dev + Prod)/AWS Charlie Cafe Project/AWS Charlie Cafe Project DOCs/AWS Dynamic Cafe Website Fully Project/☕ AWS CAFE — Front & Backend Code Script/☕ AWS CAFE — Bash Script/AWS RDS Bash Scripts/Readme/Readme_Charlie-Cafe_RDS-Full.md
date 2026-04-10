@@ -3805,23 +3805,36 @@ echo -e "${GREEN}✔ Row Counts Verified${NC}"
 echo -e "${GREEN}✔ Analytics Queries Successful${NC}"
 echo -e "${GREEN}✔ Full RDS Verification Completed${NC}"
 ```
+
+
 ---
-### Charlie-Cafe_RDS-Full.sh
+### ✅ Charlie-Cafe_RDS-Full.sh
 
 > #### Latest Version after fixed issue 
 
-✅ Fixes Included
-Removes messy duplicate columns (id + order_id)
-Adds missing payment_method
-Drops/rebuilds bad tables safely (optional clean reset)
-Uses proper schema migration logic
-Avoids duplicate inserts every run
-Keeps professional comments for learning
-Supports repeatable DevOps deployments
-Creates clean analytics-ready database
-Fixes your frontend/backend compatibility
-Production-style verification
-⚠️ IMPORTANT BEFORE RUNNING
+### ✅ Fixes Included
+
+- Removes messy duplicate columns (id + order_id)
+
+- Adds missing payment_method
+
+- Drops/rebuilds bad tables safely (optional clean reset)
+
+- Uses proper schema migration logic
+
+- Avoids duplicate inserts every run
+
+- Keeps professional comments for learning
+
+- Supports repeatable DevOps deployments
+
+- Creates clean analytics-ready database
+
+- Fixes your frontend/backend compatibility
+
+- Production-style verification
+
+### ⚠️ IMPORTANT BEFORE RUNNING
 
 This script will DROP existing tables and recreate them cleanly.
 
