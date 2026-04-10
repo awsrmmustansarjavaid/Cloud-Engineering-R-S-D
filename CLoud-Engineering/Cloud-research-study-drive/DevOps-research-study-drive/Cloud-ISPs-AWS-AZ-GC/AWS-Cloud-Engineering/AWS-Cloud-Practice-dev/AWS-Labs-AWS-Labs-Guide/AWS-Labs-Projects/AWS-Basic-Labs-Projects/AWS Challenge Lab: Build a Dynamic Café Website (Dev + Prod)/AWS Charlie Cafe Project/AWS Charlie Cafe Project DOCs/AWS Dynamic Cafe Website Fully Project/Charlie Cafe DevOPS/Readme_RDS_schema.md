@@ -43,112 +43,105 @@ infrastructure/rds/schema.sql
 ### ✅ FULL FILE (Nothing missing)
 
 ```
--- =============================================================
--- ☕ Charlie Cafe Database Schema (Production Ready)
--- =============================================================
+-- ==========================================================
+-- ☕ Charlie Cafe — DATABASE SCHEMA
+-- PURPOSE:
+-- Clean production-ready schema for Charlie Cafe RDS.
+--
+-- SAFE:
+-- Drops old tables first for full rebuild.
+--
+-- WARNING:
+-- This will DELETE old data.
+-- ==========================================================
 
--- ===============================
+-- =============================
 -- CREATE DATABASE
--- ===============================
+-- =============================
 CREATE DATABASE IF NOT EXISTS cafe_db
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
 USE cafe_db;
 
--- ===============================
+-- =============================
+-- DISABLE FK FOR CLEAN DROP
+-- =============================
+SET FOREIGN_KEY_CHECKS=0;
+
+DROP TABLE IF EXISTS attendance;
+DROP TABLE IF EXISTS leaves;
+DROP TABLE IF EXISTS holidays;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS employees;
+
+SET FOREIGN_KEY_CHECKS=1;
+
+-- =============================
 -- EMPLOYEES TABLE
--- ===============================
-CREATE TABLE IF NOT EXISTS employees (
+-- =============================
+CREATE TABLE employees (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
     cognito_user_id VARCHAR(100) UNIQUE,
-    name VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     job_title VARCHAR(50),
     salary DECIMAL(10,2),
     start_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ===============================
+-- =============================
 -- ATTENDANCE TABLE
--- ===============================
-CREATE TABLE IF NOT EXISTS attendance (
+-- =============================
+CREATE TABLE attendance (
     attendance_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
+    employee_id INT NOT NULL,
     attendance_date DATE,
     checkin_time TIME,
     checkout_time TIME,
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
+        ON DELETE CASCADE
 );
 
--- ===============================
+-- =============================
 -- LEAVES TABLE
--- ===============================
-CREATE TABLE IF NOT EXISTS leaves (
+-- =============================
+CREATE TABLE leaves (
     leave_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
+    employee_id INT NOT NULL,
     leave_date DATE,
     leave_type VARCHAR(50),
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
+        ON DELETE CASCADE
 );
 
--- ===============================
+-- =============================
 -- HOLIDAYS TABLE
--- ===============================
-CREATE TABLE IF NOT EXISTS holidays (
+-- =============================
+CREATE TABLE holidays (
     holiday_id INT AUTO_INCREMENT PRIMARY KEY,
     holiday_date DATE UNIQUE,
     description VARCHAR(100)
 );
 
--- ===============================
+-- =============================
 -- ORDERS TABLE
--- ===============================
-CREATE TABLE IF NOT EXISTS orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    table_number INT,
-    customer_name VARCHAR(100),
-    item VARCHAR(100),
-    quantity INT,
+-- =============================
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    table_number INT NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    item VARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    payment_method VARCHAR(50) DEFAULT 'CASH',
     total_cost DECIMAL(10,2),
     total_amount DECIMAL(10,2),
-    payment_status VARCHAR(20),
-    status VARCHAR(20),
+    payment_status VARCHAR(20) DEFAULT 'PENDING',
+    status VARCHAR(20) DEFAULT 'RECEIVED',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
--- ===============================
--- SAMPLE DATA (OPTIONAL BUT INCLUDED)
--- ===============================
-INSERT IGNORE INTO employees
-(cognito_user_id,name,job_title,salary,start_date)
-VALUES
-('emp-001','Ahmed','Barista',800,'2024-01-01'),
-('emp-002','Hassan','Cashier',750,'2024-02-01');
-
-INSERT IGNORE INTO attendance
-(employee_id,attendance_date,checkin_time,checkout_time)
-VALUES
-(1,CURDATE(),'09:00:00','17:00:00'),
-(2,CURDATE(),'09:15:00','17:00:00');
-
-INSERT IGNORE INTO leaves
-(employee_id,leave_date,leave_type)
-VALUES
-(1,'2026-03-01','Sick Leave');
-
-INSERT IGNORE INTO holidays
-(holiday_date,description)
-VALUES
-('2026-12-25','Christmas'),
-('2026-01-01','New Year');
-
-INSERT IGNORE INTO orders
-(table_number,customer_name,item,quantity,total_cost,total_amount,payment_status,status)
-VALUES
-(1,'Ali Khan','Espresso',2,4.00,8.00,'PAID','COMPLETED'),
-(2,'Sara Ahmed','Cappuccino',1,3.50,5.00,'PAID','COMPLETED'),
-(3,'Omar Ali','Latte',1,3.00,5.00,'PENDING','RECEIVED');
 ```
 
 ### ⚙️ 4. How It Works (Very Important)
@@ -183,26 +176,45 @@ infrastructure/rds/verify.sql
 ### ✅ FULL VERIFICATION SCRIPT
 
 ```
+-- ==========================================================
+-- ☕ Charlie Cafe — VERIFICATION & ANALYTICS
+-- PURPOSE:
+-- Verify DB structure, data, foreign keys, and analytics.
+-- ==========================================================
+
 USE cafe_db;
 
--- 1. Check database
-SHOW DATABASES;
+-- =============================
+-- VERIFY DATABASE
+-- =============================
+SELECT DATABASE();
 
--- 2. Check tables
+-- =============================
+-- SHOW TABLES
+-- =============================
 SHOW TABLES;
 
--- 3. Describe tables
+-- =============================
+-- DESCRIBE TABLES
+-- =============================
 DESCRIBE employees;
 DESCRIBE attendance;
 DESCRIBE leaves;
 DESCRIBE holidays;
 DESCRIBE orders;
 
--- 4. Check data
+-- =============================
+-- VIEW ALL DATA
+-- =============================
 SELECT * FROM employees;
+SELECT * FROM attendance;
+SELECT * FROM leaves;
+SELECT * FROM holidays;
 SELECT * FROM orders;
 
--- 5. Foreign keys
+-- =============================
+-- VERIFY FOREIGN KEYS
+-- =============================
 SELECT
     TABLE_NAME,
     COLUMN_NAME,
@@ -212,19 +224,23 @@ FROM information_schema.KEY_COLUMN_USAGE
 WHERE TABLE_SCHEMA = 'cafe_db'
 AND REFERENCED_TABLE_NAME IS NOT NULL;
 
--- 6. Indexes
+-- =============================
+-- VERIFY INDEXES
+-- =============================
 SHOW INDEX FROM orders;
 
--- 7. Row counts
+-- =============================
+-- ROW COUNTS
+-- =============================
 SELECT
 (SELECT COUNT(*) FROM orders) AS total_orders,
 (SELECT COUNT(*) FROM employees) AS total_employees,
 (SELECT COUNT(*) FROM attendance) AS total_attendance,
 (SELECT COUNT(*) FROM holidays) AS total_holidays;
 
--- ===============================
+-- =============================
 -- ANALYTICS TESTS
--- ===============================
+-- =============================
 
 -- Paid Orders
 SELECT COUNT(*) AS paid_orders
@@ -367,8 +383,14 @@ verify.sql   → testing + analytics
 ```
 -- ==========================================================
 -- ☕ Charlie Cafe — DATABASE SCHEMA
--- Purpose: Create DB + Tables + Relationships
--- Safe: YES (uses IF NOT EXISTS)
+-- PURPOSE:
+-- Clean production-ready schema for Charlie Cafe RDS.
+--
+-- SAFE:
+-- Drops old tables first for full rebuild.
+--
+-- WARNING:
+-- This will DELETE old data.
 -- ==========================================================
 
 -- =============================
@@ -381,12 +403,25 @@ COLLATE utf8mb4_unicode_ci;
 USE cafe_db;
 
 -- =============================
+-- DISABLE FK FOR CLEAN DROP
+-- =============================
+SET FOREIGN_KEY_CHECKS=0;
+
+DROP TABLE IF EXISTS attendance;
+DROP TABLE IF EXISTS leaves;
+DROP TABLE IF EXISTS holidays;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS employees;
+
+SET FOREIGN_KEY_CHECKS=1;
+
+-- =============================
 -- EMPLOYEES TABLE
 -- =============================
-CREATE TABLE IF NOT EXISTS employees (
+CREATE TABLE employees (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
     cognito_user_id VARCHAR(100) UNIQUE,
-    name VARCHAR(100),
+    name VARCHAR(100) NOT NULL,
     job_title VARCHAR(50),
     salary DECIMAL(10,2),
     start_date DATE,
@@ -396,30 +431,34 @@ CREATE TABLE IF NOT EXISTS employees (
 -- =============================
 -- ATTENDANCE TABLE
 -- =============================
-CREATE TABLE IF NOT EXISTS attendance (
+CREATE TABLE attendance (
     attendance_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
+    employee_id INT NOT NULL,
     attendance_date DATE,
     checkin_time TIME,
     checkout_time TIME,
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
+        ON DELETE CASCADE
 );
 
 -- =============================
 -- LEAVES TABLE
 -- =============================
-CREATE TABLE IF NOT EXISTS leaves (
+CREATE TABLE leaves (
     leave_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_id INT,
+    employee_id INT NOT NULL,
     leave_date DATE,
     leave_type VARCHAR(50),
-    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
+        ON DELETE CASCADE
 );
 
 -- =============================
 -- HOLIDAYS TABLE
 -- =============================
-CREATE TABLE IF NOT EXISTS holidays (
+CREATE TABLE holidays (
     holiday_id INT AUTO_INCREMENT PRIMARY KEY,
     holiday_date DATE UNIQUE,
     description VARCHAR(100)
@@ -428,16 +467,17 @@ CREATE TABLE IF NOT EXISTS holidays (
 -- =============================
 -- ORDERS TABLE
 -- =============================
-CREATE TABLE IF NOT EXISTS orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    table_number INT,
-    customer_name VARCHAR(100),
-    item VARCHAR(100),
-    quantity INT,
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    table_number INT NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    item VARCHAR(100) NOT NULL,
+    quantity INT NOT NULL,
+    payment_method VARCHAR(50) DEFAULT 'CASH',
     total_cost DECIMAL(10,2),
     total_amount DECIMAL(10,2),
-    payment_status VARCHAR(20),
-    status VARCHAR(20),
+    payment_status VARCHAR(20) DEFAULT 'PENDING',
+    status VARCHAR(20) DEFAULT 'RECEIVED',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
@@ -451,8 +491,8 @@ CREATE TABLE IF NOT EXISTS orders (
 ```
 -- ==========================================================
 -- ☕ Charlie Cafe — SAMPLE DATA
--- Purpose: Insert test data
--- Safe: YES (uses INSERT IGNORE)
+-- PURPOSE:
+-- Insert clean development/test sample data.
 -- ==========================================================
 
 USE cafe_db;
@@ -460,7 +500,7 @@ USE cafe_db;
 -- =============================
 -- EMPLOYEES
 -- =============================
-INSERT IGNORE INTO employees
+INSERT INTO employees
 (cognito_user_id,name,job_title,salary,start_date)
 VALUES
 ('emp-001','Ahmed','Barista',800,'2024-01-01'),
@@ -469,7 +509,7 @@ VALUES
 -- =============================
 -- ATTENDANCE
 -- =============================
-INSERT IGNORE INTO attendance
+INSERT INTO attendance
 (employee_id,attendance_date,checkin_time,checkout_time)
 VALUES
 (1,CURDATE(),'09:00:00','17:00:00'),
@@ -478,7 +518,7 @@ VALUES
 -- =============================
 -- LEAVES
 -- =============================
-INSERT IGNORE INTO leaves
+INSERT INTO leaves
 (employee_id,leave_date,leave_type)
 VALUES
 (1,'2026-03-01','Sick Leave');
@@ -486,7 +526,7 @@ VALUES
 -- =============================
 -- HOLIDAYS
 -- =============================
-INSERT IGNORE INTO holidays
+INSERT INTO holidays
 (holiday_date,description)
 VALUES
 ('2026-12-25','Christmas'),
@@ -495,12 +535,12 @@ VALUES
 -- =============================
 -- ORDERS
 -- =============================
-INSERT IGNORE INTO orders
-(table_number,customer_name,item,quantity,total_cost,total_amount,payment_status,status)
+INSERT INTO orders
+(table_number,customer_name,item,quantity,payment_method,total_cost,total_amount,payment_status,status)
 VALUES
-(1,'Ali Khan','Espresso',2,4.00,8.00,'PAID','COMPLETED'),
-(2,'Sara Ahmed','Cappuccino',1,3.50,5.00,'PAID','COMPLETED'),
-(3,'Omar Ali','Latte',1,3.00,5.00,'PENDING','RECEIVED');
+(1,'Ali Khan','Espresso',2,'CASH',4.00,8.00,'PAID','COMPLETED'),
+(2,'Sara Ahmed','Cappuccino',1,'CARD',3.50,3.50,'PAID','COMPLETED'),
+(3,'Omar Ali','Latte',1,'CASH',3.00,3.00,'PENDING','RECEIVED');
 ```
 
 ### 📁 3. verify.sql (TESTING + ANALYTICS)
@@ -512,12 +552,14 @@ VALUES
 ```
 -- ==========================================================
 -- ☕ Charlie Cafe — VERIFICATION & ANALYTICS
+-- PURPOSE:
+-- Verify DB structure, data, foreign keys, and analytics.
 -- ==========================================================
 
 USE cafe_db;
 
 -- =============================
--- CHECK DATABASE
+-- VERIFY DATABASE
 -- =============================
 SELECT DATABASE();
 
@@ -536,7 +578,7 @@ DESCRIBE holidays;
 DESCRIBE orders;
 
 -- =============================
--- VIEW DATA
+-- VIEW ALL DATA
 -- =============================
 SELECT * FROM employees;
 SELECT * FROM attendance;
@@ -545,7 +587,7 @@ SELECT * FROM holidays;
 SELECT * FROM orders;
 
 -- =============================
--- FOREIGN KEYS CHECK
+-- VERIFY FOREIGN KEYS
 -- =============================
 SELECT
     TABLE_NAME,
@@ -557,12 +599,12 @@ WHERE TABLE_SCHEMA = 'cafe_db'
 AND REFERENCED_TABLE_NAME IS NOT NULL;
 
 -- =============================
--- INDEX CHECK
+-- VERIFY INDEXES
 -- =============================
 SHOW INDEX FROM orders;
 
 -- =============================
--- ROW COUNT CHECK
+-- ROW COUNTS
 -- =============================
 SELECT
 (SELECT COUNT(*) FROM orders) AS total_orders,
@@ -571,7 +613,7 @@ SELECT
 (SELECT COUNT(*) FROM holidays) AS total_holidays;
 
 -- =============================
--- ANALYTICS
+-- ANALYTICS TESTS
 -- =============================
 
 -- Paid Orders
@@ -1080,3 +1122,33 @@ Unknown column 'payment_method'
 payment_method VARCHAR(20),
 ```
 
+
+### ✅ Recommended GitHub Actions Usage
+
+In deploy pipeline:
+
+```
+- name: Run Schema
+  run: mysql -h $DB_HOST -u $DB_USER -p$DB_PASS < schema.sql
+
+- name: Insert Data
+  run: mysql -h $DB_HOST -u $DB_USER -p$DB_PASS < data.sql
+
+- name: Verify DB
+  run: mysql -h $DB_HOST -u $DB_USER -p$DB_PASS < verify.sql
+```
+
+### ✅ Senior DevOps Advice
+
+Best practice for production:
+
+Do NOT run DROP TABLE schema every deployment in real production.
+
+Instead:
+
+Dev/Test → okay to rebuild.
+Production → use migrations (Flyway/Liquibase/manual ALTERs).
+
+Because dropping tables each deploy deletes real customer data.
+
+----
