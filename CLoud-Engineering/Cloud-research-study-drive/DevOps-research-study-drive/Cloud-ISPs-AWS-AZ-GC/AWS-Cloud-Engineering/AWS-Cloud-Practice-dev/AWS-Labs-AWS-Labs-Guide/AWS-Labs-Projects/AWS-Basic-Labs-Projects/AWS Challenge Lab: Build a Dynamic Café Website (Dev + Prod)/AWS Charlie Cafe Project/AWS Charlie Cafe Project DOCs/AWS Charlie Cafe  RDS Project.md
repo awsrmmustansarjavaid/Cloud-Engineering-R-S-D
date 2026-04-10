@@ -1,4 +1,6 @@
-# ☕ AWS Charlie Café – RDS Database Setup Guide
+# ☕ Charlie-Cafe_AWS-RDS-Secrets-Manager_Configurations
+
+## AWS Charlie Café – RDS Database Setup Guide
 
 ### 1️⃣ Project Overview
 
