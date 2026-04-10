@@ -2760,3 +2760,87 @@ Production → use migrations (Flyway/Liquibase/manual ALTERs).
 Because dropping tables each deploy deletes real customer data.
 
 ----
+# Charlie-Cafe_AWS-RDS-Secrets-Manager_DEVOPS-Configurations
+
+### ✅ OPTION 1 (BEST PRACTICE) — Run DB migrations INSIDE EC2 (RECOMMENDED)
+
+✔ Move ALL DB steps here:
+
+Instead of GitHub Actions → RDS
+
+👉 Do:
+
+```
+GitHub Actions
+   ↓
+EC2 (inside VPC)
+   ↓
+RDS (private access OK)
+```
+
+### 🔧 Fix (VERY IMPORTANT CHANGE)
+
+#### ❌ REMOVE from GitHub Actions:
+
+- Wait for RDS
+
+- Create database
+
+- Apply schema
+
+- Apply data
+
+- Verify DB
+
+### ✅ MOVE to EC2 script:
+
+Edit:
+
+```
+deploy_via_ssm.sh
+```
+
+Add:
+
+```
+#!/bin/bash
+
+DB_HOST="cafedb.xxxxxx.rds.amazonaws.com"
+DB_USER="cafe_user"
+DB_PASS="StrongPassword123"
+DB_NAME="cafe_db"
+
+echo "Waiting for RDS inside VPC..."
+
+for i in {1..30}; do
+  mysqladmin ping -h "$DB_HOST" -u"$DB_USER" -p"$DB_PASS" --silent && break
+  echo "RDS not ready..."
+  sleep 10
+done
+
+echo "Creating DB..."
+mysql -h "$DB_HOST" -u"$DB_USER" -p"$DB_PASS" -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+
+echo "Applying schema..."
+mysql -h "$DB_HOST" -u"$DB_USER" -p"$DB_PASS" $DB_NAME < /home/ec2-user/charlie-cafe-devops/infrastructure/rds/schema.sql
+
+echo "Applying data..."
+mysql -h "$DB_HOST" -u"$DB_USER" -p"$DB_PASS" $DB_NAME < /home/ec2-user/charlie-cafe-devops/infrastructure/rds/data.sql
+
+echo "DB setup complete"
+```
+
+### 🚀 WHY THIS WORKS
+
+Because EC2:
+
+✔ is inside same VPC as RDS
+
+✔ has private network access
+
+✔ can reach port 3306
+
+✔ no internet dependency
+
+---
+
