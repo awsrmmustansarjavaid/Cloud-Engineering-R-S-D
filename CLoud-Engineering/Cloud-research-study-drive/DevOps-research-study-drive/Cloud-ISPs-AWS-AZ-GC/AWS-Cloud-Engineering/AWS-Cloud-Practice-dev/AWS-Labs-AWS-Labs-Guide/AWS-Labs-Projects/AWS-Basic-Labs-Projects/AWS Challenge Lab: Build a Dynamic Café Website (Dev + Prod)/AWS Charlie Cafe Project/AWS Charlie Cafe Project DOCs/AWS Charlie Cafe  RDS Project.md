@@ -1998,12 +1998,6 @@ infrastructure/rds/schema.sql
 -- ☕ Charlie Cafe — DATABASE SCHEMA
 -- PURPOSE:
 -- Clean production-ready schema for Charlie Cafe RDS.
---
--- SAFE:
--- Drops old tables first for full rebuild.
---
--- WARNING:
--- This will DELETE old data.
 -- ==========================================================
 
 -- =============================
