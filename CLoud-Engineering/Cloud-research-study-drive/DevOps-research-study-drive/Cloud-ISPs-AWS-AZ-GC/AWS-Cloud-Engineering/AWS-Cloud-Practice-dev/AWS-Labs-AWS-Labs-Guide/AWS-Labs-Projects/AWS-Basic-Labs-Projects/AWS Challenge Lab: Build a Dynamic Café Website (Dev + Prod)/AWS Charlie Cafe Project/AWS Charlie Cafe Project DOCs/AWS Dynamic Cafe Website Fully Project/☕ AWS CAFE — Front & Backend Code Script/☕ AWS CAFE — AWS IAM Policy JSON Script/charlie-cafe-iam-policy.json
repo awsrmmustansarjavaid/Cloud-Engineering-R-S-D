@@ -124,37 +124,37 @@
             "Resource": "*"
         },
         {
-  "Sid": "IAMPassRoleSecure",
-  "Effect": "Allow",
-  "Action": "iam:PassRole",
-  "Resource": "*",
-  "Condition": {
-    "StringEquals": {
-      "iam:PassedToService": [
-        "ecs.amazonaws.com",
-        "lambda.amazonaws.com",
-        "codepipeline.amazonaws.com",
-        "codedeploy.amazonaws.com"
-      ]
-    }
-  }
-},
-{
-  "Sid": "CodeDeployECSBlueGreenDeploymentAccess",
-  "Effect": "Allow",
-  "Action": [
-    "codedeploy:*",
-    "elasticloadbalancing:Describe*",
-    "elasticloadbalancing:ModifyListener",
-    "elasticloadbalancing:ModifyTargetGroup",
-    "elasticloadbalancing:DescribeTargetGroups",
-    "cloudwatch:PutMetricAlarm",
-    "cloudwatch:DescribeAlarms",
-    "logs:CreateLogGroup",
-    "logs:CreateLogStream",
-    "logs:PutLogEvents"
-  ],
-  "Resource": "*"
-}
+            "Sid": "IAMPassRoleSecure",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": [
+                        "ecs.amazonaws.com",
+                        "lambda.amazonaws.com",
+                        "codepipeline.amazonaws.com",
+                        "codedeploy.amazonaws.com"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "CodeDeployECSBlueGreenDeploymentAccess",
+            "Effect": "Allow",
+            "Action": [
+                "codedeploy:*",
+                "elasticloadbalancing:Describe*",
+                "elasticloadbalancing:ModifyListener",
+                "elasticloadbalancing:ModifyTargetGroup",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "cloudwatch:PutMetricAlarm",
+                "cloudwatch:DescribeAlarms",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        }
     ]
 }
