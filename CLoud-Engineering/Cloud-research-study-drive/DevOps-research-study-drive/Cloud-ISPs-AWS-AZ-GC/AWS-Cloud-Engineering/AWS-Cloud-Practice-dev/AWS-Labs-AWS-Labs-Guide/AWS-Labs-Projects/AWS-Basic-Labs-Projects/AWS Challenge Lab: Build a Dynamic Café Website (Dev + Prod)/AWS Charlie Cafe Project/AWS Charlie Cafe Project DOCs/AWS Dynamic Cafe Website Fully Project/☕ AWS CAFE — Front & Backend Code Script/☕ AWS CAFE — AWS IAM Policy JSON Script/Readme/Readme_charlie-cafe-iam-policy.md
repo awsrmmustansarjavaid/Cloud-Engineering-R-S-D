@@ -1419,7 +1419,324 @@ This single policy now supports:
 
 ✅ Clean Sid labels (interview friendly)
 
+---
+### ✅ charlie-cafe-iam-policy.json
+
+> #### Update Version: 2
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codedeploy:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecs:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticloadbalancing:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:*",
+        "logs:*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### 🔵 1. ADD THIS NEW STATEMENT BLOCK
+
+👉 Paste this as a new object inside "Statement": []
+
+```
+{
+  "Sid": "CodeDeployECSBlueGreenDeploymentAccess",
+  "Effect": "Allow",
+  "Action": [
+    "codedeploy:*",
+    "ecs:DescribeServices",
+    "ecs:UpdateService",
+    "ecs:RegisterTaskDefinition",
+    "elasticloadbalancing:Describe*",
+    "elasticloadbalancing:ModifyListener",
+    "elasticloadbalancing:ModifyTargetGroup",
+    "elasticloadbalancing:DescribeTargetGroups",
+    "cloudwatch:PutMetricAlarm",
+    "cloudwatch:DescribeAlarms",
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents"
+  ],
+  "Resource": "*"
+}
+```
+
+### 🔵 2. REPLACE YOUR EXISTING iam:PassRole BLOCK WITH THIS
+
+👉 Find your current:
+
+```
+"Sid": "IAMPassRoleSecure"
+```
+
+👉 Replace ONLY that block with:
+
+```
+{
+  "Sid": "IAMPassRoleSecure",
+  "Effect": "Allow",
+  "Action": "iam:PassRole",
+  "Resource": "*",
+  "Condition": {
+    "StringEquals": {
+      "iam:PassedToService": [
+        "ecs.amazonaws.com",
+        "lambda.amazonaws.com",
+        "codepipeline.amazonaws.com",
+        "codedeploy.amazonaws.com"
+      ]
+    }
+  }
+}
+```
+
+### ✅ FIX (RECOMMENDED)
+
+👉 Remove ECS actions from CodeDeploy block
+
+Keep ECS ONLY in:
+
+```
+{
+  "Sid": "ECSFullAccess",
+  "Effect": "Allow",
+  "Action": [
+    "ecs:UpdateService",
+    "ecs:DescribeServices",
+    "ecs:RegisterTaskDefinition"
+  ],
+  "Resource": "*"
+}
+```
+
+✔ Then CodeDeploy block becomes cleaner:
+
+```
+{
+  "Sid": "CodeDeployECSBlueGreenDeploymentAccess",
+  "Effect": "Allow",
+  "Action": [
+    "codedeploy:*",
+    "elasticloadbalancing:Describe*",
+    "elasticloadbalancing:ModifyListener",
+    "elasticloadbalancing:ModifyTargetGroup",
+    "elasticloadbalancing:DescribeTargetGroups",
+    "cloudwatch:PutMetricAlarm",
+    "cloudwatch:DescribeAlarms",
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents"
+  ],
+  "Resource": "*"
+}
+```
+
+### 🔴 2. IAM PASSROLE (GOOD BUT TOO OPEN)
+
+You used:
+
+```
+"Resource": "*"
+```
+
+### ✅ Fully final charlie-cafe-iam-policy.json
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CloudWatchLogsFullAccess",
+            "Effect": "Allow",
+            "Action": "logs:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "LambdaVPCAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:AssignPrivateIpAddresses",
+                "ec2:UnassignPrivateIpAddresses"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "DynamoDBFullAccess",
+            "Effect": "Allow",
+            "Action": "dynamodb:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "RDSDataAPIFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "rds-data:ExecuteStatement",
+                "rds-data:BatchExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
+                "rds-data:RollbackTransaction"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "CafeMenuTableAccess",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": "arn:aws:dynamodb:us-east-1:537236558357:table/CafeMenu"
+        },
+        {
+            "Sid": "CafeOrdersTableAccess",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:Query",
+                "dynamodb:Scan"
+            ],
+            "Resource": "arn:aws:dynamodb:us-east-1:537236558357:table/CafeOrders"
+        },
+        {
+            "Sid": "CafeOrdersQueueAccess",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:SendMessage",
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes"
+            ],
+            "Resource": "arn:aws:sqs:us-east-1:537236558357:CafeOrdersQueue"
+        },
+        {
+            "Sid": "CafeSecretsManagerAccess",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSM*",
+                "arn:aws:secretsmanager:us-east-1:*:secret:CafeDevDBSecret*"
+            ]
+        },
+        {
+            "Sid": "CafeS3AppBucketAccess",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::demo-test-s3-b",
+                "arn:aws:s3:::demo-test-s3-b/*"
+            ]
+        },
+        {
+            "Sid": "ECRFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:CompleteLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:InitiateLayerUpload",
+                "ecr:PutImage",
+                "ecr:BatchGetImage",
+                "ecr:GetDownloadUrlForLayer"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECSFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ecs:UpdateService",
+                "ecs:DescribeServices",
+                "ecs:RegisterTaskDefinition"
+            ],
+            "Resource": "*"
+        },
+        {
+  "Sid": "IAMPassRoleSecure",
+  "Effect": "Allow",
+  "Action": "iam:PassRole",
+  "Resource": "*",
+  "Condition": {
+    "StringEquals": {
+      "iam:PassedToService": [
+        "ecs.amazonaws.com",
+        "lambda.amazonaws.com",
+        "codepipeline.amazonaws.com",
+        "codedeploy.amazonaws.com"
+      ]
+    }
+  }
+},
+{
+  "Sid": "CodeDeployECSBlueGreenDeploymentAccess",
+  "Effect": "Allow",
+  "Action": [
+    "codedeploy:*",
+    "elasticloadbalancing:Describe*",
+    "elasticloadbalancing:ModifyListener",
+    "elasticloadbalancing:ModifyTargetGroup",
+    "elasticloadbalancing:DescribeTargetGroups",
+    "cloudwatch:PutMetricAlarm",
+    "cloudwatch:DescribeAlarms",
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents"
+  ],
+  "Resource": "*"
+}
+    ]
+}
+```
+
 
 ---
-
-
