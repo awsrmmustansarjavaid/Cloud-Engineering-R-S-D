@@ -1,6 +1,6 @@
-**Charlie Notes**
+# Charlie Notes
 
-**🐧 Linux Fundamentals**
+## 🐧 Linux Fundamentals
 
 **Youtube Playlist URL:** [**Linux Zero To Hero**](https://www.youtube.com/playlist?list=PLe-5mmZeZbmhZZD5tBIReNOOnygP9yhGF)
 
