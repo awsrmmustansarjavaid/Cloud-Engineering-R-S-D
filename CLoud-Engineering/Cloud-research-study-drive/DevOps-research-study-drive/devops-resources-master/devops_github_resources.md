@@ -1,43 +1,493 @@
-# DEVOPS Github Resources
+# 🚀 DevOps GitHub Resources
 
+> A curated collection of GitHub repositories, learning resources, roadmaps, DevOps tools, hands-on projects, cheat sheets, books, communities, and practical references for learning and practicing DevOps.
 
-# 📚 Best GitHub Repositories to Learn DevOps
+This repository brings together DevOps learning material from beginner fundamentals to advanced cloud-native technologies such as Kubernetes, GitOps, Infrastructure as Code, observability, security, and platform engineering.
 
-> A curated collection of GitHub repositories for learning DevOps through roadmaps, practical exercises, hands-on projects, automation tools, Kubernetes, CI/CD, and cheat sheets.
-
-**Original Article:** [15 Best GitHub Repos to Learn DevOps](https://medium.com/@thetechfusionist/15-best-github-repos-to-learn-devops-eed9ea119f49)
-
-**Published:** October 25, 2025
-**Author:** Tech Fusionist
+[DevOps tools](https://github.com/collections/devops-tools)
 
 ---
 
-## 📕 DevOps Learning Roadmaps & Guides
+# 📚 Table of Contents
 
-### 1. Developer Roadmaps
+* [About This Repository](#about-this-repository)
+* [DevOps Learning Roadmap](#devops-learning-roadmap)
+* [1. API Tools](#1-api-tools)
+* [2. Artifact Management](#2-artifact-management)
+* [3. Backup & Disaster Recovery](#3-backup--disaster-recovery)
+* [4. Build Tools](#4-build-tools)
+* [5. Bug & Issue Tracking](#5-bug--issue-tracking)
+* [6. CI/CD Tools](#6-cicd-tools)
+* [7. Cloud Cost Management](#7-cloud-cost-management)
+* [8. Cloud Providers](#8-cloud-providers)
+* [9. Code Analysis & Security](#9-code-analysis--security)
+* [10. Code Coverage](#10-code-coverage)
+* [11. Code Review](#11-code-review)
+* [12. Collaboration](#12-collaboration)
+* [13. Configuration Management](#13-configuration-management)
+* [14. Container Autoscaling & Load Balancing](#14-container-autoscaling--load-balancing)
+* [15. Container Orchestration](#15-container-orchestration)
+* [16. Containerization](#16-containerization)
+* [17. Continuous Delivery & GitOps](#17-continuous-delivery--gitops)
+* [18. Data Processing & Analytics](#18-data-processing--analytics)
+* [19. Design & Architecture](#19-design--architecture)
+* [20. Development Environments](#20-development-environments)
+* [21. DevOps Learning Resources](#21-devops-learning-resources)
+* [22. Documentation](#22-documentation)
+* [23. IDE & Editors](#23-ide--editors)
+* [24. Infrastructure Provisioning & IaC](#24-infrastructure-provisioning--iac)
+* [25. Internal Developer Platforms](#25-internal-developer-platforms)
+* [26. Logging](#26-logging)
+* [27. Metric Storage](#27-metric-storage)
+* [28. Monitoring & Observability](#28-monitoring--observability)
+* [29. Networking](#29-networking)
+* [30. Operating Systems](#30-operating-systems)
+* [31. Planning & Project Management](#31-planning--project-management)
+* [32. Policy Management](#32-policy-management)
+* [33. Programming](#33-programming)
+* [34. Project-Based Learning](#34-project-based-learning)
+* [35. Secret Management](#35-secret-management)
+* [36. Service Mesh](#36-service-mesh)
+* [37. Source Code Management](#37-source-code-management)
+* [38. System Administration](#38-system-administration)
+* [39. System Design](#39-system-design)
+* [40. Test Automation & Performance Testing](#40-test-automation--performance-testing)
+* [41. Visualization](#41-visualization)
+* [42. Useful Communities](#42-useful-communities)
+* [43. Books](#43-books)
+* [44. Blogs & News](#44-blogs--news)
+* [45. Cheat Sheets](#45-cheat-sheets)
+* [46. Conferences](#46-conferences)
+* [47. DevOps Snippets](#47-devops-snippets)
+* [48. Other Useful Projects](#48-other-useful-projects)
+* [Recommended DevOps Learning Order](#recommended-devops-learning-order)
+* [How to Use This Repository](#how-to-use-this-repository)
+* [Featured GitHub Repositories](#featured-github-repositories)
+* [Contribution Guidelines](#contribution-guidelines)
+* [License](#license)
 
-**Repository:** https://github.com/kamranahmedse/developer-roadmap
+---
 
-A community-driven learning roadmap covering DevOps, Docker, Kubernetes, CI/CD, cloud platforms, and other software engineering topics.
+# 📌 About This Repository
 
-**Useful for:**
+DevOps is not a single tool.
 
-* DevOps learning roadmap
+It is a combination of:
+
+* Development
+* Operations
+* Automation
+* Infrastructure
+* Cloud
+* Containers
+* CI/CD
+* Security
+* Monitoring
+* Observability
+* Collaboration
+* Reliability
+
+This repository is designed to help learners understand **how these technologies connect together**, rather than simply collecting a list of tools.
+
+A typical DevOps workflow can look like:
+
+```text
+Developer
+    ↓
+Git / GitHub
+    ↓
+CI Pipeline
+    ↓
+Code Quality & Security
+    ↓
+Build & Test
+    ↓
+Container Image
+    ↓
+Container Registry
+    ↓
+Infrastructure / Kubernetes
+    ↓
+Application Deployment
+    ↓
+Monitoring & Logging
+    ↓
+Feedback & Improvement
+```
+
+---
+
+# 🗺️ DevOps Learning Roadmap
+
+A practical learning path is:
+
+```text
+Linux
+  ↓
+Networking Basics
+  ↓
+Git & GitHub
+  ↓
+Programming Fundamentals
+  ↓
+Bash / Shell Scripting
+  ↓
+Web Servers / Databases / Load Balancers
+  ↓
+Docker / Containers
+  ↓
+CI/CD
+  ↓
+Jenkins / GitHub Actions
+  ↓
+Cloud
+  ↓
+Terraform / CloudFormation / OpenTofu
+  ↓
+Ansible
+  ↓
+Kubernetes
+  ↓
+GitOps
+  ↓
+Security
+  ↓
+Monitoring & Observability
+  ↓
+Logging
+  ↓
+SRE / Reliability
+  ↓
+Real-World DevOps Projects
+```
+
+> You do not need to master every tool. Learn the concepts first, then learn tools that help you implement those concepts.
+
+---
+
+# 1. API Tools
+
+Tools for developing, testing, documenting, and debugging APIs.
+
+* **Postman** — API development, testing, documentation, and collaboration.
+* **Hoppscotch** — Open-source API development and testing platform.
+* **SoapUI** — API testing for SOAP and REST services.
+* **Swagger** — API specification and documentation ecosystem.
+* **HTTPie** — Human-friendly command-line HTTP client.
+* **HttpMaster** — HTTP testing and debugging tool.
+
+---
+
+# 2. Artifact Management
+
+Artifact repositories store and manage packages, binaries, container images, and other deployable artifacts.
+
+* **Nexus Repository** — Repository manager for dependencies and artifacts.
+* **JFrog Artifactory** — Universal artifact repository.
+* **npm** — JavaScript package registry and package manager.
+* **NuGet** — Package manager for the .NET ecosystem.
+
+---
+
+# 3. Backup & Disaster Recovery
+
+Tools for backing up applications, Kubernetes resources, persistent volumes, and infrastructure data.
+
+* **Velero** — Backup, restore, disaster recovery, and migration for Kubernetes.
+* **Kasten K10** — Kubernetes data management and disaster recovery.
+* **CloudCasa** — Kubernetes backup and disaster recovery platform.
+
+---
+
+# 4. Build Tools
+
+Build tools automate compilation, packaging, dependency management, and artifact creation.
+
+* **Maven** — Build and dependency management for Java.
+* **Gradle** — Build automation for JVM and other ecosystems.
+* **npm** — JavaScript package management.
+* **pnpm** — Fast and disk-efficient JavaScript package manager.
+* **Yarn** — JavaScript and TypeScript package manager.
+* **Rake** — Ruby build automation.
+* **MSBuild** — Build platform for .NET and Visual Studio.
+* **PyBuilder** — Python-based build automation.
+
+---
+
+# 5. Bug & Issue Tracking
+
+Tools for tracking bugs, issues, tasks, and software-development workflows.
+
+* **Backlog** — Project management and issue tracking.
+* **Bugzilla** — Open-source bug tracking system.
+* **Jira** — Issue tracking and project management.
+* **Lean Testing** — Test case and bug management.
+* **MantisBT** — Open-source web-based bug tracking.
+
+---
+
+# 6. CI/CD Tools
+
+Continuous Integration and Continuous Delivery tools automate building, testing, packaging, and deployment.
+
+### Popular CI/CD Tools
+
+* **Jenkins** — Open-source automation server.
+* **GitHub Actions** — CI/CD integrated with GitHub.
+* **GitLab CI/CD** — CI/CD integrated with GitLab.
+* **CircleCI** — Cloud and self-hosted CI/CD platform.
+* **Buildkite** — CI/CD platform with self-hosted agents.
+* **Drone** — Container-native CI/CD platform.
+* **TeamCity** — CI/CD and build management platform.
+* **Travis CI** — Hosted CI service.
+* **Bamboo** — CI/CD platform from Atlassian.
+* **Tekton** — Kubernetes-native CI/CD framework.
+* **Zuul** — CI system designed around project gating.
+* **Werf** — CI/CD and Kubernetes deployment tool.
+
+---
+
+# 7. Cloud Cost Management
+
+Tools for understanding, monitoring, and optimizing cloud and Kubernetes costs.
+
+* **Infracost** — Cloud cost estimation for Infrastructure as Code.
+* **Kubecost** — Kubernetes cost monitoring and optimization.
+
+---
+
+# 8. Cloud Providers
+
+Major cloud platforms used for DevOps, infrastructure, application hosting, and cloud-native workloads.
+
+* **Amazon Web Services (AWS)** — Cloud computing platform.
+* **Microsoft Azure** — Microsoft cloud platform.
+* **Google Cloud** — Google cloud computing platform.
+* **IBM Cloud** — Enterprise cloud platform.
+* **Oracle Cloud** — Cloud infrastructure and enterprise services.
+* **OpenStack** — Open-source cloud infrastructure platform.
+
+---
+
+# 9. Code Analysis & Security
+
+Code analysis tools help identify bugs, code-quality problems, vulnerabilities, and security issues.
+
+## Static Analysis
+
+Static analysis examines source code without executing the application.
+
+* **SonarQube** — Continuous code quality and security analysis.
+* **PMD** — Static source-code analyzer.
+* **Checkmarx** — Application security testing platform.
+
+## Dynamic Analysis
+
+Dynamic analysis tests applications while they are running.
+
+* **Acunetix** — Web application vulnerability scanning.
+
+## Container Security
+
+* **Trivy** — Vulnerability and security scanner.
+* **Clair** — Container vulnerability analysis.
+* **Docker Bench Security** — Docker security best-practice checks.
+* **Falco** — Runtime threat detection and cloud-native security.
+* **Notary** — Software supply-chain trust and signing ecosystem.
+
+---
+
+# 10. Code Coverage
+
+Code coverage tools measure which parts of an application are exercised by tests.
+
+* **Cobertura** — Java code coverage.
+* **Clover** — Code coverage and testing analysis.
+* **JaCoCo** — Java code coverage library.
+
+---
+
+# 11. Code Review
+
+Tools that support collaborative source-code review.
+
+* **Gerrit** — Code review and Git-based collaboration.
+* **Review Board** — Code review platform.
+* **Pull Panda** — Pull-request management and review tools.
+
+---
+
+# 12. Collaboration
+
+Tools for communication and team collaboration.
+
+* **Slack** — Team communication and collaboration.
+* **Cisco Webex** — Messaging, meetings, calling, and collaboration.
+* **Flock** — Team communication and productivity.
+* **Flowdock** — Team collaboration and communication.
+
+> Google Hangouts has historically been listed in DevOps resource collections, but the product has been retired. Prefer current Google communication products instead.
+
+---
+
+# 13. Configuration Management
+
+Configuration management tools automate the configuration and maintenance of servers and infrastructure.
+
+* **Ansible** — Agentless automation and configuration management.
+* **Chef** — Infrastructure and configuration automation.
+* **Puppet** — Declarative configuration management.
+* **Salt** — Infrastructure automation and remote execution.
+
+---
+
+# 14. Container Autoscaling & Load Balancing
+
+Tools that help Kubernetes workloads automatically scale or expose services.
+
+* **KEDA** — Event-driven Kubernetes autoscaling.
+* **MetalLB** — Load-balancer implementation for bare-metal Kubernetes.
+
+---
+
+# 15. Container Orchestration
+
+Container orchestration platforms manage containerized applications across clusters.
+
+* **Kubernetes** — Container orchestration platform.
+* **OpenShift** — Kubernetes-based application platform.
+* **Nomad** — Workload orchestrator for containers and non-containerized applications.
+* **k3s** — Lightweight Kubernetes distribution.
+
+---
+
+# 16. Containerization
+
+Container technologies package applications and dependencies into portable runtime environments.
+
+* **Docker** — Container development and runtime platform.
+* **Podman** — Daemonless OCI container engine.
+* **Buildah** — OCI container image building tool.
+* **CRI-O** — Kubernetes-focused container runtime.
+
+> `rkt` was historically an important container runtime but is no longer an active modern choice. It is retained here only as historical reference when studying older container technology.
+
+---
+
+# 17. Continuous Delivery & GitOps
+
+GitOps uses Git as a source of truth for declarative application and infrastructure configuration.
+
+* **Argo CD** — Kubernetes GitOps continuous delivery.
+* **Flux CD** — GitOps continuous delivery for Kubernetes.
+* **Jenkins** — Automation and deployment pipelines.
+* **GoCD** — Continuous delivery server.
+* **GitLab CI/CD** — Integrated CI/CD platform.
+* **Jenkins X** — Kubernetes-focused CI/CD project.
+* **Tekton** — Kubernetes-native CI/CD framework.
+
+### Typical GitOps Workflow
+
+```text
+Developer
+    ↓
+Git Repository
+    ↓
+CI Pipeline
+    ↓
+Build & Test
+    ↓
+Container Image
+    ↓
+Container Registry
+    ↓
+GitOps Repository
+    ↓
+Argo CD / Flux
+    ↓
+Kubernetes
+```
+
+---
+
+# 18. Data Processing & Analytics
+
+Tools for processing, transforming, querying, and analyzing large datasets.
+
+## Data Processing
+
+* **Apache Spark**
+* **Apache Hadoop**
+* **Apache Airflow**
+* **Presto**
+
+## Analytics Engines
+
+* **Apache Druid**
+* **Dremio**
+* **Snowflake**
+
+## Operations Data
+
+* **Salesforce**
+* **Zuora**
+
+---
+
+# 19. Design & Architecture
+
+Resources for learning software architecture, distributed systems, and cloud-native application design.
+
+* **The Twelve-Factor App** — Principles for building modern application services.
+* **Distributed Systems Reading List** — Distributed-systems learning material.
+* **System Design Primer** — System design concepts, examples, and interview preparation.
+
+---
+
+# 20. Development Environments
+
+Tools for creating reproducible development and testing environments.
+
+* **VirtualBox** — Desktop virtualization.
+* **QEMU** — Machine emulator and virtualizer.
+* **Vagrant** — Virtual machine environment management.
+* **Docker Desktop** — Desktop container development environment.
+* **Podman Desktop** — Desktop container and Kubernetes environment.
+* **Rancher Desktop** — Local Kubernetes and container environment.
+* **Minikube** — Local Kubernetes clusters.
+* **kind** — Kubernetes clusters using containers as nodes.
+* **k3d** — Runs lightweight k3s clusters inside Docker.
+
+> Minishift was designed for local OpenShift development but is no longer a recommended modern choice.
+
+---
+
+# 21. DevOps Learning Resources
+
+## 21.1 DevOps Roadmaps & Guides
+
+### Developer Roadmap
+
+**Repository:** `kamranahmedse/developer-roadmap`
+
+A large collection of roadmaps covering DevOps, cloud, Kubernetes, Docker, programming, and other technology areas.
+
+Useful for:
+
+* DevOps roadmap
+* Cloud
 * Docker
 * Kubernetes
 * CI/CD
-* Cloud platforms
 * Career planning
 
----
+### DevOps Resources
 
-### 2. DevOps Resources
+**Repository:** `bregman-arie/devops-resources`
 
-**Repository:** https://github.com/bregman-arie/devops-resources
+A broad collection of DevOps learning resources.
 
-A comprehensive collection of DevOps resources covering many important technologies and concepts.
-
-**Useful for:**
+Useful for:
 
 * Linux
 * Jenkins
@@ -45,68 +495,49 @@ A comprehensive collection of DevOps resources covering many important technolog
 * Kubernetes
 * Terraform
 * DevOps fundamentals
-* Learning resources
 
----
+### Learn DevOps
 
-### 3. Learn DevOps
+**Repository:** `codeaprendiz/learn-devops`
 
-**Repository:** https://github.com/codeaprendiz/learn-devops
+A task-oriented DevOps learning repository.
 
-A task-based repository documenting a practical DevOps learning journey.
-
-**Useful for:**
+Useful for:
 
 * Practical learning
 * DevOps tasks
 * Hands-on objectives
 * Examples
-* Learning by doing
 
----
+### DevOps Tutorial
 
-### 4. DevOps Tutorial
+**Repository:** `manikcloud/DevOps-Tutorial`
 
-**Repository:** https://github.com/manikcloud/DevOps-Tutorial
+Tutorials and practical material related to DevOps technologies.
 
-A tutorial repository containing practical guides related to DevOps technologies and workflows.
+### Tech Vault
 
-**Useful for:**
+**Repository:** `moabukar/tech-vault`
 
-* CI/CD
-* Containerization
-* Infrastructure automation
-* DevOps tutorials
-* Hands-on practice
+A collection of technical tutorials and resources.
 
----
-
-### 5. Tech Vault
-
-**Repository:** https://github.com/moabukar/tech-vault
-
-A beginner-friendly collection of technical tutorials and learning resources.
-
-**Useful for:**
+Useful for:
 
 * Docker
 * Kubernetes
 * Ansible
-* DevOps
+* Cloud
 * Infrastructure
-* Cloud technologies
 
 ---
 
-## 🎯 DevOps Exercises & Challenges
+## 21.2 DevOps Exercises
 
-### 6. DevOps Exercises
+**Repository:** `bregman-arie/devops-exercises`
 
-**Repository:** https://github.com/bregman-arie/devops-exercises
+A large collection of DevOps questions, exercises, troubleshooting topics, and interview preparation material.
 
-A large collection of practical DevOps questions and exercises covering a wide range of technologies.
-
-**Useful for:**
+Useful for:
 
 * Linux
 * AWS
@@ -115,323 +546,602 @@ A large collection of practical DevOps questions and exercises covering a wide r
 * Terraform
 * Jenkins
 * SRE
-* Interview preparation
 * Troubleshooting
-
-**Reported repository size in the article:** 67.9K stars and 2,600+ exercises.
+* Interview preparation
 
 ---
 
-### 7. Test Your Sysadmin Skills
+## 21.3 System Administration Practice
 
-**Repository:** https://github.com/trimstray/test-your-sysadmin-skills
+### Test Your Sysadmin Skills
 
-A collection of practical challenges focused primarily on system administration and infrastructure skills.
+**Repository:** `trimstray/test-your-sysadmin-skills`
 
-**Useful for:**
+Practical challenges for developing system administration and infrastructure knowledge.
+
+Useful for:
 
 * Linux
 * Networking
 * System administration
 * Troubleshooting
-* DevOps fundamentals
 
 ---
 
-## 🔥 Project-Based Learning
+# 22. Documentation
 
-### 8. Project-Based Learning
+Documentation platforms help teams maintain technical knowledge, architecture documentation, runbooks, and internal guides.
 
-**Repository:** https://github.com/practical-tutorials/project-based-learning
-
-A collection of project ideas and practical learning resources for developing real-world technical skills.
-
-**Useful for:**
-
-* Practical projects
-* Automation
-* Deployment
-* DevOps practice
-* Hands-on learning
+* **Confluence** — Collaborative documentation and knowledge management.
+* **ClickUp Docs** — Documentation integrated with project management.
+* **GitHub Wiki** — Repository-based documentation.
+* **Markdown** — Lightweight format commonly used for technical documentation.
 
 ---
 
-### 9. Build Your Own X
+# 23. IDE & Editors
 
-**Repository:** https://github.com/codecrafters-io/build-your-own-x
+* **Visual Studio Code** — Lightweight source-code editor.
+* **Sublime Text** — Fast text and code editor.
+* **Notepad++** — Windows source-code editor.
 
-A project-based collection where you learn concepts by building technologies and tools yourself.
+---
 
-**Examples include:**
+# 24. Infrastructure Provisioning & IaC
 
-* Docker
+Infrastructure as Code allows infrastructure to be defined and managed through configuration or programming languages.
+
+* **Terraform** — Multi-cloud Infrastructure as Code.
+* **OpenTofu** — Open-source Infrastructure as Code tool.
+* **Pulumi** — Infrastructure as Code using general-purpose programming languages.
+* **AWS CloudFormation** — AWS-native infrastructure provisioning.
+* **Azure Resource Manager** — Azure resource deployment and management.
+* **Azure Bicep** — Declarative language for Azure infrastructure.
+
+---
+
+# 25. Internal Developer Platforms
+
+Platform engineering tools provide developers with self-service interfaces for infrastructure, applications, services, and operational workflows.
+
+* **Backstage** — Open-source developer portal framework.
+* **Port** — Internal developer platform.
+* **Cortex** — Developer experience and service management platform.
+* **OpsLevel** — Service catalog and platform engineering capabilities.
+* **Configure8** — Infrastructure and application management platform.
+
+---
+
+# 26. Logging
+
+Centralized logging collects application and infrastructure logs into systems where they can be searched and analyzed.
+
+## Log Management
+
+* **Elastic Stack**
+* **Graylog**
+* **Fluentd**
+* **Splunk**
+* **Sumo Logic**
+* **Syslog-ng**
+* **Logz.io**
+
+## Log Aggregation
+
+* **Grafana Loki**
+* **Logstash**
+
+---
+
+# 27. Metric Storage
+
+Metric storage systems store time-series data generated by applications and infrastructure.
+
+* **Prometheus**
+* **VictoriaMetrics**
+* **InfluxDB**
+* **Thanos**
+
+---
+
+# 28. Monitoring & Observability
+
+Monitoring and observability help teams understand the health, performance, reliability, and behavior of applications and infrastructure.
+
+* **Prometheus** — Metrics monitoring and alerting.
+* **VictoriaMetrics** — Time-series database and monitoring platform.
+* **Grafana** — Visualization, dashboards, and alerting.
+* **Thanos** — Highly available and long-term Prometheus-compatible metrics architecture.
+* **Zabbix** — Infrastructure monitoring.
+* **Nagios** — Infrastructure monitoring.
+* **Sensu** — Infrastructure and application monitoring.
+* **Datadog** — Cloud monitoring and observability.
+* **New Relic** — Application and infrastructure observability.
+* **Dynatrace** — Full-stack observability.
+* **AppDynamics** — Application performance monitoring.
+* **Sumo Logic** — Cloud-native monitoring and analytics.
+* **Middleware** — Full-stack observability.
+* **Cilium** — Networking, security, and observability using eBPF.
+* **Calico** — Kubernetes networking and security.
+* **Falco** — Runtime security and threat detection.
+* **HolmesGPT** — Open-source alert investigation assistant.
+
+---
+
+# 29. Networking
+
+Networking knowledge is essential for DevOps and cloud infrastructure.
+
+Important concepts include:
+
+* IP addressing
+* Subnets
+* Routing
+* DNS
+* DHCP
+* TCP
+* UDP
+* HTTP
+* HTTPS
+* SSH
+* TLS
+* Load balancing
+* Firewalls
+* NAT
+* VPN
+* Network security
+* Service discovery
+
+Useful tools and technologies include:
+
+* Kubernetes networking
+* CNI plugins
+* Cilium
+* Calico
+* MetalLB
+* Nginx
+* HAProxy
+
+---
+
+# 30. Operating Systems
+
+Linux is one of the most important foundations for DevOps.
+
+## Linux Learning Resources
+
+* **Linux Journey** — Linux guides and exercises.
+* **TecMint Linux Guide** — Linux tutorials and administration resources.
+* **Linux Survival** — Interactive Linux learning.
+
+## Linux Topics
+
+Start with:
+
+* Filesystem
+* Permissions
+* Users and groups
+* Processes
+* Services
+* Package management
+* Networking
+* SSH
+* Storage
+* Logs
+* System monitoring
+* Shell scripting
+
+Then progress toward:
+
+* Kernel
+* Memory management
+* Virtualization
+* Process management
+* Storage architecture
+* Networking internals
+
+---
+
+# 31. Planning & Project Management
+
+* **Jira** — Agile project and issue management.
+* **Trello** — Board-based task management.
+* **Asana** — Project and task management.
+* **Backlog** — Project management and collaboration.
+* **Monday.com** — Workflow and project management.
+* **ClickUp** — Project management, documentation, and collaboration.
+
+---
+
+# 32. Policy Management
+
+Policy engines help enforce security, compliance, and configuration rules.
+
+* **Open Policy Agent (OPA)** — General-purpose policy engine.
+* **Kyverno** — Kubernetes-native policy engine.
+* **Cloud Custodian** — Policy and governance engine for cloud resources.
+
+---
+
+# 33. Programming
+
+DevOps engineers benefit from understanding at least one programming language and being comfortable with automation.
+
+Useful languages include:
+
+* Python
+* Go
+* Bash
+* JavaScript
+* Java
+* C#
+* Ruby
+
+## Programming Practice
+
+* **HackerRank** — Programming practice.
+* **Exercism** — Programming exercises across many languages.
+* **LeetCode** — Algorithm and programming practice.
+
+## DevOps Programming Projects
+
+Try building:
+
+* Infrastructure provisioning scripts
+* Log-analysis scripts
+* Monitoring scripts
+* Backup automation
+* Deployment scripts
+* API clients
+* Cloud automation tools
+* Kubernetes utilities
+
+---
+
+# 34. Project-Based Learning
+
+Hands-on projects are essential for turning DevOps theory into practical skills.
+
+### Project-Based Learning
+
+**Repository:** `practical-tutorials/project-based-learning`
+
+A collection of project ideas for learning through implementation.
+
+### Build Your Own X
+
+**Repository:** `codecrafters-io/build-your-own-x`
+
+Learn how technologies work by building simplified versions of them.
+
+Projects cover areas such as:
+
 * Git
+* Docker
 * Databases
 * Operating systems
 * Networking
 * Programming languages
 * Development tools
 
-**Why it is useful for DevOps:**
+### Kubernetes The Hard Way
 
-Building simplified versions of infrastructure and development tools can help you understand what happens underneath higher-level DevOps tools.
+**Repository:** `kelseyhightower/kubernetes-the-hard-way`
 
----
+A hands-on Kubernetes project designed to help learners understand Kubernetes components and cluster internals.
 
-### 10. Kubernetes The Hard Way
-
-**Repository:** https://github.com/kelseyhightower/kubernetes-the-hard-way
-
-A step-by-step Kubernetes learning project focused on understanding how Kubernetes components work and how a cluster can be configured manually.
-
-**Useful for:**
+Useful for:
 
 * Kubernetes architecture
-* Kubernetes components
-* Cluster setup
 * Certificates
 * Networking
+* Cluster components
 * Kubernetes internals
 
-**Recommended for:**
+> Recommended after learning basic Kubernetes concepts.
 
-Learners who already understand basic Kubernetes concepts and want to understand what happens behind the scenes.
+### Fast Kubernetes
 
----
+**Repository:** `omerbsezer/Fast-Kubernetes`
 
-### 11. Fast Kubernetes
-
-**Repository:** https://github.com/omerbsezer/Fast-Kubernetes
-
-A Kubernetes-focused repository containing projects and scripts intended to help with Kubernetes learning and deployment.
-
-**Useful for:**
-
-* Kubernetes practice
-* Kubernetes projects
-* Deployment
-* Scripts
-* Hands-on learning
+Kubernetes-focused learning material, projects, and deployment examples.
 
 ---
 
-## 🔄 CI/CD, Automation & DevOps Tools
+# 35. Secret Management
 
-### 12. DevOps Bash Tools
+Secret management tools protect passwords, API keys, certificates, tokens, and other sensitive information.
 
-**Repository:** https://github.com/HariSekhon/DevOps-Bash-tools
+* **HashiCorp Vault** — Centralized secret management.
+* **External Secrets Operator** — Synchronizes secrets from external secret-management systems into Kubernetes.
+* **AWS Secrets Manager** — Managed AWS secret storage.
+* **Google Cloud Secret Manager** — Managed GCP secret storage.
+* **Azure Key Vault** — Azure secrets, keys, and certificate management.
+* **Teller** — Developer-focused secret management.
 
-A collection of Bash scripts and utilities useful for DevOps and system administration tasks.
+---
 
-**Useful for:**
+# 36. Service Mesh
 
-* Bash scripting
-* Automation
-* Monitoring
-* System administration
-* DevOps utilities
+Service meshes provide infrastructure for service-to-service communication in distributed applications.
+
+* **Istio** — Service connectivity, security, and observability.
+* **Linkerd** — Lightweight service mesh.
+* **Cilium Service Mesh** — eBPF-based service networking and observability.
+
+---
+
+# 37. Source Code Management
+
+Source-control systems store and manage application and infrastructure code.
+
+* **GitHub** — Git repository hosting and developer collaboration.
+* **GitLab** — Source control and DevOps platform.
+* **Bitbucket** — Git repository hosting from Atlassian.
+* **Azure Repos** — Source control within Azure DevOps.
+* **Codeberg** — Community-oriented Git hosting.
+* **Forgejo** — Open-source Git hosting platform.
+* **Gitea** — Lightweight Git hosting.
+* **Gogs** — Lightweight Git service.
+* **Fossil** — Distributed version-control system with integrated project management features.
+
+## Git Skills to Learn
+
+You should become comfortable with:
+
+* Repositories
+* Commits
+* Branches
+* Merging
+* Rebasing
+* Pull requests
+* Merge requests
+* Tags
+* Releases
+* Remote repositories
+* Conflict resolution
+
+### Git Practice
+
+* **Learn Git Branching** — Interactive Git branching exercises.
+* **Learn Git Concepts, Not Commands** — Concept-focused Git learning.
+* **Codecademy Learn Git** — Guided Git learning.
+
+---
+
+# 38. System Administration
+
+DevOps builds heavily on system-administration knowledge.
+
+Important areas include:
+
+* Linux administration
+* Users and groups
+* Permissions
+* Processes
+* Services
+* Networking
+* Storage
+* Backups
+* Security
 * Troubleshooting
+* Monitoring
+* Automation
+
+### Practice
+
+**Test Your Sysadmin Skills**
+
+A useful collection of practical system-administration challenges.
 
 ---
 
-### 13. Ansible Examples
+# 39. System Design
 
-**Repository:** https://github.com/ansible/ansible-examples
+System design helps DevOps engineers understand how infrastructure and applications behave at scale.
 
-A collection of Ansible examples demonstrating automation and configuration-management concepts.
+Important concepts:
 
-**Useful for:**
+* Availability
+* Reliability
+* Scalability
+* Performance
+* Fault tolerance
+* Load balancing
+* Caching
+* Databases
+* Networking
+* Distributed systems
+* Disaster recovery
 
-* Ansible
-* Configuration management
-* Server automation
-* Provisioning
-* Playbooks
-* Infrastructure automation
+### Resources
 
----
-
-## 🚀 Quick References & Cheat Sheets
-
-### 14. Christian Lempa Cheat Sheets
-
-**Repository:** https://github.com/christianlempa/cheat-sheets
-
-A collection of cheat sheets and quick references for commonly used DevOps technologies.
-
-**Useful for:**
-
-* Docker
-* Kubernetes
-* AWS
-* Terraform
-* DevOps commands
-* Quick revision
+* **System Design Notebook** — System design learning material.
+* **System Design Primer** — Large-scale system design and interview preparation.
+* **Distributed Systems Reading List** — Distributed systems resources.
 
 ---
 
-### 15. Awesome Cheat Sheets
+# 40. Test Automation & Performance Testing
 
-**Repository:** https://github.com/LeCoupa/awesome-cheatsheets
+Testing should be part of the CI/CD lifecycle.
 
-A collection of concise cheat sheets covering programming, scripting, development, and infrastructure-related technologies.
-
-**Useful for:**
-
-* Linux commands
-* Docker
-* Kubernetes
-* Scripting
-* Development commands
-* Quick reference
+* **Selenium** — Browser automation.
+* **Appium** — Mobile application automation.
+* **JMeter** — Performance and load testing.
+* **BlazeMeter** — Continuous performance testing platform.
+* **Tosca** — Enterprise test automation.
+* **UFT** — Functional test automation.
 
 ---
 
-# 🧭 Recommended Learning Categories
+# 41. Visualization
 
-The repositories can be grouped into five major learning areas:
+Visualization tools turn metrics, logs, and operational data into dashboards and reports.
 
-### 📕 1. Roadmaps & Fundamentals
-
-Start here to understand **what to learn and in what order**.
-
-* Developer Roadmaps
-* DevOps Resources
-* Learn DevOps
-* DevOps Tutorial
-* Tech Vault
-
-### 🎯 2. Exercises & Practice
-
-Use these to test your knowledge and develop troubleshooting skills.
-
-* DevOps Exercises
-* Test Your Sysadmin Skills
-
-### 🔥 3. Projects
-
-Use projects to move from theory to practical implementation.
-
-* Project-Based Learning
-* Build Your Own X
-* Kubernetes The Hard Way
-* Fast Kubernetes
-
-### 🔄 4. Automation
-
-Learn how DevOps engineers automate repetitive infrastructure and deployment tasks.
-
-* DevOps Bash Tools
-* Ansible Examples
-
-### 🚀 5. Cheat Sheets
-
-Use these for daily command reference and revision.
-
-* Christian Lempa Cheat Sheets
-* Awesome Cheat Sheets
+* **Grafana** — Metrics and observability dashboards.
+* **Kibana** — Elasticsearch visualization interface.
+* **Tableau** — Business intelligence and data visualization.
+* **Meshery** — Visual management and design for cloud-native infrastructure.
 
 ---
 
-# 🛠️ Technologies Covered
+# 42. Useful Communities
 
-Across these repositories, you can find learning material related to:
+Learning from other engineers can help with troubleshooting and understanding real-world practices.
+
+* **Reddit DevOps** — DevOps community discussions.
+* **LinkedIn DevOps Communities** — Professional DevOps discussions.
+* **DevOps Facebook Groups** — Community discussions and resources.
+* **CNCF Landscape** — Cloud-native ecosystem discovery.
+
+---
+
+# 43. Books
+
+Books provide deeper understanding of DevOps culture, engineering practices, architecture, and reliability.
+
+Recommended titles include:
+
+* **The Phoenix Project**
+* **The DevOps Handbook**
+* **Google SRE Books**
+* **Essential Infrastructure as Code**
+
+Recommended topics:
+
+* DevOps culture
+* Continuous delivery
+* Infrastructure as Code
+* Site Reliability Engineering
+* Systems thinking
+* Automation
+
+---
+
+# 44. Blogs & News
+
+Useful sources for following DevOps, cloud, Kubernetes, infrastructure, and SRE topics.
+
+* **Spacelift Blog**
+* **Codefresh Blog**
+* **Red Hat Blog**
+* **Atlassian DevOps Blog**
+* **Azure DevOps Blog**
+* **Netflix Tech Blog**
+* **Uber Engineering**
+* **DoorDash Engineering**
+* **CloudBees Blog**
+* **Palark Tech Blog**
+* **This Week in DevOps**
+* **opensource.com**
+* **CooperPress**
+
+---
+
+# 45. Cheat Sheets
+
+Cheat sheets are useful for quick revision and daily command reference.
+
+* **Christian Lempa Cheat Sheets**
+* **Awesome Cheat Sheets**
+* **DevOps Cheat Sheet PDF**
+* **Denny Zhang Cheat Sheets**
+
+Useful topics include:
 
 * Linux
 * Git
-* GitHub
-* Bash
 * Docker
 * Kubernetes
 * Jenkins
-* CI/CD
-* AWS
 * Terraform
-* Ansible
-* SRE
-* Networking
-* System Administration
-* Infrastructure Automation
-* Monitoring
-* Cloud Computing
-* Containerization
+* YAML
+* Groovy
+* Bash
+* Cloud commands
 
 ---
 
-# 🗺️ Suggested DevOps Learning Path
+# 46. Conferences
 
-A practical way to use these repositories is:
+Conferences provide access to presentations, community discussions, and real-world engineering experiences.
 
-```text
-Linux
-  ↓
-Git & GitHub
-  ↓
-Networking Basics
-  ↓
-Bash / Shell Scripting
-  ↓
-Docker
-  ↓
-CI/CD
-  ↓
-Jenkins
-  ↓
-AWS / Cloud
-  ↓
-Terraform
-  ↓
-Ansible
-  ↓
-Kubernetes
-  ↓
-Monitoring & SRE
-  ↓
-Real-World DevOps Projects
-```
+* **DevOpsDays** — DevOps conferences around the world.
+* **Velocity** — Engineering and performance-focused conference resources.
 
 ---
 
-# 📌 How to Use This Collection
+# 47. DevOps Snippets
 
-Don't try to study all 15 repositories simultaneously.
+Small scripts and reusable examples can accelerate everyday DevOps tasks.
 
-Instead:
-
-1. Pick a **roadmap** to understand the overall DevOps journey.
-2. Learn the fundamentals using tutorials and guides.
-3. Practice individual concepts using **DevOps Exercises**.
-4. Build projects to gain practical experience.
-5. Learn automation using **Bash and Ansible**.
-6. Study Kubernetes after understanding containers.
-7. Keep the cheat sheets available for daily reference.
-8. Revisit difficult topics through hands-on projects.
+* **DevOpsnipp** — DevOps snippets and examples.
+* **GitHub Gists** — Small reusable pieces of code and configuration.
 
 ---
 
-# ⭐ Repository Summary
+# 48. Other Useful Projects
 
-| #  | Repository                | Main Purpose                      |
-| -- | ------------------------- | --------------------------------- |
-| 1  | Developer Roadmaps        | Learning roadmap                  |
-| 2  | DevOps Resources          | DevOps resources                  |
-| 3  | Learn DevOps              | Task-based learning               |
-| 4  | DevOps Tutorial           | Tutorials                         |
-| 5  | Tech Vault                | Tutorials & guides                |
-| 6  | DevOps Exercises          | Exercises & interview preparation |
-| 7  | Test Your Sysadmin Skills | Sysadmin challenges               |
-| 8  | Project-Based Learning    | Practical projects                |
-| 9  | Build Your Own X          | Build technologies from scratch   |
-| 10 | Kubernetes The Hard Way   | Kubernetes internals              |
-| 11 | Fast Kubernetes           | Kubernetes projects               |
-| 12 | DevOps Bash Tools         | Bash automation                   |
-| 13 | Ansible Examples          | Ansible automation                |
-| 14 | Cheat Sheets              | DevOps quick references           |
-| 15 | Awesome Cheat Sheets      | Command references                |
+Additional repositories and resources worth exploring:
+
+### DevOps Wiki
+
+`Leo-G/DevopsWiki`
+
+A collection of DevOps tools, tutorials, and scripts.
+
+### SRE Checklist
+
+`bregman-arie/sre-checklist`
+
+A checklist for Site Reliability Engineering practices.
+
+### How They DevOps
+
+`bregman-arie/howtheydevops`
+
+Examples and information about how organizations approach DevOps.
+
+### Infraverse
+
+`bregman-arie/infraverse`
+
+Infrastructure and DevOps-related resources.
+
+### DevOps Exercises
+
+`bregman-arie/devops-exercises`
+
+Practical DevOps questions and exercises.
 
 ---
 
-# 🔗 Complete Repository List
+# ⭐ Featured GitHub Repositories
+
+The following repositories are especially useful for structured DevOps learning.
+
+|  # | Repository                   | Main Purpose                        |
+| -: | ---------------------------- | ----------------------------------- |
+|  1 | Developer Roadmap            | DevOps learning roadmap             |
+|  2 | DevOps Resources             | DevOps resources                    |
+|  3 | Learn DevOps                 | Task-based learning                 |
+|  4 | DevOps Tutorial              | DevOps tutorials                    |
+|  5 | Tech Vault                   | Technical tutorials                 |
+|  6 | DevOps Exercises             | Exercises and interview preparation |
+|  7 | Test Your Sysadmin Skills    | System administration practice      |
+|  8 | Project-Based Learning       | Practical projects                  |
+|  9 | Build Your Own X             | Learn by building technologies      |
+| 10 | Kubernetes The Hard Way      | Kubernetes internals                |
+| 11 | Fast Kubernetes              | Kubernetes practice                 |
+| 12 | DevOps Bash Tools            | Bash automation                     |
+| 13 | Ansible Examples             | Ansible automation                  |
+| 14 | Christian Lempa Cheat Sheets | DevOps cheat sheets                 |
+| 15 | Awesome Cheat Sheets         | Quick technical references          |
+
+---
+
+# 🔗 Featured Repository Links
 
 1. https://github.com/kamranahmedse/developer-roadmap
 2. https://github.com/bregman-arie/devops-resources
@@ -451,893 +1161,840 @@ Instead:
 
 ---
 
-## 📚 Source
+# 🧩 DevOps Toolchain
 
-This README is based on the Medium article:
+A DevOps engineer does not need to use every available tool.
+
+A realistic toolchain could look like:
+
+```text
+                    ┌───────────────┐
+                    │   Developer   │
+                    └───────┬───────┘
+                            ↓
+                    ┌───────────────┐
+                    │ Git / GitHub  │
+                    └───────┬───────┘
+                            ↓
+                    ┌───────────────┐
+                    │   CI / CD     │
+                    │ Jenkins / GHA  │
+                    └───────┬───────┘
+                            ↓
+              ┌─────────────┴─────────────┐
+              ↓                           ↓
+       Code Quality                  Security Scan
+       SonarQube                     Trivy / SAST
+              └─────────────┬─────────────┘
+                            ↓
+                    ┌───────────────┐
+                    │ Docker Image  │
+                    └───────┬───────┘
+                            ↓
+                    ┌───────────────┐
+                    │    Registry   │
+                    └───────┬───────┘
+                            ↓
+                    ┌───────────────┐
+                    │ Kubernetes    │
+                    └───────┬───────┘
+                            ↓
+              ┌─────────────┴─────────────┐
+              ↓                           ↓
+        Prometheus                    Logging
+              ↓                           ↓
+          Grafana                  Loki / Elastic
+```
+
+---
+
+# 🛠️ Recommended Core DevOps Stack
+
+If you are learning DevOps, you do not need to install everything in this README.
+
+A practical learning stack is:
+
+```text
+Git
+GitHub
+Linux
+Bash
+Docker
+Jenkins / GitHub Actions
+SonarQube
+Trivy
+Terraform
+Ansible
+AWS / Azure / Google Cloud
+Kubernetes
+Argo CD
+Prometheus
+Grafana
+Loki / Elastic
+```
+
+Learn the concepts first and add additional tools when a project requires them.
+
+---
+
+# 🎯 Practical DevOps Learning Path
+
+## Phase 1 — Foundations
+
+Learn:
+
+* Linux
+* Networking
+* Git
+* GitHub
+* Basic programming
+* Bash
+
+Build:
+
+* Linux administration lab
+* Git workflow
+* Bash automation scripts
+
+---
+
+## Phase 2 — Containers
+
+Learn:
+
+* Docker
+* Container images
+* Dockerfiles
+* Container networking
+* Volumes
+* Registries
+* Container security
+
+Build:
+
+* Dockerized web application
+* Docker Compose application
+* Private container registry workflow
+
+---
+
+## Phase 3 — CI/CD
+
+Learn:
+
+* CI/CD concepts
+* Jenkins
+* GitHub Actions
+* Pipeline as Code
+* Automated testing
+* Artifact management
+
+Build:
+
+```text
+GitHub
+   ↓
+Jenkins
+   ↓
+Build
+   ↓
+Test
+   ↓
+Docker Image
+   ↓
+Registry
+```
+
+---
+
+## Phase 4 — Infrastructure as Code
+
+Learn:
+
+* Terraform
+* OpenTofu
+* CloudFormation
+* Pulumi
+* Infrastructure state
+* Modules
+* Variables
+* Outputs
+
+Build:
+
+```text
+IaC
+ ↓
+VPC
+ ↓
+Subnets
+ ↓
+Security Groups
+ ↓
+Compute
+ ↓
+Database
+```
+
+---
+
+## Phase 5 — Configuration Management
+
+Learn:
+
+* Ansible
+* Inventory
+* Playbooks
+* Roles
+* Variables
+* Idempotency
+
+Build:
+
+```text
+Ansible
+   ↓
+Linux Server
+   ↓
+Install Packages
+   ↓
+Configure Application
+   ↓
+Deploy Application
+```
+
+---
+
+## Phase 6 — Kubernetes
+
+Learn:
+
+* Cluster
+* Node
+* Pod
+* Deployment
+* Service
+* ConfigMap
+* Secret
+* Namespace
+* Ingress
+* Volumes
+* StatefulSets
+* DaemonSets
+* Jobs
+* CronJobs
+* Scheduling
+* Networking
+* Scaling
+
+Then learn:
+
+* Helm
+* Kustomize
+* Kubernetes security
+* Kubernetes storage
+* Kubernetes troubleshooting
+
+---
+
+## Phase 7 — GitOps
+
+Learn:
+
+* GitOps concepts
+* Declarative configuration
+* Argo CD
+* Flux CD
+
+Typical workflow:
+
+```text
+Developer
+   ↓
+Application Repository
+   ↓
+CI Pipeline
+   ↓
+Container Image
+   ↓
+Container Registry
+   ↓
+GitOps Repository
+   ↓
+Argo CD
+   ↓
+Kubernetes
+```
+
+---
+
+## Phase 8 — Observability
+
+Learn:
+
+* Metrics
+* Logs
+* Traces
+* Alerts
+* Dashboards
+* SLOs
+* SLIs
+* Incident response
+
+Common stack:
+
+```text
+Prometheus
+    ↓
+Grafana
+
+Application Logs
+    ↓
+Loki / Elastic
+    ↓
+Grafana / Kibana
+```
+
+---
+
+## Phase 9 — Security
+
+Learn:
+
+* Secret management
+* IAM
+* Image scanning
+* Dependency scanning
+* SAST
+* DAST
+* Runtime security
+* Policy enforcement
+* Supply-chain security
+
+Example:
+
+```text
+Source Code
+   ↓
+SAST
+   ↓
+Dependency Scan
+   ↓
+Build
+   ↓
+Container Image
+   ↓
+Trivy
+   ↓
+Registry
+   ↓
+Kubernetes
+   ↓
+Runtime Security
+```
+
+---
+
+# 🏗️ Example Real-World DevOps Project
+
+A complete learning project can combine the major concepts:
+
+```text
+                    Developer
+                        ↓
+                     GitHub
+                        ↓
+                    Jenkins
+                        ↓
+             ┌──────────┴──────────┐
+             ↓                     ↓
+         SonarQube               Tests
+             ↓                     ↓
+             └──────────┬──────────┘
+                        ↓
+                  Docker Build
+                        ↓
+                     Trivy
+                        ↓
+                 Container Registry
+                        ↓
+                  GitOps Repository
+                        ↓
+                    Argo CD
+                        ↓
+                   Kubernetes
+                        ↓
+             ┌──────────┴──────────┐
+             ↓                     ↓
+        Prometheus               Loki
+             ↓                     ↓
+             └──────────┬──────────┘
+                        ↓
+                     Grafana
+                        ↓
+                      Users
+```
+
+This type of project allows you to practice:
+
+* Git
+* GitHub
+* Jenkins
+* CI/CD
+* SonarQube
+* Docker
+* Trivy
+* Container registry
+* Kubernetes
+* GitOps
+* Argo CD
+* Prometheus
+* Grafana
+* Logging
+* Cloud infrastructure
+* Infrastructure as Code
+
+---
+
+# 🧭 How to Use This Repository
+
+Do not try to learn every tool listed here.
+
+Instead:
+
+1. Start with **Linux and networking fundamentals**.
+2. Learn **Git and GitHub**.
+3. Learn basic **programming and Bash**.
+4. Learn **Docker and containers**.
+5. Learn **CI/CD**.
+6. Learn **Jenkins or GitHub Actions**.
+7. Learn **cloud fundamentals**.
+8. Learn **Terraform, OpenTofu, or CloudFormation**.
+9. Learn **Ansible**.
+10. Learn **Kubernetes**.
+11. Learn **GitOps with Argo CD or Flux**.
+12. Learn **monitoring and observability**.
+13. Learn **DevOps security**.
+14. Build complete projects.
+15. Use exercises and troubleshooting resources to strengthen your knowledge.
+
+---
+
+# 🧪 Interactive Practice
+
+Hands-on practice is one of the best ways to develop DevOps skills.
+
+Useful platforms include:
+
+* **KodeKloud Engineer** — Practical infrastructure and DevOps tasks.
+* **Google Cloud Skills Boost** — Cloud and hands-on lab environments.
+* Cloud-provider learning labs
+* Local Kubernetes environments
+* Virtual machines
+* Docker-based labs
+
+---
+
+# 📖 Learn About DevOps
+
+Useful introductory resources include:
+
+* AWS DevOps documentation and learning resources
+* Microsoft DevOps documentation
+* Google Cloud DevOps resources
+* Red Hat DevOps resources
+* Spacelift DevOps resources
+
+Focus on understanding:
+
+* What DevOps means
+* CI vs CD
+* Infrastructure as Code
+* Automation
+* Continuous feedback
+* Observability
+* Collaboration
+* Reliability
+* Security
+
+---
+
+# 🏆 Recommended Practice Projects
+
+Start small and increase complexity gradually.
+
+### Beginner
+
+* Linux administration lab
+* Git/GitHub project
+* Bash automation project
+* Dockerized application
+* Simple CI pipeline
+
+### Intermediate
+
+* Jenkins + Docker CI/CD
+* Terraform cloud infrastructure
+* Ansible server configuration
+* Kubernetes application deployment
+* Monitoring with Prometheus and Grafana
+
+### Advanced
+
+* GitOps with Argo CD
+* Kubernetes production-style deployment
+* Multi-service application
+* Kubernetes observability
+* Kubernetes security
+* Complete cloud-native CI/CD platform
+
+---
+
+# 📊 DevOps Skill Areas
+
+This repository covers the following major areas:
+
+* Automation
+* CI/CD
+* Cloud
+* Containers
+* DevSecOps
+* Git
+* GitOps
+* Infrastructure as Code
+* Kubernetes
+* Linux
+* Monitoring
+* Networking
+* Observability
+* Programming
+* Security
+* SRE
+* System Administration
+* System Design
+* Testing
+
+---
+
+# 🧹 Repository Organization Principles
+
+To keep this repository maintainable:
+
+* Avoid listing the same tool multiple times.
+* Put each tool in its primary category.
+* Use cross-references when a tool belongs to multiple domains.
+* Prefer official documentation for installation and usage.
+* Keep learning repositories separate from production tools.
+* Keep historical or deprecated technologies clearly labeled.
+* Avoid outdated descriptions.
+* Keep links current.
+* Prefer practical examples over large collections of unrelated links.
+* Update resources when their projects become inactive or change direction.
+
+---
+
+# 🤝 Contribution Guidelines
+
+Contributions are welcome.
+
+If you know of a useful DevOps repository, tool, tutorial, project, or learning resource, you can submit a pull request.
+
+## Before Adding a Resource
+
+Make sure the resource:
+
+* Is relevant to DevOps, cloud, infrastructure, automation, security, SRE, or related engineering practices.
+* Provides meaningful educational or practical value.
+* Has a working link.
+* Is placed in the correct category.
+* Does not duplicate an existing resource.
+
+## Recommended Format
+
+```markdown
+- **[Tool or Resource Name](URL)** — Short and clear description.
+```
+
+For GitHub repositories:
+
+```markdown
+### Repository Name
+
+**Repository:** `owner/repository`
+
+Short description.
+
+Useful for:
+
+- Topic 1
+- Topic 2
+- Topic 3
+```
+
+## Avoid
+
+* Duplicate entries
+* Broken links
+* Promotional-only resources
+* Unrelated tools
+* Unverified claims
+* Copying descriptions without attribution
+* Outdated information presented as current
+
+---
+
+# 📚 Original 15-Repository Source
+
+The original collection of 15 repositories was based on the article:
 
 **“15 Best GitHub Repos to Learn DevOps”**
-by **Tech Fusionist**, published October 25, 2025.
+
+Author: **Tech Fusionist**
+
+Published: **October 25, 2025**
 
 Original article:
+
 https://medium.com/@thetechfusionist/15-best-github-repos-to-learn-devops-eed9ea119f49
 
+> The 15 repositories have been incorporated into the broader resource structure above rather than maintaining a separate duplicate section.
+
 ---
 
-## ⚠️ Note
+# ⚠️ Resource Status Notice
 
-Repository activity, stars, documentation, supported technologies, and project status can change over time. Check the individual GitHub repository for its current status before using it as a primary learning resource.
----
-# Curated List of Best DevOps Tools
+DevOps tools and repositories change frequently.
 
-A curated collection of the most effective and popular DevOps tools to streamline your development and operations processes for 2024
+Repository:
 
-This repository aims to provide a comprehensive list of DevOps tools, along with brief descriptions. Whether you're new to DevOps or looking to optimize your existing workflow, you'll find valuable resources here.
+* Stars
+* Contributors
+* Releases
+* Documentation
+* Supported technologies
+* Licensing
+* Maintenance status
+* Availability
 
-## Contributing
+can change over time.
 
-✍️ We welcome contributions! If you know of a great DevOps tool that's not listed here, please submit a pull request with your addition.! Read the [contribution guidelines](https://github.com/techiescamp/devops-tools/blob/main/CONTRIBUTING.md) to know more. 
+Always check the project's current repository and official documentation before using a resource in a production environment.
 
-## Hit the Star! :star:
-
-If you are planning to use this repo for reference, please hit the star. Thanks!
-
-## Table of Contents
-
-- [Development Environment Tools](#development-environment-tools)
-- [Source Code Management](#source-code-management)
-- [Build Tools](#build-tools)
-- [Continuous Integration Tools](#continuous-integration-tools)
-- [Artifact Management Tools](#artifact-management-tools)
-- [Code Analysis Tools](#code-analysis-tools)
-- [Continuous Delivery & GitOps Tools](#continuous-delivery--gitops-tools)
-- [Infrastructure Provisioning Tools](#infrastructure-provisioning-tools)
-- [Cloud Cost Management Tools](#cloud-cost-management-tools)
-- [Configuration Management Tools](#configuration-management-tools)
-- [Secret Management Tools](#secret-management-tools)
-- [Config/Service Discovery Tools](#configservice-discovery-tools)
-- [Containerization Tools](#containerization-tools)
-- [Container Orchestration Tools](#container-orchestration-tools)
-- [Container Autoscaling and Load Balancing](#container-autoscaling-and-load-balancing)
-- [Container Security Tools](#container-security-tools)
-- [Policy Management Tools](#policy-management-tools)
-- [Service Mesh Tools](#service-mesh-tools)
-- [Logging Tools](#logging-tools)
-- [Monitoring & Observability Tools](#monitoring--observability-tools)
-- [Visualization Tools](#visualization-tools)
-- [Internal Developer Platform Tools](#internal-developer-platform-tools)
-- [API Tools](#api-tools)
-- [Collaboration Tools](#collaboration-tools)
-- [Backups and Restoration Tools](#backups-and-restoration-tools)
-- [Cloud Providers](#cloud-providers)
-
-## Development Environment Tools
-
-Development environment tools are essential for maintaining consistency in software configurations and versions. They ensure reproducibility in minutes in case of a crash, increasing developer productivity.
-
-* **[Virtual Box](https://www.virtualbox.org/)** (Open Source): A powerful x86 and AMD64/Intel64 virtualization product for enterprise as well as home use.
-* **[Qemu](https://www.qemu.org/)** (Open Source): A generic and open source machine emulator and virtualizer.
-* **[Vagrant](https://www.vagrantup.com/)** (Open Source): A tool for building and managing virtual machine environments in a single workflow.
-* **[Docker Desktop](https://www.docker.com/products/docker-desktop)** (Open Source): An application for MacOS and Windows machines for the building and sharing of containerized applications.
-* **[Minikube](https://minikube.sigs.k8s.io/)** (Open Source): A tool that makes it easy to run Kubernetes locally.
-* **[Minishift](https://www.okd.io/minishift/)** (Open Source): A tool that helps you run OpenShift locally by running a single-node OpenShift cluster inside a VM.
-* **[Podman Desktop](https://podman.io/)** (Open Source): A daemonless container engine for developing, managing, and running OCI Containers on your Linux System.
-* **[Rancher Desktop](https://rancherdesktop.io/)** (Open Source): Rancher Desktop is a tool that enables developers to manage and deploy Kubernetes clusters effortlessly on their local machines.
-* **[kind](https://kind.sigs.k8s.io/)** (Open Source): kind is a tool that uses Docker containers as nodes to facilitate the creation of local Kubernetes cluster primarly used for local development and testing.
-* **[k3d](https://k3d.io/)** (Open Source): k3d is a lightweight wrapper to run k3s in Docker and makes it easy to create single and multi-node k3s clusters.
-
-## Source Code Management
-
-In the DevOps world, everything is treated as code (e.g., code, shell script, configurations, etc.). Robust source code management tools are a must.
-* **[Github](https://github.com/)** (Free & Paid): A web-based hosting service for version control using Git. It offers all of the distributed version control and source code management (SCM) functionality of Git as well as adding its own features.
-* **[Bitbucket](https://bitbucket.org/)** (Free & Paid): A web-based version control repository hosting service owned by Atlassian, for source code and development projects that use either Mercurial or Git revision control systems.
-* **[Gitlab](https://about.gitlab.com/)** (Free & Paid): A web-based DevOps lifecycle tool that provides a Git-repository manager providing wiki, issue-tracking and CI/CD pipeline features, using an open-source license.
-* **[AWS CodeCommit](https://aws.amazon.com/codecommit/)** (Free & Paid): A fully-managed source control service that makes it easy for companies hosting their own repositories to collaborate on code in a secure and highly scalable ecosystem.
-* **[Google Cloud Source Repositories](https://cloud.google.com/source-repositories)** (Free & Paid): Fully-featured, scalable, private Git repositories hosted on Google Cloud.
-* **[Azure Repos](https://azure.microsoft.com/en-us/services/devops/repos/)** (Free & Paid): Provides Git repositories or Team Foundation Version Control (TFVC) for source control of your code.
-* **[Codeberg](https://codeberg.org/)** (Free & Paid): Cloud-based instance of Forgejo.
-* **[Forgejo](https://forgejo.org/)** (Open Source): Open-source fork of Gitea.
-* **[Fossil](https://fossil-scm.org/home/doc/trunk/www/index.wiki)** (Free): Open-source distributed SCM that includes a wiki, issue management, and other features. Not compatible with git.
-* **[Gitea](https://about.gitea.com/)** (Open Source, Free, Paid Support Available): Open-source fork of Gogs.
-* **[Gogs](https://gogs.io/)** (Open Source): Open-source git-based SCM, loosely based on Github's UI.
-
-
-## Build Tools
-
-Build tools are essential for automating package creation or deployable artifacts.
-
-* **[Maven](https://maven.apache.org/)** (Java) (Open Source): A software project management and comprehension tool, primarily used for Java projects.
-* **[Gradle](https://gradle.org/)** (Java, Kotlin, Groovy, Scala, Python, C++) (Free & Paid): An open-source build automation system that builds upon the concepts of Apache Ant and Apache Maven.
-* **[npm](https://www.npmjs.com/)** (Javascript): A package manager for JavaScript, used to install, share, and distribute code.
-* **[pnpm](https://pnpm.io/)** (Open Source): A fast, disk space efficient package manager for JavaScript.
-* **[yarn](https://yarnpkg.com/)** (Open Source): A fast, reliable, and secure dependency manager for JavaScript and TypeScript.
-* **[Rake](https://ruby.github.io/rake/)** (Ruby) (Open Source): A software task management and build automation tool for Ruby.
-* **[MSBuild](https://github.com/dotnet/msbuild)** (.Net) (Open Source): The build platform for .NET and Visual Studio.
-* **[Pybuilder](https://pybuilder.io/)** (Python) (Open Source): A software build tool written in pure Python mainly for Python applications.
-
-## Continuous Integration Tools
-
-Continuous Integration provides continuous feedback on code integrations, helping solve issues faster and decreasing time in software release cycles.
-
-* **[Jenkins](https://www.jenkins.io/)** (Open Source): An open-source automation server, helps to automate parts of the build, test, and deployment process. Java-based, with Groovy-based pipeline definition.
-* **[Github Actions](https://github.com/features/actions)** (Free & Enterprise): A CI/CD solution that integrates with GitHub repositories to run a series of commands automatically.
-* **[Gitlab CI](https://docs.gitlab.com/ee/ci/)** (Free & Enterprise): A continuous integration service included with GitLab that builds and tests the software whenever the developer pushes code to the application. YAML-based pipelines. Can be self-hosted or use the cloud offering.
-* **[CircleCI](https://circleci.com/)** (Free & Paid): YAML-based CI/CD hosted in the cloud.
-* **[Drone](https://www.drone.io/)** (Free & Paid): YAML-based CI/CD that is container-first. Can self-host or use the cloud version.
-* **[TeamCity](https://www.jetbrains.com/teamcity/)** (Free & Enterprise): A build management and continuous integration server from JetBrains.
-* **[Travis CI](https://travis-ci.org/)** (Open Source): A cloud-based continuous integration service that automatically builds and tests code changes in GitHub repositories.
-* **[Bamboo](https://www.atlassian.com/software/bamboo)** (Free & Enterprise): A continuous integration and deployment tool that ties automated builds, tests, and releases together in a single workflow.
-* **[RazorOps CICD](https://razorops.com/)** (Free & Paid): YAML-based CI/CD that is container-first SaaS cloud version and On-Prems with large Enterprise.
-* **[Buildkite](https://buildkite.com/)** (Free & Paid): YAML-based CI/CD.
-* **[DeployBot](https://www.deploybot.com/)** (Free & Paid): A cloud-based CI/CD service that supports building, deploying and automating any project.
-
-## Artifact Management Tools
-
-Artifact management tools store and version code/binary that has to be deployed into production. They centralize repositories specifically made for this purpose.
-
-* **[Nexus](https://www.sonatype.com/nexus/repository-oss)** (Free & Enterprise): A repository manager that allows you to proxy, collect, and manage your dependencies.
-* **[Jfrog Artifactory](https://jfrog.com/artifactory/)** (Enterprise): An enterprise-grade universal binary repository manager solution that could handle end-to-end artifact management.
-* **[npm](https://www.npmjs.com/)** (Free): A package manager for JavaScript, used to install, share, and distribute code.
-* **[Nuget](https://www.nuget.org/)** (.Net) (Free): A free and open-source package manager for the Microsoft development platform.
-
-## Code Analysis Tools
-
-Code analysis tools are a crucial component of any DevOps toolkit. They scrutinize the code before deployment, pinpointing potential issues. This allows developers to enhance the quality of the software by making necessary modifications.
-
-Code analysis can be categorized into two types:
-
-* **Static Analysis (SAST)** – This method inspects the source code without executing it, identifying bugs, security vulnerabilities, and quality issues.
-* **Dynamic Analysis (DAST)** – This approach involves running the code to uncover performance bottlenecks and behavioral anomalies.
-
-Here are some notable tools in this category:
-
-* **[Sonarqube](https://www.sonarqube.org/)** (Free & Enterprise): SonarQube offers a comprehensive suite for continuous code quality inspection. It automates reviews with static code analysis to detect bugs, code smells, and security vulnerabilities.
-* **[Checkmarx](https://www.checkmarx.com/)** (Enterprise): Checkmarx is a leading solution in software security, adept at identifying, tracking, and rectifying both technical and logical security flaws in the source code.
-* **[PMD](https://pmd.github.io/)** (Open Source): PMD is a versatile static code analyzer. It can detect a wide range of programming flaws across multiple languages.
-* **[Acunetix](https://www.acunetix.com/)** (Enterprise): Acunetix is a proprietary web vulnerability scanner capable of autonomously crawling and scanning web applications to identify diverse security concerns. It comes under DAST tools.
-
-## Continuous Delivery & GitOps Tools
-
-Continuous Delivery is more of an approach rather than a toolset, aiming to ensure that software can be reliably and immediately deployed at any time. While there's no specific tool labeled solely for continuous delivery, several process-oriented tools can be leveraged to achieve this goal within your projects.
-
-GitOps, a subset of DevOps, uses Git as a single source of truth for declarative infrastructure and applications. Here are some prominent tools that align with Continuous Delivery and GitOps principles:
-
-* **[Jenkins](https://www.jenkins.io/)** (Open Source): A widely-used open-source automation server that supports building, deploying, and automating any project.
-* **[Argo CD](https://argoproj.github.io/argo-cd/)** (Open Source): A declarative, GitOps continuous delivery tool for Kubernetes.
-* **[Flux CD](https://fluxcd.io/)** (Open Source): A tool that automates the deployment of containers to Kubernetes, following the GitOps principles.
-* **[Go CD](https://www.gocd.org/)** (Open Source): An open-source continuous delivery server designed to model and visualize complex workflows.
-* **[Gitlab CD](https://docs.gitlab.com/ee/ci/)** (Free & Enterprise): GitLab's continuous delivery solution, allowing automated deployment and monitoring of applications.
-* **[Weave GitOps](https://www.weave.works/oss/gitops/)** (Enterprise): An enterprise-grade GitOps solution, providing a set of best practices for deploying and managing applications and infrastructure.
-* **[Jenkins X](https://jenkins-x.io/)** (Open Source): An open-source project that provides automated CI/CD for Kubernetes, with preview environments and promotion across environments.
-* **[Tekton](https://tekton.dev/)** (Open Source): A powerful and flexible open-source framework for creating CI/CD systems, allowing developers to build, test, and deploy across cloud providers and on-premises systems.
-
-## Infrastructure Provisioning Tools
-
-Infrastructure provisioning tools play a vital role in automating the setup of computing infrastructure. This includes the creation and management of virtual machines, networks, storage, and various cloud resources. By automating these processes, these tools enable more efficient and consistent infrastructure deployment.
-
-Here are some of the leading tools in this category:
-
-* **[Terraform](https://www.terraform.io/)** (Open Source & Enterprise): Terraform is an open-source tool that allows you to define and provision a datacenter infrastructure using a declarative configuration language. It supports various cloud providers and offers an enterprise version with additional features.
-* **[Pulumi](https://www.pulumi.com/)** (Open Source & Enterprise): Pulumi provides a way to create, deploy, and manage infrastructure using programming languages you already know. It offers both open-source and enterprise solutions.
-* **[CloudFormation](https://aws.amazon.com/cloudformation/)** (AWS Service): An AWS service that helps you model and set up Amazon Web Services resources. It allows you to use a template to describe all the AWS resources you need, automating the provisioning process.
-* **[Azure Resource Manager](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/overview)** (Azure Service): Azure Resource Manager enables you to work with the resources in your solution as a group. You can deploy, update, or delete all the resources for your solution in a single, coordinated operation.
-* **[Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)** (Azure Service): Azure Bicep is a simple and user-friendly domain-specific language (DSL) for describing Azure cloud resources. It helps to create, deploy, and manage Azure resources more easily and efficiently compared to traditional ARM templates. Bicep simplifies the process by offering a cleaner and more concise syntax, making it quicker to write and maintain Azure infrastructure code.
-* **[opentofu](https://opentofu.org/)** (Open Source): OpenTofu is an infrastructure as code tool that lets you define both cloud and on-prem resources in human-readable configuration files that you can version, reuse, and share. You can then use a consistent workflow to provision and manage all of your infrastructure throughout its lifecycle. OpenTofu can manage low-level components like compute, storage, and networking resources, as well as high-level components like DNS entries and SaaS features.
-
-## Backups and Restoration Tools
-Backup and restoration tools helps in making periodic copies of data and applications to a separate, secondary device and then using those copies to recover the data and applications.
-
-* **[Velero](https://velero.io/)** (Open Source ): Velero is an open source tool to safely backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes.
-* **[Kasten K10](https://www.kasten.io/)** (Free & Enterprise): Kasten K10 is a data management platform that provides robust Kubernetes backup and disaster recovery solutions for seamless containerized application deployment and data protection.
-* **[Cloudcasa](https://cloudcasa.io/)** (Free & Enterprise): CloudCasa is a cloud-native backup and disaster recovery solution designed to protect and manage data for Kubernetes applications seamlessly.
-
-## Cloud Cost Management Tools
-
-Cloud Cost Management Tools help organizations monitor, analyze, and optimize their cloud spending. By providing insights into resource utilization and cost allocation, these tools enable better budgeting and cost control. Here's a list of tools that can be used for Cloud Cost Management:
-
-* **[InfraCost](https://www.infracost.io/)** (Open Source): InfraCost provides cost estimates for Terraform projects, helping developers understand the cost implications of their infrastructure code.
-* **[Kubecost](https://www.kubecost.com/)** (Open Source): Kubecost gives you visibility into your Kubernetes usage and cost, allowing you to monitor and optimize your cluster resources.
-
-## Configuration Management Tools
-
-Configuration management tools are pivotal in both application and infrastructure deployment. They assist in managing the state of servers and applications, ensuring that configurations are applied consistently and idempotently. By automating these configurations, these tools enhance the reliability and efficiency of deployment processes.
-
-Here's a look at some of the widely-used configuration management tools:
-
-* **[Ansible](https://www.ansible.com/)** (Open Source & Enterprise): Ansible is a versatile automation tool that can handle configuration management, application deployment, and task automation. It uses a simple, human-readable language, allowing for easy adoption.
-* **[Chef](https://www.chef.io/)** (Open Source & Enterprise): Chef is a powerful automation platform that transforms complex infrastructure into code, automating how infrastructure is configured, deployed, and managed across your network.
-* **[Puppet](https://puppet.com/)** (Open Source & Enterprise): Puppet is designed to manage the configuration of Unix-like and Microsoft Windows systems declaratively. It provides a way to automate repetitive tasks, quickly deploy critical applications, and proactively manage infrastructure.
-* **[Saltstack](https://www.saltstack.com/)** (Open Source & Enterprise): SaltStack is an intelligent IT automation platform that can manage, secure, and optimize any infrastructure. It's built on a unique and responsive remote execution engine, allowing for control over thousands of systems with no performance degradation.
-
-## Secret Management Tools
-
-Secret management tools are essential for safeguarding sensitive information such as passwords, API keys, and other credentials. They provide a secure way to store, distribute, and manage secrets, ensuring that they are accessible only to authorized entities.
-
-Here are some popular secret management tools:
-
-* **[HashiCorp Vault](https://www.vaultproject.io/)** (Open Source & Enterprise): Vault is a tool for securely accessing secrets such as API keys, passwords, or certificates. It provides a unified interface to any secret while providing tight access control and recording a detailed audit log.
-* **[External Secrets Operator](https://github.com/external-secrets/kubernetes-external-secrets)** (Open Source): An extension for Kubernetes that allows you to securely manage secrets stored in managed cloud services
-* **[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)**: A service that helps you protect access to your applications, services, and IT resources without the upfront investment and on-going maintenance costs of operating your own infrastructure.
-* **[Google Cloud Secret Manager](https://cloud.google.com/secret-manager/)**: A fully managed service on Google Cloud Platform to handle sensitive data like API keys, passwords, and certificates. It provides robust security and convenient access controls.
-* **[Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)**: A cloud service provided by Microsoft to securely manage keys, secrets, and certificates.
-* **[Teller](https://tlr.dev/)** (Open Source): Teller is a secret management tool for developers enhancing productivity by supporting cloud-native applications and managing secrets across multiple cloud providers.
-
-## Config/Service Discovery Tools
-
-Config and Service Discovery Tools are vital in distributed systems, allowing applications to manage configuration data dynamically and discover services without hard-coded hostnames or ports. These tools provide a centralized repository for configuration and service information, ensuring consistency and availability.
-
-Here are some popular tools in this category:
-
-* **[Consul](https://www.consul.io/)** (Open Source & Enterprise): Consul is a tool for discovering and configuring services in your infrastructure. It provides key/value storage and multi-datacenter support, ensuring high availability and scalability.
-* **[Etcd](https://etcd.io/)** (Open Source): A distributed key-value store that provides a reliable way to store data across a cluster of machines. It's primarily used in distributed systems to hold configuration data that needs to be available to all nodes in the cluster.
-* **[Apache ZooKeeper](https://zookeeper.apache.org/)** (Open Source): A centralized service for maintaining configuration information, naming, providing distributed synchronization, and group services.
-* **[Eureka](https://github.com/Netflix/eureka)** (Open Source): A REST-based service that is primarily used in the AWS cloud for locating services for the purpose of load balancing and failover of middle-tier servers.
-
-## Containerization Tools
-
-Containerization Tools enable the encapsulation of an application and its dependencies into a 'container.' This ensures that the application runs the same way, regardless of where it's deployed. By isolating the application in a container, these tools provide a consistent environment that's abstracted from the host system.
-
-Here are some popular tools in this category:
-
-* **[Docker](https://www.docker.com/)** (Open Source & Enterprise): Docker is a platform that enables developers to create, deploy, and run applications in containers. It's widely used for its ease of use and integration with various orchestration tools.
-* **[Podman](https://podman.io/)** (Open Source): Podman is a daemonless container engine for developing, managing, and running OCI Containers on your Linux System. It provides a Docker-CLI-compatible command-line front end and can use many of the same commands.
-* **[Buildah](https://buildah.io/)** (Open Source): Buildah is a tool that facilitates building OCI container images. It's a complementary tool to Podman and allows for more fine-grained control over image creation and management.
-* **[rkt](https://github.com/rkt/rkt)** (Open Source): An application container engine developed for modern production cloud-native environments, emphasizing simplicity, security, and composability.
-* **[CRI-O](https://cri-o.io/)** (Open Source): CRI-O is a lightweight container runtime specifically for Kubernetes. It allows Kubernetes to use any OCI-compliant runtime as the container runtime for running pods. It provides an optimized performance for Kubernetes workloads and is known for its simplicity and reliability.
-
-
-## Container Orchestration Tools
-
-With the widespread adoption of containerization technologies like Docker, Container Orchestration Tools have become indispensable in microservices-based deployments. These tools manage the lifecycle of containers within clusters, automating tasks such as deployment, scaling, networking, and availability.
-
-Here are some of the leading tools in this category:
-
-* **[Kubernetes](https://kubernetes.io/)** (Open Source): Kubernetes is the de facto standard in container orchestration. It automates the deployment, scaling, and management of containerized applications across clusters of hosts.
-* **[OpenShift](https://www.openshift.com/)** (Open Source & Enterprise): OpenShift is a Kubernetes-based container platform that provides developer and operational tools. It extends Kubernetes by adding features such as a web console, monitoring, logging, and more.
-* **[Nomad](https://www.nomadproject.io/)** (Open Source & Enterprise): Nomad is a flexible and easy-to-use orchestrator to deploy and manage containers and non-containerized applications. It integrates seamlessly with popular DevOps tools and provides a lightweight solution for container orchestration.
-* **[k3s](https://k3s.io/)** (Open Source): k3s is a certified Kubernetes distribution which is highly available and designed for resource-constrained production workloads.
-
-## Container Autoscaling and Load Balancing
-
-Here’s a list of open-source tools for container autoscaling and load balancing:
-
-* **[KEDA](https://keda.sh/)** (Open Source): (Kubernetes Event-driven Autoscaling) - Automatically scales Kubernetes workloads based on external events.
-* **[MetalLB](https://metallb.universe.tf/)** (Open Source): -  A load balancer implementation for bare-metal Kubernetes clusters.
-
-## Container Security Tools
-
-* **[Docker Bench](https://github.com/docker/docker-bench-security)** (Open Source): A script that checks for common best-practices around deploying Docker containers in production.
-* **[Clair](https://github.com/quay/clair)** (Open Source): A vulnerability analysis tool for containers that inspects containers before they are deployed.
-* **[Anchore Engine](https://anchore.com/opensource/)** (Open Source): A service that analyzes and inspects containers for security vulnerabilities and policy issues.
-* **[AquaSec](https://www.aquasec.com/)** (Enterprise): A container security platform that provides full lifecycle security for containerized applications.
-* **[Notary](https://github.com/theupdateframework/notary)** (Open Source): A project that allows anyone to have trust over arbitrary collections of data.
-* **[Falco](https://falco.org/)** (Open Source): A behavioral activity monitor designed to detect anomalous activity in applications.
-* **[Trivy](https://github.com/aquasecurity/trivy)** (Open Source): A simple and comprehensive vulnerability scanner for containers.
-* **[Twistlock](https://www.paloaltonetworks.com/prisma/cloud)** (Enterprise): Twistlock is an innovator in container security. During runtime, Twistlock scans container images for known vulnerabilities in the software packages and libraries they contain. It's new name is Prisma Cloud.
-
-## Policy Management Tools
-
-Policy Management Tools enable organizations to define, enforce, and manage security policies across their cloud-native environments. They provide a framework for policy definition and evaluation, ensuring compliance with organizational and regulatory requirements.
-
-* **[Open Policy Agent](https://www.openpolicyagent.org/)** (Open Source): A general-purpose policy engine that unifies policy enforcement across the stack.
-* **[Kyverno](https://kyverno.io/)** (Open Source): A policy engine designed for Kubernetes, providing validation, mutation, and generation of configurations.
-* **[Cloud Custodian](https://cloudcustodian.io/)** (Open Source): A rules engine for managing public cloud accounts and resources.
-
-## Service Mesh Tools
-
-Service Mesh Tools provide a dedicated infrastructure layer for handling service-to-service communication. They make it easy to build and deploy resilient, secure, and observable microservices.
-
-* **[Istio](https://istio.io/)** (Open Source): An open platform to connect, manage, and secure microservices, providing a uniform way to secure, connect, and monitor microservices.
-* **[Linkerd](https://linkerd.io/)** (Open Source & Enterprise): A service mesh that gives you observability, reliability, and security without requiring any code changes.
-* **[Cilium Service Mesh](https://cilium.io/)**: A next-generation service mesh for transparently securing, observing, and connecting Kubernetes workloads across complex, heterogeneous environments.
-
-## Logging Tools
-
-For any production environment, logging and monitoring for infrastructure & application components are a must-have to avoid system failures and application downtime. Here is the list of tools you could use for your projects:
-
-* **[ELK Stack](https://www.elastic.co/elastic-stack)** (Open Source & Enterprise): A combination of Elasticsearch, Logstash, and Kibana, used for searching, analyzing, and visualizing log data in real-time.
-* **[Grafana Loki](https://grafana.com/oss/loki/)** (Open Source and Enterprise): A horizontally scalable, highly available, multi-tenant log aggregation system inspired by Prometheus.
-* **[Fluentd](https://www.fluentd.org/)** (Open Source): An open-source data collector for unified logging layers.
-* **[Graylog](https://www.graylog.org/)** (Open Source & Enterprise): A leading centralized log management solution for capturing, storing, and enabling real-time analysis of terabytes of machine data.
-* **[logz.io](https://logz.io/)** (Enterprise): A cloud-native logging and security platform that enables engineers to use the best open-source tools in the market without the complexity of operating them.
-* **[Splunk](https://www.splunk.com/)** (Enterprise): A platform for searching, monitoring, and examining machine-generated big data.
-* **[Syslog-ng](https://www.syslog-ng.com/)** (Enterprise): A flexible and highly scalable logging solution enabling you to centralize your log data and sort it in real-time.
-
-## Monitoring & Observability Tools
-
-Monitoring & Observability Tools provide insights into the performance, availability, and overall health of applications, infrastructure, and business processes. They enable proactive monitoring, alerting, and troubleshooting, ensuring optimal performance and reliability.
-
-* **[Prometheus](https://prometheus.io/)** (Open Source): An open-source monitoring and alerting toolkit designed for reliability and scalability.
-* **[Thanos](https://thanos.io/)** (Highly Available Prometheus Open Source Tool): A set of components that can be composed into a highly available metric system with unlimited storage capacity.
-* **[Cilium](https://cilium.io/)** (Open Source & Enterprise): eBPF-based Networking, Security, and Observability.
-* **[Falco](https://falco.org/)** (Open Source & Enterprise): Cloud Native Runtime Security.
-* **[Calico](https://www.projectcalico.org/)** (Open Source & Enterprise): Pluggable eBPF-based networking and security for containers and Kubernetes.
-* **[Sensu](https://sensu.io/)** (Open Source & Enterprise): A comprehensive monitoring solution for your entire infrastructure and application stack.
-* **[Riemann](http://riemann.io/)** (Open Source): A powerful stream processing language that helps you compose, test, and distribute data streams.
-* **[Nagios](https://www.nagios.org/)** (Free & Enterprise): A powerful monitoring system that enables organizations to identify and resolve IT infrastructure problems.
-* **[Zabbix](https://www.zabbix.com/)** (Open Source & Enterprise): An enterprise-class open-source distributed monitoring solution.
-* **[Middleware](https://middleware.io/)** (Free & Enterprise): A full-stack observability platform that offers a free developer account with all features and a paid plan for higher limits/usage.
-* **[Data Dog](https://www.datadoghq.com/)** (Enterprise): A monitoring and analytics platform for large-scale applications.
-* **[New Relic](https://newrelic.com/)** (Enterprise): A cloud-based platform that gives developers, engineers, operations, and management a clear view of what’s happening in today’s complex software environments.
-* **[App Dynamics](https://www.appdynamics.com/)** (Enterprise): An application performance management solution that uses machine learning and artificial intelligence to provide real-time visibility and insight into IT environments.
-* **[Sumologic](https://www.sumologic.com/)** (Enterprise): A cloud-native, machine data analytics platform that delivers real-time, continuous intelligence.
-* **[Dynatrace](https://www.dynatrace.com/)** (Enterprise): An AI-powered, full-stack, automated performance management solution.
-* **[HolmesGPT](https://github.com/robusta-dev/holmesgpt)** (Open Source): An Open Source alert investigation assistant capable of solving alerts like a human. Works with Prometheus alerts, Jira tickets and more.
-
-## Visualization Tools
-
-* **[Grafana](https://grafana.com/)** (Open Source & Enterprise): A leading open-source platform for monitoring and observability, allowing you to query, visualize, alert on, and understand your metrics.
-* **[Kibana](https://www.elastic.co/kibana)** (Open Source & Enterprise): A free and open user interface that lets you visualize your Elasticsearch data and navigate the Elastic Stack.
-* **[Tableau](https://www.tableau.com/)** (Enterprise): A leading data visualization and business intelligence platform that helps people see and understand their data.
-* **[Meshery](https://meshery.io/)** (Open Source): An amazing open-source platform that enables collaborative design and operation of cloud-native infrastructure. Meshery let’s you visually configure and deploy all kinds of Kubernetes-based tools.
-
-## Internal Developer Platform Tools
-
-Platform engineering is becoming a core part of every organization that wants to adopt DevOps. Internal developer platforms or IDP tools play a key part in platform engineering. The following are the key tools that can be used for IDP:
-
-* **[Backstage.io by Spotify](https://backstage.io/)** (Open Source): An open platform for building developer portals, providing a unified frontend for all your infrastructure tooling, services, and documentation.
-* **[Port.io](https://www.getport.io/)** (Free & Enterprise): A platform that enables teams to build, test, and deploy applications with ease.
-* **[Configure8](https://www.configure8.com/)** (Free & Paid): A platform that provides a unified interface for managing infrastructure as code.
-* **[Cortex](https://www.cortex.dev/)** (Enterprise): An enterprise-grade platform that simplifies the deployment, scaling, and management of machine learning models.
-* **[Opslevel](https://www.opslevel.com/)** (Enterprise): A platform that provides insights and automation for your microservices and cloud resources.
-
-## API Tools
-
-* **[Postman](https://www.postman.com/)** (Free & Enterprise): A collaboration platform for API development.
-* **[Hoppscotch](https://hoppscotch.io/)** (Open Source): Open-source API development Ecosystem.
-* **[SoapUI](https://www.soapui.org/)** (Open Source & Enterprise): The world's leading automated testing tool for SOAP and REST APIs.
-* **[Swagger](https://swagger.io/)** (Open Source & Enterprise): A framework for API specification that includes a suite of tools for auto-generating documentation, code generation, and API testing.
-* **[HTTPie](https://github.com/httpie/cli)** (Open Source): HTTPie (pronounced aitch-tee-tee-pie) is a command-line HTTP client. Its goal is to make CLI interaction with web services as human-friendly as possible
-* **[HttpMaster](https://www.httpmaster.net)** (Free & Paid): Professional software tool for HTTP testing and debugging.
- 
-## Collaboration Tools
-
-The following are the collaboration tools that you could use in your DevOps toolchain. These tools support both messaging and video calling:
-
-* **[Slack](https://slack.com/)** (Free & Paid): A collaboration hub that connects your work with the people you work with.
-* **[Cisco Webex Teams](https://www.webex.com/team-collaboration.html)** (Free & Paid): A collaboration app that helps you create, meet, message, call, whiteboard, and share, regardless of whether you’re together or apart.
-* **[Flock](https://flock.com/)** (Free & Paid): A communication and collaboration platform designed to boost productivity and foster teamwork.
-* **[Google Hangouts](https://hangouts.google.com/)** (Free & Paid): A communication platform that includes messaging, video chat, and VOIP features.
-* **[Flow Dock](https://www.flowdock.com/)** (Paid): A team collaboration app for desktop, mobile, and web, working seamlessly alongside your existing tools.
-
-## Planning & Project Management Tools
-
-Following are the planning tools that you could use in your DevOps toolchain:
-
-* **[Jira](https://www.atlassian.com/software/jira)** (Free/Paid): A popular project management tool for agile teams.
-* **[Trello](https://trello.com/)** (Free/Paid): A collaboration tool that organizes your projects into boards.
-* **[Asana](https://asana.com/)** (Free/Paid): A web and mobile application designed to help teams organize, track, and manage their work.
-* **[Backlog.com](https://backlog.com/)** (Free/Paid): A project management and collaboration tool for teams that want higher productivity.
-* **[Monday.com](https://monday.com/)** (Paid): A work operating system that powers teams to run projects and workflows with confidence.
-* **[ClickUp](https://clickup.com/)** (Free/Paid): A cloud-based productivity and project management platform that supports document management. It helps teams collaborate, organize tasks, and streamline workflows, making it easy to store, organize, and collaborate on various documents and files.
-
-
-## IDE Tools
-
-* **[Visual Studio Code](https://code.visualstudio.com/)** (Free): A free source-code editor made by Microsoft.
-* **[Sublime Editor](https://www.sublimetext.com/)** (Free): A sophisticated text editor for code, markup, and prose.
-* **[Notepad++](https://notepad-plus-plus.org/)** (Free): A free source code editor and Notepad replacement.
-
-## Bug/Issue Tracking Tools
-
-Bug and issue-tracking tools are a must for any team dealing with code. Here is the list of tools you might want to have a look at:
-
-* **[Backlog](https://backlog.com/)** (Free & Paid): A project management and collaboration tool with bug tracking capabilities.
-* **[Bugzilla](https://www.bugzilla.org/)** (Open Source): A server software designed to help you manage software development.
-* **[Jira](https://www.atlassian.com/software/jira)** (Free & Paid): Also used for bug tracking, workflow, and issue tracking.
-* **[Lean Testing](https://leantesting.com/)** (Free): A free bug tracking and test case management platform.
-* **[Mantis](https://www.mantisbt.org/)** (Free): A free web-based bug tracking system.
-
-## Test Automation/Performance Testing Tools
-
-Another important pillar in the CI/CD pipeline is test automation tools. The following are the automation/performance testing tools that top our list:
-
-* **[Selenium](https://www.selenium.dev/)**: A suite of tools to automate web browsers.
-* **[UFT](https://software.microfocus.com/software/uft)**: Unified Functional Testing tool for automated functional testing.
-* **[Appium](http://appium.io/)**: An open-source tool for automating native, mobile web, and hybrid applications.
-* **[Jmeter](https://jmeter.apache.org/)**: An open-source software to test performance both on static and dynamic resources.
-* **[Blazemeter](https://www.blazemeter.com/)**: A continuous testing platform for performance testing, monitoring, and more.
-* **[Tosca](https://www.tricentis.com/products/automate-continuous-testing-tosca)**: A software testing tool that leverages the TOSCA standard. Tricentis Tosca is an enterprise-level, continuous testing platform that uses model-based test automation to enable accelerated testing.
-
-## Centralized Documentation Management tools
-
-Documentation is an essential aspect of the DevOps culture, facilitating effective collaboration, knowledge management, and overall efficiency in the software development and delivery process. Here is the list of tools you might want to have a look at:
-
-* **[Confluence](https://www.atlassian.com/software/confluence)** (Free & Paid): A collaborative team workspace and wiki-based content management system developed by Atlassian. It is designed to facilitate team collaboration, knowledge sharing, and project documentation within organizations.
-* **[Clickup](https://clickup.com/)** (Paid): A cloud-based productivity and project management platform that supports document management. It helps teams collaborate, organize tasks, and streamline workflows, making it easy to store, organize, and collaborate on various documents and files.
-
-## Cloud Providers
-
-Cloud service provider is an information technology (IT) company that provides its customers with computing resources over the internet and delivers them on-demand. CSPs are well-suited for organizations and individuals who don’t want the responsibility of installing software, hardware or network resources — and maintaining them until the end of their life cycles.
-
-* **[AWS](https://aws.amazon.com/what-is-aws/?tag=zd-buy-button-20&ascsubtag=562e79c5abd747da9bae194058a83395%7C70d884bc-9915-4d12-a556-f163e55b789b%7Cdtp)**: World’s most comprehensive and broadly adopted cloud, offering over 200 fully featured services from data centers globally.
-* **[Microsoft Azure](https://azure.microsoft.com/en-us/?ranMID=24542&ranEAID=IokOf8qagZo&ranSiteID=IokOf8qagZo-guCnXD6ZPOcQ_KmYuaJ8vQ&epi=IokOf8qagZo-guCnXD6ZPOcQ_KmYuaJ8vQ&irgwc=1&OCID=AIDcmm549zy227_aff_7593_1243925&tduid=%28ir__snsycwhcbgkfd3nmh1j3kz3w0n2xeqhvfdev32mm00%29%287593%29%281243925%29%28IokOf8qagZo-guCnXD6ZPOcQ_KmYuaJ8vQ%29%28%29&irclickid=_snsycwhcbgkfd3nmh1j3kz3w0n2xeqhvfdev32mm00)**: The Azure cloud platform is more than 200 products and cloud services designed to help you bring new solutions to life.
-* **[Google Cloud Platform](https://cloud.google.com/?hl=en)** (GCP): A suite of cloud computing services offered by Google. Its technical offerings range from infrastructure and platform services to computing power and database hosting.
-* **[IBM](https://www.ibm.com/cloud)**: It has one of the most in-depth and highly developed portfolios of enterprise solutions of any provider across the tech sector. As a cloud provider, it has a global footprint offering its IaaS and PaaS solutions from data centers from all over the world.
-* **[Oracle](https://www.oracle.com/cloud/)**: It specializes in developing and marketing computer hardware systems and enterprise-grade software products. It offers a wide range of cloud-based database solutions including its own database-as-a-service offering.
 ---
 
-<p align="center"><img src="images/devops_resources.png"/></p>
+# 📌 Important Note
 
-:information_source: &nbsp;This repository is about gathering any useful resources and information regarding DevOps and secondly, provide some roadmap for those who want to practice DevOps.
+This repository is a **learning and reference collection**, not a recommendation to use every listed technology.
 
-:pencil: &nbsp;Feel free to add more resources by submitting pull requests
+Different organizations use different DevOps stacks.
 
-****
+For example:
 
-<!-- ALL-TOPICS-LIST:START -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<center>
-<table>
-  <tr>
-    <td align="center"><a href="#devops"><img src="images/devops.png" width="70px;" height="75px;" alt="DevOps" /><br /><b>DevOps</b></a></td>
-    <td align="center"><a href="resources/jenkins/README.md"><img src="images/jenkins.png" width="70px;" height="85px;" alt="Jenkins"/><br /><b>Jenkins</b></a></td>
-    <td align="center"><a href="resources/git.md"><img src="images/git.png" width="75px;" height="75px;" alt="Git"/><br /><b>Git</b></a></td>
-    <td align="center"><a href="resources/ansible.md"><img src="images/ansible.png" width="65px;" height="75px;" alt="Ansible"/><br /><b>Ansible</b></a></td>
-    <td align="center"><a href="resources/network.md"><img src="images/network.png" width="80x;" height="75px;" alt="Network"/><br /><b>Network</b></a></td>
-    <td align="center"><a href="resources/linux.md"><img src="images/linux.png" width="75x;" height="75px;" alt="Linux"/><br /><b>Linux</b></a></td>
-    <td align="center"><a href="resources/terraform.md"><img src="images/terraform.png" width="75px;" height="75px;" alt="Terraform"/><br /><b>Terraform</b></a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="resources/coding.md"><img src="images/coding.png" width="75px;" height="75px;" alt="coding"/><br /><b>Coding</b></a></td>
-    <td align="center"><a href="resources/python.md"><img src="images/python.png" width="70px;" height="75px;" alt="Python"/><br /><b>Python</b></a></td>
-    <td align="center"><a href="resources/go.md"><img src="images/go.png" width="80px;" height="75px;" alt="Go"/><br /><b>Go</b></a></td>
-    <td align="center"><a href="resources/bash.md"><img src="images/bash.png" width="70px;" height="75px;" alt="Bash"/><br /><b>Shell Scripting</b></a></td>
-    <td align="center"><a href="resources/kubernetes.md"><img src="images/kubernetes.png" width="75px;" height="75px;" alt="kubernetes"/><br /><b>Kubernetes</b></a></td>
-    <td align="center"><a href="resources/victoriametrics.md"><img src="images/victoriametrics.png" width="64px;" height="75px;" alt="VictoriaMetrics"/><br /><b>VictoriaMetrics</b></a></td>
-    <td align="center"><a href="resources/prometheus.md"><img src="images/prometheus.png" width="75px;" height="75px;" alt="Prometheus"/><br /><b>Prometheus</b></a></td>
-    <td align="center"><a href="resources/mongo.md"><img src="images/mongo.png" width="75px;" height="75px;" alt="Mongo"/><br /><b>Mongo</b></a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="resources/cloud.md"><img src="images/cloud.png" width="90px;" height="85px;" alt="Cloud"/><br /><b>Cloud</b></a></td>
-    <td align="center"><a href="resources/aws.md"><img src="images/aws.png" width="100px;" height="75px;" alt="AWS"/><br /><b>AWS</b></a></td>
-    <td align="center"><a href="resources/azure.md"><img src="images/azure.png" width="80px;" height="75px;" alt="azure"/><br /><b>Azure</b></a></td>
-    <td align="center"><a href="resources/gcp.md"><img src="images/gcp.png" width="75px;" height="75px;" alt="gcp"/><br /><b>Google Cloud Platform</b></a></td>
-    <td align="center"><a href="resources/openstack.md"><img src="images/openstack.png" width="75px;" height="75px;" alt="openstack"/><br /><b>OpenStack</b></a></td>
-    <td align="center"><a href="resources/security.md"><img src="images/security.png" width="75px;" height="75px;" alt="security"/><br /><b>Security</b></a></td>
-    <td align="center"><a href="resources/puppet.md"><img src="images/puppet.png" width="75px;" height="75px;" alt="puppet"/><br /><b>Puppet</b></a></td>
-  </tr>
+```text
+CI/CD:
+Jenkins OR GitHub Actions OR GitLab CI
 
-  <tr>
-    <td align="center"><a href="resources/elk.md"><img src="images/elk.png" width="75px;" height="75px;" alt="ELK"/><br /><b>ELK</b></a></td>
-    <td align="center"><a href="resources/dataops.md"><img src="images/dataops.png" width="75px;" height="75px;" alt="ELK"/><br /><b>DataOps</b></a></td>
-    <td align="center"><a href="resources/openshift.md"><img src="images/openshift.png" width="75px;" height="75px;" alt="OpenShift"/><br /><b>OpenShift</b></a></td>
-    <td align="center"><a href="resources/sql.md"><img src="images/sql.png" width="75px;" height="75px;" alt="sql"/><br /><b>SQL</b></a></td>
-    <td align="center"><a href="resources/containers.md"><img src="images/containers.png" width="75px;" height="75px;" alt="Containers"/><br /><b>Containers</b></a></td>
-  </tr>
-</table>
-</center>
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-TOPICS-LIST:END -->
+IaC:
+Terraform OR OpenTofu OR CloudFormation OR Pulumi
 
+Containers:
+Docker OR Podman
 
-* [DevOps Roadmap](#devops-roadmap)
-* [Alternative Roadmaps](#alternative-roadmaps)
-* [Learn About DevOps](#learn-about-devops)
-* [Learn Git](#learn-git)
-* [Programming](#programming)
-* [Operating Systems](#operating-systems)
-* [DevOps Toolchain](#devops-toolchain)
+Orchestration:
+Kubernetes OR another orchestrator
 
+GitOps:
+Argo CD OR Flux
 
-<a name="devops"></a>
-## DevOps
+Monitoring:
+Prometheus + Grafana
+OR
+Commercial observability platforms
 
-### DevOps Roadmap
+Logging:
+Loki
+OR
+Elastic Stack
+OR
+Commercial logging platforms
+```
 
-  * The following path is opinionated. You can find alternative paths in the [alternative roadmaps section](#alternative-roadmaps)
-  * Do NOT attempt to learn everything, especially if you are a complete beginner (the burnout will make you regret you ever heard the word DevOps)
-  * Learn enough to say "I know what is DevOps and I understand how to practice it". You can learn everything else by demand or when you feel ready
+The goal is to understand **the problem each category solves**, then choose appropriate tools for the project.
 
-The must list
+---
 
-Topic | What to learn | Alternatives | Description
-:------|:------|:------|:------:
-Version Control | [Git](#Learn-git) | - | Version Control is used everywhere and Git is the leading version control technology
-Programming | At least one [programming language](#programming) | None. Don't settle for learning only shell scripting  | Anyone who practice DevOps should know programming to some extent
-Operating System | [Linux](#operating-systems) | Other distribution of Linux :D | Operating Systems is another must when it comes to DevOps
-Protocols | DHCP, UDP, TCP, HTTP, SSH | Not as an alternative, you can simply learn later: NFS, NTP, FTP | Learn how these protocols work and what they are used for
-Applications | Web Server, Load Balancer, Cache, Database | | Learn how they work and try out some implementations (e.g. MySQL for databases and httpd for web servers)
-[System Design](https://github.com/bregman-arie/system-design-notebook) | Availability, Reliability, Scalability, Performance | Learn how to design infrastructure and systems
+# ⭐ Quick Reference
 
-The second must list :)
-Seriously though, don't try to master everything in this list and start with something that you are interested in. The order has no meaning in this case.
+```text
+FOUNDATION
+├── Linux
+├── Networking
+├── Git
+├── Programming
+└── Bash
 
-Topic | What to learn | Alternatives | Description
-:------|:------|:------|:------:
-Configuration Management and IaC | Ansible and Terraform | CM: Chef, Puppet and Salt. IaC: Pulumi and CloudFormation |
-Cloud | Azure, AWS, GCP | - |
-Containers | Podman and Kubernetes| Docker instead of Podman. Nomad instead of Kubernetes | 
-CI/CD | Jenkins, GitHub Actions | Gitlab CI, Circle CI, Argo CD |
-Logging and Dashboards | Elastic Stack, Report Portal, Grafana | Graylog, Splunk |
-Monitoring | VictoriaMetrics, Prometheus | Nagios, Centreon, Datadog | 
+CONTAINERS
+├── Docker
+├── Podman
+└── Container Registry
 
-### Alternative Roadmaps
+CI/CD
+├── Jenkins
+├── GitHub Actions
+└── GitLab CI
 
-There are other DevOps roadmaps and learning plans out there. If you feel the one above is little bit too much or just want to look at other options, maybe you'll find the following useful
+INFRASTRUCTURE
+├── Terraform
+├── OpenTofu
+├── CloudFormation
+└── Pulumi
 
-Name | Description
-:------|:------:
-[DevOps Roadmap](https://github.com/kamranahmedse/developer-roadmap) | DevOps skills roadmap. What to to learn at each step.
-[DevOps 3 Weeks Plan](https://medium.com/@medineshkatwal/devops-3-week-plan-from-16-oct-2019-to-31st-oct-2019-af486e625f72) | Detailed plan on what to do at each day
-[How to Become a DevOps Engineer in Six Months?](https://spacelift.io/blog/how-to-become-devops-engineer) | Skills you need to become DevOps Engineer
+CONFIGURATION
+└── Ansible
 
-### Learn about DevOps
+CLOUD
+├── AWS
+├── Azure
+├── Google Cloud
+├── IBM Cloud
+└── Oracle Cloud
 
-Name | Description
-:------|:------:
-[What is DevOps? - Amazon](https://aws.amazon.com/devops) | Learn what is DevOps by Amazon and which AWS services can help you to practice DevOps
-[What is DevOps? - Red Hat](https://www.redhat.com/en/topics/devops) | Learn what is DevOps by Red Hat, including many interesting articles
-[What is DevOps? - Microsoft](https://docs.microsoft.com/en-us/azure/devops/learn/what-is-devops) | Learn what is DevOps by Microsofy, including Azure DevOps service
-[What is DevOps? - Google](https://cloud.google.com/devops) | Learn what is DevOps by Google
-[Who is DevOps? - Spacelift](https://spacelift.io/blog/who-is-devops-engineer) | Who is DevOps? Is it Worth it to Become a DevOps Engineer?
+KUBERNETES
+├── Kubernetes
+├── Helm
+├── Ingress
+├── Services
+├── Storage
+└── Networking
 
-### Learn Git
+GITOPS
+├── Argo CD
+└── Flux CD
 
-Make sure you are comfortable with the following list once you done learning Git basics
+SECURITY
+├── SonarQube
+├── Trivy
+├── Vault
+├── OPA
+└── Kyverno
 
-  * Commit changes to a project
-  * Submit pull/merge requests
-  * Working with branches
-  * Rebase changes (change order, squash, ...)
+OBSERVABILITY
+├── Prometheus
+├── Grafana
+├── Loki
+├── Elastic
+└── OpenTelemetry
 
-Name | Description
-:------|:------:
-[Interactive Git Branching Learning](https://learngitbranching.js.org/) | Visual and interactive way to learn Git branching
-[Learn git concepts, not commands](https://dev.to/unseenwizzard/learn-git-concepts-not-commands-4gjc) | Article on Git concepts
-[Codeacademy Learn Git](https://www.codecademy.com/learn/learn-git) | Not Free 
+RELIABILITY
+├── SRE
+├── SLIs
+├── SLOs
+├── Alerting
+└── Incident Management
+```
 
-### Programming
+---
 
-Practicing DevOps without knowing programming is like eating cornflakes with ketchup - it's just doesn't makes sense (yes, my analogies are the worst).<br>
-Here is a list of some good sites to practice programming in general:
+# 🔗 Useful External Resource Collections
 
-Name | Comments
-:------|:------:
-[HackerRank](https://www.hackerrank.com) | Practice Coding skills
-[Exercism](https://exercism.io) | Over 48 languages and 2600 exercises
-[LeetCode](https://leetcode.com) | Practice programming online
+### DevOps Tool Directories
 
-A better approach might be to actually write some DevOps related scripts or projects. Start simple. Here are some ideas:
+* Periodic Table of DevOps Tools
+* DevOps Tool Chest
+* CNCF Cloud Native Landscape
+* DevOps Bookmarks
 
-  * Write a script that gets a number of instances and a name of a platform (AWS, local, Azure, ...) as parameters and provisions those instances on the chosen platform
-  * Write a script to parse logs and extract some specific information you are interested in
-  * Write a script that extracts information from some website using web scraping libraries
+### Learning
 
-### Operating Systems
-
-Deep dive into operation system internals. Linux should be your first choice.
-Here is a list of resources that will help you learn Linux.<br>
-Also, don't waste a second on picking the right distribution. For learning OS concepts and internals, any distribution would work fine.
-
-Name | Comments
-:------|:------:
-[Linux Journey](https://linuxjourney.com) | Written guides + exercises + quiz
-[Techmint Linux](https://www.tecmint.com/free-online-linux-learning-guide-for-beginners) | Written articles/lessons
-[Linux Survival](https://linuxsurvival.com/linux-tutorial-introduction) | Interactive guide
-
-Once you are familiar with the commands and feel comfortable enough to keep deep diving, learn some OS concepts:
-
-  * Memory Management
-  * Processes
-  * Kernel
-  * Virtualization
-  * Storage
-
-#### Linux Master Application
-
-A completely free application for testing your knowledge on Linux
-
-<a href="https://play.google.com/store/apps/details?id=com.codingshell.linuxmaster"><img src="images/linux_master.jpeg"/></a>
+* Linux Journey
+* Learn Git Branching
+* KodeKloud
+* Google Cloud Skills Boost
+* Exercism
+* HackerRank
+* LeetCode
 
 ### System Design
 
-System Design can be a complex topic. For that reason, I've created a separate repository for you to learn it properly.
-
-<p align="center"><a href="https://github.com/bregman-arie/system-design-notebook"><img src="images/system_design_notebook.png"/></a></p>
-
-### Tooling, Apps & Services
-
-Name | Description
-:------|:------:
-[Periodic table of DevOps tools](https://xebialabs.com/periodic-table-of-devops-tools) | Table of DevOps tools per category
-[DevOps tool chest](https://xebialabs.com/the-ultimate-devops-tool-chest/#tool-chest-type) | List of DevOps tools
-[DevOps Bookmarks](http://www.devopsbookmarks.com) | NSIA
-[CNCF Cloud Native Interactive Landscape](https://landscape.cncf.io) | CNCF's recommended path through the cloud native landscape
-[DevOpsBookmarks](https://www.devopsbookmarks.org) | To discover tools in the devops landscape.
-
-## Interactive practice and learning sites
-
-Learning by doing proved to be a very effective way to learn new things. If you are at a point where you don't feel comfortable enough to do it by yourself and you look for some guidance, the following sites might assist you
-
-Name | Description
-:------|:------:
-[Kodekloud Engineer](https://www.kodekloud-engineer.com/) | perform real tasks by working in a fictional organization
-[QWIKLBAS](https://www.qwiklabs.com) | AWS, GCP, ... lab practice
-
-## Community
-
-Another great way to learn is to learn from the experience of others. For that, the are some excellent DevOps communities.
-
-Name | Comments
-:------|:------:
-[Reddit DevOps](https://www.reddit.com/r/devops) | Reddit DevOps Community 
-[Linkedin DevOps](https://www.linkedin.com/groups/2825397) | Linkedin DevOps Community
-[DevOps Bits](https://www.facebook.com/groups/538897960007080) | Facebook DevOps group. Disclosure: I started it :)
-
-## Conferences
-
-Name | Comments
-:------|:------:
-[DevOpsDays](https://devopsdays.org) | DevOps Conferences around the world
-[Velocity](https://conferences.oreilly.com/velocity) | Oracle's DevOps conference
-
-## Books
-
-Read book! Practice is important and the best way to learn practical things but reading about cultures, methods, concepts, ... has its own important role in your path towards mastering DevOps and SRE.
-
-Name | Comments
-:------|:------:
-[The Phoenix Project](https://www.amazon.com/Phoenix-Project-DevOps-Helping-Business/dp/1942788290) | DevOps explained through a story of a fictional company on the brink of a failure
-[The DevOps Handbook](https://www.amazon.com/dp/1942788002) |
-[Google SRE books](https://landing.google.com/sre/books) | Very detailed books on the theory and also practice of SRE
-[Essential Infrastructure as Code](https://www.manning.com/books/essential-infrastructure-as-code) | VBook about automating software infrastructure by capturing desired configurations as a set of scripts.
-
-## Blogs & News
-
-My top picks:
-
-Name | Description
-:------|:------:
-[Codefresh Blog](https://codefresh.io/blog) | Probably best GitOps content out there
-
-Other DevOps & Software Engineering related blogs
-
-Name | Description
-:------|:------:
-[Spacelift Blog](https://spacelift.io/blog) | Excellent tech blog on Kubernetes, Ansible, Terraform and Engineering in general
-[opensource.com](https://opensource.com) | open source related articles including DevOps
-[CooperPress](https://cooperpress.com/publications) | various newsletters on different topics
-[afreshcup](https://afreshcup.com) | "covering Ruby on Rails and whatever else I find interesting in the universe of software"
-[thisweekindevops.com](https://thisweekindevops.com) | "DevOps news without the hype"
-[Uber Engineering](https://eng.uber.com/) | Not only DevOps
-[Azure DevOps Blog](https://devblogs.microsoft.com/devops) | Microsoft DevOps Blog
-[DevOps Dudes](https://medium.com/devops-dudes) | "Shortening the system development life cycle"
-[Netflix Tech Blog](https://netflixtechblog.com/tagged/devops) | Not Only DevOps
-[CloudBees Blog](https://www.cloudbees.com/blog) |
-[Red Hat Blog](https://www.redhat.com/en/blog) | Not only DevOps
-[Atlassian DevOps Blog](https://www.atlassian.com/blog/devops) |
-[Facebook Engineering Blog](https://engineering.fb.com) | Not only DevOps
-[DoorDash Engineering Blog](https://doordash.engineering) | Not only DevOps
-[Palark tech blog](https://blog.palark.com/) | Tech blog dedicated to DevOps & SRE
-
-## Articles
-
-Name | Description
-:------|:------:
-[Infrastructure as Code, Part One](https://crate.io/a/infrastructure-as-code-part-one) |
-[DevOps Best Practices](https://gist.github.com/jpswade/4135841363e72ece8086146bd7bb5d91) | What is DevOps + list of resources
-[Infrastructure as Code: Examples, Best Practices & Tools](https://spacelift.io/blog/infrastructure-as-code) |
-
-## DevOps Snippets
-
-Name | Description
-:------|:------:
-[DevOpsnipp](https://www.devopsnipp.com/) | Sharing DevOps Snippets
-[Gist](https://gist.github.com) | Not DevOps specific
-
-## Other Great Projects
-
-Name | Comments
-:------|:------:
-[DevOps Wiki](https://github.com/Leo-G/DevopsWiki) | "A wiki of Devops Tools, Tutorials and Scripts"
-[cheat-sheet-pdf](https://github.com/sk3pp3r/cheat-sheet-pdf) | "Cheat-Sheet Collection for DevOps, Engineers, IT and more"
-[System Design Primer](https://github.com/donnemartin/system-design-primer) | "Learn how to design large-scale systems. Prep for the system design interview. Includes Anki flashcards."
-[awesome-sre](https://github.com/dastergon/awesome-sre) | A curated list of Site Reliability and Production Engineering resources
-
-## Interview Questions
-
-Name | Comments
-:------|:------:
-[System Design Primer](https://github.com/donnemartin/system-design-primer) | "Learn how to design large-scale systems. Prep for the system design interview. Includes Anki flashcards."
-kdn251 | [Interviews](https://github.com/kdn251/interviews) | 
-[DevOps Exercises](https://github.com/bregman-arie/devops-exercises) | By topic, DevOps related questions and exercises
-
-## Misc
-
-Name | Description
-:------|:------:
-[CheatSheets](https://cheatsheet.dennyzhang.com) | CheatSeets for Kubernetes, Jenkins, YAML, Groovy, etc.
-[Codelabs](https://codelabs.transcend.io) | "Codelabs provide a guided, tutorial, hands-on coding experience"
-
-## Design & Architecture
-
-Name | Description
-:------|:------:
-[The 12 Factor App](https://12factor.net) | must-read in my opinion 
-[A distributed Systems Reading List](https://dancres.github.io/Pages/?fbclid=IwAR2gapLU03iaxH4NDotc0LD_GiXOkyByfMT3iwufofUOEfCKEVwmezE3vCw)
-
-## DevOps Tooling
-
-- [ ] CI/CD
-  - [ ] [Jenkins](https://www.jenkins.io/) (Managed & on-premise, Containers supported, Plugins)
-  - [ ] [GitHub Actions](https://docs.github.com/en/actions) (Hosted service)
-  - [ ] [Travis](https://travis-ci.org/) (Hosted service)
-  - [ ] [CircleCI](https://circleci.com/) (Hosted service)
-  - [ ] [GitLab CI](https://docs.gitlab.com/ee/ci/) (Hosted service and on-premise)
-  - [ ] [Bamboo](https://www.atlassian.com/software/bamboo) (Managed service and on-premise)
-  - [ ] [BuildKite](https://buildkite.com) (Hosted)
-  - [ ] [Zuul](https://zuul-ci.org/docs/zuul) (Hosted and on-premise)
-  - [ ] [Drone](https://www.drone.io)
-  - [ ] [Tekton](https://cloud.google.com/tekton)
-  - [ ] [Argo CD](https://argoproj.github.io/argo-cd)
-  - [ ] [werf](https://werf.io/)
-
-Note: "Provisioning" tools can be used to perform configuration management to some extent. The same applies for configuration management tools, which can be used for pprovisioning.
-
-- [ ] Provisioning
-  - [ ] Terraform (Open Source)
-  - [ ] CloudFormation (Available only on AWS)
-  - [ ] Pulumi (Open Source)
-
-- [ ] Configuration Management (all Open Source)
-  - [ ] Ansible (Agentless, Mutable Infrastructure, Procedural)
-  - [ ] Puppet (Agent, Mutable Infrastructure, Procedural)
-  - [ ] Chef (Mutable Infrastructure)
-  - [ ] Saltstack (Mutable Infrastructure)
-  - [ ] [Spacelift](https://spacelift.io/) (`$$$`)
-
-- [ ] Images
-  - [ ] [diskimage-builder](https://github.com/openstack/diskimage-builder)
-  - [ ] [Packer](https://www.packer.io)
-
-- [ ] Cloud
-  - [ ] AWS
-  - [ ] Azure
-  - [ ] GCP
-  - [ ] OpenStack
- 
-- [ ] Monitoring
-  - [ ] [AppDynamics](https://www.appdynamics.com/product/infrastructure-monitoring)
-  - [ ] [Datadog](https://www.datadoghq.com/)
-  - [ ] [Dynatrace](https://www.dynatrace.com/platform/infrastructure-monitoring/)
-  - [ ] [Monit](https://mmonit.com/monit/)
-  - [ ] [Nagios](https://www.nagios.org/)
-  - [ ] [Centreon](https://www.centreon.com/centreon-editions/centreon-open-source/)
-  - [ ] [New Relic](https://newrelic.com/)
-  - [ ] [Prometheus](https://prometheus.io)
-  - [ ] [Sensu](https://sensu.io/)
-  - [ ] [SolarWinds](https://www.solarwinds.com/server-application-monitor)
-  - [ ] [Statuscake](https://www.statuscake.com) - Website Uptime & Performance
-  - [ ] [VictoriaMetrics](https://victoriametrics.com/) - a fast, cost-effective and scalable monitoring solution and time series database.
-  - [ ] [Zabbix](https://www.zabbix.com/)
-
-- [ ] Collector of Metrics by agent
-  - [ ] [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
-
- Monitoring
-
-- [ ] Log Management
-  - [ ] Logstash
-  - [ ] Graylog
-  - [ ] Papertrail
-  - [ ] Fluentd
-  - [ ] [Splunk](https://www.splunk.com)
-  - [ ] [SumoLogic](https://www.sumologic.com)
-
-- [ ] Log aggregation system
-  - [ ] [Loki](https://grafana.com/oss/loki/)
-
-- [ ] Dashboards
-  - [ ] Grafana
-  - [ ] Kibana (Elastic)
-  - [ ] Report Portal (Mostly for Test Automation)
-
-- [ ] Security
-  - [ ] [Vault](https://www.vaultproject.io) - "Secure, store and tightly control access to tokens, passwords, certificates, encryption keys for protecting secrets..."
-  - [ ] [Open Policy Agent](https://www.openpolicyagent.org) - "Flexible, fine-grained control for administrators across the stack"
-
-- [ ] Code review 
-  - [ ] Gerrit - Code Review system
-  - [ ] PullPanda - A collection of Tools such as reminder & analytics
-  - [ ] Review Board
-
-- [ ] Issue Tracking
-  - [ ] Jira
-  - [ ] Bugzilla
-
-- [ ] Code coverage
-  - [ ] Cobertura
-  - [ ] Clover
-  - [ ] JaCoCo
-
-- [ ] Data Processors
-  - [ ] Spark
-  - [ ] Apache Hadoop
-  - [ ] Apache Airflow
-  - [ ] Presto
-
-- [ ] Analytics Engines
-  - [ ] Druid
-  - [ ] Dremio
-  - [ ] Snowflake
-
-- [ ] Operations Data
-  - [ ] Salesforce
-  - [ ] Zuora
-
-- [ ] Containers Orchestration
-  - [ ] Kubernetes
-  - [ ] OpenShift
-  - [ ] Nomad
-
-- [ ] Alerting
-  - [ ] PagerDuty
-  - [ ] ServiceNow
-  - [ ] Slack (Mostly used for IM)
-
-- [ ] Metric Storage
-  - [ ] InfluxDB
-  - [ ] Splunk
-  - [ ] Cloud Storage services and Databases
-
-## More Infra & DevOps projects
-
-<p align="center"><a href="https://github.com/bregman-arie/sre-checklist"><img width="500px" src="images/sre_checklist.png"/></a></p>
-<p align="center"><a href="https://github.com/bregman-arie/howtheydevops"><img src="images/how_they_devops.png"/></a></p>
-<p align="center"><a href="https://github.com/bregman-arie/devops-exercises"><img src="images/devops_exercises.png"/></a></p>
-<p align="center"><a href="https://github.com/bregman-arie/infraverse"><img src="images/infraverse.png"/></a></p>
-
-## Credits
-
-Images and icons attribution can be found [here](credits.md)
-
-## License
-
-[![License: CC BY-NC-ND 3.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%203.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/3.0/)
----
-## Roadmaps
-
-<div align="center"><img src="images/linux_map.png"></div><hr/>
-
-<div align="center"><img src="images/python_map.png"></div><hr/>
-
-<div align="center"><img src="images/jenkins_map.png"></div><hr/>
-
-<div align="center"><img src="images/terraform_map.png"></div><hr/>
-
-----
-
+* System Design Primer
+* System Design Notebook
+* Distributed Systems Reading List
 
 ---
 
-## How to Contribute to the DevOps Tools List
+# 🗺️ Roadmap Visuals
 
-We welcome contributions to our curated list of DevOps tools! If you'd like to add or update information, please follow these guidelines:
+If this repository contains roadmap images, keep them in the `images/` directory and link them here.
 
-### Use Pull Requests
+Recommended roadmap visuals:
 
-Use pull requests to contribute to the project. Make sure to adhere to the following format:
+```text
+images/
+├── linux_map.png
+├── python_map.png
+├── jenkins_map.png
+└── terraform_map.png
+```
 
-<details>
-<summary>Category Name</summary>
+Example:
 
-* **[Tool Name](Tool URL)** (License Type): Short description of the tool.
-</details>
+```html
+<div align="center">
+  <img src="images/linux_map.png" alt="Linux Roadmap">
+</div>
+```
 
-### What to Include
+---
 
-* Ensure that the tool fits into one of the existing categories or propose a new category if necessary.
-* Include the name, URL, license type (e.g., Open Source, Free, Enterprise), and a brief description of the tool.
+# 📜 License
 
-### What to Avoid
+If this repository combines material from multiple external projects, articles, or resource collections, verify the license and attribution requirements of each source before redistributing copied content.
 
-* Avoid adding tools that don't fit into the DevOps landscape or the existing categories.
-* Don't copy descriptions from other sources without proper attribution or modification.
+For original content created specifically for this repository, choose an appropriate license and add the corresponding license file.
 
-### Final Thoughts
+---
 
-Your contributions help make this a valuable resource for the DevOps community! By following these guidelines, you ensure consistency and quality across the content. If you have any questions or need further assistance, please don't hesitate to reach out to the maintainers.
+# ⭐ Support the Project
 
-Thank you for contributing to our project!
+If this collection helps you learn DevOps:
+
+* ⭐ Star the repository
+* 🍴 Fork it
+* 🐛 Report broken links
+* 💡 Suggest useful resources
+* 🔧 Submit improvements
+* 📚 Share useful learning material
+
+---
+
+# 🚀 Keep Learning
+
+DevOps is a continuous learning process.
+
+Start small:
+
+```text
+Learn
+  ↓
+Practice
+  ↓
+Build
+  ↓
+Break
+  ↓
+Troubleshoot
+  ↓
+Automate
+  ↓
+Monitor
+  ↓
+Improve
+```
+
+The objective is not to memorize hundreds of tools.
+
+The objective is to understand:
+
+> **What problem does this tool solve, where does it fit in the workflow, and how does it connect with the other parts of the system?**
+
+Happy Learning! 🚀
